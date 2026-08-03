@@ -14,21 +14,22 @@ import { describe, expect, it, vi } from 'vitest';
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import { createNativeLeftToolRailLayout, resolveNativeLeftToolRailToggleHitRect } from '../utils/leftToolRailLayout';
 import {
+  resolveNativeCrosshairContextMenuButtonLayout,
+  resolveNativeCrosshairPriceLabelText,
+} from './nativeCrosshairContextMenu';
+import {
   createNativeCrosshairContextMenuTapGesture,
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
   createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
-import {
-  resolveNativeCrosshairContextMenuButtonLayout,
-  resolveNativeCrosshairPriceLabelText,
-} from './nativeCrosshairContextMenu';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import {
   NATIVE_RESET_VIEW_HIT_SIZE,
   NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE,
   resolveNativeResetViewButtonLayout,
 } from './nativeResetViewButton';
+import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
   createNativeResetViewTapGesture,
@@ -144,6 +145,13 @@ function resetTapState() {
   };
 }
 
+function tapClaimState() {
+  return {
+    claimedSequence: shared(0),
+    sequence: shared(0),
+  };
+}
+
 const frame = createNativeChartFrameFromPanes({
   dimensions: { width: 220, height: 180, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
   panes: [{ id: 'main', type: 'main', top: 36, height: 104, yMin: 62_000, yMax: 64_000 }],
@@ -202,6 +210,49 @@ describe('native gesture activation', () => {
 
     crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
     expect(crosshair.visible.value).toBe(false);
+  });
+
+  it('defers crosshair taps so drawing selection can claim the release', () => {
+    vi.useFakeTimers();
+    try {
+      const crosshair = createCrosshair();
+      const viewport = sharedViewport(viewportValue);
+      const tradeLineRows = shared([]);
+      const tradeLineActionZones = shared([]);
+      const orderDragZones = shared([]);
+      const tapClaim = tapClaimState();
+      const crosshairTapGesture = createNativeCrosshairTapGesture({
+        crosshair,
+        frame,
+        orderDragZones,
+        sharedViewport: viewport,
+        tapClaim,
+        tradeLabelHeight: 18,
+        tradeLineActionZones,
+        tradeLineRows,
+      }) as any;
+
+      crosshairTapGesture.handlers.onTouchesDown({
+        changedTouches: [{ x: 80, y: 60 }],
+        allTouches: [{ x: 80, y: 60 }],
+      });
+      crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
+      claimNativeTap(tapClaim);
+      vi.runOnlyPendingTimers();
+      expect(crosshair.visible.value).toBe(false);
+
+      crosshairTapGesture.handlers.onTouchesDown({
+        changedTouches: [{ x: 82, y: 62 }],
+        allTouches: [{ x: 82, y: 62 }],
+      });
+      crosshairTapGesture.handlers.onEnd({ x: 82, y: 62 }, true);
+      vi.runOnlyPendingTimers();
+      expect(crosshair.visible.value).toBe(true);
+      expect(crosshair.x.value).toBe(82);
+      expect(crosshair.y.value).toBe(62);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('toggles crosshair after a stationary long press using the tap interaction rules', () => {

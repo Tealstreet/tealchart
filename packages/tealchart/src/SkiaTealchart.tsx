@@ -1,3 +1,4 @@
+import type { SkImage } from '@shopify/react-native-skia';
 import type { WorkerError } from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEventListener,
@@ -8,8 +9,8 @@ import type {
 } from './drawings';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
-import type { ChartThemeInput } from './theme';
 import type { ChartSettings } from './state/chartState';
+import type { ChartThemeInput } from './theme';
 import type { ISaveLoadAdapter } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
@@ -20,8 +21,6 @@ import type {
   ResolutionString,
   Viewport,
 } from './types';
-
-import type { SkImage } from '@shopify/react-native-skia';
 
 import React, {
   forwardRef,
@@ -63,11 +62,11 @@ import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
-import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
+import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
   shouldDimNativeRenderForTransition,
@@ -76,8 +75,8 @@ import {
 } from './mobile/render/nativeRenderTransition';
 import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
 import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
-import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { NativeUserDrawingSelectionActionOverlay } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
+import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
 import {
@@ -241,7 +240,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         saveLoadAdapter: save_load_adapter,
         storage: uiPreferencesStorage,
       }),
-    [auto_save_delay, chartKey, disable_default_layout_persistence, propSymbol, save_load_adapter, uiPreferencesStorage],
+    [
+      auto_save_delay,
+      chartKey,
+      disable_default_layout_persistence,
+      propSymbol,
+      save_load_adapter,
+      uiPreferencesStorage,
+    ],
   );
   const chartStore = useMemo(
     () =>
@@ -637,7 +643,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     ],
   );
   const handleNativeUserDrawingSelectionTap = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, claimTap: () => void) => {
       if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return;
       const selectionPoint = resolveNativeUserDrawingSelectionPoint({
         bars: nativeRenderBars,
@@ -648,7 +654,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         y,
       });
       if (!selectionPoint) return;
-      selectNativeUserDrawingAtPoint(selectionPoint.point, selectionPoint.spacesByPaneId);
+      const result = selectNativeUserDrawingAtPoint(selectionPoint.point, selectionPoint.spacesByPaneId);
+      if (result.hit || result.changed) claimTap();
     },
     [
       frame,
@@ -1026,10 +1033,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           </GestureDetector>
         </View>
       ) : null}
-      <Canvas
-        style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]}
-        pointerEvents="none"
-      >
+      <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
         {resizeSnapshot ? (
           <SkiaImage
             fit="fill"
