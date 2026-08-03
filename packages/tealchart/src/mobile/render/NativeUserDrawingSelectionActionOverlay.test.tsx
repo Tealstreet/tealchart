@@ -2,16 +2,15 @@ import type { ReactElement, ReactNode } from 'react';
 import type { UserDrawingSelectionActionAnchor, UserDrawingState } from '../../drawings';
 import type { NativeUserDrawingSelectionActionOverlayProps } from './NativeUserDrawingSelectionActionOverlay';
 
+import { Pressable, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
-import { Pressable, ScrollView } from 'react-native';
 
-import {
-  DEFAULT_USER_DRAWING_STYLE,
-  createUserDrawingState,
-} from '../../drawings';
+import { createUserDrawingState, DEFAULT_USER_DRAWING_STYLE } from '../../drawings';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
 import {
   NativeUserDrawingSelectionActionOverlayImpl,
+  resolveNativeSelectedDrawingActionControlZones,
+  resolveNativeSelectedDrawingActionHitTarget,
   resolveNativeSelectedDrawingActionOverlayModel,
 } from './NativeUserDrawingSelectionActionOverlay';
 
@@ -94,7 +93,9 @@ function createSelectedTextDrawingState() {
   });
 }
 
-function createOverlayStateProps(state: UserDrawingState): Pick<
+function createOverlayStateProps(
+  state: UserDrawingState,
+): Pick<
   NativeUserDrawingSelectionActionOverlayProps,
   | 'userDrawingDefaultStylesByKind'
   | 'userDrawingDraft'
@@ -168,34 +169,67 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
   });
 
   it('resolves no action model without a selected drawing', () => {
-    expect(
-      resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps({}, createUserDrawingState())),
-    ).toBeNull();
+    expect(resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps({}, createUserDrawingState()))).toBeNull();
   });
 
   it('can open the shared style popover group', () => {
     const overlay = renderOverlay({ openPopoverGroupId: 'style' });
-    const scrollViews = collectElementsByType(overlay, ScrollView);
+    const views = collectElementsByType(overlay, View);
     const lineWidthButton = collectElementsByType(overlay, Pressable).find(
       (pressable) => pressable.props.accessibilityLabel === '3 pixel line width',
     );
 
-    expect(
-      scrollViews.some(
-        (scrollView) => scrollView.props.accessibilityLabel === 'Selected drawing style controls',
-      ),
-    ).toBe(true);
+    expect(views.some((view) => view.props.accessibilityLabel === 'Selected drawing style controls')).toBe(true);
     expect(lineWidthButton).not.toBeUndefined();
   });
 
   it('resolves the active popover group in the action model', () => {
-    const model = resolveNativeSelectedDrawingActionOverlayModel(
-      createOverlayProps({ openPopoverGroupId: 'style' }),
-    );
+    const model = resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps({ openPopoverGroupId: 'style' }));
 
     expect(model?.activePopoverGroup?.id).toBe('style');
     expect(model?.surfaceWidth).toBeGreaterThan(0);
     expect(model?.position.left).toBeGreaterThanOrEqual(0);
+  });
+
+  it('resolves native gesture control zones for the toolbar and active popover', () => {
+    const closedModel = resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps());
+    const closedZones = resolveNativeSelectedDrawingActionControlZones(closedModel);
+    const openModel = resolveNativeSelectedDrawingActionOverlayModel(
+      createOverlayProps({ openPopoverGroupId: 'style' }),
+    );
+    const openZones = resolveNativeSelectedDrawingActionControlZones(openModel);
+
+    expect(closedZones).toHaveLength(1);
+    expect(closedZones[0].x1).toBeLessThanOrEqual(closedModel!.position.left);
+    expect(closedZones[0].x2).toBeGreaterThanOrEqual(closedModel!.position.left + closedModel!.surfaceWidth);
+    expect(closedZones[0].y1).toBeLessThanOrEqual(closedModel!.position.top);
+    expect(openZones).toHaveLength(2);
+    expect(openZones[1].y1).toBeGreaterThan(openZones[0].y1);
+    expect(openZones[1].x1).toBe(openZones[0].x1);
+    expect(openZones[1].x2).toBe(openZones[0].x2);
+  });
+
+  it('resolves native selected drawing action hits from toolbar coordinates', () => {
+    const model = resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps());
+    const duplicateTarget = resolveNativeSelectedDrawingActionHitTarget({
+      model: model!,
+      x: 18,
+      y: 18,
+    });
+    const deleteTarget = resolveNativeSelectedDrawingActionHitTarget({
+      model: model!,
+      x: 78,
+      y: 18,
+    });
+
+    expect(duplicateTarget).toMatchObject({
+      label: 'Duplicate selected drawing',
+      type: 'action',
+    });
+    expect(deleteTarget).toMatchObject({
+      label: 'Delete selected drawing',
+      type: 'action',
+    });
   });
 
   it('does not expose native text edit without a native text editor', () => {
@@ -211,9 +245,7 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     const model = resolveNativeSelectedDrawingActionOverlayModel(
       createOverlayProps({}, createSelectedTextDrawingState()),
     );
-    const commandTypes = model?.groups.flatMap((group) =>
-      group.items.map((item) => item.command.type),
-    ) ?? [];
+    const commandTypes = model?.groups.flatMap((group) => group.items.map((item) => item.command.type)) ?? [];
 
     expect(commandTypes).not.toContain('editText');
     expect(commandTypes).not.toContain('openObjectTree');

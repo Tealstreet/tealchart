@@ -49,11 +49,11 @@ import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
-import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
+import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
   shouldDimNativeRenderForTransition,
@@ -62,8 +62,12 @@ import {
 } from './mobile/render/nativeRenderTransition';
 import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
 import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
+import {
+  NativeUserDrawingSelectionActionOverlay,
+  resolveNativeSelectedDrawingActionControlZones,
+  resolveNativeSelectedDrawingActionOverlayModel,
+} from './mobile/render/NativeUserDrawingSelectionActionOverlay';
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
-import { NativeUserDrawingSelectionActionOverlay } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
 import { useNativeTealchartCoreRuntime } from './mobile/useNativeTealchartCoreRuntime';
@@ -590,6 +594,70 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [nativePriceLines],
   );
   const nativeCountdownNowMs = useNativeCountdownClock(nativeCountdownEnabled);
+  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
+  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
+  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
+  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
+  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
+  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
+  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
+    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
+    return resolveUserDrawingSelectionActionAnchorFromDrawings({
+      drawings: nativeUserDrawingDrawings,
+      selection: nativeUserDrawingSelection,
+      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+    });
+  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
+  const nativeSelectionActionLeftInset = leftToolRailLayout?.collapsed
+    ? 16
+    : (leftToolRailLayout?.railRect.width ?? 0) + 8;
+  const nativeSelectionActionTopInset = showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8;
+  const nativeUserDrawingSelectionActionModel = useMemo(
+    () =>
+      frame && nativeUserDrawingSelectionActionAnchor
+        ? resolveNativeSelectedDrawingActionOverlayModel({
+            activeBackgroundColor: gridColor,
+            activeTextColor: options.upColor,
+            anchor: nativeUserDrawingSelectionActionAnchor,
+            backgroundColor,
+            bottomInset: 8,
+            gridColor,
+            leftInset: nativeSelectionActionLeftInset,
+            mutedTextColor: nativeMutedTextColor,
+            onAction: handleNativeSelectedDrawingAction,
+            onPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
+            openPopoverGroupId: nativeSelectedActionPopoverGroupId,
+            rightInset: 8,
+            textColor,
+            topInset: nativeSelectionActionTopInset,
+            userDrawingDefaultStylesByKind: nativeUserDrawingDefaultStylesByKind,
+            userDrawingDraft: nativeUserDrawingDraft,
+            userDrawingDrawings: nativeUserDrawingDrawings,
+            userDrawingSelection: nativeUserDrawingSelection,
+            userDrawingTextEdit: nativeUserDrawingTextEdit,
+            viewportHeight: frame.dimensions.height,
+            viewportWidth: frame.dimensions.width,
+          })
+        : null,
+    [
+      backgroundColor,
+      frame,
+      gridColor,
+      handleNativeSelectedDrawingAction,
+      nativeMutedTextColor,
+      nativeSelectedActionPopoverGroupId,
+      nativeSelectionActionLeftInset,
+      nativeSelectionActionTopInset,
+      nativeUserDrawingDefaultStylesByKind,
+      nativeUserDrawingDraft,
+      nativeUserDrawingDrawings,
+      nativeUserDrawingSelection,
+      nativeUserDrawingSelectionActionAnchor,
+      nativeUserDrawingTextEdit,
+      options.upColor,
+      textColor,
+    ],
+  );
 
   const isNativeTradeLineTouchTarget = useCallback(
     (x: number, y: number) => {
@@ -656,6 +724,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       });
     }
 
+    zones.push(...resolveNativeSelectedDrawingActionControlZones(nativeUserDrawingSelectionActionModel));
+
     return zones;
   }, [
     frame,
@@ -664,6 +734,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
     nativeResetViewButtonVisible,
+    nativeUserDrawingSelectionActionModel,
     topBarLayout,
   ]);
   const handleNativeResetViewTap = useCallback(
@@ -737,12 +808,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineActionZones,
     tradeLineRows,
   });
-  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
-  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
-  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
-  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
-  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
-  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const nativeUserDrawingRenderEntries = useMemo(
     () =>
       resolveUserDrawingRenderEntriesFromSlices({
@@ -757,15 +822,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeUserDrawingDraftAnchorColor = nativeUserDrawingDraft?.style.lineColor;
   const nativeCanvasLoading = nativeRenderTransitionPending && nativeRenderBars.length > 0;
   const nativeLegendLoading = nativeRenderTransitionPending || isLoadingMoreBars;
-
-  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
-    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
-    return resolveUserDrawingSelectionActionAnchorFromDrawings({
-      drawings: nativeUserDrawingDrawings,
-      selection: nativeUserDrawingSelection,
-      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
-    });
-  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
 
   return (
     <View style={[styles.container, { backgroundColor }]} onLayout={onLayout}>
@@ -864,14 +920,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           backgroundColor={backgroundColor}
           bottomInset={8}
           gridColor={gridColor}
-          leftInset={leftToolRailLayout?.collapsed ? 16 : (leftToolRailLayout?.railRect.width ?? 0) + 8}
+          leftInset={nativeSelectionActionLeftInset}
           mutedTextColor={nativeMutedTextColor}
           onAction={handleNativeSelectedDrawingAction}
           onPopoverGroupChange={setNativeSelectedActionPopoverGroupId}
           openPopoverGroupId={nativeSelectedActionPopoverGroupId}
           rightInset={8}
           textColor={textColor}
-          topInset={showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8}
+          topInset={nativeSelectionActionTopInset}
           userDrawingDefaultStylesByKind={nativeUserDrawingDefaultStylesByKind}
           userDrawingDraft={nativeUserDrawingDraft}
           userDrawingDrawings={nativeUserDrawingDrawings}
