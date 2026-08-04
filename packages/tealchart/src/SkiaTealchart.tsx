@@ -597,7 +597,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [applyNativeViewport, chartApi, chartStore, interval, replaceNativeUserDrawingState, symbol],
   );
   const nativeLayoutSettings = createNativeChartLayoutSettings({
-    autoScale: priceAutoScale.active.value,
+    autoScale: nativeAutoScaleEnabled,
     chartType: 'candle',
     indicators: indicatorManager?.getLayoutIndicators() ?? [],
     interval: interval as ResolutionString,
