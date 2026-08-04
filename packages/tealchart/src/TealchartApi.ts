@@ -13,9 +13,9 @@ import {
 } from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
+  Awaitable,
   BracketConfig,
   BracketPnlCalculator,
-  Awaitable,
   CrossHairMovedEventParams,
   EnhancedCrossHairState,
   ExecutionDirection,
@@ -26,13 +26,13 @@ import {
   InternalExecutionLineAdapter,
   InternalOrderLineAdapter,
   InternalPositionLineAdapter,
-  OemsActionCallback,
-  OemsActionResult,
-  OemsPriceActionCallback,
   IStudyApi,
   ISubscription,
   ITimeScaleApi,
   LibrarySymbolInfo,
+  OemsActionCallback,
+  OemsActionResult,
+  OemsPriceActionCallback,
   OrderLineLengthUnit,
   OrderLineOptions,
   OrderLineRenderData,
@@ -114,6 +114,7 @@ export interface StudyCreateRequest {
 }
 
 export type StudyCreateCallback = (request: StudyCreateRequest) => Promise<boolean>;
+export type StudyVisibilityCallback = (studyId: string, isVisible: boolean) => void;
 
 export interface TealchartApiLineRenderSnapshot {
   orderLines: OrderLineRenderData[];
@@ -354,7 +355,11 @@ function createAdapterPriceCallback<TAdapter>(
   callback?: unknown,
 ): OemsPriceActionCallback {
   if (typeof callbackOrData === 'function') {
-    const handler = callbackOrData as (this: TAdapter, price: number, partialPercent?: number) => Awaitable<OemsActionResult>;
+    const handler = callbackOrData as (
+      this: TAdapter,
+      price: number,
+      partialPercent?: number,
+    ) => Awaitable<OemsActionResult>;
     return (price, partialPercent) => handler.call(adapter, price, partialPercent);
   }
 
@@ -405,6 +410,7 @@ export class TealchartApi {
   private _studyIdCounter = 0;
   private _onStudyCreate?: StudyCreateCallback;
   private _onStudyRemove?: (studyId: string) => void;
+  private _onStudyVisibilityChange?: StudyVisibilityCallback;
 
   // Callback for when symbol/interval changes need to propagate to widget
   private _onSymbolChange?: (symbol: string) => void;
@@ -1762,7 +1768,7 @@ export class TealchartApi {
     const study = this._studies.get(studyId);
     if (study) {
       study.isVisible = !study.isVisible;
-      // TODO: Trigger re-render/re-execute with visibility change
+      this._onStudyVisibilityChange?.(studyId, study.isVisible);
     }
   }
 
@@ -1771,6 +1777,7 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
+    const api = this;
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {
@@ -1783,7 +1790,9 @@ export class TealchartApi {
 
       // Extended methods for full control
       remove(): void {
-        studies.delete(studyId);
+        if (studies.delete(studyId)) {
+          api._onStudyRemove?.(studyId);
+        }
       },
 
       setInputs(inputs: Record<string, unknown>): void {
@@ -1820,6 +1829,13 @@ export class TealchartApi {
    */
   setOnStudyRemove(callback: (studyId: string) => void): void {
     this._onStudyRemove = callback;
+  }
+
+  /**
+   * @internal Set callback for study visibility changes (called by widget)
+   */
+  setOnStudyVisibilityChange(callback: StudyVisibilityCallback): void {
+    this._onStudyVisibilityChange = callback;
   }
 
   /**

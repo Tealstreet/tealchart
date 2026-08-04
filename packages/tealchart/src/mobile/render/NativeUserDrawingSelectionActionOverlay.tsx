@@ -10,6 +10,7 @@ import type {
   UserDrawingState,
   UserDrawingTextEdit,
 } from '../../drawings';
+import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 
 import React from 'react';
 
@@ -67,25 +68,18 @@ export interface NativeSelectedDrawingActionOverlayModel extends NativeSelectedD
   surfaceHeight: number;
 }
 
-export type NativeSelectedDrawingActionHitTarget =
+export type NativeSelectedDrawingActionCommand =
   | {
       command: UserDrawingSelectedActionSurfaceCommand;
-      enabled: boolean;
       type: 'command';
-      x1: number;
-      x2: number;
-      y1: number;
-      y2: number;
     }
   | {
       groupId: UserDrawingSelectedActionSurfaceGroupId;
       nextGroupId: UserDrawingSelectedActionSurfaceGroupId | null;
       type: 'popoverTrigger';
-      x1: number;
-      x2: number;
-      y1: number;
-      y2: number;
     };
+
+export type NativeSelectedDrawingActionHitTarget = NativeOverlayActionHitTarget<NativeSelectedDrawingActionCommand>;
 
 function isNativeSelectedDrawingActionSupported(command: UserDrawingSelectedActionSurfaceCommand): boolean {
   switch (command.type) {
@@ -286,9 +280,11 @@ function appendActionHitTargetsForGroups({
       if (rect) {
         targets.push({
           ...rect,
-          groupId: group.id,
-          nextGroupId: openPopoverGroupId === group.id ? null : group.id,
-          type: 'popoverTrigger',
+          command: {
+            groupId: group.id,
+            nextGroupId: openPopoverGroupId === group.id ? null : group.id,
+            type: 'popoverTrigger',
+          },
         });
       }
       cursor += ACTION_SIZE;
@@ -300,9 +296,11 @@ function appendActionHitTargetsForGroups({
       if (rect) {
         targets.push({
           ...rect,
-          command: item.command,
+          command: {
+            command: item.command,
+            type: 'command',
+          },
           enabled: item.enabled,
-          type: 'command',
         });
       }
       cursor += ACTION_SIZE + ACTION_GAP;
@@ -358,7 +356,6 @@ function renderActionButton({
   gridColor,
   item,
   mutedTextColor,
-  onAction,
   textColor,
 }: {
   activeBackgroundColor: string;
@@ -367,7 +364,6 @@ function renderActionButton({
   gridColor: string;
   item: UserDrawingSelectedActionSurfaceItem;
   mutedTextColor: string;
-  onAction: (command: UserDrawingSelectedActionSurfaceCommand) => void;
   textColor: string;
 }) {
   const iconName = resolveDrawingSelectedActionIconName(item.command, item.swatchColor);
@@ -381,9 +377,6 @@ function renderActionButton({
       disabled={!item.enabled}
       hitSlop={ACTION_HIT_SLOP}
       key={`native-selected-drawing-action-${item.id}`}
-      onPress={() => {
-        onAction(item.command);
-      }}
       style={[
         styles.actionButton,
         {
@@ -421,8 +414,6 @@ function NativeUserDrawingSelectionActionOverlayView({
   gridColor,
   model,
   mutedTextColor,
-  onAction,
-  onPopoverGroupChange,
   openPopoverGroupId = null,
   textColor,
 }: NativeUserDrawingSelectionActionOverlayProps & {
@@ -474,9 +465,6 @@ function NativeUserDrawingSelectionActionOverlayView({
                   accessibilityRole="button"
                   accessibilityState={{ expanded: openPopoverGroupId === group.id }}
                   hitSlop={ACTION_HIT_SLOP}
-                  onPress={() => {
-                    onPopoverGroupChange(openPopoverGroupId === group.id ? null : group.id);
-                  }}
                   style={[
                     styles.actionButton,
                     {
@@ -504,7 +492,6 @@ function NativeUserDrawingSelectionActionOverlayView({
                     gridColor,
                     item,
                     mutedTextColor,
-                    onAction,
                     textColor,
                   }),
                 )
@@ -538,7 +525,6 @@ function NativeUserDrawingSelectionActionOverlayView({
               gridColor,
               item,
               mutedTextColor,
-              onAction,
               textColor,
             }),
           )}

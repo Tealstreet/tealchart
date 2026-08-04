@@ -49,6 +49,8 @@ export interface ActiveIndicator {
   ast?: Program;
   /** Style overrides for plots */
   styleOverrides?: PlotStyleOverride[];
+  /** Whether this indicator currently contributes plots/drawings */
+  isVisible: boolean;
   /** Pine indicator declaration metadata discovered during execution */
   declaration?: IndicatorDeclarationMetadata;
 }
@@ -191,6 +193,7 @@ export class MobileIndicatorManager {
       layoutBuiltinId: indicator.id,
       inputs,
       ast,
+      isVisible: true,
     });
 
     // Recompute plots with new indicator
@@ -241,6 +244,7 @@ export class MobileIndicatorManager {
       layoutBuiltinId: options.builtinId,
       inputs: options.inputs,
       ast,
+      isVisible: true,
     });
 
     this._recomputePlots();
@@ -294,6 +298,27 @@ export class MobileIndicatorManager {
   }
 
   /**
+   * Update indicator plot visibility without removing it from layout state.
+   */
+  setIndicatorVisibility(instanceId: string, isVisible: boolean): void {
+    const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
+    if (!indicator || indicator.isVisible === isVisible) return;
+
+    indicator.isVisible = isVisible;
+    this._recomputePlots();
+  }
+
+  /**
+   * Toggle indicator plot visibility.
+   */
+  toggleIndicatorVisibility(instanceId: string): void {
+    const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
+    if (!indicator) return;
+
+    this.setIndicatorVisibility(instanceId, !indicator.isVisible);
+  }
+
+  /**
    * Get an indicator by instance ID
    */
   getIndicator(instanceId: string): ActiveIndicator | undefined {
@@ -317,7 +342,7 @@ export class MobileIndicatorManager {
       builtinId: activeIndicator.layoutBuiltinId ?? activeIndicator.indicator.id,
       inputs: activeIndicator.inputs ?? {},
       styleOverrides: activeIndicator.styleOverrides,
-      isVisible: true,
+      isVisible: activeIndicator.isVisible,
       createdAt: index,
     }));
   }
@@ -458,6 +483,10 @@ export class MobileIndicatorManager {
 
     for (const ind of this._indicators) {
       const { indicator, instanceId, ast, inputs } = ind;
+
+      if (!ind.isVisible) {
+        continue;
+      }
 
       if (!ast) {
         // Silently skip - no need to log for every bar update

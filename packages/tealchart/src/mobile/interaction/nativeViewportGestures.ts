@@ -79,6 +79,7 @@ function getNativeTwoTouchVector(event: NativeGestureTouchEvent): NativeTwoTouch
 
 function canBeginNativeChartAxisPinch({
   event,
+  controlZones,
   frame,
   orderDragZones,
   sharedViewport,
@@ -87,6 +88,7 @@ function canBeginNativeChartAxisPinch({
   tradeLineRows,
 }: {
   event: NativeGestureTouchEvent;
+  controlZones: readonly NativeGestureControlZone[];
   frame: NativeChartFrame;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   sharedViewport: NativeViewportSharedValues;
@@ -98,7 +100,13 @@ function canBeginNativeChartAxisPinch({
   const vector = getNativeTwoTouchVector(event);
   if (!vector) return null;
 
-  const points = [vector.firstTouch, vector.secondTouch, { x: vector.centerX, y: vector.centerY }];
+  const touchPoints = [vector.firstTouch, vector.secondTouch];
+  for (let index = 0; index < touchPoints.length; index += 1) {
+    const point = touchPoints[index];
+    if (isNativeGestureControlPoint(controlZones, point.x, point.y)) return null;
+  }
+
+  const points = [...touchPoints, { x: vector.centerX, y: vector.centerY }];
   for (let index = 0; index < points.length; index += 1) {
     const point = points[index];
     if (
@@ -216,6 +224,7 @@ export interface NativeChartAxisPinchGestureInput {
   cancelNativeViewportInteraction: () => void;
   chartAxisPinchGestureState: NativeChartAxisPinchGestureState;
   commitPanViewport: (nextViewport: Viewport) => void;
+  controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
@@ -236,6 +245,7 @@ export function createNativeChartAxisPinchGesture({
   cancelNativeViewportInteraction,
   chartAxisPinchGestureState,
   commitPanViewport,
+  controlZones = [],
   frame,
   orderDragState,
   orderDragZones,
@@ -266,6 +276,7 @@ export function createNativeChartAxisPinchGesture({
       if (event.allTouches.length < 2) return;
       const vector = canBeginNativeChartAxisPinch({
         event,
+        controlZones,
         frame,
         orderDragZones,
         sharedViewport,
@@ -338,6 +349,7 @@ export interface NativePriceScaleGestureInput {
   beginNativeViewportInteraction: () => void;
   cancelNativeViewportInteraction: () => void;
   commitPanViewport: (nextViewport: Viewport) => void;
+  controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   priceScaleActive: SharedValue<boolean>;
   priceScaleGestureState: NativePriceScaleGestureState;
@@ -348,6 +360,7 @@ export function createNativePriceScaleGesture({
   beginNativeViewportInteraction,
   cancelNativeViewportInteraction,
   commitPanViewport,
+  controlZones = [],
   frame,
   priceScaleActive,
   priceScaleGestureState,
@@ -365,7 +378,11 @@ export function createNativePriceScaleGesture({
         return;
       }
       const point = getNativeTouchPoint(event);
-      if (!point || !canBeginNativePriceScaleGesture(geometry, point.x, point.y)) {
+      if (
+        !point ||
+        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
+        !canBeginNativePriceScaleGesture(geometry, point.x, point.y)
+      ) {
         stateManager.fail();
       }
     })
@@ -399,6 +416,7 @@ export interface NativeTimeScaleGestureInput {
   beginNativeViewportInteraction: () => void;
   cancelNativeViewportInteraction: () => void;
   commitPanViewport: (nextViewport: Viewport) => void;
+  controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   sharedViewport: NativeViewportSharedValues;
   timeScaleActive: SharedValue<boolean>;
@@ -409,6 +427,7 @@ export function createNativeTimeScaleGesture({
   beginNativeViewportInteraction,
   cancelNativeViewportInteraction,
   commitPanViewport,
+  controlZones = [],
   frame,
   sharedViewport,
   timeScaleActive,
@@ -426,7 +445,11 @@ export function createNativeTimeScaleGesture({
         return;
       }
       const point = getNativeTouchPoint(event);
-      if (!point || !canBeginNativeTimeScaleGesture(geometry, point.x, point.y)) {
+      if (
+        !point ||
+        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
+        !canBeginNativeTimeScaleGesture(geometry, point.x, point.y)
+      ) {
         stateManager.fail();
       }
     })

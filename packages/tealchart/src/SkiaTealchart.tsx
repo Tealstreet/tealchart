@@ -8,6 +8,12 @@ import type {
   UserDrawingTool,
 } from './drawings';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
+import type {
+  NativeLegendActionCommand,
+  NativeLegendActionHitTarget,
+  NativeLegendIndicator,
+  NativeLegendIndicatorPaneInfo,
+} from './mobile/render/NativeChartLegendOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
@@ -323,6 +329,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     theme,
   });
   const [nativeDisplayedInterval, setNativeDisplayedInterval] = useState(interval);
+  const [nativeLegendActionTargets, setNativeLegendActionTargets] = useState<readonly NativeLegendActionHitTarget[]>(
+    [],
+  );
   useEffect(() => {
     setNativeDisplayedInterval(interval);
   }, [interval]);
@@ -349,6 +358,61 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     return result;
   }, [indicatorManager, nativeIndicatorPaneLayout]);
+  const nativeLegendIndicators = useMemo<readonly NativeLegendIndicator[]>(
+    () =>
+      indicatorManager?.getIndicators().map((indicator) => ({
+        id: indicator.instanceId,
+        inputs: indicator.inputs ?? {},
+        isVisible: indicator.isVisible,
+        name: indicator.indicator.name,
+      })) ?? [],
+    [indicatorManager, nativeIndicatorPaneLayout],
+  );
+  const nativeLegendIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeLegendIndicatorPaneInfo>>>(() => {
+    const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
+    const panes = nativeIndicatorPaneLayout?.panes ?? [];
+    const result: Record<string, NativeLegendIndicatorPaneInfo> = {};
+
+    for (const [scriptId, info] of Object.entries(paneInfo)) {
+      const pane = panes.find(
+        (candidate) => candidate.type === 'indicator' && candidate.indicatorIds?.includes(scriptId),
+      );
+      result[scriptId] = {
+        inputs: info.inputs,
+        name: info.name,
+        overlay: info.overlay,
+        paneId: pane?.id,
+      };
+    }
+
+    return result;
+  }, [indicatorManager, nativeIndicatorPaneLayout]);
+  const handleNativeToggleIndicator = useCallback(
+    (indicatorId: string) => {
+      chartApi.toggleStudyVisibility(indicatorId);
+    },
+    [chartApi],
+  );
+  const handleNativeRemoveIndicator = useCallback(
+    (indicatorId: string) => {
+      chartApi.removeStudy(indicatorId);
+    },
+    [chartApi],
+  );
+  const handleNativeOverlayAction = useCallback(
+    (command: unknown) => {
+      const legendCommand = command as NativeLegendActionCommand;
+      if (!legendCommand || typeof legendCommand.indicatorId !== 'string') return;
+      if (legendCommand.type === 'toggleIndicator') {
+        chartApi.toggleStudyVisibility(legendCommand.indicatorId);
+        return;
+      }
+      if (legendCommand.type === 'removeIndicator') {
+        chartApi.removeStudy(legendCommand.indicatorId);
+      }
+    },
+    [chartApi],
+  );
   const handleNativeViewportChangeForLayout = useCallback(
     (nextViewport: Viewport) => {
       onViewportChange?.(nextViewport);
@@ -588,7 +652,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       for (const indicator of settings.indicators ?? []) {
         const builtinIndicator = getIndicatorById(indicator.builtinId);
         if (!builtinIndicator) continue;
-        await chartApi.createStudy(
+        const studyApi = await chartApi.createStudy(
           builtinIndicator.id,
           builtinIndicator.overlay,
           false,
@@ -596,6 +660,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           {},
           { displayName: indicator.name },
         );
+        if (indicator.isVisible === false && studyApi) {
+          chartApi.toggleStudyVisibility(studyApi.getId());
+        }
       }
 
       replaceNativeUserDrawingState(settings.userDrawingState);
@@ -1123,11 +1190,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       });
     }
 
+    zones.push(...nativeLegendActionTargets);
+
     return zones;
   }, [
     frame,
     hasDataViewport,
     leftToolRailLayout,
+    nativeLegendActionTargets,
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
     nativeResetViewButtonVisible,
@@ -1188,6 +1258,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     leftToolRailLayout,
     orderDragState,
     orderDragZones,
+    overlayActionTargets: nativeLegendActionTargets,
     onDrawingTap: handleNativeUserDrawingTap,
     onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
     onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
@@ -1195,6 +1266,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
     onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
     onContextMenuTap: handleNativeContextMenuTap,
+    onOverlayAction: handleNativeOverlayAction,
     onSelectedDrawingAction: handleNativeSelectedDrawingAction,
     onSelectedDrawingActionPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
     onResetViewTap: handleNativeResetViewTap,
@@ -1346,10 +1418,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           bars={nativeRenderBars}
           downColor={options.downColor}
           frame={frame}
+          gridColor={gridColor}
+          activeIndicators={nativeLegendIndicators}
+          indicatorPaneInfo={nativeLegendIndicatorPaneInfo}
           interval={nativeRenderInterval}
           isLoading={nativeLegendLoading}
           leftToolRailLayout={leftToolRailLayout}
           mutedTextColor={nativeMutedTextColor}
+          onActionTargetsChange={setNativeLegendActionTargets}
+          onRemoveIndicator={handleNativeRemoveIndicator}
+          onToggleIndicator={handleNativeToggleIndicator}
           pricePrecision={nativePricePrecision}
           symbol={symbol}
           textColor={textColor}

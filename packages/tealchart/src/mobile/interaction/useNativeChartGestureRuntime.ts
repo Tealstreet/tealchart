@@ -3,6 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
+import type { NativeSelectedDrawingActionHitTarget } from '../render/NativeUserDrawingSelectionActionOverlay';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import type {
   NativeOrderDragZone,
@@ -14,7 +15,7 @@ import type {
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import type { NativeBracketDragInteractionState, NativeOrderDragInteractionState } from './nativeOemsDragState';
-import type { NativeSelectedDrawingActionHitTarget } from '../render/NativeUserDrawingSelectionActionOverlay';
+import type { NativeOverlayActionHitTarget } from './nativeOverlayActionGestures';
 import type { NativeTapClaimSharedValues } from './nativeTapClaim';
 import type {
   NativeChartAxisPinchGestureState,
@@ -35,6 +36,7 @@ import {
   createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
+import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
 import { claimNativeTap } from './nativeTapClaim';
 import {
@@ -85,6 +87,7 @@ export interface NativeChartGestureRuntimeInput {
   onDrawingSelectionTap: (x: number, y: number, claimTap: () => void) => void;
   onLeftToolRailToggleTap: () => void;
   onContextMenuTap: Parameters<typeof createNativeCrosshairContextMenuTapGesture>[0]['onContextMenuTap'];
+  onOverlayAction?: (command: unknown) => void;
   onSelectedDrawingAction: Parameters<typeof createNativeSelectedDrawingActionTapGesture>[0]['onAction'];
   onSelectedDrawingActionPopoverGroupChange: Parameters<
     typeof createNativeSelectedDrawingActionTapGesture
@@ -94,6 +97,7 @@ export interface NativeChartGestureRuntimeInput {
   pinchActive: SharedValue<boolean>;
   pricePrecision: number;
   priceScaleActive: SharedValue<boolean>;
+  overlayActionTargets?: readonly NativeOverlayActionHitTarget[];
   resetButtonVisible?: boolean;
   selectedDrawingActionTargets?: readonly NativeSelectedDrawingActionHitTarget[];
   priceScaleGestureState: NativePriceScaleGestureState;
@@ -161,6 +165,7 @@ export function useNativeChartGestureRuntime({
   onDrawingSelectionTap,
   onLeftToolRailToggleTap,
   onContextMenuTap,
+  onOverlayAction = () => undefined,
   onSelectedDrawingAction,
   onSelectedDrawingActionPopoverGroupChange,
   onResetViewTap,
@@ -168,6 +173,7 @@ export function useNativeChartGestureRuntime({
   pinchActive,
   pricePrecision,
   priceScaleActive,
+  overlayActionTargets = [],
   resetButtonVisible = false,
   selectedDrawingActionTargets = [],
   priceScaleGestureState,
@@ -192,6 +198,7 @@ export function useNativeChartGestureRuntime({
   const stableOnDrawingTap = useLatestNativeCallback(onDrawingTap);
   const stableOnLeftToolRailToggleTap = useLatestNativeCallback(onLeftToolRailToggleTap);
   const stableOnContextMenuTap = useLatestNativeCallback(onContextMenuTap);
+  const stableOnOverlayAction = useLatestNativeCallback(onOverlayAction);
   const stableOnSelectedDrawingAction = useLatestNativeCallback(onSelectedDrawingAction);
   const stableOnSelectedDrawingActionPopoverGroupChange = useLatestNativeCallback(
     onSelectedDrawingActionPopoverGroupChange,
@@ -358,6 +365,7 @@ export function useNativeChartGestureRuntime({
   const orderDragGesture = useMemo<GestureType>(() => {
     return createNativeOrderDragGesture({
       commitOrderMove: stableCommitOrderMove,
+      controlZones,
       frame: chartInteractionFrame,
       orderDragState,
       orderDragZones,
@@ -368,6 +376,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     chartInteractionFrame,
+    controlZones,
     orderDragState,
     orderDragZones,
     sharedViewport,
@@ -385,6 +394,7 @@ export function useNativeChartGestureRuntime({
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       chartAxisPinchGestureState,
       commitPanViewport: stableCommitPanViewport,
+      controlZones,
       frame: chartInteractionFrame,
       orderDragState,
       orderDragZones,
@@ -402,6 +412,7 @@ export function useNativeChartGestureRuntime({
     bracketDragInteractionState,
     chartAxisPinchGestureState,
     chartInteractionFrame,
+    controlZones,
     orderDragState,
     orderDragZones,
     panActive,
@@ -422,6 +433,7 @@ export function useNativeChartGestureRuntime({
       bracketDragInteractionState,
       clearNativeBracketDrag: stableClearNativeBracketDrag,
       commitBracketMove: stableCommitBracketMove,
+      controlZones,
       frame: chartInteractionFrame,
       sharedViewport,
       tradeLabelHeight,
@@ -431,6 +443,7 @@ export function useNativeChartGestureRuntime({
   }, [
     bracketDragInteractionState,
     chartInteractionFrame,
+    controlZones,
     sharedViewport,
     stableClearNativeBracketDrag,
     stableCommitBracketMove,
@@ -443,6 +456,7 @@ export function useNativeChartGestureRuntime({
     return createNativeTradeLineActionTapGesture({
       bracketDragActive,
       commitTradeLineAction: stableCommitTradeLineAction,
+      controlZones,
       frame: chartInteractionFrame,
       sharedViewport,
       tradeLabelHeight,
@@ -452,6 +466,7 @@ export function useNativeChartGestureRuntime({
   }, [
     bracketDragActive,
     chartInteractionFrame,
+    controlZones,
     sharedViewport,
     stableCommitTradeLineAction,
     tradeLabelHeight,
@@ -466,11 +481,15 @@ export function useNativeChartGestureRuntime({
       onPopoverGroupChange: stableOnSelectedDrawingActionPopoverGroupChange,
       targets: selectedDrawingActionTargets,
     });
-  }, [
-    selectedDrawingActionTargets,
-    stableOnSelectedDrawingAction,
-    stableOnSelectedDrawingActionPopoverGroupChange,
-  ]);
+  }, [selectedDrawingActionTargets, stableOnSelectedDrawingAction, stableOnSelectedDrawingActionPopoverGroupChange]);
+
+  const overlayActionTapGesture = useMemo<GestureType>(() => {
+    return createNativeOverlayActionTapGesture({
+      enabled: overlayActionTargets.length > 0,
+      onAction: stableOnOverlayAction,
+      targets: overlayActionTargets,
+    });
+  }, [overlayActionTargets, stableOnOverlayAction]);
 
   const drawingTapGesture = useMemo<GestureType>(() => {
     return createNativeUserDrawingTapGesture({
@@ -521,6 +540,7 @@ export function useNativeChartGestureRuntime({
 
   const resetViewTapGesture = useMemo<GestureType>(() => {
     return createNativeResetViewTapGesture({
+      controlZones,
       crosshair,
       frame: chartInteractionFrame,
       hasContextMenu,
@@ -532,6 +552,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     chartInteractionFrame,
+    controlZones,
     crosshair,
     hasContextMenu,
     pricePrecision,
@@ -546,6 +567,7 @@ export function useNativeChartGestureRuntime({
       beginNativeViewportInteraction: stableBeginNativeViewportInteraction,
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       commitPanViewport: stableCommitPanViewport,
+      controlZones,
       frame: chartInteractionFrame,
       priceScaleActive,
       priceScaleGestureState,
@@ -553,6 +575,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     chartInteractionFrame,
+    controlZones,
     priceScaleActive,
     priceScaleGestureState,
     sharedViewport,
@@ -566,6 +589,7 @@ export function useNativeChartGestureRuntime({
       beginNativeViewportInteraction: stableBeginNativeViewportInteraction,
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       commitPanViewport: stableCommitPanViewport,
+      controlZones,
       frame: chartInteractionFrame,
       sharedViewport,
       timeScaleActive,
@@ -573,6 +597,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     chartInteractionFrame,
+    controlZones,
     sharedViewport,
     stableBeginNativeViewportInteraction,
     stableCancelNativeViewportInteraction,
@@ -596,6 +621,7 @@ export function useNativeChartGestureRuntime({
         drawingTapGesture,
         leftToolRailToggleTapGesture,
         orderDragGesture,
+        overlayActionTapGesture,
         priceScaleGesture,
         resetViewTapGesture,
         selectedDrawingActionTapGesture,
@@ -615,6 +641,7 @@ export function useNativeChartGestureRuntime({
       drawingTapGesture,
       leftToolRailToggleTapGesture,
       orderDragGesture,
+      overlayActionTapGesture,
       priceScaleGesture,
       resetViewTapGesture,
       selectedDrawingActionTapGesture,

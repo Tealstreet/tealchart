@@ -97,6 +97,35 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getIndicatorPaneInfo()[instanceId]).toBeUndefined();
   });
 
+  it('toggles custom Tealscript visibility without removing layout metadata', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(2));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'toggle-study',
+      code: 'indicator("Toggle Study")\nplot(close)',
+    });
+
+    expect(manager.getPlots()).toHaveLength(1);
+
+    manager.setIndicatorVisibility(instanceId, false);
+
+    expect(manager.getPlots()).toHaveLength(0);
+    expect(manager.getIndicator(instanceId)).toBeDefined();
+    expect(manager.getLayoutIndicators()[0]).toMatchObject({
+      id: instanceId,
+      isVisible: false,
+    });
+
+    manager.toggleIndicatorVisibility(instanceId);
+
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getLayoutIndicators()[0]).toMatchObject({
+      id: instanceId,
+      isVisible: true,
+    });
+  });
+
   it('returns an instance ID and reports parse errors for invalid Tealscript', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();

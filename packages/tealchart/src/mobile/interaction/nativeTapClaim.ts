@@ -5,6 +5,8 @@ export interface NativeTapClaimSharedValues {
   sequence: SharedValue<number>;
 }
 
+// Same-release deferral for competing tap gestures, such as drawing selection
+// claiming a tap before crosshair toggles. Drag ownership belongs in zones.
 export function beginNativeTapClaimScope(tapClaim: NativeTapClaimSharedValues): number {
   'worklet';
   tapClaim.sequence.value += 1;
