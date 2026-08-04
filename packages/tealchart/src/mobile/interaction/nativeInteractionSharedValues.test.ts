@@ -35,7 +35,10 @@ describe('native interaction shared values', () => {
             objectId: 'order-1',
             actionType: 'cancel',
             price: 100,
+            entryPrice: 100,
             partialEnabled: false,
+            positionNotional: 0,
+            positionIsLong: true,
             color: '#00a',
             x1: 82,
             x2: 102,
@@ -63,6 +66,51 @@ describe('native interaction shared values', () => {
       { objectType: 'order', objectId: 'order-1', price: 100 },
       { objectType: 'position', objectId: 'position-1', price: 110 },
     ]);
+  });
+
+  it('refreshes action zones when bracket preview metadata changes', () => {
+    const orderDragZones = shared<NativeOrderDragZone[]>([]);
+    const actionZones = shared<NativeTradeLineActionZone[]>([]);
+    const rows = shared<NativeTradeLineRow[]>([]);
+    const actionZone = {
+      objectType: 'position',
+      objectId: 'position-1',
+      actionType: 'tp',
+      price: 110,
+      entryPrice: 100,
+      dragPrice: 125,
+      partialEnabled: true,
+      positionNotional: 1_000,
+      positionIsLong: true,
+      color: '#00a',
+      x1: 82,
+      x2: 108,
+    } satisfies NativeTradeLineActionZone;
+    const geometries = [
+      {
+        objectType: 'position',
+        objectId: 'position-1',
+        price: 110,
+        actionZones: [actionZone],
+      },
+    ] as NativeTradeLineGeometry[];
+
+    syncNativeTradeLineInteractionGeometry({ orderDragZones, actionZones, rows, geometries });
+    const firstZones = actionZones.value;
+    syncNativeTradeLineInteractionGeometry({
+      orderDragZones,
+      actionZones,
+      rows,
+      geometries: [
+        {
+          ...geometries[0],
+          actionZones: [{ ...actionZone, entryPrice: 101 }],
+        },
+      ] as NativeTradeLineGeometry[],
+    });
+
+    expect(actionZones.value).not.toBe(firstZones);
+    expect(actionZones.value[0]?.entryPrice).toBe(101);
   });
 
   it('syncs price-axis tag sources without rebuilding unchanged sources', () => {

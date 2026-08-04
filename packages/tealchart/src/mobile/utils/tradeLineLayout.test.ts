@@ -451,7 +451,15 @@ describe('native trade line layout', () => {
   });
 
   it('builds stable position geometry with reverse, close, bracket actions, and no order drag zone', () => {
-    const [geometry] = buildNativeTradeLineGeometries([], [createPositionLine()], {
+    const [geometry] = buildNativeTradeLineGeometries([], [
+      createPositionLine({
+        positionData: {
+          entryPrice: 63600,
+          isLong: true,
+          notional: 2500,
+        },
+      }),
+    ], {
       dimensions,
       pricePrecision: 0.1,
       textWidth: measureText,
@@ -479,6 +487,9 @@ describe('native trade line layout', () => {
     expect(reverseButton?.textX).toBe(Math.round((reverseButton?.x ?? 0) + (reverseButton?.width ?? 0) / 2 - measureText('⇄') / 2));
     expect(geometry?.actionZones.map((zone) => zone.actionType)).toEqual(['reverse', 'close', 'tp', 'sl']);
     expect(geometry?.actionZones.map((zone) => zone.price)).toEqual([63777, 63777, 63777, 63777]);
+    expect(geometry?.actionZones.map((zone) => zone.entryPrice)).toEqual([63600, 63600, 63600, 63600]);
+    expect(geometry?.actionZones.map((zone) => zone.positionNotional)).toEqual([2500, 2500, 2500, 2500]);
+    expect(geometry?.actionZones.map((zone) => zone.positionIsLong)).toEqual([true, true, true, true]);
     expect(geometry?.actionZones.map((zone) => zone.dragPrice)).toEqual([63777, 63777, 65000, 62000]);
     expect(geometry?.dragZone).toBeNull();
   });

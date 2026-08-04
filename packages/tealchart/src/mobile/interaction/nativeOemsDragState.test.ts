@@ -43,6 +43,11 @@ function createBracketDragState(): NativeBracketDragInteractionState {
     activeObjectType: shared(''),
     activeBracketType: shared(''),
     activePrice: shared(0),
+    activeEntryPrice: shared(0),
+    activeDragStartX: shared(0),
+    activeDragCurrentX: shared(0),
+    activePositionNotional: shared(0),
+    activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
     activeColor: shared(''),
@@ -141,24 +146,38 @@ describe('native OEMS drag state', () => {
       objectId: 'position-1',
       actionType: 'tp',
       price: 200,
+      entryPrice: 200,
       partialEnabled: true,
+      positionNotional: 1000,
+      positionIsLong: true,
       color: '#00a',
       x1: 20,
       x2: 40,
     };
 
-    expect(beginNativeBracketDragState(state, zone, 2)).toBe(true);
+    expect(beginNativeBracketDragState(state, zone, 2, 80)).toBe(true);
     expect(state.active.value).toBe(true);
     expect(state.activeObjectType.value).toBe('position');
     expect(state.activeBracketType.value).toBe('tp');
+    expect(state.activeEntryPrice.value).toBe(200);
+    expect(state.activeDragStartX.value).toBe(80);
+    expect(state.activeDragCurrentX.value).toBe(80);
+    expect(state.activePositionNotional.value).toBe(1000);
+    expect(state.activePositionIsLong.value).toBe(true);
 
     expect(updateNativeBracketDragState(state, 120, -3)).toBe(true);
     expect(state.activePrice.value).toBe(206);
+    expect(state.activeDragCurrentX.value).toBe(200);
     expect(state.activePartialPercent.value).toBeLessThan(100);
 
     clearNativeBracketDragState(state);
     expect(state.active.value).toBe(false);
     expect(state.activeObjectId.value).toBe('');
+    expect(state.activeEntryPrice.value).toBe(0);
+    expect(state.activeDragStartX.value).toBe(0);
+    expect(state.activeDragCurrentX.value).toBe(0);
+    expect(state.activePositionNotional.value).toBe(0);
+    expect(state.activePositionIsLong.value).toBe(true);
     expect(state.activePartialPercent.value).toBe(100);
   });
 
@@ -169,8 +188,11 @@ describe('native OEMS drag state', () => {
       objectId: 'order-1',
       actionType: 'sl',
       price: 200,
+      entryPrice: 200,
       dragPrice: 175,
       partialEnabled: false,
+      positionNotional: 0,
+      positionIsLong: true,
       color: '#00a',
       x1: 20,
       x2: 40,
@@ -178,6 +200,7 @@ describe('native OEMS drag state', () => {
 
     expect(beginNativeBracketDragState(state, zone, 2)).toBe(true);
     expect(state.activePrice.value).toBe(175);
+    expect(state.activeEntryPrice.value).toBe(200);
     expect(state.startPrice.value).toBe(175);
 
     expect(updateNativeBracketDragState(state, 0, -3)).toBe(true);
@@ -191,7 +214,10 @@ describe('native OEMS drag state', () => {
       objectId: 'order-1',
       actionType: 'cancel',
       price: 100,
+      entryPrice: 100,
       partialEnabled: false,
+      positionNotional: 0,
+      positionIsLong: true,
       color: '#00a',
       x1: 20,
       x2: 40,
@@ -214,7 +240,10 @@ describe('native OEMS drag state', () => {
       objectId: 'position-1',
       actionType: 'tp',
       price: 200,
+      entryPrice: 200,
       partialEnabled: true,
+      positionNotional: 1000,
+      positionIsLong: true,
       color: '#00a',
       x1: 20,
       x2: 40,
@@ -251,7 +280,10 @@ describe('native OEMS drag state', () => {
       objectId: 'position-1',
       actionType: 'tp',
       price: 200,
+      entryPrice: 200,
       partialEnabled: true,
+      positionNotional: 1000,
+      positionIsLong: true,
       color: '#00a',
       x1: 20,
       x2: 40,

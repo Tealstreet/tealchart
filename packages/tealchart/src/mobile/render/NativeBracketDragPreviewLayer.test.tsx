@@ -4,7 +4,15 @@ import type { NativeBracketDragSharedValues } from '../interaction/nativeOemsDra
 import { matchFont } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
-import { AnimatedBracketDragPreview } from './NativeBracketDragPreviewLayer';
+import {
+  AnimatedBracketDragPreview,
+  formatNativeBracketPartialPreviewLabel,
+  NativePartialBoundaryLine,
+  NativePartialMarker,
+  NATIVE_BRACKET_PARTIAL_MARKER_TEXTS,
+  resolveNativeBracketPartialMarkerOffset,
+  shouldShowNativeBracketPartialMarker,
+} from './NativeBracketDragPreviewLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativePriceAxisTagAnimatedText } from './NativePriceAxisTag';
 
@@ -64,6 +72,11 @@ function bracketDragState(): NativeBracketDragSharedValues {
     activeObjectType: shared('position'),
     activeBracketType: shared('tp'),
     activePrice: shared(63777),
+    activeEntryPrice: shared(63500),
+    activeDragStartX: shared(270),
+    activeDragCurrentX: shared(270),
+    activePositionNotional: shared(2500),
+    activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
     activeColor: shared('#12c48b'),
@@ -71,6 +84,59 @@ function bracketDragState(): NativeBracketDragSharedValues {
 }
 
 describe('AnimatedBracketDragPreview', () => {
+  it('formats position partial previews with PnL and distance context', () => {
+    expect(
+      formatNativeBracketPartialPreviewLabel({
+        bracketType: 'tp',
+        entryPrice: 100,
+        isLong: true,
+        notional: 1_000,
+        partialPercent: 50,
+        price: 110,
+      }),
+    ).toBe('+$50.00 | 50% Partial TP | +10.00%');
+  });
+
+  it('formats order partial previews without fake PnL', () => {
+    expect(
+      formatNativeBracketPartialPreviewLabel({
+        bracketType: 'sl',
+        entryPrice: 100,
+        isLong: true,
+        notional: 0,
+        partialPercent: 75,
+        price: 90,
+      }),
+    ).toBe('75% Partial SL | -10.00%');
+  });
+
+  it('hides inactive partial markers that would clamp into the active marker', () => {
+    expect(resolveNativeBracketPartialMarkerOffset(10, 1)).toBe(220);
+    expect(resolveNativeBracketPartialMarkerOffset(50, -1)).toBe(-110);
+    expect(
+      shouldShowNativeBracketPartialMarker({
+        activeCenter: 540,
+        activeWidth: 36,
+        isActive: false,
+        markerCenter: 528,
+        markerWidth: 42,
+        zoneLeft: 100,
+        zoneRight: 560,
+      }),
+    ).toBe(false);
+    expect(
+      shouldShowNativeBracketPartialMarker({
+        activeCenter: 540,
+        activeWidth: 36,
+        isActive: true,
+        markerCenter: 590,
+        markerWidth: 36,
+        zoneLeft: 100,
+        zoneRight: 560,
+      }),
+    ).toBe(true);
+  });
+
   it('emits a live bracket price-axis tag label while dragging TP or SL', () => {
     const layer = AnimatedBracketDragPreview({
       axisFont: matchFont({ fontSize: 11 }),
@@ -91,6 +157,7 @@ describe('AnimatedBracketDragPreview', () => {
     const dragState = bracketDragState();
     dragState.activePartialEnabled.value = true;
     dragState.activePartialPercent.value = 75;
+    dragState.activeDragCurrentX.value = 325;
 
     const layer = AnimatedBracketDragPreview({
       axisFont: matchFont({ fontSize: 11 }),
@@ -101,12 +168,16 @@ describe('AnimatedBracketDragPreview', () => {
       sharedViewport,
     });
     const labels = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
+    const markers = collectElementsByType(layer, NativePartialMarker);
+    const boundaries = collectElementsByType(layer, NativePartialBoundaryLine);
 
     expect(labels).toHaveLength(1);
-    expect(labels[0].props.text.value).toBe('75% Partial TP 63,777');
+    expect(labels[0].props.text.value).toBe('TP 63,777');
     expect(labels[0].props.maxCharacters).toBe(Number.MAX_SAFE_INTEGER);
-    expect(labels[0].props.characterSet).toContain('%');
-    expect(labels[0].props.characterSet).toContain('Partial');
+    expect(labels[0].props.characterSet).not.toContain('%');
+    expect(markers).toHaveLength(NATIVE_BRACKET_PARTIAL_MARKER_TEXTS.length);
+    expect(markers.map((marker) => `${marker.props.marker.percent}%`)).toEqual(NATIVE_BRACKET_PARTIAL_MARKER_TEXTS);
+    expect(boundaries).toHaveLength(NATIVE_BRACKET_PARTIAL_MARKER_TEXTS.length - 2);
   });
 
   it('uses the compact bracket label when partial mode is full size', () => {

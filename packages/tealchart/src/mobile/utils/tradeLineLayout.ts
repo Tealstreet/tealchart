@@ -42,8 +42,11 @@ export interface NativeTradeLineActionZone {
   objectId: string;
   actionType: NativeTradeLineActionType;
   price: number;
+  entryPrice: number;
   dragPrice?: number;
   partialEnabled: boolean;
+  positionNotional: number;
+  positionIsLong: boolean;
   color: string;
   x1: number;
   x2: number;
@@ -526,13 +529,17 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     ...button,
     corners: getNativeTradeLineButtonCornersForVisibleButtons(buttonGeometry, index, segmentGeometryWithCorners.length),
   }));
+  const positionData = objectType === 'position' ? (line as PositionLineRenderData).positionData : null;
   const actionZones: NativeTradeLineActionZone[] = buttonGeometryWithCorners.map((button) => ({
     objectType,
     objectId,
     actionType: button.type,
     price: line.price,
+    entryPrice: positionData?.entryPrice ?? line.price,
     dragPrice: getNativeTradeLineActionPrice(line, button.type),
     partialEnabled: line.partialEnabled ?? false,
+    positionNotional: positionData?.notional ?? 0,
+    positionIsLong: positionData?.isLong ?? true,
     color: button.type === 'tp' || button.type === 'sl' ? button.backgroundColor : line.lineColor,
     x1: button.x - TRADE_LABEL_HIT_SLOP,
     x2: button.x + button.width + TRADE_LABEL_HIT_SLOP,
