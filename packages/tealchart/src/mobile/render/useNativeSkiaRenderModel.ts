@@ -48,6 +48,8 @@ export interface NativeSkiaRenderModelInput {
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
   };
+  layoutName?: string | null;
+  layoutSelectorEnabled?: boolean;
   marginsBottom: number;
   onIndicatorsClick?: () => void;
   options: RenderOptions;
@@ -91,6 +93,8 @@ export function useNativeSkiaRenderModel({
   frame,
   interval,
   leftToolRailCollapsed,
+  layoutName,
+  layoutSelectorEnabled,
   lineSnapshot,
   marginsBottom,
   onIndicatorsClick,
@@ -142,12 +146,16 @@ export function useNativeSkiaRenderModel({
             activeTextColor: options.upColor,
             activeBackgroundColor: NATIVE_TOP_BAR_ACTIVE_BACKGROUND_COLOR,
             indicatorsEnabled: Boolean(onIndicatorsClick),
+            layoutName,
+            layoutSelectorEnabled,
             undoEnabled: userDrawingCommandAvailability?.canUndo === true,
             redoEnabled: userDrawingCommandAvailability?.canRedo === true,
           })
         : null,
     [
       frame,
+      layoutName,
+      layoutSelectorEnabled,
       nativeMutedTextColor,
       nativeTopBarTimeframes,
       onIndicatorsClick,

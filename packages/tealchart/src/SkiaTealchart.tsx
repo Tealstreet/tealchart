@@ -9,9 +9,9 @@ import type {
 } from './drawings';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
-import type { ChartSettings } from './state/chartState';
+import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import type { ISaveLoadAdapter } from './transformer/saveLoadIntegration';
+import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
   ContextMenuCallback,
@@ -50,6 +50,7 @@ import {
   resolveNativeResetViewTapTarget,
 } from './mobile/interaction/nativeResetViewButton';
 import { findNativeOrderDragZone, findNativeTradeLineActionZone } from './mobile/interaction/nativeTradeLineHitTest';
+import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nativeUserDrawingEditDragZones';
 import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
 import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
 import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeSkiaInteractionRuntime';
@@ -62,6 +63,7 @@ import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
+import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
@@ -75,7 +77,11 @@ import {
 } from './mobile/render/nativeRenderTransition';
 import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
 import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
-import { NativeUserDrawingSelectionActionOverlay } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
+import {
+  NativeUserDrawingSelectionActionOverlay,
+  resolveNativeSelectedDrawingActionHitTargets,
+  resolveNativeSelectedDrawingActionOverlayModel,
+} from './mobile/render/NativeUserDrawingSelectionActionOverlay';
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
@@ -235,19 +241,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () =>
       resolveNativeDefaultLayoutPersistence({
         autoSaveDelay: auto_save_delay,
-        chartKey: `${chartKey}:${propSymbol}`,
+        chartKey,
         disableDefaultLayoutPersistence: disable_default_layout_persistence,
         saveLoadAdapter: save_load_adapter,
         storage: uiPreferencesStorage,
       }),
-    [
-      auto_save_delay,
-      chartKey,
-      disable_default_layout_persistence,
-      propSymbol,
-      save_load_adapter,
-      uiPreferencesStorage,
-    ],
+    [auto_save_delay, chartKey, disable_default_layout_persistence, save_load_adapter, uiPreferencesStorage],
   );
   const chartStore = useMemo(
     () =>
@@ -258,6 +257,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartKey, uiPreferencesStorage],
   );
   const [uiPreferences, setUiPreferences] = useState(() => chartStore.uiPreferences.get());
+  const [nativeCurrentLayout, setNativeCurrentLayout] = useState<CurrentLayoutState>(() =>
+    chartStore.currentLayout.get(),
+  );
+  const [nativeSaveStatus, setNativeSaveStatus] = useState<SaveStatus>(() => chartStore.saveStatus.get());
   const [nativeAutoScaleEnabled, setNativeAutoScaleEnabled] = useState(() => chartStore.settings.get().autoScale);
   useEffect(() => {
     setUiPreferences(chartStore.uiPreferences.get());
@@ -269,6 +272,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
     return chartStore.settings.listen((nextSettings) => {
       setNativeAutoScaleEnabled(nextSettings.autoScale);
+    });
+  }, [chartStore]);
+  useEffect(() => {
+    setNativeCurrentLayout(chartStore.currentLayout.get());
+    return chartStore.currentLayout.listen((nextLayout) => {
+      setNativeCurrentLayout(nextLayout);
+    });
+  }, [chartStore]);
+  useEffect(() => {
+    setNativeSaveStatus(chartStore.saveStatus.get());
+    return chartStore.saveStatus.listen((nextStatus) => {
+      setNativeSaveStatus(nextStatus);
     });
   }, [chartStore]);
   const leftToolRailCollapsed = uiPreferences.leftToolRailCollapsed;
@@ -510,13 +525,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const {
+    beginNativeUserDrawingEditDragAtPoint,
     dispatchNativeUserDrawingSelectedAction,
+    endNativeUserDrawingEditDrag,
     handleNativeUserDrawingInput,
     redoNativeUserDrawingCommand,
     replaceNativeUserDrawingState,
     selectNativeUserDrawingAtPoint,
     selectNativeUserDrawingTool,
     undoNativeUserDrawingCommand,
+    updateNativeUserDrawingEditDrag,
     userDrawingCommandAvailability,
     userDrawingRecentToolsByCategory,
     userDrawingState: nativeUserDrawingState,
@@ -525,8 +543,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onUserDrawingCommand: handleNativeUserDrawingCommandForLayout,
     onUserDrawingStateChange,
   });
+  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
+  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
+  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
+  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
+  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
+  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const applyNativeLayoutSettings = useCallback(
     async (settings: ChartSettings) => {
+      const nextSymbol = settings.symbol || symbol;
+      if (nextSymbol && nextSymbol !== chartApi.symbol()) {
+        chartApi.setSymbol(nextSymbol);
+      }
+
       if (settings.interval && settings.interval !== chartApi.resolution()) {
         setNativeDisplayedInterval(settings.interval);
         chartApi.setResolution(settings.interval);
@@ -556,7 +585,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         indicators: settings.indicators || [],
         interval: settings.interval || interval,
         showVolume: settings.showVolume,
-        symbol,
+        symbol: nextSymbol,
         userDrawingState: settings.userDrawingState,
         viewport: settings.viewport,
         volumeHeight: settings.volumeHeight,
@@ -578,9 +607,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     viewport: hasDataViewport ? viewport : undefined,
     volumeHeight: VOLUME_HEIGHT_RATIO,
   });
-  const { markNativeLayoutDirty } = useNativeLayoutPersistence({
+  const {
+    deleteNativeLayout,
+    getNativeLayouts,
+    loadNativeLayout,
+    markNativeLayoutDirty,
+    renameNativeLayout,
+    saveNativeLayoutAs,
+    saveNativeLayoutNow,
+  } = useNativeLayoutPersistence({
     autoSaveDelay: nativeLayoutPersistence.autoSaveDelay,
     chartStore,
+    currentLayoutStorage: nativeLayoutPersistence.currentLayoutStorage,
+    currentLayoutStorageKey: nativeLayoutPersistence.currentLayoutStorageKey,
     currentSettings: nativeLayoutSettings,
     onApplyLayout: applyNativeLayoutSettings,
     readyToCreateDefaultLayout: hasDataViewport,
@@ -594,6 +633,111 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
     };
   }, [markNativeLayoutDirty]);
+  const nativeLayoutSelectorEnabled = nativeLayoutPersistence.saveLoadAdapter !== null;
+  const [nativeLayoutSelectorOpen, setNativeLayoutSelectorOpen] = useState(false);
+  const [nativeLayoutSelectorLayouts, setNativeLayoutSelectorLayouts] = useState<LayoutMetadata[]>([]);
+  const [nativeLayoutSelectorLoading, setNativeLayoutSelectorLoading] = useState(false);
+  const [nativeLayoutSelectorError, setNativeLayoutSelectorError] = useState<string | null>(null);
+  const refreshNativeLayoutSelector = useCallback(async () => {
+    if (!nativeLayoutSelectorEnabled) return;
+    setNativeLayoutSelectorLoading(true);
+    setNativeLayoutSelectorError(null);
+    try {
+      setNativeLayoutSelectorLayouts(await getNativeLayouts());
+    } catch {
+      setNativeLayoutSelectorError('Could not load layouts');
+    } finally {
+      setNativeLayoutSelectorLoading(false);
+    }
+  }, [getNativeLayouts, nativeLayoutSelectorEnabled]);
+  useEffect(() => {
+    if (!nativeLayoutSelectorOpen) return;
+    void refreshNativeLayoutSelector();
+  }, [nativeLayoutSelectorOpen, refreshNativeLayoutSelector]);
+  useEffect(() => {
+    if (!nativeLayoutSelectorEnabled) {
+      setNativeLayoutSelectorOpen(false);
+      setNativeLayoutSelectorLayouts([]);
+    }
+  }, [nativeLayoutSelectorEnabled]);
+  const openNativeLayoutSelector = useCallback(() => {
+    if (!nativeLayoutSelectorEnabled) return;
+    setNativeLayoutSelectorOpen(true);
+  }, [nativeLayoutSelectorEnabled]);
+  const handleNativeLayoutSelectorLoad = useCallback(
+    (layoutId: string | number) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void loadNativeLayout(layoutId)
+        .then(() => {
+          setNativeLayoutSelectorOpen(false);
+        })
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not load layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [loadNativeLayout],
+  );
+  const handleNativeLayoutSelectorSave = useCallback(() => {
+    setNativeLayoutSelectorLoading(true);
+    setNativeLayoutSelectorError(null);
+    void saveNativeLayoutNow()
+      .then(refreshNativeLayoutSelector)
+      .catch(() => {
+        setNativeLayoutSelectorError('Could not save layout');
+      })
+      .finally(() => {
+        setNativeLayoutSelectorLoading(false);
+      });
+  }, [refreshNativeLayoutSelector, saveNativeLayoutNow]);
+  const handleNativeLayoutSelectorSaveAs = useCallback(
+    (layoutName: string) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void saveNativeLayoutAs(layoutName)
+        .then(refreshNativeLayoutSelector)
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not save layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [refreshNativeLayoutSelector, saveNativeLayoutAs],
+  );
+  const handleNativeLayoutSelectorRename = useCallback(
+    (layoutId: string | number, nextName: string) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void renameNativeLayout(layoutId, nextName)
+        .then(refreshNativeLayoutSelector)
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not rename layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [refreshNativeLayoutSelector, renameNativeLayout],
+  );
+  const handleNativeLayoutSelectorDelete = useCallback(
+    (layoutId: string | number) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void deleteNativeLayout(layoutId)
+        .then(refreshNativeLayoutSelector)
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not delete layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [deleteNativeLayout, refreshNativeLayoutSelector],
+  );
   const [nativeSelectedActionPopoverGroupId, setNativeSelectedActionPopoverGroupId] =
     useState<UserDrawingSelectedActionSurfaceGroupId | null>(null);
   const nativeSelectedDrawingId = nativeUserDrawingState.selection?.drawingId ?? null;
@@ -666,6 +810,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       selectNativeUserDrawingAtPoint,
     ],
   );
+  const resolveNativeUserDrawingEditDragPoint = useCallback(
+    (x: number, y: number) => {
+      if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return null;
+      return resolveNativeUserDrawingSelectionPoint({
+        bars: nativeRenderBars,
+        frame,
+        spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+        viewport: nativeRenderViewport,
+        x,
+        y,
+      });
+    },
+    [frame, nativeDrawingSelectionEnabled, nativeRenderBars, nativeRenderViewport, nativeUserDrawingCoordinateSpaces],
+  );
+  const handleNativeUserDrawingEditDragBegin = useCallback(
+    (x: number, y: number) => {
+      const dragPoint = resolveNativeUserDrawingEditDragPoint(x, y);
+      if (!dragPoint) return;
+      beginNativeUserDrawingEditDragAtPoint(dragPoint.point, dragPoint.spacesByPaneId);
+    },
+    [beginNativeUserDrawingEditDragAtPoint, resolveNativeUserDrawingEditDragPoint],
+  );
+  const handleNativeUserDrawingEditDragMove = useCallback(
+    (x: number, y: number) => {
+      updateNativeUserDrawingEditDrag({ x, y });
+    },
+    [updateNativeUserDrawingEditDrag],
+  );
   const handleNativeSelectedDrawingAction = useCallback(
     (command: UserDrawingSelectedActionSurfaceCommand) => {
       dispatchNativeUserDrawingSelectedAction(command);
@@ -676,6 +848,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   const { commitNativeTopBarRuntimeAction } = useNativeTopBarActionRuntime({
     chartApi,
+    onLayoutClick: nativeLayoutSelectorEnabled ? openNativeLayoutSelector : undefined,
     onSymbolClick,
     onIndicatorsClick,
     redoUserDrawingCommand: redoNativeUserDrawingCommand,
@@ -726,6 +899,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     bars: nativeRenderBars,
     frame,
     interval: nativeRenderInterval,
+    layoutName: nativeCurrentLayout.layoutName,
+    layoutSelectorEnabled: nativeLayoutSelectorEnabled,
     leftToolRailCollapsed,
     lineSnapshot,
     marginsBottom: margins.bottom,
@@ -799,6 +974,86 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => (frame ? resolveNativeResetViewButtonLayout(frame) : null),
     [frame],
   );
+  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
+    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
+    return resolveUserDrawingSelectionActionAnchorFromDrawings({
+      drawings: nativeUserDrawingDrawings,
+      selection: nativeUserDrawingSelection,
+      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+    });
+  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
+  const nativeSelectionActionLeftInset = leftToolRailLayout?.collapsed
+    ? 16
+    : (leftToolRailLayout?.railRect.width ?? 0) + 8;
+  const nativeSelectionActionTopInset = showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8;
+  const nativeUserDrawingSelectionActionOverlayModel = useMemo(
+    () =>
+      frame
+        ? resolveNativeSelectedDrawingActionOverlayModel({
+            activeBackgroundColor: gridColor,
+            activeTextColor: options.upColor,
+            anchor: nativeUserDrawingSelectionActionAnchor,
+            backgroundColor,
+            bottomInset: 8,
+            gridColor,
+            leftInset: nativeSelectionActionLeftInset,
+            mutedTextColor: nativeMutedTextColor,
+            onAction: handleNativeSelectedDrawingAction,
+            onPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
+            openPopoverGroupId: nativeSelectedActionPopoverGroupId,
+            rightInset: 8,
+            textColor,
+            topInset: nativeSelectionActionTopInset,
+            userDrawingDefaultStylesByKind: nativeUserDrawingDefaultStylesByKind,
+            userDrawingDraft: nativeUserDrawingDraft,
+            userDrawingDrawings: nativeUserDrawingDrawings,
+            userDrawingSelection: nativeUserDrawingSelection,
+            userDrawingTextEdit: nativeUserDrawingTextEdit,
+            viewportHeight: frame.dimensions.height,
+            viewportWidth: frame.dimensions.width,
+          })
+        : null,
+    [
+      backgroundColor,
+      frame,
+      gridColor,
+      handleNativeSelectedDrawingAction,
+      nativeMutedTextColor,
+      nativeSelectedActionPopoverGroupId,
+      nativeSelectionActionLeftInset,
+      nativeSelectionActionTopInset,
+      nativeUserDrawingDefaultStylesByKind,
+      nativeUserDrawingDraft,
+      nativeUserDrawingDrawings,
+      nativeUserDrawingSelection,
+      nativeUserDrawingSelectionActionAnchor,
+      nativeUserDrawingTextEdit,
+      options.upColor,
+      textColor,
+    ],
+  );
+  const nativeUserDrawingSelectionActionTargets = useMemo(
+    () => resolveNativeSelectedDrawingActionHitTargets(nativeUserDrawingSelectionActionOverlayModel),
+    [nativeUserDrawingSelectionActionOverlayModel],
+  );
+  const nativeUserDrawingEditDragZones = useMemo(
+    () =>
+      nativeDrawingSelectionEnabled
+        ? resolveNativeUserDrawingEditDragZones({
+            anchor: nativeUserDrawingSelectionActionAnchor,
+            drawings: nativeUserDrawingDrawings,
+            selection: nativeUserDrawingSelection,
+            spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+          })
+        : [],
+    [
+      nativeDrawingSelectionEnabled,
+      nativeUserDrawingCoordinateSpaces,
+      nativeUserDrawingDrawings,
+      nativeUserDrawingSelection,
+      nativeUserDrawingSelectionActionAnchor,
+    ],
+  );
   const nativeGestureControlZones = useMemo<readonly NativeGestureControlZone[]>(() => {
     const zones: NativeGestureControlZone[] = [];
     if (frame && topBarLayout) {
@@ -834,6 +1089,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       });
     }
 
+    if (nativeUserDrawingSelectionActionOverlayModel) {
+      zones.push({
+        x1: nativeUserDrawingSelectionActionOverlayModel.position.left,
+        x2:
+          nativeUserDrawingSelectionActionOverlayModel.position.left +
+          nativeUserDrawingSelectionActionOverlayModel.surfaceWidth,
+        y1: nativeUserDrawingSelectionActionOverlayModel.position.top,
+        y2:
+          nativeUserDrawingSelectionActionOverlayModel.position.top +
+          nativeUserDrawingSelectionActionOverlayModel.surfaceHeight,
+      });
+    }
+
     return zones;
   }, [
     frame,
@@ -842,6 +1110,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
     nativeResetViewButtonVisible,
+    nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
   const handleNativeResetViewTap = useCallback(
@@ -889,6 +1158,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     commitTradeLineAction,
     controlZones: nativeGestureControlZones,
     crosshair,
+    drawingEditDragZones: nativeUserDrawingEditDragZones,
     drawingInputEnabled: nativeDrawingInputEnabled,
     drawingSelectionEnabled: nativeDrawingSelectionEnabled,
     frame,
@@ -898,15 +1168,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     orderDragState,
     orderDragZones,
     onDrawingTap: handleNativeUserDrawingTap,
+    onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
+    onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
+    onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,
     onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
     onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
     onContextMenuTap: handleNativeContextMenuTap,
+    onSelectedDrawingAction: handleNativeSelectedDrawingAction,
+    onSelectedDrawingActionPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
     onResetViewTap: handleNativeResetViewTap,
     panActive,
     pinchActive,
     pricePrecision: nativePricePrecision,
     priceScaleActive,
     resetButtonVisible: nativeResetViewButtonVisible,
+    selectedDrawingActionTargets: nativeUserDrawingSelectionActionTargets,
     priceScaleGestureState,
     sharedViewport,
     timeScaleActive,
@@ -915,12 +1191,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineActionZones,
     tradeLineRows,
   });
-  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
-  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
-  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
-  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
-  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
-  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const nativeUserDrawingRenderEntries = useMemo(
     () =>
       resolveUserDrawingRenderEntriesFromSlices({
@@ -980,14 +1250,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     };
   }, []);
 
-  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
-    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
-    return resolveUserDrawingSelectionActionAnchorFromDrawings({
-      drawings: nativeUserDrawingDrawings,
-      selection: nativeUserDrawingSelection,
-      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
-    });
-  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
   const liveChartMounted = !resizeLayoutFrozen && frame && nativeRenderProjection;
 
   return (
@@ -1101,14 +1363,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           backgroundColor={backgroundColor}
           bottomInset={8}
           gridColor={gridColor}
-          leftInset={leftToolRailLayout?.collapsed ? 16 : (leftToolRailLayout?.railRect.width ?? 0) + 8}
+          leftInset={nativeSelectionActionLeftInset}
           mutedTextColor={nativeMutedTextColor}
           onAction={handleNativeSelectedDrawingAction}
           onPopoverGroupChange={setNativeSelectedActionPopoverGroupId}
           openPopoverGroupId={nativeSelectedActionPopoverGroupId}
           rightInset={8}
           textColor={textColor}
-          topInset={showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8}
+          topInset={nativeSelectionActionTopInset}
           userDrawingDefaultStylesByKind={nativeUserDrawingDefaultStylesByKind}
           userDrawingDraft={nativeUserDrawingDraft}
           userDrawingDrawings={nativeUserDrawingDrawings}
@@ -1128,6 +1390,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           menu={nativeContextMenu}
           onClose={closeNativeContextMenu}
           renderOptions={options}
+          textColor={textColor}
+        />
+      ) : null}
+      {nativeLayoutSelectorOpen ? (
+        <NativeLayoutSelectorOverlay
+          backgroundColor={backgroundColor}
+          currentLayout={nativeCurrentLayout}
+          errorText={nativeLayoutSelectorError}
+          gridColor={gridColor}
+          layouts={nativeLayoutSelectorLayouts}
+          loading={nativeLayoutSelectorLoading}
+          mutedTextColor={nativeMutedTextColor}
+          onClose={() => setNativeLayoutSelectorOpen(false)}
+          onDelete={handleNativeLayoutSelectorDelete}
+          onLoad={handleNativeLayoutSelectorLoad}
+          onRefresh={refreshNativeLayoutSelector}
+          onRename={handleNativeLayoutSelectorRename}
+          onSave={handleNativeLayoutSelectorSave}
+          onSaveAs={handleNativeLayoutSelectorSaveAs}
+          saveStatus={nativeSaveStatus}
           textColor={textColor}
         />
       ) : null}

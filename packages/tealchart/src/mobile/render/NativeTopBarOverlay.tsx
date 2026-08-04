@@ -2,7 +2,7 @@ import type { NativeTopBarActionCommand, NativeTopBarButtonGeometry, NativeTopBa
 
 import React from 'react';
 
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { NativeDrawingIcon } from './NativeDrawingIcon';
 
@@ -25,6 +25,7 @@ function iconForButton(button: NativeTopBarButtonGeometry) {
 function accessibilityLabelForButton(button: NativeTopBarButtonGeometry): string {
   if (button.type === 'timeframe') return `${button.text} timeframe`;
   if (button.type === 'indicators') return 'Indicators';
+  if (button.type === 'layout') return 'Chart layouts';
   if (button.type === 'undo') return 'Undo drawing action';
   return 'Redo drawing action';
 }
@@ -100,69 +101,90 @@ export function NativeTopBarOverlayImpl({
         />
       )}
 
-      {topBarLayout.dividers.map((divider, index) => (
-        <View
-          key={`native-top-bar-divider-${index}`}
-          pointerEvents="none"
-          style={[
-            styles.divider,
-            {
-              backgroundColor: gridColor,
-              height: divider.height,
-              left: divider.x,
-              top: divider.y,
-            },
-          ]}
-        />
-      ))}
+      <ScrollView
+        bounces={false}
+        horizontal
+        keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={16}
+        showsHorizontalScrollIndicator={false}
+        style={[
+          styles.scrollArea,
+          {
+            height: topBarLayout.height,
+            left: topBarLayout.scrollAreaX,
+          },
+        ]}
+      >
+        <View style={{ height: topBarLayout.height, width: topBarLayout.scrollContentWidth }}>
+          {topBarLayout.dividers.map((divider, index) => (
+            <View
+              key={`native-top-bar-divider-${index}`}
+              pointerEvents="none"
+              style={[
+                styles.divider,
+                {
+                  backgroundColor: gridColor,
+                  height: divider.height,
+                  left: divider.x,
+                  top: divider.y,
+                },
+              ]}
+            />
+          ))}
 
-      {topBarLayout.buttons.map((button) => {
-        const icon = iconForButton(button);
-        return (
-          <Pressable
-            key={`native-top-bar-button-${button.type}-${button.interval ?? button.text}-${button.x}`}
-            accessibilityLabel={accessibilityLabelForButton(button)}
-            accessibilityRole="button"
-            disabled={!button.enabled}
-            hitSlop={{ left: 3, right: 3, top: 4, bottom: 4 }}
-            onPress={() => onAction(button)}
-            style={[
-              styles.button,
-              {
-                backgroundColor: button.backgroundColor ?? 'transparent',
-                height: button.height,
-                left: button.x,
-                opacity: button.enabled ? 1 : 0.45,
-                top: button.y,
-                width: button.width,
-              },
-            ]}
-          >
-            {icon && (
-              <NativeDrawingIcon
-                name={icon}
-                size={button.type === 'indicators' ? 18 : 19}
-                color={button.textColor}
-                strokeWidth={button.type === 'indicators' ? 1.7 : 1.9}
-              />
-            )}
-            {button.type !== 'undo' && button.type !== 'redo' && (
-              <Text
-                numberOfLines={1}
+          {topBarLayout.buttons.map((button) => {
+            const icon = iconForButton(button);
+            return (
+              <Pressable
+                key={`native-top-bar-button-${button.type}-${button.interval ?? button.text}-${button.x}`}
+                accessibilityLabel={accessibilityLabelForButton(button)}
+                accessibilityRole="button"
+                disabled={!button.enabled}
+                hitSlop={{ left: 3, right: 3, top: 4, bottom: 4 }}
+                onPress={() => onAction(button)}
                 style={[
-                  styles.buttonText,
+                  styles.button,
                   {
-                    color: button.textColor,
+                    backgroundColor: button.backgroundColor ?? 'transparent',
+                    height: button.height,
+                    left: button.x,
+                    opacity: button.enabled ? 1 : 0.45,
+                    top: button.y,
+                    width: button.width,
                   },
-                  button.type === 'indicators' ? styles.indicatorsText : null,
                 ]}
               >
-                {button.text}
-              </Text>
-            )}
-          </Pressable>
-        );
-      })}
+                {icon && (
+                  <NativeDrawingIcon
+                    name={icon}
+                    size={button.type === 'indicators' ? 18 : 19}
+                    color={button.textColor}
+                    strokeWidth={button.type === 'indicators' ? 1.7 : 1.9}
+                  />
+                )}
+                {button.type !== 'undo' && button.type !== 'redo' && (
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.buttonText,
+                      {
+                        color: button.textColor,
+                      },
+                      button.type === 'indicators' ? styles.indicatorsText : null,
+                      button.type === 'layout' ? styles.layoutText : null,
+                    ]}
+                  >
+                    {button.text}
+                  </Text>
+                )}
+                {button.type === 'layout' ? (
+                  <NativeDrawingIcon name="chevronDown" size={13} color={button.textColor} strokeWidth={2} />
+                ) : null}
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -190,9 +212,17 @@ const styles = StyleSheet.create({
   indicatorsText: {
     marginLeft: 4,
   },
+  layoutText: {
+    marginRight: 3,
+  },
   overlay: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  scrollArea: {
     position: 'absolute',
     right: 0,
     top: 0,

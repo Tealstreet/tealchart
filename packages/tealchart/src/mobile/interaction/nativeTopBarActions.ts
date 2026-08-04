@@ -4,6 +4,7 @@ import type { NativeTopBarActionCommand } from '../utils/topBarLayout';
 export interface NativeTopBarActionHandlers {
   currentInterval: ResolutionString;
   setInterval: (interval: ResolutionString) => void;
+  onLayoutClick?: () => void;
   onSymbolClick?: () => void;
   onIndicatorsClick?: () => void;
   redoUserDrawingCommand?: () => boolean;
@@ -29,6 +30,12 @@ export function commitNativeTopBarAction(
   if (action.type === 'indicators') {
     if (!handlers.onIndicatorsClick) return false;
     handlers.onIndicatorsClick();
+    return true;
+  }
+
+  if (action.type === 'layout') {
+    if (!handlers.onLayoutClick) return false;
+    handlers.onLayoutClick();
     return true;
   }
 
