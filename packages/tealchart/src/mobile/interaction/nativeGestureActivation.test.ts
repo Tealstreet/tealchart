@@ -24,6 +24,7 @@ import {
   createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
+import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
 import {
   NATIVE_RESET_VIEW_HIT_SIZE,
   NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE,
@@ -35,6 +36,7 @@ import {
   createNativeResetViewTapGesture,
   createNativeUserDrawingTapGesture,
 } from './nativeTapGestures';
+import { createNativeUserDrawingEditDragGesture } from './nativeUserDrawingEditGestures';
 import {
   createNativeChartAxisPinchGesture,
   createNativeChartPanGesture,
@@ -253,6 +255,78 @@ describe('native gesture activation', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('routes selected drawing drags only after the start point is accepted', () => {
+    const began: [number, number][] = [];
+    const moved: [number, number][] = [];
+    let ended = 0;
+    const gesture = createNativeUserDrawingEditDragGesture({
+      controlZones: [{ x1: 0, x2: 30, y1: 0, y2: 30 }],
+      dragActive: shared(false),
+      dragZones: [{ x1: 70, x2: 100, y1: 70, y2: 100 }],
+      enabled: true,
+      frame,
+      onBeginDrag: (x, y) => {
+        began.push([x, y]);
+      },
+      onEndDrag: () => {
+        ended += 1;
+      },
+      onMoveDrag: (x, y) => {
+        moved.push([x, y]);
+      },
+    }) as any;
+
+    const blockedByControl = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 20, y: 20 }], allTouches: [{ x: 20, y: 20 }] },
+      blockedByControl,
+    );
+    expect(blockedByControl.failed).toBe(true);
+
+    const rejected = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 60, y: 80 }], allTouches: [{ x: 60, y: 80 }] }, rejected);
+    expect(rejected.failed).toBe(true);
+
+    const accepted = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 80, y: 80 }], allTouches: [{ x: 80, y: 80 }] }, accepted);
+    expect(accepted.failed).toBe(false);
+
+    gesture.handlers.onBegin({ x: 80, y: 80 });
+    gesture.handlers.onUpdate({ x: 90, y: 72 });
+    gesture.handlers.onFinalize({}, true);
+
+    expect(began).toEqual([[80, 80]]);
+    expect(moved).toEqual([[90, 72]]);
+    expect(ended).toBe(1);
+  });
+
+  it('routes selected drawing action taps through native hit targets', () => {
+    const onAction = vi.fn();
+    const onPopoverGroupChange = vi.fn();
+    const gesture = createNativeSelectedDrawingActionTapGesture({
+      enabled: true,
+      onAction,
+      onPopoverGroupChange,
+      targets: [
+        {
+          command: { type: 'toolbarAction', action: 'deleteSelected' },
+          enabled: true,
+          type: 'command',
+          x1: 40,
+          x2: 80,
+          y1: 20,
+          y2: 60,
+        },
+      ],
+    }) as any;
+
+    gesture.handlers.onEnd({ x: 60, y: 40 }, true);
+    expect(onAction).toHaveBeenCalledWith({ type: 'toolbarAction', action: 'deleteSelected' });
+
+    gesture.handlers.onEnd({ x: 10, y: 40 }, true);
+    expect(onAction).toHaveBeenCalledTimes(1);
   });
 
   it('toggles crosshair after a stationary long press using the tap interaction rules', () => {

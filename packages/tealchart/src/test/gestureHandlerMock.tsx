@@ -74,6 +74,10 @@ export const Gesture = {
     type: 'Simultaneous',
     gestures,
   }),
+  Exclusive: (...gestures: unknown[]) => ({
+    type: 'Exclusive',
+    gestures,
+  }),
 };
 
 export function GestureDetector({ children }: { children: unknown }) {

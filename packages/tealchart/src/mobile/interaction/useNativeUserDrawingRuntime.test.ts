@@ -1,3 +1,5 @@
+import type { DrawingCoordinateSpace } from '../../drawings';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -6,12 +8,35 @@ import {
   DEFAULT_USER_DRAWING_STYLE,
   dispatchUserDrawingCommand,
 } from '../../drawings';
+import { resolveNativeUserDrawingEditDragZones } from './nativeUserDrawingEditDragZones';
 import {
+  canBeginNativeUserDrawingEditDragAtPointFromState,
   createNativeUserDrawingDuplicateSelectedToolbarCommand,
   createNativeUserDrawingNoAffectedToolbarCommandMetadata,
   createNativeUserDrawingSelectedToolbarCommandMetadata,
   resolveNativeUserDrawingExternalState,
 } from './useNativeUserDrawingRuntime';
+
+const drawingSpace: DrawingCoordinateSpace = {
+  viewport: {
+    startTime: 1_000,
+    endTime: 2_000,
+    priceMin: 0,
+    priceMax: 200,
+  },
+  pane: {
+    id: 'main',
+    top: 0,
+    bottom: 100,
+    height: 100,
+    yMin: 0,
+    yMax: 200,
+  },
+  chartLeft: 0,
+  chartRight: 100,
+};
+
+const spacesByPaneId = new Map([['main', drawingSpace]]);
 
 describe('native user drawing command metadata', () => {
   it('marks drawing-independent toolbar commands as affecting no drawing ids', () => {
@@ -53,12 +78,89 @@ describe('native user drawing command metadata', () => {
       ],
       selection: { drawingId: 'trend-line' },
     });
-    const command = createNativeUserDrawingDuplicateSelectedToolbarCommand(state, () => 'trend-line-copy', () => 10);
+    const command = createNativeUserDrawingDuplicateSelectedToolbarCommand(
+      state,
+      () => 'trend-line-copy',
+      () => 10,
+    );
     const result = dispatchUserDrawingCommand(state, command);
     const event = createUserDrawingCommandEvent(state, result);
 
     expect(result.changed).toBe(true);
     expect(event?.affectedIds).toEqual(['trend-line', 'trend-line-copy']);
+  });
+});
+
+describe('native selected drawing edit drag eligibility', () => {
+  const selectedTrendLineState = createUserDrawingState({
+    drawings: [
+      {
+        id: 'trend-line',
+        kind: 'trendLine',
+        paneId: 'main',
+        visible: true,
+        locked: false,
+        createdAt: 1,
+        updatedAt: 1,
+        style: DEFAULT_USER_DRAWING_STYLE,
+        points: [
+          { time: 1_000, price: 100 },
+          { time: 2_000, price: 100 },
+        ],
+        extend: 'none',
+      },
+    ],
+    selection: { drawingId: 'trend-line' },
+  });
+
+  it('accepts drags that start on an already selected drawing', () => {
+    expect(
+      canBeginNativeUserDrawingEditDragAtPointFromState(selectedTrendLineState, { x: 50, y: 50 }, spacesByPaneId),
+    ).toBe(true);
+  });
+
+  it('rejects unselected, empty, and locked drawing starts', () => {
+    expect(
+      canBeginNativeUserDrawingEditDragAtPointFromState(
+        createUserDrawingState({ ...selectedTrendLineState, selection: null }),
+        { x: 50, y: 50 },
+        spacesByPaneId,
+      ),
+    ).toBe(false);
+    expect(
+      canBeginNativeUserDrawingEditDragAtPointFromState(selectedTrendLineState, { x: 50, y: 80 }, spacesByPaneId),
+    ).toBe(false);
+    expect(
+      canBeginNativeUserDrawingEditDragAtPointFromState(
+        createUserDrawingState({
+          ...selectedTrendLineState,
+          drawings: selectedTrendLineState.drawings.map((drawing) => ({ ...drawing, locked: true })),
+        }),
+        { x: 50, y: 50 },
+        spacesByPaneId,
+      ),
+    ).toBe(false);
+  });
+
+  it('samples edit drag zones around the actual selected drawing hit surface', () => {
+    const zones = resolveNativeUserDrawingEditDragZones({
+      anchor: {
+        anchor: { x: 50, y: 40 },
+        bounds: { x: 0, y: 40, width: 100, height: 20 },
+        drawingIds: ['trend-line'],
+        paneIds: ['main'],
+        primaryPaneId: 'main',
+      },
+      drawings: selectedTrendLineState.drawings,
+      radius: 10,
+      selection: selectedTrendLineState.selection,
+      spacesByPaneId,
+      step: 20,
+    });
+
+    expect(zones.length).toBeGreaterThan(0);
+    expect(zones.some((zone) => zone.x1 <= 50 && zone.x2 >= 50 && zone.y1 <= 50 && zone.y2 >= 50)).toBe(true);
+    expect(zones.every((zone) => zone.y1 <= 60 && zone.y2 >= 40)).toBe(true);
   });
 });
 
