@@ -6,12 +6,14 @@
  */
 
 import type { Bar, IBasicDataFeed, UnifiedPaneLayout } from '../types';
-import type { IIndicatorManager } from './ChartWidgetCore';
+import type { ChartWidgetBarsChangedContext, ChartWidgetDataContext, IIndicatorManager } from './ChartWidgetCore';
+import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './historyBackfill';
 
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 
-import { ChartWidgetCore } from './ChartWidgetCore';
 import { TIME_AXIS_HEIGHT } from '../types';
+import { normalizeResolution } from '../utils/normalizeResolution';
+import { ChartWidgetCore } from './ChartWidgetCore';
 
 // Force re-render helper
 function useForceUpdate() {
@@ -31,7 +33,9 @@ export interface UseTealchartCoreOptions {
 
 export interface TealchartCoreState {
   bars: Bar[];
+  barsContext: ChartWidgetBarsChangedContext | null;
   isLoading: boolean;
+  isLoadingMoreBars: boolean;
   symbol: string;
   interval: string;
   unifiedLayout: UnifiedPaneLayout;
@@ -41,6 +45,7 @@ export interface TealchartCoreActions {
   setSymbol: (symbol: string) => void;
   setInterval: (interval: string) => void;
   setIndicatorManager: (manager: IIndicatorManager) => void;
+  requestMoreBars: (direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint) => void;
 }
 
 export type UseTealchartCoreReturn = TealchartCoreState &
@@ -65,6 +70,91 @@ const EMPTY_PANE_LAYOUT: UnifiedPaneLayout = {
   timeAxisHeight: TIME_AXIS_HEIGHT,
 };
 
+type TealchartCoreStateAction =
+  | {
+      type: 'barsChanged';
+      bars: Bar[];
+      context: ChartWidgetBarsChangedContext;
+    }
+  | {
+      type: 'loadingChanged';
+      loading: boolean;
+      context: ChartWidgetDataContext;
+    }
+  | {
+      type: 'loadingMoreBarsChanged';
+      loading: boolean;
+      context: ChartWidgetDataContext;
+    }
+  | {
+      type: 'symbolChanged';
+      symbol: string;
+    }
+  | {
+      type: 'intervalChanged';
+      interval: string;
+    }
+  | {
+      type: 'controlledDataContextChanged';
+      symbol: string;
+      interval: string;
+    };
+
+export function dataContextMatches(state: TealchartCoreState, context: ChartWidgetDataContext): boolean {
+  return state.symbol === context.symbol && state.interval === context.interval;
+}
+
+export function tealchartCoreStateReducer(
+  state: TealchartCoreState,
+  action: TealchartCoreStateAction,
+): TealchartCoreState {
+  switch (action.type) {
+    case 'barsChanged':
+      if (!dataContextMatches(state, action.context)) return state;
+      return {
+        ...state,
+        bars: [...action.bars],
+        barsContext: action.context,
+      };
+    case 'loadingChanged':
+      if (!dataContextMatches(state, action.context)) return state;
+      return {
+        ...state,
+        isLoading: action.loading,
+      };
+    case 'loadingMoreBarsChanged':
+      if (!dataContextMatches(state, action.context)) return state;
+      return {
+        ...state,
+        isLoadingMoreBars: action.loading,
+      };
+    case 'symbolChanged':
+      return {
+        ...state,
+        symbol: action.symbol,
+        isLoading: true,
+        isLoadingMoreBars: false,
+      };
+    case 'intervalChanged':
+      return {
+        ...state,
+        interval: action.interval,
+        isLoading: true,
+        isLoadingMoreBars: false,
+      };
+    case 'controlledDataContextChanged':
+      return {
+        ...state,
+        symbol: action.symbol,
+        interval: action.interval,
+        isLoading: true,
+        isLoadingMoreBars: false,
+      };
+    default:
+      return state;
+  }
+}
+
 /**
  * React hook that wraps ChartWidgetCore for reactive state management.
  *
@@ -86,36 +176,53 @@ const EMPTY_PANE_LAYOUT: UnifiedPaneLayout = {
 export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchartCoreReturn {
   const forceUpdate = useForceUpdate();
   const coreRef = useRef<ChartWidgetCore | null>(null);
+  const lastIntervalPropRef = useRef(options.interval);
+  const lastSymbolPropRef = useRef(options.symbol);
 
   // Whether the hook is enabled (datafeed provided)
   const enabled = !!options.datafeed;
 
-  // Reactive state
-  const [bars, setBars] = useState<Bar[]>([]);
-  const [isLoading, setIsLoading] = useState(enabled);
-  const [symbol, setSymbolState] = useState(options.symbol);
-  const [interval, setIntervalState] = useState(options.interval || '1h');
+  const [coreState, dispatchCoreState] = useReducer(tealchartCoreStateReducer, {
+    bars: [],
+    barsContext: null,
+    isLoading: enabled,
+    isLoadingMoreBars: false,
+    symbol: options.symbol,
+    interval: normalizeResolution(options.interval, '1h'),
+    unifiedLayout: EMPTY_PANE_LAYOUT,
+  });
 
   const core = coreRef.current;
 
   // Create and initialize core in effect (only if enabled)
   useEffect(() => {
     if (!enabled || !options.datafeed) return;
+    const interval = normalizeResolution(options.interval, '1h');
+    lastSymbolPropRef.current = options.symbol;
+    lastIntervalPropRef.current = options.interval;
+    dispatchCoreState({ type: 'controlledDataContextChanged', symbol: options.symbol, interval });
 
     const instance = new ChartWidgetCore({
       datafeed: options.datafeed,
       symbol: options.symbol,
       interval: options.interval,
       indicatorManager: options.indicatorManager,
-      scheduleRender: forceUpdate,
-      onBarsChanged: (newBars) => setBars([...newBars]),
-      onLoadingChanged: setIsLoading,
+      scheduleRender: () => {},
+      onBarsChanged: (newBars, context) => {
+        dispatchCoreState({ type: 'barsChanged', bars: newBars, context });
+      },
+      onLoadingChanged: (loading, context) => {
+        dispatchCoreState({ type: 'loadingChanged', loading, context });
+      },
+      onLoadingMoreBarsChanged: (loading, context) => {
+        dispatchCoreState({ type: 'loadingMoreBarsChanged', loading, context });
+      },
       onSymbolChange: (s) => {
-        setSymbolState(s);
+        dispatchCoreState({ type: 'symbolChanged', symbol: s });
         options.onSymbolChange?.(s);
       },
       onIntervalChange: (i) => {
-        setIntervalState(i);
+        dispatchCoreState({ type: 'intervalChanged', interval: i });
         options.onIntervalChange?.(i);
       },
     });
@@ -131,17 +238,25 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
 
   // Handle symbol prop changes
   useEffect(() => {
-    if (core && options.symbol !== symbol) {
-      core.setSymbol(options.symbol);
+    if (!core) {
+      lastSymbolPropRef.current = options.symbol;
+      return;
     }
-  }, [options.symbol, symbol, core]);
+    if (Object.is(lastSymbolPropRef.current, options.symbol)) return;
+    lastSymbolPropRef.current = options.symbol;
+    core.setSymbol(options.symbol);
+  }, [options.symbol, core]);
 
   // Handle interval prop changes
   useEffect(() => {
-    if (core && options.interval && options.interval !== interval) {
-      core.setInterval(options.interval);
+    if (!core) {
+      lastIntervalPropRef.current = options.interval;
+      return;
     }
-  }, [options.interval, interval, core]);
+    if (Object.is(lastIntervalPropRef.current, options.interval)) return;
+    lastIntervalPropRef.current = options.interval;
+    if (options.interval) core.setInterval(options.interval);
+  }, [options.interval, core]);
 
   // Handle indicator manager changes
   useEffect(() => {
@@ -172,18 +287,28 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
     [core],
   );
 
+  const requestMoreBars = useCallback(
+    (direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint) => {
+      core?.requestMoreBars(direction, hint);
+    },
+    [core],
+  );
+
   return {
     // State
-    bars,
-    isLoading,
-    symbol,
-    interval,
-    unifiedLayout: core?.getUnifiedLayout() ?? EMPTY_PANE_LAYOUT,
+    bars: coreState.bars,
+    barsContext: coreState.barsContext,
+    isLoading: coreState.isLoading,
+    isLoadingMoreBars: coreState.isLoadingMoreBars,
+    symbol: coreState.symbol,
+    interval: coreState.interval,
+    unifiedLayout: core?.getUnifiedLayout() ?? coreState.unifiedLayout,
 
     // Actions
     setSymbol,
     setInterval: setIntervalAction,
     setIndicatorManager,
+    requestMoreBars,
 
     // Core instance (null when disabled)
     core,

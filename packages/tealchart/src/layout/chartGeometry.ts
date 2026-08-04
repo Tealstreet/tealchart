@@ -87,13 +87,15 @@ export const WEB_CHART_CHROME_METRICS: ChartChromeMetrics = {
 export const MOBILE_CHART_CHROME_METRICS: ChartChromeMetrics = {
   topBarHeight: 36,
   leftToolRailWidth: 52,
-  leftToolRailInset: 8,
+  leftToolRailInset: 0,
   leftToolRailTopGap: 8,
   topLeftLegendLeft: 0,
   topLeftLegendTopGap: 0,
   topLeftLegendWidth: 0,
   topLeftLegendMinHeight: 0,
 };
+
+export const LEFT_TOOL_RAIL_COLLAPSED_WIDTH = 34;
 
 export const EMPTY_INSETS: Insets = {
   top: 0,
@@ -152,6 +154,20 @@ export function computeLeftToolRailTop(metrics: Pick<ChartChromeMetrics, 'topBar
   return metrics.topBarHeight + metrics.leftToolRailTopGap;
 }
 
+export function resolveLeftToolRailWidth(
+  metrics: Pick<ChartChromeMetrics, 'leftToolRailWidth'>,
+  collapsed: boolean,
+): number {
+  return collapsed ? Math.min(metrics.leftToolRailWidth, LEFT_TOOL_RAIL_COLLAPSED_WIDTH) : metrics.leftToolRailWidth;
+}
+
+export function resolveLeftToolRailMetrics(metrics: ChartChromeMetrics, collapsed: boolean): ChartChromeMetrics {
+  return {
+    ...metrics,
+    leftToolRailWidth: resolveLeftToolRailWidth(metrics, collapsed),
+  };
+}
+
 export function computeLeftToolRailAvoidanceInset(
   metrics: Pick<ChartChromeMetrics, 'leftToolRailInset' | 'leftToolRailWidth'>,
   viewportWidth: number,
@@ -163,6 +179,14 @@ export function computeLeftToolRailAvoidanceInset(
   const preferredInset = metrics.leftToolRailInset + metrics.leftToolRailWidth + gap;
   const maxFittingInset = viewportWidth - rightInset - surfaceWidth;
   return Math.max(baseInset, Math.min(preferredInset, maxFittingInset));
+}
+
+export function computeTradingLineLabelMinX(
+  metrics: Pick<ChartChromeMetrics, 'leftToolRailInset' | 'leftToolRailWidth'>,
+  margins: Pick<ChartMargins, 'left'>,
+  gap = 2,
+): number {
+  return Math.max(margins.left, metrics.leftToolRailInset + metrics.leftToolRailWidth + gap);
 }
 
 export function computeTopLeftLegendRect(

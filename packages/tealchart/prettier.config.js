@@ -40,8 +40,4 @@ module.exports = {
     '^(?!.*.s?css$)(\\.\\/.*$|\\.$)',
     '.*\\.s?css$',
   ],
-  importOrderSeparation: true,
-  importOrderMergeDuplicateImports: true,
-  importOrderBuiltinModulesToTop: true,
-  importOrderCaseInsensitive: true,
 };

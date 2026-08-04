@@ -3,8 +3,8 @@ import type { UserDrawingSelectedActionSurfaceCommand, UserDrawingToolbarAction 
 
 /**
  * Platform-neutral line-icon registry for drawing tools and toolbar actions.
- * Web renders these via inline <svg>; mobile renders the same nodes through
- * react-native-svg, so both platforms draw identical marks from one source.
+ * Web renders these via inline <svg>; future native drawing surfaces should
+ * consume the same geometry instead of inventing a second icon catalog.
  *
  * Geometry only — stroke/fill/width are applied by the platform render layer
  * (default: stroke = current color, no fill, round caps). `filled` nodes are
@@ -65,6 +65,10 @@ export const DRAWING_ICONS = {
     line(1.5, 12, 6, 12),
     line(18, 12, 22.5, 12),
   ]),
+  chevronLeft: def([polyline('15 6 9 12 15 18')]),
+  chevronRight: def([polyline('9 6 15 12 9 18')]),
+  chevronDown: def([polyline('6 9 12 15 18 9')]),
+  indicators: def([line(15, 4, 9, 20), line(12, 8, 19, 8), line(5, 15, 12, 15)]),
 
   // --- Lines ---
   trendLine: def([line(5, 19, 19, 5), circle(5, 19, 2), circle(19, 5, 2)]),
@@ -275,6 +279,12 @@ export const DRAWING_ICONS = {
   more: def([dot(5, 12, 1.6), dot(12, 12, 1.6), dot(19, 12, 1.6)]),
   undo: def([polyline('9 14 4 9 9 4'), p('M4 9h10.5a5.5 5.5 0 0 1 0 11H9')]),
   redo: def([polyline('15 14 20 9 15 4'), p('M20 9H9.5a5.5 5.5 0 0 0 0 11H15')]),
+  refresh: def([
+    p('M21 2v6h-6'),
+    p('M3 12a9 9 0 0 1 15-6.7L21 8'),
+    p('M3 22v-6h6'),
+    p('M21 12a9 9 0 0 1-15 6.7L3 16'),
+  ]),
   plus: def([line(12, 5, 12, 19), line(5, 12, 19, 12)]),
   close: def([line(18, 6, 6, 18), line(6, 6, 18, 18)]),
   arrowUp: def([line(12, 19, 12, 5), polyline('6 11 12 5 18 11')]),

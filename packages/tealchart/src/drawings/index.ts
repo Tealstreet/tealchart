@@ -360,8 +360,10 @@ export {
   resolveUserDrawingPressureStrokeSegments,
   resolveUserDrawingHandlePoints,
   resolveUserDrawingRenderEntries,
+  resolveUserDrawingRenderEntriesFromSlices,
   resolveUserDrawingScreenBounds,
   resolveUserDrawingSelectionActionAnchor,
+  resolveUserDrawingSelectionActionAnchorFromDrawings,
 } from './renderModel';
 export type {
   ResolveUserDrawingRenderEntriesOptions,

@@ -53,7 +53,6 @@ export abstract class Component<S = Record<string, unknown>> {
    */
   mount(parent: HTMLElement): void {
     if (this._mounted) {
-      console.warn('Component already mounted');
       return;
     }
 
@@ -151,7 +150,7 @@ export abstract class Component<S = Record<string, unknown>> {
       onClick?: (e: MouseEvent) => void;
       onMouseEnter?: (e: MouseEvent) => void;
       onMouseLeave?: (e: MouseEvent) => void;
-    }
+    },
   ): HTMLElementTagNameMap[K] {
     const el = document.createElement(tagName);
 
@@ -244,7 +243,7 @@ export class TemplateComponent extends Component<Record<string, unknown>> {
   constructor(
     template: (state: Record<string, unknown>) => string,
     initialState: Record<string, unknown> = {},
-    options: ComponentOptions = {}
+    options: ComponentOptions = {},
   ) {
     super('div', initialState, options);
     this.template = template;

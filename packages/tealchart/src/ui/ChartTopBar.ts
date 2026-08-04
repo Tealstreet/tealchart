@@ -16,6 +16,7 @@ import type { ChartStore } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
+import type { ChartChromeMetrics } from '../layout/chartGeometry';
 
 import {
   getUserDrawingAllDrawingsUpdateOptions,
@@ -40,6 +41,7 @@ import {
 import {
   computeLeftToolRailAvoidanceInset,
   computeTopLeftLegendRect,
+  resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
@@ -653,6 +655,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private drawingRailTooltipEl: HTMLElement | null = null;
   private drawingFavoritesBarEl: HTMLElement | null = null;
   private drawingFavoritesBarCleanup: Array<() => void> = [];
+  private uiPreferencesUnsubscribe: (() => void) | null = null;
   private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
   private selectedActionSurfaceEl: HTMLElement | null = null;
@@ -675,6 +678,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     // Apply container styles
     Object.assign(this.el.style, styles.container);
+    this.applyContainerLayout();
 
     // Apply CSS vars if provided
     if (options.cssVars) {
@@ -691,10 +695,16 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     // The interval is pushed by the widget via setInterval(). Subscribing to the
     // shared store would cause cross-widget contamination when multiple widgets
     // share the same chartKey.
+    this.uiPreferencesUnsubscribe = this.chartStore.uiPreferences.listen(() => {
+      this.pinnedDrawingToolCategoryId = null;
+      this.render();
+    });
     this.render();
   }
 
   protected onUnmount(): void {
+    this.uiPreferencesUnsubscribe?.();
+    this.uiPreferencesUnsubscribe = null;
     this.removeDrawingToolRail();
     this.removeDrawingFavoritesBar();
     this.removeSelectedActionSurface();
@@ -712,6 +722,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeDrawingFavoritesBar();
     this.removeSelectedActionSurface();
     this.timeframeButtons.clear();
+    this.applyContainerLayout();
 
     // Symbol section
     const symbolSection = this.createElement('div', {
@@ -831,6 +842,24 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
       this.el.appendChild(this.layoutSelector.getElement());
     }
+  }
+
+  private isDrawingToolRailCollapsed(): boolean {
+    return this.chartStore.uiPreferences.get().leftToolRailCollapsed;
+  }
+
+  private getLeftToolRailMetrics(): ChartChromeMetrics {
+    return resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, this.isDrawingToolRailCollapsed());
+  }
+
+  private applyContainerLayout(): void {
+    this.el.style.marginLeft = `${this.getLeftToolRailMetrics().leftToolRailWidth}px`;
+  }
+
+  private setDrawingToolRailCollapsed(collapsed: boolean): void {
+    this.pinnedDrawingToolCategoryId = null;
+    this.hideRailTooltip();
+    this.chartStore.uiPreferences.setKey('leftToolRailCollapsed', collapsed);
   }
 
   private removeDrawingToolRail(): void {
@@ -1090,8 +1119,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     const viewportHeight = parentRect.height || window.innerHeight;
     const barWidth = bar.offsetWidth || 0;
     const barHeight = bar.offsetHeight || 0;
-    const defaultLeft =
-      WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 16;
+    const railMetrics = this.getLeftToolRailMetrics();
+    const defaultLeft = railMetrics.leftToolRailInset + railMetrics.leftToolRailWidth + 16;
     const defaultTop = WEB_CHART_CHROME_METRICS.topBarHeight + 38;
     const maxLeft = Math.max(0, viewportWidth - barWidth - 8);
     const maxTop = Math.max(0, viewportHeight - barHeight - 8);
@@ -1252,8 +1281,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       width: parentRect.width || window.innerWidth,
       height: parentRect.height || window.innerHeight,
     };
+    const railMetrics = this.getLeftToolRailMetrics();
     const legendRect = computeTopLeftLegendRect(
-      WEB_CHART_CHROME_METRICS,
+      railMetrics,
       { x: 0, y: 0, width: viewport.width, height: viewport.height },
       0,
       // The rail runs full height, so the legend clears it — match that in the avoid-rect.
@@ -1268,7 +1298,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       },
       inset: {
         left: computeLeftToolRailAvoidanceInset(
-          WEB_CHART_CHROME_METRICS,
+          railMetrics,
           viewport.width,
           SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
         ),
@@ -1447,14 +1477,63 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
   }
 
-  private renderDrawingToolRail(activeTool: UserDrawingTool): void {
-    const drawingState = this.options.userDrawingState;
-    const rail = this.createElement('div', {
-      style: styles.drawingToolRail,
+  private createDrawingRailCollapseButton(collapsed: boolean): HTMLButtonElement {
+    const label = collapsed ? 'Expand drawing toolbar' : 'Collapse drawing toolbar';
+    const btn = this.createElement('button', {
+      style: styles.drawingToolCategoryButton,
       attributes: {
-        'aria-label': 'Drawing tool categories',
+        type: 'button',
+        title: label,
+        'aria-label': label,
+        'aria-pressed': collapsed ? 'true' : 'false',
       },
     });
+    this.setDrawingIconContent(btn, collapsed ? 'arrowMarkRight' : 'arrowMarkLeft', collapsed ? '>' : '<', 18);
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.setDrawingToolRailCollapsed(!collapsed);
+    });
+    btn.addEventListener('mouseenter', () => {
+      Object.assign(btn.style, styles.drawingButtonHover);
+      this.showRailTooltip(btn, label);
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.backgroundColor = 'transparent';
+      btn.style.color = 'var(--text2, #b2b5be)';
+      this.hideRailTooltip();
+    });
+    return btn;
+  }
+
+  private renderDrawingToolRail(activeTool: UserDrawingTool): void {
+    const drawingState = this.options.userDrawingState;
+    const collapsed = this.isDrawingToolRailCollapsed();
+    const railMetrics = this.getLeftToolRailMetrics();
+    const rail = this.createElement('div', {
+      style: {
+        ...styles.drawingToolRail,
+        width: `${railMetrics.leftToolRailWidth}px`,
+      },
+      attributes: {
+        'aria-label': 'Drawing tool categories',
+        'aria-expanded': collapsed ? 'false' : 'true',
+      },
+    });
+    rail.appendChild(this.createDrawingRailCollapseButton(collapsed));
+
+    this.drawingToolRailEl = rail;
+    const overlayParent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
+    overlayParent.appendChild(rail);
+
+    const tooltip = this.createElement('div', { style: styles.drawingToolTooltip });
+    this.drawingRailTooltipEl = tooltip;
+    overlayParent.appendChild(tooltip);
+
+    if (collapsed) {
+      return;
+    }
+
     const railList = this.createElement('div', {
       style: styles.drawingToolRailList,
       attributes: {
@@ -1528,7 +1607,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         20,
       );
       const flyout = this.createElement('div', {
-        style: styles.drawingToolFlyout,
+        style: {
+          ...styles.drawingToolFlyout,
+          left: `${railMetrics.leftToolRailWidth}px`,
+        },
         attributes: {
           id: flyoutId,
           role: 'menu',
@@ -1589,19 +1671,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         if (flyout.style.display === 'block' && this.pinnedDrawingToolCategoryId !== category.id) hideFlyout();
         else showFlyout();
       };
-      const isMultiTool = category.tools.length > 1;
       categoryButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        // TradingView model: a click (re)activates the category's last-used tool.
-        // A second click on the already-active category reveals the menu instead.
-        if (isMultiTool && activeCategory) {
-          toggleFlyout();
-          return;
-        }
-        closeActiveFlyout();
-        this.recentDrawingToolsByCategory[category.id] = categoryTool;
-        this.options.onUserDrawingToolSelect?.(categoryTool);
+        toggleFlyout();
       });
+      const isMultiTool = category.tools.length > 1;
       const caret = isMultiTool
         ? this.createElement('button', {
             style: styles.drawingToolCategoryCaret,
@@ -1699,13 +1773,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     rail.appendChild(railList);
     this.renderDrawingRailToggles(rail, drawingState);
-    this.drawingToolRailEl = rail;
-    const overlayParent = this.options.drawingOverlayParent ?? this.el.parentElement ?? this.el;
-    overlayParent.appendChild(rail);
-
-    const tooltip = this.createElement('div', { style: styles.drawingToolTooltip });
-    this.drawingRailTooltipEl = tooltip;
-    overlayParent.appendChild(tooltip);
 
     const closeOnOutsidePointer = (event: MouseEvent | TouchEvent) => {
       const target = event.target;

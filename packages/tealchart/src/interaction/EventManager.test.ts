@@ -869,4 +869,52 @@ describe('EventManager drawing drag routing', () => {
 
     manager.dispose();
   });
+
+  it('clamps web time-axis zoom to the shared minimum candle width', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+
+    const container = createContainer();
+    let viewport = { startTime: 99_601, endTime: 100_000, priceMin: 0, priceMax: 100 };
+    const onViewportChange = vi.fn((nextViewport: typeof viewport) => {
+      viewport = nextViewport;
+    });
+    const onRequestMoreBars = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getViewport: () => viewport,
+        getDimensions: () => ({
+          width: 16,
+          height: 600,
+          priceAxisWidth: 8,
+          timeAxisHeight: 24,
+          topMargin: 20,
+          leftMargin: 0,
+        }),
+        getIntervalMs: () => 100,
+        onViewportChange,
+        onRequestMoreBars,
+      }),
+    );
+
+    const event = new Event('wheel', { bubbles: true, cancelable: true }) as WheelEvent;
+    Object.defineProperties(event, {
+      deltaX: { value: 0 },
+      deltaY: { value: 10_000 },
+    });
+    container.dispatchEvent(event);
+    rafCallbacks.shift()?.(0);
+
+    expect(onViewportChange).toHaveBeenCalledOnce();
+    expect(onViewportChange).toHaveBeenCalledWith({ startTime: 99_600, endTime: 100_000, priceMin: 0, priceMax: 100 });
+    expect(onRequestMoreBars).toHaveBeenCalledWith('left', {
+      viewport: { startTime: 99_600, endTime: 100_000, priceMin: 0, priceMax: 100 },
+    });
+
+    manager.dispose();
+  });
 });

@@ -67,8 +67,8 @@ The two platforms share:
 Platform-specific rendering:
 
 - **Web**: `ui/ChartCore.ts` (canvas + Konva), `interaction/EventManager.ts`.
-- **Mobile**: `mobile/SkiaTealchart.tsx`, `mobile/components/*` (RN),
-  `mobile/hooks/useChartGestures.ts`.
+- **Mobile**: `src/SkiaTealchart.tsx` plus passive `src/mobile/render/*`
+  and `src/mobile/utils/*` helpers.
 
 If a feature is genuinely web-only or mobile-only (e.g. keyboard
 shortcuts, native haptics), say so explicitly in the PR description.

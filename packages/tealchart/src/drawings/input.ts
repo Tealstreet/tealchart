@@ -52,6 +52,7 @@ export interface UserDrawingInputOptions {
 export interface UserDrawingSelectionInputOptions {
   additive?: boolean;
   hitTest?: UserDrawingHitTestOptions;
+  toggleSelected?: boolean;
 }
 
 export interface UserDrawingSelectionAtPointResult {
@@ -977,9 +978,19 @@ export function resolveUserDrawingSelectionAtPoint(
     };
   }
 
+  const currentSelectionIds = getUserDrawingSelectionIds(state.selection);
+  const shouldToggleSelectionOff =
+    options.toggleSelected === true &&
+    hit !== null &&
+    currentSelectionIds.length === 1 &&
+    currentSelectionIds[0] === hit.drawing.id;
   const nextState = selectUserDrawing(
     state,
-    hit ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex } : null,
+    shouldToggleSelectionOff
+      ? null
+      : hit
+        ? { drawingId: hit.drawing.id, handle: hit.handle, pointIndex: hit.pointIndex }
+        : null,
   );
   return {
     state: nextState,

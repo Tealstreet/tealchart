@@ -98,25 +98,47 @@ export function resolveUserDrawingRenderEntries(
   state: UserDrawingState,
   options: ResolveUserDrawingRenderEntriesOptions = {},
 ): UserDrawingRenderEntry[] {
-  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
-  const entries: UserDrawingRenderEntry[] = state.drawings.map((drawing) => ({
+  return resolveUserDrawingRenderEntriesFromSlices({
+    draft: state.draft,
+    drawings: state.drawings,
+    measure: state.measure,
+    selection: state.selection,
+    options,
+  });
+}
+
+export function resolveUserDrawingRenderEntriesFromSlices({
+  draft,
+  drawings,
+  measure,
+  selection,
+  options = {},
+}: {
+  draft: UserDrawingState['draft'];
+  drawings: readonly UserDrawing[];
+  measure?: UserDrawingState['measure'];
+  selection: UserDrawingState['selection'];
+  options?: ResolveUserDrawingRenderEntriesOptions;
+}): UserDrawingRenderEntry[] {
+  const selectedIds = new Set(getUserDrawingSelectionIds(selection));
+  const entries: UserDrawingRenderEntry[] = drawings.map((drawing) => ({
     drawing,
     phase: 'committed' as const,
     selected: selectedIds.has(drawing.id),
   }));
 
-  if (state.measure) {
+  if (measure) {
     const measureDrawing = createUserDrawingFromDraft(
       {
         tool: 'datePriceRange',
-        paneId: state.measure.paneId,
-        anchors: state.measure.anchors,
-        style: state.measure.style,
-        startedAt: state.measure.startedAt,
+        paneId: measure.paneId,
+        anchors: measure.anchors,
+        style: measure.style,
+        startedAt: measure.startedAt,
       },
       {
         id: '__measure__',
-        now: options.now ?? state.measure.startedAt,
+        now: options.now ?? measure.startedAt,
       },
     );
     if (measureDrawing) {
@@ -128,13 +150,13 @@ export function resolveUserDrawingRenderEntries(
     }
   }
 
-  if (!state.draft) return entries;
+  if (!draft) return entries;
 
-  const requiredAnchorCount = getRequiredAnchorCount(state.draft.tool);
-  const placementMode = getUserDrawingPlacementMode(state.draft.tool);
-  let draftAnchors = state.draft.anchors;
-  if (state.draft.anchors.length < requiredAnchorCount && options.draftPreviewAnchor) {
-    draftAnchors = [...state.draft.anchors, options.draftPreviewAnchor];
+  const requiredAnchorCount = getRequiredAnchorCount(draft.tool);
+  const placementMode = getUserDrawingPlacementMode(draft.tool);
+  let draftAnchors = draft.anchors;
+  if (draft.anchors.length < requiredAnchorCount && options.draftPreviewAnchor) {
+    draftAnchors = [...draft.anchors, options.draftPreviewAnchor];
   }
   if (
     draftAnchors.length >= 2 &&
@@ -150,12 +172,12 @@ export function resolveUserDrawingRenderEntries(
 
   const draftDrawing = createUserDrawingFromDraft(
     {
-      ...state.draft,
+      ...draft,
       anchors: draftAnchors,
     },
     {
       id: options.draftId ?? '__draft__',
-      now: options.now ?? state.draft.startedAt,
+      now: options.now ?? draft.startedAt,
     },
   );
 
@@ -675,14 +697,43 @@ export function resolveUserDrawingSelectionActionAnchor(
   spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace> | Readonly<Record<string, DrawingCoordinateSpace>>,
   options: ResolveUserDrawingSelectionActionAnchorOptions = {},
 ): UserDrawingSelectionActionAnchor | null {
-  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
-  if (selectedIds.size === 0) return null;
+  return resolveUserDrawingSelectionActionAnchorFromDrawings({
+    drawings: state.drawings,
+    selection: state.selection,
+    spacesByPaneId,
+    options,
+  });
+}
+
+export function resolveUserDrawingSelectionActionAnchorFromDrawings({
+  drawings,
+  selection,
+  spacesByPaneId,
+  options = {},
+}: {
+  drawings: readonly UserDrawing[];
+  selection: UserDrawingState['selection'];
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace> | Readonly<Record<string, DrawingCoordinateSpace>>;
+  options?: ResolveUserDrawingSelectionActionAnchorOptions;
+}): UserDrawingSelectionActionAnchor | null {
+  const selectedIds = getUserDrawingSelectionIds(selection);
+  if (selectedIds.length === 0) return null;
 
   const normalizedOptions = {
     padding: options.padding ?? DEFAULT_SELECTION_ACTION_PADDING,
     minTargetSize: options.minTargetSize ?? DEFAULT_SELECTION_ACTION_MIN_TARGET_SIZE,
   };
-  const drawingsById = new Map(state.drawings.map((drawing) => [drawing.id, drawing]));
+  const selectedIndexById = new Map(selectedIds.map((drawingId, index) => [drawingId, index]));
+  const selectedDrawings: (UserDrawing | null)[] = Array.from({ length: selectedIds.length }, () => null);
+  let unresolvedSelectedCount = selectedIds.length;
+  for (const drawing of drawings) {
+    const selectedIndex = selectedIndexById.get(drawing.id);
+    if (selectedIndex === undefined || selectedDrawings[selectedIndex]) continue;
+    selectedDrawings[selectedIndex] = drawing;
+    unresolvedSelectedCount -= 1;
+    if (unresolvedSelectedCount === 0) break;
+  }
+
   const drawingIds: string[] = [];
   const paneIds: string[] = [];
   const fallbackDrawingIds: string[] = [];
@@ -690,8 +741,7 @@ export function resolveUserDrawingSelectionActionAnchor(
   let fallbackSpace: DrawingCoordinateSpace | null = null;
   let bounds: DrawingScreenRect | null = null;
 
-  for (const drawingId of selectedIds) {
-    const drawing = drawingsById.get(drawingId);
+  for (const drawing of selectedDrawings) {
     if (!drawing) continue;
 
     const space = getSpaceForDrawing(spacesByPaneId, drawing);
