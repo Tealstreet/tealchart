@@ -285,15 +285,17 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
-  it('suppresses crosshair updates during canvas pan drag', () => {
+  it('keeps the crosshair visible and moving during canvas pan drag', () => {
     const container = createContainer();
     const onCrossHairMoved = vi.fn();
     const onCrossHairVisibilityChange = vi.fn();
+    const onCrosshairRender = vi.fn();
     const manager = new EventManager(
       container,
       createCallbacks({
         onCrossHairMoved,
         onCrossHairVisibilityChange,
+        onCrosshairRender,
       }),
     );
 
@@ -304,8 +306,16 @@ describe('EventManager drawing drag routing', () => {
     container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
     window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 140, clientY: 120 }));
 
-    expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(false);
-    expect(onCrossHairMoved).toHaveBeenCalledOnce();
+    expect(onCrossHairVisibilityChange).not.toHaveBeenCalledWith(false);
+    expect(onCrossHairMoved).toHaveBeenCalledTimes(2);
+    expect(onCrossHairMoved).toHaveBeenLastCalledWith(140, 120, { constrainedPlacement: false });
+    expect(manager.getCrosshair()).toEqual({ visible: true, x: 140, y: 120 });
+    expect(onCrosshairRender).toHaveBeenCalledTimes(2);
+
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 760, clientY: 120 }));
+    expect(onCrossHairVisibilityChange).not.toHaveBeenCalledWith(false);
+    expect(manager.getCrosshair()).toEqual({ visible: true, x: 739, y: 120 });
+    expect(onCrosshairRender).toHaveBeenCalledTimes(3);
 
     window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 140, clientY: 120 }));
     manager.dispose();
