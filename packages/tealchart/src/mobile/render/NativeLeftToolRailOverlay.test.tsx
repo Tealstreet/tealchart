@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import { resolveDrawingToolIconName, USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS } from '../../drawings';
@@ -75,6 +75,7 @@ describe('NativeLeftToolRailOverlay', () => {
     const views = collectElementsByType(overlay, View);
     const pressables = collectElementsByType(overlay, Pressable);
     const icons = collectElementsByType(overlay, NativeDrawingIcon);
+    const scrollViews = collectElementsByType(overlay, ScrollView);
 
     expect(layout!.items.map((item) => item.icon)).toEqual([
       'chevronLeft',
@@ -101,6 +102,14 @@ describe('NativeLeftToolRailOverlay', () => {
         width: layout!.railRect.width,
       }),
     );
+    expect(scrollViews).toHaveLength(1);
+    expect(flattenStyle(scrollViews[0].props.style)).toEqual(
+      expect.objectContaining({
+        height: layout!.railRect.height,
+        width: layout!.railRect.width,
+      }),
+    );
+    expect(views.some((view) => flattenStyle(view.props.style).height === layout!.scrollContentHeight)).toBe(true);
     pressables[0].props.onPress!();
     expect(onCategoryOpenChange).toHaveBeenCalledWith('cursor');
     expect(onToolSelect).not.toHaveBeenCalled();
@@ -263,18 +272,22 @@ describe('NativeLeftToolRailOverlay', () => {
     const pressables = collectElementsByType(overlay, Pressable);
     const texts = collectElementsByType(overlay, Text);
     const views = collectElementsByType(overlay, View);
+    const scrollViews = collectElementsByType(overlay, ScrollView);
     const linesCategory = pressables.find((pressable) => pressable.props.accessibilityLabel === 'Lines drawing tools');
     const trendLineRow = pressables.find((pressable) => pressable.props.accessibilityLabel === 'Trend line');
     const rayRow = pressables.find((pressable) => pressable.props.accessibilityLabel === 'Ray');
 
     expect(linesCategory?.props.accessibilityState).toEqual({ selected: false, expanded: true });
     expect(texts.some((text) => text.props.children === 'Lines')).toBe(true);
+    expect(scrollViews).toHaveLength(2);
     expect(trendLineRow).not.toBeNull();
     expect(rayRow).not.toBeNull();
-    expect(views.some((view) => {
-      const style = flattenStyle(view.props.style);
-      return style.zIndex === 41 && style.elevation === 7;
-    })).toBe(true);
+    expect(
+      views.some((view) => {
+        const style = flattenStyle(view.props.style);
+        return style.zIndex === 41 && style.elevation === 7;
+      }),
+    ).toBe(true);
     linesCategory?.props.onPress!();
     expect(onCategoryOpenChange).toHaveBeenCalledWith(null);
     expect(onToolSelect).not.toHaveBeenCalled();
@@ -282,5 +295,36 @@ describe('NativeLeftToolRailOverlay', () => {
     rayRow?.props.onPress!();
     expect(onToolSelect).toHaveBeenCalledWith('ray');
     expect(onCategoryOpenChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps every category pressable reachable through rail scroll on short surfaces', () => {
+    const layout = createNativeLeftToolRailLayout({
+      height: 160,
+      bottomInset: 32,
+      topBarHeight: 36,
+    });
+    expect(layout).not.toBeNull();
+
+    const overlay = NativeLeftToolRailOverlayImpl({
+      activeBackgroundColor: '#20242a',
+      activeTextColor: '#12c48b',
+      backgroundColor: '#101418',
+      gridColor: '#222831',
+      leftToolRailLayout: layout!,
+      mutedTextColor: '#8a8f98',
+      onCategoryOpenChange: vi.fn(),
+      onToolSelect: vi.fn(),
+      onToggleCollapsed: vi.fn(),
+      toggleBackgroundColor: '#f0f3fa',
+    });
+    const pressables = collectElementsByType(overlay, Pressable);
+    const scrollViews = collectElementsByType(overlay, ScrollView);
+    const lastCategory = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.at(-1)!;
+
+    expect(scrollViews).toHaveLength(1);
+    expect(layout!.scrollContentHeight).toBeGreaterThan(layout!.railRect.height);
+    expect(
+      pressables.some((pressable) => pressable.props.accessibilityLabel === `${lastCategory.label} drawing tools`),
+    ).toBe(true);
   });
 });

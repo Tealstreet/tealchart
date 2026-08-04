@@ -4,10 +4,10 @@ import { resolveDrawingToolIconName, USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS } fr
 import { MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import {
   createNativeLeftToolRailLayout,
+  isNativeLeftToolRailToggleTap,
   NATIVE_LEFT_TOOL_RAIL_CATEGORY_COUNT,
   NATIVE_LEFT_TOOL_RAIL_TOGGLE_BOTTOM_GAP,
   NATIVE_LEFT_TOOL_RAIL_TOGGLE_WIDTH,
-  isNativeLeftToolRailToggleTap,
   resolveNativeLeftToolRailToggleHitRect,
 } from './leftToolRailLayout';
 
@@ -130,7 +130,7 @@ describe('native left tool rail layout', () => {
     );
   });
 
-  it('clips rail items instead of overflowing short chart surfaces', () => {
+  it('overflows short chart surfaces into vertical scroll content', () => {
     const layout = createNativeLeftToolRailLayout({
       height: 160,
       bottomInset: 32,
@@ -139,9 +139,11 @@ describe('native left tool rail layout', () => {
 
     expect(layout).not.toBeNull();
     expect(layout?.items[0]?.kind).toBe('collapseToggle');
-    expect(layout?.items.length).toBeLessThan(NATIVE_LEFT_TOOL_RAIL_CATEGORY_COUNT + 1);
+    expect(layout?.items.length).toBe(NATIVE_LEFT_TOOL_RAIL_CATEGORY_COUNT + 1);
+    expect(layout?.scrollContentHeight).toBeGreaterThan(layout!.railRect.height);
     const lastItem = layout!.items.at(-1)!;
-    expect(lastItem.y + lastItem.height).toBeLessThanOrEqual(layout!.y + layout!.height);
+    expect(lastItem.y + lastItem.height).toBeLessThan(layout!.railRect.y + layout!.scrollContentHeight);
+    expect(lastItem.y + lastItem.height).toBeGreaterThan(layout!.y + layout!.height);
   });
 
   it('omits the rail when there is no room for a touch-sized item', () => {

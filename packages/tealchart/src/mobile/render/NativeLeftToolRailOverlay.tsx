@@ -1,3 +1,4 @@
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import type { UserDrawingTool } from '../../drawings';
 import type { NativeLeftToolRailItem, NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 
@@ -22,6 +23,7 @@ const TOOL_DRAWER_HEADER_HEIGHT = 40;
 const TOOL_DRAWER_ROW_HEIGHT = 38;
 const TOOL_DRAWER_MIN_HEIGHT = 104;
 const TOOL_DRAWER_VERTICAL_PADDING = 8;
+const nativeLeftToolRailScrollOffsets = new WeakMap<NativeLeftToolRailLayout, number>();
 
 export interface NativeLeftToolRailOverlayProps {
   activeBackgroundColor: string;
@@ -41,13 +43,13 @@ function clampNumber(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-function resolveToolDrawerFrame(layout: NativeLeftToolRailLayout, item: NativeLeftToolRailItem) {
+function resolveToolDrawerFrame(layout: NativeLeftToolRailLayout, item: NativeLeftToolRailItem, scrollOffsetY: number) {
   const availableHeight = Math.max(TOOL_DRAWER_MIN_HEIGHT, layout.railRect.height - TOOL_DRAWER_VERTICAL_PADDING);
   const preferredHeight =
     TOOL_DRAWER_HEADER_HEIGHT + (item.tools?.length ?? 0) * TOOL_DRAWER_ROW_HEIGHT + TOOL_DRAWER_VERTICAL_PADDING;
   const height = Math.min(Math.max(TOOL_DRAWER_MIN_HEIGHT, preferredHeight), availableHeight);
   const maxTop = Math.max(4, layout.railRect.height - height - 4);
-  const top = clampNumber(item.y - layout.railRect.y, 4, maxTop);
+  const top = clampNumber(item.y - layout.railRect.y - scrollOffsetY, 4, maxTop);
 
   return {
     height,
@@ -96,7 +98,13 @@ export function NativeLeftToolRailOverlayImpl({
   const openCategoryItem = leftToolRailLayout.collapsed
     ? null
     : categoryItems.find((item) => item.categoryId === openCategoryId && item.tools?.length);
-  const drawerFrame = openCategoryItem ? resolveToolDrawerFrame(leftToolRailLayout, openCategoryItem) : null;
+  const drawerFrame = openCategoryItem
+    ? resolveToolDrawerFrame(
+        leftToolRailLayout,
+        openCategoryItem,
+        nativeLeftToolRailScrollOffsets.get(leftToolRailLayout) ?? 0,
+      )
+    : null;
 
   if (!toggleItem) return null;
   const toggleBottom = leftToolRailLayout.y + leftToolRailLayout.height - (toggleItem.y + toggleItem.height);
@@ -142,52 +150,81 @@ export function NativeLeftToolRailOverlayImpl({
             },
           ]}
         />
-        {categoryItems.map((item) => {
-          if (!item.categoryId) return null;
-          const isOpen = openCategoryId === item.categoryId && !leftToolRailLayout.collapsed;
-          const isHighlighted = item.active === true || isOpen;
-          const itemStyle = [
-            styles.item,
-            styles.toolButton,
+        <ScrollView
+          bounces={false}
+          keyboardShouldPersistTaps="handled"
+          onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+            nativeLeftToolRailScrollOffsets.set(leftToolRailLayout, event.nativeEvent.contentOffset.y);
+          }}
+          onScrollBeginDrag={() => {
+            if (openCategoryId) onCategoryOpenChange(null);
+          }}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+          style={[
+            styles.railScrollArea,
             {
-              height: item.height,
+              height: leftToolRailLayout.railRect.height,
               left: 0,
-              top: item.y - leftToolRailLayout.railRect.y,
+              top: 0,
               width: leftToolRailLayout.railRect.width,
             },
-          ];
-          const visualStyle = [
-            styles.itemVisual,
-            styles.toolItem,
-            {
-              backgroundColor: isHighlighted ? activeBackgroundColor : 'transparent',
-              borderColor: isHighlighted ? activeTextColor : 'transparent',
-              height: item.height,
-              width: item.width,
-            },
-          ];
+          ]}
+        >
+          <View
+            style={{
+              height: leftToolRailLayout.scrollContentHeight,
+              width: leftToolRailLayout.railRect.width,
+            }}
+          >
+            {categoryItems.map((item) => {
+              if (!item.categoryId) return null;
+              const isOpen = openCategoryId === item.categoryId && !leftToolRailLayout.collapsed;
+              const isHighlighted = item.active === true || isOpen;
+              const itemStyle = [
+                styles.item,
+                styles.toolButton,
+                {
+                  height: item.height,
+                  left: 0,
+                  top: item.y - leftToolRailLayout.railRect.y,
+                  width: leftToolRailLayout.railRect.width,
+                },
+              ];
+              const visualStyle = [
+                styles.itemVisual,
+                styles.toolItem,
+                {
+                  backgroundColor: isHighlighted ? activeBackgroundColor : 'transparent',
+                  borderColor: isHighlighted ? activeTextColor : 'transparent',
+                  height: item.height,
+                  width: item.width,
+                },
+              ];
 
-          return (
-            <Pressable
-              accessibilityLabel={item.label}
-              accessibilityRole="button"
-              accessibilityState={{ selected: item.active === true, expanded: isOpen }}
-              hitSlop={{ top: 4, bottom: 4 }}
-              key={`native-left-tool-category-${item.categoryId}`}
-              onPress={() => onCategoryOpenChange(isOpen ? null : (item.categoryId ?? null))}
-              style={itemStyle}
-            >
-              <View pointerEvents="none" style={visualStyle}>
-                <NativeDrawingIcon
-                  name={item.icon}
-                  size={22}
-                  color={isHighlighted ? activeTextColor : mutedTextColor}
-                  strokeWidth={1.75}
-                />
-              </View>
-            </Pressable>
-          );
-        })}
+              return (
+                <Pressable
+                  accessibilityLabel={item.label}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: item.active === true, expanded: isOpen }}
+                  hitSlop={{ top: 4, bottom: 4 }}
+                  key={`native-left-tool-category-${item.categoryId}`}
+                  onPress={() => onCategoryOpenChange(isOpen ? null : (item.categoryId ?? null))}
+                  style={itemStyle}
+                >
+                  <View pointerEvents="none" style={visualStyle}>
+                    <NativeDrawingIcon
+                      name={item.icon}
+                      size={22}
+                      color={isHighlighted ? activeTextColor : mutedTextColor}
+                      strokeWidth={1.75}
+                    />
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        </ScrollView>
         {openCategoryItem && drawerFrame && (
           <View
             accessibilityLabel={`${openCategoryItem.categoryLabel ?? 'Drawing'} tools`}
@@ -320,6 +357,9 @@ const styles = StyleSheet.create({
   },
   railGroup: {
     overflow: 'visible',
+    position: 'absolute',
+  },
+  railScrollArea: {
     position: 'absolute',
   },
   toggleTrack: {
