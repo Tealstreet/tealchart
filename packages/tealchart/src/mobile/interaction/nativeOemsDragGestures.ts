@@ -233,6 +233,7 @@ export function createNativeBracketDragGesture({
         runOnJS(clearNativeBracketDrag)();
         return;
       }
+      clearNativeBracketDragState(bracketDragInteractionState);
       runOnJS(commitBracketMove)(
         payload.objectType,
         payload.objectId,

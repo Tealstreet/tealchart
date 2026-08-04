@@ -1520,5 +1520,7 @@ describe('native gesture activation', () => {
     bracketDragGesture.handlers.onEnd({ translationX: 0, translationY: -8 });
     expect(clearNativeBracketDrag).not.toHaveBeenCalled();
     expect(commitBracketMove).toHaveBeenCalledWith('position', 'position-1', 'tp', expect.any(Number), undefined);
+    expect(bracketDragInteractionState.active.value).toBe(false);
+    expect(bracketDragInteractionState.activeObjectId.value).toBe('');
   });
 });
