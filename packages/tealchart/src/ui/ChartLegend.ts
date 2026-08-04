@@ -2,6 +2,8 @@ import type { PlotStyleOverride } from '../state/chartState';
 import type { Bar, ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 
+import type { ChartChromeMetrics } from '../layout/chartGeometry';
+
 import { computeTopLeftLegendRect, rect, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { safeToFixed } from '../utils/safeNumber';
 import { Component } from './Component';
@@ -39,6 +41,7 @@ export interface ChartLegendOptions extends ComponentOptions {
   interval: ResolutionString;
   exchangeName?: string;
   avoidLeftTools?: boolean;
+  chromeMetrics?: ChartChromeMetrics;
   onToggleIndicator?: (indicatorId: string) => void;
   onSettingsIndicator?: (indicatorId: string) => void;
   onRemoveIndicator?: (indicatorId: string) => void;
@@ -79,9 +82,12 @@ interface IndicatorListElements {
 // Styles
 // ============================================================================
 
-function resolveLegendOrigin(avoidLeftTools: boolean): { left: string; top: string } {
+function resolveLegendOrigin(
+  avoidLeftTools: boolean,
+  chromeMetrics: ChartChromeMetrics = WEB_CHART_CHROME_METRICS,
+): { left: string; top: string } {
   const origin = computeTopLeftLegendRect(
-    WEB_CHART_CHROME_METRICS,
+    chromeMetrics,
     rect(0, 0, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER),
     0,
     { avoidLeftTools },
@@ -280,6 +286,12 @@ export class ChartLegend extends Component<ChartLegendState> {
     this.applyPosition();
   }
 
+  setChromeMetrics(chromeMetrics: ChartChromeMetrics): void {
+    if (chromeMetrics === this.options.chromeMetrics) return;
+    this.options.chromeMetrics = chromeMetrics;
+    this.applyPosition();
+  }
+
   setBars(latestBar: Bar | null, previousBar: Bar | null): void {
     this.state.latestBar = latestBar;
     this.state.previousBar = previousBar;
@@ -347,7 +359,7 @@ export class ChartLegend extends Component<ChartLegendState> {
   }
 
   private applyPosition(): void {
-    const origin = resolveLegendOrigin(Boolean(this.options.avoidLeftTools));
+    const origin = resolveLegendOrigin(Boolean(this.options.avoidLeftTools), this.options.chromeMetrics);
     this.el.style.top = origin.top;
     this.el.style.left = origin.left;
   }

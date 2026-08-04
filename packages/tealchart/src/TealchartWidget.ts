@@ -9,6 +9,7 @@ import type {
   PlotOutput,
   TealscriptRuntimeOptions,
 } from '@tealstreet/tealscript';
+import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
@@ -60,6 +61,12 @@ import type { ChartThemeInput } from './theme';
 import type { ResolutionInput } from './utils/normalizeResolution';
 
 import { LOADING_OPACITY } from './constants';
+import {
+  DEFAULT_HISTORY_BACKFILL_BAR_COUNT,
+  mergeLeftHistoryBackfillRequestHints,
+  resolveLeftHistoryBackfillContinuationHint,
+  resolveLeftHistoryBackfillRequest,
+} from './core/historyBackfill';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -237,6 +244,8 @@ export class TealchartWidget {
 
   // Historical data loading
   private _isLoadingMoreBars = false;
+  private _hasQueuedLeftHistoryBackfill = false;
+  private _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   private _hasMoreHistoricalData = true;
 
   // Loading state for timeframe changes
@@ -617,7 +626,7 @@ export class TealchartWidget {
   }
 
   // Number of bars to request initially - enough to fill viewport with buffer
-  private static readonly INITIAL_BAR_COUNT = 300;
+  private static readonly INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
 
   private _loadBars(): void {
     if (!this._symbolInfo) {
@@ -627,6 +636,7 @@ export class TealchartWidget {
 
     // Increment request ID to cancel any in-flight requests
     const requestId = ++this._loadBarsRequestId;
+    this._clearQueuedLeftHistoryBackfill();
     this._isLoadingBars = true;
     this._scheduler.markDirty(DIRTY.CROSSHAIR); // Re-render to show faded/loading state
 
@@ -821,40 +831,44 @@ export class TealchartWidget {
     this._scheduler.markDirty(DIRTY.BARS | DIRTY.LINES);
   }
 
-  private _loadMoreBars(direction: 'left' | 'right'): void {
+  private _loadMoreBars(direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint): void {
     // Only support loading older data (left) for now
     if (direction !== 'left') return;
     if (!this._symbolInfo) return;
-    if (this._isLoadingMoreBars) return;
+    if (this._isLoadingMoreBars) {
+      this._queueLeftHistoryBackfill(hint);
+      return;
+    }
     if (!this._hasMoreHistoricalData) return;
-
-    this._isLoadingMoreBars = true;
 
     // Find the earliest bar we have
     const earliestBar = this._bars[0];
-    if (!earliestBar) {
-      this._isLoadingMoreBars = false;
-      return;
-    }
+    if (!earliestBar) return;
+    const previousEarliestBarTime = earliestBar.time;
 
     // Capture current request ID — if symbol/interval changes while this request
     // is in flight, _loadBarsRequestId will be incremented and this callback
     // will be discarded as stale.
     const requestId = this._loadBarsRequestId;
 
-    // Request same number of bars as initial load, going back from earliest bar
     const intervalMs = intervalToMs(this._interval);
-    const countBack = TealchartWidget.INITIAL_BAR_COUNT;
-    const toTime = Math.floor(earliestBar.time / 1000) - 1; // 1 second before earliest bar
-    const fromTime = toTime - Math.floor((countBack * intervalMs) / 1000);
+    const request = resolveLeftHistoryBackfillRequest({
+      defaultCount: TealchartWidget.INITIAL_BAR_COUNT,
+      earliestBarTime: earliestBar.time,
+      hint,
+      intervalMs,
+    });
+    if (!request) return;
+
+    this._isLoadingMoreBars = true;
 
     this._datafeed.getBars(
       this._symbolInfo,
       this._interval,
       {
-        countBack,
-        from: fromTime,
-        to: toTime,
+        countBack: request.countBack,
+        from: request.from,
+        to: request.to,
         firstDataRequest: false,
       },
       (bars, _meta) => {
@@ -868,6 +882,7 @@ export class TealchartWidget {
 
         if (bars.length === 0) {
           this._hasMoreHistoricalData = false;
+          this._clearQueuedLeftHistoryBackfill();
           return;
         }
 
@@ -885,15 +900,52 @@ export class TealchartWidget {
           this._scheduler.markDirty(DIRTY.BARS);
           this._tealScriptManager?.setBars(this._bars);
         }
+        this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
       },
       (error) => {
         if (this._disposed || requestId !== this._loadBarsRequestId) {
           return;
         }
         this._isLoadingMoreBars = false;
+        this._clearQueuedLeftHistoryBackfill();
         this._logger?.error(LogCategory.Datafeed, 'Failed to load more bars', error);
       },
     );
+  }
+
+  private _queueLeftHistoryBackfill(hint?: HistoryBackfillRequestHint): void {
+    this._hasQueuedLeftHistoryBackfill = true;
+    this._queuedLeftHistoryBackfillHint = mergeLeftHistoryBackfillRequestHints(
+      this._queuedLeftHistoryBackfillHint,
+      hint,
+    );
+  }
+
+  private _clearQueuedLeftHistoryBackfill(): void {
+    this._hasQueuedLeftHistoryBackfill = false;
+    this._queuedLeftHistoryBackfillHint = undefined;
+  }
+
+  private _consumeQueuedLeftHistoryBackfill(): HistoryBackfillRequestHint | undefined | null {
+    if (!this._hasQueuedLeftHistoryBackfill) return null;
+    const hint = this._queuedLeftHistoryBackfillHint;
+    this._clearQueuedLeftHistoryBackfill();
+    return hint;
+  }
+
+  private _loadNextLeftHistoryBackfill(
+    activeHint: HistoryBackfillRequestHint | undefined,
+    previousEarliestBarTime: number,
+  ): void {
+    const hint = resolveLeftHistoryBackfillContinuationHint({
+      activeHint,
+      currentEarliestBarTime: this._bars[0]?.time,
+      previousEarliestBarTime,
+      queuedHint: this._consumeQueuedLeftHistoryBackfill(),
+    });
+    if (hint !== null) {
+      this._loadMoreBars('left', hint);
+    }
   }
 
   /**
@@ -1131,8 +1183,8 @@ export class TealchartWidget {
         this._viewportController.handleReset(this._bars, intervalToMs(this._interval));
       },
       isAutoScale: (paneId: string) => this._viewportController.isAutoScale(paneId),
-      onRequestMoreBars: (direction) => {
-        this._loadMoreBars(direction);
+      onRequestMoreBars: (direction, hint) => {
+        this._loadMoreBars(direction, hint);
       },
       onOrderMove: (orderId, newPrice) => this._chartApi.triggerOrderMove(orderId, newPrice),
       onOrderMoving: (orderId, newPrice) => this._chartApi.triggerOrderMoving(orderId, newPrice),
@@ -2089,6 +2141,7 @@ export class TealchartWidget {
     this._isLoadingBars = true;
     this._hasMoreHistoricalData = true;
     this._isLoadingMoreBars = false;
+    this._clearQueuedLeftHistoryBackfill();
 
     // Update symbol if changed
     if (options.newSymbol !== undefined) {
@@ -2287,6 +2340,7 @@ export class TealchartWidget {
   remove(): void {
     // Mark as disposed to invalidate all in-flight async callbacks
     this._disposed = true;
+    this._clearQueuedLeftHistoryBackfill();
 
     // Unsubscribe from bars
     if (this._barSubscriptionGuid) {
@@ -3126,7 +3180,7 @@ export class TealchartWidget {
   private _handleUserDrawingSelection(
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-    options: Pick<UserDrawingSelectionInputOptions, 'additive'> = {},
+    options: Pick<UserDrawingSelectionInputOptions, 'additive' | 'toggleSelected'> = {},
   ): UserDrawingSelectionAtPointResult {
     if (this._userDrawingState.activeTool !== 'select') {
       return { state: this._userDrawingState, hit: false, changed: false };
@@ -3140,6 +3194,7 @@ export class TealchartWidget {
       options: {
         additive: options.additive,
         hitTest: this._getUserDrawingHitTestOptions(),
+        toggleSelected: options.toggleSelected,
       },
       meta: { source: 'pointer' },
     });

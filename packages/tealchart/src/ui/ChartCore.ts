@@ -11,6 +11,7 @@
  */
 
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
@@ -27,6 +28,7 @@ import type {
   CrosshairState as EventCrosshairState,
   PaneDividerInfo,
 } from '../interaction/EventManager';
+import type { OemsActionKind, OemsActionState } from '../interaction/oemsActionManager';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -37,7 +39,6 @@ import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_SELL_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
-  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
   STOP_LOSS_COLOR,
 } from '../constants';
 import {
@@ -50,23 +51,21 @@ import {
   resolveUserDrawingPlacementConstraint,
 } from '../drawings';
 import { EventManager } from '../interaction/EventManager';
-import type { OemsActionKind, OemsActionState } from '../interaction/oemsActionManager';
 import { OemsActionManager } from '../interaction/oemsActionManager';
 import { PriceLineManager } from '../interaction/PriceLineManager';
-import { computePaneGeometry, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
 import { TealchartRenderer } from '../TealchartRenderer';
 import {
+  Awaitable,
   Bar,
-  ChartLineLabel,
   ChartMargins,
   ChartPane,
   ContextMenuItem,
   DEFAULT_MARGINS,
   ExecutionLineRenderData,
-  Awaitable,
   OemsActionResult,
   OrderLineRenderData,
   PaneLayout,
@@ -75,13 +74,16 @@ import {
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
+  ResolutionString,
   TIME_AXIS_HEIGHT,
   UnifiedPaneLayout,
   Viewport,
 } from '../types';
 import { dedupeBarsByTime } from '../utils/dedupeBars';
 import { safeToFixed } from '../utils/safeNumber';
-import { applyAutoScale } from '../viewport/viewScale';
+import { tradingLineToBracketLines } from '../utils/tradeLineBrackets';
+import { resolveOrderTradeLineLabel, resolvePositionTradeLineLabel } from '../utils/tradeLineLabel';
+import { applyAutoScale, intervalToMs } from '../viewport/viewScale';
 import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, icons } from './dom';
 
@@ -111,14 +113,18 @@ export interface ChartCoreOptions {
   width: number;
   /** Initial height */
   height: number;
+  /** Active bar interval */
+  interval?: ResolutionString;
   /** Render options for colors and styling */
   renderOptions?: Partial<RenderOptions>;
+  /** Minimum x for chart-area trading labels after overlay chrome. */
+  chartLabelMinX?: number;
   /** Custom margins */
   margins?: Partial<ChartMargins>;
   /** Callback when viewport changes */
   onViewportChange?: (viewport: Viewport) => void;
   /** Callback when more historical bars needed */
-  onRequestMoreBars?: (direction: 'left' | 'right') => void;
+  onRequestMoreBars?: (direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint) => void;
   /** Callback when order is moved via drag */
   onOrderMove?: (orderId: string, newPrice: number) => Awaitable<OemsActionResult>;
   /** Callback while an order is being dragged */
@@ -141,7 +147,7 @@ export interface ChartCoreOptions {
   onUserDrawingSelection?: (
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
-    options?: Pick<UserDrawingSelectionInputOptions, 'additive'>,
+    options?: Pick<UserDrawingSelectionInputOptions, 'additive' | 'toggleSelected'>,
   ) => UserDrawingSelectionAtPointResult;
   /** Called when select-mode pointer down may start editing a user drawing */
   onUserDrawingEditStart?: (
@@ -296,76 +302,7 @@ function orderLineToPriceLine(
     3: 'dashed',
     4: 'dashed',
   };
-  const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-  const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = order.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-
-  const chartLabel: ChartLineLabel = {
-    offsetPercent: order.lineLength,
-    segments: [
-      ...(order.text
-        ? [
-            {
-              text: order.text,
-              textShort: order.textShort || undefined,
-              backgroundColor: order.bodyBackgroundColor,
-              textColor: order.bodyTextColor,
-              borderColor: order.bodyBorderColor,
-            },
-          ]
-        : []),
-      ...(order.quantity
-        ? [
-            {
-              text: order.quantity,
-              textShort: order.quantityShort || undefined,
-              backgroundColor: order.quantityBackgroundColor,
-              textColor: order.quantityTextColor,
-              borderColor: order.quantityBorderColor,
-            },
-          ]
-        : []),
-    ],
-    buttons: [
-      ...(order.brackets !== null
-        ? [
-            {
-              type: 'tp' as const,
-              icon: 'TP',
-              backgroundColor: takeProfitColor,
-              iconColor: takeProfitTextColor,
-              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-              tooltip: 'Drag to set Take Profit',
-            },
-          ]
-        : []),
-      ...(order.brackets !== null
-        ? [
-            {
-              type: 'sl' as const,
-              icon: 'SL',
-              backgroundColor: stopLossColor,
-              iconColor: stopLossTextColor,
-              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-              tooltip: 'Drag to set Stop Loss',
-            },
-          ]
-        : []),
-      ...(order.cancellable
-        ? [
-            {
-              type: 'cancel' as const,
-              icon: order.cancelAsSubmit ? '✓' : '×',
-              backgroundColor: order.cancelButtonBackgroundColor,
-              iconColor: order.cancelButtonIconColor,
-              borderColor: order.cancelButtonBorderColor,
-              tooltip: order.cancelTooltip,
-            },
-          ]
-        : []),
-    ],
-  };
+  const chartLabel = resolveOrderTradeLineLabel(order, positiveColor);
 
   return {
     id: order.id,
@@ -410,105 +347,7 @@ function positionLineToPriceLine(
     4: 'dashed',
   };
 
-  let pnlStateColor: string | undefined;
-  if (position.profitState === 'positive') {
-    pnlStateColor = positiveColor;
-  } else if (position.profitState === 'negative') {
-    pnlStateColor = negativeColor;
-  }
-  const lineColor = position.lineColor;
-  const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-  const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = position.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-
-  const chartLabel: ChartLineLabel = {
-    offsetPercent: position.lineLength,
-    segments: [
-      ...(position.text
-        ? [
-            {
-              text: position.text,
-              textShort: position.textShort || undefined,
-              backgroundColor: position.bodyBackgroundColor,
-              textColor: position.bodyTextColor,
-              borderColor: position.bodyBorderColor,
-            },
-          ]
-        : []),
-      ...(position.quantity
-        ? [
-            {
-              text: position.quantity,
-              textShort: position.quantityShort || undefined,
-              backgroundColor: position.quantityBackgroundColor,
-              textColor: position.quantityTextColor,
-              borderColor: position.quantityBorderColor,
-            },
-          ]
-        : []),
-      ...(position.pnl
-        ? [
-            {
-              text: position.pnl,
-              textShort: position.pnlShort || undefined,
-              backgroundColor: pnlStateColor ?? lineColor,
-              textColor: pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : position.bodyTextColor,
-              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-            },
-          ]
-        : []),
-    ],
-    buttons: [
-      ...(position.reversible
-        ? [
-            {
-              type: 'reverse' as const,
-              icon: '↩',
-              backgroundColor: position.reverseButtonBackgroundColor,
-              iconColor: position.reverseButtonIconColor,
-              borderColor: position.reverseButtonBorderColor,
-            },
-          ]
-        : []),
-      ...(position.closeable
-        ? [
-            {
-              type: 'close' as const,
-              icon: '×',
-              backgroundColor: position.closeButtonBackgroundColor,
-              iconColor: position.closeButtonIconColor,
-              borderColor: position.closeButtonBorderColor,
-              tooltip: position.closeTooltip,
-            },
-          ]
-        : []),
-      ...(position.brackets !== null
-        ? [
-            {
-              type: 'tp' as const,
-              icon: 'TP',
-              backgroundColor: takeProfitColor,
-              iconColor: takeProfitTextColor,
-              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-              tooltip: 'Drag to set Take Profit',
-            },
-          ]
-        : []),
-      ...(position.brackets !== null
-        ? [
-            {
-              type: 'sl' as const,
-              icon: 'SL',
-              backgroundColor: stopLossColor,
-              iconColor: stopLossTextColor,
-              borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
-              tooltip: 'Drag to set Stop Loss',
-            },
-          ]
-        : []),
-    ],
-  };
+  const chartLabel = resolvePositionTradeLineLabel(position, positiveColor, negativeColor);
 
   return {
     id: position.id,
@@ -535,67 +374,6 @@ function positionLineToPriceLine(
     actionState: position.actionState,
     callbacks: position.callbacks,
   };
-}
-
-/**
- * Generate bracket lines (TP/SL) for an order or position
- */
-function tradingLineToBracketLines(
-  line: OrderLineRenderData | PositionLineRenderData,
-  formatPrice: (price: number) => string,
-  positiveColor: string,
-): PriceLine[] {
-  const bracketLines: PriceLine[] = [];
-  const brackets = line.brackets;
-
-  if (!brackets) return bracketLines;
-
-  const takeProfitColor = brackets.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = brackets.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-  const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = brackets.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-
-  if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
-    bracketLines.push({
-      id: `${line.id}-tp`,
-      price: brackets.takeProfit,
-      lineStyle: 'dashed',
-      color: takeProfitColor,
-      type: 'price',
-      lineLength: 100,
-      extendLeft: true,
-      lineWidth: 1,
-      priority: 70,
-      label: {
-        primaryText: formatPrice(brackets.takeProfit),
-        secondaryText: 'TP',
-        backgroundColor: takeProfitColor,
-        textColor: takeProfitTextColor,
-      },
-    });
-  }
-
-  if (brackets.stopLoss !== undefined && brackets.stopLoss > 0) {
-    bracketLines.push({
-      id: `${line.id}-sl`,
-      price: brackets.stopLoss,
-      lineStyle: 'dashed',
-      color: stopLossColor,
-      type: 'price',
-      lineLength: 100,
-      extendLeft: true,
-      lineWidth: 1,
-      priority: 70,
-      label: {
-        primaryText: formatPrice(brackets.stopLoss),
-        secondaryText: 'SL',
-        backgroundColor: stopLossColor,
-        textColor: stopLossTextColor,
-      },
-    });
-  }
-
-  return bracketLines;
 }
 
 // ============================================================================
@@ -777,6 +555,7 @@ export class ChartCore {
         ...options.renderOptions,
         width: options.width,
         height: options.height,
+        chartLabelMinX: this.getChartLabelMinX(),
       },
       this.margins,
     );
@@ -827,7 +606,7 @@ export class ChartCore {
             this.renderCrosshairOverlay();
           },
           fontFamily: this.renderer.font,
-          chartLabelMinX: WEB_CHART_CHROME_METRICS.leftToolRailInset + WEB_CHART_CHROME_METRICS.leftToolRailWidth + 2,
+          chartLabelMinX: this.getChartLabelMinX(),
           onCursorChange: (cursor) => this.applyCursor(cursor),
         });
       }
@@ -846,6 +625,7 @@ export class ChartCore {
         topMargin: this.margins.top,
         leftMargin: this.margins.left,
       }),
+      getIntervalMs: () => intervalToMs(this.options.interval ?? '60'),
       getPriceFromY: (y) =>
         this.renderer.publicYToPriceWithLayout(
           y,
@@ -909,15 +689,16 @@ export class ChartCore {
         this.paneYOverrides.set(paneId, { yMin, yMax });
         this.scheduleRender();
       },
-      onRequestMoreBars: (dir) => {
+      onRequestMoreBars: (dir, hint) => {
         // Only request more bars if viewport is actually before the earliest bar
         // This matches React's behavior - prevents loading history on every left pan
-        if (dir === 'left' && this.bars.length > 0 && this.viewport) {
-          if (this.viewport.startTime < this.bars[0].time) {
-            this.options.onRequestMoreBars?.(dir);
+        const requestedViewport = hint?.viewport ?? this.viewport;
+        if (dir === 'left' && this.bars.length > 0 && requestedViewport) {
+          if (requestedViewport.startTime < this.bars[0].time) {
+            this.options.onRequestMoreBars?.(dir, hint ?? { viewport: requestedViewport });
           }
         } else {
-          this.options.onRequestMoreBars?.(dir);
+          this.options.onRequestMoreBars?.(dir, hint);
         }
       },
       onCrossHairMoved: (x, y, options) => {
@@ -1004,6 +785,10 @@ export class ChartCore {
     this.chartContainer.style.cursor = this.cursor;
   }
 
+  private getChartLabelMinX(): number {
+    return this.options.chartLabelMinX ?? computeTradingLineLabelMinX(WEB_CHART_CHROME_METRICS, this.margins);
+  }
+
   // ============================================================================
   // Public API
   // ============================================================================
@@ -1037,6 +822,10 @@ export class ChartCore {
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
+  setInterval(interval: ResolutionString): void {
+    this.options.interval = interval;
+  }
+
   /**
    * Set price lines
    */
@@ -1055,7 +844,7 @@ export class ChartCore {
     if (lines === this.orderLines && this.oemsActions.getActions().length === 0) return;
 
     this.confirmOrderLineSnapshots(lines);
-    this.orderLines = lines;
+    this.orderLines = lines.map((line) => this.applyOrderActionState(line));
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1069,22 +858,8 @@ export class ChartCore {
     if (lines === this.positionLines && this.oemsActions.getActions().length === 0) return;
 
     this.confirmPositionLineSnapshots(lines);
-    this.positionLines = lines;
+    this.positionLines = lines.map((line) => this.applyPositionActionState(line));
     // No scheduleRender — paint() is called by the widget after pushing state
-  }
-
-  private getRenderedOrderLines(): OrderLineRenderData[] {
-    if (this.oemsActions.getActions().length === 0) {
-      return this.orderLines.map((line) => ({ ...line, actionState: undefined }));
-    }
-    return this.orderLines.map((line) => this.applyOrderActionState(line));
-  }
-
-  private getRenderedPositionLines(): PositionLineRenderData[] {
-    if (this.oemsActions.getActions().length === 0) {
-      return this.positionLines.map((line) => ({ ...line, actionState: undefined }));
-    }
-    return this.positionLines.map((line) => this.applyPositionActionState(line));
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {
@@ -1175,10 +950,9 @@ export class ChartCore {
     };
   }
 
-  private applyBracketActionState<TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets']>(
-    brackets: TBracket,
-    state: OemsTradingLineState,
-  ): TBracket {
+  private applyBracketActionState<
+    TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets'],
+  >(brackets: TBracket, state: OemsTradingLineState): TBracket {
     if (!brackets) return brackets;
     return {
       ...brackets,
@@ -1294,6 +1068,15 @@ export class ChartCore {
     }
     this.applyCssVars();
     // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  setChartLabelMinX(chartLabelMinX: number | undefined): void {
+    if (this.options.chartLabelMinX === chartLabelMinX) return;
+    this.options.chartLabelMinX = chartLabelMinX;
+    const resolvedChartLabelMinX = this.getChartLabelMinX();
+    this.renderer.setOptions({ chartLabelMinX: resolvedChartLabelMinX });
+    this.priceLineManager?.setChartLabelMinX(resolvedChartLabelMinX);
+    this.scheduleRender();
   }
 
   /**
@@ -1494,15 +1277,11 @@ export class ChartCore {
     if (result.completedSynchronously) this.scheduleRender();
   }
 
-  private getBoundTradingObject(
-    bound: PriceLineLabelBounds,
-  ):
-    | {
-        objectType: 'order' | 'position';
-        objectId: string;
-        state: OemsTradingLineState;
-      }
-    | null {
+  private getBoundTradingObject(bound: PriceLineLabelBounds): {
+    objectType: 'order' | 'position';
+    objectId: string;
+    state: OemsTradingLineState;
+  } | null {
     if (bound.type === 'order') {
       const objectId = bound.orderId || bound.lineId;
       const line = this.orderLines.find((candidate) => this.getOrderObjectId(candidate) === objectId);
@@ -1974,6 +1753,7 @@ export class ChartCore {
 
       const selection = this.options.onUserDrawingSelection?.({ x, y }, this.getUserDrawingSpaces(this.viewport), {
         additive: options.additiveSelection,
+        toggleSelected: source === 'touch',
       });
       return source === 'touch' && (selection?.hit === true || selection?.changed === true)
         ? { handled: true, allowPaneDoubleClick: true }
@@ -2360,8 +2140,6 @@ export class ChartCore {
     const renderOptions = { ...this.renderer.getOptions(), ...this.options.renderOptions };
     const positiveTradingColor = resolvePositiveTradingColor(renderOptions);
     const negativeTradingColor = resolveNegativeTradingColor(renderOptions);
-    const renderedOrderLines = this.getRenderedOrderLines();
-    const renderedPositionLines = this.getRenderedPositionLines();
 
     // Build all price lines
     const allPriceLines: PriceLine[] = [
@@ -2383,12 +2161,12 @@ export class ChartCore {
         }
         return { ...p, priority: p.priority ?? 100 };
       }),
-      ...renderedOrderLines.map((o) => orderLineToPriceLine(o, formatPrice, positiveTradingColor)),
-      ...renderedPositionLines.map((p) =>
+      ...this.orderLines.map((o) => orderLineToPriceLine(o, formatPrice, positiveTradingColor)),
+      ...this.positionLines.map((p) =>
         positionLineToPriceLine(p, formatPrice, positiveTradingColor, negativeTradingColor),
       ),
-      ...renderedOrderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice, positiveTradingColor)),
-      ...renderedPositionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice, positiveTradingColor)),
+      ...this.orderLines.flatMap((o) => tradingLineToBracketLines(o, formatPrice, positiveTradingColor)),
+      ...this.positionLines.flatMap((p) => tradingLineToBracketLines(p, formatPrice, positiveTradingColor)),
     ];
 
     // Skip the line being dragged — the Konva drag line replaces it during drag.

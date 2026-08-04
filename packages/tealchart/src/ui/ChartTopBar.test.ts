@@ -53,6 +53,7 @@ describe('ChartTopBar drawing toolbar', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
+    window.localStorage.clear();
     clearChartStoreCache();
   });
 
@@ -91,9 +92,9 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(linesCategory?.getAttribute('aria-controls')).toBe('tealchart-drawing-tools-lines');
     expect(document.getElementById('tealchart-drawing-tools-lines')?.getAttribute('role')).toBe('menu');
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('false');
-    // The caret button opens the category menu (a plain click activates the tool).
-    linesMenu?.click();
+    linesCategory?.click();
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
+    expect(onTool).not.toHaveBeenCalled();
     linesCategory?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
     expect(linesCategory?.getAttribute('aria-expanded')).toBe('true');
     expect(document.body.textContent).toContain('Lines');
@@ -280,6 +281,48 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
 
     topBar.unmount();
+  });
+
+  it('collapses the left drawing rail and persists the preference by chart key', () => {
+    const chartKey = 'topbar-drawing-rail-collapse';
+    const topBar = new ChartTopBar({
+      chartKey,
+      symbol: 'BTCUSDT',
+      userDrawingState: baseDrawingState,
+    });
+    topBar.mount(document.body);
+
+    const expandedRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
+    expect(expandedRail?.getAttribute('aria-expanded')).toBe('true');
+    expect(topBar.getElement().style.marginLeft).toBe('50px');
+    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).not.toBeNull();
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Collapse drawing toolbar"]')?.click();
+
+    const collapsedRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
+    expect(collapsedRail?.getAttribute('aria-expanded')).toBe('false');
+    expect(topBar.getElement().style.marginLeft).toBe('34px');
+    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).toBeNull();
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
+
+    topBar.unmount();
+    clearChartStoreCache();
+    document.body.innerHTML = '';
+
+    const restoredTopBar = new ChartTopBar({
+      chartKey,
+      symbol: 'BTCUSDT',
+      userDrawingState: baseDrawingState,
+    });
+    restoredTopBar.mount(document.body);
+
+    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+    expect(restoredTopBar.getElement().style.marginLeft).toBe('34px');
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
+
+    restoredTopBar.unmount();
   });
 
   it('toggles magnet and keep-drawing modes from the rail bottom toggles', () => {

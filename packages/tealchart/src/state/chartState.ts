@@ -1,15 +1,18 @@
 import type { MapStore, WritableAtom } from 'nanostores';
 import type { ResolutionString } from '../types';
 import type { UserDrawingState } from '../drawings';
+import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
 
 import { atom, computed, map } from 'nanostores';
 
+import { createLocalStorageKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
 import { CHART_SETTINGS_VERSION } from './safeDeepMerge';
 
 /**
  * Chart State Management with Nanostores
  * Settings are in-memory only — loaded from SaveLoadAdapter on startup.
- * Only CurrentLayoutState (layoutId/layoutName) persists to localStorage.
+ * CurrentLayoutState still persists to localStorage. UI preferences persist
+ * through TealchartKeyValueStorage so web and native can share one contract.
  * Framework-agnostic - works with React, vanilla JS, or any other framework
  */
 
@@ -112,6 +115,19 @@ const DEFAULT_CURRENT_LAYOUT: CurrentLayoutState = {
 };
 
 // ============================================================================
+// Chart UI Preferences
+// ============================================================================
+
+export interface ChartUiPreferences {
+  /** Whether the left drawing tool rail is collapsed to its toggle affordance. */
+  leftToolRailCollapsed: boolean;
+}
+
+export const DEFAULT_CHART_UI_PREFERENCES: ChartUiPreferences = {
+  leftToolRailCollapsed: false,
+};
+
+// ============================================================================
 // Chart Store - Combined state for a chart instance
 // ============================================================================
 
@@ -120,6 +136,8 @@ export interface ChartStore {
   settings: MapStore<ChartSettings>;
   /** Current layout state (persistent) */
   currentLayout: MapStore<CurrentLayoutState>;
+  /** Platform UI preferences (persistent when storage is supplied/available) */
+  uiPreferences: MapStore<ChartUiPreferences>;
   /** Dirty state (transient) - true when there are unsaved changes */
   isDirty: WritableAtom<boolean>;
   /** Save status (transient) - tracks save operation state */
@@ -181,9 +199,95 @@ function saveLayoutState(chartKey: string, state: CurrentLayoutState): void {
   }
 }
 
+function getUiPreferencesStorageKey(chartKey: string): string {
+  return `${getStorageKey(chartKey)}:ui-preferences`;
+}
+
+function createDefaultChartUiPreferences(
+  overrides?: Partial<ChartUiPreferences>,
+): ChartUiPreferences {
+  return {
+    ...DEFAULT_CHART_UI_PREFERENCES,
+    ...overrides,
+  };
+}
+
+function normalizeChartUiPreferences(
+  value: unknown,
+  defaults: ChartUiPreferences = DEFAULT_CHART_UI_PREFERENCES,
+): ChartUiPreferences {
+  if (value == null || typeof value !== 'object') return { ...defaults };
+  const input = value as Partial<ChartUiPreferences>;
+  return {
+    leftToolRailCollapsed:
+      typeof input.leftToolRailCollapsed === 'boolean'
+        ? input.leftToolRailCollapsed
+        : defaults.leftToolRailCollapsed,
+  };
+}
+
+function readUiPreferences(
+  raw: string | null,
+  defaults: ChartUiPreferences,
+): ChartUiPreferences {
+  if (!raw) return { ...defaults };
+  try {
+    return normalizeChartUiPreferences(JSON.parse(raw), defaults);
+  } catch {
+    return { ...defaults };
+  }
+}
+
+function saveUiPreferences(
+  storage: TealchartKeyValueStorage,
+  chartKey: string,
+  state: ChartUiPreferences,
+): void {
+  try {
+    const result = storage.setItem(getUiPreferencesStorageKey(chartKey), JSON.stringify(state));
+    if (result && typeof (result as Promise<void>).catch === 'function') {
+      void (result as Promise<void>).catch(() => undefined);
+    }
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
+interface UiPreferencesStorageBinding {
+  applyingHydratedValue: boolean;
+  changedBeforeHydration: boolean;
+  chartKey: string;
+  defaultUiPreferences: ChartUiPreferences;
+  hydrated: boolean;
+  listenerAttached: boolean;
+  storage: TealchartKeyValueStorage | null;
+}
+
+const uiPreferencesStorageBindings = new WeakMap<MapStore<ChartUiPreferences>, UiPreferencesStorageBinding>();
+
+function ensureUiPreferencesStorageListener(
+  store: MapStore<ChartUiPreferences>,
+  binding: UiPreferencesStorageBinding,
+): void {
+  if (binding.listenerAttached) return;
+  binding.listenerAttached = true;
+  store.listen((value) => {
+    if (binding.applyingHydratedValue) return;
+    if (!binding.storage || !binding.hydrated) binding.changedBeforeHydration = true;
+    if (binding.storage) saveUiPreferences(binding.storage, binding.chartKey, value);
+  });
+}
+
 // ============================================================================
 // Chart Store Factory
 // ============================================================================
+
+export interface ChartStoreOptions {
+  /** Storage for chart-keyed UI preferences. Defaults to localStorage on web. */
+  uiPreferencesStorage?: TealchartKeyValueStorage | null;
+  /** Platform defaults for UI preferences. Stored values still win. */
+  defaultUiPreferences?: Partial<ChartUiPreferences>;
+}
 
 /**
  * Cache of chart stores by key
@@ -214,15 +318,83 @@ function createPersistentLayoutStore(chartKey: string): MapStore<CurrentLayoutSt
   return store;
 }
 
+function createUiPreferencesStore(
+  chartKey: string,
+  storage: TealchartKeyValueStorage | null,
+  defaultUiPreferences: ChartUiPreferences,
+): MapStore<ChartUiPreferences> {
+  const store = map<ChartUiPreferences>({ ...defaultUiPreferences });
+  const binding: UiPreferencesStorageBinding = {
+    applyingHydratedValue: false,
+    changedBeforeHydration: false,
+    chartKey,
+    defaultUiPreferences,
+    hydrated: storage == null,
+    listenerAttached: false,
+    storage: null,
+  };
+  uiPreferencesStorageBindings.set(store, binding);
+  ensureUiPreferencesStorageListener(store, binding);
+  bindUiPreferencesStorage(store, storage);
+  return store;
+}
+
+function bindUiPreferencesStorage(
+  store: MapStore<ChartUiPreferences>,
+  storage: TealchartKeyValueStorage | null | undefined,
+): void {
+  const binding = uiPreferencesStorageBindings.get(store);
+  if (!binding || !storage || binding.storage === storage) return;
+  if (binding.storage) return;
+
+  binding.storage = storage;
+  binding.hydrated = false;
+  const applyHydratedValue = (raw: string | null): void => {
+    binding.hydrated = true;
+    if (!binding.changedBeforeHydration) {
+      binding.applyingHydratedValue = true;
+      store.set(readUiPreferences(raw, binding.defaultUiPreferences));
+      binding.applyingHydratedValue = false;
+    }
+  };
+
+  ensureUiPreferencesStorageListener(store, binding);
+
+  if (binding.changedBeforeHydration) {
+    binding.hydrated = true;
+    saveUiPreferences(storage, binding.chartKey, store.get());
+    return;
+  }
+
+  try {
+    const result = storage.getItem(getUiPreferencesStorageKey(binding.chartKey));
+    if (result && typeof (result as Promise<string | null>).then === 'function') {
+      void (result as Promise<string | null>).then(applyHydratedValue, () => {
+        binding.hydrated = true;
+      });
+    } else {
+      applyHydratedValue(result as string | null);
+    }
+  } catch {
+    binding.hydrated = true;
+  }
+}
+
 /**
  * Get or create a chart store for a specific chart key
  */
-export function getChartStore(chartKey: string): ChartStore {
+export function getChartStore(chartKey: string, options: ChartStoreOptions = {}): ChartStore {
   let store = chartStoreCache.get(chartKey);
 
   if (!store) {
+    const defaultUiPreferences = createDefaultChartUiPreferences(options.defaultUiPreferences);
     const settings = createSettingsStore();
     const currentLayout = createPersistentLayoutStore(chartKey);
+    const uiPreferences = createUiPreferencesStore(
+      chartKey,
+      options.uiPreferencesStorage === undefined ? createLocalStorageKeyValueStorage() : options.uiPreferencesStorage,
+      defaultUiPreferences,
+    );
     const isDirty = atom(false);
     const saveStatus = atom<SaveStatus>('idle');
 
@@ -232,12 +404,15 @@ export function getChartStore(chartKey: string): ChartStore {
     store = {
       settings,
       currentLayout,
+      uiPreferences,
       isDirty,
       saveStatus,
       intervalMs,
     };
 
     chartStoreCache.set(chartKey, store);
+  } else if (options.uiPreferencesStorage !== undefined) {
+    bindUiPreferencesStorage(store.uiPreferences, options.uiPreferencesStorage);
   }
 
   return store;

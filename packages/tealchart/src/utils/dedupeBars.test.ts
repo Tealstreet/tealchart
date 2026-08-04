@@ -1,8 +1,8 @@
 import type { Bar } from '../types';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { barValuesEqual, dedupeBarsByTime, resetBarWarnThrottleForTest } from './dedupeBars';
+import { barValuesEqual, dedupeBarsByTime } from './dedupeBars';
 
 const bar = (time: number, close = time): Bar => ({
   time,
@@ -14,7 +14,6 @@ const bar = (time: number, close = time): Bar => ({
 });
 
 describe('dedupeBarsByTime', () => {
-  beforeEach(() => resetBarWarnThrottleForTest());
   afterEach(() => vi.restoreAllMocks());
 
   it('returns the same reference when already strictly increasing', () => {
@@ -34,7 +33,7 @@ describe('dedupeBarsByTime', () => {
     const out = dedupeBarsByTime(bars);
     expect(out.map((b) => b.time)).toEqual([1, 2, 3]);
     expect(out.find((b) => b.time === 2)?.close).toBe(99); // last wins
-    expect(console.warn).toHaveBeenCalledOnce();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   it('re-sorts out-of-order bars and dedupes together', () => {
@@ -45,13 +44,11 @@ describe('dedupeBarsByTime', () => {
     expect(out.find((b) => b.time === 1)?.close).toBe(42); // last-seen for that time
   });
 
-  it('re-sorts out-of-order bars with no duplicates and warns without "dropped"', () => {
+  it('re-sorts out-of-order bars with no duplicates', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const out = dedupeBarsByTime([bar(3), bar(1), bar(2)]);
     expect(out.map((b) => b.time)).toEqual([1, 2, 3]);
-    const msg = warn.mock.calls[0]?.[0] as string | undefined;
-    expect(msg).toMatch(/re-sorted out-of-order bars/);
-    expect(msg).not.toMatch(/dropped/);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('collapses the observed 3-per-timestamp feed pattern', () => {
@@ -69,7 +66,15 @@ describe('dedupeBarsByTime', () => {
 });
 
 describe('barValuesEqual', () => {
-  const full = (over: Partial<Bar> = {}): Bar => ({ time: 1, open: 1, high: 2, low: 0, close: 1.5, volume: 10, ...over });
+  const full = (over: Partial<Bar> = {}): Bar => ({
+    time: 1,
+    open: 1,
+    high: 2,
+    low: 0,
+    close: 1.5,
+    volume: 10,
+    ...over,
+  });
 
   it('is true for identical time + OHLCV', () => {
     expect(barValuesEqual(full(), full())).toBe(true);

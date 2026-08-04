@@ -1,79 +1,31 @@
-/**
- * SkiaTealchart - React Native Skia implementation of Tealchart
- *
- * Mobile equivalent of TealchartWidget on web:
- * - Accepts datafeed, symbol, interval (like TealchartWidget)
- * - Handles bar fetching, indicators, pane management internally
- * - Renders using Skia instead of canvas
- *
- * Architecture:
- * - Layer 1: Skia Canvas (static) - candles, grid, indicators via Picture recording
- * - Layer 2: Base Gesture Layer - pan, pinch, axis scaling with zone detection
- * - Layer 3: Interactive RN Layer - order lines, position lines, crosshair
- */
-
+import type { SkImage } from '@shopify/react-native-skia';
 import type { WorkerError } from '@tealstreet/tealscript';
-import type { IIndicatorManager } from './core/ChartWidgetCore';
 import type {
-  DrawingCoordinateSpace,
-  DrawingScreenPoint,
-  ResolveUserDrawingPropertiesSurfaceCommandOptions,
-  UpdateUserDrawingOptions,
-  UserDrawing,
-  UserDrawingAnchor,
-  UserDrawingClipboard,
-  UserDrawingCommandEvent,
   UserDrawingCommandEventListener,
-  UserDrawingCommandHistory,
-  UserDrawingCommandSource,
-  UserDrawingEditDrag,
-  UserDrawingFontFamily,
-  UserDrawingHandleRole,
-  UserDrawingIconName,
-  UserDrawingImageSourceInput,
-  UserDrawingInputPoint,
-  UserDrawingKeyboardInput,
-  UserDrawingLineStyle,
-  UserDrawingMagnetMode,
-  UserDrawingMeasureMode,
-  UserDrawingObjectTreeDispatchAction,
-  UserDrawingObjectTreeModel,
-  UserDrawingObjectTreeOptions,
-  UserDrawingPropertiesIntent,
-  UserDrawingPropertiesSurface,
-  UserDrawingPropertiesSurfaceCommand,
+  UserDrawingSelectedActionSurfaceCommand,
+  UserDrawingSelectedActionSurfaceGroupId,
   UserDrawingState,
-  UserDrawingStyle,
-  UserDrawingTableCellInput,
-  UserDrawingTableCellsInput,
-  UserDrawingTableColumnInput,
-  UserDrawingTableRowInput,
-  UserDrawingTextAlign,
-  UserDrawingTextAnnotation,
   UserDrawingTool,
-  UserDrawingTrendLineExtend,
-  UserDrawingZOrderAction,
 } from './drawings';
-import type { BuiltinIndicator } from './indicators/builtinIndicators';
-import type { IndicatorSettingsData } from './mobile/components/IndicatorSettingsModalMobile';
-import type { ChartDrawingGestureOptions } from './mobile/hooks/useChartGestures';
-import type { LabelBounds } from './mobile/hooks/useLabelCollision';
+import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type {
-  MobileUserDrawingBalloonLayout,
-  MobileUserDrawingImagePrimitive,
-  MobileUserDrawingTextBoxPrimitive,
-} from './mobile/utils/drawingRenderModel';
-import type { PlotStyleOverride } from './state/chartState';
+  NativeLegendActionCommand,
+  NativeLegendActionHitTarget,
+  NativeLegendIndicator,
+  NativeLegendIndicatorPaneInfo,
+} from './mobile/render/NativeChartLegendOverlay';
+import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
+import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
+import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
-  ChartMargins,
-  ContextMenuItem,
+  ContextMenuCallback,
   IBasicDataFeed,
-  OemsActionCallback,
-  OrderLineRenderData,
-  PositionLineRenderData,
   PriceLine,
   RenderOptions,
+  ResolutionString,
   Viewport,
 } from './types';
 
@@ -84,854 +36,415 @@ import React, {
   useImperativeHandle,
   useLayoutEffect,
   useMemo,
-  useReducer,
   useRef,
   useState,
 } from 'react';
 
-import {
-  Canvas,
-  Circle,
-  createPicture,
-  DashPathEffect,
-  FontStyle,
-  Group,
-  Oval,
-  Picture,
-  Rect,
-  Skia,
-  Image as SkiaImage,
-  Line as SkiaLine,
-  Path as SkiaPath,
-  Text as SkiaText,
-  useFont,
-  useImage,
-  vec,
-} from '@shopify/react-native-skia';
-import { LayoutChangeEvent, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Canvas, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
+import { StyleSheet, View } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
 
-import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR, LOADING_OPACITY, STOP_LOSS_COLOR } from './constants';
-import { useTealchartCore } from './core/useTealchartCore';
+import { LOADING_OPACITY } from './constants';
 import {
-  canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
-  canUndoUserDrawingCommand as canUndoUserDrawingCommandHistory,
-  clearUserDrawingCommandHistory,
-  createUserDrawingClipboard,
-  createUserDrawingCommandEvent,
-  createUserDrawingCommandHistory,
-  createUserDrawingHistoryCommandEvent,
-  createUserDrawingState,
-  DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR,
-  DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR,
-  DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING,
-  dispatchUserDrawingCommand,
-  getUserDrawingAllDrawingsUpdateOptions,
-  getUserDrawingPlacementMode,
-  isUserDrawingPathFamilyTool,
-  measureUserDrawingTextLines,
-  normalizeUserDrawingFontFamily,
-  normalizeUserDrawingFontSize,
-  normalizeUserDrawingOpacity,
-  redoUserDrawingCommand as redoUserDrawingCommandHistory,
-  resolveUserDrawingContextActionsAtPoint,
-  resolveUserDrawingObjectTreeDispatchActionCommands,
-  resolveUserDrawingObjectTreeModel,
-  resolveUserDrawingPlacementConstraint,
-  resolveUserDrawingPropertiesIntent,
-  resolveUserDrawingPropertiesSurface,
-  resolveUserDrawingPropertiesSurfaceCommand,
-  resolveUserDrawingSelectedActionSurface,
-  resolveUserDrawingSelectionActionAnchor,
-  resolveUserDrawingTextEditMetrics,
-  undoUserDrawingCommand as undoUserDrawingCommandHistory,
-  USER_DRAWING_FONT_FAMILIES,
-  USER_DRAWING_FONT_SIZES,
+  resolveUserDrawingRenderEntriesFromSlices,
+  resolveUserDrawingSelectionActionAnchorFromDrawings,
 } from './drawings';
 import { getIndicatorById } from './indicators/builtinIndicators';
-import { computePaneGeometry } from './layout/chartGeometry';
-import { ChartTopBarComponent } from './mobile/components/ChartTopBarComponent';
-import { ContextMenuComponent } from './mobile/components/ContextMenuComponent';
-import { CrosshairComponent } from './mobile/components/CrosshairComponent';
-import { IndicatorSettingsModalMobile } from './mobile/components/IndicatorSettingsModalMobile';
-import { IndicatorsModalMobile } from './mobile/components/IndicatorsModalMobile';
-import { OrderLineComponent } from './mobile/components/OrderLineComponent';
-import { PositionLineComponent } from './mobile/components/PositionLineComponent';
-import { UserDrawingObjectTreeSheet } from './mobile/components/UserDrawingObjectTreeSheet';
-import { UserDrawingPropertiesSheet } from './mobile/components/UserDrawingPropertiesSheet';
-import { UserDrawingSelectedActionSurfaceComponent } from './mobile/components/UserDrawingSelectedActionSurface';
-import { useChartGestures } from './mobile/hooks/useChartGestures';
-import { useLabelCollision } from './mobile/hooks/useLabelCollision';
-import { MobileIndicatorManager } from './mobile/MobileIndicatorManager';
-import { priceToY, xToTime, yToPrice } from './mobile/utils/coordinates';
-import { dispatchMobileUserDrawingActionCommand } from './mobile/utils/drawingActionDispatch';
+import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
 import {
-  dispatchMobileUserDrawingHistoryCommand,
-  dispatchMobileUserDrawingKeyboardAction as dispatchMobileUserDrawingKeyboardActionToState,
-} from './mobile/utils/drawingCommands';
-import { resolveMobileUserDrawingDoubleTapEditIntent } from './mobile/utils/drawingEditIntent';
-import { resolveMobileUserDrawingFontFamily } from './mobile/utils/drawingFonts';
+  NATIVE_RESET_VIEW_DISMISS_MS,
+  resolveNativeResetViewButtonLayout,
+  resolveNativeResetViewTapTarget,
+} from './mobile/interaction/nativeResetViewButton';
+import { findNativeOrderDragZone, findNativeTradeLineActionZone } from './mobile/interaction/nativeTradeLineHitTest';
+import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nativeUserDrawingEditDragZones';
+import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
+import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
+import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeSkiaInteractionRuntime';
+import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
+import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopBarActionRuntime';
+import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserDrawingRuntime';
+import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
+import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
+import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
+import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
+import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
+import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
+import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
-  isMobileChartGestureLayerEnabled,
-  isMobileCrosshairPanGestureEnabled,
-} from './mobile/utils/drawingGestureMode';
+  NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
+  NativeLeftToolRailOverlay,
+} from './mobile/render/NativeLeftToolRailOverlay';
+import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
-  resolveMobileUserDrawingDuplicateEditDragEnabled,
-  resolveMobileUserDrawingInputPoint,
-  resolveMobileUserDrawingPlacementConstraintEnabled,
-} from './mobile/utils/drawingInput';
+  nativeBarsMatchRequestedData,
+  shouldDimNativeRenderForTransition,
+  shouldHoldNativeRenderSnapshotForTransition,
+  shouldUseNativeStaticRenderProjectionForTransition,
+} from './mobile/render/nativeRenderTransition';
+import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
+import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
 import {
-  exportMobileUserDrawingStateForLayout,
-  importMobileUserDrawingStateFromLayout,
-  replaceMobileUserDrawingState,
-} from './mobile/utils/drawingPersistence';
-import type { OemsActionKind, OemsActionState, OemsActionObjectType } from './interaction/oemsActionManager';
-import { OemsActionManager } from './interaction/oemsActionManager';
+  NativeUserDrawingSelectionActionOverlay,
+  resolveNativeSelectedDrawingActionHitTargets,
+  resolveNativeSelectedDrawingActionOverlayModel,
+} from './mobile/render/NativeUserDrawingSelectionActionOverlay';
+import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
+import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
+import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
 import {
-  isMobileUserDrawingTextBoxPrimitive,
-  resolveMobileUserDrawingBalloonLayout,
-  resolveMobileUserDrawingInfoLineLabelPosition,
-  resolveMobileUserDrawingMeasurementLabelPosition,
-  resolveMobileUserDrawingPriceRangeLabelPosition,
-  resolveMobileUserDrawingRenderModel,
-  resolveMobileUserDrawingRiskRewardLabelPosition,
-  resolveMobileUserDrawingTextLabelLayout,
-  resolveMobileUserDrawingTrendAngleLabelPosition,
-} from './mobile/utils/drawingRenderModel';
-import { formatNativeTradeLinePrice } from './mobile/utils/tradeLineLayout';
-import { CollectedTextItem, SkiaCanvasContext } from './rendering/SkiaCanvasContext';
-import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
-import { TealchartRenderer } from './TealchartRenderer';
-import { mergeChartThemeRenderOptions } from './theme';
-import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
-import { withAlpha } from './ui/chromeTheme';
-import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
-import { safeToFixed } from './utils/safeNumber';
-import { ViewportController } from './viewport/ViewportController';
-import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
+  createNativeChartLayoutSettings,
+  resolveNativeDefaultLayoutPersistence,
+  useNativeLayoutPersistence,
+} from './mobile/useNativeLayoutPersistence';
+import { useNativeTealchartCoreRuntime } from './mobile/useNativeTealchartCoreRuntime';
+import { resolveNativeLeftToolRailToggleHitRect } from './mobile/utils/leftToolRailLayout';
+import {
+  createNativeUserDrawingCoordinateSpaces,
+  resolveNativeUserDrawingInputPoint,
+  resolveNativeUserDrawingSelectionPoint,
+} from './mobile/utils/nativeUserDrawingGeometry';
+import {
+  getNativeOrderObjectId as getOrderObjectId,
+  getNativePositionObjectId as getPositionObjectId,
+} from './mobile/utils/tradeLineLayout';
+import { getChartStore } from './state/chartState';
+import { TealchartApi } from './TealchartApi';
+import { DEFAULT_MARGINS } from './types';
 
-const RESET_BUTTON_HIDE_DELAY_MS = 5000;
-const RESET_BUTTON_FADE_MS = 220;
-const RESET_BUTTON_REVEAL_THROTTLE_MS = 250;
-const PENDING_ORDER_RENDER_ALPHA = 0.58;
-type SkiaFontStyleInput = Parameters<ReturnType<typeof Skia.FontMgr.System>['matchFamilyStyle']>[1];
-const SKIA_NORMAL_FONT_STYLE: SkiaFontStyleInput =
-  (FontStyle as { Normal?: SkiaFontStyleInput } | undefined)?.Normal ?? {};
+const STATIC_TOP_BAR_HEIGHT = 36;
+const TRADE_LABEL_HEIGHT = 18;
+const VOLUME_HEIGHT_RATIO = 0.15;
+const MOBILE_TOP_BAR_TIMEFRAME_VALUES = new Set<ResolutionString>(['1', '5', '15', '30', '60']);
+const NATIVE_CHART_UI_DEFAULTS = { leftToolRailCollapsed: true };
+const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>['anchors'] = [];
+const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
+const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 
-type UserDrawingTextDecorationLine = 'none' | 'underline' | 'line-through' | 'underline line-through';
-
-interface ActiveNativeOrderPriceDrag {
-  lineId: string;
-  externalOrderId?: string;
-  originalPrice: number;
-  currentPrice: number;
+interface NativeResizeSnapshot {
+  height: number;
+  image: SkImage;
+  width: number;
 }
 
-interface NativeTradingLineState extends OemsActionState {
-  price?: number;
-  takeProfit?: number;
-  stopLoss?: number;
-  visible?: boolean;
-}
-
-type NativeTradingLineObject = {
-  objectType: OemsActionObjectType;
-  objectId: string;
-  state: NativeTradingLineState;
-};
-
-function matchesNativeOrderIdentity(
-  order: OrderLineRenderData,
-  lineId: string,
-  externalOrderId?: string,
-): boolean {
-  return order.id === lineId || (!!externalOrderId && order.orderId === externalOrderId);
-}
-
-function findNativeOrderLine(
-  orderLines: OrderLineRenderData[],
-  lineId: string,
-  externalOrderId?: string,
-): OrderLineRenderData | undefined {
-  return orderLines.find((order) => matchesNativeOrderIdentity(order, lineId, externalOrderId));
-}
-
-function isNativeOrderPriceDragForLine(
-  activeDrag: ActiveNativeOrderPriceDrag | null,
-  order: OrderLineRenderData,
-): activeDrag is ActiveNativeOrderPriceDrag {
-  return !!activeDrag && matchesNativeOrderIdentity(order, activeDrag.lineId, activeDrag.externalOrderId);
-}
-
-function getNativeOrderRenderKey(order: OrderLineRenderData): string {
-  return order.orderId ?? order.id;
-}
-
-function getNativeOrderObjectId(order: OrderLineRenderData): string {
-  return order.orderId ?? order.id;
-}
-
-function getNativePositionObjectId(position: PositionLineRenderData): string {
-  return position.positionId ?? position.id;
-}
-
-function getNativeOrderLineState(order: OrderLineRenderData): NativeTradingLineState {
-  return {
-    price: order.price,
-    takeProfit: order.brackets?.takeProfit,
-    stopLoss: order.brackets?.stopLoss,
-    visible: true,
-  };
-}
-
-function getNativePositionLineState(position: PositionLineRenderData): NativeTradingLineState {
-  return {
-    price: position.price,
-    takeProfit: position.brackets?.takeProfit,
-    stopLoss: position.brackets?.stopLoss,
-    visible: true,
-  };
-}
-
-function applyNativeBracketActionState<
-  TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets'],
->(brackets: TBracket, state: NativeTradingLineState): TBracket {
-  if (!brackets) return brackets;
-  return {
-    ...brackets,
-    takeProfit: typeof state.takeProfit === 'number' ? state.takeProfit : brackets.takeProfit,
-    stopLoss: typeof state.stopLoss === 'number' ? state.stopLoss : brackets.stopLoss,
-  } as TBracket;
-}
-
-function getNativeActionOpacity(actionState: OrderLineRenderData['actionState'] | PositionLineRenderData['actionState']) {
-  return actionState?.isAwaitingCallback ? PENDING_ORDER_RENDER_ALPHA : 1;
-}
-
-function nativeTradingLineToBracketPriceLines(
-  line: OrderLineRenderData | PositionLineRenderData,
-  pricePrecision: number,
-  positiveColor: string,
-): PriceLine[] {
-  const brackets = line.brackets;
-  if (!brackets) return [];
-
-  const bracketLines: PriceLine[] = [];
-  const alpha = getNativeActionOpacity(line.actionState);
-  const takeProfitColor = brackets.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = brackets.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-  const stopLossColor = brackets.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = brackets.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-
-  if (brackets.takeProfit !== undefined && brackets.takeProfit > 0) {
-    bracketLines.push({
-      id: `${line.id}-tp`,
-      price: brackets.takeProfit,
-      lineStyle: 'dashed',
-      color: withAlpha(takeProfitColor, alpha),
-      type: 'price',
-      lineLength: 100,
-      extendLeft: true,
-      lineWidth: 1,
-      priority: 70,
-      label: {
-        primaryText: formatNativeTradeLinePrice(brackets.takeProfit, pricePrecision),
-        secondaryText: 'TP',
-        backgroundColor: withAlpha(takeProfitColor, alpha),
-        textColor: withAlpha(takeProfitTextColor, alpha),
-      },
-      actionState: line.actionState,
-    });
-  }
-
-  if (brackets.stopLoss !== undefined && brackets.stopLoss > 0) {
-    bracketLines.push({
-      id: `${line.id}-sl`,
-      price: brackets.stopLoss,
-      lineStyle: 'dashed',
-      color: withAlpha(stopLossColor, alpha),
-      type: 'price',
-      lineLength: 100,
-      extendLeft: true,
-      lineWidth: 1,
-      priority: 70,
-      label: {
-        primaryText: formatNativeTradeLinePrice(brackets.stopLoss, pricePrecision),
-        secondaryText: 'SL',
-        backgroundColor: withAlpha(stopLossColor, alpha),
-        textColor: withAlpha(stopLossTextColor, alpha),
-      },
-      actionState: line.actionState,
-    });
-  }
-
-  return bracketLines;
-}
-
-function hasMobileUserDrawingBalloonTail(layout: unknown): layout is Pick<MobileUserDrawingBalloonLayout, 'tail'> {
-  return typeof layout === 'object' && layout !== null && 'tail' in layout;
-}
-
-function resolveUserDrawingTextDecorationLine(style: UserDrawingStyle): UserDrawingTextDecorationLine {
-  if (style.textUnderline && style.textLineThrough) return 'underline line-through';
-  if (style.textUnderline) return 'underline';
-  if (style.textLineThrough) return 'line-through';
-  return 'none';
-}
-
-function dashIntervalsForUserDrawingLineStyle(lineStyle: UserDrawingLineStyle): number[] | null {
-  switch (lineStyle) {
-    case 'dashed':
-      return [6, 4];
-    case 'dotted':
-      return [2, 4];
-    case 'solid':
-      return null;
-  }
-}
-
-function UserDrawingSkiaFill({ style, children }: { style: UserDrawingStyle; children: React.ReactNode }) {
-  return <Group opacity={normalizeUserDrawingOpacity(style.fillOpacity ?? 1)}>{children}</Group>;
-}
-
-function LoadedUserDrawingSkiaImage({ primitive }: { primitive: MobileUserDrawingImagePrimitive }) {
-  const image = useImage(primitive.src || null);
-  if (!image) return null;
-
-  return (
-    <SkiaImage
-      image={image}
-      x={primitive.rect.x}
-      y={primitive.rect.y}
-      width={primitive.rect.width}
-      height={primitive.rect.height}
-      fit="fill"
-    />
-  );
-}
-
-function UserDrawingSkiaText({
-  x,
-  y,
-  text,
-  font,
-  color,
-  style,
-  underlineWidth,
-  fontSize,
-}: {
-  x: number;
-  y: number;
-  text: string;
-  font: ReturnType<typeof Skia.Font>;
-  color: string;
-  style: UserDrawingStyle;
-  underlineWidth?: number;
-  fontSize?: number;
-}) {
-  const decorationWidth = underlineWidth ?? font.measureText(text).width;
-  const resolvedFontSize = fontSize ?? 12;
-  const content = (
-    <>
-      <SkiaText x={x} y={y} text={text} font={font} color={color} />
-      {style.fontWeight === 'bold' && <SkiaText x={x + 0.45} y={y} text={text} font={font} color={color} />}
-      {style.textUnderline && (
-        <SkiaLine
-          p1={vec(x, y + resolvedFontSize * 0.18)}
-          p2={vec(x + decorationWidth, y + resolvedFontSize * 0.18)}
-          color={color}
-          strokeWidth={Math.max(1, resolvedFontSize / 14)}
-        />
-      )}
-      {style.textLineThrough && (
-        <SkiaLine
-          p1={vec(x, y - resolvedFontSize * 0.32)}
-          p2={vec(x + decorationWidth, y - resolvedFontSize * 0.32)}
-          color={color}
-          strokeWidth={Math.max(1, resolvedFontSize / 14)}
-        />
-      )}
-    </>
-  );
-  if (style.fontStyle !== 'italic') return content;
-  return (
-    <Group origin={{ x, y }} transform={[{ skewX: -0.16 }]}>
-      {content}
-    </Group>
-  );
+function disposeNativeResizeSnapshot(snapshot: NativeResizeSnapshot | null): void {
+  snapshot?.image.dispose();
 }
 
 export interface SkiaTealchartHandle {
   chart(index?: number): TealchartApi;
   activeChart(): TealchartApi;
   changeTheme(theme: ChartThemeInput): void;
-  getUserDrawingState(): UserDrawingState;
-  exportUserDrawingStateForLayout(): UserDrawingState | undefined;
-  importUserDrawingStateFromLayout(state?: UserDrawingState | null): boolean;
-  setUserDrawingState(state: UserDrawingState): boolean;
-  setActiveUserDrawingTool(tool: UserDrawingTool): boolean;
-  setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean;
-  isUserDrawingStayInDrawingMode(): boolean;
-  setUserDrawingMagnetMode(magnetMode: UserDrawingMagnetMode): boolean;
-  getUserDrawingMagnetMode(): UserDrawingMagnetMode;
-  setUserDrawingMeasureMode(measureMode: UserDrawingMeasureMode): boolean;
-  getUserDrawingMeasureMode(): UserDrawingMeasureMode;
-  canUndoUserDrawingCommand(): boolean;
-  canRedoUserDrawingCommand(): boolean;
-  undoUserDrawingCommand(): boolean;
-  redoUserDrawingCommand(): boolean;
-  dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean;
-  selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): boolean;
-  selectUserDrawings(drawingIds: readonly string[]): boolean;
-  addUserDrawing(drawing: UserDrawing, options?: { select?: boolean }): boolean;
-  deleteUserDrawing(drawingId?: string): boolean;
-  deleteSelectedUserDrawing(): boolean;
-  duplicateUserDrawing(drawingId?: string): boolean;
-  duplicateSelectedUserDrawing(): boolean;
-  beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean;
-  setUserDrawingDuplicateEditDrag(duplicate: boolean): void;
-  clearUserDrawingDuplicateEditDrag(): void;
-  isUserDrawingDuplicateEditDragEnabled(): boolean;
-  setUserDrawingPlacementConstraint(constrained: boolean): void;
-  clearUserDrawingPlacementConstraint(): void;
-  isUserDrawingPlacementConstrained(): boolean;
-  copySelectedUserDrawing(): boolean;
-  pasteUserDrawingClipboard(): boolean;
-  clearUserDrawingClipboard(): boolean;
-  clearUserDrawings(): boolean;
-  hideAllUserDrawings(): boolean;
-  showAllUserDrawings(): boolean;
-  lockAllUserDrawings(): boolean;
-  unlockAllUserDrawings(): boolean;
-  cancelUserDrawingDraft(): boolean;
-  beginUserDrawingTextEdit(drawingId?: string): boolean;
-  updateUserDrawingTextEdit(value: string): boolean;
-  commitUserDrawingTextEdit(): boolean;
-  cancelUserDrawingTextEdit(): boolean;
-  setUserDrawingText(drawingId: string, text: string): boolean;
-  setUserDrawingTextContent(text: string, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingName(drawingId: string, name: string | null, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingImageSource(source: UserDrawingImageSourceInput, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingTableCell(
-    row: number,
-    column: number,
-    value: UserDrawingTableCellInput,
-    options?: UpdateUserDrawingOptions,
-  ): boolean;
-  setUserDrawingTableDimensions(rows: number, columns: number, options?: UpdateUserDrawingOptions): boolean;
-  insertUserDrawingTableRow(
-    row: number,
-    values?: UserDrawingTableRowInput,
-    options?: UpdateUserDrawingOptions,
-  ): boolean;
-  deleteUserDrawingTableRow(row: number, options?: UpdateUserDrawingOptions): boolean;
-  insertUserDrawingTableColumn(
-    column: number,
-    values?: UserDrawingTableColumnInput,
-    options?: UpdateUserDrawingOptions,
-  ): boolean;
-  deleteUserDrawingTableColumn(column: number, options?: UpdateUserDrawingOptions): boolean;
-  updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingTrendLineExtend(extend: UserDrawingTrendLineExtend, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingIconName(iconName: UserDrawingIconName, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingVisibility(visible: boolean, options?: UpdateUserDrawingOptions): boolean;
-  setUserDrawingLocked(locked: boolean, options?: UpdateUserDrawingOptions): boolean;
-  reorderUserDrawings(action: UserDrawingZOrderAction, options?: UpdateUserDrawingOptions): boolean;
-  bringUserDrawingForward(options?: UpdateUserDrawingOptions): boolean;
-  sendUserDrawingBackward(options?: UpdateUserDrawingOptions): boolean;
-  bringUserDrawingToFront(options?: UpdateUserDrawingOptions): boolean;
-  sendUserDrawingToBack(options?: UpdateUserDrawingOptions): boolean;
-  getUserDrawingObjectTreeModel(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
-  openUserDrawingObjectTree(options?: UserDrawingObjectTreeOptions): UserDrawingObjectTreeModel;
-  dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean;
-  getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null;
-  getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface;
-  dispatchUserDrawingPropertiesSurfaceCommand(
-    command: UserDrawingPropertiesSurfaceCommand,
-    options?: ResolveUserDrawingPropertiesSurfaceCommandOptions,
-  ): boolean;
-  openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null;
 }
 
 export interface SkiaTealchartProps {
-  /** Datafeed for fetching bars - widget handles bar fetching internally (REQUIRED) */
-  datafeed: IBasicDataFeed;
-  /** Symbol to display (e.g., "BTC/USDT") */
-  symbol: string;
-  /** Timeframe interval (e.g., "15", "1h") */
-  interval?: string;
-
-  // ===========================================================================
-  // Layout & Rendering
-  // ===========================================================================
+  chartKey?: string;
   width?: number;
   height?: number;
-  /** Render options for colors and styling */
-  renderOptions?: Partial<Omit<RenderOptions, 'width' | 'height' | 'devicePixelRatio'>>;
-  /** Built-in or custom chart theme. Explicit renderOptions override theme values. */
+  datafeed?: IBasicDataFeed;
+  symbol: string;
+  interval?: string;
+  renderOptions?: Partial<RenderOptions>;
   theme?: ChartThemeInput;
-  /** Custom margins to override defaults */
-  margins?: Partial<ChartMargins>;
-  /** Price lines to render (last trade, orders, positions, etc.) */
+  margins?: Partial<typeof DEFAULT_MARGINS>;
   priceLines?: PriceLine[];
-  /** Map from plotId to style overrides */
-  plotStyleOverrides?: Map<string, PlotStyleOverride>;
-  /** Called when viewport changes */
-  onViewportChange?: (viewport: Viewport) => void;
-  /** Context menu callback */
-  onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
-  /** Called when crosshair position changes */
-  onCrossHairMoved?: (price: number, time: number) => void;
-  /** Initial user drawing state; later prop changes replace the chart's local drawing state. */
-  userDrawingState?: UserDrawingState;
-  /** Called when the chart updates user drawing state through input or its public API. */
-  onUserDrawingStateChange?: (state: UserDrawingState) => void;
-  /**
-   * Called after a user drawing command changes state. Direct state replacement and layout import emit
-   * a non-undoable `replaceState` command event when the committed drawing layout changes.
-   */
-  onUserDrawingCommand?: UserDrawingCommandEventListener;
-  /** Called when app or handle code asks to open the user drawing object tree. */
-  onUserDrawingObjectTreeOpen?: (model: UserDrawingObjectTreeModel) => void;
-  /** Called when app or handle code asks to open selected drawing properties. */
-  onUserDrawingPropertiesOpen?: (intent: UserDrawingPropertiesIntent) => void;
-  /** Constrain two-anchor drawing placement drags to square or 45-degree geometry for touch toolbars. */
-  constrainUserDrawingPlacement?: boolean;
-  /** Duplicate the selected drawing whenever a touch edit drag starts; host toolbars can expose this as a held modifier mode. */
-  duplicateUserDrawingOnEditDrag?: boolean;
-  /** Called when gesture blocks/unblocks parent scroll */
-  onSwipeBlockChange?: (blocked: boolean) => void;
-  /** Price precision for display */
   pricePrecision?: number;
-  // ===========================================================================
-  // Top Bar Props
-  // ===========================================================================
-  /** Whether to show the top bar (default: true) */
   showTopBar?: boolean;
-  /** Exchange name (e.g., "Binance") */
-  exchangeName?: string;
-  /** Called when timeframe changes */
+  supportedResolutions?: ResolutionString[];
+  uiPreferencesStorage?: TealchartKeyValueStorage | null;
+  save_load_adapter?: ISaveLoadAdapter | null;
+  disable_default_layout_persistence?: boolean;
+  auto_save_delay?: number;
+  userDrawingState?: UserDrawingState;
+  onIndicatorsClick?: () => void;
+  onContextMenu?: ContextMenuCallback;
+  onViewportChange?: (viewport: Viewport) => void;
   onIntervalChange?: (interval: string) => void;
-  /** Called when symbol changes */
+  onSymbolClick?: () => void;
   onSymbolChange?: (symbol: string) => void;
-  // ===========================================================================
-  // Indicator Props
-  // ===========================================================================
-  /** Called when an indicator is selected from the modal */
-  onAddIndicator?: (indicator: BuiltinIndicator) => void;
-  /** Called to open indicator settings for a given instance ID */
-  onOpenIndicatorSettings?: (instanceId: string) => void;
-  /** Called when a Tealscript parse/runtime error occurs */
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
+  onUserDrawingCommand?: UserDrawingCommandEventListener;
+  onUserDrawingStateChange?: (state: UserDrawingState) => void;
+  resizeFreeze?: boolean;
 }
 
 export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>(function SkiaTealchart(
   {
     width: propWidth,
     height: propHeight,
-    // Required datafeed prop
     datafeed,
     symbol: propSymbol,
     interval: propInterval = '15',
-    // Rendering props
     renderOptions,
     theme = 'Dark',
     margins: marginsProp,
     priceLines,
-    plotStyleOverrides,
-    onViewportChange,
-    onContextMenu,
-    onCrossHairMoved,
-    userDrawingState: propUserDrawingState,
-    onUserDrawingStateChange,
-    onUserDrawingCommand,
-    onUserDrawingObjectTreeOpen,
-    onUserDrawingPropertiesOpen,
-    constrainUserDrawingPlacement = false,
-    duplicateUserDrawingOnEditDrag = false,
-    onSwipeBlockChange,
     pricePrecision = 2,
-    // Top bar props
     showTopBar = true,
-    exchangeName,
+    supportedResolutions,
+    userDrawingState,
+    onIndicatorsClick,
+    onContextMenu,
+    onViewportChange,
     onIntervalChange,
+    onSymbolClick,
     onSymbolChange,
-    // Indicator props
-    onAddIndicator,
     onTealscriptError,
+    onUserDrawingCommand,
+    onUserDrawingStateChange,
+    resizeFreeze = false,
+    chartKey: propChartKey,
+    uiPreferencesStorage,
+    save_load_adapter,
+    disable_default_layout_persistence,
+    auto_save_delay,
   },
   ref,
 ) {
-  // ==========================================================================
-  // Core Hook + Indicator Management
-  // ==========================================================================
-
-  // Force re-render helper for indicator updates
-  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
-  const chartApiRef = useRef<TealchartApi | null>(null);
-  if (!chartApiRef.current) {
-    chartApiRef.current = new TealchartApi(propSymbol, propInterval);
-    chartApiRef.current.setOnLinesChanged(forceUpdate);
-  }
-  const chartApi = chartApiRef.current;
-  const oemsActionsRef = useRef<OemsActionManager<NativeTradingLineState> | null>(null);
-  if (!oemsActionsRef.current) {
-    oemsActionsRef.current = new OemsActionManager<NativeTradingLineState>({
-      onChange: forceUpdate,
+  const canvasRef = useCanvasRef();
+  const resizeSnapshotRef = useRef<NativeResizeSnapshot | null>(null);
+  const resizeSnapshotClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [resizeSnapshot, setResizeSnapshotState] = useState<NativeResizeSnapshot | null>(null);
+  const setResizeSnapshot = useCallback((nextSnapshot: NativeResizeSnapshot | null) => {
+    setResizeSnapshotState((currentSnapshot) => {
+      if (currentSnapshot?.image !== nextSnapshot?.image) {
+        disposeNativeResizeSnapshot(currentSnapshot);
+      }
+      resizeSnapshotRef.current = nextSnapshot;
+      return nextSnapshot;
     });
-  }
-  const oemsActions = oemsActionsRef.current;
-  const [activeOrderPriceDrag, setActiveOrderPriceDrag] = useState<ActiveNativeOrderPriceDrag | null>(null);
-
-  useEffect(
-    () => () => {
-      oemsActions.dispose();
-    },
-    [oemsActions],
-  );
-  const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
-  const [uncontrolledUserDrawingState, setUncontrolledUserDrawingState] = useState<UserDrawingState>(() =>
-    createUserDrawingState(propUserDrawingState),
-  );
-  const effectiveUserDrawingState = uncontrolledUserDrawingState;
-  const userDrawingStateRef = useRef(effectiveUserDrawingState);
-  const userDrawingHistoryRef = useRef<UserDrawingCommandHistory>(createUserDrawingCommandHistory());
-  const userDrawingClipboardRef = useRef<UserDrawingClipboard | null>(null);
-  const userDrawingSpacesByPaneIdRef = useRef<ReadonlyMap<string, DrawingCoordinateSpace>>(new Map());
-  const userDrawingIdCounterRef = useRef(0);
-  const userDrawingEditDragRef = useRef<UserDrawingEditDrag | null>(null);
-  const userDrawingEditDragTransactionKeyRef = useRef('edit-drag');
-  const userDrawingEditDragTransactionCounterRef = useRef(0);
-  const [userDrawingDraftPreviewAnchor, setUserDrawingDraftPreviewAnchor] = useState<UserDrawingAnchor | null>(null);
-  const userDrawingPlacementConstraintOverrideRef = useRef<boolean | null>(null);
-  const userDrawingDuplicateEditDragOverrideRef = useRef<boolean | null>(null);
-  const [userDrawingDuplicateEditDragOverride, setUserDrawingDuplicateEditDragOverride] = useState<boolean | null>(
-    null,
-  );
-  const [userDrawingSelectedActionPopoverDismissSignal, setUserDrawingSelectedActionPopoverDismissSignal] = useState(0);
-  const userDrawingMeasureLastPointRef = useRef<UserDrawingInputPoint | null>(null);
-
-  const commitUserDrawingState = useCallback(
-    (nextState: UserDrawingState) => {
-      userDrawingStateRef.current = nextState;
-      if (!nextState.draft) {
-        setUserDrawingDraftPreviewAnchor(null);
-      }
-      if (!nextState.measure) {
-        userDrawingMeasureLastPointRef.current = null;
-      }
-      setUncontrolledUserDrawingState(nextState);
-      onUserDrawingStateChange?.(nextState);
-    },
-    [onUserDrawingStateChange],
-  );
-
-  const notifyUserDrawingCommand = useCallback(
-    (event: UserDrawingCommandEvent) => {
-      try {
-        onUserDrawingCommand?.(event);
-      } catch {
-        // Keep chart input/state flow isolated from app callback failures.
-      }
-    },
-    [onUserDrawingCommand],
-  );
-
-  useEffect(() => {
-    if (propUserDrawingState) {
-      userDrawingHistoryRef.current = clearUserDrawingCommandHistory(userDrawingHistoryRef.current);
-      userDrawingMeasureLastPointRef.current = null;
-      setUserDrawingDraftPreviewAnchor(null);
-      const nextState = createUserDrawingState(propUserDrawingState);
-      userDrawingStateRef.current = nextState;
-      setUncontrolledUserDrawingState(nextState);
-    }
-  }, [propUserDrawingState]);
-
-  useEffect(() => {
-    setImperativeTheme(null);
-  }, [theme]);
-
-  const createUserDrawingId = useCallback(() => {
-    const existingIds = new Set(userDrawingStateRef.current.drawings.map((drawing) => drawing.id));
-    let id = '';
-    do {
-      id = `drawing_${++userDrawingIdCounterRef.current}`;
-    } while (existingIds.has(id));
-    return id;
   }, []);
-
-  const dispatchUserDrawingCommandToStateWithResult = useCallback(
-    (command: Parameters<typeof dispatchUserDrawingCommand>[1]) => {
-      const previousState = userDrawingStateRef.current;
-      const result = dispatchMobileUserDrawingHistoryCommand(previousState, userDrawingHistoryRef.current, command);
-      userDrawingHistoryRef.current = result.history;
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-        const event = createUserDrawingCommandEvent(previousState, result);
-        if (event) {
-          notifyUserDrawingCommand(event);
-        }
-      }
-      return result;
+  const resizeSnapshotVisible = resizeSnapshot !== null;
+  const resizeLayoutFrozen = resizeFreeze && resizeSnapshotVisible;
+  const layoutPropHeight = resizeLayoutFrozen ? resizeSnapshot.height : propHeight;
+  const layoutPropWidth = resizeLayoutFrozen ? resizeSnapshot.width : propWidth;
+  const chartKey = propChartKey ?? propSymbol;
+  const nativeLayoutDirtyRef = useRef<() => void>(() => undefined);
+  const markNativeLayoutDirtyIfReady = useCallback(() => {
+    nativeLayoutDirtyRef.current();
+  }, []);
+  const handleNativeIntervalChangeForLayout = useCallback(
+    (nextInterval: string) => {
+      onIntervalChange?.(nextInterval);
+      markNativeLayoutDirtyIfReady();
     },
-    [commitUserDrawingState, notifyUserDrawingCommand],
+    [markNativeLayoutDirtyIfReady, onIntervalChange],
   );
-
-  const dispatchUserDrawingCommandToState = useCallback(
-    (command: Parameters<typeof dispatchUserDrawingCommand>[1]) =>
-      dispatchUserDrawingCommandToStateWithResult(command).changed,
-    [dispatchUserDrawingCommandToStateWithResult],
-  );
-
-  const copySelectedUserDrawingToClipboard = useCallback(
-    (state: UserDrawingState = userDrawingStateRef.current): boolean => {
-      const clipboard = createUserDrawingClipboard(state);
-      if (!clipboard) return false;
-      userDrawingClipboardRef.current = clipboard;
-      return true;
+  const handleNativeSymbolChangeForLayout = useCallback(
+    (nextSymbol: string) => {
+      onSymbolChange?.(nextSymbol);
+      markNativeLayoutDirtyIfReady();
     },
+    [markNativeLayoutDirtyIfReady, onSymbolChange],
+  );
+  const handleNativeUserDrawingCommandForLayout: UserDrawingCommandEventListener = useCallback(
+    (event) => {
+      onUserDrawingCommand?.(event);
+      if (event.source !== 'layout') markNativeLayoutDirtyIfReady();
+    },
+    [markNativeLayoutDirtyIfReady, onUserDrawingCommand],
+  );
+  const nativeLayoutPersistence = useMemo(
+    () =>
+      resolveNativeDefaultLayoutPersistence({
+        autoSaveDelay: auto_save_delay,
+        chartKey,
+        disableDefaultLayoutPersistence: disable_default_layout_persistence,
+        saveLoadAdapter: save_load_adapter,
+        storage: uiPreferencesStorage,
+      }),
+    [auto_save_delay, chartKey, disable_default_layout_persistence, save_load_adapter, uiPreferencesStorage],
+  );
+  const chartStore = useMemo(
+    () =>
+      getChartStore(chartKey, {
+        uiPreferencesStorage,
+        defaultUiPreferences: NATIVE_CHART_UI_DEFAULTS,
+      }),
+    [chartKey, uiPreferencesStorage],
+  );
+  const [uiPreferences, setUiPreferences] = useState(() => chartStore.uiPreferences.get());
+  const [nativeCurrentLayout, setNativeCurrentLayout] = useState<CurrentLayoutState>(() =>
+    chartStore.currentLayout.get(),
+  );
+  const [nativeSaveStatus, setNativeSaveStatus] = useState<SaveStatus>(() => chartStore.saveStatus.get());
+  const [nativeAutoScaleEnabled, setNativeAutoScaleEnabled] = useState(() => chartStore.settings.get().autoScale);
+  useEffect(() => {
+    setUiPreferences(chartStore.uiPreferences.get());
+    return chartStore.uiPreferences.listen((nextPreferences) => {
+      setUiPreferences(nextPreferences);
+    });
+  }, [chartStore]);
+  useEffect(() => {
+    setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
+    return chartStore.settings.listen((nextSettings) => {
+      setNativeAutoScaleEnabled(nextSettings.autoScale);
+    });
+  }, [chartStore]);
+  useEffect(() => {
+    setNativeCurrentLayout(chartStore.currentLayout.get());
+    return chartStore.currentLayout.listen((nextLayout) => {
+      setNativeCurrentLayout(nextLayout);
+    });
+  }, [chartStore]);
+  useEffect(() => {
+    setNativeSaveStatus(chartStore.saveStatus.get());
+    return chartStore.saveStatus.listen((nextStatus) => {
+      setNativeSaveStatus(nextStatus);
+    });
+  }, [chartStore]);
+  const leftToolRailCollapsed = uiPreferences.leftToolRailCollapsed;
+  const [nativeOpenDrawingCategoryId, setNativeOpenDrawingCategoryId] = useState<string | null>(null);
+  const toggleLeftToolRailCollapsed = useCallback(() => {
+    chartStore.uiPreferences.setKey('leftToolRailCollapsed', !chartStore.uiPreferences.get().leftToolRailCollapsed);
+  }, [chartStore]);
+  const dismissNativeOpenDrawingCategory = useCallback(() => {
+    setNativeOpenDrawingCategoryId(null);
+  }, []);
+  useEffect(() => {
+    if (leftToolRailCollapsed) setNativeOpenDrawingCategoryId(null);
+  }, [leftToolRailCollapsed]);
+
+  const {
+    bars,
+    barsContext,
+    chartApi,
+    forceUpdate,
+    imperativeTheme,
+    indicatorManager,
+    interval,
+    isLoading,
+    isLoadingMoreBars,
+    requestMoreBars,
+    setImperativeTheme,
+    symbol,
+  } = useNativeTealchartCoreRuntime({
+    datafeed,
+    onIntervalChange: handleNativeIntervalChangeForLayout,
+    onLayoutDirty: markNativeLayoutDirtyIfReady,
+    onSymbolChange: handleNativeSymbolChangeForLayout,
+    onTealscriptError,
+    propInterval,
+    propSymbol,
+    theme,
+  });
+  const [nativeDisplayedInterval, setNativeDisplayedInterval] = useState(interval);
+  const [nativeLegendActionTargets, setNativeLegendActionTargets] = useState<readonly NativeLegendActionHitTarget[]>(
     [],
   );
-
-  const undoUserDrawingCommandFromSource = useCallback(
-    (source: UserDrawingCommandSource): boolean => {
-      const previousState = userDrawingStateRef.current;
-      const result = undoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
-      userDrawingHistoryRef.current = result.history;
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-        const event = createUserDrawingHistoryCommandEvent(
-          previousState,
-          result.state,
-          { type: 'undo', meta: { source } },
-          true,
-        );
-        if (event) notifyUserDrawingCommand(event);
-      }
-      return result.changed;
-    },
-    [commitUserDrawingState, notifyUserDrawingCommand],
+  useEffect(() => {
+    setNativeDisplayedInterval(interval);
+  }, [interval]);
+  const nativePricePrecision = useMemo(
+    () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision),
+    [pricePrecision],
   );
+  const nativeIndicatorPaneLayout = indicatorManager?.getUnifiedLayout();
+  const nativeIndicatorPlots = indicatorManager?.getPlots() ?? [];
+  const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
+    const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
+    const panes = nativeIndicatorPaneLayout?.panes ?? [];
+    const result: Record<string, NativeIndicatorPaneInfo> = {};
 
-  const redoUserDrawingCommandFromSource = useCallback(
-    (source: UserDrawingCommandSource): boolean => {
-      const previousState = userDrawingStateRef.current;
-      const result = redoUserDrawingCommandHistory(previousState, userDrawingHistoryRef.current);
-      userDrawingHistoryRef.current = result.history;
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-        const event = createUserDrawingHistoryCommandEvent(
-          previousState,
-          result.state,
-          { type: 'redo', meta: { source } },
-          true,
-        );
-        if (event) notifyUserDrawingCommand(event);
-      }
-      return result.changed;
-    },
-    [commitUserDrawingState, notifyUserDrawingCommand],
+    for (const [scriptId, info] of Object.entries(paneInfo)) {
+      const pane = panes.find(
+        (candidate) => candidate.type === 'indicator' && candidate.indicatorIds?.includes(scriptId),
+      );
+      result[scriptId] = {
+        overlay: info.overlay,
+        paneId: pane?.id,
+      };
+    }
+
+    return result;
+  }, [indicatorManager, nativeIndicatorPaneLayout]);
+  const nativeLegendIndicators = useMemo<readonly NativeLegendIndicator[]>(
+    () =>
+      indicatorManager?.getIndicators().map((indicator) => ({
+        id: indicator.instanceId,
+        inputs: indicator.inputs ?? {},
+        isVisible: indicator.isVisible,
+        name: indicator.indicator.name,
+      })) ?? [],
+    [indicatorManager, nativeIndicatorPaneLayout],
   );
+  const nativeLegendIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeLegendIndicatorPaneInfo>>>(() => {
+    const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
+    const panes = nativeIndicatorPaneLayout?.panes ?? [];
+    const result: Record<string, NativeLegendIndicatorPaneInfo> = {};
 
-  const [userDrawingObjectTreeVisible, setUserDrawingObjectTreeVisible] = useState(false);
-  const [userDrawingPropertiesVisible, setUserDrawingPropertiesVisible] = useState(false);
-  const [userDrawingPropertiesDrawingId, setUserDrawingPropertiesDrawingId] = useState<string | undefined>(undefined);
+    for (const [scriptId, info] of Object.entries(paneInfo)) {
+      const pane = panes.find(
+        (candidate) => candidate.type === 'indicator' && candidate.indicatorIds?.includes(scriptId),
+      );
+      result[scriptId] = {
+        inputs: info.inputs,
+        name: info.name,
+        overlay: info.overlay,
+        paneId: pane?.id,
+      };
+    }
 
-  const handleUserDrawingObjectTreeOpen = useCallback(
-    (model: UserDrawingObjectTreeModel) => {
-      if (onUserDrawingObjectTreeOpen) {
-        onUserDrawingObjectTreeOpen(model);
-      } else {
-        setUserDrawingObjectTreeVisible(true);
+    return result;
+  }, [indicatorManager, nativeIndicatorPaneLayout]);
+  const handleNativeToggleIndicator = useCallback(
+    (indicatorId: string) => {
+      chartApi.toggleStudyVisibility(indicatorId);
+    },
+    [chartApi],
+  );
+  const handleNativeRemoveIndicator = useCallback(
+    (indicatorId: string) => {
+      chartApi.removeStudy(indicatorId);
+    },
+    [chartApi],
+  );
+  const handleNativeOverlayAction = useCallback(
+    (command: unknown) => {
+      const legendCommand = command as NativeLegendActionCommand;
+      if (!legendCommand || typeof legendCommand.indicatorId !== 'string') return;
+      if (legendCommand.type === 'toggleIndicator') {
+        chartApi.toggleStudyVisibility(legendCommand.indicatorId);
+        return;
+      }
+      if (legendCommand.type === 'removeIndicator') {
+        chartApi.removeStudy(legendCommand.indicatorId);
       }
     },
-    [onUserDrawingObjectTreeOpen],
+    [chartApi],
   );
-
-  const handleUserDrawingPropertiesOpen = useCallback(
-    (intent: UserDrawingPropertiesIntent) => {
-      if (onUserDrawingPropertiesOpen) {
-        onUserDrawingPropertiesOpen(intent);
-      } else {
-        setUserDrawingPropertiesDrawingId(intent.drawingId);
-        setUserDrawingPropertiesVisible(true);
-      }
+  const handleNativeViewportChangeForLayout = useCallback(
+    (nextViewport: Viewport) => {
+      onViewportChange?.(nextViewport);
+      markNativeLayoutDirtyIfReady();
     },
-    [onUserDrawingPropertiesOpen],
+    [markNativeLayoutDirtyIfReady, onViewportChange],
   );
-
-  const dispatchUserDrawingObjectTreeActionToState = useCallback(
-    (action: UserDrawingObjectTreeDispatchAction): boolean => {
-      const commands = resolveUserDrawingObjectTreeDispatchActionCommands(userDrawingStateRef.current, action, {
-        createId: createUserDrawingId,
-        now: () => Date.now(),
-      });
-      let changed = false;
-      for (const command of commands) {
-        changed = dispatchUserDrawingCommandToState(command) || changed;
-      }
-      return changed;
-    },
-    [createUserDrawingId, dispatchUserDrawingCommandToState],
-  );
-
-  const replaceUserDrawingState = useCallback(
-    (nextState: UserDrawingState, source: 'api' | 'layout') => {
-      const previousState = userDrawingStateRef.current;
-      const result = replaceMobileUserDrawingState(previousState, userDrawingHistoryRef.current, nextState, source);
-      userDrawingHistoryRef.current = result.history;
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-      }
-      if (result.event) notifyUserDrawingCommand(result.event);
-      return result;
-    },
-    [commitUserDrawingState, notifyUserDrawingCommand],
-  );
-
-  // Create indicator manager (stable ref)
-  const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
-  if (!indicatorManagerRef.current) {
-    indicatorManagerRef.current = new MobileIndicatorManager();
-    indicatorManagerRef.current.setOnUpdate(forceUpdate);
-  }
-
-  useLayoutEffect(() => {
-    chartApi.setOnLinesChanged(forceUpdate);
-    chartApi.setOnOrderPriceChanged(forceUpdate);
-    chartApi.setOnStudyCreate(async (request) => {
-      const indicator = getIndicatorById(request.name);
-      const code = request.name.trim().startsWith('//@version') ? request.name : indicator?.code;
-      if (!code) return false;
-
-      indicatorManagerRef.current?.addTealscriptIndicator({
-        id: request.studyId,
-        code,
-        name: request.options?.displayName ?? indicator?.name ?? request.displayName,
-        overlay: request.forceOverlay || (indicator?.overlay ?? false),
-        inputs: request.inputs,
-        yAxisRange: indicator?.yAxisRange,
-      });
-      return true;
-    });
-    chartApi.setOnStudyRemove((studyId) => {
-      indicatorManagerRef.current?.removeIndicator(studyId);
-    });
-  }, [chartApi, forceUpdate]);
-
-  useLayoutEffect(() => {
-    const manager = indicatorManagerRef.current;
-    if (!manager || !onTealscriptError) return;
-    manager.onErrorSubscribe(onTealscriptError);
-    return () => {
-      manager.onErrorUnsubscribe(onTealscriptError);
-    };
-  }, [onTealscriptError]);
-
+  const loadedBarsInterval = bars.length > 0 ? (barsContext?.interval ?? interval) : interval;
+  const {
+    bracketDragActive,
+    bracketDragInteractionState,
+    bracketDragState,
+    chartAxisPinchGestureState,
+    chartPanGestureState,
+    crosshair,
+    orderDragState,
+    orderDragZones,
+    panActive,
+    panMetrics,
+    panStartViewport,
+    pinchActive,
+    priceAutoScale,
+    priceScaleActive,
+    priceScaleGestureState,
+    sharedPriceAxisTagSources,
+    sharedViewport,
+    timeScaleActive,
+    timeScaleGestureState,
+    tradeLineActionZones,
+    tradeLineRows,
+    viewportSyncEpoch,
+  } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled });
   useImperativeHandle(
     ref,
     () => ({
@@ -947,4750 +460,1061 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       changeTheme(nextTheme: ChartThemeInput): void {
         setImperativeTheme(nextTheme);
       },
-      getUserDrawingState(): UserDrawingState {
-        return userDrawingStateRef.current;
-      },
-      exportUserDrawingStateForLayout(): UserDrawingState | undefined {
-        return exportMobileUserDrawingStateForLayout(userDrawingStateRef.current);
-      },
-      importUserDrawingStateFromLayout(nextState?: UserDrawingState | null): boolean {
-        return replaceUserDrawingState(importMobileUserDrawingStateFromLayout(nextState), 'layout').layoutChanged;
-      },
-      setUserDrawingState(nextState: UserDrawingState): boolean {
-        return replaceUserDrawingState(nextState, 'api').changed;
-      },
-      setActiveUserDrawingTool(tool: UserDrawingTool): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'api' } });
-      },
-      setUserDrawingStayInDrawingMode(stayInDrawingMode: boolean): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setStayInDrawingMode',
-          stayInDrawingMode,
-          meta: { source: 'api' },
-        });
-      },
-      isUserDrawingStayInDrawingMode(): boolean {
-        return userDrawingStateRef.current.stayInDrawingMode !== false;
-      },
-      setUserDrawingMagnetMode(magnetMode: UserDrawingMagnetMode): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setMagnetMode',
-          magnetMode,
-          meta: { source: 'api' },
-        });
-      },
-      getUserDrawingMagnetMode(): UserDrawingMagnetMode {
-        return userDrawingStateRef.current.magnetMode ?? 'off';
-      },
-      setUserDrawingMeasureMode(measureMode: UserDrawingMeasureMode): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setMeasureMode',
-          measureMode,
-          meta: { source: 'api' },
-        });
-      },
-      getUserDrawingMeasureMode(): UserDrawingMeasureMode {
-        return userDrawingStateRef.current.measureMode ?? 'off';
-      },
-      canUndoUserDrawingCommand(): boolean {
-        return canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current);
-      },
-      canRedoUserDrawingCommand(): boolean {
-        return canRedoUserDrawingCommandHistory(userDrawingHistoryRef.current);
-      },
-      undoUserDrawingCommand(): boolean {
-        return undoUserDrawingCommandFromSource('api');
-      },
-      redoUserDrawingCommand(): boolean {
-        return redoUserDrawingCommandFromSource('api');
-      },
-      dispatchUserDrawingKeyboardAction(input: UserDrawingKeyboardInput): boolean {
-        const previousState = userDrawingStateRef.current;
-        const result = dispatchMobileUserDrawingKeyboardActionToState(
-          previousState,
-          userDrawingHistoryRef.current,
-          input,
-          {
-            clipboard: userDrawingClipboardRef.current,
-            createId: createUserDrawingId,
-            spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
-            setClipboard: (clipboard) => {
-              userDrawingClipboardRef.current = clipboard;
-            },
-          },
-        );
-        userDrawingHistoryRef.current = result.history;
-        if (result.changed && result.state !== userDrawingStateRef.current) {
-          commitUserDrawingState(result.state);
-          if (result.command) {
-            const event = createUserDrawingCommandEvent(previousState, { ...result, command: result.command });
-            if (event) {
-              notifyUserDrawingCommand(event);
-            }
-          } else if (result.action?.type === 'undo' || result.action?.type === 'redo') {
-            const event = createUserDrawingHistoryCommandEvent(
-              previousState,
-              result.state,
-              {
-                type: result.action.type === 'undo' ? 'undo' : 'redo',
-                meta: { source: 'keyboard' },
-              },
-              true,
-            );
-            if (event) {
-              notifyUserDrawingCommand(event);
-            }
-          }
-        }
-        return result.changed;
-      },
-      selectUserDrawing(drawingId: string | null, handle?: UserDrawingHandleRole): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'select', drawingId, handle, meta: { source: 'api' } });
-      },
-      selectUserDrawings(drawingIds: readonly string[]): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'selectMany', drawingIds, meta: { source: 'api' } });
-      },
-      addUserDrawing(drawing: UserDrawing, options: { select?: boolean } = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'add',
-          drawing,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      deleteUserDrawing(drawingId?: string): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'delete', options: { drawingId }, meta: { source: 'api' } });
-      },
-      deleteSelectedUserDrawing(): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'api' } });
-      },
-      duplicateUserDrawing(drawingId?: string): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'duplicate',
-          options: {
-            drawingId,
-            createId: createUserDrawingId,
-          },
-          meta: { source: 'api' },
-        });
-      },
-      duplicateSelectedUserDrawing(): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'duplicate',
-          options: {
-            createId: createUserDrawingId,
-          },
-          meta: { source: 'api' },
-        });
-      },
-      beginDuplicateUserDrawingDragAtPoint(point: DrawingScreenPoint): boolean {
-        const transactionKey = `duplicate-drag-${++userDrawingEditDragTransactionCounterRef.current}`;
-        const previousState = userDrawingStateRef.current;
-        const result = dispatchMobileUserDrawingHistoryCommand(previousState, userDrawingHistoryRef.current, {
-          type: 'beginDuplicateEditDragAtPoint',
-          point,
-          spacesByPaneId: userDrawingSpacesByPaneIdRef.current,
-          options: {
-            createId: createUserDrawingId,
-            hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-          },
-          meta: { source: 'api', transactionKey },
-        });
-        if (!result.hit || !result.editDrag) return false;
-
-        userDrawingHistoryRef.current = result.history;
-        if (result.changed) {
-          commitUserDrawingState(result.state);
-          const event = createUserDrawingCommandEvent(previousState, result);
-          if (event) {
-            notifyUserDrawingCommand(event);
-          }
-        }
-        userDrawingEditDragRef.current = result.editDrag;
-        userDrawingEditDragTransactionKeyRef.current = transactionKey;
-        return true;
-      },
-      setUserDrawingDuplicateEditDrag(duplicate: boolean): void {
-        userDrawingDuplicateEditDragOverrideRef.current = duplicate;
-        setUserDrawingDuplicateEditDragOverride(duplicate);
-      },
-      clearUserDrawingDuplicateEditDrag(): void {
-        userDrawingDuplicateEditDragOverrideRef.current = null;
-        setUserDrawingDuplicateEditDragOverride(null);
-      },
-      isUserDrawingDuplicateEditDragEnabled(): boolean {
-        return resolveMobileUserDrawingDuplicateEditDragEnabled({
-          propDuplicate: duplicateUserDrawingOnEditDrag,
-          overrideDuplicate: userDrawingDuplicateEditDragOverrideRef.current,
-        });
-      },
-      setUserDrawingPlacementConstraint(constrained: boolean): void {
-        userDrawingPlacementConstraintOverrideRef.current = constrained;
-      },
-      clearUserDrawingPlacementConstraint(): void {
-        userDrawingPlacementConstraintOverrideRef.current = null;
-      },
-      isUserDrawingPlacementConstrained(): boolean {
-        return resolveMobileUserDrawingPlacementConstraintEnabled({
-          propConstrained: constrainUserDrawingPlacement,
-          overrideConstrained: userDrawingPlacementConstraintOverrideRef.current,
-        });
-      },
-      copySelectedUserDrawing(): boolean {
-        return copySelectedUserDrawingToClipboard();
-      },
-      pasteUserDrawingClipboard(): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'paste',
-          clipboard: userDrawingClipboardRef.current,
-          options: {
-            createId: createUserDrawingId,
-          },
-          meta: { source: 'keyboard' },
-        });
-      },
-      clearUserDrawingClipboard(): boolean {
-        if (!userDrawingClipboardRef.current) return false;
-        userDrawingClipboardRef.current = null;
-        return true;
-      },
-      clearUserDrawings(): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'api' } });
-      },
-      hideAllUserDrawings(): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setVisibility',
-          visible: false,
-          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current, { includeLocked: true }),
-          meta: { source: 'api' },
-        });
-      },
-      showAllUserDrawings(): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setVisibility',
-          visible: true,
-          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current, { includeLocked: true }),
-          meta: { source: 'api' },
-        });
-      },
-      lockAllUserDrawings(): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setLocked',
-          locked: true,
-          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current),
-          meta: { source: 'api' },
-        });
-      },
-      unlockAllUserDrawings(): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setLocked',
-          locked: false,
-          options: getUserDrawingAllDrawingsUpdateOptions(userDrawingStateRef.current, { includeLocked: true }),
-          meta: { source: 'api' },
-        });
-      },
-      cancelUserDrawingDraft(): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'api' } });
-      },
-      beginUserDrawingTextEdit(drawingId?: string): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'beginTextEdit', drawingId, meta: { source: 'api' } });
-      },
-      updateUserDrawingTextEdit(value: string): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'updateTextEdit', value, meta: { source: 'textEditor' } });
-      },
-      commitUserDrawingTextEdit(): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'commitTextEdit', meta: { source: 'textEditor' } });
-      },
-      cancelUserDrawingTextEdit(): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'cancelTextEdit', meta: { source: 'textEditor' } });
-      },
-      setUserDrawingText(drawingId: string, text: string): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setText', drawingId, text, meta: { source: 'api' } });
-      },
-      setUserDrawingTextContent(text: string, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setTextContent', text, options, meta: { source: 'api' } });
-      },
-      setUserDrawingName(drawingId: string, name: string | null, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setName',
-          drawingId,
-          name,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      setUserDrawingImageSource(source: UserDrawingImageSourceInput, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setImageSource', source, options, meta: { source: 'api' } });
-      },
-      setUserDrawingTableCells(cells: UserDrawingTableCellsInput, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setTableCells', cells, options, meta: { source: 'api' } });
-      },
-      setUserDrawingTableCell(
-        row: number,
-        column: number,
-        value: UserDrawingTableCellInput,
-        options: UpdateUserDrawingOptions = {},
-      ): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setTableCell',
-          row,
-          column,
-          value,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      setUserDrawingTableDimensions(rows: number, columns: number, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setTableDimensions',
-          rows,
-          columns,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      insertUserDrawingTableRow(
-        row: number,
-        values?: UserDrawingTableRowInput,
-        options: UpdateUserDrawingOptions = {},
-      ): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'insertTableRow',
-          row,
-          values,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      deleteUserDrawingTableRow(row: number, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'deleteTableRow', row, options, meta: { source: 'api' } });
-      },
-      insertUserDrawingTableColumn(
-        column: number,
-        values?: UserDrawingTableColumnInput,
-        options: UpdateUserDrawingOptions = {},
-      ): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'insertTableColumn',
-          column,
-          values,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      deleteUserDrawingTableColumn(column: number, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'deleteTableColumn',
-          column,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      updateUserDrawingStyle(style: Partial<UserDrawingStyle>, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'updateStyle', style, options, meta: { source: 'api' } });
-      },
-      setUserDrawingTextAlign(textAlign: UserDrawingTextAlign, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setTextAlign', textAlign, options, meta: { source: 'api' } });
-      },
-      setUserDrawingTrendLineExtend(
-        extend: UserDrawingTrendLineExtend,
-        options: UpdateUserDrawingOptions = {},
-      ): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'setTrendLineExtend',
-          extend,
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      setUserDrawingIconName(iconName: UserDrawingIconName, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setIconName', iconName, options, meta: { source: 'api' } });
-      },
-      setUserDrawingVisibility(visible: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setVisibility', visible, options, meta: { source: 'api' } });
-      },
-      setUserDrawingLocked(locked: boolean, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'setLocked', locked, options, meta: { source: 'api' } });
-      },
-      reorderUserDrawings(action: UserDrawingZOrderAction, options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({ type: 'reorder', action, options, meta: { source: 'api' } });
-      },
-      bringUserDrawingForward(options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'reorder',
-          action: 'bringForward',
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      sendUserDrawingBackward(options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'reorder',
-          action: 'sendBackward',
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      bringUserDrawingToFront(options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'reorder',
-          action: 'bringToFront',
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      sendUserDrawingToBack(options: UpdateUserDrawingOptions = {}): boolean {
-        return dispatchUserDrawingCommandToState({
-          type: 'reorder',
-          action: 'sendToBack',
-          options,
-          meta: { source: 'api' },
-        });
-      },
-      getUserDrawingObjectTreeModel(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
-        return resolveUserDrawingObjectTreeModel(userDrawingStateRef.current, options);
-      },
-      openUserDrawingObjectTree(options: UserDrawingObjectTreeOptions = {}): UserDrawingObjectTreeModel {
-        const model = resolveUserDrawingObjectTreeModel(userDrawingStateRef.current, options);
-        handleUserDrawingObjectTreeOpen(model);
-        return model;
-      },
-      dispatchUserDrawingObjectTreeAction(action: UserDrawingObjectTreeDispatchAction): boolean {
-        return dispatchUserDrawingObjectTreeActionToState(action);
-      },
-      getUserDrawingPropertiesIntent(drawingId?: string): UserDrawingPropertiesIntent | null {
-        return resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
-      },
-      getUserDrawingPropertiesSurface(drawingId?: string): UserDrawingPropertiesSurface {
-        return resolveUserDrawingPropertiesSurface(userDrawingStateRef.current, drawingId);
-      },
-      dispatchUserDrawingPropertiesSurfaceCommand(
-        command: UserDrawingPropertiesSurfaceCommand,
-        options: ResolveUserDrawingPropertiesSurfaceCommandOptions = {},
-      ): boolean {
-        return dispatchUserDrawingCommandToState(resolveUserDrawingPropertiesSurfaceCommand(command, options));
-      },
-      openUserDrawingProperties(drawingId?: string): UserDrawingPropertiesIntent | null {
-        const intent = resolveUserDrawingPropertiesIntent(userDrawingStateRef.current, { drawingId });
-        if (intent) {
-          handleUserDrawingPropertiesOpen(intent);
-        }
-        return intent;
-      },
     }),
-    [
-      chartApi,
-      commitUserDrawingState,
-      copySelectedUserDrawingToClipboard,
-      constrainUserDrawingPlacement,
-      createUserDrawingId,
-      duplicateUserDrawingOnEditDrag,
-      dispatchUserDrawingCommandToState,
-      dispatchUserDrawingCommandToStateWithResult,
-      notifyUserDrawingCommand,
-      redoUserDrawingCommandFromSource,
-      onUserDrawingObjectTreeOpen,
-      handleUserDrawingObjectTreeOpen,
-      handleUserDrawingPropertiesOpen,
-      dispatchUserDrawingObjectTreeActionToState,
-      undoUserDrawingCommandFromSource,
-      replaceUserDrawingState,
-    ],
+    [chartApi, setImperativeTheme],
   );
 
-  // Use core hook for bar fetching and state management
-  const coreResult = useTealchartCore({
-    datafeed,
-    symbol: propSymbol,
-    interval: propInterval,
-    indicatorManager: indicatorManagerRef.current as unknown as IIndicatorManager,
-    onSymbolChange,
-    onIntervalChange,
+  const { frame, margins, onLayout, options } = useNativeSkiaLayoutRuntime({
+    imperativeTheme,
+    leftToolRailCollapsed,
+    marginsProp,
+    paneLayout: nativeIndicatorPaneLayout,
+    pricePrecision: nativePricePrecision,
+    propHeight: layoutPropHeight,
+    propWidth: layoutPropWidth,
+    renderOptions,
+    showTopBar,
+    theme,
+    topBarHeight: STATIC_TOP_BAR_HEIGHT,
   });
 
-  // Get values from core hook
-  const { bars, symbol, interval, isLoading, unifiedLayout } = coreResult;
-
-  useEffect(() => {
-    chartApi.setOnSymbolChange((nextSymbol) => coreResult.setSymbol(nextSymbol));
-    chartApi.setOnIntervalChange((nextInterval) => coreResult.setInterval(nextInterval));
-  }, [chartApi, coreResult.setInterval, coreResult.setSymbol]);
-
-  useEffect(() => {
-    if (chartApi.symbol() !== symbol) {
-      chartApi.setSymbol(symbol);
-    }
-  }, [chartApi, symbol]);
-
-  useEffect(() => {
-    if (chartApi.resolution() !== interval) {
-      chartApi.setResolution(interval);
-    }
-  }, [chartApi, interval]);
-
-  const lineRenderSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
-  const orderLines = lineRenderSnapshot.orderLines;
-  const positionLines = lineRenderSnapshot.positionLines;
-
-  useEffect(() => {
-    const seen = new Set(orderLines.map(getNativeOrderObjectId));
-    for (const line of orderLines) {
-      oemsActions.confirmState('order', getNativeOrderObjectId(line), getNativeOrderLineState(line));
-    }
-
-    for (const action of oemsActions.getActions()) {
-      if (action.objectType === 'order' && action.confirmsRemoved && !seen.has(action.objectId)) {
-        oemsActions.confirmRemoved('order', action.objectId);
-      }
-    }
-  }, [oemsActions, orderLines]);
-
-  useEffect(() => {
-    const seen = new Set(positionLines.map(getNativePositionObjectId));
-    for (const line of positionLines) {
-      oemsActions.confirmState('position', getNativePositionObjectId(line), getNativePositionLineState(line));
-    }
-
-    for (const action of oemsActions.getActions()) {
-      if (action.objectType === 'position' && action.confirmsRemoved && !seen.has(action.objectId)) {
-        oemsActions.confirmRemoved('position', action.objectId);
-      }
-    }
-  }, [oemsActions, positionLines]);
-
-  useEffect(() => {
-    if (!activeOrderPriceDrag) return;
-    const hasActiveOrder = orderLines.some((order) => isNativeOrderPriceDragForLine(activeOrderPriceDrag, order));
-    if (!hasActiveOrder) {
-      setActiveOrderPriceDrag(null);
-    }
-  }, [activeOrderPriceDrag, orderLines]);
-
-  const handleOrderPriceDragStart = useCallback(
-    (lineId: string, originalPrice: number, externalOrderId?: string) => {
-      const order = findNativeOrderLine(orderLines, lineId, externalOrderId);
-      const objectId = order ? getNativeOrderObjectId(order) : externalOrderId ?? lineId;
-      if (oemsActions.getAction('order', objectId)) return;
-      setActiveOrderPriceDrag({
-        lineId,
-        externalOrderId: externalOrderId ?? order?.orderId,
-        originalPrice,
-        currentPrice: originalPrice,
-      });
-    },
-    [oemsActions, orderLines],
-  );
-
-  const handleOrderPriceDragMove = useCallback(
-    (lineId: string, price: number, externalOrderId?: string) => {
-      setActiveOrderPriceDrag((current) => {
-        if (
-          current &&
-          (current.lineId === lineId ||
-            (!!externalOrderId && current.externalOrderId === externalOrderId) ||
-            (!!current.externalOrderId && current.externalOrderId === externalOrderId))
-        ) {
-          return { ...current, currentPrice: price };
-        }
-
-        const order = findNativeOrderLine(orderLines, lineId, externalOrderId);
-        return {
-          lineId,
-          externalOrderId: externalOrderId ?? order?.orderId,
-          originalPrice: order?.price ?? price,
-          currentPrice: price,
-        };
-      });
-
-      const order = findNativeOrderLine(orderLines, lineId, externalOrderId);
-      order?.callbacks?.onMoving?.(price);
-    },
-    [orderLines],
-  );
-
-  const handleOrderPriceDragEnd = useCallback(
-    (lineId: string, price: number, externalOrderId?: string) => {
-      const resolvedExternalOrderId = externalOrderId ?? activeOrderPriceDrag?.externalOrderId;
-      const activeDrag =
-        activeOrderPriceDrag &&
-        (activeOrderPriceDrag.lineId === lineId ||
-          (!!resolvedExternalOrderId && activeOrderPriceDrag.externalOrderId === resolvedExternalOrderId))
-          ? activeOrderPriceDrag
-          : null;
-      const order = findNativeOrderLine(orderLines, lineId, resolvedExternalOrderId);
-      const originalPrice = activeDrag?.originalPrice ?? order?.price ?? price;
-      const objectId = order ? getNativeOrderObjectId(order) : resolvedExternalOrderId ?? lineId;
-      const originalState = order ? getNativeOrderLineState(order) : { price: originalPrice, visible: true };
-
-      setActiveOrderPriceDrag(null);
-      const result = oemsActions.startAction({
-        objectType: 'order',
-        objectId,
-        kind: 'orderMove',
-        originalState,
-        optimisticState: {
-          ...originalState,
-          price,
-        },
-        callback: () => order?.callbacks?.onMove?.(price),
-      });
-      if (result.completedSynchronously) forceUpdate();
-    },
-    [activeOrderPriceDrag, oemsActions, orderLines],
-  );
-
-  const handleOrderPriceDragCancel = useCallback((lineId: string, externalOrderId?: string) => {
-    setActiveOrderPriceDrag((current) =>
-      current &&
-      (current.lineId === lineId || (!!externalOrderId && current.externalOrderId === externalOrderId))
-        ? null
-        : current,
-    );
-  }, []);
-
-  const resolveNativeTradingObject = useCallback(
-    (line: OrderLineRenderData | PositionLineRenderData, objectType: OemsActionObjectType): NativeTradingLineObject => {
-      if (objectType === 'order') {
-        const order = line as OrderLineRenderData;
-        return {
-          objectType,
-          objectId: getNativeOrderObjectId(order),
-          state: getNativeOrderLineState(order),
-        };
-      }
-
-      const position = line as PositionLineRenderData;
-      return {
-        objectType,
-        objectId: getNativePositionObjectId(position),
-        state: getNativePositionLineState(position),
-      };
-    },
-    [],
-  );
-
-  const startNativeOemsAction = useCallback(
-    (
-      object: NativeTradingLineObject,
-      kind: OemsActionKind,
-      optimisticState: NativeTradingLineState,
-      callback: OemsActionCallback,
-      confirmsRemoved = false,
-    ) => {
-      const result = oemsActions.startAction({
-        objectType: object.objectType,
-        objectId: object.objectId,
-        kind,
-        originalState: object.state,
-        optimisticState,
-        confirmsRemoved,
-        callback,
-      });
-      if (result.completedSynchronously) forceUpdate();
-    },
-    [oemsActions, forceUpdate],
-  );
-
-  const handleNativeOrderCancel = useCallback(
-    (order: OrderLineRenderData) => {
-      if (order.actionState?.isPending) return;
-      const object = resolveNativeTradingObject(order, 'order');
-      startNativeOemsAction(object, 'orderCancel', object.state, () => order.callbacks?.onCancel?.(), true);
-    },
-    [resolveNativeTradingObject, startNativeOemsAction],
-  );
-
-  const handleNativePositionClose = useCallback(
-    (position: PositionLineRenderData) => {
-      if (position.actionState?.isPending) return;
-      const object = resolveNativeTradingObject(position, 'position');
-      startNativeOemsAction(object, 'positionClose', object.state, () => position.callbacks?.onClose?.(), true);
-    },
-    [resolveNativeTradingObject, startNativeOemsAction],
-  );
-
-  const handleNativePositionReverse = useCallback(
-    (position: PositionLineRenderData) => {
-      if (position.actionState?.isPending) return;
-      const object = resolveNativeTradingObject(position, 'position');
-      startNativeOemsAction(object, 'positionReverse', object.state, () => position.callbacks?.onReverse?.(), true);
-    },
-    [resolveNativeTradingObject, startNativeOemsAction],
-  );
-
-  const handleNativeBracketMoveEnd = useCallback(
-    (
-      line: OrderLineRenderData | PositionLineRenderData,
-      objectType: OemsActionObjectType,
-      bracketType: 'tp' | 'sl',
-      price: number,
-      partialPercent?: number,
-    ) => {
-      if (line.actionState?.isPending) return;
-      const object = resolveNativeTradingObject(line, objectType);
-      const optimisticState = {
-        ...object.state,
-        ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
-      };
-      const kind: OemsActionKind =
-        objectType === 'order'
-          ? bracketType === 'tp'
-            ? 'orderTpMove'
-            : 'orderSlMove'
-          : bracketType === 'tp'
-            ? 'positionTpMove'
-            : 'positionSlMove';
-      const callback =
-        bracketType === 'tp'
-          ? () => line.callbacks?.onTPMoveEnd?.(price, partialPercent)
-          : () => line.callbacks?.onSLMoveEnd?.(price, partialPercent);
-      startNativeOemsAction(object, kind, optimisticState, callback);
-    },
-    [resolveNativeTradingObject, startNativeOemsAction],
-  );
-
-  const handleNativeBracketClick = useCallback(
-    (line: OrderLineRenderData | PositionLineRenderData, objectType: OemsActionObjectType, bracketType: 'tp' | 'sl') => {
-      if (line.actionState?.isPending) return;
-      const object = resolveNativeTradingObject(line, objectType);
-      const kind: OemsActionKind = bracketType === 'tp' ? 'tpClick' : 'slClick';
-      const callback = bracketType === 'tp' ? () => line.callbacks?.onTPClick?.() : () => line.callbacks?.onSLClick?.();
-      startNativeOemsAction(object, kind, object.state, callback);
-    },
-    [resolveNativeTradingObject, startNativeOemsAction],
-  );
-
-  const interactiveOrderLines = useMemo<OrderLineRenderData[]>(() => {
-    return orderLines.map((order) => {
-      const isActiveDrag = isNativeOrderPriceDragForLine(activeOrderPriceDrag, order);
-      const objectId = getNativeOrderObjectId(order);
-      const status = oemsActions.getObjectStatus('order', objectId, getNativeOrderLineState(order));
-      const actionState = status.action
-        ? {
-            kind: status.action.kind,
-            isPending: status.isPending,
-            isAwaitingCallback: status.isAwaitingCallback,
-            isAwaitingConfirmation: status.isAwaitingConfirmation,
-          }
-        : undefined;
-      return {
-        ...order,
-        price: isActiveDrag ? activeOrderPriceDrag.currentPrice : typeof status.state.price === 'number' ? status.state.price : order.price,
-        brackets: applyNativeBracketActionState(order.brackets, status.state),
-        actionState,
-      };
-    });
-  }, [activeOrderPriceDrag, oemsActions, orderLines]);
-
-  const interactivePositionLines = useMemo<PositionLineRenderData[]>(() => {
-    return positionLines.map((position) => {
-      const objectId = getNativePositionObjectId(position);
-      const status = oemsActions.getObjectStatus('position', objectId, getNativePositionLineState(position));
-      const actionState = status.action
-        ? {
-            kind: status.action.kind,
-            isPending: status.isPending,
-            isAwaitingCallback: status.isAwaitingCallback,
-            isAwaitingConfirmation: status.isAwaitingConfirmation,
-          }
-        : undefined;
-      return {
-        ...position,
-        price: typeof status.state.price === 'number' ? status.state.price : position.price,
-        brackets: applyNativeBracketActionState(position.brackets, status.state),
-        actionState,
-      };
-    });
-  }, [oemsActions, positionLines]);
-
-  // Get supported resolutions from core (for filtering timeframe selector)
-  const supportedResolutions = coreResult.core?.getSupportedResolutions() ?? null;
-
-  // Get indicator state from manager
-  const plots = indicatorManagerRef.current?.getPlots() || [];
-  const drawings = indicatorManagerRef.current?.getDrawings() || [];
-  const baseUnifiedPaneLayout = indicatorManagerRef.current?.getUnifiedLayout() || unifiedLayout;
-  const indicatorPaneInfo = indicatorManagerRef.current?.getIndicatorPaneInfo() || {};
-
-  const activeIndicatorIds = indicatorManagerRef.current?.getIndicators().map((ind) => ind.indicator.id) || [];
-
-  // Handle indicator addition
-  const handleAddIndicatorInternal = useCallback(
-    (indicator: BuiltinIndicator) => {
-      if (indicatorManagerRef.current) {
-        console.log('[SkiaTealchart] Adding indicator:', indicator.id);
-        indicatorManagerRef.current.addIndicator(indicator);
-      }
-      // Also call external callback if provided
-      onAddIndicator?.(indicator);
-    },
-    [onAddIndicator],
-  );
-
-  // ==========================================================================
-  // Dimensions & Layout
-  // ==========================================================================
-
-  const [dimensions, setDimensions] = useState({ width: propWidth || 0, height: propHeight || 0 });
-
-  useEffect(() => {
-    if (propWidth && propHeight) {
-      setDimensions({ width: propWidth, height: propHeight });
-    }
-  }, [propWidth, propHeight]);
-
-  const onLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      if (!propWidth || !propHeight) {
-        const { width, height } = event.nativeEvent.layout;
-        setDimensions({ width, height });
-      }
-    },
-    [propWidth, propHeight],
-  );
-
-  // Top bar safe zone - just enough to keep price labels below the toolbar content
-  // The top bar is 36px tall but we only need ~26px clearance (content is centered)
-  const TOP_BAR_SAFE_ZONE = 26;
-
-  // Increase top margin when top bar is shown to create safe zone for price labels
-  const margins: ChartMargins = useMemo(
-    () => ({
-      ...DEFAULT_MARGINS,
-      ...marginsProp,
-      // Add safe zone to top margin so price labels don't overlap with top bar
-      top: (marginsProp?.top ?? DEFAULT_MARGINS.top) + (showTopBar ? TOP_BAR_SAFE_ZONE : 0),
-    }),
-    [marginsProp, showTopBar],
-  );
-
-  // Chart uses full height (top bar overlays on top, but margins create safe zone)
-
-  // ==========================================================================
-  // Viewport State
-  // ==========================================================================
-
-  const [viewport, setViewport] = useState<Viewport | null>(() =>
-    bars.length > 0 ? TealchartRenderer.calculateViewport(bars) : null,
-  );
-
-  const barsLengthRef = useRef(bars.length);
-  const viewportControllerRef = useRef(new ViewportController());
-
-  // Track the first bar's time to detect reloads with the same count
-  const barsFirstTimeRef = useRef<number | null>(bars.length > 0 ? bars[0].time : null);
-
-  // Compute auto-scale Y ranges for indicator panes (matching TealchartWidget behavior)
-  const unifiedPaneLayout = useMemo(() => {
-    if (!viewport || plots.length === 0 || !baseUnifiedPaneLayout) return baseUnifiedPaneLayout;
-
-    // Compute auto-scale Y ranges for indicator panes via ViewportController
-    const indicatorPanes = baseUnifiedPaneLayout.panes
-      .filter((p) => p.type === 'indicator' && p.indicatorIds)
-      .map((p) => ({ id: p.id, fixedRange: p.fixedRange, indicatorIds: p.indicatorIds! }));
-
-    const ranges = viewportControllerRef.current.computePaneYRanges(
-      indicatorPanes,
-      plots,
-      bars,
-      viewport.startTime,
-      viewport.endTime,
-    );
-
-    if (ranges.size === 0) return baseUnifiedPaneLayout;
-
-    return {
-      ...baseUnifiedPaneLayout,
-      panes: baseUnifiedPaneLayout.panes.map((pane) => {
-        const range = ranges.get(pane.id);
-        if (range) {
-          return { ...pane, yMin: range.yMin, yMax: range.yMax };
-        }
-        return pane;
-      }),
-    };
-  }, [baseUnifiedPaneLayout, viewport, plots, bars]);
-
-  const userDrawingInputPanes = useMemo(() => {
-    if (!viewport || !unifiedPaneLayout) return [];
-
-    return computePaneGeometry({
-      paneLayout: unifiedPaneLayout,
-      height: dimensions.height,
-      topOffset: margins.top,
-    }).map((pane) => {
-      const yRange =
-        pane.type === 'main' && !pane.fixedRange
-          ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
-          : { yMin: pane.yMin, yMax: pane.yMax };
-      return {
-        id: pane.id,
-        top: pane.top,
-        height: pane.height,
-        bottom: pane.bottom,
-        ...yRange,
-      };
-    });
-  }, [dimensions.height, margins.top, unifiedPaneLayout, viewport]);
-
-  const userDrawingSpacesByPaneId = useMemo(() => {
-    if (!viewport) return new Map<string, DrawingCoordinateSpace>();
-
-    return new Map(
-      userDrawingInputPanes.map((pane) => [
-        pane.id,
-        {
-          viewport,
-          pane,
-          chartLeft: margins.left,
-          chartRight: dimensions.width - margins.right,
-          bars: pane.id === 'main' ? bars : undefined,
-        },
-      ]),
-    );
-  }, [bars, dimensions.width, margins.left, margins.right, userDrawingInputPanes, viewport]);
-  userDrawingSpacesByPaneIdRef.current = userDrawingSpacesByPaneId;
-
-  const userDrawingPrimitives = useMemo(
-    () =>
-      resolveMobileUserDrawingRenderModel(effectiveUserDrawingState, userDrawingSpacesByPaneId, {
-        draftPreviewAnchor: userDrawingDraftPreviewAnchor ?? undefined,
-      }),
-    [effectiveUserDrawingState, userDrawingDraftPreviewAnchor, userDrawingSpacesByPaneId],
-  );
-  const userDrawingSelectionActionAnchor = useMemo(
-    () => resolveUserDrawingSelectionActionAnchor(effectiveUserDrawingState, userDrawingSpacesByPaneId),
-    [effectiveUserDrawingState, userDrawingSpacesByPaneId],
-  );
-  const userDrawingSelectedActionSurface = useMemo(
-    () =>
-      resolveUserDrawingSelectedActionSurface(effectiveUserDrawingState, {
-        duplicateEditDragEnabled: resolveMobileUserDrawingDuplicateEditDragEnabled({
-          propDuplicate: duplicateUserDrawingOnEditDrag,
-          overrideDuplicate: userDrawingDuplicateEditDragOverride,
-        }),
-      }),
-    [duplicateUserDrawingOnEditDrag, effectiveUserDrawingState, userDrawingDuplicateEditDragOverride],
-  );
-  const resolveConstrainedUserDrawingPlacementPoint = useCallback(
-    (point: UserDrawingInputPoint): UserDrawingInputPoint => {
-      // Click placement constrains the pending anchor relative to the last-placed draft point.
-      const draft = userDrawingStateRef.current.draft;
-      const startPoint =
-        draft && draft.anchors.length > 0
-          ? { paneId: draft.paneId, anchor: draft.anchors[draft.anchors.length - 1]! }
-          : null;
-      return resolveUserDrawingPlacementConstraint({
-        tool: userDrawingStateRef.current.activeTool,
-        startPoint,
-        currentPoint: point,
-        spacesByPaneId: userDrawingSpacesByPaneId,
-        options: {
-          constrainedPlacement: resolveMobileUserDrawingPlacementConstraintEnabled({
-            propConstrained: constrainUserDrawingPlacement,
-            overrideConstrained: userDrawingPlacementConstraintOverrideRef.current,
-          }),
-        },
-      });
-    },
-    [constrainUserDrawingPlacement, userDrawingSpacesByPaneId],
-  );
-  const activeUserDrawingTextEditPrimitive = useMemo(
-    () =>
-      userDrawingPrimitives.find(
-        (primitive): primitive is MobileUserDrawingTextBoxPrimitive =>
-          isMobileUserDrawingTextBoxPrimitive(primitive) &&
-          primitive.editing &&
-          primitive.id === effectiveUserDrawingState.textEdit?.drawingId,
-      ),
-    [effectiveUserDrawingState.textEdit?.drawingId, userDrawingPrimitives],
-  );
-  const activeUserDrawingTextEditorStyle = useMemo(() => {
-    if (!activeUserDrawingTextEditPrimitive) return null;
-    const value = activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text;
-    const editMetrics = resolveUserDrawingTextEditMetrics(value);
-    const configuredWidth =
-      activeUserDrawingTextEditPrimitive.style.textWrap && activeUserDrawingTextEditPrimitive.style.textMaxWidth
-        ? activeUserDrawingTextEditPrimitive.style.textMaxWidth
-        : undefined;
-    const width = configuredWidth ?? Math.max(120, Math.min(260, editMetrics.longestLineLength * 7 + 32));
-    const height = Math.max(32, Math.min(160, editMetrics.lines.length * 18 + 14));
-    const chartRight = dimensions.width - margins.right;
-    const left = Math.max(
-      margins.left,
-      Math.min(activeUserDrawingTextEditPrimitive.point.x - width / 2, chartRight - width - 8),
-    );
-
-    return {
-      left,
-      top: Math.max(margins.top, activeUserDrawingTextEditPrimitive.point.y - height / 2),
-      width,
-      height,
-      color: activeUserDrawingTextEditPrimitive.style.textColor ?? activeUserDrawingTextEditPrimitive.style.lineColor,
-      fontSize: normalizeUserDrawingFontSize(activeUserDrawingTextEditPrimitive.style.fontSize ?? 12),
-      fontFamily: resolveMobileUserDrawingFontFamily(activeUserDrawingTextEditPrimitive.style.fontFamily, Platform.OS),
-      fontWeight: activeUserDrawingTextEditPrimitive.style.fontWeight === 'bold' ? ('700' as const) : ('400' as const),
-      fontStyle:
-        activeUserDrawingTextEditPrimitive.style.fontStyle === 'italic' ? ('italic' as const) : ('normal' as const),
-      textDecorationLine: resolveUserDrawingTextDecorationLine(activeUserDrawingTextEditPrimitive.style),
-      borderColor: activeUserDrawingTextEditPrimitive.style.lineColor,
-    };
-  }, [activeUserDrawingTextEditPrimitive, dimensions.width, margins.left, margins.right, margins.top]);
-
-  useEffect(() => {
-    if (bars.length === 0) {
-      // Reset refs when bars are cleared so next load always triggers
-      barsLengthRef.current = 0;
-      barsFirstTimeRef.current = null;
-      return;
-    }
-
-    const firstTime = bars[0].time;
-    const lengthChanged = bars.length !== barsLengthRef.current;
-    const identityChanged = firstTime !== barsFirstTimeRef.current;
-
-    if (lengthChanged || identityChanged) {
-      barsLengthRef.current = bars.length;
-      barsFirstTimeRef.current = firstTime;
-
-      const newViewport = viewportControllerRef.current.handleBarsLoaded(bars, intervalToMs(interval));
-      setViewport(newViewport);
-      onViewportChange?.(newViewport);
-    }
-  }, [bars, onViewportChange]);
-
-  const handleViewportChange = useCallback(
-    (newViewport: Viewport) => {
-      const vp = viewportControllerRef.current.handleViewportChange(newViewport, bars, intervalToMs(interval));
-      setViewport(vp);
-      onViewportChange?.(vp);
-    },
-    [onViewportChange, bars, interval],
-  );
-
-  // ==========================================================================
-  // Render Options
-  // ==========================================================================
-
-  const fullRenderOptions: RenderOptions = useMemo(() => {
-    const themedRenderOptions = mergeChartThemeRenderOptions(imperativeTheme ?? theme, renderOptions);
-    return {
-      width: dimensions.width,
-      height: dimensions.height,
-      devicePixelRatio: 1,
-      backgroundColor: themedRenderOptions.backgroundColor ?? DEFAULT_RENDER_OPTIONS.backgroundColor,
-      upColor: themedRenderOptions.upColor ?? DEFAULT_RENDER_OPTIONS.upColor,
-      downColor: themedRenderOptions.downColor ?? DEFAULT_RENDER_OPTIONS.downColor,
-      textColor: themedRenderOptions.textColor ?? DEFAULT_RENDER_OPTIONS.textColor,
-      gridColor: themedRenderOptions.gridColor ?? DEFAULT_RENDER_OPTIONS.gridColor,
-      showVolume: themedRenderOptions.showVolume ?? true,
-      volumeHeight: themedRenderOptions.volumeHeight ?? 0.15,
-      minCandleWidth: themedRenderOptions.minCandleWidth ?? 1,
-      ...themedRenderOptions,
-      crosshairColor: themedRenderOptions.crosshairColor ?? DEFAULT_RENDER_OPTIONS.crosshairColor,
-      candleSpacing: themedRenderOptions.candleSpacing ?? DEFAULT_RENDER_OPTIONS.candleSpacing,
-      maxCandleWidth: themedRenderOptions.maxCandleWidth ?? DEFAULT_RENDER_OPTIONS.maxCandleWidth,
-      // Pass margins with top bar offset so price labels have safe zone
-      margins,
-    };
-  }, [dimensions.width, dimensions.height, imperativeTheme, margins, renderOptions, theme]);
-
-  const effectivePriceLines = useMemo(() => {
-    const latestBar = bars.length > 0 ? bars[bars.length - 1] : null;
-    const lastTradeLine = buildLastTradePriceLine({
-      latestBar,
-      interval,
-      pricePrecision,
-      upColor: fullRenderOptions.upColor,
-      downColor: fullRenderOptions.downColor,
-      renderLineOnCanvas: false,
-    });
-    const nonLastTradeLines = (priceLines ?? []).filter((line) => line.id !== 'last-trade');
-    const bracketPriceLines = [
-      ...interactiveOrderLines.flatMap((line) =>
-        nativeTradingLineToBracketPriceLines(line, pricePrecision, fullRenderOptions.upColor),
-      ),
-      ...interactivePositionLines.flatMap((line) =>
-        nativeTradingLineToBracketPriceLines(line, pricePrecision, fullRenderOptions.upColor),
-      ),
-    ];
-
-    return lastTradeLine
-      ? [...nonLastTradeLines, ...bracketPriceLines, lastTradeLine]
-      : [...nonLastTradeLines, ...bracketPriceLines];
-  }, [
-    bars,
+  const nativeBarsReadyForRequestedData = nativeBarsMatchRequestedData({
+    barsContext,
+    barsLength: bars.length,
     interval,
-    priceLines,
-    pricePrecision,
-    fullRenderOptions.upColor,
-    fullRenderOptions.downColor,
-    interactiveOrderLines,
-    interactivePositionLines,
-  ]);
+    symbol,
+  });
 
-  // ==========================================================================
-  // Gestures (using unified hook)
-  // ==========================================================================
-
-  const chartDimensions = useMemo(
+  const {
+    beginNativeViewportInteraction,
+    cancelNativeViewportInteraction,
+    commitPanViewport,
+    applyNativeViewport,
+    dataLoadRenderBlocked,
+    hasDataViewport,
+    projection,
+    resetNativeViewport,
+    viewport,
+  } = useNativeViewportRuntime({
+    autoScaleEnabled: nativeAutoScaleEnabled,
+    bars,
+    barsMatchRequestedData: nativeBarsReadyForRequestedData,
+    frame,
+    interval,
+    isLoading,
+    loadedBarsInterval,
+    onRequestMoreBars: requestMoreBars,
+    onViewportChange: handleNativeViewportChangeForLayout,
+    panActive,
+    panMetrics,
+    panStartViewport,
+    pinchActive,
+    priceAutoScale,
+    priceScaleActive,
+    sharedViewport,
+    symbol,
+    timeScaleActive,
+    viewportSyncEpoch,
+  });
+  const liveNativeRenderSnapshot = useMemo(
     () => ({
-      width: dimensions.width,
-      height: dimensions.height,
-      margins,
+      bars,
+      hasDataViewport,
+      interval: loadedBarsInterval,
+      priceLines: priceLines ?? EMPTY_NATIVE_PRICE_LINES,
+      projection,
+      viewport,
     }),
-    [dimensions.width, dimensions.height, margins],
+    [bars, hasDataViewport, loadedBarsInterval, priceLines, projection, viewport],
   );
-  const positiveTradingColor = fullRenderOptions.upColor;
-  const negativeTradingColor = fullRenderOptions.downColor;
-
-  const handleAutoScaleDisabled = useCallback((paneId: string) => {
-    viewportControllerRef.current.disableAutoScale(paneId);
-  }, []);
-
-  const getIsAutoScale = useCallback((paneId: string) => viewportControllerRef.current.isAutoScale(paneId), []);
-
-  const handleResetViewport = useCallback(() => {
-    if (bars.length > 0) {
-      const vp = viewportControllerRef.current.handleReset(bars, intervalToMs(interval));
-      setViewport(vp);
-      onViewportChange?.(vp);
-    }
-  }, [bars, interval, onViewportChange]);
-
-  const handleUserDrawingZoomIn = useCallback(() => {
-    if (!viewport) return;
-    handleViewportChange(zoomViewportTimeRange(viewport, VIEWPORT_ZOOM_IN_FACTOR));
-  }, [handleViewportChange, viewport]);
-
-  // ==========================================================================
-  // Crosshair State
-  // ==========================================================================
-
-  const [crosshairVisible, setCrosshairVisible] = useState(false);
-  // Store the crosshair position (updated via runOnJS from gestures)
-  const [lastCrosshairPosition, setLastCrosshairPosition] = useState({ x: 0, y: 0 });
-  const crosshairDragStartX = useSharedValue(0);
-  const crosshairDragStartY = useSharedValue(0);
-
-  const [resetButtonVisible, setResetButtonVisible] = useState(false);
-  const resetButtonOpacity = useSharedValue(0);
-  const resetButtonHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resetButtonFadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resetButtonLastRevealAtRef = useRef(0);
-
-  const clearResetButtonTimers = useCallback(() => {
-    if (resetButtonHideTimerRef.current) {
-      clearTimeout(resetButtonHideTimerRef.current);
-      resetButtonHideTimerRef.current = null;
-    }
-    if (resetButtonFadeTimerRef.current) {
-      clearTimeout(resetButtonFadeTimerRef.current);
-      resetButtonFadeTimerRef.current = null;
-    }
-  }, []);
-
-  const hideResetButtonOverlay = useCallback(() => {
-    resetButtonOpacity.value = withTiming(0, { duration: RESET_BUTTON_FADE_MS });
-    resetButtonFadeTimerRef.current = setTimeout(() => {
-      setResetButtonVisible(false);
-      resetButtonFadeTimerRef.current = null;
-    }, RESET_BUTTON_FADE_MS);
-  }, [resetButtonOpacity]);
-
-  const revealResetButtonOverlay = useCallback(
-    (force = false) => {
-      const now = Date.now();
-      if (!force && now - resetButtonLastRevealAtRef.current < RESET_BUTTON_REVEAL_THROTTLE_MS) return;
-      resetButtonLastRevealAtRef.current = now;
-
-      clearResetButtonTimers();
-      setResetButtonVisible(true);
-      resetButtonOpacity.value = withTiming(1, { duration: 120 });
-      resetButtonHideTimerRef.current = setTimeout(() => {
-        resetButtonHideTimerRef.current = null;
-        hideResetButtonOverlay();
-      }, RESET_BUTTON_HIDE_DELAY_MS);
+  const nativeRenderSnapshotRef = useRef(liveNativeRenderSnapshot);
+  const nativeRenderTransitionPending = shouldDimNativeRenderForTransition({
+    barsContext,
+    barsLength: bars.length,
+    interval,
+    isLoading,
+    symbol,
+  });
+  const shouldHoldNativeRenderSnapshot = shouldHoldNativeRenderSnapshotForTransition({
+    barsContext,
+    barsLength: bars.length,
+    hasDataViewport,
+    interval,
+    isLoading,
+    previousBarsLength: nativeRenderSnapshotRef.current.bars.length,
+    previousHasDataViewport: nativeRenderSnapshotRef.current.hasDataViewport,
+    previousProjectionReady: Boolean(nativeRenderSnapshotRef.current.projection),
+    projectionReady: Boolean(projection),
+    symbol,
+  });
+  const nativeRenderSnapshot = shouldHoldNativeRenderSnapshot
+    ? nativeRenderSnapshotRef.current
+    : liveNativeRenderSnapshot;
+  useEffect(() => {
+    if (shouldHoldNativeRenderSnapshot || bars.length === 0 || !hasDataViewport || !projection) return;
+    nativeRenderSnapshotRef.current = liveNativeRenderSnapshot;
+  }, [bars.length, hasDataViewport, liveNativeRenderSnapshot, projection, shouldHoldNativeRenderSnapshot]);
+  const nativeRenderBars = nativeRenderSnapshot.bars;
+  const nativeRenderHasDataViewport = nativeRenderSnapshot.hasDataViewport;
+  const nativeRenderInterval = nativeRenderSnapshot.interval;
+  const nativeRenderPriceLines = nativeRenderSnapshot.priceLines;
+  const nativeRenderProjection = nativeRenderSnapshot.projection;
+  const nativeRenderViewport = nativeRenderSnapshot.viewport;
+  const useStaticNativeRenderProjection = shouldUseNativeStaticRenderProjectionForTransition({
+    dataLoadRenderBlocked,
+    holdingSnapshot: shouldHoldNativeRenderSnapshot,
+  });
+  const staticNativeRenderProjection = useStaticNativeRenderProjection ? nativeRenderProjection : null;
+  const [nativeResetViewButtonVisible, setNativeResetViewButtonVisible] = useState(false);
+  const [nativeContextMenu, setNativeContextMenu] = useState<NativeCrosshairContextMenuState | null>(null);
+  const nativeResetViewButtonTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasNativeContextMenu = Boolean(onContextMenu);
+  const closeNativeContextMenu = useCallback(() => {
+    setNativeContextMenu(null);
+    crosshair.visible.value = false;
+  }, [crosshair]);
+  const handleNativeContextMenuTap = useCallback(
+    (time: number, price: number, anchorX: number, anchorY: number) => {
+      const items = onContextMenu?.(time, price) ?? [];
+      setNativeContextMenu(items.length > 0 ? { anchorX, anchorY, items } : null);
     },
-    [clearResetButtonTimers, hideResetButtonOverlay, resetButtonOpacity],
+    [onContextMenu],
   );
-
-  const revealResetButtonIfInBottomRegion = useCallback(
-    (_x: number, y: number) => {
-      if (dimensions.height <= 0) return;
-      if (y >= dimensions.height * (2 / 3) && y <= dimensions.height) {
-        revealResetButtonOverlay();
-      }
-    },
-    [dimensions.height, revealResetButtonOverlay],
-  );
-
-  const handleResetButtonPress = useCallback(() => {
-    handleResetViewport();
-    revealResetButtonOverlay(true);
-  }, [handleResetViewport, revealResetButtonOverlay]);
-
-  const resetButtonAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: resetButtonOpacity.value,
-  }));
+  useEffect(() => {
+    if (!onContextMenu) setNativeContextMenu(null);
+  }, [onContextMenu]);
+  const clearNativeResetViewButtonTimer = useCallback(() => {
+    if (nativeResetViewButtonTimerRef.current) {
+      clearTimeout(nativeResetViewButtonTimerRef.current);
+      nativeResetViewButtonTimerRef.current = null;
+    }
+  }, []);
+  const hideNativeResetViewButton = useCallback(() => {
+    clearNativeResetViewButtonTimer();
+    setNativeResetViewButtonVisible(false);
+  }, [clearNativeResetViewButtonTimer]);
+  const showNativeResetViewButton = useCallback(() => {
+    clearNativeResetViewButtonTimer();
+    setNativeResetViewButtonVisible(true);
+    nativeResetViewButtonTimerRef.current = setTimeout(() => {
+      setNativeResetViewButtonVisible(false);
+      nativeResetViewButtonTimerRef.current = null;
+    }, NATIVE_RESET_VIEW_DISMISS_MS);
+  }, [clearNativeResetViewButtonTimer]);
 
   useEffect(
     () => () => {
-      clearResetButtonTimers();
+      clearNativeResetViewButtonTimer();
     },
-    [clearResetButtonTimers],
+    [clearNativeResetViewButtonTimer],
   );
 
-  // Context menu state
-  const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuItems, setContextMenuItems] = useState<ContextMenuItem[]>([]);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0, price: 0, time: 0 });
-  const closeContextMenu = useCallback(() => {
-    setContextMenuVisible(false);
-    setContextMenuItems([]);
-  }, []);
-
-  // ==========================================================================
-  // Bracket Drag Preview State (TP/SL drag on Skia canvas)
-  // ==========================================================================
-
-  const [bracketDragState, setBracketDragState] = useState<{
-    type: 'tp' | 'sl';
-    positionId: string;
-    price: number;
-    entryPrice: number;
-    isLong: boolean;
-    notional: number;
-    partialEnabled: boolean;
-    partialPercent: number;
-    color: string;
-  } | null>(null);
-
-  const handleTPMove = useCallback(
-    (positionId: string, price: number, partialPercent = 100) => {
-      const pos = interactivePositionLines?.find((p) => p.id === positionId || p.positionId === positionId);
-      if (pos?.positionData) {
-        setBracketDragState({
-          type: 'tp',
-          positionId,
-          price,
-          entryPrice: pos.positionData.entryPrice,
-          isLong: pos.positionData.isLong,
-          notional: pos.positionData.notional,
-          partialEnabled: pos.partialEnabled ?? false,
-          partialPercent,
-          color: pos.brackets?.takeProfitColor ?? positiveTradingColor,
-        });
-      }
-    },
-    [interactivePositionLines, positiveTradingColor],
-  );
-
-  const handleSLMove = useCallback(
-    (positionId: string, price: number, partialPercent = 100) => {
-      const pos = interactivePositionLines?.find((p) => p.id === positionId || p.positionId === positionId);
-      if (pos?.positionData) {
-        setBracketDragState({
-          type: 'sl',
-          positionId,
-          price,
-          entryPrice: pos.positionData.entryPrice,
-          isLong: pos.positionData.isLong,
-          notional: pos.positionData.notional,
-          partialEnabled: pos.partialEnabled ?? false,
-          partialPercent,
-          color: pos.brackets?.stopLossColor ?? STOP_LOSS_COLOR,
-        });
-      }
-    },
-    [interactivePositionLines],
-  );
-
-  // Order TP/SL drag move handlers (for Skia bracket preview)
-  const handleOrderTPMove = useCallback(
-    (orderId: string, price: number, partialPercent = 100) => {
-      const order = interactiveOrderLines?.find((o) => o.id === orderId || o.orderId === orderId);
-      if (order) {
-        setBracketDragState({
-          type: 'tp',
-          positionId: orderId,
-          price,
-          entryPrice: order.price,
-          isLong: true, // Approximation — actual side determined by OrderLineManager
-          notional: 0,
-          partialEnabled: order.partialEnabled ?? false,
-          partialPercent,
-          color: order.brackets?.takeProfitColor ?? positiveTradingColor,
-        });
-      }
-    },
-    [interactiveOrderLines, positiveTradingColor],
-  );
-
-  const handleOrderSLMove = useCallback(
-    (orderId: string, price: number, partialPercent = 100) => {
-      const order = interactiveOrderLines?.find((o) => o.id === orderId || o.orderId === orderId);
-      if (order) {
-        setBracketDragState({
-          type: 'sl',
-          positionId: orderId,
-          price,
-          entryPrice: order.price,
-          isLong: true, // Approximation — actual side determined by OrderLineManager
-          notional: 0,
-          partialEnabled: order.partialEnabled ?? false,
-          partialPercent,
-          color: order.brackets?.stopLossColor ?? STOP_LOSS_COLOR,
-        });
-      }
-    },
-    [interactiveOrderLines],
-  );
-
-  const handleTPSLDragEnd = useCallback(() => {
-    setBracketDragState(null);
-  }, []);
-
-  // Indicators modal state
-  const [indicatorsModalVisible, setIndicatorsModalVisible] = useState(false);
-
-  const handleIndicatorsPress = useCallback(() => {
-    setIndicatorsModalVisible(true);
-  }, []);
-
-  const handleIndicatorsModalClose = useCallback(() => {
-    setIndicatorsModalVisible(false);
-  }, []);
-
-  const handleSelectIndicator = useCallback(
-    (indicator: BuiltinIndicator) => {
-      console.log('[SkiaTealchart] handleSelectIndicator called:', indicator.id, indicator.name);
-      // Use internal handler which manages indicators in datafeed mode
-      handleAddIndicatorInternal(indicator);
-    },
-    [handleAddIndicatorInternal],
-  );
-
-  // Indicator settings modal state
-  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
-  const [settingsIndicator, setSettingsIndicator] = useState<IndicatorSettingsData | null>(null);
-  const [settingsInputDefs] = useState<import('@tealstreet/tealscript').InputDefinition[]>([]);
-  const [settingsPlots] = useState<import('@tealstreet/tealscript').PlotOutput[]>([]);
-
-  const handleSettingsModalClose = useCallback(() => {
-    setSettingsModalVisible(false);
-    setSettingsIndicator(null);
-  }, []);
-
-  const handleSettingsSave = useCallback(
-    (inputs: Record<string, unknown>, styleOverrides?: PlotStyleOverride[]) => {
-      const manager = indicatorManagerRef.current;
-      if (!manager || !settingsIndicator) return;
-
-      manager.updateInputs(settingsIndicator.id, inputs);
-      if (styleOverrides) {
-        manager.updateStyleOverrides(settingsIndicator.id, styleOverrides);
-      }
-    },
-    [settingsIndicator],
-  );
-
-  // Handle crosshair move callback
-  const handleCrosshairMove = useCallback(
-    (x: number, y: number) => {
-      // Update last position for context menu
-      setLastCrosshairPosition({ x, y });
-
-      // Preview the in-progress click-placed drawing following the crosshair between taps.
-      const draftTool = effectiveUserDrawingState.draft?.tool;
-      if (draftTool && getUserDrawingPlacementMode(draftTool) === 'click' && viewport) {
-        const point = resolveMobileUserDrawingInputPoint({
-          point: { x, y },
-          viewport,
-          dimensions: chartDimensions,
-          panes: userDrawingInputPanes,
-          bars,
-          magnetMode: isUserDrawingPathFamilyTool(draftTool) ? 'off' : (effectiveUserDrawingState.magnetMode ?? 'off'),
-        });
-        // Clear the preview when the crosshair is over an unresolvable region so it never sticks.
-        setUserDrawingDraftPreviewAnchor(point ? resolveConstrainedUserDrawingPlacementPoint(point).anchor : null);
-      }
-
-      if (!viewport || !onCrossHairMoved) return;
-      const price = yToPrice(y, viewport, chartDimensions);
-      const time = xToTime(x, viewport, chartDimensions);
-      onCrossHairMoved(price, time);
-    },
-    [
-      viewport,
-      chartDimensions,
-      onCrossHairMoved,
-      effectiveUserDrawingState,
-      userDrawingInputPanes,
-      bars,
-      resolveConstrainedUserDrawingPlacementPoint,
-    ],
-  );
-
-  const isPointInChartArea = useCallback(
-    (x: number, y: number) => {
-      const chartLeft = chartDimensions.margins.left;
-      const chartRight = chartDimensions.width - chartDimensions.margins.right;
-      const chartTop = chartDimensions.margins.top;
-      const chartBottom = chartDimensions.height - chartDimensions.margins.bottom;
-
-      return x >= chartLeft && x < chartRight && y >= chartTop && y < chartBottom;
-    },
-    [chartDimensions],
-  );
-
-  const measureUserDrawingTextLabelLine = useCallback((drawing: UserDrawingTextAnnotation, line: string): number => {
-    const normalizedFontFamily = normalizeUserDrawingFontFamily(drawing.style.fontFamily ?? 'sans-serif');
-    const nativeFontFamily = resolveMobileUserDrawingFontFamily(normalizedFontFamily, Platform.OS);
-    const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily, SKIA_NORMAL_FONT_STYLE);
-    const font = Skia.Font(typeface, normalizeUserDrawingFontSize(drawing.style.fontSize ?? 12));
-    return font.measureText(line).width;
-  }, []);
-
-  const handleUserDrawingTap = useCallback(
-    (x: number, y: number, additive = false) => {
-      if (!viewport) return false;
-
-      if (effectiveUserDrawingState.activeTool === 'select') {
-        if (!isPointInChartArea(x, y)) return false;
-
-        const selection = dispatchUserDrawingCommand(effectiveUserDrawingState, {
-          type: 'selectAtPoint',
-          point: { x, y },
-          spacesByPaneId: userDrawingSpacesByPaneId,
-          options: { additive, hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
-          meta: { source: 'touch' },
-        });
-        if (selection.changed) {
-          commitUserDrawingState(selection.state);
-          const event = createUserDrawingCommandEvent(effectiveUserDrawingState, selection);
-          if (event) {
-            notifyUserDrawingCommand(event);
-          }
-        }
-        return (selection.hit ?? false) || selection.changed;
-      }
-
-      const point = resolveMobileUserDrawingInputPoint({
-        point: { x, y },
-        viewport,
-        dimensions: chartDimensions,
-        panes: userDrawingInputPanes,
-        bars,
-        magnetMode: isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)
-          ? 'off'
-          : (effectiveUserDrawingState.magnetMode ?? 'off'),
-      });
-      if (!point) return false;
-
-      return dispatchUserDrawingCommandToState({
-        type: 'handleInput',
-        point: resolveConstrainedUserDrawingPlacementPoint(point),
-        options: {
-          createId: createUserDrawingId,
-        },
-        meta: { source: 'touch' },
-      });
-    },
-    [
-      chartDimensions,
-      createUserDrawingId,
-      commitUserDrawingState,
-      dispatchUserDrawingCommandToState,
-      resolveConstrainedUserDrawingPlacementPoint,
-      effectiveUserDrawingState,
-      isPointInChartArea,
-      measureUserDrawingTextLabelLine,
-      notifyUserDrawingCommand,
-      userDrawingInputPanes,
-      userDrawingSpacesByPaneId,
-      bars,
-      viewport,
-    ],
-  );
-
-  const handleUserDrawingEditStart = useCallback(
-    (x: number, y: number, options?: ChartDrawingGestureOptions) => {
-      if (!viewport) return false;
-      if (!isPointInChartArea(x, y)) return false;
-
-      if (effectiveUserDrawingState.measureMode === 'on') {
-        const point = resolveMobileUserDrawingInputPoint({
-          point: { x, y },
-          viewport,
-          dimensions: chartDimensions,
-          panes: userDrawingInputPanes,
-          bars,
-          magnetMode: effectiveUserDrawingState.magnetMode ?? 'off',
-        });
-        if (!point) return false;
-
-        const changed = dispatchUserDrawingCommandToState({
-          type: 'beginMeasure',
-          point,
-          meta: { source: 'touch' },
-        });
-        if (!changed) return false;
-
-        userDrawingMeasureLastPointRef.current = point;
-        return true;
-      }
-
-      if (isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)) {
-        const point = resolveMobileUserDrawingInputPoint({
-          point: { x, y },
-          viewport,
-          dimensions: chartDimensions,
-          panes: userDrawingInputPanes,
-          bars,
-          pressure: options?.pressure,
-        });
-        if (!point) return false;
-
-        return dispatchUserDrawingCommandToState({
-          type: 'beginPathDrag',
-          point,
-          meta: { source: 'touch', transactionKey: 'path-drag' },
-        });
-      }
-
-      if (effectiveUserDrawingState.activeTool !== 'select') return false;
-
-      const duplicateEditDrag = resolveMobileUserDrawingDuplicateEditDragEnabled({
-        propDuplicate: duplicateUserDrawingOnEditDrag,
-        overrideDuplicate: userDrawingDuplicateEditDragOverrideRef.current,
-      });
-      const transactionKey = `${duplicateEditDrag ? 'duplicate-drag' : 'edit-drag'}-${++userDrawingEditDragTransactionCounterRef.current}`;
-      const result = duplicateEditDrag
-        ? dispatchUserDrawingCommandToStateWithResult({
-            type: 'beginDuplicateEditDragAtPoint',
-            point: { x, y },
-            spacesByPaneId: userDrawingSpacesByPaneId,
-            options: {
-              createId: createUserDrawingId,
-              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-            },
-            meta: { source: 'touch', transactionKey },
-          })
-        : dispatchUserDrawingCommand(effectiveUserDrawingState, {
-            type: 'beginEditDragAtPoint',
-            point: { x, y },
-            spacesByPaneId: userDrawingSpacesByPaneId,
-            options: {
-              hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-            },
-            meta: { source: 'touch', transactionKey },
-          });
-      if (!result.hit || !result.editDrag) return false;
-
-      userDrawingEditDragRef.current = result.editDrag;
-      userDrawingEditDragTransactionKeyRef.current = transactionKey;
-      if (!duplicateEditDrag && result.changed) {
-        commitUserDrawingState(result.state);
-        const event = createUserDrawingCommandEvent(effectiveUserDrawingState, result);
-        if (event) {
-          notifyUserDrawingCommand(event);
-        }
-      }
-      return true;
-    },
-    [
-      chartDimensions,
-      commitUserDrawingState,
-      createUserDrawingId,
-      duplicateUserDrawingOnEditDrag,
-      dispatchUserDrawingCommandToState,
-      dispatchUserDrawingCommandToStateWithResult,
-      effectiveUserDrawingState,
-      isPointInChartArea,
-      measureUserDrawingTextLabelLine,
-      notifyUserDrawingCommand,
-      userDrawingInputPanes,
-      userDrawingSpacesByPaneId,
-      bars,
-      viewport,
-    ],
-  );
-
-  const handleUserDrawingEditMove = useCallback(
-    (x: number, y: number, options?: ChartDrawingGestureOptions) => {
-      if (viewport && effectiveUserDrawingState.measureMode === 'on') {
-        const point = resolveMobileUserDrawingInputPoint({
-          point: { x, y },
-          viewport,
-          dimensions: chartDimensions,
-          panes: userDrawingInputPanes,
-          bars,
-          magnetMode: effectiveUserDrawingState.magnetMode ?? 'off',
-        });
-        if (!point || !userDrawingMeasureLastPointRef.current) return;
-
-        userDrawingMeasureLastPointRef.current = point;
-        dispatchUserDrawingCommandToState({
-          type: 'updateMeasure',
-          point,
-          meta: { source: 'touch' },
-        });
-        return;
-      }
-
-      if (viewport && isUserDrawingPathFamilyTool(effectiveUserDrawingState.activeTool)) {
-        const point = resolveMobileUserDrawingInputPoint({
-          point: { x, y },
-          viewport,
-          dimensions: chartDimensions,
-          panes: userDrawingInputPanes,
-          bars,
-          pressure: options?.pressure,
-        });
-        if (!point) return;
-
-        dispatchUserDrawingCommandToState({
-          type: 'appendPathDragPoint',
-          point,
-          meta: { source: 'touch', transactionKey: 'path-drag' },
-        });
-        return;
-      }
-
-      const drag = userDrawingEditDragRef.current;
-      if (!drag) return;
-
-      dispatchUserDrawingCommandToState({
-        type: 'applyEditDrag',
-        drag,
-        point: { x, y },
-        meta: { source: 'touch', transactionKey: userDrawingEditDragTransactionKeyRef.current },
-      });
-    },
-    [
-      chartDimensions,
-      dispatchUserDrawingCommandToState,
-      effectiveUserDrawingState,
-      userDrawingInputPanes,
-      bars,
-      viewport,
-    ],
-  );
-
-  const handleUserDrawingEditEnd = useCallback(() => {
-    if (userDrawingStateRef.current.measureMode === 'on') {
-      userDrawingMeasureLastPointRef.current = null;
-      dispatchUserDrawingCommandToState({ type: 'endMeasure', meta: { source: 'touch' } });
-      return;
-    }
-
-    if (isUserDrawingPathFamilyTool(userDrawingStateRef.current.activeTool)) {
-      dispatchUserDrawingCommandToState({
-        type: 'commitPathDrag',
-        options: {
-          createId: createUserDrawingId,
-        },
-        meta: { source: 'touch' },
-      });
-      return;
-    }
-
-    userDrawingEditDragRef.current = null;
-    userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
-  }, [createUserDrawingId, dispatchUserDrawingCommandToState]);
-
-  const handleUserDrawingEditCancel = useCallback(() => {
-    if (userDrawingStateRef.current.measureMode === 'on') {
-      userDrawingMeasureLastPointRef.current = null;
-      dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'touch' } });
-      return;
-    }
-
-    if (isUserDrawingPathFamilyTool(userDrawingStateRef.current.activeTool)) {
-      setUserDrawingDraftPreviewAnchor(null);
-      dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'touch' } });
-      return;
-    }
-
-    userDrawingEditDragRef.current = null;
-    userDrawingEditDragTransactionKeyRef.current = 'edit-drag';
-  }, [dispatchUserDrawingCommandToState]);
-
-  const dismissUserDrawingSelectedActionPopover = useCallback(() => {
-    setUserDrawingSelectedActionPopoverDismissSignal((value) => value + 1);
-  }, []);
-
-  const { composedGesture } = useChartGestures({
-    dimensions: chartDimensions,
-    bars,
-    viewport,
-    onViewportChange: handleViewportChange,
-    enabled: isMobileChartGestureLayerEnabled(effectiveUserDrawingState.activeTool, crosshairVisible),
-    onSwipeBlockChange,
-    onAutoScaleDisabled: handleAutoScaleDisabled,
-    isAutoScale: getIsAutoScale,
-    onInteraction: revealResetButtonIfInBottomRegion,
-    onGestureStart: dismissUserDrawingSelectedActionPopover,
-    onDrawingEditStart: handleUserDrawingEditStart,
-    onDrawingEditMove: handleUserDrawingEditMove,
-    onDrawingEditEnd: handleUserDrawingEditEnd,
-    onDrawingEditCancel: handleUserDrawingEditCancel,
+  const {
+    beginNativeUserDrawingEditDragAtPoint,
+    dispatchNativeUserDrawingSelectedAction,
+    endNativeUserDrawingEditDrag,
+    handleNativeUserDrawingInput,
+    redoNativeUserDrawingCommand,
+    replaceNativeUserDrawingState,
+    selectNativeUserDrawingAtPoint,
+    selectNativeUserDrawingTool,
+    undoNativeUserDrawingCommand,
+    updateNativeUserDrawingEditDrag,
+    userDrawingCommandAvailability,
+    userDrawingRecentToolsByCategory,
+    userDrawingState: nativeUserDrawingState,
+  } = useNativeUserDrawingRuntime({
+    initialUserDrawingState: userDrawingState,
+    onUserDrawingCommand: handleNativeUserDrawingCommandForLayout,
+    onUserDrawingStateChange,
   });
-
-  const handleCrosshairTap = useCallback(
-    (x: number, y: number) => {
-      revealResetButtonIfInBottomRegion(x, y);
-      dismissUserDrawingSelectedActionPopover();
-
-      if (handleUserDrawingTap(x, y)) return;
-
-      if (crosshairVisible) {
-        setCrosshairVisible(false);
-        return;
+  const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
+  const nativeUserDrawingSelection = nativeUserDrawingState.selection;
+  const nativeUserDrawingDraft = nativeUserDrawingState.draft;
+  const nativeUserDrawingMeasure = nativeUserDrawingState.measure;
+  const nativeUserDrawingTextEdit = nativeUserDrawingState.textEdit;
+  const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
+  const applyNativeLayoutSettings = useCallback(
+    async (settings: ChartSettings) => {
+      const nextSymbol = settings.symbol || symbol;
+      if (nextSymbol && nextSymbol !== chartApi.symbol()) {
+        chartApi.setSymbol(nextSymbol);
       }
 
-      if (!isPointInChartArea(x, y)) return;
+      if (settings.interval && settings.interval !== chartApi.resolution()) {
+        setNativeDisplayedInterval(settings.interval);
+        chartApi.setResolution(settings.interval);
+      }
 
-      setCrosshairVisible(true);
-      handleCrosshairMove(x, y);
-    },
-    [
-      crosshairVisible,
-      dismissUserDrawingSelectedActionPopover,
-      handleCrosshairMove,
-      handleUserDrawingTap,
-      isPointInChartArea,
-      revealResetButtonIfInBottomRegion,
-    ],
-  );
-
-  // Pan gesture for moving crosshair (active only while crosshair is visible)
-  const crosshairPanGesture = useMemo(
-    () =>
-      Gesture.Pan()
-        .enabled(isMobileCrosshairPanGestureEnabled(effectiveUserDrawingState.activeTool, crosshairVisible))
-        .onStart((event) => {
-          runOnJS(dismissUserDrawingSelectedActionPopover)();
-          runOnJS(revealResetButtonIfInBottomRegion)(event.x, event.y);
-          crosshairDragStartX.value = lastCrosshairPosition.x;
-          crosshairDragStartY.value = lastCrosshairPosition.y;
-        })
-        .onUpdate((event) => {
-          runOnJS(revealResetButtonIfInBottomRegion)(event.x, event.y);
-          runOnJS(handleCrosshairMove)(
-            crosshairDragStartX.value + event.translationX,
-            crosshairDragStartY.value + event.translationY,
-          );
-        })
-        .onEnd(() => {
-          // Keep crosshair visible after pan ends - tap elsewhere to hide
-        }),
-    [
-      crosshairVisible,
-      effectiveUserDrawingState.activeTool,
-      crosshairDragStartX,
-      crosshairDragStartY,
-      dismissUserDrawingSelectedActionPopover,
-      handleCrosshairMove,
-      lastCrosshairPosition,
-      revealResetButtonIfInBottomRegion,
-    ],
-  );
-
-  // Single tap toggles crosshair immediately. Drag gestures win once movement starts.
-  const tapGesture = useMemo(
-    () =>
-      Gesture.Tap()
-        .maxDuration(250)
-        .maxDistance(10)
-        .onEnd((event) => {
-          runOnJS(handleCrosshairTap)(event.x, event.y);
-        }),
-    [handleCrosshairTap],
-  );
-
-  const additiveTapGesture = useMemo(
-    () =>
-      Gesture.Tap()
-        .minPointers(2)
-        .maxDuration(250)
-        .maxDistance(10)
-        .onEnd((event) => {
-          runOnJS(dismissUserDrawingSelectedActionPopover)();
-          runOnJS(handleUserDrawingTap)(event.x, event.y, true);
-        }),
-    [dismissUserDrawingSelectedActionPopover, handleUserDrawingTap],
-  );
-
-  // Double-tap handler for pane maximize/restore
-  const handleDoubleTap = useCallback(
-    (x: number, y: number) => {
-      dismissUserDrawingSelectedActionPopover();
-
-      if (effectiveUserDrawingState.activeTool === 'select' && isPointInChartArea(x, y)) {
-        const result = resolveMobileUserDrawingDoubleTapEditIntent(
-          effectiveUserDrawingState,
-          { x, y },
-          userDrawingSpacesByPaneId,
-          {
-            source: 'touch',
-            hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-          },
+      for (const study of chartApi.getAllStudies()) {
+        chartApi.removeStudy(study.id);
+      }
+      for (const indicator of settings.indicators ?? []) {
+        const builtinIndicator = getIndicatorById(indicator.builtinId);
+        if (!builtinIndicator) continue;
+        const studyApi = await chartApi.createStudy(
+          builtinIndicator.id,
+          builtinIndicator.overlay,
+          false,
+          indicator.inputs,
+          {},
+          { displayName: indicator.name },
         );
-
-        if (result.intent.type !== 'pane') {
-          if (result.changed) {
-            commitUserDrawingState(result.state);
-            for (const event of result.events) {
-              notifyUserDrawingCommand(event);
-            }
-          }
-          if (result.propertiesIntent) {
-            handleUserDrawingPropertiesOpen(result.propertiesIntent);
-          }
-          return;
+        if (indicator.isVisible === false && studyApi) {
+          chartApi.toggleStudyVisibility(studyApi.getId());
         }
       }
 
-      if (!unifiedPaneLayout || !coreResult.core) return;
-      const panes = unifiedPaneLayout.panes;
-      const availableHeight = dimensions.height - (margins.bottom || DEFAULT_MARGINS.bottom);
-      let currentTop = margins.top || 0;
-
-      for (const pane of panes) {
-        const paneHeight = availableHeight * pane.heightRatio;
-        if (y >= currentTop && y < currentTop + paneHeight) {
-          coreResult.core.toggleMaximizePane(pane.id);
-          return;
-        }
-        currentTop += paneHeight;
+      replaceNativeUserDrawingState(settings.userDrawingState);
+      chartStore.settings.set({
+        ...chartStore.settings.get(),
+        autoScale: settings.autoScale,
+        chartType: settings.chartType || 'candle',
+        indicators: settings.indicators || [],
+        interval: settings.interval || interval,
+        showVolume: settings.showVolume,
+        symbol: nextSymbol,
+        userDrawingState: settings.userDrawingState,
+        viewport: settings.viewport,
+        volumeHeight: settings.volumeHeight,
+      });
+      if (settings.viewport) {
+        applyNativeViewport(settings.viewport);
       }
     },
-    [
-      commitUserDrawingState,
-      coreResult.core,
-      dismissUserDrawingSelectedActionPopover,
-      dimensions.height,
-      effectiveUserDrawingState,
-      isPointInChartArea,
-      margins,
-      measureUserDrawingTextLabelLine,
-      notifyUserDrawingCommand,
-      handleUserDrawingPropertiesOpen,
-      unifiedPaneLayout,
-      userDrawingSpacesByPaneId,
-    ],
+    [applyNativeViewport, chartApi, chartStore, interval, replaceNativeUserDrawingState, symbol],
   );
-
-  const handleUserDrawingContextMenu = useCallback(
-    (x: number, y: number) => {
-      if (!viewport || effectiveUserDrawingState.activeTool !== 'select' || !isPointInChartArea(x, y)) {
-        closeContextMenu();
-        return false;
+  const nativeLayoutSettings = createNativeChartLayoutSettings({
+    autoScale: nativeAutoScaleEnabled,
+    chartType: 'candle',
+    indicators: indicatorManager?.getLayoutIndicators() ?? [],
+    interval: interval as ResolutionString,
+    showVolume: true,
+    symbol,
+    userDrawingState: nativeUserDrawingState,
+    viewport: hasDataViewport ? viewport : undefined,
+    volumeHeight: VOLUME_HEIGHT_RATIO,
+  });
+  const {
+    deleteNativeLayout,
+    getNativeLayouts,
+    loadNativeLayout,
+    markNativeLayoutDirty,
+    renameNativeLayout,
+    saveNativeLayoutAs,
+    saveNativeLayoutNow,
+  } = useNativeLayoutPersistence({
+    autoSaveDelay: nativeLayoutPersistence.autoSaveDelay,
+    chartStore,
+    currentLayoutStorage: nativeLayoutPersistence.currentLayoutStorage,
+    currentLayoutStorageKey: nativeLayoutPersistence.currentLayoutStorageKey,
+    currentSettings: nativeLayoutSettings,
+    onApplyLayout: applyNativeLayoutSettings,
+    readyToCreateDefaultLayout: hasDataViewport,
+    saveLoadAdapter: nativeLayoutPersistence.saveLoadAdapter,
+  });
+  useEffect(() => {
+    nativeLayoutDirtyRef.current = markNativeLayoutDirty;
+    return () => {
+      if (nativeLayoutDirtyRef.current === markNativeLayoutDirty) {
+        nativeLayoutDirtyRef.current = () => undefined;
       }
-
-      const result = resolveUserDrawingContextActionsAtPoint(
-        effectiveUserDrawingState,
-        { x, y },
-        userDrawingSpacesByPaneId,
-        {
-          hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine },
-        },
-      );
-      if (!result.hit) {
-        closeContextMenu();
-        return false;
-      }
-      if (result.changed) {
-        commitUserDrawingState(result.state);
-        const event = createUserDrawingCommandEvent(effectiveUserDrawingState, {
-          state: result.state,
-          changed: true,
-          command: {
-            type: 'selectAtPoint',
-            point: { x, y },
-            spacesByPaneId: userDrawingSpacesByPaneId,
-            options: { hitTest: { labelHeight: 20, measureTextLabelLine: measureUserDrawingTextLabelLine } },
-            meta: { source: 'contextMenu' },
-          },
-          meta: { source: 'contextMenu' },
-          hit: true,
+    };
+  }, [markNativeLayoutDirty]);
+  const nativeLayoutSelectorEnabled = nativeLayoutPersistence.saveLoadAdapter !== null;
+  const [nativeLayoutSelectorOpen, setNativeLayoutSelectorOpen] = useState(false);
+  const [nativeLayoutSelectorLayouts, setNativeLayoutSelectorLayouts] = useState<LayoutMetadata[]>([]);
+  const [nativeLayoutSelectorLoading, setNativeLayoutSelectorLoading] = useState(false);
+  const [nativeLayoutSelectorError, setNativeLayoutSelectorError] = useState<string | null>(null);
+  const refreshNativeLayoutSelector = useCallback(async () => {
+    if (!nativeLayoutSelectorEnabled) return;
+    setNativeLayoutSelectorLoading(true);
+    setNativeLayoutSelectorError(null);
+    try {
+      setNativeLayoutSelectorLayouts(await getNativeLayouts());
+    } catch {
+      setNativeLayoutSelectorError('Could not load layouts');
+    } finally {
+      setNativeLayoutSelectorLoading(false);
+    }
+  }, [getNativeLayouts, nativeLayoutSelectorEnabled]);
+  useEffect(() => {
+    if (!nativeLayoutSelectorOpen) return;
+    void refreshNativeLayoutSelector();
+  }, [nativeLayoutSelectorOpen, refreshNativeLayoutSelector]);
+  useEffect(() => {
+    if (!nativeLayoutSelectorEnabled) {
+      setNativeLayoutSelectorOpen(false);
+      setNativeLayoutSelectorLayouts([]);
+    }
+  }, [nativeLayoutSelectorEnabled]);
+  const openNativeLayoutSelector = useCallback(() => {
+    if (!nativeLayoutSelectorEnabled) return;
+    setNativeLayoutSelectorOpen(true);
+  }, [nativeLayoutSelectorEnabled]);
+  const handleNativeLayoutSelectorLoad = useCallback(
+    (layoutId: string | number) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void loadNativeLayout(layoutId)
+        .then(() => {
+          setNativeLayoutSelectorOpen(false);
+        })
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not load layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
         });
-        if (event) {
-          notifyUserDrawingCommand(event);
-        }
-      }
-
-      if (result.items.length === 0) {
-        closeContextMenu();
-        return true;
-      }
-
-      setContextMenuItems(
-        result.items.map(
-          (item): ContextMenuItem => ({
-            position: item.groupId === 'visibility' ? 'bottom' : 'top',
-            text: item.label,
-            enabled: item.enabled,
-            click: () => {
-              if (!item.enabled) return;
-              dispatchMobileUserDrawingActionCommand(item.command, {
-                state: userDrawingStateRef.current,
-                source: 'contextMenu',
-                createId: createUserDrawingId,
-                dispatchUserDrawingCommand: dispatchUserDrawingCommandToState,
-                onUserDrawingPropertiesOpen: handleUserDrawingPropertiesOpen,
-                onUserDrawingObjectTreeOpen: handleUserDrawingObjectTreeOpen,
-                onUserDrawingCopySelected: () => {
-                  copySelectedUserDrawingToClipboard();
-                },
-              });
-            },
-          }),
-        ),
-      );
-      setContextMenuPosition({
+    },
+    [loadNativeLayout],
+  );
+  const handleNativeLayoutSelectorSave = useCallback(() => {
+    setNativeLayoutSelectorLoading(true);
+    setNativeLayoutSelectorError(null);
+    void saveNativeLayoutNow()
+      .then(refreshNativeLayoutSelector)
+      .catch(() => {
+        setNativeLayoutSelectorError('Could not save layout');
+      })
+      .finally(() => {
+        setNativeLayoutSelectorLoading(false);
+      });
+  }, [refreshNativeLayoutSelector, saveNativeLayoutNow]);
+  const handleNativeLayoutSelectorSaveAs = useCallback(
+    (layoutName: string) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void saveNativeLayoutAs(layoutName)
+        .then(refreshNativeLayoutSelector)
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not save layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [refreshNativeLayoutSelector, saveNativeLayoutAs],
+  );
+  const handleNativeLayoutSelectorRename = useCallback(
+    (layoutId: string | number, nextName: string) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void renameNativeLayout(layoutId, nextName)
+        .then(refreshNativeLayoutSelector)
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not rename layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [refreshNativeLayoutSelector, renameNativeLayout],
+  );
+  const handleNativeLayoutSelectorDelete = useCallback(
+    (layoutId: string | number) => {
+      setNativeLayoutSelectorLoading(true);
+      setNativeLayoutSelectorError(null);
+      void deleteNativeLayout(layoutId)
+        .then(refreshNativeLayoutSelector)
+        .catch(() => {
+          setNativeLayoutSelectorError('Could not delete layout');
+        })
+        .finally(() => {
+          setNativeLayoutSelectorLoading(false);
+        });
+    },
+    [deleteNativeLayout, refreshNativeLayoutSelector],
+  );
+  const [nativeSelectedActionPopoverGroupId, setNativeSelectedActionPopoverGroupId] =
+    useState<UserDrawingSelectedActionSurfaceGroupId | null>(null);
+  const nativeSelectedDrawingId = nativeUserDrawingState.selection?.drawingId ?? null;
+  const nativeUserDrawingCoordinateSpaces = useMemo(
+    () =>
+      frame && nativeRenderViewport && nativeRenderHasDataViewport
+        ? createNativeUserDrawingCoordinateSpaces({ bars: nativeRenderBars, frame, viewport: nativeRenderViewport })
+        : null,
+    [frame, nativeRenderBars, nativeRenderHasDataViewport, nativeRenderViewport],
+  );
+  useEffect(() => {
+    setNativeSelectedActionPopoverGroupId(null);
+  }, [nativeSelectedDrawingId]);
+  const handleNativeUserDrawingToolSelect = useCallback(
+    (tool: UserDrawingTool) => {
+      selectNativeUserDrawingTool(tool);
+      setNativeOpenDrawingCategoryId(null);
+      setNativeSelectedActionPopoverGroupId(null);
+    },
+    [selectNativeUserDrawingTool],
+  );
+  const nativeDrawingInputEnabled = nativeUserDrawingState.activeTool !== 'select';
+  const nativeDrawingSelectionEnabled = nativeUserDrawingState.activeTool === 'select';
+  const handleNativeUserDrawingTap = useCallback(
+    (x: number, y: number) => {
+      if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingInputEnabled) return;
+      const point = resolveNativeUserDrawingInputPoint({
+        bars: nativeRenderBars,
+        frame,
+        spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+        state: nativeUserDrawingState,
+        viewport: nativeRenderViewport,
         x,
         y,
-        price: yToPrice(y, viewport, chartDimensions),
-        time: xToTime(x, viewport, chartDimensions),
       });
-      setContextMenuVisible(true);
-      return true;
+      if (!point) return;
+      handleNativeUserDrawingInput(point);
     },
     [
-      chartDimensions,
-      closeContextMenu,
-      commitUserDrawingState,
-      copySelectedUserDrawingToClipboard,
-      createUserDrawingId,
-      dispatchUserDrawingCommandToState,
-      effectiveUserDrawingState,
-      isPointInChartArea,
-      measureUserDrawingTextLabelLine,
-      notifyUserDrawingCommand,
-      handleUserDrawingObjectTreeOpen,
-      handleUserDrawingPropertiesOpen,
-      userDrawingSpacesByPaneId,
-      viewport,
+      frame,
+      handleNativeUserDrawingInput,
+      nativeDrawingInputEnabled,
+      nativeRenderBars,
+      nativeRenderViewport,
+      nativeUserDrawingCoordinateSpaces,
+      nativeUserDrawingState,
+    ],
+  );
+  const handleNativeUserDrawingSelectionTap = useCallback(
+    (x: number, y: number, claimTap: () => void) => {
+      if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return;
+      const selectionPoint = resolveNativeUserDrawingSelectionPoint({
+        bars: nativeRenderBars,
+        frame,
+        spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+        viewport: nativeRenderViewport,
+        x,
+        y,
+      });
+      if (!selectionPoint) return;
+      const result = selectNativeUserDrawingAtPoint(selectionPoint.point, selectionPoint.spacesByPaneId);
+      if (result.hit || result.changed) claimTap();
+    },
+    [
+      frame,
+      nativeDrawingSelectionEnabled,
+      nativeRenderBars,
+      nativeRenderViewport,
+      nativeUserDrawingCoordinateSpaces,
+      selectNativeUserDrawingAtPoint,
+    ],
+  );
+  const resolveNativeUserDrawingEditDragPoint = useCallback(
+    (x: number, y: number) => {
+      if (!frame || !nativeUserDrawingCoordinateSpaces || !nativeDrawingSelectionEnabled) return null;
+      return resolveNativeUserDrawingSelectionPoint({
+        bars: nativeRenderBars,
+        frame,
+        spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+        viewport: nativeRenderViewport,
+        x,
+        y,
+      });
+    },
+    [frame, nativeDrawingSelectionEnabled, nativeRenderBars, nativeRenderViewport, nativeUserDrawingCoordinateSpaces],
+  );
+  const handleNativeUserDrawingEditDragBegin = useCallback(
+    (x: number, y: number) => {
+      const dragPoint = resolveNativeUserDrawingEditDragPoint(x, y);
+      if (!dragPoint) return;
+      beginNativeUserDrawingEditDragAtPoint(dragPoint.point, dragPoint.spacesByPaneId);
+    },
+    [beginNativeUserDrawingEditDragAtPoint, resolveNativeUserDrawingEditDragPoint],
+  );
+  const handleNativeUserDrawingEditDragMove = useCallback(
+    (x: number, y: number) => {
+      updateNativeUserDrawingEditDrag({ x, y });
+    },
+    [updateNativeUserDrawingEditDrag],
+  );
+  const handleNativeSelectedDrawingAction = useCallback(
+    (command: UserDrawingSelectedActionSurfaceCommand) => {
+      dispatchNativeUserDrawingSelectedAction(command);
+      setNativeSelectedActionPopoverGroupId(null);
+    },
+    [dispatchNativeUserDrawingSelectedAction],
+  );
+
+  const { commitNativeTopBarRuntimeAction } = useNativeTopBarActionRuntime({
+    chartApi,
+    onLayoutClick: nativeLayoutSelectorEnabled ? openNativeLayoutSelector : undefined,
+    onSymbolClick,
+    onIndicatorsClick,
+    redoUserDrawingCommand: redoNativeUserDrawingCommand,
+    undoUserDrawingCommand: undoNativeUserDrawingCommand,
+  });
+  const handleNativeTopBarAction = useCallback(
+    (action: Parameters<typeof commitNativeTopBarRuntimeAction>[0]) => {
+      if (action.type === 'timeframe' && action.interval) {
+        setNativeDisplayedInterval(action.interval);
+      }
+      commitNativeTopBarRuntimeAction(action);
+    },
+    [commitNativeTopBarRuntimeAction],
+  );
+
+  const {
+    clearNativeBracketDrag,
+    commitBracketMove,
+    commitOrderMove,
+    commitTradeLineAction,
+    lineSnapshot,
+    syncNativeOemsDragStateForSnapshot,
+  } = useNativeOemsLineRuntime({
+    bracketDragInteractionState,
+    bracketDragState,
+    chartApi,
+    forceUpdate,
+    orderDragState,
+  });
+
+  const {
+    axisFont,
+    backgroundColor,
+    gridColor,
+    leftToolRailLayout,
+    nativeMutedTextColor,
+    nativePriceLines,
+    plotPrimitiveClip,
+    priceAxisTagSources,
+    smallFont,
+    textColor,
+    textFont,
+    topBarLayout,
+    tradeLineGeometries,
+    visibleBars,
+    volumeHeight,
+  } = useNativeSkiaRenderModel({
+    bars: nativeRenderBars,
+    frame,
+    interval: nativeRenderInterval,
+    layoutName: nativeCurrentLayout.layoutName,
+    layoutSelectorEnabled: nativeLayoutSelectorEnabled,
+    leftToolRailCollapsed,
+    lineSnapshot,
+    marginsBottom: margins.bottom,
+    onIndicatorsClick,
+    options,
+    priceAxisTagHeight: PRICE_AXIS_TAG_HEIGHT,
+    priceLines: nativeRenderPriceLines,
+    pricePrecision: nativePricePrecision,
+    projection: nativeRenderProjection,
+    showTopBar,
+    supportedResolutions,
+    symbol,
+    topBarInterval: nativeDisplayedInterval,
+    topBarDefaultVisibleValues: MOBILE_TOP_BAR_TIMEFRAME_VALUES,
+    topBarHeight: STATIC_TOP_BAR_HEIGHT,
+    tradeLabelHeight: TRADE_LABEL_HEIGHT,
+    userDrawingActiveTool: nativeUserDrawingState.activeTool,
+    userDrawingCommandAvailability,
+    userDrawingRecentToolsByCategory,
+    volumeHeightRatio: VOLUME_HEIGHT_RATIO,
+  });
+
+  const { resolvedPriceAxisTags } = useNativeSkiaSharedValueBridge({
+    bracketDragState: bracketDragInteractionState,
+    frame,
+    hasDataViewport: nativeRenderHasDataViewport,
+    orderDragState,
+    orderDragZones,
+    priceAxisTagHeight: PRICE_AXIS_TAG_HEIGHT,
+    priceAxisTagSources,
+    sharedPriceAxisTagSources,
+    sharedViewport,
+    syncNativeOemsDragStateForSnapshot,
+    tradeLineActionZones,
+    tradeLineGeometries,
+    tradeLineRows,
+  });
+  const nativeCountdownEnabled = useMemo(
+    () => nativePriceLines.some((line) => line.countdownToTime !== undefined),
+    [nativePriceLines],
+  );
+  const nativeCountdownNowMs = useNativeCountdownClock(nativeCountdownEnabled);
+
+  const isNativeTradeLineTouchTarget = useCallback(
+    (x: number, y: number) => {
+      if (!frame) return false;
+      return Boolean(
+        findNativeTradeLineActionZone({
+          zones: tradeLineActionZones.value,
+          rows: tradeLineRows.value,
+          x,
+          y,
+          sharedViewport,
+          frame,
+          tradeLabelHeight: TRADE_LABEL_HEIGHT,
+        }) ||
+        findNativeOrderDragZone({
+          zones: orderDragZones.value,
+          rows: tradeLineRows.value,
+          x,
+          y,
+          sharedViewport,
+          frame,
+          tradeLabelHeight: TRADE_LABEL_HEIGHT,
+        }),
+      );
+    },
+    [frame, orderDragZones, sharedViewport, tradeLineActionZones, tradeLineRows],
+  );
+  const nativeResetViewButtonLayout = useMemo(
+    () => (frame ? resolveNativeResetViewButtonLayout(frame) : null),
+    [frame],
+  );
+  const nativeUserDrawingSelectionActionAnchor = useMemo(() => {
+    if (!nativeUserDrawingCoordinateSpaces || !nativeUserDrawingSelection) return null;
+    return resolveUserDrawingSelectionActionAnchorFromDrawings({
+      drawings: nativeUserDrawingDrawings,
+      selection: nativeUserDrawingSelection,
+      spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+    });
+  }, [nativeUserDrawingCoordinateSpaces, nativeUserDrawingDrawings, nativeUserDrawingSelection]);
+  const nativeSelectionActionLeftInset = leftToolRailLayout?.collapsed
+    ? 16
+    : (leftToolRailLayout?.railRect.width ?? 0) + 8;
+  const nativeSelectionActionTopInset = showTopBar ? STATIC_TOP_BAR_HEIGHT + 8 : 8;
+  const nativeUserDrawingSelectionActionOverlayModel = useMemo(
+    () =>
+      frame
+        ? resolveNativeSelectedDrawingActionOverlayModel({
+            activeBackgroundColor: gridColor,
+            activeTextColor: options.upColor,
+            anchor: nativeUserDrawingSelectionActionAnchor,
+            backgroundColor,
+            bottomInset: 8,
+            gridColor,
+            leftInset: nativeSelectionActionLeftInset,
+            mutedTextColor: nativeMutedTextColor,
+            onAction: handleNativeSelectedDrawingAction,
+            onPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
+            openPopoverGroupId: nativeSelectedActionPopoverGroupId,
+            rightInset: 8,
+            textColor,
+            topInset: nativeSelectionActionTopInset,
+            userDrawingDefaultStylesByKind: nativeUserDrawingDefaultStylesByKind,
+            userDrawingDraft: nativeUserDrawingDraft,
+            userDrawingDrawings: nativeUserDrawingDrawings,
+            userDrawingSelection: nativeUserDrawingSelection,
+            userDrawingTextEdit: nativeUserDrawingTextEdit,
+            viewportHeight: frame.dimensions.height,
+            viewportWidth: frame.dimensions.width,
+          })
+        : null,
+    [
+      backgroundColor,
+      frame,
+      gridColor,
+      handleNativeSelectedDrawingAction,
+      nativeMutedTextColor,
+      nativeSelectedActionPopoverGroupId,
+      nativeSelectionActionLeftInset,
+      nativeSelectionActionTopInset,
+      nativeUserDrawingDefaultStylesByKind,
+      nativeUserDrawingDraft,
+      nativeUserDrawingDrawings,
+      nativeUserDrawingSelection,
+      nativeUserDrawingSelectionActionAnchor,
+      nativeUserDrawingTextEdit,
+      options.upColor,
+      textColor,
+    ],
+  );
+  const nativeUserDrawingSelectionActionTargets = useMemo(
+    () => resolveNativeSelectedDrawingActionHitTargets(nativeUserDrawingSelectionActionOverlayModel),
+    [nativeUserDrawingSelectionActionOverlayModel],
+  );
+  const nativeUserDrawingEditDragZones = useMemo(
+    () =>
+      nativeDrawingSelectionEnabled
+        ? resolveNativeUserDrawingEditDragZones({
+            anchor: nativeUserDrawingSelectionActionAnchor,
+            drawings: nativeUserDrawingDrawings,
+            selection: nativeUserDrawingSelection,
+            spacesByPaneId: nativeUserDrawingCoordinateSpaces,
+          })
+        : [],
+    [
+      nativeDrawingSelectionEnabled,
+      nativeUserDrawingCoordinateSpaces,
+      nativeUserDrawingDrawings,
+      nativeUserDrawingSelection,
+      nativeUserDrawingSelectionActionAnchor,
+    ],
+  );
+  const nativeGestureControlZones = useMemo<readonly NativeGestureControlZone[]>(() => {
+    const zones: NativeGestureControlZone[] = [];
+    if (frame && topBarLayout) {
+      zones.push({
+        x1: 0,
+        x2: frame.dimensions.width,
+        y1: 0,
+        y2: topBarLayout.height,
+      });
+    }
+
+    if (leftToolRailLayout) {
+      const drawerWidth =
+        nativeOpenDrawingCategoryId && !leftToolRailLayout.collapsed ? NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH : 0;
+      const toggleHitRect = resolveNativeLeftToolRailToggleHitRect(leftToolRailLayout);
+      zones.push({
+        x1: leftToolRailLayout.x,
+        x2: Math.max(
+          leftToolRailLayout.x + leftToolRailLayout.width + drawerWidth,
+          toggleHitRect ? toggleHitRect.x + toggleHitRect.width : 0,
+        ),
+        y1: leftToolRailLayout.y,
+        y2: leftToolRailLayout.y + leftToolRailLayout.height,
+      });
+    }
+
+    if (nativeResetViewButtonLayout && nativeResetViewButtonVisible && hasDataViewport) {
+      zones.push({
+        x1: nativeResetViewButtonLayout.centerX - nativeResetViewButtonLayout.hitRadius,
+        x2: nativeResetViewButtonLayout.centerX + nativeResetViewButtonLayout.hitRadius,
+        y1: nativeResetViewButtonLayout.centerY - nativeResetViewButtonLayout.hitRadius,
+        y2: nativeResetViewButtonLayout.centerY + nativeResetViewButtonLayout.hitRadius,
+      });
+    }
+
+    if (nativeUserDrawingSelectionActionOverlayModel) {
+      zones.push({
+        x1: nativeUserDrawingSelectionActionOverlayModel.position.left,
+        x2:
+          nativeUserDrawingSelectionActionOverlayModel.position.left +
+          nativeUserDrawingSelectionActionOverlayModel.surfaceWidth,
+        y1: nativeUserDrawingSelectionActionOverlayModel.position.top,
+        y2:
+          nativeUserDrawingSelectionActionOverlayModel.position.top +
+          nativeUserDrawingSelectionActionOverlayModel.surfaceHeight,
+      });
+    }
+
+    zones.push(...nativeLegendActionTargets);
+
+    return zones;
+  }, [
+    frame,
+    hasDataViewport,
+    leftToolRailLayout,
+    nativeLegendActionTargets,
+    nativeOpenDrawingCategoryId,
+    nativeResetViewButtonLayout,
+    nativeResetViewButtonVisible,
+    nativeUserDrawingSelectionActionOverlayModel,
+    topBarLayout,
+  ]);
+  const handleNativeResetViewTap = useCallback(
+    (x: number, y: number) => {
+      if (!frame || !hasDataViewport) return;
+      const target = resolveNativeResetViewTapTarget({
+        frame,
+        resetButtonVisible: nativeResetViewButtonVisible,
+        x,
+        y,
+        isControlTarget: isNativeGestureControlPoint(nativeGestureControlZones, x, y),
+        isTradeLineTarget: isNativeTradeLineTouchTarget(x, y),
+      });
+      if (!target) return;
+      if (target === 'button') {
+        resetNativeViewport();
+        hideNativeResetViewButton();
+        return;
+      }
+      showNativeResetViewButton();
+    },
+    [
+      frame,
+      hasDataViewport,
+      hideNativeResetViewButton,
+      isNativeTradeLineTouchTarget,
+      nativeGestureControlZones,
+      nativeResetViewButtonVisible,
+      resetNativeViewport,
+      showNativeResetViewButton,
     ],
   );
 
-  // Double-tap gesture for pane maximize/restore
-  const doubleTapGesture = useMemo(
+  const { nativeChartGesture } = useNativeChartGestureRuntime({
+    beginNativeViewportInteraction,
+    bracketDragActive,
+    bracketDragInteractionState,
+    cancelNativeViewportInteraction,
+    chartAxisPinchGestureState,
+    chartPanGestureState,
+    clearNativeBracketDrag,
+    commitBracketMove,
+    commitOrderMove,
+    commitPanViewport,
+    commitTradeLineAction,
+    controlZones: nativeGestureControlZones,
+    crosshair,
+    drawingEditDragZones: nativeUserDrawingEditDragZones,
+    drawingInputEnabled: nativeDrawingInputEnabled,
+    drawingSelectionEnabled: nativeDrawingSelectionEnabled,
+    frame,
+    hasContextMenu: hasNativeContextMenu,
+    hasDataViewport,
+    leftToolRailLayout,
+    orderDragState,
+    orderDragZones,
+    overlayActionTargets: nativeLegendActionTargets,
+    onDrawingTap: handleNativeUserDrawingTap,
+    onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
+    onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
+    onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,
+    onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
+    onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
+    onContextMenuTap: handleNativeContextMenuTap,
+    onOverlayAction: handleNativeOverlayAction,
+    onSelectedDrawingAction: handleNativeSelectedDrawingAction,
+    onSelectedDrawingActionPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
+    onResetViewTap: handleNativeResetViewTap,
+    panActive,
+    pinchActive,
+    pricePrecision: nativePricePrecision,
+    priceScaleActive,
+    resetButtonVisible: nativeResetViewButtonVisible,
+    selectedDrawingActionTargets: nativeUserDrawingSelectionActionTargets,
+    priceScaleGestureState,
+    sharedViewport,
+    timeScaleActive,
+    timeScaleGestureState,
+    tradeLabelHeight: TRADE_LABEL_HEIGHT,
+    tradeLineActionZones,
+    tradeLineRows,
+  });
+  const nativeUserDrawingRenderEntries = useMemo(
     () =>
-      Gesture.Tap()
-        .numberOfTaps(2)
-        .onEnd((event) => {
-          runOnJS(handleDoubleTap)(event.x, event.y);
-        }),
-    [handleDoubleTap],
+      resolveUserDrawingRenderEntriesFromSlices({
+        draft: nativeUserDrawingDraft,
+        drawings: nativeUserDrawingDrawings,
+        measure: nativeUserDrawingMeasure,
+        selection: nativeUserDrawingSelection,
+      }),
+    [nativeUserDrawingDraft, nativeUserDrawingDrawings, nativeUserDrawingMeasure, nativeUserDrawingSelection],
   );
+  const nativeUserDrawingDraftAnchors = nativeUserDrawingDraft?.anchors ?? EMPTY_NATIVE_USER_DRAWING_ANCHORS;
+  const nativeUserDrawingDraftAnchorColor = nativeUserDrawingDraft?.style.lineColor;
+  const nativeCanvasLoading = nativeRenderTransitionPending && nativeRenderBars.length > 0;
+  const nativeLegendLoading = nativeRenderTransitionPending || isLoadingMoreBars;
 
-  const tapOrDoubleTapGesture = useMemo(
-    () =>
-      effectiveUserDrawingState.activeTool === 'select'
-        ? Gesture.Exclusive(additiveTapGesture, doubleTapGesture, tapGesture)
-        : tapGesture,
-    [additiveTapGesture, doubleTapGesture, effectiveUserDrawingState.activeTool, tapGesture],
-  );
-
-  const drawingContextMenuGesture = useMemo(
-    () =>
-      Gesture.LongPress()
-        .enabled(effectiveUserDrawingState.activeTool === 'select')
-        .minDuration(500)
-        .maxDistance(10)
-        .onStart((event) => {
-          runOnJS(dismissUserDrawingSelectedActionPopover)();
-          runOnJS(handleUserDrawingContextMenu)(event.x, event.y);
-        }),
-    [dismissUserDrawingSelectedActionPopover, effectiveUserDrawingState.activeTool, handleUserDrawingContextMenu],
-  );
-
-  // Combine all gestures
-  const allGestures = useMemo(
-    () =>
-      Gesture.Simultaneous(
-        drawingContextMenuGesture,
-        Gesture.Race(crosshairPanGesture, tapOrDoubleTapGesture, composedGesture),
-      ),
-    [composedGesture, crosshairPanGesture, drawingContextMenuGesture, tapOrDoubleTapGesture],
-  );
-
-  // ==========================================================================
-  // Label Collision Resolution
-  // ==========================================================================
-
-  // Build label bounds for collision resolution
-  const labelBoundsInput = useMemo(() => {
-    if (!viewport) return [];
-
-    const bounds: Array<LabelBounds & { id: string }> = [];
-    const labelHeight = 20;
-
-    // Add order line labels
-    interactiveOrderLines.forEach((order) => {
-      bounds.push({
-        id: `order-${order.id}`,
-        originalY: priceToY(order.price, viewport, chartDimensions),
-        adjustedY: 0,
-        height: labelHeight,
-        priority: 1, // Orders have lower priority than positions
-      });
-    });
-
-    // Add position line labels
-    interactivePositionLines.forEach((pos) => {
-      bounds.push({
-        id: `position-${pos.id}`,
-        originalY: priceToY(pos.price, viewport, chartDimensions),
-        adjustedY: 0,
-        height: labelHeight,
-        priority: 2, // Positions have higher priority
-      });
-    });
-
-    return bounds;
-  }, [viewport, chartDimensions, interactiveOrderLines, interactivePositionLines]);
-
-  // Resolve collisions
-  const resolvedLabelBounds = useLabelCollision(labelBoundsInput);
-  const resolvedLabelYById = useMemo(() => {
-    const yById = new Map<string, number>();
-    for (const bounds of resolvedLabelBounds) {
-      yById.set(bounds.id, bounds.adjustedY);
+  useLayoutEffect(() => {
+    if (!resizeFreeze) {
+      return;
     }
-    return yById;
-  }, [resolvedLabelBounds]);
 
-  // ==========================================================================
-  // Context Menu Handler
-  // ==========================================================================
+    if (resizeSnapshotClearTimerRef.current !== null) {
+      clearTimeout(resizeSnapshotClearTimerRef.current);
+      resizeSnapshotClearTimerRef.current = null;
+    }
 
-  const handleContextMenuPress = useCallback(
-    (price: number, time: number) => {
-      if (!onContextMenu) {
-        closeContextMenu();
-        return;
+    if (resizeSnapshotRef.current || !frame || !canvasRef.current) return;
+
+    try {
+      const image = canvasRef.current.makeImageSnapshot();
+      if (!image) return;
+      setResizeSnapshot({
+        image,
+        width: frame.dimensions.width,
+        height: frame.dimensions.height,
+      });
+    } catch {
+      setResizeSnapshot(null);
+    }
+  }, [canvasRef, frame, resizeFreeze, setResizeSnapshot]);
+
+  useEffect(() => {
+    if (resizeFreeze || !resizeSnapshotRef.current || resizeSnapshotClearTimerRef.current !== null) return;
+
+    resizeSnapshotClearTimerRef.current = setTimeout(() => {
+      resizeSnapshotClearTimerRef.current = null;
+      setResizeSnapshot(null);
+    }, RESIZE_SNAPSHOT_RELEASE_HOLD_MS);
+  }, [resizeFreeze, setResizeSnapshot]);
+
+  useEffect(() => {
+    return () => {
+      if (resizeSnapshotClearTimerRef.current !== null) {
+        clearTimeout(resizeSnapshotClearTimerRef.current);
       }
-
-      const items = onContextMenu(time, price);
-      if (!items || items.length === 0) {
-        closeContextMenu();
-        return;
-      }
-
-      setContextMenuItems(items);
-      setContextMenuPosition({
-        x: lastCrosshairPosition.x,
-        y: lastCrosshairPosition.y,
-        price,
-        time,
-      });
-      setContextMenuVisible(true);
-    },
-    [closeContextMenu, onContextMenu, lastCrosshairPosition],
-  );
-
-  const handleContextMenuClose = closeContextMenu;
-
-  // ==========================================================================
-  // Skia Picture Rendering (Layer 1: Static)
-  // ==========================================================================
-
-  const { picture, textItems } = useMemo(() => {
-    if (!viewport || bars.length === 0 || dimensions.width === 0 || dimensions.height === 0) {
-      return { picture: null, textItems: [] as CollectedTextItem[] };
-    }
-
-    let collectedText: CollectedTextItem[] = [];
-
-    const pic = createPicture(
-      (canvas) => {
-        const ctx = new SkiaCanvasContext(canvas as any, Skia as any);
-        // Pass margins as third parameter (constructor doesn't read from options.margins)
-        const renderer = new TealchartRenderer(ctx, fullRenderOptions, margins);
-
-        renderer.renderWithLayout(
-          bars,
-          viewport,
-          unifiedPaneLayout,
-          effectivePriceLines,
-          plots,
-          indicatorPaneInfo,
-          undefined,
-          plotStyleOverrides,
-          undefined,
-          undefined,
-          drawings,
-        );
-
-        collectedText = ctx.getCollectedText();
-      },
-      { width: dimensions.width, height: dimensions.height },
-    );
-
-    return { picture: pic, textItems: collectedText };
-  }, [
-    bars,
-    viewport,
-    dimensions,
-    fullRenderOptions,
-    margins,
-    effectivePriceLines,
-    plots,
-    drawings,
-    unifiedPaneLayout,
-    indicatorPaneInfo,
-    plotStyleOverrides,
-  ]);
-
-  // ==========================================================================
-  // Text Style Helper
-  // ==========================================================================
-
-  const getTextStyle = useCallback((item: CollectedTextItem) => {
-    let left = item.x;
-    let top = item.y;
-
-    const estimatedWidth = item.text.length * item.fontSize * 0.6;
-
-    if (item.textAlign === 'center') {
-      left = item.x - estimatedWidth / 2;
-    } else if (item.textAlign === 'right' || item.textAlign === 'end') {
-      left = item.x - estimatedWidth;
-    }
-
-    if (item.textBaseline === 'top') {
-      // top is default in RN
-    } else if (item.textBaseline === 'middle') {
-      top = item.y - item.fontSize / 2;
-    } else if (item.textBaseline === 'bottom') {
-      top = item.y - item.fontSize;
-    } else {
-      // 'alphabetic' - roughly 80% of font size above baseline
-      top = item.y - item.fontSize * 0.8;
-    }
-
-    return {
-      position: 'absolute' as const,
-      left,
-      top,
-      fontSize: item.fontSize,
-      color: item.color,
+      disposeNativeResizeSnapshot(resizeSnapshotRef.current);
+      resizeSnapshotRef.current = null;
     };
   }, []);
 
-  // ==========================================================================
-  // Bracket Drag Preview (Skia rendering data)
-  // ==========================================================================
-
-  // Fonts for Skia text rendering in bracket preview and drawing labels.
-  const bracketFont = useFont(null, 12);
-  const userDrawingTextFonts = useMemo(() => {
-    const fontSizes = USER_DRAWING_FONT_SIZES;
-    const fonts: Partial<
-      Record<UserDrawingFontFamily, Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>>>
-    > = {};
-
-    for (const fontFamily of USER_DRAWING_FONT_FAMILIES) {
-      const nativeFontFamily = resolveMobileUserDrawingFontFamily(fontFamily, Platform.OS);
-      const typeface = Skia.FontMgr.System().matchFamilyStyle(nativeFontFamily, SKIA_NORMAL_FONT_STYLE);
-      const familyFonts: Partial<Record<(typeof fontSizes)[number], ReturnType<typeof Skia.Font>>> = {};
-      for (const fontSize of fontSizes) {
-        familyFonts[fontSize] = Skia.Font(typeface, fontSize);
-      }
-      fonts[fontFamily] = familyFonts;
-    }
-
-    return fonts;
-  }, []);
-  const getUserDrawingTextFont = useCallback(
-    (fontSize: number | undefined, fontFamily: string | undefined) => {
-      const normalizedFontFamily = normalizeUserDrawingFontFamily(fontFamily ?? 'sans-serif');
-      const normalizedFontSize = normalizeUserDrawingFontSize(fontSize ?? 12);
-      return userDrawingTextFonts[normalizedFontFamily]?.[normalizedFontSize] ?? bracketFont;
-    },
-    [bracketFont, userDrawingTextFonts],
-  );
-
-  // Compute bracket drag preview rendering data
-  const bracketPreview = useMemo(() => {
-    if (!bracketDragState || !viewport) return null;
-
-    const { type, price, entryPrice, isLong, notional, partialEnabled, partialPercent, color } = bracketDragState;
-    const y = priceToY(price, viewport, chartDimensions);
-
-    // PnL estimate: notional * (price - entry) / entry for long, inverted for short
-    const priceDelta = isLong ? price - entryPrice : entryPrice - price;
-    const pnl = entryPrice > 0 ? (priceDelta / entryPrice) * notional * (partialPercent / 100) : 0;
-    const hasPnl = notional > 0;
-    const pnlText = hasPnl ? `${pnl >= 0 ? '+' : '-'}$${safeToFixed(Math.abs(pnl), 2)}` : '';
-    const percentDistance = entryPrice > 0 ? ((price - entryPrice) / entryPrice) * 100 : 0;
-    const percentText = `${percentDistance >= 0 ? '+' : ''}${safeToFixed(percentDistance, 2)}%`;
-    const typeText =
-      partialEnabled && partialPercent < 100 ? `${partialPercent}% Partial ${type.toUpperCase()}` : type.toUpperCase();
-    const labelText = [pnlText, typeText, percentText].filter(Boolean).join('  ');
-    const labelWidth = Math.max(96, Math.ceil(labelText.length * 7 + 14));
-
-    const chartLeft = chartDimensions.margins.left;
-    const chartRight = chartDimensions.width - chartDimensions.margins.right;
-
-    return { y, color, labelText, labelWidth, chartLeft, chartRight, pnl };
-  }, [bracketDragState, viewport, chartDimensions, pricePrecision]);
-
-  const crosshairOverlay = useMemo(() => {
-    if (!viewport || !crosshairVisible) return null;
-
-    const chartLeft = margins.left;
-    const chartRight = dimensions.width - margins.right;
-    const chartTop = margins.top;
-    const chartBottom = dimensions.height - margins.bottom;
-    const { x, y } = lastCrosshairPosition;
-
-    if (x < chartLeft || x > chartRight) return null;
-
-    const hasContextMenu = !!onContextMenu;
-    const horizontalRight = hasContextMenu ? chartRight - 26 : chartRight;
-    const showHorizontal = y >= chartTop && y <= chartBottom;
-
-    return {
-      color: fullRenderOptions.crosshairColor,
-      x,
-      y,
-      chartLeft,
-      chartRight,
-      chartTop,
-      chartBottom,
-      horizontalRight,
-      showHorizontal,
-    };
-  }, [
-    viewport,
-    crosshairVisible,
-    margins.left,
-    margins.right,
-    margins.top,
-    margins.bottom,
-    dimensions.width,
-    dimensions.height,
-    lastCrosshairPosition,
-    onContextMenu,
-    fullRenderOptions.crosshairColor,
-  ]);
-
-  // ==========================================================================
-  // Render
-  // ==========================================================================
-
-  if (dimensions.width === 0 || dimensions.height === 0) {
-    return (
-      <View style={[styles.container, { backgroundColor: fullRenderOptions.backgroundColor }]} onLayout={onLayout} />
-    );
-  }
+  const liveChartMounted = !resizeLayoutFrozen && frame && nativeRenderProjection;
 
   return (
-    <View style={[styles.container, { backgroundColor: fullRenderOptions.backgroundColor }]} onLayout={onLayout}>
-      {/* Layer 1: Skia Canvas (static rendering) */}
-      <Canvas
-        style={[
-          styles.absoluteFill,
-          { width: dimensions.width, height: dimensions.height, opacity: isLoading ? LOADING_OPACITY : 1 },
-        ]}
-      >
-        {picture && <Picture picture={picture} />}
-
-        {userDrawingPrimitives.map((primitive) => {
-          if (primitive.kind === 'line') {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip}>
-                <SkiaLine
-                  p1={vec(primitive.start.x, primitive.start.y)}
-                  p2={vec(primitive.end.x, primitive.end.y)}
-                  color={primitive.style.lineColor}
-                  opacity={primitive.opacity}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
-                {primitive.arrowHead && (
-                  <>
-                    <SkiaLine
-                      p1={vec(primitive.arrowHead.left.x, primitive.arrowHead.left.y)}
-                      p2={vec(primitive.end.x, primitive.end.y)}
-                      color={primitive.style.lineColor}
-                      opacity={primitive.opacity}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      style="stroke"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                    <SkiaLine
-                      p1={vec(primitive.arrowHead.right.x, primitive.arrowHead.right.y)}
-                      p2={vec(primitive.end.x, primitive.end.y)}
-                      color={primitive.style.lineColor}
-                      opacity={primitive.opacity}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      style="stroke"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                  </>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'infoLine') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
-            const labelPosition = resolveMobileUserDrawingInfoLineLabelPosition(primitive, textBounds);
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaLine
-                    p1={vec(primitive.start.x, primitive.start.y)}
-                    p2={vec(primitive.end.x, primitive.end.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
-                )}
-                {font && (
-                  <SkiaText
-                    x={labelPosition.x}
-                    y={labelPosition.y}
-                    text={primitive.label}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                  />
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'forecast') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const changeTextBounds = font ? font.measureText(primitive.changeLabel) : { width: 0 };
-            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaLine
-                    p1={vec(primitive.start.x, primitive.start.y)}
-                    p2={vec(primitive.end.x, primitive.end.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
-                )}
-                {font && (
-                  <>
-                    <SkiaText
-                      x={primitive.start.x + 4}
-                      y={primitive.start.y - 4}
-                      text={primitive.sourceLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={primitive.end.x - font.measureText(primitive.targetLabel).width - 4}
-                      y={primitive.end.y - 4}
-                      text={primitive.targetLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={primitive.labelPoint.x - changeTextBounds.width / 2}
-                      y={primitive.labelPoint.y - fontSize}
-                      text={primitive.changeLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  </>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'projection') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const changeTextBounds = font ? font.measureText(primitive.changeLabel) : { width: 0 };
-            const targetTextBounds = font ? font.measureText(primitive.targetLabel) : { width: 0 };
-            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
-            const strokePath = Skia.Path.Make();
-            strokePath.moveTo(primitive.start.x, primitive.start.y);
-            strokePath.lineTo(primitive.pivot.x, primitive.pivot.y);
-            strokePath.lineTo(primitive.target.x, primitive.target.y);
-            const fillPath = Skia.Path.Make();
-            fillPath.moveTo(primitive.start.x, primitive.start.y);
-            fillPath.lineTo(primitive.pivot.x, primitive.pivot.y);
-            fillPath.lineTo(primitive.target.x, primitive.target.y);
-            fillPath.close();
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={strokePath}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-                {font && (
-                  <>
-                    <SkiaText
-                      x={primitive.start.x + 4}
-                      y={primitive.start.y - 4}
-                      text={primitive.startLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={primitive.pivot.x + 4}
-                      y={primitive.pivot.y - 4}
-                      text={primitive.pivotLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={primitive.target.x - targetTextBounds.width - 4}
-                      y={primitive.target.y - 4}
-                      text={primitive.targetLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={primitive.labelPoint.x - changeTextBounds.width / 2}
-                      y={primitive.labelPoint.y - fontSize}
-                      text={primitive.changeLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  </>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'sector') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.close();
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={path} color={primitive.style.fillColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'trendAngle') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
-            const labelPosition = resolveMobileUserDrawingTrendAngleLabelPosition(primitive, textBounds);
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaLine
-                    p1={vec(primitive.start.x, primitive.start.y)}
-                    p2={vec(primitive.end.x, primitive.end.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
-                )}
-                {font && (
-                  <SkiaText
-                    x={labelPosition.x}
-                    y={labelPosition.y}
-                    text={primitive.label}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                  />
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'crossLine') {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip}>
-                <SkiaLine
-                  p1={vec(primitive.horizontal.start.x, primitive.horizontal.start.y)}
-                  p2={vec(primitive.horizontal.end.x, primitive.horizontal.end.y)}
-                  color={primitive.style.lineColor}
-                  opacity={primitive.opacity}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
-                <SkiaLine
-                  p1={vec(primitive.vertical.start.x, primitive.vertical.start.y)}
-                  p2={vec(primitive.vertical.end.x, primitive.vertical.end.y)}
-                  color={primitive.style.lineColor}
-                  opacity={primitive.opacity}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'pitchfork') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const fillPath = Skia.Path.Make();
-            const [firstFillPoint, ...remainingFillPoints] = primitive.fill;
-            if (firstFillPoint) {
-              fillPath.moveTo(firstFillPoint.x, firstFillPoint.y);
-              for (const point of remainingFillPoints) {
-                fillPath.lineTo(point.x, point.y);
-              }
-              fillPath.close();
-            }
-            const linePath = Skia.Path.Make();
-            linePath.moveTo(primitive.median.start.x, primitive.median.start.y);
-            linePath.lineTo(primitive.median.end.x, primitive.median.end.y);
-            linePath.moveTo(primitive.upper.start.x, primitive.upper.start.y);
-            linePath.lineTo(primitive.upper.end.x, primitive.upper.end.y);
-            linePath.moveTo(primitive.lower.start.x, primitive.lower.start.y);
-            linePath.lineTo(primitive.lower.end.x, primitive.lower.end.y);
-            for (const parallel of primitive.parallels) {
-              linePath.moveTo(parallel.start.x, parallel.start.y);
-              linePath.lineTo(parallel.end.x, parallel.end.y);
-            }
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={linePath}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'pitchfan') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const linePath = Skia.Path.Make();
-            for (const ray of primitive.rays) {
-              linePath.moveTo(ray.start.x, ray.start.y);
-              linePath.lineTo(ray.end.x, ray.end.y);
-            }
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.fillVisible !== false &&
-                  primitive.style.fillColor &&
-                  primitive.bands.map((band) => {
-                    const path = Skia.Path.Make();
-                    const [origin, first, second] = band.points;
-                    path.moveTo(origin.x, origin.y);
-                    path.lineTo(first.x, first.y);
-                    path.lineTo(second.x, second.y);
-                    path.close();
-                    return (
-                      <UserDrawingSkiaFill key={`${band.fromRatio}-${band.toRatio}`} style={primitive.style}>
-                        <SkiaPath path={path} color={primitive.style.fillColor} style="fill" />
-                      </UserDrawingSkiaFill>
-                    );
-                  })}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={linePath}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (
-            primitive.kind === 'fibFan' ||
-            primitive.kind === 'fibSpeedResistanceFan' ||
-            primitive.kind === 'gannFan'
-          ) {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.rays.map((ray) => (
-                  <SkiaLine
-                    key={ray.ratio}
-                    p1={vec(ray.start.x, ray.start.y)}
-                    p2={vec(ray.end.x, ray.end.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    style="stroke"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
-                ))}
-                {font &&
-                  primitive.rays.map((ray) => {
-                    if (!('label' in ray) || !('labelPoint' in ray) || !ray.label || !ray.labelPoint) return null;
-                    const textWidth = font.measureText(ray.label).width;
-                    const x = ray.end.x >= ray.start.x ? ray.labelPoint.x - textWidth : ray.labelPoint.x;
-                    return (
-                      <SkiaText
-                        key={`${ray.ratio}:label`}
-                        x={x}
-                        y={ray.labelPoint.y}
-                        text={ray.label}
-                        font={font}
-                        color={primitive.style.textColor ?? primitive.style.lineColor}
-                      />
-                    );
-                  })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'fibChannel') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.close();
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={path} color={primitive.style.fillColor} />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false &&
-                  primitive.levels.map((level) => (
-                    <SkiaLine
-                      key={`${primitive.id}:level:${level.ratio}`}
-                      p1={vec(level.start.x, level.start.y)}
-                      p2={vec(level.end.x, level.end.y)}
-                      color={primitive.style.lineColor}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      style="stroke"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                  ))}
-                {primitive.style.lineVisible !== false &&
-                  primitive.levels.map((level) => (
-                    <SkiaText
-                      key={`${primitive.id}:level-label:${level.ratio}`}
-                      x={level.labelPoint.x}
-                      y={level.labelPoint.y}
-                      text={level.label}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  ))}
-              </Group>
-            );
-          }
-
-          if (
-            primitive.kind === 'fibTimeZone' ||
-            primitive.kind === 'trendBasedFibTime' ||
-            primitive.kind === 'cyclicLines'
-          ) {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.levels.map((level) => (
-                  <Group key={`${primitive.id}:level:${level.ratio}`}>
-                    <SkiaLine
-                      p1={vec(level.start.x, level.start.y)}
-                      p2={vec(level.end.x, level.end.y)}
-                      color={primitive.style.lineColor}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      style="stroke"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                    {font && (
-                      <SkiaText
-                        x={level.labelPoint.x - font.measureText(level.label).width / 2}
-                        y={level.labelPoint.y}
-                        text={level.label}
-                        color={textColor}
-                        font={font}
-                      />
-                    )}
-                  </Group>
-                ))}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'timeCycles') {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                {primitive.cycles.map((cycle) => {
-                  const path = Skia.Path.Make();
-                  const [firstPoint, ...remainingPoints] = cycle.points;
-                  if (firstPoint) {
-                    path.moveTo(firstPoint.x, firstPoint.y);
-                    for (const point of remainingPoints) {
-                      path.lineTo(point.x, point.y);
-                    }
-                  }
-
-                  return (
-                    <Group key={`${primitive.id}:cycle:${cycle.ratio}`}>
-                      <SkiaLine
-                        p1={vec(cycle.startBoundary.start.x, cycle.startBoundary.start.y)}
-                        p2={vec(cycle.startBoundary.end.x, cycle.startBoundary.end.y)}
-                        color={primitive.style.lineColor}
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                        style="stroke"
-                      >
-                        {dash && <DashPathEffect intervals={dash} />}
-                      </SkiaLine>
-                      <SkiaLine
-                        p1={vec(cycle.endBoundary.start.x, cycle.endBoundary.start.y)}
-                        p2={vec(cycle.endBoundary.end.x, cycle.endBoundary.end.y)}
-                        color={primitive.style.lineColor}
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                        style="stroke"
-                      >
-                        {dash && <DashPathEffect intervals={dash} />}
-                      </SkiaLine>
-                      {firstPoint && (
-                        <SkiaPath
-                          path={path}
-                          color={primitive.style.lineColor}
-                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                          style="stroke"
-                        >
-                          {dash && <DashPathEffect intervals={dash} />}
-                        </SkiaPath>
-                      )}
-                      {font && (
-                        <SkiaText
-                          x={cycle.labelPoint.x - font.measureText(cycle.label).width / 2}
-                          y={cycle.labelPoint.y}
-                          text={cycle.label}
-                          color={textColor}
-                          font={font}
-                        />
-                      )}
-                    </Group>
-                  );
-                })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'sineLine') {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-
-            return (
-              <Group key={primitive.id} clip={primitive.clip} opacity={primitive.opacity}>
-                <SkiaPath
-                  path={path}
-                  color={primitive.style.lineColor}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  style="stroke"
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaPath>
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'arrowMarker' || primitive.kind === 'icon') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.close();
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'arrowMark') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.close();
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={path} color={primitive.style.fillColor ?? primitive.style.lineColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'rectangle') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'image') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const label = primitive.src ? primitive.alt || 'Image' : 'Image';
-            const textBounds = font ? font.measureText(label) : { width: 0 };
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor ?? 'rgba(127, 127, 127, 0.12)'}
-                      style="fill"
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <>
-                    <SkiaLine
-                      p1={vec(primitive.rect.x, primitive.rect.y)}
-                      p2={vec(primitive.rect.x + primitive.rect.width, primitive.rect.y + primitive.rect.height)}
-                      color={primitive.style.lineColor}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                    <SkiaLine
-                      p1={vec(primitive.rect.x + primitive.rect.width, primitive.rect.y)}
-                      p2={vec(primitive.rect.x, primitive.rect.y + primitive.rect.height)}
-                      color={primitive.style.lineColor}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                  </>
-                )}
-                {font && (
-                  <SkiaText
-                    x={primitive.rect.x + primitive.rect.width / 2 - textBounds.width / 2}
-                    y={primitive.rect.y + primitive.rect.height / 2 + 4}
-                    text={label}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                  />
-                )}
-                <LoadedUserDrawingSkiaImage primitive={primitive} />
-                {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'gannBox' || primitive.kind === 'gannSquare' || primitive.kind === 'gannSquareFixed') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
-            const path = Skia.Path.Make();
-            for (const level of primitive.levels) {
-              path.moveTo(level.horizontal.start.x, level.horizontal.start.y);
-              path.lineTo(level.horizontal.end.x, level.horizontal.end.y);
-              path.moveTo(level.vertical.start.x, level.vertical.start.y);
-              path.lineTo(level.vertical.end.x, level.vertical.end.y);
-            }
-            for (const angle of primitive.angles) {
-              path.moveTo(angle.start.x, angle.start.y);
-              path.lineTo(angle.end.x, angle.end.y);
-            }
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-                {primitive.style.lineVisible !== false &&
-                  font &&
-                  primitive.levels.map((level) => (
-                    <SkiaText
-                      key={`${primitive.id}:level:${level.ratio}:label`}
-                      x={level.labelPoint.x}
-                      y={level.labelPoint.y}
-                      text={level.label}
-                      color={textColor}
-                      font={font}
-                    />
-                  ))}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'circle') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Circle
-                      cx={primitive.center.x}
-                      cy={primitive.center.y}
-                      r={primitive.radius}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <Circle
-                    cx={primitive.center.x}
-                    cy={primitive.center.y}
-                    r={primitive.radius}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Circle>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'fibCircles') {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.circles.map((circle) => (
-                  <Group key={`${primitive.id}:circle:${circle.ratio}`}>
-                    <Circle
-                      cx={primitive.center.x}
-                      cy={primitive.center.y}
-                      r={circle.radius}
-                      color={primitive.style.lineColor}
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </Circle>
-                    {font && (
-                      <SkiaText
-                        x={circle.labelPoint.x - font.measureText(circle.label).width / 2}
-                        y={circle.labelPoint.y}
-                        text={circle.label}
-                        color={textColor}
-                        font={font}
-                      />
-                    )}
-                  </Group>
-                ))}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'fibArcs' || primitive.kind === 'fibSpeedResistanceArcs') {
-            if (primitive.style.lineVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.arcs.map((arc) => {
-                  const path = Skia.Path.Make();
-                  const startDeg = (arc.startAngle * 180) / Math.PI;
-                  const sweepDeg = ((arc.endAngle - arc.startAngle) * 180) / Math.PI;
-                  path.arcToOval(
-                    Skia.XYWHRect(
-                      primitive.center.x - arc.radius,
-                      primitive.center.y - arc.radius,
-                      arc.radius * 2,
-                      arc.radius * 2,
-                    ),
-                    startDeg,
-                    sweepDeg,
-                    false,
-                  );
-                  return (
-                    <Group key={`${primitive.id}:arc:${arc.ratio}`}>
-                      <SkiaPath
-                        path={path}
-                        color={primitive.style.lineColor}
-                        style="stroke"
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      >
-                        {dash && <DashPathEffect intervals={dash} />}
-                      </SkiaPath>
-                      {font && (
-                        <SkiaText
-                          x={arc.labelPoint.x - font.measureText(arc.label).width / 2}
-                          y={arc.labelPoint.y}
-                          text={arc.label}
-                          color={textColor}
-                          font={font}
-                        />
-                      )}
-                    </Group>
-                  );
-                })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'fibWedge') {
-            if (primitive.style.lineVisible === false && primitive.style.fillVisible === false) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textColor = primitive.style.textColor ?? primitive.style.lineColor;
-            const boundaryPath = Skia.Path.Make();
-            for (const boundary of primitive.boundaries) {
-              boundaryPath.moveTo(boundary.start.x, boundary.start.y);
-              boundaryPath.lineTo(boundary.end.x, boundary.end.y);
-            }
-            const outerArc = primitive.arcs[primitive.arcs.length - 1];
-            const fillPath = Skia.Path.Make();
-            fillPath.moveTo(primitive.center.x, primitive.center.y);
-            if (outerArc) {
-              fillPath.lineTo(
-                primitive.center.x + Math.cos(outerArc.startAngle) * primitive.baseRadius,
-                primitive.center.y + Math.sin(outerArc.startAngle) * primitive.baseRadius,
-              );
-              fillPath.arcToOval(
-                Skia.XYWHRect(
-                  primitive.center.x - primitive.baseRadius,
-                  primitive.center.y - primitive.baseRadius,
-                  primitive.baseRadius * 2,
-                  primitive.baseRadius * 2,
-                ),
-                (outerArc.startAngle * 180) / Math.PI,
-                ((outerArc.endAngle - outerArc.startAngle) * 180) / Math.PI,
-                false,
-              );
-              fillPath.close();
-            }
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <>
-                    <SkiaPath
-                      path={boundaryPath}
-                      color={primitive.style.lineColor}
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      strokeCap="round"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaPath>
-                    {primitive.arcs.map((arc) => {
-                      const path = Skia.Path.Make();
-                      const startDeg = (arc.startAngle * 180) / Math.PI;
-                      const sweepDeg = ((arc.endAngle - arc.startAngle) * 180) / Math.PI;
-                      path.arcToOval(
-                        Skia.XYWHRect(
-                          primitive.center.x - arc.radius,
-                          primitive.center.y - arc.radius,
-                          arc.radius * 2,
-                          arc.radius * 2,
-                        ),
-                        startDeg,
-                        sweepDeg,
-                        false,
-                      );
-                      return (
-                        <Group key={`${primitive.id}:arc:${arc.ratio}`}>
-                          <SkiaPath
-                            path={path}
-                            color={primitive.style.lineColor}
-                            style="stroke"
-                            strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                            strokeCap="round"
-                          >
-                            {dash && <DashPathEffect intervals={dash} />}
-                          </SkiaPath>
-                          {font && (
-                            <SkiaText
-                              x={arc.labelPoint.x - font.measureText(arc.label).width / 2}
-                              y={arc.labelPoint.y}
-                              text={arc.label}
-                              color={textColor}
-                              font={font}
-                            />
-                          )}
-                        </Group>
-                      );
-                    })}
-                  </>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'ellipse') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Oval
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <Oval
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Oval>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'trianglePattern') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const fillPath = Skia.Path.Make();
-            const [firstFillPoint, ...remainingFillPoints] = primitive.polygon;
-            if (!firstFillPoint) return null;
-            fillPath.moveTo(firstFillPoint.x, firstFillPoint.y);
-            for (const point of remainingFillPoints) {
-              fillPath.lineTo(point.x, point.y);
-            }
-            fillPath.close();
-
-            const boundaryPath = Skia.Path.Make();
-            for (const boundary of primitive.boundaries) {
-              boundaryPath.moveTo(boundary.start.x, boundary.start.y);
-              boundaryPath.lineTo(boundary.end.x, boundary.end.y);
-            }
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={fillPath} color={primitive.style.fillColor} style="fill" />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={boundaryPath}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-                {font &&
-                  primitive.labels.map((label) => {
-                    const bounds = font.measureText(label.text);
-                    return (
-                      <SkiaText
-                        key={`${primitive.id}:label:${label.text}`}
-                        x={label.point.x - bounds.width / 2}
-                        y={label.point.y - 6}
-                        text={label.text}
-                        font={font}
-                        color={primitive.style.textColor ?? primitive.style.lineColor}
-                      />
-                    );
-                  })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'headShouldersPattern') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.moveTo(primitive.neckline.start.x, primitive.neckline.start.y);
-            path.lineTo(primitive.neckline.end.x, primitive.neckline.end.y);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-                {font &&
-                  primitive.labels.map((label) => {
-                    const bounds = font.measureText(label.text);
-                    return (
-                      <SkiaText
-                        key={`${primitive.id}:label:${label.text}`}
-                        x={label.point.x - bounds.width / 2}
-                        y={label.point.y - 6}
-                        text={label.text}
-                        font={font}
-                        color={primitive.style.textColor ?? primitive.style.lineColor}
-                      />
-                    );
-                  })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'doubleCurve') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            path.moveTo(primitive.start.x, primitive.start.y);
-            path.cubicTo(
-              primitive.firstControl.x,
-              primitive.firstControl.y,
-              primitive.secondControl.x,
-              primitive.secondControl.y,
-              primitive.end.x,
-              primitive.end.y,
-            );
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'fibSpiral') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-                {primitive.style.lineVisible !== false &&
-                  font &&
-                  primitive.labels.map((label) => {
-                    const bounds = font.measureText(label.text);
-                    return (
-                      <SkiaText
-                        key={`${primitive.id}:label:${label.text}`}
-                        x={label.point.x - bounds.width / 2}
-                        y={label.point.y - 6}
-                        text={label.text}
-                        font={font}
-                        color={primitive.style.textColor ?? primitive.style.lineColor}
-                      />
-                    );
-                  })}
-              </Group>
-            );
-          }
-
-          if (
-            primitive.kind === 'path' ||
-            primitive.kind === 'brush' ||
-            primitive.kind === 'highlighter' ||
-            primitive.kind === 'curve' ||
-            primitive.kind === 'arc' ||
-            primitive.kind === 'abcdPattern' ||
-            primitive.kind === 'xabcdPattern' ||
-            primitive.kind === 'cypherPattern' ||
-            primitive.kind === 'threeDrivesPattern' ||
-            primitive.kind === 'elliottImpulseWave' ||
-            primitive.kind === 'elliottCorrectiveWave' ||
-            primitive.kind === 'elliottDoubleComboWave' ||
-            primitive.kind === 'elliottTripleComboWave' ||
-            primitive.kind === 'elliottTriangleWave'
-          ) {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font =
-              primitive.kind === 'xabcdPattern' ||
-              primitive.kind === 'cypherPattern' ||
-              primitive.kind === 'abcdPattern' ||
-              primitive.kind === 'threeDrivesPattern' ||
-              primitive.kind === 'elliottImpulseWave' ||
-              primitive.kind === 'elliottCorrectiveWave' ||
-              primitive.kind === 'elliottDoubleComboWave' ||
-              primitive.kind === 'elliottTripleComboWave' ||
-              primitive.kind === 'elliottTriangleWave'
-                ? getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily)
-                : null;
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            const pressureSegments =
-              primitive.kind === 'path' || primitive.kind === 'brush' || primitive.kind === 'highlighter'
-                ? primitive.pressureSegments
-                : [];
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false && pressureSegments.length > 0
-                  ? pressureSegments.map((segment, index) => {
-                      const segmentPath = Skia.Path.Make();
-                      segmentPath.moveTo(segment.start.x, segment.start.y);
-                      segmentPath.lineTo(segment.end.x, segment.end.y);
-                      return (
-                        <SkiaPath
-                          key={`${primitive.id}:pressure:${index}`}
-                          path={segmentPath}
-                          color={primitive.style.lineColor}
-                          style="stroke"
-                          strokeWidth={segment.lineWidth}
-                          strokeCap="round"
-                          strokeJoin="round"
-                        >
-                          {dash && <DashPathEffect intervals={dash} phase={segment.lineDashOffset} />}
-                        </SkiaPath>
-                      );
-                    })
-                  : primitive.style.lineVisible !== false && (
-                      <SkiaPath
-                        path={path}
-                        color={primitive.style.lineColor}
-                        style="stroke"
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                        strokeCap="round"
-                        strokeJoin="round"
-                      >
-                        {dash && <DashPathEffect intervals={dash} />}
-                      </SkiaPath>
-                    )}
-                {(primitive.kind === 'xabcdPattern' ||
-                  primitive.kind === 'cypherPattern' ||
-                  primitive.kind === 'abcdPattern' ||
-                  primitive.kind === 'threeDrivesPattern' ||
-                  primitive.kind === 'elliottImpulseWave' ||
-                  primitive.kind === 'elliottCorrectiveWave' ||
-                  primitive.kind === 'elliottDoubleComboWave' ||
-                  primitive.kind === 'elliottTripleComboWave' ||
-                  primitive.kind === 'elliottTriangleWave') &&
-                  font &&
-                  primitive.labels.map((label) => {
-                    const bounds = font.measureText(label.text);
-                    return (
-                      <SkiaText
-                        key={`${primitive.id}:label:${label.text}`}
-                        x={label.point.x - bounds.width / 2}
-                        y={label.point.y - 6}
-                        text={label.text}
-                        font={font}
-                        color={primitive.style.textColor ?? primitive.style.lineColor}
-                      />
-                    );
-                  })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'anchoredVwap') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'anchoredVolumeProfile' || primitive.kind === 'fixedRangeVolumeProfile') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const fillColor = primitive.style.fillColor ?? primitive.style.lineColor;
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false &&
-                  primitive.bins.map((bin) =>
-                    bin.volume > 0 && bin.rect.width > 0 && bin.rect.height > 0 ? (
-                      <UserDrawingSkiaFill
-                        key={`${primitive.id}:bin:${bin.priceMin}:${bin.priceMax}`}
-                        style={primitive.style}
-                      >
-                        <Rect
-                          x={bin.rect.x}
-                          y={bin.rect.y}
-                          width={bin.rect.width}
-                          height={bin.rect.height}
-                          color={fillColor}
-                          style="fill"
-                        />
-                      </UserDrawingSkiaFill>
-                    ) : null,
-                  )}
-                {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={primitive.bounds.x}
-                    y={primitive.bounds.y}
-                    width={primitive.bounds.width}
-                    height={primitive.bounds.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
-                )}
-                {primitive.style.lineVisible !== false &&
-                  primitive.guides.map((guide) => {
-                    const path = Skia.Path.Make();
-                    path.moveTo(guide.segment.start.x, guide.segment.start.y);
-                    path.lineTo(guide.segment.end.x, guide.segment.end.y);
-                    const guideDash = guide.kind === 'pointOfControl' ? null : [4, 3];
-                    return (
-                      <SkiaPath
-                        key={`${primitive.id}:guide:${guide.kind}`}
-                        path={path}
-                        color={primitive.style.lineColor}
-                        style="stroke"
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                        strokeCap="round"
-                        strokeJoin="round"
-                      >
-                        {guideDash && <DashPathEffect intervals={guideDash} />}
-                      </SkiaPath>
-                    );
-                  })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'triangle') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.close();
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={path} color={primitive.style.fillColor} />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (
-            primitive.kind === 'parallelChannel' ||
-            primitive.kind === 'regressionTrend' ||
-            primitive.kind === 'rotatedRectangle' ||
-            primitive.kind === 'flatTopBottom' ||
-            primitive.kind === 'disjointChannel'
-          ) {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const path = Skia.Path.Make();
-            const [firstPoint, ...remainingPoints] = primitive.points;
-            if (!firstPoint) return null;
-            path.moveTo(firstPoint.x, firstPoint.y);
-            for (const point of remainingPoints) {
-              path.lineTo(point.x, point.y);
-            }
-            path.close();
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <SkiaPath path={path} color={primitive.style.fillColor} />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <SkiaPath
-                    path={path}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    strokeCap="round"
-                    strokeJoin="round"
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaPath>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'riskRewardPosition') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const rewardTextBounds = font ? font.measureText(primitive.rewardLabel) : { width: 0 };
-            const riskTextBounds = font ? font.measureText(primitive.riskLabel) : { width: 0 };
-            const ratioTextBounds = font ? font.measureText(primitive.ratioLabel) : { width: 0 };
-            const rewardLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
-              {
-                labelPoint: primitive.rewardLabelPoint,
-                riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
-                style: primitive.style,
-              },
-              rewardTextBounds,
-            );
-            const riskLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
-              {
-                labelPoint: primitive.riskLabelPoint,
-                riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
-                style: primitive.style,
-              },
-              riskTextBounds,
-            );
-            const ratioLabelPosition = resolveMobileUserDrawingRiskRewardLabelPosition(
-              {
-                labelPoint: primitive.ratioLabelPoint,
-                riskRewardLabelAlignment: primitive.riskRewardLabelAlignment,
-                style: primitive.style,
-              },
-              ratioTextBounds,
-            );
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.profitRect.x}
-                      y={primitive.profitRect.y}
-                      width={primitive.profitRect.width}
-                      height={primitive.profitRect.height}
-                      color="rgba(34, 197, 94, 0.18)"
-                    />
-                    <Rect
-                      x={primitive.riskRect.x}
-                      y={primitive.riskRect.y}
-                      width={primitive.riskRect.width}
-                      height={primitive.riskRect.height}
-                      color="rgba(244, 63, 94, 0.18)"
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <>
-                    <Rect
-                      x={primitive.profitRect.x}
-                      y={primitive.profitRect.y}
-                      width={primitive.profitRect.width}
-                      height={primitive.profitRect.height}
-                      color="#22c55e"
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </Rect>
-                    <Rect
-                      x={primitive.riskRect.x}
-                      y={primitive.riskRect.y}
-                      width={primitive.riskRect.width}
-                      height={primitive.riskRect.height}
-                      color="#f43f5e"
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </Rect>
-                    {[primitive.targetLine, primitive.entryLine, primitive.stopLine].map((line, index) => (
-                      <SkiaLine
-                        key={`${primitive.id}:line:${index}`}
-                        p1={vec(line.start.x, line.start.y)}
-                        p2={vec(line.end.x, line.end.y)}
-                        color={primitive.style.lineColor}
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                        style="stroke"
-                      >
-                        {dash && <DashPathEffect intervals={dash} />}
-                      </SkiaLine>
-                    ))}
-                  </>
-                )}
-                {font && (
-                  <>
-                    <SkiaText
-                      x={rewardLabelPosition.x}
-                      y={rewardLabelPosition.y}
-                      text={primitive.rewardLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={riskLabelPosition.x}
-                      y={riskLabelPosition.y}
-                      text={primitive.riskLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={ratioLabelPosition.x}
-                      y={ratioLabelPosition.y}
-                      text={primitive.ratioLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  </>
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'barsPattern') {
-            if (primitive.displayMode === 'line') {
-              const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-              const path = Skia.Path.Make();
-              primitive.linePoints.forEach((point, index) => {
-                if (index === 0) {
-                  path.moveTo(point.x, point.y);
-                } else {
-                  path.lineTo(point.x, point.y);
-                }
-              });
-
-              return (
-                <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                  {primitive.style.lineVisible !== false && primitive.linePoints.length > 0 && (
-                    <SkiaPath
-                      path={path}
-                      color={primitive.style.lineColor}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      style="stroke"
-                      strokeCap="round"
-                      strokeJoin="round"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaPath>
-                  )}
-                </Group>
-              );
-            }
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.bars.map((bar) => {
-                  const color = bar.up
-                    ? (primitive.style.barsPatternUpColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_UP_COLOR)
-                    : (primitive.style.barsPatternDownColor ?? DEFAULT_USER_DRAWING_BARS_PATTERN_DOWN_COLOR);
-                  const bodyTop = Math.min(bar.openY, bar.closeY);
-                  const bodyHeight = Math.max(1, Math.abs(bar.closeY - bar.openY));
-                  const bodyX = bar.x - bar.bodyWidth / 2;
-
-                  return (
-                    <Group key={`${primitive.id}:bar:${bar.time}`}>
-                      {primitive.style.lineVisible !== false && (
-                        <SkiaLine
-                          p1={vec(bar.x, bar.highY)}
-                          p2={vec(bar.x, bar.lowY)}
-                          color={color}
-                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                          style="stroke"
-                        />
-                      )}
-                      {primitive.style.fillVisible !== false && (
-                        <UserDrawingSkiaFill style={primitive.style}>
-                          <Rect x={bodyX} y={bodyTop} width={bar.bodyWidth} height={bodyHeight} color={color} />
-                        </UserDrawingSkiaFill>
-                      )}
-                      {primitive.style.lineVisible !== false && (
-                        <Rect
-                          x={bodyX}
-                          y={bodyTop}
-                          width={bar.bodyWidth}
-                          height={bodyHeight}
-                          color={primitive.style.lineColor}
-                          style="stroke"
-                          strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                        />
-                      )}
-                    </Group>
-                  );
-                })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'priceRange') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
-            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textBounds);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
-                )}
-                {font && (
-                  <SkiaText
-                    x={labelPosition.x}
-                    y={labelPosition.y}
-                    text={primitive.label}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                  />
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'datePriceRange') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const priceTextBounds = font ? font.measureText(primitive.priceLabel) : { width: 0 };
-            const dateTextBounds = font ? font.measureText(primitive.dateLabel) : { width: 0 };
-            const priceLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
-              {
-                labelPoint: primitive.priceLabelPoint,
-                measurementLabelAlignment: primitive.measurementLabelAlignment,
-                style: primitive.style,
-              },
-              priceTextBounds,
-            );
-            const dateLabelPosition = resolveMobileUserDrawingMeasurementLabelPosition(
-              {
-                labelPoint: primitive.dateLabelPoint,
-                measurementLabelAlignment: primitive.measurementLabelAlignment,
-                style: primitive.style,
-              },
-              dateTextBounds,
-            );
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
-                )}
-                {font && (
-                  <>
-                    <SkiaText
-                      x={priceLabelPosition.x}
-                      y={priceLabelPosition.y}
-                      text={primitive.priceLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                    <SkiaText
-                      x={dateLabelPosition.x}
-                      y={dateLabelPosition.y}
-                      text={primitive.dateLabel}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  </>
-                )}
-              </Group>
-            );
-          }
-
-          if (
-            primitive.kind === 'fibRetracement' ||
-            primitive.kind === 'fibExtension' ||
-            primitive.kind === 'trendBasedFibExtension'
-          ) {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.lineVisible !== false &&
-                  primitive.levels.map((level) => (
-                    <SkiaLine
-                      key={`${primitive.id}:level:${level.ratio}:line`}
-                      p1={vec(level.start.x, level.start.y)}
-                      p2={vec(level.end.x, level.end.y)}
-                      color={primitive.style.lineColor}
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      strokeCap="round"
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </SkiaLine>
-                  ))}
-                {font &&
-                  primitive.levels.map((level) => (
-                    <SkiaText
-                      key={`${primitive.id}:level:${level.ratio}:label`}
-                      x={level.start.x + 4}
-                      y={level.start.y - 2}
-                      text={level.label}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                    />
-                  ))}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'dateRange') {
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            const textBounds = font ? font.measureText(primitive.label) : { width: 0 };
-            const labelPosition = resolveMobileUserDrawingPriceRangeLabelPosition(primitive, textBounds);
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.rect.x}
-                      y={primitive.rect.y}
-                      width={primitive.rect.width}
-                      height={primitive.rect.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <Rect
-                    x={primitive.rect.x}
-                    y={primitive.rect.y}
-                    width={primitive.rect.width}
-                    height={primitive.rect.height}
-                    color={primitive.style.lineColor}
-                    style="stroke"
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </Rect>
-                )}
-                {font && (
-                  <SkiaText
-                    x={labelPosition.x}
-                    y={labelPosition.y}
-                    text={primitive.label}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                  />
-                )}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'pin') {
-            const radius = primitive.radius;
-            const stem = radius * 1.8;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const color = primitive.style.lineColor;
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Circle
-                      cx={primitive.point.x}
-                      cy={primitive.point.y - stem}
-                      r={radius}
-                      color={primitive.style.fillColor ?? color}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                <Circle
-                  cx={primitive.point.x}
-                  cy={primitive.point.y - stem}
-                  r={radius}
-                  color={color}
-                  style="stroke"
-                  strokeWidth={1}
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </Circle>
-                <SkiaLine
-                  p1={vec(primitive.point.x, primitive.point.y - stem + radius)}
-                  p2={vec(primitive.point.x, primitive.point.y)}
-                  color={color}
-                  strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                >
-                  {dash && <DashPathEffect intervals={dash} />}
-                </SkiaLine>
-              </Group>
-            );
-          }
-
-          if (isMobileUserDrawingTextBoxPrimitive(primitive)) {
-            const textPrimitive: MobileUserDrawingTextBoxPrimitive = primitive;
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            if (!font) return null;
-            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            const textWrapWidth = primitive.style.textWrap ? primitive.style.textMaxWidth : undefined;
-            const measuredLines = measureUserDrawingTextLines(
-              primitive.text,
-              (line) => font.measureText(line).width,
-              textWrapWidth === undefined
-                ? undefined
-                : Math.max(1, textWrapWidth - DEFAULT_USER_DRAWING_TEXT_LABEL_PADDING * 2),
-            );
-            const textLines = measuredLines.map((line) => line.text);
-            const measuredWidths = measuredLines.map((line) => line.width);
-            const layout =
-              textPrimitive.kind === 'balloon'
-                ? resolveMobileUserDrawingBalloonLayout(textPrimitive, measuredWidths, {
-                    lines: textLines,
-                    boxWidth: textWrapWidth,
-                  })
-                : resolveMobileUserDrawingTextLabelLayout(textPrimitive, measuredWidths, {
-                    lines: textLines,
-                    boxWidth: textWrapWidth,
-                  });
-            const balloonTailPath = textPrimitive.kind === 'balloon' ? Skia.Path.Make() : null;
-            if (balloonTailPath && hasMobileUserDrawingBalloonTail(layout)) {
-              balloonTailPath.moveTo(layout.tail.left.x, layout.tail.left.y);
-              balloonTailPath.lineTo(layout.tail.tip.x, layout.tail.tip.y);
-              balloonTailPath.lineTo(layout.tail.right.x, layout.tail.right.y);
-              balloonTailPath.close();
-            }
-
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {(primitive.kind === 'callout' || primitive.kind === 'priceNote') && (
-                  <SkiaLine
-                    p1={vec(primitive.tip.x, primitive.tip.y)}
-                    p2={vec(primitive.point.x, primitive.point.y)}
-                    color={primitive.style.lineColor}
-                    strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                  >
-                    {dash && <DashPathEffect intervals={dash} />}
-                  </SkiaLine>
-                )}
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={layout.box.x}
-                      y={layout.box.y}
-                      width={layout.box.width}
-                      height={layout.box.height}
-                      color={primitive.style.fillColor}
-                    />
-                    {balloonTailPath && <SkiaPath path={balloonTailPath} color={primitive.style.fillColor} />}
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false && (
-                  <>
-                    <Rect
-                      x={layout.box.x}
-                      y={layout.box.y}
-                      width={layout.box.width}
-                      height={layout.box.height}
-                      color={primitive.style.lineColor}
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </Rect>
-                    {balloonTailPath && (
-                      <SkiaPath
-                        path={balloonTailPath}
-                        color={primitive.style.lineColor}
-                        style="stroke"
-                        strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                      >
-                        {dash && <DashPathEffect intervals={dash} />}
-                      </SkiaPath>
-                    )}
-                  </>
-                )}
-                {layout.lines.map((line, index) => (
-                  <UserDrawingSkiaText
-                    key={`${primitive.id}:line:${index}`}
-                    x={line.x}
-                    y={line.y}
-                    text={line.text}
-                    font={font}
-                    color={primitive.style.textColor ?? primitive.style.lineColor}
-                    style={primitive.style}
-                    underlineWidth={font.measureText(line.text).width}
-                    fontSize={fontSize}
-                  />
-                ))}
-              </Group>
-            );
-          }
-
-          if (primitive.kind === 'table') {
-            const fontSize = normalizeUserDrawingFontSize(primitive.style.fontSize ?? 12);
-            const font = getUserDrawingTextFont(primitive.style.fontSize, primitive.style.fontFamily);
-            if (!font) return null;
-            const dash = dashIntervalsForUserDrawingLineStyle(primitive.style.lineStyle);
-            return (
-              <Group key={primitive.id} opacity={primitive.opacity} clip={primitive.clip}>
-                {primitive.style.fillVisible !== false && primitive.style.fillColor && (
-                  <UserDrawingSkiaFill style={primitive.style}>
-                    <Rect
-                      x={primitive.table.bounds.x}
-                      y={primitive.table.bounds.y}
-                      width={primitive.table.bounds.width}
-                      height={primitive.table.bounds.height}
-                      color={primitive.style.fillColor}
-                    />
-                  </UserDrawingSkiaFill>
-                )}
-                {primitive.style.lineVisible !== false &&
-                  primitive.table.cells.map((cell) => (
-                    <Rect
-                      key={`${primitive.id}:cell:${cell.row}:${cell.column}`}
-                      x={cell.rect.x}
-                      y={cell.rect.y}
-                      width={cell.rect.width}
-                      height={cell.rect.height}
-                      color={primitive.style.lineColor}
-                      style="stroke"
-                      strokeWidth={Math.max(1, primitive.style.lineWidth)}
-                    >
-                      {dash && <DashPathEffect intervals={dash} />}
-                    </Rect>
-                  ))}
-                {primitive.table.cells.map((cell) => {
-                  const textWidth = font.measureText(cell.text).width;
-                  const textX =
-                    primitive.textAlign === 'center'
-                      ? cell.rect.x + cell.rect.width / 2 - textWidth / 2
-                      : primitive.textAlign === 'right'
-                        ? cell.rect.x + cell.rect.width - 10 - textWidth
-                        : cell.textPoint.x;
-                  return (
-                    <UserDrawingSkiaText
-                      key={`${primitive.id}:text:${cell.row}:${cell.column}`}
-                      x={textX}
-                      y={cell.textPoint.y + fontSize / 2 - 2}
-                      text={cell.text}
-                      font={font}
-                      color={primitive.style.textColor ?? primitive.style.lineColor}
-                      style={primitive.style}
-                      underlineWidth={textWidth}
-                      fontSize={fontSize}
-                    />
-                  );
-                })}
-              </Group>
-            );
-          }
-
-          if (primitive.kind !== 'handle') return null;
-
-          return (
-            <Group key={primitive.id} clip={primitive.clip}>
-              <Circle
-                cx={primitive.point.x}
-                cy={primitive.point.y}
-                r={primitive.radius}
-                color={primitive.fillColor}
-                style="fill"
+    <View style={[styles.container, { backgroundColor }]} onLayout={onLayout}>
+      {liveChartMounted ? (
+        <View pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'} style={styles.liveChartLayer}>
+          <GestureDetector gesture={nativeChartGesture}>
+            <Canvas ref={canvasRef} style={styles.canvas}>
+              <NativeChartCanvasLayers
+                axisFont={axisFont}
+                backgroundColor={backgroundColor}
+                bracketDragState={bracketDragState}
+                crosshair={crosshair}
+                extraPriceLines={nativePriceLines}
+                frame={frame}
+                getOrderObjectId={getOrderObjectId}
+                getPositionObjectId={getPositionObjectId}
+                gridColor={gridColor}
+                hasDataViewport={nativeRenderHasDataViewport}
+                hasContextMenu={hasNativeContextMenu}
+                indicatorPaneInfo={nativeIndicatorPaneInfo}
+                indicatorPlots={nativeIndicatorPlots}
+                indicatorTotalBarCount={nativeRenderBars.length}
+                lineSnapshot={lineSnapshot}
+                options={options}
+                plotOpacity={nativeCanvasLoading ? LOADING_OPACITY : 1}
+                orderDragState={orderDragState}
+                plotPrimitiveClip={plotPrimitiveClip}
+                pricePrecision={nativePricePrecision}
+                nowMs={nativeCountdownNowMs}
+                resolvedPriceAxisTags={resolvedPriceAxisTags}
+                sharedViewport={sharedViewport}
+                smallFont={smallFont}
+                staticProjection={staticNativeRenderProjection}
+                textColor={textColor}
+                textFont={textFont}
+                tradeLabelHeight={TRADE_LABEL_HEIGHT}
+                tradeLineGeometries={tradeLineGeometries}
+                userDrawingDraftAnchorColor={nativeUserDrawingDraftAnchorColor}
+                userDrawingDraftAnchors={nativeUserDrawingDraftAnchors}
+                userDrawingRenderEntries={nativeUserDrawingRenderEntries}
+                visibleBars={visibleBars}
+                volumeHeight={volumeHeight}
               />
-              <Circle
-                cx={primitive.point.x}
-                cy={primitive.point.y}
-                r={primitive.radius}
-                color={primitive.strokeColor}
-                style="stroke"
-                strokeWidth={1}
-              />
-            </Group>
-          );
-        })}
-
-        {/* Crosshair lines mirror the web overlay and avoid RN dashed-border gaps on iOS. */}
-        {crosshairOverlay && (
-          <Group>
-            <SkiaLine
-              p1={vec(crosshairOverlay.x, crosshairOverlay.chartTop)}
-              p2={vec(crosshairOverlay.x, crosshairOverlay.chartBottom)}
-              color={crosshairOverlay.color}
-              strokeWidth={1}
-              style="stroke"
-            >
-              <DashPathEffect intervals={[4, 4]} />
-            </SkiaLine>
-
-            {crosshairOverlay.showHorizontal && (
-              <SkiaLine
-                p1={vec(crosshairOverlay.chartLeft, crosshairOverlay.y)}
-                p2={vec(crosshairOverlay.horizontalRight, crosshairOverlay.y)}
-                color={crosshairOverlay.color}
-                strokeWidth={1}
-                style="stroke"
-              >
-                <DashPathEffect intervals={[4, 4]} />
-              </SkiaLine>
-            )}
-          </Group>
-        )}
-
-        {/* Bracket drag preview (TP/SL dashed line + label) */}
-        {bracketPreview && bracketFont && (
-          <Group>
-            {/* Dashed horizontal line at drag price */}
-            <SkiaLine
-              p1={vec(bracketPreview.chartLeft, bracketPreview.y)}
-              p2={vec(bracketPreview.chartRight, bracketPreview.y)}
-              color={bracketPreview.color}
-              strokeWidth={1.5}
-              style="stroke"
-            >
-              <DashPathEffect intervals={[6, 4]} />
-            </SkiaLine>
-
-            {/* Label background */}
-            <Rect
-              x={bracketPreview.chartRight - bracketPreview.labelWidth - 5}
-              y={bracketPreview.y - 18}
-              width={bracketPreview.labelWidth}
-              height={16}
-              color="rgba(19, 23, 34, 0.9)"
-            />
-            {/* Label border */}
-            <Rect
-              x={bracketPreview.chartRight - bracketPreview.labelWidth - 5}
-              y={bracketPreview.y - 18}
-              width={bracketPreview.labelWidth}
-              height={16}
-              color={bracketPreview.color}
-              style="stroke"
-              strokeWidth={1}
-            />
-
-            {/* Label text */}
-            <SkiaText
-              x={bracketPreview.chartRight - bracketPreview.labelWidth}
-              y={bracketPreview.y - 6}
-              text={bracketPreview.labelText}
-              font={bracketFont}
-              color={bracketPreview.pnl >= 0 ? positiveTradingColor : negativeTradingColor}
-            />
-          </Group>
-        )}
-      </Canvas>
-
-      {/* Layer 2: Base Gesture Handler */}
-      <GestureDetector gesture={allGestures}>
-        <Animated.View
-          style={[styles.absoluteFill, styles.baseGestureLayer, { width: dimensions.width, height: dimensions.height }]}
-        />
-      </GestureDetector>
-
-      {/* Layer 3: Interactive RN Layer (order lines, crosshair, etc.) */}
-      <View style={[styles.absoluteFill, styles.interactiveLayer]} pointerEvents="box-none">
-        {/* Text labels from Skia renderer */}
-        {textItems.map((item, index) => (
-          <Text key={`${item.text}-${item.x}-${item.y}-${index}`} style={getTextStyle(item)} numberOfLines={1}>
-            {item.text}
-          </Text>
-        ))}
-
-        {/* Order lines */}
-        {viewport &&
-          interactiveOrderLines.map((order) => (
-            <OrderLineComponent
-              key={getNativeOrderRenderKey(order)}
-              order={order}
-              viewport={viewport}
-              dimensions={chartDimensions}
-              labelY={resolvedLabelYById.get(`order-${order.id}`)}
-              pricePrecision={pricePrecision}
-              useNarrowText={dimensions.width < 400}
-              onPriceDragStart={handleOrderPriceDragStart}
-              onPriceDragMove={handleOrderPriceDragMove}
-              onPriceDragEnd={handleOrderPriceDragEnd}
-              onPriceDragCancel={handleOrderPriceDragCancel}
-              onCancel={handleNativeOrderCancel}
-              onTPClick={(line) => handleNativeBracketClick(line, 'order', 'tp')}
-              onSLClick={(line) => handleNativeBracketClick(line, 'order', 'sl')}
-              onTPDragEnd={(line, price, partialPercent) =>
-                handleNativeBracketMoveEnd(line, 'order', 'tp', price, partialPercent)
-              }
-              onSLDragEnd={(line, price, partialPercent) =>
-                handleNativeBracketMoveEnd(line, 'order', 'sl', price, partialPercent)
-              }
-              onTPMovePreview={handleOrderTPMove}
-              onSLMovePreview={handleOrderSLMove}
-              onTPSLDragEnd={handleTPSLDragEnd}
-              positiveColor={positiveTradingColor}
-            />
-          ))}
-
-        {/* Position lines */}
-        {viewport &&
-          interactivePositionLines.map((position) => (
-            <PositionLineComponent
-              key={position.id}
-              position={position}
-              viewport={viewport}
-              dimensions={chartDimensions}
-              labelY={resolvedLabelYById.get(`position-${position.id}`)}
-              pricePrecision={pricePrecision}
-              useNarrowText={dimensions.width < 400}
-              onClose={handleNativePositionClose}
-              onReverse={handleNativePositionReverse}
-              onTPClick={(line) => handleNativeBracketClick(line, 'position', 'tp')}
-              onSLClick={(line) => handleNativeBracketClick(line, 'position', 'sl')}
-              onTPDragEnd={(line, price, partialPercent) =>
-                handleNativeBracketMoveEnd(line, 'position', 'tp', price, partialPercent)
-              }
-              onSLDragEnd={(line, price, partialPercent) =>
-                handleNativeBracketMoveEnd(line, 'position', 'sl', price, partialPercent)
-              }
-              onTPMovePreview={handleTPMove}
-              onSLMovePreview={handleSLMove}
-              onTPSLDragEnd={handleTPSLDragEnd}
-              positiveColor={positiveTradingColor}
-              negativeColor={negativeTradingColor}
-            />
-          ))}
-
-        {/* Crosshair */}
-        {viewport && (
-          <CrosshairComponent
-            x={lastCrosshairPosition.x}
-            y={lastCrosshairPosition.y}
-            visible={crosshairVisible}
-            viewport={viewport}
-            dimensions={chartDimensions}
-            pricePrecision={pricePrecision}
-            color={fullRenderOptions.crosshairColor}
-            showContextMenuButton={!!onContextMenu}
-            showLines={false}
-            onContextMenuPress={handleContextMenuPress}
-          />
-        )}
-      </View>
-
-      {/* Reset viewport button — re-enables auto-scale */}
-      {resetButtonVisible && (
-        <Animated.View style={[styles.resetButtonContainer, resetButtonAnimatedStyle]} pointerEvents="box-none">
-          <TouchableOpacity
-            style={styles.resetButton}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            onPress={handleResetButtonPress}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel="Reset chart viewport"
-            accessibilityHint="Resets zoom and auto-scale"
-          >
-            <Text style={styles.resetButtonText}>↻</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-
-      {activeUserDrawingTextEditPrimitive && activeUserDrawingTextEditorStyle && (
-        <TextInput
-          accessibilityLabel="Edit drawing text"
-          autoFocus
-          blurOnSubmit={false}
-          multiline
-          selectTextOnFocus
-          value={activeUserDrawingTextEditPrimitive.editValue ?? activeUserDrawingTextEditPrimitive.text}
-          onChangeText={(value: string) => {
-            dispatchUserDrawingCommandToState({ type: 'updateTextEdit', value, meta: { source: 'textEditor' } });
-          }}
-          onBlur={() => {
-            dispatchUserDrawingCommandToState({ type: 'commitTextEdit', meta: { source: 'textEditor' } });
-          }}
-          style={[styles.userDrawingTextEditor, activeUserDrawingTextEditorStyle]}
-        />
-      )}
-
-      <UserDrawingSelectedActionSurfaceComponent
-        state={effectiveUserDrawingState}
-        surface={userDrawingSelectedActionSurface}
-        anchor={userDrawingSelectionActionAnchor}
-        dimensions={dimensions}
-        topInset={showTopBar ? TOP_BAR_SAFE_ZONE : 0}
-        dismissPopoverSignal={userDrawingSelectedActionPopoverDismissSignal}
-        createId={createUserDrawingId}
-        dispatchUserDrawingCommand={(command) => dispatchUserDrawingCommandToState(command)}
-        onUserDrawingDuplicateEditDragChange={(enabled) => {
-          userDrawingDuplicateEditDragOverrideRef.current = enabled;
-          setUserDrawingDuplicateEditDragOverride(enabled);
-        }}
-        onUserDrawingPropertiesOpen={handleUserDrawingPropertiesOpen}
-        onUserDrawingObjectTreeOpen={handleUserDrawingObjectTreeOpen}
-        onUserDrawingCopySelected={() => {
-          copySelectedUserDrawingToClipboard(effectiveUserDrawingState);
-        }}
-      />
-
-      {/* Top Bar (overlay on top of chart) */}
-      {showTopBar && (
-        <View style={styles.topBarOverlay} pointerEvents="box-none">
-          <ChartTopBarComponent
-            symbol={symbol}
-            exchangeName={exchangeName}
-            interval={interval}
-            onIntervalChange={onIntervalChange}
-            onIndicatorsPress={handleIndicatorsPress}
-            backgroundColor={fullRenderOptions.backgroundColor}
-            textColor={fullRenderOptions.textColor}
-            textSecondaryColor={withAlpha(fullRenderOptions.textColor, 0.7)}
-            accentColor={fullRenderOptions.crosshairColor}
-            borderColor={fullRenderOptions.gridColor}
-            supportedResolutions={supportedResolutions}
-            userDrawingState={effectiveUserDrawingState}
-            userDrawingCommandAvailability={{
-              canUndo: canUndoUserDrawingCommandHistory(userDrawingHistoryRef.current),
-              canRedo: canRedoUserDrawingCommandHistory(userDrawingHistoryRef.current),
-            }}
-            onUserDrawingToolSelect={(tool) =>
-              dispatchUserDrawingCommandToState({ type: 'setActiveTool', tool, meta: { source: 'toolbar' } })
-            }
-            onUserDrawingToggleFavoriteTool={(tool) =>
-              dispatchUserDrawingCommandToState({ type: 'toggleFavoriteTool', tool, meta: { source: 'toolbar' } })
-            }
-            onUserDrawingFavoriteToolbarMove={(position) =>
-              dispatchUserDrawingCommandToState({
-                type: 'setFavoriteToolbarPosition',
-                position,
-                meta: { source: 'toolbar' },
-              })
-            }
-            onUserDrawingUndo={() => {
-              undoUserDrawingCommandFromSource('toolbar');
-            }}
-            onUserDrawingRedo={() => {
-              redoUserDrawingCommandFromSource('toolbar');
-            }}
-            onUserDrawingDuplicateSelected={() => {
-              dispatchUserDrawingCommandToState({
-                type: 'duplicate',
-                options: { createId: createUserDrawingId },
-                meta: { source: 'toolbar' },
-              });
-            }}
-            onUserDrawingDeleteSelected={() => {
-              dispatchUserDrawingCommandToState({ type: 'delete', meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingCancelDraft={() => {
-              dispatchUserDrawingCommandToState({ type: 'cancelDraft', meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingClearAll={() => {
-              dispatchUserDrawingCommandToState({ type: 'clear', meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingMeasureModeChange={(enabled) => {
-              dispatchUserDrawingCommandToState({
-                type: 'setMeasureMode',
-                measureMode: enabled ? 'on' : 'off',
-                meta: { source: 'toolbar' },
-              });
-            }}
-            onUserDrawingMagnetModeChange={(magnetMode) => {
-              dispatchUserDrawingCommandToState({ type: 'setMagnetMode', magnetMode, meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingStayInDrawingModeChange={(stayInDrawingMode) => {
-              dispatchUserDrawingCommandToState({
-                type: 'setStayInDrawingMode',
-                stayInDrawingMode,
-                meta: { source: 'toolbar' },
-              });
-            }}
-            onUserDrawingZoomIn={handleUserDrawingZoomIn}
-            onUserDrawingObjectTreeOpen={() =>
-              handleUserDrawingObjectTreeOpen(resolveUserDrawingObjectTreeModel(effectiveUserDrawingState))
-            }
-            onUserDrawingZOrderChange={(action) => {
-              dispatchUserDrawingCommandToState({ type: 'reorder', action, meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingStyleChange={(style) => {
-              dispatchUserDrawingCommandToState({ type: 'updateStyle', style, meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingTextAlignChange={(textAlign) => {
-              dispatchUserDrawingCommandToState({ type: 'setTextAlign', textAlign, meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingTrendLineExtendChange={(extend) => {
-              dispatchUserDrawingCommandToState({ type: 'setTrendLineExtend', extend, meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingIconNameChange={(iconName) => {
-              dispatchUserDrawingCommandToState({ type: 'setIconName', iconName, meta: { source: 'toolbar' } });
-            }}
-            onUserDrawingVisibilityChange={(visible, options) => {
-              dispatchUserDrawingCommandToState({
-                type: 'setVisibility',
-                visible,
-                options,
-                meta: { source: 'toolbar' },
-              });
-            }}
-            onUserDrawingLockedChange={(locked, options) => {
-              dispatchUserDrawingCommandToState({
-                type: 'setLocked',
-                locked,
-                options,
-                meta: { source: 'toolbar' },
-              });
-            }}
-          />
+            </Canvas>
+          </GestureDetector>
         </View>
+      ) : null}
+      <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
+        {resizeSnapshot ? (
+          <SkiaImage
+            fit="fill"
+            height={Math.max(propHeight ?? resizeSnapshot.height, 1)}
+            image={resizeSnapshot.image}
+            width={Math.max(propWidth ?? resizeSnapshot.width, 1)}
+            x={0}
+            y={0}
+          />
+        ) : null}
+      </Canvas>
+      {topBarLayout && (
+        <NativeTopBarOverlay
+          backgroundColor={backgroundColor}
+          gridColor={gridColor}
+          mutedTextColor={nativeMutedTextColor}
+          onAction={handleNativeTopBarAction}
+          textColor={textColor}
+          topBarLayout={topBarLayout}
+        />
       )}
-
-      {/* Context Menu (Modal) */}
-      <ContextMenuComponent
-        visible={contextMenuVisible}
-        items={contextMenuItems}
-        x={contextMenuPosition.x}
-        y={contextMenuPosition.y}
-        price={contextMenuPosition.price}
-        time={contextMenuPosition.time}
-        pricePrecision={pricePrecision}
-        onClose={handleContextMenuClose}
-      />
-
-      <UserDrawingObjectTreeSheet
-        visible={userDrawingObjectTreeVisible}
-        model={resolveUserDrawingObjectTreeModel(effectiveUserDrawingState)}
-        onDispatch={dispatchUserDrawingObjectTreeActionToState}
-        onClose={() => setUserDrawingObjectTreeVisible(false)}
-      />
-
-      <UserDrawingPropertiesSheet
-        visible={userDrawingPropertiesVisible}
-        surface={resolveUserDrawingPropertiesSurface(effectiveUserDrawingState, userDrawingPropertiesDrawingId)}
-        onDispatch={(command) =>
-          dispatchUserDrawingCommandToState(
-            resolveUserDrawingPropertiesSurfaceCommand(command, { drawingId: userDrawingPropertiesDrawingId }),
-          )
-        }
-        onClose={() => {
-          setUserDrawingPropertiesVisible(false);
-          setUserDrawingPropertiesDrawingId(undefined);
-        }}
-      />
-
-      {/* Indicators Modal */}
-      <IndicatorsModalMobile
-        visible={indicatorsModalVisible}
-        onClose={handleIndicatorsModalClose}
-        onSelectIndicator={handleSelectIndicator}
-        activeIndicatorIds={activeIndicatorIds}
-      />
-
-      {/* Indicator Settings Modal */}
-      <IndicatorSettingsModalMobile
-        visible={settingsModalVisible}
-        onClose={handleSettingsModalClose}
-        indicator={settingsIndicator}
-        inputDefinitions={settingsInputDefs}
-        plots={settingsPlots}
-        onSave={handleSettingsSave}
-      />
+      {frame && (
+        <NativeChartLegendOverlay
+          bars={nativeRenderBars}
+          downColor={options.downColor}
+          frame={frame}
+          gridColor={gridColor}
+          activeIndicators={nativeLegendIndicators}
+          indicatorPaneInfo={nativeLegendIndicatorPaneInfo}
+          interval={nativeRenderInterval}
+          isLoading={nativeLegendLoading}
+          leftToolRailLayout={leftToolRailLayout}
+          mutedTextColor={nativeMutedTextColor}
+          onActionTargetsChange={setNativeLegendActionTargets}
+          onRemoveIndicator={handleNativeRemoveIndicator}
+          onToggleIndicator={handleNativeToggleIndicator}
+          pricePrecision={nativePricePrecision}
+          symbol={symbol}
+          textColor={textColor}
+          upColor={options.upColor}
+        />
+      )}
+      {frame && nativeOpenDrawingCategoryId && leftToolRailLayout && !leftToolRailLayout.collapsed && (
+        <NativeDrawingCategoryDismissOverlay
+          height={Math.max(0, frame.dimensions.height - (topBarLayout?.height ?? 0))}
+          onDismiss={dismissNativeOpenDrawingCategory}
+          top={topBarLayout?.height ?? 0}
+          width={frame.dimensions.width}
+        />
+      )}
+      {leftToolRailLayout && (
+        <NativeLeftToolRailOverlay
+          backgroundColor={backgroundColor}
+          gridColor={gridColor}
+          leftToolRailLayout={leftToolRailLayout}
+          mutedTextColor={nativeMutedTextColor}
+          activeBackgroundColor={gridColor}
+          activeTextColor={options.upColor}
+          openCategoryId={nativeOpenDrawingCategoryId}
+          onCategoryOpenChange={setNativeOpenDrawingCategoryId}
+          onToolSelect={handleNativeUserDrawingToolSelect}
+          onToggleCollapsed={toggleLeftToolRailCollapsed}
+          toggleBackgroundColor={textColor}
+        />
+      )}
+      {frame && nativeUserDrawingSelectionActionAnchor && (
+        <NativeUserDrawingSelectionActionOverlay
+          activeBackgroundColor={gridColor}
+          activeTextColor={options.upColor}
+          anchor={nativeUserDrawingSelectionActionAnchor}
+          backgroundColor={backgroundColor}
+          bottomInset={8}
+          gridColor={gridColor}
+          leftInset={nativeSelectionActionLeftInset}
+          mutedTextColor={nativeMutedTextColor}
+          onAction={handleNativeSelectedDrawingAction}
+          onPopoverGroupChange={setNativeSelectedActionPopoverGroupId}
+          openPopoverGroupId={nativeSelectedActionPopoverGroupId}
+          rightInset={8}
+          textColor={textColor}
+          topInset={nativeSelectionActionTopInset}
+          userDrawingDefaultStylesByKind={nativeUserDrawingDefaultStylesByKind}
+          userDrawingDraft={nativeUserDrawingDraft}
+          userDrawingDrawings={nativeUserDrawingDrawings}
+          userDrawingSelection={nativeUserDrawingSelection}
+          userDrawingTextEdit={nativeUserDrawingTextEdit}
+          viewportHeight={frame.dimensions.height}
+          viewportWidth={frame.dimensions.width}
+        />
+      )}
+      {nativeResetViewButtonLayout && nativeResetViewButtonVisible && hasDataViewport && (
+        <NativeResetViewButtonOverlay layout={nativeResetViewButtonLayout} />
+      )}
+      {frame && nativeContextMenu ? (
+        <NativeCrosshairContextMenuOverlay
+          backgroundColor={backgroundColor}
+          dimensions={frame.dimensions}
+          menu={nativeContextMenu}
+          onClose={closeNativeContextMenu}
+          renderOptions={options}
+          textColor={textColor}
+        />
+      ) : null}
+      {nativeLayoutSelectorOpen ? (
+        <NativeLayoutSelectorOverlay
+          backgroundColor={backgroundColor}
+          currentLayout={nativeCurrentLayout}
+          errorText={nativeLayoutSelectorError}
+          gridColor={gridColor}
+          layouts={nativeLayoutSelectorLayouts}
+          loading={nativeLayoutSelectorLoading}
+          mutedTextColor={nativeMutedTextColor}
+          onClose={() => setNativeLayoutSelectorOpen(false)}
+          onDelete={handleNativeLayoutSelectorDelete}
+          onLoad={handleNativeLayoutSelectorLoad}
+          onRefresh={refreshNativeLayoutSelector}
+          onRename={handleNativeLayoutSelectorRename}
+          onSave={handleNativeLayoutSelectorSave}
+          onSaveAs={handleNativeLayoutSelectorSaveAs}
+          saveStatus={nativeSaveStatus}
+          textColor={textColor}
+        />
+      ) : null}
     </View>
   );
 });
@@ -5700,63 +1524,19 @@ SkiaTealchart.displayName = 'SkiaTealchart';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: 'hidden',
+    position: 'relative',
   },
-  absoluteFill: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  canvas: {
+    flex: 1,
   },
-  topBarOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    // No background - transparent overlay
+  liveChartLayer: {
+    ...StyleSheet.absoluteFillObject,
   },
-  userDrawingTextEditor: {
-    position: 'absolute',
-    zIndex: 6,
-    minHeight: 30,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderRadius: 4,
-    backgroundColor: 'rgba(9, 12, 18, 0.92)',
-    lineHeight: 18,
+  snapshotLayer: {
+    ...StyleSheet.absoluteFillObject,
   },
-  userDrawingActionDivider: {
-    width: 1,
-    height: 18,
-    backgroundColor: '#363a45',
-  },
-  interactiveLayer: {
-    zIndex: 2,
-  },
-  baseGestureLayer: {
-    zIndex: 1,
-  },
-  resetButtonContainer: {
-    position: 'absolute',
-    bottom: 40, // Above time axis
-    alignSelf: 'center',
-    left: '50%',
-    marginLeft: -14, // Half of width (28)
-  },
-  resetButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(42, 46, 57, 0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  resetButtonText: {
-    color: '#d1d4dc',
-    fontSize: 16,
+  hiddenSnapshotLayer: {
+    opacity: 0,
   },
 });
-
-export default SkiaTealchart;

@@ -9,7 +9,10 @@
  * - Context menu (right-click and long-press)
  */
 
+import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type { Viewport } from '../types';
+
+import { clampViewportTimeRange } from '../viewport/timeRangeConstraints';
 
 // ============================================================================
 // Types
@@ -31,7 +34,7 @@ export interface EventManagerCallbacks {
   /** Called when an indicator pane Y range changes (for price axis zoom) */
   onPaneYRangeChange?: (paneId: string, yMin: number, yMax: number) => void;
   /** Called when more historical bars are needed */
-  onRequestMoreBars?: (direction: 'left' | 'right') => void;
+  onRequestMoreBars?: (direction: HistoryBackfillDirection, hint?: HistoryBackfillRequestHint) => void;
   /** Called when crosshair position updates */
   onCrossHairMoved?: (x: number, y: number, options?: DrawingInputEventOptions) => void;
   /** Called when crosshair visibility changes */
@@ -57,6 +60,8 @@ export interface EventManagerCallbacks {
     topMargin: number;
     leftMargin: number;
   };
+  /** Get the active bar interval in milliseconds */
+  getIntervalMs?: () => number;
   /** Get pane at Y position (for price-axis zoom) */
   getPaneAtY?: (y: number) => PaneInfo | null;
   /** Get divider at Y position (for pane resizing) */
@@ -80,9 +85,19 @@ export interface EventManagerCallbacks {
   /** Called on double-click/double-tap on a pane */
   onPaneDoubleClick?: (paneId: string, point: { x: number; y: number }) => void;
   /** Called on chart-surface click/tap when user drawing input wants first refusal */
-  onDrawingInput?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingInputEventOptions) => DrawingInputResult;
+  onDrawingInput?: (
+    x: number,
+    y: number,
+    source: 'mouse' | 'touch',
+    options?: DrawingInputEventOptions,
+  ) => DrawingInputResult;
   /** Called before drag starts when drawing mode may need to preserve click input */
-  onDrawingDragPending?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
+  onDrawingDragPending?: (
+    x: number,
+    y: number,
+    source: 'mouse' | 'touch',
+    options?: DrawingDragEventOptions,
+  ) => boolean;
   /** Called before pan starts so selected drawing edits can claim the drag */
   onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean;
   /** Called while an active drawing edit drag moves */
@@ -163,7 +178,9 @@ function getPointerDrawingDragOptions(e: PointerEvent): DrawingDragEventOptions 
 }
 
 function invokeDrawingDragCallback(
-  callback: ((x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean) | undefined,
+  callback:
+    | ((x: number, y: number, source: 'mouse' | 'touch', options?: DrawingDragEventOptions) => boolean)
+    | undefined,
   x: number,
   y: number,
   source: 'mouse' | 'touch',
@@ -271,7 +288,8 @@ export class EventManager {
 
   // Touch tracking
   private activeTouches = new Map<number, { x: number; y: number }>();
-  private touchStart: { x: number; y: number; time: number; drawingDragOptions?: DrawingDragEventOptions } | null = null;
+  private touchStart: { x: number; y: number; time: number; drawingDragOptions?: DrawingDragEventOptions } | null =
+    null;
   private isTouchDragging = false;
   private touchCrosshairLocked = false;
   private touchCrosshairPosition = { x: 0, y: 0 };
@@ -489,7 +507,10 @@ export class EventManager {
     }
 
     const drawingDragOptions = getMouseDrawingDragOptions(e);
-    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', drawingDragOptions)) {
+    if (
+      e.button === 0 &&
+      invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'mouse', drawingDragOptions)
+    ) {
       this.state.isDragging = true;
       this.state.dragMode = 'pendingDrawing';
       this.state.dragStartX = x;
@@ -501,7 +522,10 @@ export class EventManager {
       return;
     }
 
-    if (e.button === 0 && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', drawingDragOptions)) {
+    if (
+      e.button === 0 &&
+      invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'mouse', drawingDragOptions)
+    ) {
       this.state.isDragging = true;
       this.state.dragMode = 'drawing';
       this.state.dragStartX = x;
@@ -682,7 +706,10 @@ export class EventManager {
     // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
     const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
     this.state.isOverInteractive =
-      !this.state.isOverPriceAxis && !this.state.isOverPaneDivider && !inDeadZone && !!this.callbacks.isOverInteractiveElement?.(x, y);
+      !this.state.isOverPriceAxis &&
+      !this.state.isOverPaneDivider &&
+      !inDeadZone &&
+      !!this.callbacks.isOverInteractiveElement?.(x, y);
 
     // Update crosshair - hide when over price axis, divider, or in dead zones
     if (!this.state.isDragging) {
@@ -749,7 +776,15 @@ export class EventManager {
 
       const startOptions = this._pendingMouseDrawingDragStartOptions ?? this._pendingMouseDrawingDragOptions;
       const moveOptions = this._pendingMouseDrawingDragOptions;
-      if (invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, this.state.dragStartX, this.state.dragStartY, 'mouse', startOptions)) {
+      if (
+        invokeDrawingDragCallback(
+          this.callbacks.onDrawingDragStart,
+          this.state.dragStartX,
+          this.state.dragStartY,
+          'mouse',
+          startOptions,
+        )
+      ) {
         this.state.dragMode = 'drawing';
         this.applyActiveDragCursor();
         invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', moveOptions);
@@ -760,13 +795,7 @@ export class EventManager {
 
     if (this.state.dragMode === 'drawing') {
       this.applyActiveDragCursor();
-      invokeDrawingDragCallback(
-        this.callbacks.onDrawingDragMove,
-        x,
-        y,
-        'mouse',
-        this._pendingMouseDrawingDragOptions,
-      );
+      invokeDrawingDragCallback(this.callbacks.onDrawingDragMove, x, y, 'mouse', this._pendingMouseDrawingDragOptions);
       this.scheduleRender();
       return;
     }
@@ -1181,15 +1210,28 @@ export class EventManager {
       const dims = this.callbacks.getDimensions();
       const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
 
-      const drawingDragPending = invokeDrawingDragCallback(this.callbacks.onDrawingDragPending, x, y, 'touch', drawingDragOptions);
+      const drawingDragPending = invokeDrawingDragCallback(
+        this.callbacks.onDrawingDragPending,
+        x,
+        y,
+        'touch',
+        drawingDragOptions,
+      );
       const drawingDragStarted =
-        !drawingDragPending && invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'touch', drawingDragOptions);
+        !drawingDragPending &&
+        invokeDrawingDragCallback(this.callbacks.onDrawingDragStart, x, y, 'touch', drawingDragOptions);
 
       const viewport = this.callbacks.getViewport();
       this.state.dragStartX = x;
       this.state.dragStartY = y;
       this.state.dragStartViewport = { ...viewport };
-      this.state.dragMode = drawingDragPending ? 'pendingDrawing' : drawingDragStarted ? 'drawing' : isOverPriceAxis ? 'priceAxisZoom' : 'pan';
+      this.state.dragMode = drawingDragPending
+        ? 'pendingDrawing'
+        : drawingDragStarted
+          ? 'drawing'
+          : isOverPriceAxis
+            ? 'priceAxisZoom'
+            : 'pan';
       // Save crosshair position at touch start for tracking during drag
       this.state.dragStartCrosshairX = this.crosshair.x;
       this.state.dragStartCrosshairY = this.crosshair.y;
@@ -1224,7 +1266,11 @@ export class EventManager {
           }
         }, LONG_PRESS_DURATION);
       }
-    } else if (e.touches.length === 2 && this.state.dragMode !== 'drawing' && this.state.dragMode !== 'pendingDrawing') {
+    } else if (
+      e.touches.length === 2 &&
+      this.state.dragMode !== 'drawing' &&
+      this.state.dragMode !== 'pendingDrawing'
+    ) {
       // Two touches - prepare for pinch zoom
       this.clearLongPressTimer();
       const touch1 = e.touches[0];
@@ -1527,11 +1573,6 @@ export class EventManager {
     const newStartTime = this.state.dragStartViewport.startTime + timePanned;
     const newEndTime = this.state.dragStartViewport.endTime + timePanned;
 
-    // Request more bars if panning left (to earlier times)
-    if (newStartTime < this.state.dragStartViewport.startTime) {
-      this.callbacks.onRequestMoreBars?.('left');
-    }
-
     // Calculate price per pixel using the actual pane height (not full chart height)
     const { yMin: startYMin, yMax: startYMax } = this.state.dragStartPaneYRange;
     const priceRange = startYMax - startYMin;
@@ -1548,24 +1589,32 @@ export class EventManager {
     // external callback is only called at drag end
     const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;
 
+    let nextViewport: Viewport;
     if (this.state.draggedPaneId === 'main' && !this.callbacks.isAutoScale?.('main')) {
       // Update viewport for main pane (horizontal + vertical)
       // When auto-scale is active, skip vertical — auto-scale will recalculate price axis
-      updateViewport?.({
+      nextViewport = {
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
         priceMin: newPriceMin,
         priceMax: newPriceMax,
-      });
+      };
     } else {
       // For indicator panes (or main pane with auto-scale): only update time axis
-      updateViewport?.({
+      nextViewport = {
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
-      });
+      };
     }
+
+    // Request more bars for the viewport we are moving toward, not the previous committed viewport.
+    if (newStartTime < this.state.dragStartViewport.startTime) {
+      this.callbacks.onRequestMoreBars?.('left', { viewport: nextViewport });
+    }
+
+    updateViewport?.(nextViewport);
   }
 
   private handlePriceAxisZoom(dy: number): void {
@@ -1659,19 +1708,26 @@ export class EventManager {
     const newStartTime = viewport.startTime + timePanned;
     const newEndTime = viewport.endTime + timePanned;
 
-    // Request more bars if panning left
-    if (timePanned < 0) {
-      this.callbacks.onRequestMoreBars?.('left');
-    }
-
-    return {
+    const nextViewport = {
       ...viewport,
       startTime: newStartTime,
       endTime: newEndTime,
     };
+
+    // Request more bars if panning left
+    if (timePanned < 0) {
+      this.callbacks.onRequestMoreBars?.('left', { viewport: nextViewport });
+    }
+
+    return nextViewport;
   }
 
-  private zoomViewport(viewport: Viewport, factor: number, _width: number, anchor: 'right' | 'center' = 'right'): Viewport {
+  private zoomViewport(
+    viewport: Viewport,
+    factor: number,
+    width: number,
+    anchor: 'right' | 'center' = 'right',
+  ): Viewport {
     const newTimeRange = (viewport.endTime - viewport.startTime) * factor;
     // Wheel/momentum anchor on the far right edge (endTime fixed); pinch stays centered.
     let newStartTime: number;
@@ -1685,21 +1741,38 @@ export class EventManager {
       newStartTime = newEndTime - newTimeRange;
     }
 
-    // Request more bars if zooming out left
-    if (newStartTime < viewport.startTime) {
-      this.callbacks.onRequestMoreBars?.('left');
-    }
-
-    return {
+    const nextViewport = {
       ...viewport,
       startTime: newStartTime,
       endTime: newEndTime,
     };
+    const constrainedViewport = this.clampZoomTimeRange(nextViewport, width, anchor);
+
+    // Request more bars if zooming out left
+    if (constrainedViewport.startTime < viewport.startTime) {
+      this.callbacks.onRequestMoreBars?.('left', { viewport: constrainedViewport });
+    }
+
+    return constrainedViewport;
   }
 
   // ============================================================================
   // Private: Helpers
   // ============================================================================
+
+  private clampZoomTimeRange(viewport: Viewport, width: number, anchor: 'right' | 'center'): Viewport {
+    const intervalMs = this.callbacks.getIntervalMs?.();
+    if (!intervalMs) return viewport;
+
+    const dims = this.callbacks.getDimensions();
+    const plotWidth = Math.max(1, (width || dims.width) - dims.leftMargin - dims.priceAxisWidth);
+    return clampViewportTimeRange({
+      viewport,
+      intervalMs,
+      plotWidth,
+      anchor,
+    });
+  }
 
   private clearLongPressTimer(): void {
     if (this.longPressTimer) {
