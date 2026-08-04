@@ -74,12 +74,8 @@ export function resolveNativeTimeGridSlotModel({
 
   return {
     labelText,
-    labelX: clampNativeTimeAxisTickLabelX(
-      frame,
-      x,
-      Math.min(labelText.length * characterWidth, frame.contentWidth),
-    ),
-    lineEnd: { x, y: frame.mainPane.bottom },
+    labelX: clampNativeTimeAxisTickLabelX(frame, x, Math.min(labelText.length * characterWidth, frame.contentWidth)),
+    lineEnd: { x, y: frame.timeAxisTop },
     lineStart: { x, y: frame.mainPane.top },
     visible: slot.visible && x >= frame.contentLeft && x <= frame.contentRight,
     x,
@@ -169,12 +165,8 @@ function getNativeStaticTimeGridSlots({
 
     return {
       labelText,
-      labelX: clampNativeTimeAxisTickLabelX(
-        frame,
-        x,
-        Math.min(labelText.length * characterWidth, frame.contentWidth),
-      ),
-      lineEnd: { x, y: frame.mainPane.bottom },
+      labelX: clampNativeTimeAxisTickLabelX(frame, x, Math.min(labelText.length * characterWidth, frame.contentWidth)),
+      lineEnd: { x, y: frame.timeAxisTop },
       lineStart: { x, y: frame.mainPane.top },
       visible: slot.visible && x >= frame.contentLeft && x <= frame.contentRight,
       x,

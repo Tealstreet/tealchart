@@ -1,3 +1,4 @@
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingAnchor, UserDrawingRenderEntry } from '../../drawings';
 import type { OrderLineRenderData, PositionLineRenderData, RenderOptions } from '../../types';
@@ -7,6 +8,7 @@ import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
@@ -19,6 +21,7 @@ import { NativeChartChromeLayer } from './NativeChartChromeLayer';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
 import { NativeChartTradeLinesLayer } from './NativeChartTradeLinesLayer';
 import { NativeCrosshairLayer } from './NativeCrosshairLayer';
+import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
 
 export interface NativeChartCanvasLayersProps {
@@ -33,6 +36,9 @@ export interface NativeChartCanvasLayersProps {
   gridColor: string;
   hasDataViewport: boolean;
   hasContextMenu: boolean;
+  indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
+  indicatorPlots: readonly PlotOutput[];
+  indicatorTotalBarCount: number;
   lineSnapshot: {
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
@@ -70,6 +76,9 @@ export function NativeChartCanvasLayers({
   gridColor,
   hasDataViewport,
   hasContextMenu,
+  indicatorPaneInfo,
+  indicatorPlots,
+  indicatorTotalBarCount,
   lineSnapshot,
   options,
   plotOpacity,
@@ -116,6 +125,16 @@ export function NativeChartCanvasLayers({
             staticProjection={staticProjection}
             visibleBars={visibleBars}
             volumeHeight={volumeHeight}
+          />
+
+          <NativeIndicatorPlotLayer
+            frame={frame}
+            indicatorPaneInfo={indicatorPaneInfo}
+            plots={indicatorPlots}
+            sharedViewport={sharedViewport}
+            staticProjection={staticProjection}
+            totalBarCount={indicatorTotalBarCount}
+            visibleBars={visibleBars}
           />
 
           <NativeChartPrimitiveLayer

@@ -492,20 +492,25 @@ describe('imperative chart API contract', () => {
   });
 
   it('renders native trading lines from adapter snapshots', () => {
-    const source = readSource('SkiaTealchart.tsx');
+    const runtimeSource = readSource('mobile/interaction/useNativeOemsLineRuntime.ts');
+    const layerSource = readSource('mobile/render/NativeChartTradeLinesLayer.tsx');
 
-    expect(source).toContain('const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
-    expect(source).toContain('confirmOrderLineSnapshots(oemsActions, rawLineSnapshot.orderLines);');
-    expect(source).toContain('confirmPositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);');
-    expect(source).toContain('orderLines: rawLineSnapshot.orderLines.map((line) => applyOrderActionState(line, oemsActions)),');
-    expect(source).toContain('positionLines: rawLineSnapshot.positionLines.map((line) => applyPositionActionState(line, oemsActions)),');
-    expect(source).toContain('{lineSnapshot.orderLines.map((line) => {');
-    expect(source).toContain('{lineSnapshot.positionLines.map((line) => {');
-    expect(source).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
-    expect(source).not.toContain('onPriceChange={onOrderMove}');
-    expect(source).not.toContain('onCancel={onOrderCancel}');
-    expect(source).not.toContain('onClose={onPositionClose}');
-    expect(source).not.toContain('onReverse={onPositionReverse}');
+    expect(runtimeSource).toContain('const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
+    expect(runtimeSource).toContain('confirmNativeOrderLineSnapshots(oemsActions, rawLineSnapshot.orderLines);');
+    expect(runtimeSource).toContain('confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);');
+    expect(runtimeSource).toContain(
+      'orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),',
+    );
+    expect(runtimeSource).toContain(
+      'positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),',
+    );
+    expect(layerSource).toContain('{lineSnapshot.orderLines.map((line) => {');
+    expect(layerSource).toContain('{lineSnapshot.positionLines.map((line) => {');
+    expect(layerSource).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
+    expect(layerSource).not.toContain('onPriceChange={onOrderMove}');
+    expect(layerSource).not.toContain('onCancel={onOrderCancel}');
+    expect(layerSource).not.toContain('onClose={onPositionClose}');
+    expect(layerSource).not.toContain('onReverse={onPositionReverse}');
   });
 
   it('re-snapshots native trading lines when render-visible adapters change', () => {
@@ -540,7 +545,7 @@ describe('imperative chart API contract', () => {
 
   it('keeps native createStudy metadata on the imperative path', () => {
     const apiSource = readSource('TealchartApi.ts');
-    const skiaSource = readSource('SkiaTealchart.tsx');
+    const nativeCoreSource = readSource('mobile/useNativeTealchartCoreRuntime.ts');
     const widgetSource = readSource('TealchartWidget.ts');
 
     expect(apiSource).toContain('export interface StudyCreateRequest');
@@ -551,7 +556,7 @@ describe('imperative chart API contract', () => {
     expect(widgetSource).toContain('name: request.displayName,');
     expect(widgetSource).toContain('overlay: request.forceOverlay,');
     expect(widgetSource).toContain('indicatorId: request.studyId,');
-    expect(skiaSource).toContain('name: request.options?.displayName ?? indicator?.name ?? request.displayName,');
-    expect(skiaSource).toContain('overlay: request.forceOverlay || (indicator?.overlay ?? false),');
+    expect(nativeCoreSource).toContain('name: request.options?.displayName ?? indicator?.name ?? request.displayName,');
+    expect(nativeCoreSource).toContain('overlay: request.forceOverlay || (indicator?.overlay ?? false),');
   });
 });

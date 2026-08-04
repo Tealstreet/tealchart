@@ -75,6 +75,7 @@ const bars: NativeVisibleBar[] = [
   {
     time: 15_000,
     interval: 15_000,
+    sourceIndex: 0,
     x: 0,
     open: 63300,
     high: 63600,
@@ -85,6 +86,7 @@ const bars: NativeVisibleBar[] = [
   {
     time: 30_000,
     interval: 15_000,
+    sourceIndex: 1,
     x: 0,
     open: 63600,
     high: 63700,

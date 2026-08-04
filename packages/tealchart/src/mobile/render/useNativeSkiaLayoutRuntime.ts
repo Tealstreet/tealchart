@@ -1,11 +1,12 @@
 import type { LayoutChangeEvent } from 'react-native';
 import type { ChartThemeInput } from '../../theme';
-import type { ChartMargins, RenderOptions } from '../../types';
+import type { ChartMargins, RenderOptions, UnifiedPaneLayout } from '../../types';
 import type { NativeChartFrame } from './nativeChartFrame';
 
 import { useCallback, useMemo, useState } from 'react';
 
 import {
+  computePaneGeometry,
   computeTradingLineLabelMinX,
   MOBILE_CHART_CHROME_METRICS,
   resolveLeftToolRailMetrics,
@@ -30,6 +31,7 @@ export interface NativeSkiaLayoutRuntimeInput {
   imperativeTheme: ChartThemeInput | null;
   leftToolRailCollapsed?: boolean;
   marginsProp?: Partial<ChartMargins>;
+  paneLayout?: UnifiedPaneLayout;
   priceAxisWidth?: number;
   pricePrecision: number;
   propHeight?: number;
@@ -72,7 +74,10 @@ export function createNativeSkiaChartMargins({
   pricePrecision,
   showTopBar,
   topBarHeight,
-}: Pick<NativeSkiaLayoutRuntimeInput, 'marginsProp' | 'priceAxisWidth' | 'pricePrecision' | 'showTopBar' | 'topBarHeight'>): ChartMargins {
+}: Pick<
+  NativeSkiaLayoutRuntimeInput,
+  'marginsProp' | 'priceAxisWidth' | 'pricePrecision' | 'showTopBar' | 'topBarHeight'
+>): ChartMargins {
   const explicitTopMargin = marginsProp?.top;
   const resolvedPriceAxisWidth = priceAxisWidth ?? createNativePriceAxisLaneWidth({ pricePrecision });
 
@@ -89,6 +94,7 @@ export function useNativeSkiaLayoutRuntime({
   imperativeTheme,
   leftToolRailCollapsed,
   marginsProp,
+  paneLayout,
   priceAxisWidth,
   pricePrecision,
   propHeight,
@@ -109,7 +115,9 @@ export function useNativeSkiaLayoutRuntime({
     (event: LayoutChangeEvent) => {
       if (hasExplicitDimensions) return;
       const { width, height } = event.nativeEvent.layout;
-      setMeasuredDimensions((current) => (current.width === width && current.height === height ? current : { width, height }));
+      setMeasuredDimensions((current) =>
+        current.width === width && current.height === height ? current : { width, height },
+      );
     },
     [hasExplicitDimensions],
   );
@@ -119,13 +127,14 @@ export function useNativeSkiaLayoutRuntime({
     [imperativeTheme, renderOptions, theme],
   );
   const margins = useMemo<ChartMargins>(
-    () => createNativeSkiaChartMargins({
-      marginsProp,
-      priceAxisWidth,
-      pricePrecision,
-      showTopBar,
-      topBarHeight,
-    }),
+    () =>
+      createNativeSkiaChartMargins({
+        marginsProp,
+        priceAxisWidth,
+        pricePrecision,
+        showTopBar,
+        topBarHeight,
+      }),
     [marginsProp, priceAxisWidth, pricePrecision, showTopBar, topBarHeight],
   );
   const options = useMemo<RenderOptions>(
@@ -144,29 +153,54 @@ export function useNativeSkiaLayoutRuntime({
     }),
     [dimensions.height, dimensions.width, leftToolRailCollapsed, margins, pricePrecision, themedRenderOptions],
   );
+  const paneLayoutPanes = paneLayout?.panes;
+  const paneLayoutSignature =
+    (paneLayoutPanes ?? [])
+      .map((pane) =>
+        [
+          pane.id,
+          pane.type,
+          pane.heightRatio,
+          pane.yMin,
+          pane.yMax,
+          pane.fixedRange ? 'fixed' : 'auto',
+          pane.indicatorIds?.join(',') ?? '',
+        ].join(':'),
+      )
+      .join('|') || 'main';
 
   const frame = useMemo<NativeChartFrame | null>(() => {
     if (dimensions.width <= 0 || dimensions.height <= 0) return null;
-    const plotTop = margins.top;
-    const plotBottom = Math.max(plotTop + 1, dimensions.height - margins.bottom);
+    const resolvedPaneLayout: UnifiedPaneLayout = {
+      panes: paneLayoutPanes?.length
+        ? paneLayoutPanes
+        : [
+            {
+              id: 'main',
+              type: 'main',
+              heightRatio: 1,
+              yMin: 0,
+              yMax: 1,
+              fixedRange: false,
+            },
+          ],
+      timeAxisHeight: margins.bottom,
+    };
+    const panes = computePaneGeometry({
+      paneLayout: resolvedPaneLayout,
+      height: dimensions.height,
+      topOffset: margins.top,
+    });
+
     return createNativeChartFrameFromPanes({
       dimensions: {
         width: dimensions.width,
         height: dimensions.height,
         margins,
       },
-      panes: [
-        {
-          id: 'main',
-          type: 'main',
-          top: plotTop,
-          height: plotBottom - plotTop,
-          yMin: 0,
-          yMax: 1,
-        },
-      ],
+      panes,
     });
-  }, [dimensions.height, dimensions.width, margins]);
+  }, [dimensions.height, dimensions.width, margins, paneLayoutPanes, paneLayoutSignature]);
 
   return {
     frame,

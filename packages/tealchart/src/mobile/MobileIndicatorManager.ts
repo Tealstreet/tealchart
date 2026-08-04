@@ -518,8 +518,38 @@ export class MobileIndicatorManager {
 
     this._plots = allPlots;
     this._drawings = allDrawings;
+    this._updateAutoPaneRanges(allPlots);
 
     // Notify React to re-render (unless silent mode for RAF batching)
     if (!silent) this._onUpdate?.();
+  }
+
+  private _updateAutoPaneRanges(plots: readonly PlotOutput[]): void {
+    const panes = this._paneManager.getIndicatorPanes();
+    if (panes.length === 0) return;
+
+    for (const pane of panes) {
+      if (pane.fixedRange) continue;
+
+      let min = Number.POSITIVE_INFINITY;
+      let max = Number.NEGATIVE_INFINITY;
+      for (const plot of plots) {
+        if (!plot.scriptId || !pane.indicatorIds?.includes(plot.scriptId) || plot.forceOverlay) continue;
+        if (Number.isFinite(plot.histbase)) {
+          min = Math.min(min, plot.histbase!);
+          max = Math.max(max, plot.histbase!);
+        }
+        for (const value of plot.values) {
+          if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+          min = Math.min(min, value);
+          max = Math.max(max, value);
+        }
+      }
+
+      if (!Number.isFinite(min) || !Number.isFinite(max)) continue;
+      const range = max - min;
+      const padding = range === 0 ? Math.max(Math.abs(max) * 0.05, 1) : range * 0.1;
+      this._paneManager.updatePaneRange(pane.id, min - padding, max + padding);
+    }
   }
 }
