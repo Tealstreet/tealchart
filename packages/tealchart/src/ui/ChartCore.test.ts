@@ -6,7 +6,7 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from '../drawings';
-import type { Bar, Viewport } from '../types';
+import type { Bar, PositionLineRenderData, PriceLineLabelBounds, Viewport } from '../types';
 
 import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -85,6 +85,7 @@ function stubCanvasContext(): void {
     setTransform: () => {},
     scale: () => {},
     translate: () => {},
+    rotate: () => {},
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,6 +101,56 @@ function makeBars(count: number, startTime = 1_000_000, interval = 60_000, baseP
     close: basePrice + (i + 1) * 10,
     volume: 100 + i,
   }));
+}
+
+function makePositionLine(overrides: Partial<PositionLineRenderData> = {}): PositionLineRenderData {
+  return {
+    id: 'position-1',
+    positionId: 'position-1',
+    price: 50010,
+    lineColor: '#2196F3',
+    lineStyle: 0,
+    lineLength: 100,
+    lineLengthUnit: 'percentage',
+    extendLeft: true,
+    lineWidth: 1,
+    text: 'Long',
+    textShort: 'Lng',
+    quantity: '1 BTC',
+    quantityShort: '1',
+    pnl: '$0.00',
+    pnlShort: '0',
+    profitState: 'neutral',
+    bodyBackgroundColor: '#111111',
+    bodyTextColor: '#ffffff',
+    bodyBorderColor: '#2196F3',
+    bodyFont: '',
+    quantityBackgroundColor: '#111111',
+    quantityTextColor: '#ffffff',
+    quantityBorderColor: '#2196F3',
+    quantityFont: '',
+    reverseButtonBackgroundColor: '#2196F3',
+    reverseButtonIconColor: '#ffffff',
+    reverseButtonBorderColor: '#2196F3',
+    closeButtonBackgroundColor: '#2196F3',
+    closeButtonIconColor: '#ffffff',
+    closeButtonBorderColor: '#2196F3',
+    tooltip: '',
+    closeTooltip: 'Close',
+    reverseTooltip: 'Reverse',
+    protectTooltipText: 'Protect',
+    partialEnabled: true,
+    reversible: true,
+    closeable: true,
+    brackets: {},
+    positionData: {
+      entryPrice: 50000,
+      isLong: true,
+      notional: 1000,
+    },
+    callbacks: {},
+    ...overrides,
+  };
 }
 
 interface CountdownManagerProbe {
@@ -331,10 +382,14 @@ describe('ChartCore viewport management', () => {
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
     expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), {
       additive: undefined,
+      toggleSelected: false,
     });
     expect(testCore.handleUserDrawingInput(100, 100, 'mouse', { additiveSelection: true })).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
-    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), { additive: true });
+    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), {
+      additive: true,
+      toggleSelected: false,
+    });
     expect(testCore.handleUserDrawingInput(100, 100, 'touch')).toEqual({
       handled: true,
       allowPaneDoubleClick: true,
@@ -971,6 +1026,116 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('does not create a stale optimistic bracket line when empty bracket buttons create external orders', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: { upColor: '#00aa77', downColor: '#ee3355' },
+    });
+
+    const onSLMoveEnd = vi.fn(() => new Promise<void>(() => {}));
+    core.setBars(makeBars(5));
+    core.setPositionLines([
+      makePositionLine({
+        brackets: {},
+        callbacks: {
+          onSLMoveEnd,
+        },
+      }),
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const bound = {
+      lineId: 'position-1',
+      positionId: 'position-1',
+      type: 'position',
+      price: 50010,
+      originalY: 0,
+      adjustedY: 0,
+      width: 0,
+      height: 0,
+      color: '#2196F3',
+      label: { primaryText: '50,010' },
+      lineStyle: 'solid',
+      callbacks: {
+        onSLMoveEnd,
+      },
+    } as PriceLineLabelBounds;
+    const privateCore = core as unknown as {
+      handleBracketMoveEnd(type: 'tp' | 'sl', bound: PriceLineLabelBounds, price: number, percent: number): void;
+      oemsActions: { getActions(): unknown[] };
+    };
+
+    privateCore.handleBracketMoveEnd('sl', bound, 49900, 75);
+    core.paint(DIRTY.FULL);
+
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    expect(onSLMoveEnd).toHaveBeenCalledWith(49900, 75);
+    expect(privateCore.oemsActions.getActions()).toHaveLength(0);
+    expect(manager.cachedLineGroups.has('position-1-sl')).toBe(false);
+
+    core.dispose();
+  });
+
+  it('draws the active bracket drag price on the price axis overlay', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: { pricePrecision: 0 },
+    });
+
+    core.setBars(makeBars(5));
+    const fillText = vi.fn();
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      roundRect: vi.fn(),
+      measureText: (text: string) => ({ width: text.length * 7 }),
+      setLineDash: vi.fn(),
+      fillText,
+      font: '',
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 1,
+      textAlign: 'left',
+      textBaseline: 'top',
+      globalAlpha: 1,
+    };
+    const privateCore = core as unknown as {
+      _bracketDragState: unknown;
+      _drawBracketPreview(ctx: CanvasRenderingContext2D): void;
+    };
+
+    privateCore._bracketDragState = {
+      type: 'sl',
+      positionId: 'position-1',
+      price: 49900,
+      entryPrice: 50000,
+      partialPercent: 100,
+      partialEnabled: false,
+      dragStartX: 300,
+      dragCurrentX: 300,
+      positionData: { entryPrice: 50000, isLong: true, notional: 1000 },
+      color: '#f97316',
+    };
+    privateCore._drawBracketPreview(ctx as unknown as CanvasRenderingContext2D);
+
+    expect(fillText).toHaveBeenCalledWith('49,900', expect.any(Number), expect.any(Number));
+
+    core.dispose();
+  });
+
   it('renders position lines on the experimental canvas interactive-line path', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
@@ -1085,7 +1250,7 @@ describe('ChartCore viewport management', () => {
     };
     expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
       backgroundColor: '#ee3355',
-      borderColor: 'rgba(255, 255, 255, 0.16)',
+      borderColor: '#2196F3',
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
@@ -1139,7 +1304,7 @@ describe('ChartCore viewport management', () => {
     });
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
       backgroundColor: '#00aa77',
-      borderColor: 'rgba(255, 255, 255, 0.16)',
+      borderColor: '#ef5350',
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(core.getViewport()).not.toBeNull();

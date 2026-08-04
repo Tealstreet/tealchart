@@ -279,6 +279,10 @@ function getNumberFormatter(decimals: number): Intl.NumberFormat {
   return formatter;
 }
 
+function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
+  return typeof value === 'object' && value !== null && 'then' in value && typeof value.then === 'function';
+}
+
 /**
  * Convert OrderLineRenderData to PriceLine
  */
@@ -1240,6 +1244,7 @@ export class ChartCore {
     if (!object) return;
 
     const originalState = object.state;
+    const existingBracketPrice = bracketType === 'tp' ? originalState.takeProfit : originalState.stopLoss;
     const optimisticState: OemsTradingLineState = {
       ...originalState,
       ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
@@ -1249,6 +1254,12 @@ export class ChartCore {
       bracketType === 'tp'
         ? () => bound.callbacks?.onTPMoveEnd?.(price, partialPercent)
         : () => bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
+
+    if (typeof existingBracketPrice !== 'number') {
+      this.runExternalBracketCreate(callback);
+      return;
+    }
+
     const result = this.oemsActions.startAction({
       objectType: object.objectType,
       objectId: object.objectId,
@@ -1258,6 +1269,26 @@ export class ChartCore {
       callback,
     });
     if (result.completedSynchronously) this.scheduleRender();
+  }
+
+  private runExternalBracketCreate(callback: () => Awaitable<OemsActionResult>): void {
+    let callbackResult: Awaitable<OemsActionResult>;
+    try {
+      callbackResult = callback();
+    } catch {
+      this.scheduleRender();
+      return;
+    }
+
+    if (isPromiseLike<OemsActionResult>(callbackResult)) {
+      void Promise.resolve(callbackResult).finally(() => {
+        this.scheduleRender();
+      });
+      this.scheduleRender();
+      return;
+    }
+
+    this.scheduleRender();
   }
 
   private handleBracketClick(bracketType: 'tp' | 'sl', bound: PriceLineLabelBounds): void {
@@ -2824,6 +2855,8 @@ export class ChartCore {
     ctx.lineTo(chartWidth, roundedBracketY);
     ctx.stroke();
 
+    this._drawBracketPreviewPriceAxisLabel(ctx, state.price, roundedBracketY, color);
+
     // ========= Main label (PnL | type | %) =========
     const labelParts = [pnlText, typeLabel, percentText].filter(Boolean);
 
@@ -2951,6 +2984,50 @@ export class ChartCore {
       ctx.globalAlpha = 1.0;
     }
 
+    ctx.restore();
+  }
+
+  private _drawBracketPreviewPriceAxisLabel(
+    ctx: CanvasRenderingContext2D,
+    price: number,
+    y: number,
+    color: string,
+  ): void {
+    const pricePrecision = this.options.renderOptions?.pricePrecision;
+    let decimals: number;
+    if (pricePrecision && pricePrecision > 0) {
+      decimals = getDecimalPlacesFromPrecision(pricePrecision);
+    } else {
+      const priceRange = this.viewport ? this.viewport.priceMax - this.viewport.priceMin : 0;
+      if (priceRange >= 10) decimals = 0;
+      else if (priceRange >= 1) decimals = 1;
+      else if (priceRange >= 0.1) decimals = 2;
+      else if (priceRange >= 0.01) decimals = 3;
+      else if (priceRange >= 0.001) decimals = 4;
+      else if (priceRange >= 0.0001) decimals = 5;
+      else decimals = 6;
+    }
+    const priceText = getNumberFormatter(decimals).format(price);
+    const labelHeight = 20;
+    const labelPaddingX = 8;
+    const labelWidth = Math.max(this.margins.right - 8, ctx.measureText(priceText).width + labelPaddingX * 2);
+    const labelX = this.options.width - labelWidth - 4;
+    const minY = this.margins.top;
+    const maxY = this.options.height - this.margins.bottom - labelHeight;
+    const labelY = Math.max(minY, Math.min(maxY, y - labelHeight / 2));
+
+    ctx.save();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 2);
+    ctx.fill();
+    ctx.fillStyle = DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(priceText, labelX + labelWidth / 2, labelY + labelHeight / 2);
     ctx.restore();
   }
 
