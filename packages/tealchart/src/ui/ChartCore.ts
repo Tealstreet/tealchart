@@ -733,6 +733,7 @@ export class ChartCore {
         // Render directly — no need to schedule another RAF frame.
         // Price label is drawn on canvas — zero DOM mutations.
         this.renderCrosshairOverlay();
+        if (this.eventManager.getIsDragging()) return;
         // Pointer cursor over canvas-drawn + button
         const b = this._plusButtonBounds;
         if (b) {

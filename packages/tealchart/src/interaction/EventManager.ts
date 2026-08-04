@@ -399,10 +399,74 @@ export class EventManager {
     }
   }
 
-  private hideCrosshairForDrag(): void {
-    if (!this.crosshair.visible) return;
-    this.crosshair.visible = false;
-    this.callbacks.onCrossHairVisibilityChange?.(false);
+  private resolveCrosshairHitState(
+    x: number,
+    y: number,
+    dims = this.callbacks.getDimensions(),
+  ): {
+    isOverPriceAxis: boolean;
+    isOverPaneDivider: boolean;
+    inDeadZone: boolean;
+    shouldShowCrosshair: boolean;
+    divider: ReturnType<NonNullable<EventManagerCallbacks['getDividerAtY']>> | null;
+  } {
+    const isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
+    const divider = this.callbacks.getDividerAtY?.(y) ?? null;
+    const isOverPaneDivider = divider !== null && divider !== undefined;
+    const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
+
+    return {
+      isOverPriceAxis,
+      isOverPaneDivider,
+      inDeadZone,
+      shouldShowCrosshair: !isOverPriceAxis && !isOverPaneDivider && !inDeadZone,
+      divider,
+    };
+  }
+
+  private updateCrosshairForMousePoint(
+    x: number,
+    y: number,
+    options?: DrawingInputEventOptions,
+    renderOverlay = false,
+  ): void {
+    const { shouldShowCrosshair } = this.resolveCrosshairHitState(x, y);
+    const wasVisible = this.crosshair.visible;
+
+    this.crosshair.visible = shouldShowCrosshair;
+    this.crosshair.x = x;
+    this.crosshair.y = y;
+
+    if (shouldShowCrosshair) {
+      this.callbacks.onCrossHairMoved?.(x, y, options);
+    }
+    if (wasVisible !== shouldShowCrosshair) {
+      this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
+    }
+    if (renderOverlay) {
+      this.callbacks.onCrosshairRender?.();
+    }
+  }
+
+  private updateCrosshairForPanDrag(
+    x: number,
+    y: number,
+    options?: DrawingInputEventOptions,
+  ): void {
+    const dims = this.callbacks.getDimensions();
+    const clampedX = Math.max(dims.leftMargin, Math.min(x, dims.width - dims.priceAxisWidth - 1));
+    const clampedY = Math.max(dims.topMargin, Math.min(y, dims.height - dims.timeAxisHeight));
+    const wasVisible = this.crosshair.visible;
+
+    this.crosshair.visible = true;
+    this.crosshair.x = clampedX;
+    this.crosshair.y = clampedY;
+
+    this.callbacks.onCrossHairMoved?.(clampedX, clampedY, options);
+    if (!wasVisible) {
+      this.callbacks.onCrossHairVisibilityChange?.(true);
+    }
+    this.callbacks.onCrosshairRender?.();
   }
 
   /**
@@ -569,7 +633,6 @@ export class EventManager {
 
     // Set cursor based on drag mode
     if (this.state.dragMode === 'pan') {
-      this.hideCrosshairForDrag();
       this.callbacks.onCursorChange?.('grabbing');
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.callbacks.onCursorChange?.('ns-resize');
@@ -693,38 +756,25 @@ export class EventManager {
     this.state.hoveredY = y;
 
     const dims = this.callbacks.getDimensions();
-    this.state.isOverPriceAxis = x > dims.width - dims.priceAxisWidth;
+    const crosshairHitState = this.resolveCrosshairHitState(x, y, dims);
+    this.state.isOverPriceAxis = crosshairHitState.isOverPriceAxis;
 
     // Check for pane divider hover
-    const divider = this.callbacks.getDividerAtY?.(y);
-    this.state.isOverPaneDivider = divider !== null && divider !== undefined;
-    this.state.hoveredDividerIndex = divider?.dividerIndex ?? -1;
+    this.state.isOverPaneDivider = crosshairHitState.isOverPaneDivider;
+    this.state.hoveredDividerIndex = crosshairHitState.divider?.dividerIndex ?? -1;
     if (!this.state.isDragging) {
-      this.callbacks.onPaneDividerHover?.(divider ?? null);
+      this.callbacks.onPaneDividerHover?.(crosshairHitState.divider);
     }
 
-    // Check if in dead zone (top bar or time axis - areas where crosshair shouldn't show)
-    const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
     this.state.isOverInteractive =
       !this.state.isOverPriceAxis &&
       !this.state.isOverPaneDivider &&
-      !inDeadZone &&
+      !crosshairHitState.inDeadZone &&
       !!this.callbacks.isOverInteractiveElement?.(x, y);
 
     // Update crosshair - hide when over price axis, divider, or in dead zones
     if (!this.state.isDragging) {
-      const shouldShowCrosshair = !this.state.isOverPriceAxis && !this.state.isOverPaneDivider && !inDeadZone;
-      const wasVisible = this.crosshair.visible;
-      this.crosshair.visible = shouldShowCrosshair;
-      this.crosshair.x = x;
-      this.crosshair.y = y;
-      if (shouldShowCrosshair) {
-        this.callbacks.onCrossHairMoved?.(x, y, { constrainedPlacement: this._pendingMouseShift });
-      }
-      // Notify visibility change
-      if (wasVisible !== shouldShowCrosshair) {
-        this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
-      }
+      this.updateCrosshairForMousePoint(x, y, { constrainedPlacement: this._pendingMouseShift });
       // Re-assert cursor on every move. Konva/button handlers can set the cursor
       // directly, and relying only on state transitions can leave the container
       // stuck in pointer mode after an interaction completes.
@@ -751,6 +801,7 @@ export class EventManager {
     // Store coordinates and defer to RAF
     this._pendingMouseClientX = e.clientX;
     this._pendingMouseClientY = e.clientY;
+    this._pendingMouseShift = e.shiftKey;
     this._pendingMouseDrawingDragOptions = getMouseDrawingDragOptions(e);
     this._pendingEventType = 'drag';
     this.scheduleInputProcessing();
@@ -808,6 +859,7 @@ export class EventManager {
     if (this.state.dragMode === 'pan') {
       this.applyActiveDragCursor();
       this.handlePan(dx, dy);
+      this.updateCrosshairForPanDrag(x, y, { constrainedPlacement: this._pendingMouseShift });
     } else if (this.state.dragMode === 'priceAxisZoom') {
       this.applyActiveDragCursor();
       this.handlePriceAxisZoom(dy);
