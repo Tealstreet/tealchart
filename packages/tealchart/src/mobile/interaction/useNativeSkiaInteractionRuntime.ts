@@ -95,6 +95,11 @@ export function useNativeSkiaInteractionRuntime({
   const activeBracketDragObjectType = useSharedValue<NativeTradeLineObjectType | ''>('');
   const activeBracketDragType = useSharedValue<NativeTradeLineBracketType | ''>('');
   const activeBracketDragPrice = useSharedValue(0);
+  const activeBracketDragEntryPrice = useSharedValue(0);
+  const activeBracketDragStartX = useSharedValue(0);
+  const activeBracketDragCurrentX = useSharedValue(0);
+  const activeBracketDragPositionNotional = useSharedValue(0);
+  const activeBracketDragPositionIsLong = useSharedValue(true);
   const activeBracketDragPartialPercent = useSharedValue(100);
   const activeBracketDragPartialEnabled = useSharedValue(false);
   const activeBracketDragColor = useSharedValue('');
@@ -171,17 +176,27 @@ export function useNativeSkiaInteractionRuntime({
       activeObjectType: activeBracketDragObjectType,
       activeBracketType: activeBracketDragType,
       activePrice: activeBracketDragPrice,
+      activeEntryPrice: activeBracketDragEntryPrice,
+      activeDragStartX: activeBracketDragStartX,
+      activeDragCurrentX: activeBracketDragCurrentX,
+      activePositionNotional: activeBracketDragPositionNotional,
+      activePositionIsLong: activeBracketDragPositionIsLong,
       activePartialPercent: activeBracketDragPartialPercent,
       activePartialEnabled: activeBracketDragPartialEnabled,
       activeColor: activeBracketDragColor,
     }),
     [
       activeBracketDragColor,
+      activeBracketDragCurrentX,
+      activeBracketDragEntryPrice,
       activeBracketDragObjectId,
       activeBracketDragObjectType,
       activeBracketDragPartialEnabled,
       activeBracketDragPartialPercent,
       activeBracketDragPrice,
+      activeBracketDragPositionIsLong,
+      activeBracketDragPositionNotional,
+      activeBracketDragStartX,
       activeBracketDragType,
     ],
   );

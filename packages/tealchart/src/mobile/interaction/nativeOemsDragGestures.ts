@@ -217,7 +217,7 @@ export function createNativeBracketDragGesture({
         tradeLabelHeight,
       });
       if (!zone) return;
-      beginNativeBracketDragState(bracketDragInteractionState, zone, getLiveNativePricePerPixel(sharedViewport, frame));
+      beginNativeBracketDragState(bracketDragInteractionState, zone, getLiveNativePricePerPixel(sharedViewport, frame), event.x);
     })
     .onUpdate((event) => {
       updateNativeBracketDragState(bracketDragInteractionState, event.translationX, event.translationY);

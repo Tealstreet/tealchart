@@ -29,6 +29,11 @@ export interface NativeBracketDragSharedValues {
   activeObjectType: SharedValue<NativeTradeLineObjectType | ''>;
   activeBracketType: SharedValue<NativeTradeLineBracketType | ''>;
   activePrice: SharedValue<number>;
+  activeEntryPrice: SharedValue<number>;
+  activeDragStartX: SharedValue<number>;
+  activeDragCurrentX: SharedValue<number>;
+  activePositionNotional: SharedValue<number>;
+  activePositionIsLong: SharedValue<boolean>;
   activePartialPercent: SharedValue<number>;
   activePartialEnabled: SharedValue<boolean>;
   activeColor: SharedValue<string>;
@@ -100,6 +105,11 @@ export function clearNativeBracketDragState(state: NativeBracketDragInteractionS
   state.activeObjectId.value = '';
   state.activeObjectType.value = '';
   state.activeBracketType.value = '';
+  state.activeEntryPrice.value = 0;
+  state.activeDragStartX.value = 0;
+  state.activeDragCurrentX.value = 0;
+  state.activePositionNotional.value = 0;
+  state.activePositionIsLong.value = true;
   state.activePartialPercent.value = 100;
   state.activePartialEnabled.value = false;
   state.activeColor.value = '';
@@ -110,6 +120,7 @@ export function beginNativeBracketDragState(
   state: NativeBracketDragInteractionState,
   zone: NativeTradeLineActionZone,
   pricePerPixel: number,
+  dragStartX = 0,
 ): boolean {
   'worklet';
   if (zone.actionType !== 'tp' && zone.actionType !== 'sl') return false;
@@ -118,6 +129,11 @@ export function beginNativeBracketDragState(
   state.activeObjectType.value = zone.objectType;
   state.activeBracketType.value = zone.actionType;
   state.activePrice.value = zone.dragPrice ?? zone.price;
+  state.activeEntryPrice.value = zone.entryPrice;
+  state.activeDragStartX.value = dragStartX;
+  state.activeDragCurrentX.value = dragStartX;
+  state.activePositionNotional.value = zone.positionNotional;
+  state.activePositionIsLong.value = zone.positionIsLong;
   state.activePartialPercent.value = 100;
   state.activePartialEnabled.value = zone.partialEnabled;
   state.activeColor.value = zone.color;
@@ -134,6 +150,7 @@ export function updateNativeBracketDragState(
   'worklet';
   if (!state.active.value) return false;
   state.activePrice.value = state.startPrice.value - translationY * state.pricePerPixel.value;
+  state.activeDragCurrentX.value = state.activeDragStartX.value + translationX;
   state.activePartialPercent.value = state.activePartialEnabled.value ? calculatePartialBracketPercentFromDelta(translationX) : 100;
   return true;
 }

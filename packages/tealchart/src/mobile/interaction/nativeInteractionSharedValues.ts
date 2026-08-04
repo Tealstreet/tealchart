@@ -32,8 +32,11 @@ function areNativeTradeLineActionZonesEqual(
       zone.objectId === other.objectId &&
       zone.actionType === other.actionType &&
       zone.price === other.price &&
+      zone.entryPrice === other.entryPrice &&
       zone.dragPrice === other.dragPrice &&
       zone.partialEnabled === other.partialEnabled &&
+      zone.positionNotional === other.positionNotional &&
+      zone.positionIsLong === other.positionIsLong &&
       zone.color === other.color &&
       zone.x1 === other.x1 &&
       zone.x2 === other.x2
