@@ -41,6 +41,7 @@ export interface NativeLeftToolRailLayout {
   activeTool: UserDrawingTool;
   collapsed: boolean;
   railRect: NativeLeftToolRailRect;
+  scrollContentHeight: number;
   items: NativeLeftToolRailItem[];
 }
 
@@ -89,9 +90,9 @@ export function createNativeLeftToolRailLayout(input: NativeLeftToolRailLayoutIn
     height: toggleHeight,
   };
 
-  const availableToolSlots = Math.max(0, Math.floor((height - ITEM_SIZE) / (ITEM_SIZE + ITEM_GAP)));
-  const maxItems = Math.min(USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.length, availableToolSlots);
-  const items = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.slice(0, maxItems).map((category, index) => {
+  const scrollContentHeight =
+    ITEM_SIZE + ITEM_GAP + USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.length * (ITEM_SIZE + ITEM_GAP);
+  const items = USER_DRAWING_TOOL_CATEGORY_DESCRIPTORS.map((category, index) => {
     const displayTool = resolveUserDrawingToolCategoryButtonTool(category, activeTool, recentTools);
     return {
       active: category.tools.includes(activeTool),
@@ -122,6 +123,7 @@ export function createNativeLeftToolRailLayout(input: NativeLeftToolRailLayoutIn
       width: metrics.leftToolRailWidth,
       height,
     },
+    scrollContentHeight: Math.max(height, scrollContentHeight),
     items: [toggleItem, ...items],
   };
 }
@@ -145,7 +147,8 @@ export function resolveNativeLeftToolRailToggleHitRect(
     x: toggleItem.x + translateX - NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.left,
     y: toggleItem.y - NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.top,
     width: toggleItem.width + NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.left + NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.right,
-    height: toggleItem.height + NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.top + NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.bottom,
+    height:
+      toggleItem.height + NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.top + NATIVE_LEFT_TOOL_RAIL_TOGGLE_HIT_SLOP.bottom,
   };
 }
 
