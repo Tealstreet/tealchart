@@ -35,21 +35,25 @@ describe('native top-bar actions', () => {
 
   it('dispatches available indicators and drawing commands', () => {
     const onIndicatorsClick = vi.fn();
+    const onLayoutClick = vi.fn();
     const undoUserDrawingCommand = vi.fn(() => true);
     const redoUserDrawingCommand = vi.fn(() => true);
     const handlers = {
       currentInterval: '15' as const,
       setInterval: vi.fn(),
       onIndicatorsClick,
+      onLayoutClick,
       undoUserDrawingCommand,
       redoUserDrawingCommand,
     };
 
     expect(commitNativeTopBarAction({ type: 'indicators' }, handlers)).toBe(true);
+    expect(commitNativeTopBarAction({ type: 'layout' }, handlers)).toBe(true);
     expect(commitNativeTopBarAction({ type: 'undo' }, handlers)).toBe(true);
     expect(commitNativeTopBarAction({ type: 'redo' }, handlers)).toBe(true);
 
     expect(onIndicatorsClick).toHaveBeenCalledOnce();
+    expect(onLayoutClick).toHaveBeenCalledOnce();
     expect(undoUserDrawingCommand).toHaveBeenCalledOnce();
     expect(redoUserDrawingCommand).toHaveBeenCalledOnce();
   });
@@ -63,6 +67,7 @@ describe('native top-bar actions', () => {
     };
 
     expect(commitNativeTopBarAction({ type: 'indicators' }, handlers)).toBe(false);
+    expect(commitNativeTopBarAction({ type: 'layout' }, handlers)).toBe(false);
     expect(commitNativeTopBarAction({ type: 'symbol' }, handlers)).toBe(false);
     expect(commitNativeTopBarAction({ type: 'undo' }, handlers)).toBe(false);
     expect(commitNativeTopBarAction({ type: 'redo' }, handlers)).toBe(false);

@@ -7,6 +7,7 @@ import { commitNativeTopBarAction } from './nativeTopBarActions';
 
 export interface NativeTopBarActionRuntimeInput {
   chartApi: TealchartApi;
+  onLayoutClick?: () => void;
   onSymbolClick?: () => void;
   onIndicatorsClick?: () => void;
   redoUserDrawingCommand?: () => boolean;
@@ -19,6 +20,7 @@ export interface NativeTopBarActionRuntime {
 
 export function useNativeTopBarActionRuntime({
   chartApi,
+  onLayoutClick,
   onSymbolClick,
   onIndicatorsClick,
   redoUserDrawingCommand,
@@ -29,13 +31,14 @@ export function useNativeTopBarActionRuntime({
       commitNativeTopBarAction(action, {
         currentInterval: chartApi.resolution(),
         setInterval: (nextInterval) => chartApi.setResolution(nextInterval),
+        onLayoutClick,
         onSymbolClick,
         onIndicatorsClick,
         undoUserDrawingCommand,
         redoUserDrawingCommand,
       });
     },
-    [chartApi, onIndicatorsClick, onSymbolClick, redoUserDrawingCommand, undoUserDrawingCommand],
+    [chartApi, onIndicatorsClick, onLayoutClick, onSymbolClick, redoUserDrawingCommand, undoUserDrawingCommand],
   );
 
   return { commitNativeTopBarRuntimeAction };

@@ -1,7 +1,7 @@
 import type { TimeframeOption } from '../../state/chartState';
 import type { ResolutionString } from '../../types';
 
-export type NativeTopBarActionType = 'symbol' | 'timeframe' | 'indicators' | 'undo' | 'redo';
+export type NativeTopBarActionType = 'symbol' | 'timeframe' | 'indicators' | 'layout' | 'undo' | 'redo';
 
 export interface NativeTopBarActionCommand {
   type: NativeTopBarActionType;
@@ -47,6 +47,8 @@ export interface NativeTopBarLayout {
   symbol: NativeTopBarTextGeometry;
   symbolChevron: NativeTopBarTextGeometry | null;
   symbolHitRect: NativeTopBarHitRectGeometry | null;
+  scrollAreaX: number;
+  scrollContentWidth: number;
   buttons: NativeTopBarButtonGeometry[];
   dividers: NativeTopBarDividerGeometry[];
 }
@@ -64,6 +66,8 @@ export interface NativeTopBarLayoutInput {
   activeTextColor: string;
   activeBackgroundColor: string;
   indicatorsEnabled?: boolean;
+  layoutName?: string | null;
+  layoutSelectorEnabled?: boolean;
   undoEnabled?: boolean;
   redoEnabled?: boolean;
 }
@@ -89,11 +93,15 @@ const MIN_TIMEFRAME_BUTTON_WIDTH = 30;
 const ACTION_BUTTON_WIDTH = 24;
 const DIVIDER_HEIGHT = 18;
 const SYMBOL_CHEVRON = 'v';
-const SYMBOL_CHEVRON_WIDTH = 8;
 const SYMBOL_CHEVRON_GAP = 5;
 const INDICATORS_LABEL = 'Indicators';
 const INDICATORS_ICON_WIDTH = 16;
 const INDICATORS_ICON_GAP = 4;
+const LAYOUT_LABEL = 'Layout';
+const LAYOUT_CHEVRON_WIDTH = 13;
+const LAYOUT_CHEVRON_GAP = 3;
+const LAYOUT_MIN_WIDTH = 54;
+const LAYOUT_MAX_WIDTH = 104;
 const UNDO_ICON = '↶';
 const REDO_ICON = '↷';
 
@@ -118,6 +126,11 @@ function pushDivider(dividers: NativeTopBarDividerGeometry[], x: number, height:
   });
 }
 
+function sumButtonWidths(widths: readonly number[]): number {
+  if (widths.length === 0) return 0;
+  return widths.reduce((total, width) => total + width, 0) + BUTTON_GAP * (widths.length - 1);
+}
+
 export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): NativeTopBarLayout {
   const height = input.height;
   const buttonY = Math.round((height - BUTTON_HEIGHT) / 2);
@@ -136,7 +149,6 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
     color: input.textColor,
     font: 'title',
   };
-  const symbolChevronWidth = SYMBOL_CHEVRON_WIDTH;
   const symbolChevron: NativeTopBarTextGeometry | null =
     symbolText.length > 0
       ? {
@@ -157,64 +169,6 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
         }
       : null;
 
-  let rightX = input.width - HORIZONTAL_PADDING;
-  const actionButtons: NativeTopBarButtonGeometry[] = [];
-  for (const action of [
-    { type: 'redo' as const, text: REDO_ICON },
-    { type: 'undo' as const, text: UNDO_ICON },
-  ]) {
-    const enabled = action.type === 'undo' ? input.undoEnabled === true : input.redoEnabled === true;
-    rightX -= ACTION_BUTTON_WIDTH;
-    if (rightX < HORIZONTAL_PADDING) break;
-    const button: NativeTopBarButtonGeometry = {
-      type: action.type,
-      text: action.text,
-      enabled,
-      x: rightX,
-      y: buttonY,
-      width: ACTION_BUTTON_WIDTH,
-      height: BUTTON_HEIGHT,
-      textX: Math.round(rightX + (ACTION_BUTTON_WIDTH - input.textWidth(action.text)) / 2),
-      textY,
-      textColor: input.mutedTextColor,
-    };
-    actionButtons.push(button);
-    rightX -= BUTTON_GAP;
-  }
-
-  const indicatorsWidth = Math.max(
-    72,
-    Math.ceil(input.textWidth(INDICATORS_LABEL)) + INDICATORS_ICON_WIDTH + INDICATORS_ICON_GAP + 8,
-  );
-  rightX -= GROUP_GAP + indicatorsWidth;
-  if (rightX >= HORIZONTAL_PADDING) {
-    const button: NativeTopBarButtonGeometry = {
-      type: 'indicators',
-      text: INDICATORS_LABEL,
-      enabled: input.indicatorsEnabled === true,
-      x: rightX,
-      y: buttonY,
-      width: indicatorsWidth,
-      height: BUTTON_HEIGHT,
-      textX: rightX + INDICATORS_ICON_WIDTH + INDICATORS_ICON_GAP + 4,
-      textY,
-      textColor: input.mutedTextColor,
-    };
-    buttons.push(button);
-    pushDivider(dividers, Math.max(HORIZONTAL_PADDING, button.x - Math.ceil(GROUP_GAP / 2)), height);
-    rightX -= GROUP_GAP;
-  }
-
-  if (actionButtons.length > 0) {
-    rightX = Math.min(rightX, actionButtons[0].x - GROUP_GAP);
-  }
-
-  let x = HORIZONTAL_PADDING + symbolWidth + (symbolChevron ? SYMBOL_CHEVRON_GAP + symbolChevronWidth : 0) + GROUP_GAP;
-  if (x < rightX) {
-    pushDivider(dividers, x, height);
-    x += GROUP_GAP;
-  }
-
   const timeframeCandidates = input.timeframes.map(
     (timeframe): NativeTopBarTimeframeCandidate => ({
       timeframe,
@@ -224,33 +178,32 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
       ),
     }),
   );
-  const visibleTimeframes: NativeTopBarTimeframeCandidate[] = [];
-  let usedTimeframeWidth = 0;
-  const maxTimeframeWidth = Math.max(0, rightX - x);
+  const scrollAreaX =
+    (symbolHitRect ? symbolHitRect.x + symbolHitRect.width : HORIZONTAL_PADDING) +
+    (symbolChevron ? GROUP_GAP : HORIZONTAL_PADDING);
+  const timeframeWidth = sumButtonWidths(timeframeCandidates.map((candidate) => candidate.width));
+
+  const rawLayoutLabel = input.layoutName?.trim() || LAYOUT_LABEL;
+  const resolvedLayoutWidth = input.layoutSelectorEnabled
+    ? Math.min(
+        LAYOUT_MAX_WIDTH,
+        Math.max(
+          LAYOUT_MIN_WIDTH,
+          Math.ceil(input.textWidth(rawLayoutLabel)) + BUTTON_PADDING_X * 2 + LAYOUT_CHEVRON_GAP + LAYOUT_CHEVRON_WIDTH,
+        ),
+      )
+    : 0;
+  const indicatorsWidth = Math.max(
+    72,
+    Math.ceil(input.textWidth(INDICATORS_LABEL)) + INDICATORS_ICON_WIDTH + INDICATORS_ICON_GAP + 8,
+  );
+  const actionButtonsWidth = ACTION_BUTTON_WIDTH * 2 + BUTTON_GAP;
+  const rightControlsWidth =
+    indicatorsWidth + GROUP_GAP + actionButtonsWidth + (resolvedLayoutWidth > 0 ? GROUP_GAP + resolvedLayoutWidth : 0);
+  const visibleLaneWidth = Math.max(0, input.width - scrollAreaX);
+
+  let x = 0;
   for (const candidate of timeframeCandidates) {
-    const nextWidth = usedTimeframeWidth + (visibleTimeframes.length > 0 ? BUTTON_GAP : 0) + candidate.width;
-    if (nextWidth > maxTimeframeWidth) break;
-    visibleTimeframes.push(candidate);
-    usedTimeframeWidth = nextWidth;
-  }
-
-  const activeTimeframe = timeframeCandidates.find((candidate) => candidate.timeframe.value === input.interval);
-  if (activeTimeframe && !visibleTimeframes.some((candidate) => candidate.timeframe.value === input.interval)) {
-    while (
-      visibleTimeframes.length > 0 &&
-      usedTimeframeWidth + BUTTON_GAP + activeTimeframe.width > maxTimeframeWidth
-    ) {
-      const removed = visibleTimeframes.pop();
-      if (!removed) break;
-      usedTimeframeWidth -= removed.width + (visibleTimeframes.length > 0 ? BUTTON_GAP : 0);
-    }
-    const activeWidth = usedTimeframeWidth + (visibleTimeframes.length > 0 ? BUTTON_GAP : 0) + activeTimeframe.width;
-    if (activeWidth <= maxTimeframeWidth) {
-      visibleTimeframes.push(activeTimeframe);
-    }
-  }
-
-  for (const candidate of visibleTimeframes) {
     const { timeframe } = candidate;
     const label = timeframe.shortLabel;
     const buttonWidth = candidate.width;
@@ -272,16 +225,78 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
     buttons.push(button);
     x += buttonWidth + BUTTON_GAP;
   }
-
-  if (actionButtons.length > 0) {
-    const leftActionButton = actionButtons.reduce((minX, button) => Math.min(minX, button.x), input.width);
-    pushDivider(dividers, Math.max(HORIZONTAL_PADDING, leftActionButton - GROUP_GAP), height);
+  if (timeframeCandidates.length > 0) {
+    x -= BUTTON_GAP;
   }
 
-  actionButtons.reverse();
-  for (const button of actionButtons) {
-    buttons.push(button);
+  const spacerBeforeRightControls = Math.max(
+    GROUP_GAP,
+    visibleLaneWidth - x - GROUP_GAP - rightControlsWidth - HORIZONTAL_PADDING,
+  );
+  x += spacerBeforeRightControls;
+  pushDivider(dividers, Math.max(0, x - Math.ceil(GROUP_GAP / 2)), height);
+
+  const indicatorsButton: NativeTopBarButtonGeometry = {
+    type: 'indicators',
+    text: INDICATORS_LABEL,
+    enabled: input.indicatorsEnabled === true,
+    x,
+    y: buttonY,
+    width: indicatorsWidth,
+    height: BUTTON_HEIGHT,
+    textX: x + INDICATORS_ICON_WIDTH + INDICATORS_ICON_GAP + 4,
+    textY,
+    textColor: input.mutedTextColor,
+  };
+  buttons.push(indicatorsButton);
+  x += indicatorsWidth + GROUP_GAP;
+  pushDivider(dividers, Math.max(0, x - Math.ceil(GROUP_GAP / 2)), height);
+
+  for (const action of [
+    { type: 'undo' as const, text: UNDO_ICON, enabled: input.undoEnabled === true },
+    { type: 'redo' as const, text: REDO_ICON, enabled: input.redoEnabled === true },
+  ]) {
+    buttons.push({
+      type: action.type,
+      text: action.text,
+      enabled: action.enabled,
+      x,
+      y: buttonY,
+      width: ACTION_BUTTON_WIDTH,
+      height: BUTTON_HEIGHT,
+      textX: Math.round(x + (ACTION_BUTTON_WIDTH - input.textWidth(action.text)) / 2),
+      textY,
+      textColor: input.mutedTextColor,
+    });
+    x += ACTION_BUTTON_WIDTH + BUTTON_GAP;
   }
+  x -= BUTTON_GAP;
+
+  if (resolvedLayoutWidth > 0) {
+    x += GROUP_GAP;
+    pushDivider(dividers, Math.max(0, x - Math.ceil(GROUP_GAP / 2)), height);
+    const text = fitTextToWidth(
+      rawLayoutLabel,
+      resolvedLayoutWidth - BUTTON_PADDING_X * 2 - LAYOUT_CHEVRON_GAP - LAYOUT_CHEVRON_WIDTH,
+      input.textWidth,
+    );
+    const textAndCaretWidth = input.textWidth(text) + LAYOUT_CHEVRON_GAP + LAYOUT_CHEVRON_WIDTH;
+    buttons.push({
+      type: 'layout',
+      text,
+      enabled: true,
+      x,
+      y: buttonY,
+      width: resolvedLayoutWidth,
+      height: BUTTON_HEIGHT,
+      textX: Math.round(x + (resolvedLayoutWidth - textAndCaretWidth) / 2),
+      textY,
+      textColor: input.mutedTextColor,
+    });
+    x += resolvedLayoutWidth;
+  }
+
+  const scrollContentWidth = Math.max(visibleLaneWidth, x + HORIZONTAL_PADDING);
 
   buttons.sort((a, b) => a.x - b.x);
 
@@ -290,6 +305,8 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
     symbol,
     symbolChevron,
     symbolHitRect,
+    scrollAreaX,
+    scrollContentWidth,
     buttons,
     dividers,
   };

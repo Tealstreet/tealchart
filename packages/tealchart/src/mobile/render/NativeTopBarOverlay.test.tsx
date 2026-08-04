@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
-import { Pressable, Text } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
@@ -15,6 +15,7 @@ interface TestElementProps {
   children?: ReactNode;
   name?: string;
   onPress?: () => void;
+  style?: { width?: number } | Array<{ width?: number }>;
 }
 
 type TestElement = ReactElement<TestElementProps>;
@@ -40,6 +41,13 @@ function collectElementsByType(root: ReactNode, type: unknown): TestElement[] {
   return elements;
 }
 
+function styleWidth(style: TestElementProps['style']): number | undefined {
+  if (Array.isArray(style)) {
+    return style.find((item) => item.width !== undefined)?.width;
+  }
+  return style?.width;
+}
+
 function createLayout() {
   return createNativeTopBarLayout({
     width: 390,
@@ -54,6 +62,8 @@ function createLayout() {
     activeTextColor: '#12c48b',
     activeBackgroundColor: '#24312b',
     indicatorsEnabled: true,
+    layoutName: 'tealstreet',
+    layoutSelectorEnabled: true,
     undoEnabled: true,
     redoEnabled: true,
   });
@@ -72,10 +82,17 @@ describe('NativeTopBarOverlay', () => {
     const texts = collectElementsByType(overlay, Text).map((element) => element.props.children);
     const iconNames = collectElementsByType(overlay, NativeDrawingIcon).map((element) => element.props.name);
     const pressables = collectElementsByType(overlay, Pressable);
+    const scrollViews = collectElementsByType(overlay, ScrollView);
+    const contentViews = collectElementsByType(overlay, View);
 
-    expect(texts).toEqual(expect.arrayContaining(['BTC-USD', '1m', '5m', '15m', '30m', 'Indicators']));
+    expect(texts).toEqual(expect.arrayContaining(['BTC-USD', '15m', 'tealstreet', 'Indicators']));
     expect(iconNames).toEqual(expect.arrayContaining(['chevronDown', 'indicators', 'undo', 'redo']));
+    expect(iconNames.filter((name) => name === 'chevronDown')).toHaveLength(2);
     expect(pressables.length).toBe(createLayout().buttons.length + 1);
+    expect(scrollViews).toHaveLength(1);
+    expect(contentViews.some((element) => styleWidth(element.props.style) === createLayout().scrollContentWidth)).toBe(
+      true,
+    );
     expect(pressables.some((element) => element.props.accessibilityLabel === 'Change symbol')).toBe(true);
   });
 
@@ -118,5 +135,24 @@ describe('NativeTopBarOverlay', () => {
     expect(activePressable).toBeDefined();
     activePressable!.props.onPress!();
     expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'timeframe', interval: '15' }));
+  });
+
+  it('dispatches the layout selector command from the layout button', () => {
+    const onAction = vi.fn();
+    const overlay = NativeTopBarOverlayImpl({
+      backgroundColor: '#101418',
+      gridColor: '#222831',
+      mutedTextColor: '#8a8f98',
+      onAction,
+      textColor: '#f0f3fa',
+      topBarLayout: createLayout(),
+    });
+    const layoutPressable = collectElementsByType(overlay, Pressable).find(
+      (element) => element.props.accessibilityLabel === 'Chart layouts',
+    );
+
+    expect(layoutPressable).toBeDefined();
+    layoutPressable!.props.onPress!();
+    expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'layout' }));
   });
 });

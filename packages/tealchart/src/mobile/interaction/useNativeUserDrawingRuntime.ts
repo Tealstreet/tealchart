@@ -1,12 +1,14 @@
 import type {
   DrawingCoordinateSpace,
   DrawingScreenPoint,
+  UserDrawingAnchor,
   UserDrawingCommand,
   UserDrawingCommandAvailability,
   UserDrawingCommandDispatchResult,
-  UserDrawingCommandMetadata,
   UserDrawingCommandEventListener,
+  UserDrawingCommandMetadata,
   UserDrawingDraft,
+  UserDrawingEditDrag,
   UserDrawingInputPoint,
   UserDrawingMeasure,
   UserDrawingPanePosition,
@@ -18,7 +20,6 @@ import type {
   UserDrawingStyle,
   UserDrawingTextEdit,
   UserDrawingTool,
-  UserDrawingAnchor,
   UserDrawingZOrderAction,
 } from '../../drawings';
 
@@ -27,22 +28,33 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import {
   canRedoUserDrawingCommand,
   canUndoUserDrawingCommand,
+  createUserDrawingClipboard,
   createUserDrawingCommandEvent,
   createUserDrawingCommandHistory,
   createUserDrawingHistoryCommandEvent,
   createUserDrawingReplaceStateCommandEvent,
-  createUserDrawingClipboard,
   createUserDrawingState,
   dispatchUserDrawingCommandWithHistory,
   getSelectedUserDrawing,
   getUserDrawingSelectionIds,
   getUserDrawingToolCategoryDescriptorForTool,
+  hitTestUserDrawings,
   isUserDrawingLayoutStateEqual,
   redoUserDrawingCommand,
   undoUserDrawingCommand,
 } from '../../drawings';
 
 const EMPTY_NATIVE_USER_DRAWING_AFFECTED_IDS: readonly string[] = [];
+export const NATIVE_USER_DRAWING_EDIT_DRAG_HIT_TEST = {
+  handleTolerance: 16,
+  labelHeight: 20,
+  tolerance: 14,
+};
+
+interface NativeUserDrawingEditDragSession {
+  drag: UserDrawingEditDrag;
+  transactionKey: string;
+}
 
 export interface NativeUserDrawingRuntimeInput {
   initialUserDrawingState?: UserDrawingState | null;
@@ -51,8 +63,17 @@ export interface NativeUserDrawingRuntimeInput {
 }
 
 export interface NativeUserDrawingRuntime {
+  beginNativeUserDrawingEditDragAtPoint: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => boolean;
+  canBeginNativeUserDrawingEditDragAtPoint: (
+    point: DrawingScreenPoint,
+    spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+  ) => boolean;
   dispatchNativeUserDrawingCommand: (command: UserDrawingCommand) => boolean;
   dispatchNativeUserDrawingSelectedAction: (command: UserDrawingSelectedActionSurfaceCommand) => boolean;
+  endNativeUserDrawingEditDrag: () => void;
   handleNativeUserDrawingInput: (point: UserDrawingInputPoint) => boolean;
   redoNativeUserDrawingCommand: () => boolean;
   replaceNativeUserDrawingState: (nextState?: UserDrawingState | null) => boolean;
@@ -62,6 +83,7 @@ export interface NativeUserDrawingRuntime {
   ) => UserDrawingSelectionAtPointResult;
   selectNativeUserDrawingTool: (tool: UserDrawingTool) => boolean;
   undoNativeUserDrawingCommand: () => boolean;
+  updateNativeUserDrawingEditDrag: (point: DrawingScreenPoint) => boolean;
   userDrawingCommandAvailability: UserDrawingCommandAvailability;
   userDrawingRecentToolsByCategory: UserDrawingRecentToolByCategory;
   userDrawingState: UserDrawingState;
@@ -73,10 +95,7 @@ export interface NativeUserDrawingExternalStateResolution {
   state: UserDrawingState;
 }
 
-function isNativeUserDrawingRuntimeStateEqual(
-  previousState: UserDrawingState,
-  nextState: UserDrawingState,
-): boolean {
+function isNativeUserDrawingRuntimeStateEqual(previousState: UserDrawingState, nextState: UserDrawingState): boolean {
   if (Object.is(previousState, nextState)) return true;
   return (
     !isNativeUserDrawingTransientStateChanged(previousState, nextState) &&
@@ -162,11 +181,14 @@ function areNativeUserDrawingAnchorsEqual(
   previousAnchors: readonly UserDrawingAnchor[],
   nextAnchors: readonly UserDrawingAnchor[],
 ): boolean {
-  return areNativeReadonlyArraysEqual(previousAnchors, nextAnchors, (previousAnchor, nextAnchor) =>
-    Object.is(previousAnchor, nextAnchor) ||
-    (previousAnchor.time === nextAnchor.time &&
-      previousAnchor.price === nextAnchor.price &&
-      previousAnchor.pressure === nextAnchor.pressure),
+  return areNativeReadonlyArraysEqual(
+    previousAnchors,
+    nextAnchors,
+    (previousAnchor, nextAnchor) =>
+      Object.is(previousAnchor, nextAnchor) ||
+      (previousAnchor.time === nextAnchor.time &&
+        previousAnchor.price === nextAnchor.price &&
+        previousAnchor.pressure === nextAnchor.pressure),
   );
 }
 
@@ -174,9 +196,12 @@ function areNativeUserDrawingPanePositionsEqual(
   previousPositions: readonly UserDrawingPanePosition[],
   nextPositions: readonly UserDrawingPanePosition[],
 ): boolean {
-  return areNativeReadonlyArraysEqual(previousPositions, nextPositions, (previousPosition, nextPosition) =>
-    Object.is(previousPosition, nextPosition) ||
-    (previousPosition.x === nextPosition.x && previousPosition.y === nextPosition.y),
+  return areNativeReadonlyArraysEqual(
+    previousPositions,
+    nextPositions,
+    (previousPosition, nextPosition) =>
+      Object.is(previousPosition, nextPosition) ||
+      (previousPosition.x === nextPosition.x && previousPosition.y === nextPosition.y),
   );
 }
 
@@ -197,10 +222,7 @@ function areNativeUserDrawingBarsPatternBarsEqual(
   );
 }
 
-function areNativeUserDrawingStylesEqual(
-  previousStyle: UserDrawingStyle,
-  nextStyle: UserDrawingStyle,
-): boolean {
+function areNativeUserDrawingStylesEqual(previousStyle: UserDrawingStyle, nextStyle: UserDrawingStyle): boolean {
   if (Object.is(previousStyle, nextStyle)) return true;
   const previousKeys = getNativeUserDrawingDefinedStyleKeys(previousStyle);
   const nextKeys = getNativeUserDrawingDefinedStyleKeys(nextStyle);
@@ -209,9 +231,9 @@ function areNativeUserDrawingStylesEqual(
 }
 
 function getNativeUserDrawingDefinedStyleKeys(style: UserDrawingStyle): (keyof UserDrawingStyle)[] {
-  return Object.keys(style).filter((key) => style[key as keyof UserDrawingStyle] !== undefined) as (
-    keyof UserDrawingStyle
-  )[];
+  return Object.keys(style).filter(
+    (key) => style[key as keyof UserDrawingStyle] !== undefined,
+  ) as (keyof UserDrawingStyle)[];
 }
 
 function areNativeReadonlyArraysEqual<T>(
@@ -225,12 +247,7 @@ function areNativeReadonlyArraysEqual<T>(
 }
 
 function isUserDrawingZOrderAction(action: string): action is UserDrawingZOrderAction {
-  return (
-    action === 'bringForward' ||
-    action === 'sendBackward' ||
-    action === 'bringToFront' ||
-    action === 'sendToBack'
-  );
+  return action === 'bringForward' || action === 'sendBackward' || action === 'bringToFront' || action === 'sendToBack';
 }
 
 function didUserDrawingHistoryAvailabilityChange(
@@ -255,6 +272,18 @@ export function createNativeUserDrawingSelectedToolbarCommandMetadata(
     source: 'toolbar',
     affectedIds: affectedIds.length > 0 ? affectedIds : EMPTY_NATIVE_USER_DRAWING_AFFECTED_IDS,
   };
+}
+
+export function canBeginNativeUserDrawingEditDragAtPointFromState(
+  state: UserDrawingState,
+  point: DrawingScreenPoint,
+  spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
+): boolean {
+  const selectedIds = new Set(getUserDrawingSelectionIds(state.selection));
+  if (selectedIds.size === 0) return false;
+
+  const hit = hitTestUserDrawings(state.drawings, point, spacesByPaneId, NATIVE_USER_DRAWING_EDIT_DRAG_HIT_TEST);
+  return Boolean(hit && selectedIds.has(hit.drawing.id) && !hit.drawing.locked);
 }
 
 export function createNativeUserDrawingDuplicateSelectedToolbarCommand(
@@ -305,6 +334,8 @@ export function useNativeUserDrawingRuntime({
   const historyRef = useRef(createUserDrawingCommandHistory());
   const clipboardRef = useRef<ReturnType<typeof createUserDrawingClipboard> | null>(null);
   const drawingIdSequenceRef = useRef(0);
+  const editDragRef = useRef<NativeUserDrawingEditDragSession | null>(null);
+  const editDragSequenceRef = useRef(0);
   const lastInitialUserDrawingStateRef = useRef(initialUserDrawingState);
   const onCommandRef = useRef(onUserDrawingCommand);
   const onStateChangeRef = useRef(onUserDrawingStateChange);
@@ -421,6 +452,54 @@ export function useNativeUserDrawingRuntime({
     [createNativeUserDrawingId, dispatchNativeUserDrawingCommand],
   );
 
+  const canBeginNativeUserDrawingEditDragAtPoint = useCallback(
+    (point: DrawingScreenPoint, spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>) =>
+      canBeginNativeUserDrawingEditDragAtPointFromState(stateRef.current, point, spacesByPaneId),
+    [],
+  );
+
+  const beginNativeUserDrawingEditDragAtPoint = useCallback(
+    (point: DrawingScreenPoint, spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>) => {
+      if (!canBeginNativeUserDrawingEditDragAtPoint(point, spacesByPaneId)) return false;
+
+      editDragSequenceRef.current += 1;
+      const transactionKey = `native-user-drawing-edit-drag-${editDragSequenceRef.current}`;
+      const result = dispatchNativeUserDrawingCommandResult({
+        type: 'beginEditDragAtPoint',
+        point,
+        spacesByPaneId,
+        options: { hitTest: NATIVE_USER_DRAWING_EDIT_DRAG_HIT_TEST },
+        meta: { source: 'touch', transactionKey },
+      });
+      if (!result.editDrag) return false;
+
+      editDragRef.current = {
+        drag: result.editDrag,
+        transactionKey,
+      };
+      return true;
+    },
+    [canBeginNativeUserDrawingEditDragAtPoint, dispatchNativeUserDrawingCommandResult],
+  );
+
+  const updateNativeUserDrawingEditDrag = useCallback(
+    (point: DrawingScreenPoint) => {
+      const session = editDragRef.current;
+      if (!session) return false;
+      return dispatchNativeUserDrawingCommand({
+        type: 'applyEditDrag',
+        drag: session.drag,
+        point,
+        meta: { source: 'touch', transactionKey: session.transactionKey },
+      });
+    },
+    [dispatchNativeUserDrawingCommand],
+  );
+
+  const endNativeUserDrawingEditDrag = useCallback(() => {
+    editDragRef.current = null;
+  }, []);
+
   const selectNativeUserDrawingAtPoint = useCallback(
     (
       point: DrawingScreenPoint,
@@ -478,20 +557,22 @@ export function useNativeUserDrawingRuntime({
         case 'styleAction': {
           let changed = false;
           if (command.visible !== undefined) {
-            changed = dispatchNativeUserDrawingCommand({
-              type: 'setVisibility',
-              visible: command.visible,
-              options: { includeLocked: command.includeLocked, now },
-              meta: selectedMeta,
-            }) || changed;
+            changed =
+              dispatchNativeUserDrawingCommand({
+                type: 'setVisibility',
+                visible: command.visible,
+                options: { includeLocked: command.includeLocked, now },
+                meta: selectedMeta,
+              }) || changed;
           }
           if (command.locked !== undefined) {
-            changed = dispatchNativeUserDrawingCommand({
-              type: 'setLocked',
-              locked: command.locked,
-              options: { includeLocked: command.includeLocked, now },
-              meta: selectedMeta,
-            }) || changed;
+            changed =
+              dispatchNativeUserDrawingCommand({
+                type: 'setLocked',
+                locked: command.locked,
+                options: { includeLocked: command.includeLocked, now },
+                meta: selectedMeta,
+              }) || changed;
           }
           return changed;
         }
@@ -555,10 +636,15 @@ export function useNativeUserDrawingRuntime({
 
     if (result.changed) {
       setNativeUserDrawingState(result.state);
-      const event = createUserDrawingHistoryCommandEvent(previousState, result.state, {
-        type: 'undo',
-        meta: { source: 'toolbar' },
-      }, true);
+      const event = createUserDrawingHistoryCommandEvent(
+        previousState,
+        result.state,
+        {
+          type: 'undo',
+          meta: { source: 'toolbar' },
+        },
+        true,
+      );
       if (event) onCommandRef.current?.(event);
     }
 
@@ -576,10 +662,15 @@ export function useNativeUserDrawingRuntime({
 
     if (result.changed) {
       setNativeUserDrawingState(result.state);
-      const event = createUserDrawingHistoryCommandEvent(previousState, result.state, {
-        type: 'redo',
-        meta: { source: 'toolbar' },
-      }, true);
+      const event = createUserDrawingHistoryCommandEvent(
+        previousState,
+        result.state,
+        {
+          type: 'redo',
+          meta: { source: 'toolbar' },
+        },
+        true,
+      );
       if (event) onCommandRef.current?.(event);
     }
 
@@ -624,14 +715,18 @@ export function useNativeUserDrawingRuntime({
   );
 
   return {
+    beginNativeUserDrawingEditDragAtPoint,
+    canBeginNativeUserDrawingEditDragAtPoint,
     dispatchNativeUserDrawingCommand,
     dispatchNativeUserDrawingSelectedAction,
+    endNativeUserDrawingEditDrag,
     handleNativeUserDrawingInput,
     redoNativeUserDrawingCommand,
     replaceNativeUserDrawingState,
     selectNativeUserDrawingAtPoint,
     selectNativeUserDrawingTool,
     undoNativeUserDrawingCommand,
+    updateNativeUserDrawingEditDrag,
     userDrawingCommandAvailability,
     userDrawingRecentToolsByCategory,
     userDrawingState,
