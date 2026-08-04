@@ -124,6 +124,7 @@ describe('NativeChartPrimitiveLayer', () => {
     );
 
     expect(visible.map((candidate) => candidate.time)).toEqual([0, 1_000, 2_000, 3_000]);
+    expect(visible.map((candidate) => candidate.sourceIndex)).toEqual([1, 2, 3, 4]);
     expect(visible.map((candidate) => candidate.x)).toEqual([-70, 0, 70, 140]);
     expect(new Set(visible.map((candidate) => candidate.interval))).toEqual(new Set([1_000]));
   });
@@ -142,10 +143,10 @@ describe('NativeChartPrimitiveLayer', () => {
 
   it('derives volume normalization from the live viewport range', () => {
     const visibleBars = [
-      { ...bar(0), volume: 500, interval: 1_000, x: 0 },
-      { ...bar(1_000), volume: 100, interval: 1_000, x: 10 },
-      { ...bar(2_000), volume: 800, interval: 1_000, x: 20 },
-      { ...bar(3_000), volume: 200, interval: 1_000, x: 30 },
+      { ...bar(0), volume: 500, interval: 1_000, sourceIndex: 0, x: 0 },
+      { ...bar(1_000), volume: 100, interval: 1_000, sourceIndex: 1, x: 10 },
+      { ...bar(2_000), volume: 800, interval: 1_000, sourceIndex: 2, x: 20 },
+      { ...bar(3_000), volume: 200, interval: 1_000, sourceIndex: 3, x: 30 },
     ];
 
     expect(getNativeViewportMaxVolume(visibleBars, 0, 3_000)).toBe(800);

@@ -9,6 +9,7 @@ import type {
 } from './drawings';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
+import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
@@ -329,6 +330,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision),
     [pricePrecision],
   );
+  const nativeIndicatorPaneLayout = indicatorManager?.getUnifiedLayout();
+  const nativeIndicatorPlots = indicatorManager?.getPlots() ?? [];
+  const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
+    const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
+    const panes = nativeIndicatorPaneLayout?.panes ?? [];
+    const result: Record<string, NativeIndicatorPaneInfo> = {};
+
+    for (const [scriptId, info] of Object.entries(paneInfo)) {
+      const pane = panes.find(
+        (candidate) => candidate.type === 'indicator' && candidate.indicatorIds?.includes(scriptId),
+      );
+      result[scriptId] = {
+        overlay: info.overlay,
+        paneId: pane?.id,
+      };
+    }
+
+    return result;
+  }, [indicatorManager, nativeIndicatorPaneLayout]);
   const handleNativeViewportChangeForLayout = useCallback(
     (nextViewport: Viewport) => {
       onViewportChange?.(nextViewport);
@@ -384,6 +404,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     imperativeTheme,
     leftToolRailCollapsed,
     marginsProp,
+    paneLayout: nativeIndicatorPaneLayout,
     pricePrecision: nativePricePrecision,
     propHeight: layoutPropHeight,
     propWidth: layoutPropWidth,
@@ -1270,6 +1291,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 gridColor={gridColor}
                 hasDataViewport={nativeRenderHasDataViewport}
                 hasContextMenu={hasNativeContextMenu}
+                indicatorPaneInfo={nativeIndicatorPaneInfo}
+                indicatorPlots={nativeIndicatorPlots}
+                indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
                 options={options}
                 plotOpacity={nativeCanvasLoading ? LOADING_OPACITY : 1}

@@ -171,6 +171,25 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getPlots()[0].values).toEqual([100, 101]);
   });
 
+  it('auto-scales non-overlay indicator panes from computed plot values', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(3));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'pane-study',
+      code: 'indicator("Pane Study")\nplot(close)',
+      overlay: false,
+    });
+
+    const indicatorPane = manager
+      .getUnifiedLayout()
+      .panes.find((pane) => pane.type === 'indicator' && pane.indicatorIds?.includes(instanceId));
+
+    expect(indicatorPane).toBeDefined();
+    expect(indicatorPane?.yMin).toBeLessThan(101);
+    expect(indicatorPane?.yMax).toBeGreaterThan(103);
+  });
+
   it('exports built-in indicator metadata for layout persistence', () => {
     const manager = new MobileIndicatorManager();
 

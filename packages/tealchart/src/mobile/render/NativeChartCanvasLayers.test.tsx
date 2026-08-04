@@ -12,6 +12,7 @@ import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
 import { NativeChartTradeLinesLayer } from './NativeChartTradeLinesLayer';
 import { NativeCrosshairLayer } from './NativeCrosshairLayer';
+import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
 
 function shared<T>(value: T) {
@@ -66,6 +67,9 @@ describe('NativeChartCanvasLayers', () => {
       gridColor: '#222831',
       hasDataViewport,
       hasContextMenu: false,
+      indicatorPaneInfo: {},
+      indicatorPlots: [],
+      indicatorTotalBarCount: 0,
       lineSnapshot: { orderLines: [], positionLines: [] },
       options: { upColor: '#12c48b', downColor: '#f04465' } as RenderOptions,
       plotOpacity: 1,
@@ -104,6 +108,7 @@ describe('NativeChartCanvasLayers', () => {
     expect((plotGroup.props.children as ReactElement[]).map((child) => child.type)).toEqual([
       NativeChartPrimitiveLayer,
       NativeCandleVolumeLayer,
+      NativeIndicatorPlotLayer,
       NativeChartPrimitiveLayer,
       NativeUserDrawingLayer,
       NativeChartTradeLinesLayer,
@@ -112,8 +117,14 @@ describe('NativeChartCanvasLayers', () => {
 
     const plotChildren = plotGroup.props.children as ReactElement[];
     expect(plotChildren[0]?.props).toMatchObject({ showAxisLabels: false, showGridLines: true });
-    expect(plotChildren[2]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
-    expect(plotChildren[5]?.props).toMatchObject({ hasContextMenu: false });
+    expect(plotChildren[2]?.props).toMatchObject({
+      indicatorPaneInfo: {},
+      plots: [],
+      totalBarCount: 0,
+      visibleBars: [],
+    });
+    expect(plotChildren[3]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
+    expect(plotChildren[6]?.props).toMatchObject({ hasContextMenu: false });
   });
 
   it('applies loading opacity inside the Skia plot layer', () => {

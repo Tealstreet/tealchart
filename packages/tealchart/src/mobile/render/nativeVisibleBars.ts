@@ -23,6 +23,7 @@ function clamp(value: number, min: number, max: number): number {
 
 export type NativeVisibleBar = Bar & {
   interval: number;
+  sourceIndex: number;
   x: number;
 };
 
@@ -58,11 +59,14 @@ export function getNativeBarInterval(bars: readonly Bar[], fallbackInterval: num
 export function getNativeVisibleBars(bars: readonly Bar[], projection: NativeChartProjection): NativeVisibleBar[] {
   const { frame, viewport } = projection;
   const { startTime: visibleStartTime, endTime: visibleEndTime } = getNativeCandidateTimeWindow(viewport);
-  const visible = bars.filter((bar) => bar.time >= visibleStartTime && bar.time <= visibleEndTime);
+  const visible = bars
+    .map((bar, sourceIndex) => ({ bar, sourceIndex }))
+    .filter(({ bar }) => bar.time >= visibleStartTime && bar.time <= visibleEndTime);
   const interval = getNativeBarInterval(bars, viewport.endTime - viewport.startTime);
-  return visible.map((bar) => ({
+  return visible.map(({ bar, sourceIndex }) => ({
     ...bar,
     interval,
+    sourceIndex,
     x: projection.timeToX(bar.time),
   }));
 }
