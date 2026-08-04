@@ -21,9 +21,9 @@ import {
   isNativeResetViewButtonTap,
   isNativeResetViewTapWithinTolerance,
   NATIVE_RESET_VIEW_HIT_SIZE,
-  NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE,
   resolveNativeResetViewButtonLayout,
 } from './nativeResetViewButton';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { findNativeTradeLineActionZone } from './nativeTradeLineHitTest';
 
 export interface NativeLeftToolRailToggleTapGestureInput {
@@ -37,7 +37,7 @@ export function createNativeLeftToolRailToggleTapGesture({
 }: NativeLeftToolRailToggleTapGestureInput) {
   if (!leftToolRailLayout) return Gesture.Tap().enabled(false);
   return Gesture.Tap()
-    .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onEnd((event, success) => {
       if (!success) return;
       if (!isNativeLeftToolRailToggleTap(leftToolRailLayout, event.x, event.y)) return;
@@ -53,6 +53,7 @@ export interface NativeResetViewTapGestureState {
 }
 
 export interface NativeResetViewTapGestureInput {
+  controlZones?: readonly NativeGestureControlZone[];
   crosshair?: NativeCrosshairSharedValues;
   frame: NativeChartFrame | null;
   hasContextMenu?: boolean;
@@ -64,6 +65,7 @@ export interface NativeResetViewTapGestureInput {
 }
 
 export function createNativeResetViewTapGesture({
+  controlZones = [],
   crosshair,
   frame,
   hasContextMenu = false,
@@ -75,7 +77,7 @@ export function createNativeResetViewTapGesture({
 }: NativeResetViewTapGestureInput) {
   if (!frame) return Gesture.Tap().enabled(false);
   return Gesture.Tap()
-    .maxDistance(resetButtonVisible ? NATIVE_RESET_VIEW_HIT_SIZE / 2 : NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
+    .maxDistance(resetButtonVisible ? NATIVE_RESET_VIEW_HIT_SIZE / 2 : NATIVE_TAP_MAX_DISTANCE)
     .onTouchesDown((event) => {
       const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
       if (!touch) {
@@ -85,6 +87,11 @@ export function createNativeResetViewTapGesture({
       }
       resetTapGestureState.startX.value = touch.x;
       resetTapGestureState.startY.value = touch.y;
+      if (isNativeGestureControlPoint(controlZones, touch.x, touch.y)) {
+        resetTapGestureState.blockedByContextMenuButton.value = true;
+        resetTapGestureState.startedOnButton.value = false;
+        return;
+      }
       resetTapGestureState.blockedByContextMenuButton.value = Boolean(
         hasContextMenu &&
         crosshair?.visible.value &&
@@ -114,6 +121,7 @@ export function createNativeResetViewTapGesture({
             resetTapGestureState.startY.value,
             event.x,
             event.y,
+            NATIVE_TAP_MAX_DISTANCE,
           )
         ) {
           return;
@@ -138,7 +146,7 @@ export function createNativeUserDrawingTapGesture({
 }: NativeUserDrawingTapGestureInput) {
   if (!frame || !enabled) return Gesture.Tap().enabled(false);
   return Gesture.Tap()
-    .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onEnd((event, success) => {
       if (!success) return;
       if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
@@ -153,6 +161,7 @@ export interface NativeTradeLineActionTapGestureInput {
     objectId: string,
     actionType: NativeTradeLineActionType,
   ) => void;
+  controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
@@ -163,6 +172,7 @@ export interface NativeTradeLineActionTapGestureInput {
 export function createNativeTradeLineActionTapGesture({
   bracketDragActive,
   commitTradeLineAction,
+  controlZones = [],
   frame,
   sharedViewport,
   tradeLabelHeight,
@@ -170,19 +180,22 @@ export function createNativeTradeLineActionTapGesture({
   tradeLineRows,
 }: NativeTradeLineActionTapGestureInput) {
   if (!frame) return Gesture.Tap().enabled(false);
-  return Gesture.Tap().onEnd((event, success) => {
-    if (!success) return;
-    if (bracketDragActive.value) return;
-    const zone = findNativeTradeLineActionZone({
-      zones: tradeLineActionZones.value,
-      rows: tradeLineRows.value,
-      x: event.x,
-      y: event.y,
-      sharedViewport,
-      frame,
-      tradeLabelHeight,
+  return Gesture.Tap()
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
+    .onEnd((event, success) => {
+      if (!success) return;
+      if (bracketDragActive.value) return;
+      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
+      const zone = findNativeTradeLineActionZone({
+        zones: tradeLineActionZones.value,
+        rows: tradeLineRows.value,
+        x: event.x,
+        y: event.y,
+        sharedViewport,
+        frame,
+        tradeLabelHeight,
+      });
+      if (!zone) return;
+      runOnJS(commitTradeLineAction)(zone.objectType, zone.objectId, zone.actionType);
     });
-    if (!zone) return;
-    runOnJS(commitTradeLineAction)(zone.objectType, zone.objectId, zone.actionType);
-  });
 }

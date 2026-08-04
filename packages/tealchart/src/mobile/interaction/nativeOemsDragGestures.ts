@@ -8,6 +8,7 @@ import type {
   NativeTradeLineObjectType,
   NativeTradeLineRow,
 } from '../utils/tradeLineLayout';
+import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import type {
   NativeBracketDragInteractionState,
   NativeOrderDragInteractionState,
@@ -17,6 +18,7 @@ import type {
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
+import { isNativeGestureControlPoint } from './nativeGestureControlZones';
 import {
   beginNativeBracketDragState,
   beginNativeOrderDragState,
@@ -59,6 +61,7 @@ function getLiveNativePricePerPixel(sharedViewport: NativeViewportSharedValues, 
 
 export interface NativeOrderDragGestureInput {
   commitOrderMove: (objectId: string, nextPrice: number) => void;
+  controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
@@ -70,6 +73,7 @@ export interface NativeOrderDragGestureInput {
 
 export function createNativeOrderDragGesture({
   commitOrderMove,
+  controlZones = [],
   frame,
   orderDragState,
   orderDragZones,
@@ -90,6 +94,7 @@ export function createNativeOrderDragGesture({
       const point = getNativeTouchPoint(event);
       if (
         !point ||
+        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
         findNativeTradeLineActionZone({
           zones: tradeLineActionZones.value,
           rows: tradeLineRows.value,
@@ -155,6 +160,7 @@ export interface NativeBracketDragGestureInput {
     price: number,
     partialPercent?: number,
   ) => void;
+  controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
@@ -166,6 +172,7 @@ export function createNativeBracketDragGesture({
   bracketDragInteractionState,
   clearNativeBracketDrag,
   commitBracketMove,
+  controlZones = [],
   frame,
   sharedViewport,
   tradeLabelHeight,
@@ -182,11 +189,15 @@ export function createNativeBracketDragGesture({
         return;
       }
       const point = getNativeTouchPoint(event);
+      if (!point || isNativeGestureControlPoint(controlZones, point.x, point.y)) {
+        stateManager.fail();
+        return;
+      }
       const zone = findNativeBracketDragZone({
         zones: tradeLineActionZones.value,
         rows: tradeLineRows.value,
-        x: point?.x ?? Number.NaN,
-        y: point?.y ?? Number.NaN,
+        x: point.x,
+        y: point.y,
         sharedViewport,
         frame,
         tradeLabelHeight,

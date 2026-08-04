@@ -1,14 +1,19 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Bar } from '../../types';
 
-import { Text } from 'react-native';
-import { describe, expect, it } from 'vitest';
+import { Pressable, Text } from 'react-native';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import { NativeChartLegendOverlayImpl } from './NativeChartLegendOverlay';
+import {
+  areNativeLegendActionTargetsEqual,
+  NativeChartLegendOverlayImpl,
+  resolveNativeLegendActionTargets,
+} from './NativeChartLegendOverlay';
 
 interface TestElementProps {
   children?: ReactNode;
+  [key: string]: unknown;
 }
 
 type TestElement = ReactElement<TestElementProps>;
@@ -64,6 +69,18 @@ function renderLegend(isLoading: boolean) {
   });
 }
 
+const frameWithIndicatorPane = createNativeChartFrameFromPanes({
+  dimensions: {
+    width: 390,
+    height: 520,
+    margins: { bottom: 32, left: 62, right: 76, top: 36 },
+  },
+  panes: [
+    { id: 'main', type: 'main', top: 36, height: 300, yMin: 63000, yMax: 64000 },
+    { id: 'pane_1', type: 'indicator', top: 336, height: 152, yMin: -10, yMax: 10 },
+  ],
+});
+
 describe('NativeChartLegendOverlay', () => {
   it('renders symbol, interval, and OHLC values', () => {
     const texts = collectElementsByType(renderLegend(false), Text).map((element) => element.props.children);
@@ -78,5 +95,119 @@ describe('NativeChartLegendOverlay', () => {
     const texts = collectElementsByType(renderLegend(true), Text).map((element) => element.props.children);
 
     expect(texts).toContain('...');
+  });
+
+  it('renders overlay indicator action visuals as passive controls', () => {
+    const onRemoveIndicator = vi.fn();
+    const onToggleIndicator = vi.fn();
+    const legend = NativeChartLegendOverlayImpl({
+      activeIndicators: [{ id: 'study_1', inputs: { length: 20 }, isVisible: true, name: 'SMA' }],
+      bars,
+      downColor: '#f04465',
+      frame,
+      gridColor: '#1f2630',
+      indicatorPaneInfo: { study_1: { inputs: { length: 20 }, name: 'SMA', overlay: true } },
+      interval: '15',
+      isLoading: false,
+      leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98',
+      onRemoveIndicator,
+      onToggleIndicator,
+      pricePrecision: 0.1,
+      symbol: 'BTC-USD',
+      textColor: '#f0f3fa',
+      upColor: '#12c48b',
+    });
+
+    const texts = collectElementsByType(legend, Text).map((element) => element.props.children);
+    const buttons = collectElementsByType(legend, Pressable);
+
+    expect(texts).toEqual(expect.arrayContaining(['SMA', '20']));
+    const hidePress = buttons.find((button) => button.props.accessibilityLabel === 'Hide SMA')?.props.onPress;
+    const removePress = buttons.find((button) => button.props.accessibilityLabel === 'Remove SMA')?.props.onPress;
+
+    expect(hidePress).toBeUndefined();
+    expect(removePress).toBeUndefined();
+    expect(onToggleIndicator).not.toHaveBeenCalled();
+    expect(onRemoveIndicator).not.toHaveBeenCalled();
+  });
+
+  it('renders non-overlay indicator legends in their pane', () => {
+    const legend = NativeChartLegendOverlayImpl({
+      activeIndicators: [{ id: 'study_2', inputs: { fast: 12, slow: 26, signal: 9 }, isVisible: false, name: 'MACD' }],
+      bars,
+      downColor: '#f04465',
+      frame: frameWithIndicatorPane,
+      gridColor: '#1f2630',
+      indicatorPaneInfo: {
+        study_2: { inputs: { fast: 12, slow: 26, signal: 9 }, name: 'MACD', overlay: false, paneId: 'pane_1' },
+      },
+      interval: '15',
+      isLoading: false,
+      leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98',
+      pricePrecision: 0.1,
+      symbol: 'BTC-USD',
+      textColor: '#f0f3fa',
+      upColor: '#12c48b',
+    });
+
+    const texts = collectElementsByType(legend, Text).map((element) => element.props.children);
+
+    expect(texts).toEqual(expect.arrayContaining(['MACD', '12 · 26 · 9']));
+  });
+
+  it('resolves measured action button layouts into absolute overlay hit targets', () => {
+    const targets = resolveNativeLegendActionTargets({
+      actionLayouts: {
+        'main:study_1:removeIndicator': {
+          action: 'removeIndicator',
+          button: { height: 22, width: 22, x: 74, y: 0 },
+          indicatorId: 'study_1',
+          rowKey: 'main:study_1',
+        },
+      },
+      actionOrigins: [
+        {
+          action: 'removeIndicator',
+          indicatorId: 'study_1',
+          key: 'main:study_1:removeIndicator',
+          left: 62,
+          top: 42,
+        },
+      ],
+      rowLayouts: {
+        'main:study_1': { height: 22, width: 100, x: 0, y: 28 },
+      },
+    });
+
+    expect(targets).toEqual([
+      {
+        command: { indicatorId: 'study_1', type: 'removeIndicator' },
+        enabled: true,
+        x1: 130,
+        x2: 164,
+        y1: 64,
+        y2: 98,
+      },
+    ]);
+  });
+
+  it('compares action target payloads instead of array identity', () => {
+    const first = [
+      {
+        command: { indicatorId: 'study_1', type: 'removeIndicator' as const },
+        enabled: true,
+        x1: 130,
+        x2: 164,
+        y1: 64,
+        y2: 98,
+      },
+    ];
+    const matching = first.map((target) => ({ ...target, command: { ...target.command } }));
+    const changed = [{ ...matching[0], x2: 165 }];
+
+    expect(areNativeLegendActionTargetsEqual(first, matching)).toBe(true);
+    expect(areNativeLegendActionTargetsEqual(first, changed)).toBe(false);
   });
 });

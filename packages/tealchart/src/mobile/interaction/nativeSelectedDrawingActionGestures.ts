@@ -1,16 +1,10 @@
+import type { UserDrawingSelectedActionSurfaceCommand, UserDrawingSelectedActionSurfaceGroupId } from '../../drawings';
 import type {
+  NativeSelectedDrawingActionCommand,
   NativeSelectedDrawingActionHitTarget,
 } from '../render/NativeUserDrawingSelectionActionOverlay';
-import type {
-  UserDrawingSelectedActionSurfaceCommand,
-  UserDrawingSelectedActionSurfaceGroupId,
-} from '../../drawings';
 
-import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS } from 'react-native-worklets';
-
-import { findNativeSelectedDrawingActionHitTarget } from '../render/NativeUserDrawingSelectionActionOverlay';
-import { NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE } from './nativeResetViewButton';
+import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 
 export interface NativeSelectedDrawingActionTapGestureInput {
   enabled: boolean;
@@ -25,21 +19,18 @@ export function createNativeSelectedDrawingActionTapGesture({
   onPopoverGroupChange,
   targets,
 }: NativeSelectedDrawingActionTapGestureInput) {
-  if (!enabled || targets.length === 0) return Gesture.Tap().enabled(false);
+  const onSelectedDrawingActionCommand = (command: NativeSelectedDrawingActionCommand) => {
+    if (command.type === 'popoverTrigger') {
+      onPopoverGroupChange(command.nextGroupId);
+      return;
+    }
 
-  return Gesture.Tap()
-    .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
-    .onEnd((event, success) => {
-      if (!success) return;
-      const target = findNativeSelectedDrawingActionHitTarget(targets, event.x, event.y);
-      if (!target) return;
+    onAction(command.command);
+  };
 
-      if (target.type === 'popoverTrigger') {
-        runOnJS(onPopoverGroupChange)(target.nextGroupId);
-        return;
-      }
-
-      if (!target.enabled) return;
-      runOnJS(onAction)(target.command);
-    });
+  return createNativeOverlayActionTapGesture({
+    enabled,
+    onAction: onSelectedDrawingActionCommand,
+    targets,
+  });
 }

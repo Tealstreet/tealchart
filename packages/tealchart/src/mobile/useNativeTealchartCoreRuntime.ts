@@ -80,6 +80,10 @@ export function useNativeTealchartCoreRuntime({
       indicatorManagerRef.current?.removeIndicator(studyId);
       onLayoutDirty?.();
     });
+    chartApi.setOnStudyVisibilityChange((studyId, isVisible) => {
+      indicatorManagerRef.current?.setIndicatorVisibility(studyId, isVisible);
+      onLayoutDirty?.();
+    });
   }, [chartApi, coreResult.setInterval, coreResult.setSymbol, forceUpdate, onLayoutDirty]);
 
   useEffect(() => {

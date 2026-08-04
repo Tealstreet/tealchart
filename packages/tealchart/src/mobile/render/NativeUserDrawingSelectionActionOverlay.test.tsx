@@ -2,19 +2,16 @@ import type { ReactElement, ReactNode } from 'react';
 import type { UserDrawingSelectionActionAnchor, UserDrawingState } from '../../drawings';
 import type { NativeUserDrawingSelectionActionOverlayProps } from './NativeUserDrawingSelectionActionOverlay';
 
-import { describe, expect, it, vi } from 'vitest';
 import { Pressable, ScrollView, View } from 'react-native';
+import { describe, expect, it, vi } from 'vitest';
 
-import {
-  DEFAULT_USER_DRAWING_STYLE,
-  createUserDrawingState,
-} from '../../drawings';
+import { createUserDrawingState, DEFAULT_USER_DRAWING_STYLE } from '../../drawings';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
 import {
   findNativeSelectedDrawingActionHitTarget,
   NativeUserDrawingSelectionActionOverlayImpl,
-  resolveNativeSelectedDrawingActionOverlayModel,
   resolveNativeSelectedDrawingActionHitTargets,
+  resolveNativeSelectedDrawingActionOverlayModel,
 } from './NativeUserDrawingSelectionActionOverlay';
 
 interface TestElementProps {
@@ -96,7 +93,9 @@ function createSelectedTextDrawingState() {
   });
 }
 
-function createOverlayStateProps(state: UserDrawingState): Pick<
+function createOverlayStateProps(
+  state: UserDrawingState,
+): Pick<
   NativeUserDrawingSelectionActionOverlayProps,
   | 'userDrawingDefaultStylesByKind'
   | 'userDrawingDraft'
@@ -143,8 +142,7 @@ function renderOverlay(
 
 describe('NativeUserDrawingSelectionActionOverlay', () => {
   it('renders selected drawing actions from the shared action surface', () => {
-    const onAction = vi.fn();
-    const overlay = renderOverlay({ onAction });
+    const overlay = renderOverlay();
     const pressables = collectElementsByType(overlay, Pressable);
     const icons = collectElementsByType(overlay, NativeDrawingIcon);
 
@@ -157,10 +155,8 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
 
     expect(duplicateButton).not.toBeUndefined();
     expect(deleteButton).not.toBeUndefined();
+    expect(deleteButton?.props.onPress).toBeUndefined();
     expect(icons.some((icon) => icon.props.name === 'trash')).toBe(true);
-
-    deleteButton?.props.onPress!();
-    expect(onAction).toHaveBeenCalledWith({ type: 'toolbarAction', action: 'deleteSelected' });
   });
 
   it('renders nothing without a selected drawing', () => {
@@ -170,12 +166,10 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
   });
 
   it('resolves no action model without a selected drawing', () => {
-    expect(
-      resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps({}, createUserDrawingState())),
-    ).toBeNull();
+    expect(resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps({}, createUserDrawingState()))).toBeNull();
   });
 
-  it('can open the shared style popover group', () => {
+  it('renders the active shared style popover group', () => {
     const overlay = renderOverlay({ openPopoverGroupId: 'style' });
     const scrollViews = collectElementsByType(overlay, ScrollView);
     const lineWidthButton = collectElementsByType(overlay, Pressable).find(
@@ -183,17 +177,13 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     );
 
     expect(
-      scrollViews.some(
-        (scrollView) => scrollView.props.accessibilityLabel === 'Selected drawing style controls',
-      ),
+      scrollViews.some((scrollView) => scrollView.props.accessibilityLabel === 'Selected drawing style controls'),
     ).toBe(true);
     expect(lineWidthButton).not.toBeUndefined();
   });
 
   it('resolves the active popover group in the action model', () => {
-    const model = resolveNativeSelectedDrawingActionOverlayModel(
-      createOverlayProps({ openPopoverGroupId: 'style' }),
-    );
+    const model = resolveNativeSelectedDrawingActionOverlayModel(createOverlayProps({ openPopoverGroupId: 'style' }));
 
     expect(model?.activePopoverGroup?.id).toBe('style');
     expect(model?.surfaceWidth).toBeGreaterThan(0);
@@ -223,9 +213,9 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     const targets = resolveNativeSelectedDrawingActionHitTargets(model);
     const deleteTarget = targets.find(
       (target) =>
-        target.type === 'command' &&
-        target.command.type === 'toolbarAction' &&
-        target.command.action === 'deleteSelected',
+        target.command.type === 'command' &&
+        target.command.command.type === 'toolbarAction' &&
+        target.command.command.action === 'deleteSelected',
     );
 
     expect(deleteTarget).not.toBeUndefined();
@@ -252,9 +242,7 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     const model = resolveNativeSelectedDrawingActionOverlayModel(
       createOverlayProps({}, createSelectedTextDrawingState()),
     );
-    const commandTypes = model?.groups.flatMap((group) =>
-      group.items.map((item) => item.command.type),
-    ) ?? [];
+    const commandTypes = model?.groups.flatMap((group) => group.items.map((item) => item.command.type)) ?? [];
 
     expect(commandTypes).not.toContain('editText');
     expect(commandTypes).not.toContain('openObjectTree');

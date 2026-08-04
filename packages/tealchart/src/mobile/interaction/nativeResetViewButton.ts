@@ -5,7 +5,6 @@ export const NATIVE_RESET_VIEW_HIT_SIZE = 100;
 export const NATIVE_RESET_VIEW_DISMISS_MS = 2500;
 export const NATIVE_RESET_VIEW_REVEAL_TOP_BUFFER = 8;
 export const NATIVE_RESET_VIEW_BOTTOM_OFFSET = 30;
-export const NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE = 8;
 
 export interface NativeResetViewButtonLayout {
   centerX: number;
@@ -60,11 +59,12 @@ export function isNativeResetViewTapWithinTolerance(
   startY: number,
   x: number,
   y: number,
+  tolerance: number,
 ): boolean {
   'worklet';
   const dx = x - startX;
   const dy = y - startY;
-  return dx * dx + dy * dy <= NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE * NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE;
+  return dx * dx + dy * dy <= tolerance * tolerance;
 }
 
 export function resolveNativeResetViewTapTarget({

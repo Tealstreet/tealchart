@@ -19,7 +19,8 @@ import {
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
 import { isNativeGestureControlPoint } from './nativeGestureControlZones';
-import { isNativeResetViewRevealTap, NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE } from './nativeResetViewButton';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
+import { isNativeResetViewRevealTap } from './nativeResetViewButton';
 import { beginNativeTapClaimScope, isNativeTapClaimed } from './nativeTapClaim';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
 
@@ -182,7 +183,7 @@ export function createNativeCrosshairTapGesture({
   };
 
   return Gesture.Tap()
-    .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onTouchesDown(() => {
       if (tapClaim) beginNativeTapClaimScope(tapClaim);
     })
@@ -223,7 +224,7 @@ export function createNativeCrosshairLongPressGesture({
   if (!frame) return Gesture.LongPress().enabled(false);
   return Gesture.LongPress()
     .minDuration(NATIVE_CROSSHAIR_LONG_PRESS_MIN_DURATION_MS)
-    .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onStart((event) => {
       toggleNativeCrosshairAtPoint({
         controlZones,
@@ -314,7 +315,7 @@ export function createNativeCrosshairContextMenuTapGesture({
 }: NativeCrosshairContextMenuTapGestureInput) {
   if (!frame || !hasContextMenu) return Gesture.Tap().enabled(false);
   return Gesture.Tap()
-    .maxDistance(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onEnd((event, success) => {
       if (!success || !crosshair.visible.value) return;
       if (

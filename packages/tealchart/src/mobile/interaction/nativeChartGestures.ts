@@ -15,6 +15,7 @@ interface NativeChartGestureInput {
   drawingTapGesture: GestureType;
   leftToolRailToggleTapGesture: GestureType;
   orderDragGesture: GestureType;
+  overlayActionTapGesture: GestureType;
   priceScaleGesture: GestureType;
   resetViewTapGesture: GestureType;
   selectedDrawingActionTapGesture: GestureType;
@@ -35,16 +36,20 @@ export function createNativeChartGesture({
   drawingTapGesture,
   leftToolRailToggleTapGesture,
   orderDragGesture,
+  overlayActionTapGesture,
   priceScaleGesture,
   resetViewTapGesture,
   selectedDrawingActionTapGesture,
   timeScaleGesture,
   tradeLineActionTapGesture,
 }: NativeChartGestureInput): SimultaneousGesture {
+  // Ordering is not ownership. Each broad canvas gesture must reject reserved
+  // control zones before it can compete with overlay action gestures.
   return Gesture.Simultaneous(
     bracketDragGesture,
     tradeLineActionTapGesture,
     selectedDrawingActionTapGesture,
+    overlayActionTapGesture,
     orderDragGesture,
     drawingTapGesture,
     leftToolRailToggleTapGesture,

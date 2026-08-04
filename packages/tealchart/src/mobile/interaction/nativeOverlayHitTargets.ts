@@ -6,9 +6,9 @@ export interface NativeOverlayHitRect {
 }
 
 /**
- * Chart-owned controls floating over Skia should render as passive overlays and
- * route critical taps through native gesture hit targets derived from the same
- * layout model.
+ * Canvas-overlaid action controls should render as passive overlays and route
+ * critical taps through gesture hit targets. Register those rects as control
+ * zones to reserve ownership.
  */
 export function findNativeOverlayHitTarget<T extends NativeOverlayHitRect>(
   targets: readonly T[],

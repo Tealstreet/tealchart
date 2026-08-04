@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import {
   NATIVE_RESET_VIEW_BUTTON_SIZE,
   NATIVE_RESET_VIEW_HIT_SIZE,
@@ -97,7 +98,7 @@ describe('native reset view button', () => {
   });
 
   it('cancels passive reset taps once movement exceeds tolerance', () => {
-    expect(isNativeResetViewTapWithinTolerance(80, 360, 84, 364)).toBe(true);
-    expect(isNativeResetViewTapWithinTolerance(80, 360, 80, 369)).toBe(false);
+    expect(isNativeResetViewTapWithinTolerance(80, 360, 84, 364, NATIVE_TAP_MAX_DISTANCE)).toBe(true);
+    expect(isNativeResetViewTapWithinTolerance(80, 360, 80, 369, NATIVE_TAP_MAX_DISTANCE)).toBe(false);
   });
 });

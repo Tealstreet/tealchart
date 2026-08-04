@@ -24,16 +24,15 @@ import {
   createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
+import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
+import { NATIVE_RESET_VIEW_HIT_SIZE, resolveNativeResetViewButtonLayout } from './nativeResetViewButton';
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
-import {
-  NATIVE_RESET_VIEW_HIT_SIZE,
-  NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE,
-  resolveNativeResetViewButtonLayout,
-} from './nativeResetViewButton';
 import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
   createNativeResetViewTapGesture,
+  createNativeTradeLineActionTapGesture,
   createNativeUserDrawingTapGesture,
 } from './nativeTapGestures';
 import { createNativeUserDrawingEditDragGesture } from './nativeUserDrawingEditGestures';
@@ -192,7 +191,7 @@ describe('native gesture activation', () => {
       tradeLineRows,
     }) as any;
 
-    expect(crosshairTapGesture.config.maxDistance).toBe(8);
+    expect(crosshairTapGesture.config.maxDistance).toBe(NATIVE_TAP_MAX_DISTANCE);
     crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
     expect(crosshair.visible.value).toBe(true);
     expect(crosshair.x.value).toBe(80);
@@ -311,9 +310,8 @@ describe('native gesture activation', () => {
       onPopoverGroupChange,
       targets: [
         {
-          command: { type: 'toolbarAction', action: 'deleteSelected' },
+          command: { type: 'command', command: { type: 'toolbarAction', action: 'deleteSelected' } },
           enabled: true,
-          type: 'command',
           x1: 40,
           x2: 80,
           y1: 20,
@@ -324,6 +322,22 @@ describe('native gesture activation', () => {
 
     gesture.handlers.onEnd({ x: 60, y: 40 }, true);
     expect(onAction).toHaveBeenCalledWith({ type: 'toolbarAction', action: 'deleteSelected' });
+
+    gesture.handlers.onEnd({ x: 10, y: 40 }, true);
+    expect(onAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('routes generic overlay action taps through native hit targets', () => {
+    const onAction = vi.fn();
+    const command = { indicatorId: 'study_1', type: 'removeIndicator' };
+    const gesture = createNativeOverlayActionTapGesture({
+      enabled: true,
+      onAction,
+      targets: [{ command, enabled: true, x1: 40, x2: 80, y1: 20, y2: 60 }],
+    }) as any;
+
+    gesture.handlers.onEnd({ x: 60, y: 40 }, true);
+    expect(onAction).toHaveBeenCalledWith(command);
 
     gesture.handlers.onEnd({ x: 10, y: 40 }, true);
     expect(onAction).toHaveBeenCalledTimes(1);
@@ -346,7 +360,7 @@ describe('native gesture activation', () => {
     }) as any;
 
     expect(crosshairLongPressGesture.config.minDuration).toBe(2_000);
-    expect(crosshairLongPressGesture.config.maxDistance).toBe(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE);
+    expect(crosshairLongPressGesture.config.maxDistance).toBe(NATIVE_TAP_MAX_DISTANCE);
 
     crosshairLongPressGesture.handlers.onStart({ x: 80, y: 60 });
     expect(crosshair.visible.value).toBe(true);
@@ -511,7 +525,7 @@ describe('native gesture activation', () => {
     expect(multiTouch.failed).toBe(true);
   });
 
-  it('leaves overlay control zones to native Pressables instead of crosshair gestures', () => {
+  it('leaves overlay control zones to overlay gesture owners instead of crosshair gestures', () => {
     const crosshair = createCrosshair();
     const viewport = sharedViewport(viewportValue);
     const tradeLineRows = shared([]);
@@ -597,7 +611,7 @@ describe('native gesture activation', () => {
     expect(visibleCrosshair.failed).toBe(true);
   });
 
-  it('leaves overlay control zones to native Pressables instead of chart pan', () => {
+  it('leaves overlay control zones to overlay gesture owners instead of chart pan', () => {
     const panActive = shared(false);
     const viewport = sharedViewport(viewportValue);
     const tradeLineRows = shared([]);
@@ -650,7 +664,7 @@ describe('native gesture activation', () => {
       resetButtonVisible: true,
     }) as any;
 
-    expect(hiddenResetTapGesture.config.maxDistance).toBe(NATIVE_RESET_VIEW_TAP_MOVE_TOLERANCE);
+    expect(hiddenResetTapGesture.config.maxDistance).toBe(NATIVE_TAP_MAX_DISTANCE);
     expect(visibleResetTapGesture.config.maxDistance).toBe(NATIVE_RESET_VIEW_HIT_SIZE / 2);
 
     visibleResetTapGesture.handlers.onTouchesDown({
@@ -698,6 +712,25 @@ describe('native gesture activation', () => {
     expect(onResetViewTap).not.toHaveBeenCalled();
   });
 
+  it('leaves overlay control zones to overlay gesture owners instead of reset gestures', () => {
+    const onResetViewTap = vi.fn();
+    const resetTapGesture = createNativeResetViewTapGesture({
+      controlZones: [{ x1: 70, x2: 130, y1: 70, y2: 120 }],
+      frame,
+      onResetViewTap,
+      resetTapGestureState: resetTapState(),
+      resetButtonVisible: true,
+    }) as any;
+
+    resetTapGesture.handlers.onTouchesDown({
+      changedTouches: [{ x: 90, y: 90 }],
+      allTouches: [{ x: 90, y: 90 }],
+    });
+    resetTapGesture.handlers.onEnd({ x: 90, y: 90 }, true);
+
+    expect(onResetViewTap).not.toHaveBeenCalled();
+  });
+
   it('commits left tool rail toggle taps through the chart gesture layer', () => {
     const expandedLayout = createNativeLeftToolRailLayout({ height: 520, bottomInset: 32, topBarHeight: 36 });
     const collapsedLayout = createNativeLeftToolRailLayout({
@@ -741,6 +774,176 @@ describe('native gesture activation', () => {
 
     expect(onDrawingTap).toHaveBeenCalledTimes(1);
     expect(onDrawingTap).toHaveBeenCalledWith(80, 80);
+  });
+
+  it('leaves overlay control zones to overlay gesture owners instead of trade-line actions', () => {
+    const viewport = sharedViewport(viewportValue);
+    const tradeLineRows = shared([{ objectType: 'order' as const, objectId: 'order-1', price: 63_000 }]);
+    const tradeLineActionZones = shared([
+      {
+        objectType: 'order' as const,
+        objectId: 'order-1',
+        actionType: 'cancel' as const,
+        price: 63_000,
+        partialEnabled: false,
+        color: '#00a8d8',
+        x1: 70,
+        x2: 100,
+      },
+    ]);
+    const commitTradeLineAction = vi.fn();
+    const tradeLineActionTapGesture = createNativeTradeLineActionTapGesture({
+      bracketDragActive: shared(false),
+      commitTradeLineAction,
+      controlZones: [{ x1: 70, x2: 100, y1: 80, y2: 96 }],
+      frame,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones,
+      tradeLineRows,
+    }) as any;
+
+    tradeLineActionTapGesture.handlers.onEnd({ x: 80, y: 88 }, true);
+    tradeLineActionTapGesture.handlers.onEnd({ x: 80, y: 72 }, true);
+
+    expect(commitTradeLineAction).toHaveBeenCalledTimes(1);
+    expect(commitTradeLineAction).toHaveBeenCalledWith('order', 'order-1', 'cancel');
+  });
+
+  it('leaves overlay control zones to overlay gesture owners instead of price and time scale drags', () => {
+    const priceScaleActive = shared(false);
+    const timeScaleActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const controlZones = [
+      {
+        x1: frame.dimensions.width - frame.dimensions.margins.right,
+        x2: frame.dimensions.width,
+        y1: frame.mainPane.top,
+        y2: frame.mainPane.top + 20,
+      },
+      {
+        x1: frame.dimensions.margins.left,
+        x2: frame.dimensions.margins.left + 30,
+        y1: frame.dimensions.height - frame.dimensions.margins.bottom,
+        y2: frame.dimensions.height,
+      },
+    ];
+    const priceScaleGesture = createNativePriceScaleGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      controlZones,
+      frame,
+      priceScaleActive,
+      priceScaleGestureState: {
+        active: priceScaleActive,
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorPrice: shared(0),
+      },
+      sharedViewport: viewport,
+    }) as any;
+    const timeScaleGesture = createNativeTimeScaleGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      controlZones,
+      frame,
+      sharedViewport: viewport,
+      timeScaleActive,
+      timeScaleGestureState: {
+        active: timeScaleActive,
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+      },
+    }) as any;
+
+    const priceBlocked = mockStateManager();
+    priceScaleGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: frame.dimensions.width - 10, y: frame.mainPane.top + 10 }],
+        allTouches: [{ x: frame.dimensions.width - 10, y: frame.mainPane.top + 10 }],
+      },
+      priceBlocked,
+    );
+    expect(priceBlocked.failed).toBe(true);
+
+    const timeBlocked = mockStateManager();
+    timeScaleGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: frame.dimensions.margins.left + 10, y: frame.dimensions.height - 10 }],
+        allTouches: [{ x: frame.dimensions.margins.left + 10, y: frame.dimensions.height - 10 }],
+      },
+      timeBlocked,
+    );
+    expect(timeBlocked.failed).toBe(true);
+  });
+
+  it('leaves overlay control zones to overlay gesture owners instead of order and bracket drags', () => {
+    const viewport = sharedViewport(viewportValue);
+    const centerY = 88;
+    const price =
+      viewportValue.priceMax -
+      ((centerY - frame.mainPane.top) / frame.mainPane.height) * (viewportValue.priceMax - viewportValue.priceMin);
+    const tradeLineRows = shared([{ objectType: 'order' as const, objectId: 'order-1', price }]);
+    const orderDragZones = shared([{ objectId: 'order-1', price, x1: 40, x2: 120 }]);
+    const tradeLineActionZones = shared([
+      {
+        objectType: 'order' as const,
+        objectId: 'order-1',
+        actionType: 'tp' as const,
+        price,
+        dragPrice: price + 10,
+        partialEnabled: false,
+        color: '#00a8d8',
+        x1: 130,
+        x2: 156,
+      },
+    ]);
+    const controlZones = [
+      { x1: 40, x2: 120, y1: centerY - 10, y2: centerY + 10 },
+      { x1: 130, x2: 156, y1: centerY - 10, y2: centerY + 10 },
+    ];
+    const orderDragGesture = createNativeOrderDragGesture({
+      commitOrderMove: () => {},
+      controlZones,
+      frame,
+      orderDragState: createOrderDragState(),
+      orderDragZones,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones,
+      tradeLineRows,
+    }) as any;
+    const bracketDragGesture = createNativeBracketDragGesture({
+      bracketDragInteractionState: createBracketDragState(),
+      clearNativeBracketDrag: () => {},
+      commitBracketMove: () => {},
+      controlZones,
+      frame,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones,
+      tradeLineRows,
+    }) as any;
+
+    const orderBlocked = mockStateManager();
+    orderDragGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: centerY }], allTouches: [{ x: 80, y: centerY }] },
+      orderBlocked,
+    );
+    expect(orderBlocked.failed).toBe(true);
+
+    const bracketBlocked = mockStateManager();
+    bracketDragGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 140, y: centerY }], allTouches: [{ x: 140, y: centerY }] },
+      bracketBlocked,
+    );
+    expect(bracketBlocked.failed).toBe(true);
   });
 
   it('filters viewport gesture ownership at touch-down but begins after pan recognition', () => {
@@ -944,6 +1147,73 @@ describe('native gesture activation', () => {
         priceMax: expect.any(Number),
       }),
     );
+  });
+
+  it('leaves overlay control zones to overlay gesture owners instead of axis pinch touch starts', () => {
+    const panActive = shared(false);
+    const pinchActive = shared(false);
+    const priceScaleActive = shared(false);
+    const timeScaleActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const chartAxisPinchGesture = createNativeChartAxisPinchGesture({
+      beginNativeViewportInteraction: () => {},
+      bracketDragActive: shared(false),
+      bracketDragInteractionState: createBracketDragState(),
+      cancelNativeViewportInteraction: () => {},
+      chartAxisPinchGestureState: {
+        active: pinchActive,
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+        activeAnchorPrice: shared(0),
+        activeStartSpanX: shared(0),
+        activeStartSpanY: shared(0),
+      },
+      commitPanViewport: () => {},
+      controlZones: [{ x1: 50, x2: 70, y1: 50, y2: 70 }],
+      frame,
+      orderDragState: createOrderDragState(),
+      orderDragZones: shared([]),
+      panActive,
+      pinchActive,
+      priceScaleActive,
+      sharedViewport: viewport,
+      timeScaleActive,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+    }) as any;
+
+    const blocked = mockStateManager();
+    chartAxisPinchGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 120, y: 100 }],
+        allTouches: [
+          { x: 60, y: 60 },
+          { x: 120, y: 100 },
+        ],
+      },
+      blocked,
+    );
+
+    expect(blocked.failed).toBe(true);
+    expect(pinchActive.value).toBe(false);
+
+    const centerOverlapAllowed = mockStateManager();
+    chartAxisPinchGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 80, y: 80 }],
+        allTouches: [
+          { x: 30, y: 60 },
+          { x: 90, y: 60 },
+        ],
+      },
+      centerOverlapAllowed,
+    );
+
+    expect(centerOverlapAllowed.failed).toBe(false);
   });
 
   it('transitions an active chart pan into axis pinch when a second finger joins', () => {
