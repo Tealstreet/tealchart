@@ -247,6 +247,8 @@ export interface PriceLineLabel {
   backgroundColor?: string;
   /** Text color (default: inherits from line color) */
   textColor?: string;
+  /** Render simple price-axis labels as filled tags instead of outline-only tags. */
+  filled?: boolean;
 }
 
 /**

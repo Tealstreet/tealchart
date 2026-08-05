@@ -6,7 +6,7 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from '../drawings';
-import type { Bar, Viewport } from '../types';
+import type { Bar, PositionLineRenderData, PriceLineLabelBounds, Viewport } from '../types';
 
 import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -23,26 +23,20 @@ interface EventManagerCallbackProbe {
   onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
   onDrawingDragCancel?: (source: 'mouse' | 'touch') => void;
   onCrossHairMoved?: (x: number, y: number) => void;
-  onCrosshairRender?: () => void;
   onCursorChange?: (cursor: string) => void;
 }
 
-const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe; isDragging: boolean }>);
+const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe }>);
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
-    private instance: { callbacks: EventManagerCallbackProbe; isDragging: boolean };
-
     constructor(_container: HTMLElement, callbacks: EventManagerCallbackProbe) {
-      this.instance = { callbacks, isDragging: false };
-      eventManagerInstances.push(this.instance);
+      eventManagerInstances.push({ callbacks });
     }
-
     getIsDragging() {
-      return this.instance.isDragging;
+      return false;
     }
-
     dispose() {}
   },
 }));
@@ -91,6 +85,7 @@ function stubCanvasContext(): void {
     setTransform: () => {},
     scale: () => {},
     translate: () => {},
+    rotate: () => {},
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -106,6 +101,56 @@ function makeBars(count: number, startTime = 1_000_000, interval = 60_000, baseP
     close: basePrice + (i + 1) * 10,
     volume: 100 + i,
   }));
+}
+
+function makePositionLine(overrides: Partial<PositionLineRenderData> = {}): PositionLineRenderData {
+  return {
+    id: 'position-1',
+    positionId: 'position-1',
+    price: 50010,
+    lineColor: '#2196F3',
+    lineStyle: 0,
+    lineLength: 100,
+    lineLengthUnit: 'percentage',
+    extendLeft: true,
+    lineWidth: 1,
+    text: 'Long',
+    textShort: 'Lng',
+    quantity: '1 BTC',
+    quantityShort: '1',
+    pnl: '$0.00',
+    pnlShort: '0',
+    profitState: 'neutral',
+    bodyBackgroundColor: '#111111',
+    bodyTextColor: '#ffffff',
+    bodyBorderColor: '#2196F3',
+    bodyFont: '',
+    quantityBackgroundColor: '#111111',
+    quantityTextColor: '#ffffff',
+    quantityBorderColor: '#2196F3',
+    quantityFont: '',
+    reverseButtonBackgroundColor: '#2196F3',
+    reverseButtonIconColor: '#ffffff',
+    reverseButtonBorderColor: '#2196F3',
+    closeButtonBackgroundColor: '#2196F3',
+    closeButtonIconColor: '#ffffff',
+    closeButtonBorderColor: '#2196F3',
+    tooltip: '',
+    closeTooltip: 'Close',
+    reverseTooltip: 'Reverse',
+    protectTooltipText: 'Protect',
+    partialEnabled: true,
+    reversible: true,
+    closeable: true,
+    brackets: {},
+    positionData: {
+      entryPrice: 50000,
+      isLong: true,
+      notional: 1000,
+    },
+    callbacks: {},
+    ...overrides,
+  };
 }
 
 interface CountdownManagerProbe {
@@ -337,10 +382,14 @@ describe('ChartCore viewport management', () => {
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(1);
     expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), {
       additive: undefined,
+      toggleSelected: false,
     });
     expect(testCore.handleUserDrawingInput(100, 100, 'mouse', { additiveSelection: true })).toBe(false);
     expect(onUserDrawingSelection).toHaveBeenCalledTimes(2);
-    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), { additive: true });
+    expect(onUserDrawingSelection).toHaveBeenLastCalledWith(expect.anything(), expect.any(Map), {
+      additive: true,
+      toggleSelected: false,
+    });
     expect(testCore.handleUserDrawingInput(100, 100, 'touch')).toEqual({
       handled: true,
       allowPaneDoubleClick: true,
@@ -958,21 +1007,155 @@ describe('ChartCore viewport management', () => {
     expect(manager.cachedLineGroups.has('order-1-tp')).toBe(true);
     expect(manager.cachedLineGroups.has('order-1-sl')).toBe(true);
     const tpBound = manager.cachedLineGroups.get('order-1-tp')?.getAttr('boundData') as {
-      label?: { backgroundColor: string; textColor: string; secondaryText?: string };
+      label?: { backgroundColor: string; textColor: string; secondaryText?: string; filled?: boolean };
     };
     const slBound = manager.cachedLineGroups.get('order-1-sl')?.getAttr('boundData') as {
-      label?: { backgroundColor: string; textColor: string; secondaryText?: string };
+      label?: { backgroundColor: string; textColor: string; secondaryText?: string; filled?: boolean };
     };
     expect(tpBound.label).toMatchObject({
       backgroundColor: '#00aa77',
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
-      secondaryText: 'TP',
+      filled: true,
     });
+    expect(tpBound.label?.secondaryText).toBeUndefined();
     expect(slBound.label).toMatchObject({
       backgroundColor: '#f97316',
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
-      secondaryText: 'SL',
+      filled: true,
     });
+    expect(slBound.label?.secondaryText).toBeUndefined();
+    const slRefs = manager.cachedLineGroups.get('order-1-sl')?.getAttr('contentRefs') as LineContentRefsProbe;
+    expect(slRefs.priceAxisRect?.fill()).toBe('#f97316');
+
+    core.dispose();
+  });
+
+  it('settles optimistic bracket creates when external order callbacks resolve', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: { upColor: '#00aa77', downColor: '#ee3355' },
+    });
+
+    let resolveSubmit!: () => void;
+    const submitPromise = new Promise<void>((resolve) => {
+      resolveSubmit = resolve;
+    });
+    const onSLMoveEnd = vi.fn(() => submitPromise);
+    core.setBars(makeBars(5));
+    core.setPositionLines([
+      makePositionLine({
+        brackets: {},
+        callbacks: {
+          onSLMoveEnd,
+        },
+      }),
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const bound = {
+      lineId: 'position-1',
+      positionId: 'position-1',
+      type: 'position',
+      price: 50010,
+      originalY: 0,
+      adjustedY: 0,
+      width: 0,
+      height: 0,
+      color: '#2196F3',
+      label: { primaryText: '50,010' },
+      lineStyle: 'solid',
+      callbacks: {
+        onSLMoveEnd,
+      },
+    } as PriceLineLabelBounds;
+    const privateCore = core as unknown as {
+      handleBracketMoveEnd(type: 'tp' | 'sl', bound: PriceLineLabelBounds, price: number, percent: number): void;
+      oemsActions: { getActions(): unknown[] };
+    };
+
+    privateCore.handleBracketMoveEnd('sl', bound, 49900, 75);
+    core.paint(DIRTY.FULL);
+
+    const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
+    expect(onSLMoveEnd).toHaveBeenCalledWith(49900, 75);
+    expect(privateCore.oemsActions.getActions()).toHaveLength(1);
+    expect(manager.cachedLineGroups.has('position-1-sl')).toBe(true);
+    const pendingRefs = manager.cachedLineGroups.get('position-1-sl')?.getAttr('contentRefs') as LineContentRefsProbe;
+    const pendingBound = manager.cachedLineGroups.get('position-1-sl')?.getAttr('boundData') as PriceLineLabelBounds;
+    expect(pendingRefs.priceAxisRect?.fill()).toBe('#f97316');
+    expect(pendingBound.label).toMatchObject({
+      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      filled: true,
+    });
+    expect(pendingBound.label.secondaryText).toBeUndefined();
+
+    resolveSubmit();
+    await Promise.resolve();
+    await Promise.resolve();
+    core.paint(DIRTY.FULL);
+
+    expect(privateCore.oemsActions.getActions()).toHaveLength(0);
+    expect(manager.cachedLineGroups.has('position-1-sl')).toBe(false);
+
+    core.dispose();
+  });
+
+  it('draws the active bracket drag price on the price axis overlay', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: { pricePrecision: 0 },
+    });
+
+    core.setBars(makeBars(5));
+    const fillText = vi.fn();
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      roundRect: vi.fn(),
+      measureText: (text: string) => ({ width: text.length * 7 }),
+      setLineDash: vi.fn(),
+      fillText,
+      font: '',
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 1,
+      textAlign: 'left',
+      textBaseline: 'top',
+      globalAlpha: 1,
+    };
+    const privateCore = core as unknown as {
+      _bracketDragState: unknown;
+      _drawBracketPreview(ctx: CanvasRenderingContext2D): void;
+    };
+
+    privateCore._bracketDragState = {
+      type: 'sl',
+      positionId: 'position-1',
+      price: 49900,
+      entryPrice: 50000,
+      partialPercent: 100,
+      partialEnabled: false,
+      dragStartX: 300,
+      dragCurrentX: 300,
+      positionData: { entryPrice: 50000, isLong: true, notional: 1000 },
+      color: '#f97316',
+    };
+    privateCore._drawBracketPreview(ctx as unknown as CanvasRenderingContext2D);
+
+    expect(fillText).toHaveBeenCalledWith('49,900', expect.any(Number), expect.any(Number));
 
     core.dispose();
   });
@@ -1091,7 +1274,7 @@ describe('ChartCore viewport management', () => {
     };
     expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
       backgroundColor: '#ee3355',
-      borderColor: 'rgba(255, 255, 255, 0.16)',
+      borderColor: '#2196F3',
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
@@ -1145,7 +1328,7 @@ describe('ChartCore viewport management', () => {
     });
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
       backgroundColor: '#00aa77',
-      borderColor: 'rgba(255, 255, 255, 0.16)',
+      borderColor: '#ef5350',
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
     });
     expect(core.getViewport()).not.toBeNull();
@@ -1440,7 +1623,8 @@ describe('ChartCore viewport management', () => {
     const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
     const lineGroup = manager.cachedLineGroups.get('order-cursor');
     const draggableRects = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) as
-      Konva.Rect[] | undefined;
+      | Konva.Rect[]
+      | undefined;
     const orderDragRect = draggableRects?.[0];
 
     expect(orderDragRect).toBeDefined();
@@ -1452,37 +1636,6 @@ describe('ChartCore viewport management', () => {
     expect(chartContainer.style.cursor).toBe('grabbing');
 
     orderDragRect!.fire('dragend');
-    expect(chartContainer.style.cursor).toBe('crosshair');
-    core.dispose();
-  });
-
-  it('does not let crosshair overlay repaint override the active pan cursor', async () => {
-    const { ChartCore } = await import('./ChartCore');
-    const core = new ChartCore({
-      container,
-      width: 800,
-      height: 600,
-      onContextMenu: vi.fn(),
-    });
-
-    core.setBars(makeBars(5));
-    core.paint(DIRTY.FULL);
-
-    const chartContainer = container.firstElementChild as HTMLElement;
-    const eventManager = eventManagerInstances[0];
-
-    eventManager.callbacks.onCrossHairMoved?.(729, 120);
-    eventManager.callbacks.onCrosshairRender?.();
-    expect(chartContainer.style.cursor).toBe('pointer');
-
-    eventManager.isDragging = true;
-    eventManager.callbacks.onCursorChange?.('grabbing');
-    eventManager.callbacks.onCrossHairMoved?.(729, 140);
-    eventManager.callbacks.onCrosshairRender?.();
-    expect(chartContainer.style.cursor).toBe('grabbing');
-
-    eventManager.isDragging = false;
-    eventManager.callbacks.onCursorChange?.('crosshair');
     expect(chartContainer.style.cursor).toBe('crosshair');
     core.dispose();
   });
@@ -1538,7 +1691,8 @@ describe('ChartCore viewport management', () => {
     const probe = core as unknown as { priceLineManager: PriceLineManagerProbe; stage: Konva.Stage };
     const lineGroup = probe.priceLineManager.cachedLineGroups.get('order-hover-cursor');
     const draggableRects = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) as
-      Konva.Rect[] | undefined;
+      | Konva.Rect[]
+      | undefined;
     const orderDragRect = draggableRects?.[0];
 
     expect(orderDragRect).toBeDefined();

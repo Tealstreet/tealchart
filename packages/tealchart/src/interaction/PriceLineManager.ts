@@ -373,6 +373,7 @@ export class PriceLineManager {
           b.label?.secondaryText ?? '',
           b.label?.backgroundColor ?? '',
           b.label?.textColor ?? '',
+          b.label?.filled ? '1' : '0',
           segmentSignature,
           buttonSignature,
         ].join('|');
@@ -486,8 +487,12 @@ export class PriceLineManager {
     const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
     if (!refs) return;
 
-    if (bound.type !== 'price') {
+    const shouldFillPriceAxisLabel = bound.type !== 'price' || bound.label.filled;
+    if (shouldFillPriceAxisLabel) {
       refs.priceAxisRect?.fill(bound.label.backgroundColor || bound.color);
+      refs.priceAxisRect?.fillEnabled(true);
+    } else {
+      refs.priceAxisRect?.fillEnabled(false);
     }
     refs.priceAxisRect?.stroke(bound.color);
 
@@ -670,11 +675,14 @@ export class PriceLineManager {
     const fontFamily = this.getTextFontFamily();
 
     // Border-only label
+    const shouldFill = Boolean(bound.label.filled);
     const priceAxisRect = new Konva.Rect({
       x,
       y,
       width: bound.width,
       height: bound.height,
+      fill: shouldFill ? bound.label.backgroundColor || bound.color : undefined,
+      fillEnabled: shouldFill,
       stroke: bound.color,
       strokeWidth: 1,
       cornerRadius: 2,

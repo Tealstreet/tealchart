@@ -33,9 +33,9 @@ export function tradingLineToBracketLines(
       priority: 70,
       label: {
         primaryText: formatPrice(brackets.takeProfit),
-        secondaryText: 'TP',
         backgroundColor: takeProfitColor,
         textColor: takeProfitTextColor,
+        filled: true,
       },
     });
   }
@@ -53,9 +53,9 @@ export function tradingLineToBracketLines(
       priority: 70,
       label: {
         primaryText: formatPrice(brackets.stopLoss),
-        secondaryText: 'SL',
         backgroundColor: stopLossColor,
         textColor: stopLossTextColor,
+        filled: true,
       },
     });
   }
