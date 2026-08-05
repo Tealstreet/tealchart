@@ -23,20 +23,26 @@ interface EventManagerCallbackProbe {
   onDrawingDragEnd?: (source: 'mouse' | 'touch') => void;
   onDrawingDragCancel?: (source: 'mouse' | 'touch') => void;
   onCrossHairMoved?: (x: number, y: number) => void;
+  onCrosshairRender?: () => void;
   onCursorChange?: (cursor: string) => void;
 }
 
-const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe }>);
+const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe; isDragging: boolean }>);
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
+    private instance: { callbacks: EventManagerCallbackProbe; isDragging: boolean };
+
     constructor(_container: HTMLElement, callbacks: EventManagerCallbackProbe) {
-      eventManagerInstances.push({ callbacks });
+      this.instance = { callbacks, isDragging: false };
+      eventManagerInstances.push(this.instance);
     }
+
     getIsDragging() {
-      return false;
+      return this.instance.isDragging;
     }
+
     dispose() {}
   },
 }));
@@ -1636,6 +1642,37 @@ describe('ChartCore viewport management', () => {
     expect(chartContainer.style.cursor).toBe('grabbing');
 
     orderDragRect!.fire('dragend');
+    expect(chartContainer.style.cursor).toBe('crosshair');
+    core.dispose();
+  });
+
+  it('does not let crosshair overlay repaint override the active pan cursor', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+    });
+
+    core.setBars(makeBars(5));
+    core.paint(DIRTY.FULL);
+
+    const chartContainer = container.firstElementChild as HTMLElement;
+    const eventManager = eventManagerInstances[0];
+
+    eventManager.callbacks.onCrossHairMoved?.(729, 120);
+    eventManager.callbacks.onCrosshairRender?.();
+    expect(chartContainer.style.cursor).toBe('pointer');
+
+    eventManager.isDragging = true;
+    eventManager.callbacks.onCursorChange?.('grabbing');
+    eventManager.callbacks.onCrossHairMoved?.(729, 140);
+    eventManager.callbacks.onCrosshairRender?.();
+    expect(chartContainer.style.cursor).toBe('grabbing');
+
+    eventManager.isDragging = false;
+    eventManager.callbacks.onCursorChange?.('crosshair');
     expect(chartContainer.style.cursor).toBe('crosshair');
     core.dispose();
   });
