@@ -82,6 +82,20 @@ Tealchart's widget interfaces mirror TradingView's. Be careful to:
 - Document any deliberate divergence from TradingView's behavior so
   consumers know what to expect when porting.
 
+## Async OEMS actions
+
+Chart trading interactions call consumer callbacks through an awaited
+contract. The chart may set optimistic hold state before invoking the callback,
+then it must flush that state when the callback resolves, returns `false`, or
+throws.
+
+Consumer adapters must return the promise for confirmation dialogs, network
+submits, and nested flows. Do not fire-and-forget chart callbacks. Existing
+order or bracket amends can wait for account-line confirmation after the
+callback resolves; externally-created objects such as a new TP/SL bracket
+settle on callback completion because the resulting order may appear under a
+different chart object.
+
 ## Code style
 
 Prettier + ESLint with the project defaults. Run `yarn lint` and
