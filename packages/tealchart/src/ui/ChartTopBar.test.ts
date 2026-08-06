@@ -335,9 +335,9 @@ describe('ChartTopBar drawing toolbar', () => {
     const collapseButton = document.querySelector<HTMLButtonElement>('button[aria-label="Collapse drawing toolbar"]');
     expect(collapseButton?.style.position).toBe('absolute');
     expect(collapseButton?.style.bottom).toBe('10px');
-    expect(collapseButton?.style.right).toBe('-10px');
-    expect(collapseButton?.style.width).toBe('18px');
-    expect(collapseButton?.style.height).toBe('42px');
+    expect(collapseButton?.style.right).toBe('-6px');
+    expect(collapseButton?.style.width).toBe('14px');
+    expect(collapseButton?.style.height).toBe('38px');
 
     collapseButton?.click();
 
@@ -351,7 +351,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(expandButton).not.toBeNull();
     expect(expandButton?.style.position).toBe('absolute');
     expect(expandButton?.style.bottom).toBe('10px');
-    expect(expandButton?.style.right).toBe('-10px');
+    expect(expandButton?.style.right).toBe('-6px');
 
     topBar.unmount();
     clearChartStoreCache();
@@ -366,6 +366,9 @@ describe('ChartTopBar drawing toolbar', () => {
 
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.getAttribute('aria-expanded')).toBe(
       'false',
+    );
+    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.style.transform).toBe(
+      'translateX(-36px)',
     );
     expect(restoredTopBar.getElement().style.marginLeft).toBe('34px');
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
