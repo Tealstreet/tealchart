@@ -791,7 +791,7 @@ export class ChartCore {
           this.crosshair.x,
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
         );
-        this.handleContextMenu(rect.right - this.margins.right, rect.top + this.crosshair.y, price, time);
+        this.handleContextMenu(rect.left + b.x, rect.top + b.y, price, time, 'crosshairButton');
       }
     };
     this.chartContainer.addEventListener('click', this.plusButtonClickHandler);
@@ -1622,7 +1622,13 @@ export class ChartCore {
     this.options.onContextMenu = callback;
   }
 
-  private handleContextMenu(screenX: number, screenY: number, price: number, time: number): void {
+  private handleContextMenu(
+    screenX: number,
+    screenY: number,
+    price: number,
+    time: number,
+    placement: 'default' | 'crosshairButton' = 'default',
+  ): void {
     const drawingItems =
       this.viewport && this.userDrawingState?.activeTool === 'select'
         ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
@@ -1682,6 +1688,7 @@ export class ChartCore {
     }
 
     document.body.appendChild(this.contextMenu);
+    this.positionContextMenu(screenX, screenY, placement);
 
     // Close on click outside
     this.contextMenuCloseHandler = (e: MouseEvent) => {
@@ -1694,6 +1701,22 @@ export class ChartCore {
       if (!this.contextMenu || !this.contextMenuCloseHandler) return;
       document.addEventListener('click', this.contextMenuCloseHandler);
     }, 0);
+  }
+
+  private positionContextMenu(screenX: number, screenY: number, placement: 'default' | 'crosshairButton'): void {
+    if (!this.contextMenu) return;
+    const rect = this.contextMenu.getBoundingClientRect();
+    const menuWidth = rect.width || 150;
+    const menuHeight = rect.height || this.contextMenu.offsetHeight || 0;
+    const margin = 8;
+    const gap = 6;
+    const desiredLeft = placement === 'crosshairButton' ? screenX - menuWidth - gap : screenX;
+    const desiredTop = placement === 'crosshairButton' ? screenY + gap : screenY;
+    const maxLeft = Math.max(margin, window.innerWidth - menuWidth - margin);
+    const maxTop = Math.max(margin, window.innerHeight - menuHeight - margin);
+
+    this.contextMenu.style.left = `${Math.min(Math.max(desiredLeft, margin), maxLeft)}px`;
+    this.contextMenu.style.top = `${Math.min(Math.max(desiredTop, margin), maxTop)}px`;
   }
 
   private closeContextMenu(): void {

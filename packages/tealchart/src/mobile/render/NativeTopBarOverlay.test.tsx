@@ -62,7 +62,7 @@ function createLayout() {
     activeTextColor: '#12c48b',
     activeBackgroundColor: '#24312b',
     indicatorsEnabled: true,
-    layoutName: 'tealstreet',
+    layoutName: 'Default',
     layoutSelectorEnabled: true,
     undoEnabled: true,
     redoEnabled: true,
@@ -85,7 +85,7 @@ describe('NativeTopBarOverlay', () => {
     const scrollViews = collectElementsByType(overlay, ScrollView);
     const contentViews = collectElementsByType(overlay, View);
 
-    expect(texts).toEqual(expect.arrayContaining(['BTC-USD', '15m', 'tealstreet', 'Indicators']));
+    expect(texts).toEqual(expect.arrayContaining(['BTC-USD', '15m', 'Default', 'Indicators']));
     expect(iconNames).toEqual(expect.arrayContaining(['chevronDown', 'indicators', 'undo', 'redo']));
     expect(iconNames.filter((name) => name === 'chevronDown')).toHaveLength(2);
     expect(pressables.length).toBe(createLayout().buttons.length + 1);

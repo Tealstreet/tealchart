@@ -601,6 +601,38 @@ describe('ChartCore viewport management', () => {
     removeDocumentListener.mockRestore();
   });
 
+  it('opens the crosshair button context menu down-left from its anchor', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onContextMenu = vi.fn(() => [{ position: 'top' as const, text: 'Limit Buy', click: vi.fn() }]);
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu,
+    });
+    const testCore = core as unknown as {
+      handleContextMenu(
+        screenX: number,
+        screenY: number,
+        price: number,
+        time: number,
+        placement?: 'default' | 'crosshairButton',
+      ): void;
+    };
+
+    testCore.handleContextMenu(300, 100, 10, 20, 'crosshairButton');
+    const crosshairMenu = document.body.lastElementChild as HTMLElement;
+    expect(crosshairMenu.style.left).toBe('144px');
+    expect(crosshairMenu.style.top).toBe('106px');
+
+    testCore.handleContextMenu(300, 100, 10, 20);
+    const defaultMenu = document.body.lastElementChild as HTMLElement;
+    expect(defaultMenu.style.left).toBe('300px');
+    expect(defaultMenu.style.top).toBe('100px');
+
+    core.dispose();
+  });
+
   it.each(['rectangle', 'fibCircles', 'fibSpiral', 'gannSquare', 'gannSquareFixed'] satisfies UserDrawingTool[])(
     'constrains the %s second click to a square when placement is constrained',
     async (tool) => {

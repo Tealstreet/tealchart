@@ -33,7 +33,7 @@ describe('native layout persistence defaults', () => {
     expect(resolved.autoSaveDelay).toBe(1);
     const layoutId = await resolved.saveLoadAdapter!.saveChart({
       content: '{}',
-      name: 'tealstreet',
+      name: 'Default',
       resolution: '15',
       symbol: 'BTC',
     });
