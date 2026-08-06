@@ -963,6 +963,8 @@ export interface TealchartWidgetOptions {
   chartKey?: string;
   /** Whether to show the built-in top bar with timeframe selector (default: true) */
   showTopBar?: boolean;
+  /** Called when the built-in top bar symbol control is clicked. */
+  onSymbolClick?: () => void;
   /**
    * SaveLoadAdapter for loading/saving layouts (same pattern as TradingView's save_load_adapter)
    * When provided, enables layout selector UI in the top bar.

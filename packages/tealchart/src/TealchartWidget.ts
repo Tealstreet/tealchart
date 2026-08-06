@@ -1142,6 +1142,7 @@ export class TealchartWidget {
       showTopBar,
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
+      onSymbolClick: this._options.onSymbolClick,
       onIntervalChange: (interval) => {
         this._chartApi.setResolution(interval);
       },
