@@ -166,6 +166,9 @@ const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
 const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
 const DRAWING_RAIL_ANIMATION_DURATION_MS = 160;
+const DRAWING_RAIL_COLLAPSE_TAB_WIDTH = 14;
+const DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH = 14;
+const DRAWING_RAIL_COLLAPSE_TAB_OVERHANG = 6;
 
 // The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); flyouts
 // cap their height to that content box so long lists don't overflow over the time axis.
@@ -221,10 +224,13 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   symbolCaret: {
-    color: 'var(--text2, #787b86)',
-    fontSize: '10px',
-    lineHeight: '1',
-    marginLeft: '4px',
+    width: '0',
+    height: '0',
+    marginLeft: '5px',
+    borderLeft: '4px solid transparent',
+    borderRight: '4px solid transparent',
+    borderTop: '5px solid var(--text2, #787b86)',
+    pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   exchange: {
@@ -354,13 +360,13 @@ const styles = {
 
   drawingRailCollapseTab: {
     position: 'absolute',
-    right: '-10px',
+    right: `-${DRAWING_RAIL_COLLAPSE_TAB_OVERHANG}px`,
     bottom: '10px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '18px',
-    height: '42px',
+    width: `${DRAWING_RAIL_COLLAPSE_TAB_WIDTH}px`,
+    height: '38px',
     border: '1px solid var(--border, #2a2e39)',
     borderLeft: 'none',
     borderTopRightRadius: '10px',
@@ -815,7 +821,6 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       symbolSection.appendChild(
         this.createElement('span', {
           style: styles.symbolCaret,
-          textContent: '▾',
         }),
       );
     }
@@ -957,7 +962,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private resolveDrawingToolRailCollapsedTransform(): string {
-    return `translateX(-${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px)`;
+    const distance = WEB_CHART_CHROME_METRICS.leftToolRailWidth - DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH;
+    return `translateX(-${distance}px)`;
   }
 
   private getDrawingToolRailInitialTransform(collapsed: boolean): string {

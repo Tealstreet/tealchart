@@ -56,6 +56,17 @@ const selectorStyles = {
     textOverflow: 'ellipsis',
   } as Partial<CSSStyleDeclaration>,
 
+  buttonChevron: {
+    width: '0',
+    height: '0',
+    marginLeft: '5px',
+    borderLeft: '4px solid transparent',
+    borderRight: '4px solid transparent',
+    borderTop: '5px solid var(--text2, #787b86)',
+    pointerEvents: 'none',
+    flexShrink: '0',
+  } as Partial<CSSStyleDeclaration>,
+
   listItem: {
     display: 'flex',
     alignItems: 'center',
@@ -348,12 +359,7 @@ export class LayoutSelector {
     this.buttonEl.appendChild(this.buttonLabelEl);
 
     const chevron = document.createElement('span');
-    chevron.style.display = 'inline-flex';
-    chevron.style.alignItems = 'center';
-    chevron.style.fontSize = '11px';
-    chevron.style.lineHeight = '1';
-    chevron.style.marginLeft = '4px';
-    chevron.textContent = '\u25BE';
+    Object.assign(chevron.style, selectorStyles.buttonChevron);
     this.buttonEl.appendChild(chevron);
 
     this.buttonEl.addEventListener('mouseenter', () => {
