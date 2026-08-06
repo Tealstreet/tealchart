@@ -437,6 +437,7 @@ export class ChartCore {
   private showResetButton = false;
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
   private cursor = 'crosshair';
+  private requestedCursor = 'crosshair';
 
   // Bracket drag preview state (TP/SL drag visualization on crosshair canvas)
   private _bracketDragState: {
@@ -464,23 +465,34 @@ export class ChartCore {
   private rafId: number | null = null;
 
   private applyCursor(cursor: string): void {
-    let nextCursor = cursor;
-    if (this.priceLineManager?.isDragging() && cursor !== 'grabbing') {
-      nextCursor = 'grabbing';
-    } else if (cursor === 'pointer' || cursor === 'crosshair') {
-      nextCursor = this.getKonvaCursorAt(this.crosshair.x, this.crosshair.y) ?? cursor;
+    this.requestedCursor = cursor;
+    this.applyResolvedCursor();
+  }
+
+  private resolveCursor(): string {
+    // Cursor priority is centralized here: active gestures lock the cursor,
+    // then price-line drags, then passive hover intent.
+    const activeGestureCursor = this.eventManager?.getActiveCursor();
+    if (activeGestureCursor) return activeGestureCursor;
+    if (this.priceLineManager?.isDragging()) return 'grabbing';
+    if (this.requestedCursor === 'pointer' || this.requestedCursor === 'crosshair') {
+      return this.getKonvaCursorAt(this.crosshair.x, this.crosshair.y) ?? this.requestedCursor;
     }
-    const wasDragging = this.cursor === 'grabbing';
+    return this.requestedCursor;
+  }
+
+  private applyResolvedCursor(): void {
+    const nextCursor = this.resolveCursor();
 
     this.cursor = nextCursor;
-    this.chartContainer.style.cursor = nextCursor;
-    if (this.stage) {
-      this.stage.container().style.cursor = nextCursor;
+    if (this.chartContainer.style.cursor !== nextCursor) {
+      this.chartContainer.style.cursor = nextCursor;
     }
-
-    if (nextCursor === 'grabbing' || wasDragging) {
-      this.crosshair.visible = false;
-      this.renderCrosshairOverlay();
+    if (this.stage) {
+      const stageContainer = this.stage.container();
+      if (stageContainer.style.cursor !== nextCursor) {
+        stageContainer.style.cursor = nextCursor;
+      }
     }
   }
 
