@@ -109,6 +109,8 @@ export interface TealchartWidgetUIOptions {
   renderOptions?: Partial<RenderOptions>;
   /** Callback when interval changes */
   onIntervalChange?: (interval: ResolutionString) => void;
+  /** Callback when the symbol control is clicked */
+  onSymbolClick?: () => void;
   /** Callback when indicator is added */
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
   /** Indicators available in this chart runtime */
@@ -361,6 +363,7 @@ export class TealchartWidgetUI {
       this.topBar = new ChartTopBar({
         chartKey: options.chartKey,
         symbol: options.symbol,
+        onSymbolClick: options.onSymbolClick,
         onIntervalChange: (interval) => {
           options.onIntervalChange?.(interval);
         },
