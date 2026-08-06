@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import type { LayoutMetadata } from '../transformer/saveLoadIntegration';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

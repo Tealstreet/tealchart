@@ -83,9 +83,14 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(categoryRail).not.toBeNull();
     expect(categoryList).not.toBeNull();
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
+    expect(topBar.getElement().style.overflowX).toBe('auto');
+    expect(topBar.getElement().style.overflowY).toBe('hidden');
     expect(categoryRail?.style.overflow).toBe('visible');
     expect(categoryList?.style.overflowY).toBe('auto');
-    expect(categoryList?.style.maxHeight).not.toBe('');
+    expect(categoryList?.style.flexGrow).toBe('1');
+    expect(categoryList?.style.flexShrink).toBe('1');
+    expect(categoryList?.style.minHeight).toBe('0px');
+    expect(categoryList?.style.maxHeight).toBe('');
     expect(shapesCategory?.getAttribute('aria-pressed')).toBe('true');
     expect(linesCategory?.getAttribute('aria-pressed')).toBe('false');
     expect(linesCategory?.getAttribute('aria-haspopup')).toBe('menu');

@@ -10,6 +10,7 @@
 
 import type { LayoutMetadata } from '../transformer/saveLoadIntegration';
 
+import { DEFAULT_LAYOUT_NAME } from '../layoutDefaults';
 import { Modal } from './Modal';
 
 // ============================================================================
@@ -343,12 +344,15 @@ export class LayoutSelector {
     this.buttonLabelEl = document.createElement('span');
     this.buttonLabelEl.style.overflow = 'hidden';
     this.buttonLabelEl.style.textOverflow = 'ellipsis';
-    this.buttonLabelEl.textContent = 'Default';
+    this.buttonLabelEl.textContent = DEFAULT_LAYOUT_NAME;
     this.buttonEl.appendChild(this.buttonLabelEl);
 
     const chevron = document.createElement('span');
-    chevron.style.fontSize = '8px';
-    chevron.style.marginLeft = '2px';
+    chevron.style.display = 'inline-flex';
+    chevron.style.alignItems = 'center';
+    chevron.style.fontSize = '11px';
+    chevron.style.lineHeight = '1';
+    chevron.style.marginLeft = '4px';
     chevron.textContent = '\u25BE';
     this.buttonEl.appendChild(chevron);
 

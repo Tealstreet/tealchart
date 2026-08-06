@@ -164,9 +164,8 @@ const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
 const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
 
-// The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); the
-// tool list and flyout cap their height to that content box so long lists don't
-// overflow into the padding / over the time axis.
+// The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); flyouts
+// cap their height to that content box so long lists don't overflow over the time axis.
 const LEFT_TOOL_RAIL_VERTICAL_PADDING = 8;
 
 const styles = {
@@ -291,9 +290,11 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '2px',
-    maxHeight: `calc(100vh - ${
-      TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
-    }px)`,
+    flexGrow: '1',
+    flexShrink: '1',
+    flexBasis: 'auto',
+    minHeight: '0',
+    width: '100%',
     overflowY: 'auto',
     overflowX: 'hidden',
     scrollbarWidth: 'none',
@@ -301,6 +302,7 @@ const styles = {
 
   drawingToolRailItem: {
     position: 'relative',
+    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingRailToggleGroup: {
@@ -309,6 +311,7 @@ const styles = {
     alignItems: 'center',
     gap: '2px',
     marginTop: '2px',
+    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   drawingRailToggleDivider: {
@@ -333,6 +336,7 @@ const styles = {
     fontWeight: '600',
     padding: '0',
     transition: 'background-color 0.15s, color 0.15s',
+    flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   // Right-edge flyout-menu button (revealed on hover); click opens the category menu.
