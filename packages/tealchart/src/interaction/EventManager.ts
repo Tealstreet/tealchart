@@ -379,6 +379,14 @@ export class EventManager {
     return this.state.isDragging;
   }
 
+  /**
+   * Cursor intent owned by the active gesture. While this returns a cursor,
+   * hover/crosshair layers must not override it.
+   */
+  getActiveCursor(): string | null {
+    return this.state.isDragging ? this.getActiveDragCursor() : null;
+  }
+
   private getActiveDragCursor(): string | null {
     switch (this.state.dragMode) {
       case 'pan':

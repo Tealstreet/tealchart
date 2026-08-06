@@ -27,20 +27,26 @@ interface EventManagerCallbackProbe {
   onCursorChange?: (cursor: string) => void;
 }
 
-const eventManagerInstances = vi.hoisted(() => [] as Array<{ callbacks: EventManagerCallbackProbe; isDragging: boolean }>);
+const eventManagerInstances = vi.hoisted(
+  () => [] as Array<{ callbacks: EventManagerCallbackProbe; isDragging: boolean; activeCursor: string | null }>,
+);
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
-    private instance: { callbacks: EventManagerCallbackProbe; isDragging: boolean };
+    private instance: { callbacks: EventManagerCallbackProbe; isDragging: boolean; activeCursor: string | null };
 
     constructor(_container: HTMLElement, callbacks: EventManagerCallbackProbe) {
-      this.instance = { callbacks, isDragging: false };
+      this.instance = { callbacks, isDragging: false, activeCursor: null };
       eventManagerInstances.push(this.instance);
     }
 
     getIsDragging() {
       return this.instance.isDragging;
+    }
+
+    getActiveCursor() {
+      return this.instance.activeCursor;
     }
 
     dispose() {}
@@ -1666,12 +1672,49 @@ describe('ChartCore viewport management', () => {
     expect(chartContainer.style.cursor).toBe('pointer');
 
     eventManager.isDragging = true;
+    eventManager.activeCursor = 'grabbing';
     eventManager.callbacks.onCursorChange?.('grabbing');
     eventManager.callbacks.onCrossHairMoved?.(729, 140);
     eventManager.callbacks.onCrosshairRender?.();
     expect(chartContainer.style.cursor).toBe('grabbing');
 
     eventManager.isDragging = false;
+    eventManager.activeCursor = null;
+    eventManager.callbacks.onCursorChange?.('crosshair');
+    expect(chartContainer.style.cursor).toBe('crosshair');
+    core.dispose();
+  });
+
+  it('does not let hover processing override the active price-axis cursor', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+    });
+
+    core.setBars(makeBars(5));
+    core.paint(DIRTY.FULL);
+
+    const chartContainer = container.firstElementChild as HTMLElement;
+    const eventManager = eventManagerInstances[0];
+
+    eventManager.isDragging = true;
+    eventManager.activeCursor = 'ns-resize';
+    eventManager.callbacks.onCursorChange?.('ns-resize');
+    expect(chartContainer.style.cursor).toBe('ns-resize');
+
+    eventManager.callbacks.onCrossHairMoved?.(729, 120);
+    eventManager.callbacks.onCrosshairRender?.();
+    eventManager.callbacks.onCursorChange?.('pointer');
+    expect(chartContainer.style.cursor).toBe('ns-resize');
+
+    eventManager.callbacks.onCursorChange?.('crosshair');
+    expect(chartContainer.style.cursor).toBe('ns-resize');
+
+    eventManager.isDragging = false;
+    eventManager.activeCursor = null;
     eventManager.callbacks.onCursorChange?.('crosshair');
     expect(chartContainer.style.cursor).toBe('crosshair');
     core.dispose();
