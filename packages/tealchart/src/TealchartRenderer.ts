@@ -5700,9 +5700,16 @@ export class TealchartRenderer {
 
     // No left margin on initial load - start exactly at first visible bar
     // User can pan left to see more historical data
+    // A single bar — or bars sharing a timestamp — leaves timeRange at 0, so
+    // rightPadding is 0 too and endTime lands exactly on startTime. Every
+    // viewport assert downstream then throws forever, and the chart-pan gesture
+    // has no guard around it, so the throw aborts the process. Fall back to the
+    // same one-hour window the empty-bars branch above uses.
+    const paddedEndTime = maxTime + rightPadding;
+
     return {
       startTime: minTime,
-      endTime: maxTime + rightPadding,
+      endTime: paddedEndTime > minTime ? paddedEndTime : minTime + 3600000,
       priceMin: snappedPriceMin,
       priceMax: snappedPriceMax,
     };
