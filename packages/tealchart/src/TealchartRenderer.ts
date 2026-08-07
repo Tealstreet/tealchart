@@ -3913,8 +3913,15 @@ export class TealchartRenderer {
     }
 
     for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
-      const renderPlots =
-        domain === 'price'
+      const explicitPlotZOrder = indicatorPaneInfo[scriptId]?.explicitPlotZOrder;
+      // hlines normally draw in the earlier price pass, but that hoists them
+      // past a script's declared order. Keep explicit z-order scripts whole in
+      // the later pass so zOrder decides, not the pass split.
+      const renderPlots = explicitPlotZOrder
+        ? domain === 'time'
+          ? scriptPlots
+          : []
+        : domain === 'price'
           ? scriptPlots.filter((plot) => plot.type === 'hline')
           : scriptPlots.filter((plot) => plot.type !== 'hline');
       if (renderPlots.length === 0) continue;
@@ -3925,7 +3932,7 @@ export class TealchartRenderer {
         bars,
         viewport,
         pane,
-        indicatorPaneInfo[scriptId]?.explicitPlotZOrder,
+        explicitPlotZOrder,
         plotStyleOverrides,
       );
     }

@@ -47,7 +47,9 @@ export function createNativeBracketPriceLines({
       nativeBracketRef: {
         objectType,
         objectId,
-        bracketType: priceLine.label.secondaryText === 'SL' ? 'sl' : 'tp',
+        // tradingLineToBracketLines owns these ids; the labels carry no
+        // secondaryText, so keying off one tagged every bracket as tp.
+        bracketType: priceLine.id.endsWith('-sl') ? 'sl' : 'tp',
       },
     }),
   );

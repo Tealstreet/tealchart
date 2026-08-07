@@ -4420,7 +4420,9 @@ describe('TealchartWidget', () => {
 
     it('sizes loadMoreBars requests from the requested viewport', () => {
       const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
+      // Bars are spaced one minute apart, so the widget has to be on the
+      // matching resolution for the viewport gap to size in bars.
+      const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
       completeInit(datafeed, makeBars(10, 1000000, 60000, 50000));
 
       (widget as any)._loadMoreBars('left', {
@@ -4437,7 +4439,7 @@ describe('TealchartWidget', () => {
 
     it('continues oversized loadMoreBars viewport requests in capped pages until covered', () => {
       const datafeed = createMockDatafeed();
-      const widget = createWidget(datafeed);
+      const widget = createWidget(datafeed, { interval: '1' as ResolutionString });
       const intervalMs = 60000;
       const earliestTime = 1000000;
       const requiredStartTime = earliestTime - (MAX_HISTORY_BACKFILL_BAR_COUNT + 300) * intervalMs;
