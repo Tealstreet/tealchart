@@ -3913,8 +3913,15 @@ export class TealchartRenderer {
     }
 
     for (const [scriptId, scriptPlots] of overlayPlotsByScript) {
-      const renderPlots =
-        domain === 'price'
+      const explicitPlotZOrder = indicatorPaneInfo[scriptId]?.explicitPlotZOrder;
+      // hlines normally draw in the earlier price pass, but that hoists them
+      // past a script's declared order. Keep explicit z-order scripts whole in
+      // the later pass so zOrder decides, not the pass split.
+      const renderPlots = explicitPlotZOrder
+        ? domain === 'time'
+          ? scriptPlots
+          : []
+        : domain === 'price'
           ? scriptPlots.filter((plot) => plot.type === 'hline')
           : scriptPlots.filter((plot) => plot.type !== 'hline');
       if (renderPlots.length === 0) continue;
@@ -3925,7 +3932,7 @@ export class TealchartRenderer {
         bars,
         viewport,
         pane,
-        indicatorPaneInfo[scriptId]?.explicitPlotZOrder,
+        explicitPlotZOrder,
         plotStyleOverrides,
       );
     }
@@ -5693,9 +5700,16 @@ export class TealchartRenderer {
 
     // No left margin on initial load - start exactly at first visible bar
     // User can pan left to see more historical data
+    // A single bar — or bars sharing a timestamp — leaves timeRange at 0, so
+    // rightPadding is 0 too and endTime lands exactly on startTime. Every
+    // viewport assert downstream then throws forever, and the chart-pan gesture
+    // has no guard around it, so the throw aborts the process. Fall back to the
+    // same one-hour window the empty-bars branch above uses.
+    const paddedEndTime = maxTime + rightPadding;
+
     return {
       startTime: minTime,
-      endTime: maxTime + rightPadding,
+      endTime: paddedEndTime > minTime ? paddedEndTime : minTime + 3600000,
       priceMin: snappedPriceMin,
       priceMax: snappedPriceMax,
     };
