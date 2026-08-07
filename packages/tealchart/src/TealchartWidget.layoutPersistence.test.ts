@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import type { TealchartWidgetOptions } from './types';
 
 import { afterEach, describe, expect, it } from 'vitest';

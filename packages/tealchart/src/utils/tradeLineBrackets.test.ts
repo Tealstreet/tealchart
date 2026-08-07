@@ -48,8 +48,9 @@ describe('trade line bracket price lines', () => {
 
     expect(lines.map((line) => line.id)).toEqual(['adapter-order-tp', 'adapter-order-sl']);
     expect(lines.map((line) => line.lineStyle)).toEqual(['dashed', 'dashed']);
-    expect(lines.map((line) => line.label.secondaryText)).toEqual(['TP', 'SL']);
+    expect(lines.map((line) => line.label.secondaryText)).toEqual([undefined, undefined]);
     expect(lines.map((line) => line.label.primaryText)).toEqual(['65000.0', '62000.0']);
+    expect(lines.map((line) => line.label.filled)).toEqual([true, true]);
   });
 
   it('omits inactive brackets', () => {

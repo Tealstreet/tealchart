@@ -71,6 +71,8 @@ export interface VanillaChartReactProps {
   bars?: Bar[];
   /** Callback when interval changes */
   onIntervalChange?: (interval: ResolutionString) => void;
+  /** Callback when the symbol control is clicked */
+  onSymbolClick?: () => void;
   /** Callback when an indicator is added */
   onIndicatorAdd?: (indicator: { id: string; name: string }) => void;
   /** CSS class name */
@@ -93,6 +95,7 @@ export const VanillaChartReact = forwardRef<VanillaChartHandle, VanillaChartReac
       showTopBar = true,
       bars,
       onIntervalChange,
+      onSymbolClick,
       onIndicatorAdd,
       className,
       style,
@@ -113,6 +116,7 @@ export const VanillaChartReact = forwardRef<VanillaChartHandle, VanillaChartReac
         interval,
         chartKey,
         showTopBar,
+        onSymbolClick,
       });
 
       // Set initial bars if provided

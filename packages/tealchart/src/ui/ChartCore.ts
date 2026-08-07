@@ -411,7 +411,9 @@ export class ChartCore {
   private bars: Bar[] = [];
   private viewport: Viewport | null = null;
   private priceLines: PriceLine[] = [];
+  private rawOrderLines: OrderLineRenderData[] = [];
   private orderLines: OrderLineRenderData[] = [];
+  private rawPositionLines: PositionLineRenderData[] = [];
   private positionLines: PositionLineRenderData[] = [];
   private executionLines: ExecutionLineRenderData[] = [];
   private plots: PlotOutput[] = [];
@@ -435,6 +437,7 @@ export class ChartCore {
   private showResetButton = false;
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
   private cursor = 'crosshair';
+  private requestedCursor = 'crosshair';
 
   // Bracket drag preview state (TP/SL drag visualization on crosshair canvas)
   private _bracketDragState: {
@@ -462,23 +465,34 @@ export class ChartCore {
   private rafId: number | null = null;
 
   private applyCursor(cursor: string): void {
-    let nextCursor = cursor;
-    if (this.priceLineManager?.isDragging() && cursor !== 'grabbing') {
-      nextCursor = 'grabbing';
-    } else if (cursor === 'pointer' || cursor === 'crosshair') {
-      nextCursor = this.getKonvaCursorAt(this.crosshair.x, this.crosshair.y) ?? cursor;
+    this.requestedCursor = cursor;
+    this.applyResolvedCursor();
+  }
+
+  private resolveCursor(): string {
+    // Cursor priority is centralized here: active gestures lock the cursor,
+    // then price-line drags, then passive hover intent.
+    const activeGestureCursor = this.eventManager?.getActiveCursor();
+    if (activeGestureCursor) return activeGestureCursor;
+    if (this.priceLineManager?.isDragging()) return 'grabbing';
+    if (this.requestedCursor === 'pointer' || this.requestedCursor === 'crosshair') {
+      return this.getKonvaCursorAt(this.crosshair.x, this.crosshair.y) ?? this.requestedCursor;
     }
-    const wasDragging = this.cursor === 'grabbing';
+    return this.requestedCursor;
+  }
+
+  private applyResolvedCursor(): void {
+    const nextCursor = this.resolveCursor();
 
     this.cursor = nextCursor;
-    this.chartContainer.style.cursor = nextCursor;
-    if (this.stage) {
-      this.stage.container().style.cursor = nextCursor;
+    if (this.chartContainer.style.cursor !== nextCursor) {
+      this.chartContainer.style.cursor = nextCursor;
     }
-
-    if (nextCursor === 'grabbing' || wasDragging) {
-      this.crosshair.visible = false;
-      this.renderCrosshairOverlay();
+    if (this.stage) {
+      const stageContainer = this.stage.container();
+      if (stageContainer.style.cursor !== nextCursor) {
+        stageContainer.style.cursor = nextCursor;
+      }
     }
   }
 
@@ -487,7 +501,10 @@ export class ChartCore {
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
     this.oemsActions = new OemsActionManager<OemsTradingLineState>({
-      onChange: () => this.scheduleRender(),
+      onChange: () => {
+        this.reapplyOemsActionState();
+        this.scheduleRender();
+      },
     });
 
     // Create chart container
@@ -733,6 +750,7 @@ export class ChartCore {
         // Render directly — no need to schedule another RAF frame.
         // Price label is drawn on canvas — zero DOM mutations.
         this.renderCrosshairOverlay();
+        if (this.eventManager.getIsDragging()) return;
         // Pointer cursor over canvas-drawn + button
         const b = this._plusButtonBounds;
         if (b) {
@@ -773,7 +791,7 @@ export class ChartCore {
           this.crosshair.x,
           this.viewport ?? TealchartRenderer.calculateViewport(this.bars),
         );
-        this.handleContextMenu(rect.right - this.margins.right, rect.top + this.crosshair.y, price, time);
+        this.handleContextMenu(rect.left + b.x, rect.top + b.y, price, time, 'crosshairButton');
       }
     };
     this.chartContainer.addEventListener('click', this.plusButtonClickHandler);
@@ -841,8 +859,9 @@ export class ChartCore {
    */
   setOrderLines(lines: OrderLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
-    if (lines === this.orderLines && this.oemsActions.getActions().length === 0) return;
+    if (lines === this.rawOrderLines && this.oemsActions.getActions().length === 0) return;
 
+    this.rawOrderLines = lines;
     this.confirmOrderLineSnapshots(lines);
     this.orderLines = lines.map((line) => this.applyOrderActionState(line));
     // No scheduleRender — paint() is called by the widget after pushing state
@@ -855,11 +874,17 @@ export class ChartCore {
    */
   setPositionLines(lines: PositionLineRenderData[]): void {
     if (this.eventManager.getIsDragging() || this.priceLineManager?.isDragging()) return;
-    if (lines === this.positionLines && this.oemsActions.getActions().length === 0) return;
+    if (lines === this.rawPositionLines && this.oemsActions.getActions().length === 0) return;
 
+    this.rawPositionLines = lines;
     this.confirmPositionLineSnapshots(lines);
     this.positionLines = lines.map((line) => this.applyPositionActionState(line));
     // No scheduleRender — paint() is called by the widget after pushing state
+  }
+
+  private reapplyOemsActionState(): void {
+    this.orderLines = this.rawOrderLines.map((line) => this.applyOrderActionState(line));
+    this.positionLines = this.rawPositionLines.map((line) => this.applyPositionActionState(line));
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {
@@ -953,11 +978,16 @@ export class ChartCore {
   private applyBracketActionState<
     TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets'],
   >(brackets: TBracket, state: OemsTradingLineState): TBracket {
-    if (!brackets) return brackets;
+    if (!brackets && typeof state.takeProfit !== 'number' && typeof state.stopLoss !== 'number') return brackets;
+    const nextBrackets = { ...(brackets ?? {}) };
+    if (typeof state.takeProfit === 'number') {
+      nextBrackets.takeProfit = state.takeProfit;
+    }
+    if (typeof state.stopLoss === 'number') {
+      nextBrackets.stopLoss = state.stopLoss;
+    }
     return {
-      ...brackets,
-      takeProfit: typeof state.takeProfit === 'number' ? state.takeProfit : brackets.takeProfit,
-      stopLoss: typeof state.stopLoss === 'number' ? state.stopLoss : brackets.stopLoss,
+      ...nextBrackets,
     } as TBracket;
   }
 
@@ -1240,6 +1270,7 @@ export class ChartCore {
     if (!object) return;
 
     const originalState = object.state;
+    const existingBracketPrice = bracketType === 'tp' ? originalState.takeProfit : originalState.stopLoss;
     const optimisticState: OemsTradingLineState = {
       ...originalState,
       ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
@@ -1249,12 +1280,14 @@ export class ChartCore {
       bracketType === 'tp'
         ? () => bound.callbacks?.onTPMoveEnd?.(price, partialPercent)
         : () => bound.callbacks?.onSLMoveEnd?.(price, partialPercent);
+
     const result = this.oemsActions.startAction({
       objectType: object.objectType,
       objectId: object.objectId,
       kind,
       originalState,
       optimisticState,
+      settleOnCallback: typeof existingBracketPrice !== 'number',
       callback,
     });
     if (result.completedSynchronously) this.scheduleRender();
@@ -1589,7 +1622,13 @@ export class ChartCore {
     this.options.onContextMenu = callback;
   }
 
-  private handleContextMenu(screenX: number, screenY: number, price: number, time: number): void {
+  private handleContextMenu(
+    screenX: number,
+    screenY: number,
+    price: number,
+    time: number,
+    placement: 'default' | 'crosshairButton' = 'default',
+  ): void {
     const drawingItems =
       this.viewport && this.userDrawingState?.activeTool === 'select'
         ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
@@ -1649,6 +1688,7 @@ export class ChartCore {
     }
 
     document.body.appendChild(this.contextMenu);
+    this.positionContextMenu(screenX, screenY, placement);
 
     // Close on click outside
     this.contextMenuCloseHandler = (e: MouseEvent) => {
@@ -1661,6 +1701,22 @@ export class ChartCore {
       if (!this.contextMenu || !this.contextMenuCloseHandler) return;
       document.addEventListener('click', this.contextMenuCloseHandler);
     }, 0);
+  }
+
+  private positionContextMenu(screenX: number, screenY: number, placement: 'default' | 'crosshairButton'): void {
+    if (!this.contextMenu) return;
+    const rect = this.contextMenu.getBoundingClientRect();
+    const menuWidth = rect.width || 150;
+    const menuHeight = rect.height || this.contextMenu.offsetHeight || 0;
+    const margin = 8;
+    const gap = 6;
+    const desiredLeft = placement === 'crosshairButton' ? screenX - menuWidth - gap : screenX;
+    const desiredTop = placement === 'crosshairButton' ? screenY + gap : screenY;
+    const maxLeft = Math.max(margin, window.innerWidth - menuWidth - margin);
+    const maxTop = Math.max(margin, window.innerHeight - menuHeight - margin);
+
+    this.contextMenu.style.left = `${Math.min(Math.max(desiredLeft, margin), maxLeft)}px`;
+    this.contextMenu.style.top = `${Math.min(Math.max(desiredTop, margin), maxTop)}px`;
   }
 
   private closeContextMenu(): void {
@@ -2824,6 +2880,8 @@ export class ChartCore {
     ctx.lineTo(chartWidth, roundedBracketY);
     ctx.stroke();
 
+    this._drawBracketPreviewPriceAxisLabel(ctx, state.price, roundedBracketY, color);
+
     // ========= Main label (PnL | type | %) =========
     const labelParts = [pnlText, typeLabel, percentText].filter(Boolean);
 
@@ -2951,6 +3009,50 @@ export class ChartCore {
       ctx.globalAlpha = 1.0;
     }
 
+    ctx.restore();
+  }
+
+  private _drawBracketPreviewPriceAxisLabel(
+    ctx: CanvasRenderingContext2D,
+    price: number,
+    y: number,
+    color: string,
+  ): void {
+    const pricePrecision = this.options.renderOptions?.pricePrecision;
+    let decimals: number;
+    if (pricePrecision && pricePrecision > 0) {
+      decimals = getDecimalPlacesFromPrecision(pricePrecision);
+    } else {
+      const priceRange = this.viewport ? this.viewport.priceMax - this.viewport.priceMin : 0;
+      if (priceRange >= 10) decimals = 0;
+      else if (priceRange >= 1) decimals = 1;
+      else if (priceRange >= 0.1) decimals = 2;
+      else if (priceRange >= 0.01) decimals = 3;
+      else if (priceRange >= 0.001) decimals = 4;
+      else if (priceRange >= 0.0001) decimals = 5;
+      else decimals = 6;
+    }
+    const priceText = getNumberFormatter(decimals).format(price);
+    const labelHeight = 20;
+    const labelPaddingX = 8;
+    const labelWidth = Math.max(this.margins.right - 8, ctx.measureText(priceText).width + labelPaddingX * 2);
+    const labelX = this.options.width - labelWidth - 4;
+    const minY = this.margins.top;
+    const maxY = this.options.height - this.margins.bottom - labelHeight;
+    const labelY = Math.max(minY, Math.min(maxY, y - labelHeight / 2));
+
+    ctx.save();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 2);
+    ctx.fill();
+    ctx.fillStyle = DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(priceText, labelX + labelWidth / 2, labelY + labelHeight / 2);
     ctx.restore();
   }
 

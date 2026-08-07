@@ -108,6 +108,7 @@ import {
   jailbreakInputsToInputDefinitions,
 } from './indicators/builtinIndicators';
 import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
+import { DEFAULT_LAYOUT_NAME } from './layoutDefaults';
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore, hasChartStore } from './state/chartState';
@@ -608,9 +609,9 @@ export class TealchartWidget {
       loadAsTealchart(current.layoutId!, this._options.save_load_adapter!)
         .then((result) => {
           if (this._disposed) return;
-          this._handleLoadLayout(result.data, result.warnings, current.layoutId!, current.layoutName || 'tealstreet');
+          this._handleLoadLayout(result.data, result.warnings, current.layoutId!, current.layoutName || DEFAULT_LAYOUT_NAME);
           // Sync layout selector UI
-          this._ui?.setCurrentLayout(current.layoutId, current.layoutName);
+          this._ui?.setCurrentLayout(current.layoutId, current.layoutName || DEFAULT_LAYOUT_NAME);
         })
         .catch((error) => {
           if (this._disposed) return;
@@ -1141,6 +1142,7 @@ export class TealchartWidget {
       showTopBar,
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
+      onSymbolClick: this._options.onSymbolClick,
       onIntervalChange: (interval) => {
         this._chartApi.setResolution(interval);
       },
@@ -1622,7 +1624,7 @@ export class TealchartWidget {
 
   /**
    * Schedule auto-save after the configured delay.
-   * Always fires when adapter is available — creates a new "tealstreet" layout
+   * Always fires when adapter is available — creates a new default layout
    * for fresh clients, or updates the existing layout.
    */
   private _scheduleAutoSave(): void {
@@ -1695,8 +1697,8 @@ export class TealchartWidget {
           });
       });
     } else {
-      // No layout yet — create a new one named "tealstreet"
-      const layoutName = 'tealstreet';
+      // No layout yet — create a new default layout.
+      const layoutName = DEFAULT_LAYOUT_NAME;
       import('./transformer').then(({ saveTealchartLayout }) => {
         saveTealchartLayout(settings, layoutName, this._options.save_load_adapter!)
           .then((chartId) => {

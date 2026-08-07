@@ -1,9 +1,9 @@
+import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
+import type { NativeOemsTradingLineState } from './nativeOemsLineState';
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { OemsActionManager } from '../../interaction/oemsActionManager';
-import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
-
-import type { NativeOemsTradingLineState } from './nativeOemsLineState';
 import {
   startNativeBracketMoveAction,
   startNativeOrderMoveAction,
@@ -95,6 +95,34 @@ describe('native OEMS line actions', () => {
     expect(manager.getAction('position', 'position-1')).toMatchObject({
       kind: 'positionSlMove',
       optimisticState: { stopLoss: 80, takeProfit: 120 },
+      settleOnCallback: false,
+    });
+    manager.dispose();
+  });
+
+  it('settles new async bracket creates on callback completion', () => {
+    const manager = createManager();
+
+    const result = startNativeBracketMoveAction({
+      manager,
+      orderLines: [],
+      positionLines: [
+        positionLine({
+          brackets: {},
+          callbacks: { onSLMoveEnd: pendingCallback },
+        }),
+      ],
+      objectType: 'position',
+      objectId: 'position-1',
+      bracketType: 'sl',
+      price: 80,
+    });
+
+    expect(result).toEqual({ clearDrag: false, forceUpdate: false });
+    expect(manager.getAction('position', 'position-1')).toMatchObject({
+      kind: 'positionSlMove',
+      optimisticState: { stopLoss: 80 },
+      settleOnCallback: true,
     });
     manager.dispose();
   });

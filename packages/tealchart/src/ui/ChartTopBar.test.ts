@@ -57,6 +57,35 @@ describe('ChartTopBar drawing toolbar', () => {
     clearChartStoreCache();
   });
 
+  it('dispatches symbol clicks only when a symbol callback is wired', () => {
+    const onSymbolClick = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-symbol-click',
+      symbol: 'BTCUSDT',
+      onSymbolClick,
+    });
+    topBar.mount(document.body);
+
+    const symbolButton = document.querySelector<HTMLButtonElement>('button[aria-label="Change symbol"]');
+    expect(symbolButton).not.toBeNull();
+    expect(symbolButton?.textContent).toContain('BTCUSDT');
+    symbolButton?.click();
+    expect(onSymbolClick).toHaveBeenCalledTimes(1);
+
+    topBar.unmount();
+    document.body.innerHTML = '';
+
+    const inertTopBar = new ChartTopBar({
+      chartKey: 'topbar-symbol-inert',
+      symbol: 'ETHUSDT',
+    });
+    inertTopBar.mount(document.body);
+    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Change symbol"]')).toBeNull();
+    expect(document.body.textContent).toContain('ETHUSDT');
+
+    inertTopBar.unmount();
+  });
+
   it('renders drawing tools from shared descriptors and dispatches tool changes', () => {
     const onTool = vi.fn();
     const topBar = new ChartTopBar({
@@ -83,9 +112,14 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(categoryRail).not.toBeNull();
     expect(categoryList).not.toBeNull();
     expect(topBar.getElement().contains(categoryRail)).toBe(false);
+    expect(topBar.getElement().style.overflowX).toBe('auto');
+    expect(topBar.getElement().style.overflowY).toBe('hidden');
     expect(categoryRail?.style.overflow).toBe('visible');
     expect(categoryList?.style.overflowY).toBe('auto');
-    expect(categoryList?.style.maxHeight).not.toBe('');
+    expect(categoryList?.style.flexGrow).toBe('1');
+    expect(categoryList?.style.flexShrink).toBe('1');
+    expect(categoryList?.style.minHeight).toBe('0px');
+    expect(categoryList?.style.maxHeight).toBe('');
     expect(shapesCategory?.getAttribute('aria-pressed')).toBe('true');
     expect(linesCategory?.getAttribute('aria-pressed')).toBe('false');
     expect(linesCategory?.getAttribute('aria-haspopup')).toBe('menu');
@@ -294,16 +328,30 @@ describe('ChartTopBar drawing toolbar', () => {
 
     const expandedRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
     expect(expandedRail?.getAttribute('aria-expanded')).toBe('true');
+    expect(expandedRail?.style.transition).toContain('transform');
+    expect(expandedRail?.style.width).toBe('50px');
     expect(topBar.getElement().style.marginLeft).toBe('50px');
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).not.toBeNull();
+    const collapseButton = document.querySelector<HTMLButtonElement>('button[aria-label="Collapse drawing toolbar"]');
+    expect(collapseButton?.style.position).toBe('absolute');
+    expect(collapseButton?.style.bottom).toBe('10px');
+    expect(collapseButton?.style.right).toBe('-6px');
+    expect(collapseButton?.style.width).toBe('14px');
+    expect(collapseButton?.style.height).toBe('38px');
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="Collapse drawing toolbar"]')?.click();
+    collapseButton?.click();
 
     const collapsedRail = document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]');
     expect(collapsedRail?.getAttribute('aria-expanded')).toBe('false');
+    expect(collapsedRail?.style.transition).toContain('transform');
+    expect(collapsedRail?.style.width).toBe('50px');
     expect(topBar.getElement().style.marginLeft).toBe('34px');
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).toBeNull();
-    expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
+    const expandButton = document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]');
+    expect(expandButton).not.toBeNull();
+    expect(expandButton?.style.position).toBe('absolute');
+    expect(expandButton?.style.bottom).toBe('10px');
+    expect(expandButton?.style.right).toBe('-6px');
 
     topBar.unmount();
     clearChartStoreCache();
@@ -318,6 +366,9 @@ describe('ChartTopBar drawing toolbar', () => {
 
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.getAttribute('aria-expanded')).toBe(
       'false',
+    );
+    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.style.transform).toBe(
+      'translateX(-36px)',
     );
     expect(restoredTopBar.getElement().style.marginLeft).toBe('34px');
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
