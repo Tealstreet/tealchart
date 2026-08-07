@@ -4,6 +4,7 @@ import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAda
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { DEFAULT_LAYOUT_NAME } from '../layoutDefaults';
 import { CHART_SETTINGS_VERSION } from '../state/safeDeepMerge';
 import {
   deleteLayout,
@@ -15,7 +16,6 @@ import {
 import { StorageSaveLoadAdapter } from '../transformer/storageSaveLoadAdapter';
 
 const DEFAULT_NATIVE_AUTO_SAVE_DELAY_SECONDS = 1;
-const DEFAULT_NATIVE_LAYOUT_NAME = 'tealstreet';
 
 export interface NativeLayoutPersistenceOptions {
   autoSaveDelay?: number;
@@ -227,8 +227,8 @@ export function useNativeLayoutPersistence({
               currentLayout.layoutName,
               saveLoadAdapter,
             )
-          : await saveTealchartLayout(settings, DEFAULT_NATIVE_LAYOUT_NAME, saveLoadAdapter);
-      const layoutName = currentLayout.layoutName ?? DEFAULT_NATIVE_LAYOUT_NAME;
+          : await saveTealchartLayout(settings, DEFAULT_LAYOUT_NAME, saveLoadAdapter);
+      const layoutName = currentLayout.layoutName ?? DEFAULT_LAYOUT_NAME;
 
       if (dirtyRevisionRef.current === saveRevision) {
         setCurrentLayout({ layoutId, layoutName });
@@ -291,7 +291,7 @@ export function useNativeLayoutPersistence({
 
     const settings = latestSettingsRef.current;
     const currentLayout = chartStore.currentLayout.get();
-    const layoutName = currentLayout.layoutName ?? DEFAULT_NATIVE_LAYOUT_NAME;
+    const layoutName = currentLayout.layoutName ?? DEFAULT_LAYOUT_NAME;
     setNativeSaveStatus('saving');
 
     try {
@@ -393,7 +393,7 @@ export function useNativeLayoutPersistence({
           currentLayout.layoutId != null
             ? charts.find((chart) => String(chart.id) === String(currentLayout.layoutId))
             : null;
-        const defaultLayout = indexedCurrentLayout ?? charts.find((chart) => chart.name === DEFAULT_NATIVE_LAYOUT_NAME);
+        const defaultLayout = indexedCurrentLayout ?? charts.find((chart) => chart.name === DEFAULT_LAYOUT_NAME);
         const layoutId = defaultLayout?.id ?? null;
         const layoutName = defaultLayout?.name ?? null;
 
@@ -409,7 +409,7 @@ export function useNativeLayoutPersistence({
         await onApplyLayoutRef.current(result.data);
         setCurrentLayout({
           layoutId,
-          layoutName: layoutName ?? DEFAULT_NATIVE_LAYOUT_NAME,
+          layoutName: layoutName ?? DEFAULT_LAYOUT_NAME,
         });
         chartStore.isDirty.set(false);
       } catch {

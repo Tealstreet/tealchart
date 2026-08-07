@@ -1,18 +1,14 @@
 import type { OemsActionManager } from '../../interaction/oemsActionManager';
 import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
+import type { NativeTradeLineActionType, NativeTradeLineObjectType } from '../utils/tradeLineLayout';
 import type { NativeTradeLineBracketType } from './nativeOemsDragState';
-import {
-  getNativeOrderObjectId,
-  getNativePositionObjectId,
-  type NativeTradeLineActionType,
-  type NativeTradeLineObjectType,
-} from '../utils/tradeLineLayout';
+import type { NativeOemsTradingLineState } from './nativeOemsLineState';
 
+import { getNativeOrderObjectId, getNativePositionObjectId } from '../utils/tradeLineLayout';
 import {
   getNativeOrderLineState,
   getNativePositionLineState,
   isNativeOrderLineRenderData,
-  type NativeOemsTradingLineState,
 } from './nativeOemsLineState';
 
 export interface NativeOemsCommitResult {
@@ -85,7 +81,10 @@ export function startNativeBracketMoveAction({
     return { clearDrag: true, forceUpdate: false };
   }
 
-  const originalState = isNativeOrderLineRenderData(line) ? getNativeOrderLineState(line) : getNativePositionLineState(line);
+  const originalState = isNativeOrderLineRenderData(line)
+    ? getNativeOrderLineState(line)
+    : getNativePositionLineState(line);
+  const existingBracketPrice = bracketType === 'tp' ? originalState.takeProfit : originalState.stopLoss;
   const callback = bracketType === 'tp' ? line.callbacks?.onTPMoveEnd : line.callbacks?.onSLMoveEnd;
   const result = manager.startAction({
     objectType,
@@ -103,6 +102,7 @@ export function startNativeBracketMoveAction({
       ...originalState,
       ...(bracketType === 'tp' ? { takeProfit: price } : { stopLoss: price }),
     },
+    settleOnCallback: typeof existingBracketPrice !== 'number',
     callback: () => callback?.(price, partialPercent),
   });
 

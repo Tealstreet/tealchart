@@ -928,12 +928,17 @@ export class TealchartRenderer {
       ctx.restore();
     }
 
-    // Draw label border with rounded corners (no background - transparent)
+    // Draw label border with rounded corners
+    if (bound.label.filled) {
+      ctx.fillStyle = bound.label.backgroundColor || color;
+      ctx.beginPath();
+      ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
+      ctx.fill();
+    }
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
-    const borderRadius = 2;
     ctx.beginPath();
-    ctx.roundRect(labelX, labelY, bound.width, bound.height, borderRadius);
+    ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
     ctx.stroke();
 
     // Draw text
@@ -4999,6 +5004,12 @@ export class TealchartRenderer {
     }
 
     // Label border
+    if (bound.label.filled) {
+      ctx.fillStyle = bound.label.backgroundColor || color;
+      ctx.beginPath();
+      ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
+      ctx.fill();
+    }
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.beginPath();

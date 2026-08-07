@@ -37,6 +37,7 @@ export interface OemsAction<TState extends OemsActionState = OemsActionState> {
   expiresAt: number;
   timeoutId: ReturnType<typeof setTimeout> | null;
   confirmsRemoved: boolean;
+  settleOnCallback: boolean;
 }
 
 export interface OemsActionStartArgs<TState extends OemsActionState = OemsActionState> {
@@ -46,6 +47,7 @@ export interface OemsActionStartArgs<TState extends OemsActionState = OemsAction
   originalState: TState;
   optimisticState?: TState;
   confirmsRemoved?: boolean;
+  settleOnCallback?: boolean;
   callback?: () => Awaitable<OemsActionResult>;
 }
 
@@ -84,12 +86,7 @@ export interface OemsActionManagerOptions<TState extends OemsActionState = OemsA
 const DEFAULT_OEMS_ACTION_TIMEOUT_MS = 30000;
 
 function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'then' in value &&
-    typeof value.then === 'function'
-  );
+  return typeof value === 'object' && value !== null && 'then' in value && typeof value.then === 'function';
 }
 
 function getObjectKey(objectType: OemsActionObjectType, objectId: string): string {
@@ -178,6 +175,10 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
           this.failAction(action, undefined);
           return;
         }
+        if (action.settleOnCallback) {
+          this.settleAction(action, 'confirmed');
+          return;
+        }
         this.advancePastCallback(action);
       },
       (error) => {
@@ -200,7 +201,11 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
     return Array.from(this.actionsByObject.values());
   }
 
-  getObjectStatus(objectType: OemsActionObjectType, objectId: string, currentState: TState): OemsActionObjectStatus<TState> {
+  getObjectStatus(
+    objectType: OemsActionObjectType,
+    objectId: string,
+    currentState: TState,
+  ): OemsActionObjectStatus<TState> {
     const action = this.getAction(objectType, objectId);
     const state = action ? action.optimisticState : currentState;
 
@@ -260,6 +265,7 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
       expiresAt: startedAt + this.timeoutMs,
       timeoutId: null,
       confirmsRemoved: Boolean(args.confirmsRemoved),
+      settleOnCallback: Boolean(args.settleOnCallback),
     };
     action.timeoutId = this.setTimer(() => {
       this.timeOutAction(action);
@@ -283,7 +289,11 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
     this.settleAction(action, 'timedOut');
   }
 
-  private settleAction(action: OemsAction<TState>, status: OemsActionSettlement<TState>['status'], error?: unknown): void {
+  private settleAction(
+    action: OemsAction<TState>,
+    status: OemsActionSettlement<TState>['status'],
+    error?: unknown,
+  ): void {
     if (action.timeoutId) this.clearTimer(action.timeoutId);
     this.actionsByObject.delete(getObjectKey(action.objectType, action.objectId));
     this.onSettle?.({ action, status, error });

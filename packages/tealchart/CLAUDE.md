@@ -199,6 +199,7 @@ When adding features like TP/SL drag preview, crosshair improvements, or new lin
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
 - Trading-line labels and line segments must be clamped after the overlaid left drawing rail (`leftToolRailInset + leftToolRailWidth`) in both web and mobile paths. Do not place labels or left-extending line segments at raw `margins.left`.
 - TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.
+- TP/SL empty-button drags create external bracket orders; only existing numeric TP/SL bracket lines should enter the OEMS optimistic bracket-mutation lifecycle. Otherwise the chart invents a bracket state that consumers cannot confirm and leaves stale TP/SL lines behind.
 - Cursor writes are centralized through `ChartCore.applyCursor`; active Konva line drags must keep `grabbing`, and Konva hit targets set `tealchartCursor` (`pointer` for order-label drag handles and buttons) so EventManager hover processing cannot overwrite the intended cursor.
 - All crosshair rendering is canvas-drawn (+ button, price label, time label) — zero DOM mutations for performance
 - Event handlers (mousemove, drag, touch) defer all processing to RAF — event handler itself is near-zero cost
