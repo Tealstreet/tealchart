@@ -1,3 +1,6 @@
+// @vitest-environment node
+// Reads sibling sources through import.meta.url, which jsdom rewrites away from
+// a file: URL. No DOM is used here, so pin the file to node.
 import type { Bar } from '../../types';
 
 import { describe, expect, it } from 'vitest';

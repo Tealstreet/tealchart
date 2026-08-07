@@ -739,6 +739,34 @@ describe('native gesture activation', () => {
     expect(onResetViewTap).not.toHaveBeenCalled();
   });
 
+  it('still resets when the button reserves its own control zone', () => {
+    const layout = resolveNativeResetViewButtonLayout(frame);
+    const onResetViewTap = vi.fn();
+    const resetTapGesture = createNativeResetViewTapGesture({
+      controlZones: [
+        {
+          owner: 'resetView',
+          x1: layout.centerX - layout.hitRadius,
+          x2: layout.centerX + layout.hitRadius,
+          y1: layout.centerY - layout.hitRadius,
+          y2: layout.centerY + layout.hitRadius,
+        },
+      ],
+      frame,
+      onResetViewTap,
+      resetTapGestureState: resetTapState(),
+      resetButtonVisible: true,
+    }) as any;
+
+    resetTapGesture.handlers.onTouchesDown({
+      changedTouches: [{ x: layout.centerX, y: layout.centerY }],
+      allTouches: [{ x: layout.centerX, y: layout.centerY }],
+    });
+    resetTapGesture.handlers.onEnd({ x: layout.centerX, y: layout.centerY }, true);
+
+    expect(onResetViewTap).toHaveBeenCalledTimes(1);
+  });
+
   it('commits left tool rail toggle taps through the chart gesture layer', () => {
     const expandedLayout = createNativeLeftToolRailLayout({ height: 520, bottomInset: 32, topBarHeight: 36 });
     const collapsedLayout = createNativeLeftToolRailLayout({

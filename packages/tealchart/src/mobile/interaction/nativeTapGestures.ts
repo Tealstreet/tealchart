@@ -87,7 +87,9 @@ export function createNativeResetViewTapGesture({
       }
       resetTapGestureState.startX.value = touch.x;
       resetTapGestureState.startY.value = touch.y;
-      if (isNativeGestureControlPoint(controlZones, touch.x, touch.y)) {
+      // The visible button reserves its own control zone so pan and crosshair
+      // leave the tap alone; skip it here or the button blocks itself.
+      if (isNativeGestureControlPoint(controlZones, touch.x, touch.y, 'resetView')) {
         resetTapGestureState.blockedByContextMenuButton.value = true;
         resetTapGestureState.startedOnButton.value = false;
         return;

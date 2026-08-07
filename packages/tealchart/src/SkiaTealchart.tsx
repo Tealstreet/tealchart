@@ -1170,6 +1170,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     if (nativeResetViewButtonLayout && nativeResetViewButtonVisible && hasDataViewport) {
       zones.push({
+        owner: 'resetView',
         x1: nativeResetViewButtonLayout.centerX - nativeResetViewButtonLayout.hitRadius,
         x2: nativeResetViewButtonLayout.centerX + nativeResetViewButtonLayout.hitRadius,
         y1: nativeResetViewButtonLayout.centerY - nativeResetViewButtonLayout.hitRadius,
