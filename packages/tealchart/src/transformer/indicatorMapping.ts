@@ -497,6 +497,14 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
     defaultInputs: {},
     isOverlay: true,
   },
+
+  stackedImbalance: {
+    customId: 'stackedImbalance',
+    tvStudyId: 'Tealstreet-StackedImbalance@tv-basicstudies-1',
+    inputMappings: {},
+    defaultInputs: {},
+    isOverlay: true,
+  },
 };
 
 // ============================================================================
