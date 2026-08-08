@@ -78,7 +78,7 @@ function label(overrides: Partial<Extract<DrawingOutput, { type: 'label' }>> = {
   };
 }
 
-function hlinePlot(overrides: Partial<Extract<PlotOutput, { type: 'hline' }>> = {}): PlotOutput {
+function hlinePlot(overrides: Partial<PlotOutput> = {}): PlotOutput {
   return {
     type: 'hline',
     id: 'hline-1',
@@ -91,7 +91,7 @@ function hlinePlot(overrides: Partial<Extract<PlotOutput, { type: 'hline' }>> = 
   } as PlotOutput;
 }
 
-function linePlot(overrides: Partial<Extract<PlotOutput, { type: 'plot' }>> = {}): PlotOutput {
+function linePlot(overrides: Partial<PlotOutput> = {}): PlotOutput {
   return {
     type: 'plot',
     id: 'plot-1',
