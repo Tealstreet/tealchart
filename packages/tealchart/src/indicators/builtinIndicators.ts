@@ -819,6 +819,43 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
       },
     },
   },
+  {
+    id: 'volumeDeltaCandles',
+    name: 'Volume Delta Candles',
+    category: 'tealstreet',
+    description: 'Candles filled proportionally to buy/sell volume delta derived from lower-timeframe candles',
+    overlay: true,
+    code: '',
+    jailbreak: {
+      inputs: [
+        {
+          id: 'ltf',
+          name: 'Lower Timeframe',
+          type: 'string',
+          defval: 'auto',
+          options: ['auto', '1m', '5m', '15m', '1h', '4h'],
+        },
+        { id: 'displayMode', name: 'Display Mode', type: 'string', defval: 'full', options: ['full', 'half'] },
+        { id: 'showLabels', name: 'Show Delta Labels', type: 'bool', defval: false },
+        { id: 'showActivityLevel', name: 'Show Max Activity Level', type: 'bool', defval: false },
+        { id: 'hideCandles', name: 'Hide Candles', type: 'bool', defval: true },
+      ],
+      defaults: {
+        ltf: 'auto',
+        displayMode: 'full',
+        showLabels: false,
+        showActivityLevel: false,
+        hideCandles: true,
+      },
+      palette: {
+        bullBody: { name: 'Bullish Body', defaultColor: 'rgba(38, 166, 154, 1)' },
+        bearBody: { name: 'Bearish Body', defaultColor: 'rgba(239, 83, 80, 1)' },
+        deltaPositive: { name: 'Delta Positive', defaultColor: 'rgba(38, 166, 154, 0.7)' },
+        deltaNegative: { name: 'Delta Negative', defaultColor: 'rgba(239, 83, 80, 0.7)' },
+        text: { name: 'Text Color', defaultColor: 'rgba(255, 255, 255, 0.55)' },
+      },
+    },
+  },
 ];
 
 /**
