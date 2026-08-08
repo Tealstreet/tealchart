@@ -98,8 +98,8 @@ describe('trade line label resolver', () => {
 
     expect(label.offsetPercent).toBe(0);
     expect(label.segments.map((segment) => segment.text)).toEqual(['Long', '0.0034']);
-    expect(label.buttons.map((button) => button.type)).toEqual(['tp', 'sl', 'cancel']);
-    expect(label.buttons.map((button) => button.icon)).toEqual(['TP', 'SL', '×']);
+    expect(label.buttons?.map((button) => button.type)).toEqual(['tp', 'sl', 'cancel']);
+    expect(label.buttons?.map((button) => button.icon)).toEqual(['TP', 'SL', '×']);
   });
 
   it('orders inline action buttons before TP/SL for display parity', () => {
@@ -117,8 +117,8 @@ describe('trade line label resolver', () => {
     expect(label.segments.map((segment) => segment.text)).toEqual(['Long', '0.0034', '+$1.33 (+0.17%)']);
     expect(label.segments[2]?.backgroundColor).toBe('#12c48b');
     expect(label.segments[2]?.borderColor).toBe('#18aee8');
-    expect(label.buttons.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
-    expect(label.buttons.map((button) => button.icon)).toEqual(['⇄', '×', 'TP', 'SL']);
+    expect(label.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
+    expect(label.buttons?.map((button) => button.icon)).toEqual(['⇄', '×', 'TP', 'SL']);
   });
 
   it('omits optional order controls when they are disabled', () => {

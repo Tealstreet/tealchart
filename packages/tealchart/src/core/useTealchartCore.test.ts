@@ -25,6 +25,7 @@ function makeState(overrides: Partial<TealchartCoreState> = {}): TealchartCoreSt
     barsContext: null,
     interval: '5',
     isLoading: true,
+    isLoadingMoreBars: false,
     symbol: 'BTC',
     unifiedLayout: emptyLayout,
     ...overrides,

@@ -175,7 +175,7 @@ interface PriceLineManagerProbe {
 }
 
 interface LineContentRefsProbe {
-  priceAxisRect?: { listening(): boolean };
+  priceAxisRect?: { listening(): boolean; fill(): string };
   priceAxisPrimaryText?: { listening(): boolean };
   priceAxisSecondaryText?: { listening(): boolean };
   segmentRects?: Array<{ fill(): string; x(): number; cornerRadius(): number | number[] }>;
