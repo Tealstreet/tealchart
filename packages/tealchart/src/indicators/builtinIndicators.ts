@@ -995,6 +995,46 @@ const TEALSTREET_INDICATORS: BuiltinIndicator[] = [
   },
 ];
 
+const findTealstreetIndicator = (id: string): BuiltinIndicator => {
+  const base = TEALSTREET_INDICATORS.find((indicator) => indicator.id === id);
+  if (!base) throw new Error(`unknown tealstreet indicator: ${id}`);
+  return base;
+};
+
+/**
+ * Cross-venue twins of the two order-flow signal indicators.
+ *
+ * They consume the footprint feed's server-side `aggregate` channel (a merge of
+ * binance futures, bybit linear, hyperliquid perps, okx swaps and coinbase
+ * spot, keyed by canonical base) instead of the chart venue's own tape, so they
+ * work on ANY exchange rather than only the five that are collected directly.
+ *
+ * **Derived from the base entries on purpose** — inputs, defaults and palette
+ * are shared by construction, so the settings UI cannot drift between a variant
+ * and its base. Only the identity and the description differ. Add a new input
+ * to the base entry and both variants get it.
+ */
+const AGGREGATED_ORDER_FLOW_INDICATORS: BuiltinIndicator[] = [
+  {
+    ...findTealstreetIndicator('stackedImbalance'),
+    id: 'stackedImbalanceAggregated',
+    name: 'Stacked Imbalance (Aggregated)',
+    description:
+      'Stacked diagonal imbalances from cross-exchange aggregated order flow — works on any venue, ' +
+      'including ones with no order-flow collection of their own. Levels are bucketed across venues, ' +
+      'so cross-venue basis (perp vs spot) smears the exact price and only the row-sized zone is meaningful.',
+  },
+  {
+    ...findTealstreetIndicator('absorption'),
+    id: 'absorptionAggregated',
+    name: 'Absorption (Aggregated)',
+    description:
+      'Levels where cross-exchange aggregated aggressive volume failed to move price — works on any venue, ' +
+      'including ones with no order-flow collection of their own. Levels are bucketed across venues, ' +
+      'so cross-venue basis (perp vs spot) smears the exact price and only the row-sized zone is meaningful.',
+  },
+];
+
 /**
  * Trend-following indicators
  */
@@ -1409,6 +1449,7 @@ plot(ta.sma(volume, length), "Volume MA", color=color.blue, linewidth=2)`,
  */
 export const BUILTIN_INDICATORS: BuiltinIndicator[] = [
   ...TEALSTREET_INDICATORS,
+  ...AGGREGATED_ORDER_FLOW_INDICATORS,
   ...TREND_INDICATORS,
   ...MOMENTUM_INDICATORS,
   ...VOLATILITY_INDICATORS,
