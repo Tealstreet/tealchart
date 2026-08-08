@@ -1777,6 +1777,7 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
+    const api = this;
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {
@@ -1787,17 +1788,10 @@ export class TealchartApi {
         }
       },
 
-      // Extended methods for full control.
-      //
-      // An arrow property, not method shorthand: shorthand binds its own
-      // `this`, so reaching the chart from here previously needed a
-      // `const api = this` alias. That alias tripped `no-this-alias` and was
-      // carrying an `eslint-disable` comment — which a Copybara down-sync from
-      // the tealchart mirror silently dropped, turning master's lint gate red.
-      // A comment cannot survive that round trip; code can.
-      remove: (): void => {
+      // Extended methods for full control
+      remove(): void {
         if (studies.delete(studyId)) {
-          this._onStudyRemove?.(studyId);
+          api._onStudyRemove?.(studyId);
         }
       },
 

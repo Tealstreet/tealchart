@@ -100,7 +100,6 @@ describe('user drawing render model', () => {
           createdAt: 1,
           updatedAt: 1,
           style,
-          extend: 'none',
           points: [
             { time: 10, price: 20 },
             { time: 30, price: 50 },
@@ -116,6 +115,7 @@ describe('user drawing render model', () => {
       },
       selection: {
         drawingId: 'line',
+        paneId: 'main',
       },
     });
     const options = { draftPreviewAnchor: { time: 60, price: 80 }, now: 5 };
