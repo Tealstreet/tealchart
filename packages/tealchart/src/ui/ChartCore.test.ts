@@ -175,7 +175,7 @@ interface PriceLineManagerProbe {
 }
 
 interface LineContentRefsProbe {
-  priceAxisRect?: { listening(): boolean };
+  priceAxisRect?: { listening(): boolean; fill(): string };
   priceAxisPrimaryText?: { listening(): boolean };
   priceAxisSecondaryText?: { listening(): boolean };
   segmentRects?: Array<{ fill(): string; x(): number; cornerRadius(): number | number[] }>;
@@ -1667,8 +1667,7 @@ describe('ChartCore viewport management', () => {
     const manager = (core as unknown as { priceLineManager: PriceLineManagerProbe }).priceLineManager;
     const lineGroup = manager.cachedLineGroups.get('order-cursor');
     const draggableRects = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) as
-      | Konva.Rect[]
-      | undefined;
+      Konva.Rect[] | undefined;
     const orderDragRect = draggableRects?.[0];
 
     expect(orderDragRect).toBeDefined();
@@ -1803,8 +1802,7 @@ describe('ChartCore viewport management', () => {
     const probe = core as unknown as { priceLineManager: PriceLineManagerProbe; stage: Konva.Stage };
     const lineGroup = probe.priceLineManager.cachedLineGroups.get('order-hover-cursor');
     const draggableRects = lineGroup?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) as
-      | Konva.Rect[]
-      | undefined;
+      Konva.Rect[] | undefined;
     const orderDragRect = draggableRects?.[0];
 
     expect(orderDragRect).toBeDefined();
