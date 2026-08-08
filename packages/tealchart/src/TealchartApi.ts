@@ -1777,12 +1777,6 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
-    // The returned object uses method shorthand, so each method binds its own
-    // `this` — this alias is how `remove()` below reaches the chart. Arrow
-    // properties would also work, but this package is consumed as source by
-    // several hosts, so the rewrite carries risk for no behavioural gain.
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const api = this;
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {
@@ -1793,10 +1787,17 @@ export class TealchartApi {
         }
       },
 
-      // Extended methods for full control
-      remove(): void {
+      // Extended methods for full control.
+      //
+      // An arrow property, not method shorthand: shorthand binds its own
+      // `this`, so reaching the chart from here previously needed a
+      // `const api = this` alias. That alias tripped `no-this-alias` and was
+      // carrying an `eslint-disable` comment — which a Copybara down-sync from
+      // the tealchart mirror silently dropped, turning master's lint gate red.
+      // A comment cannot survive that round trip; code can.
+      remove: (): void => {
         if (studies.delete(studyId)) {
-          api._onStudyRemove?.(studyId);
+          this._onStudyRemove?.(studyId);
         }
       },
 
