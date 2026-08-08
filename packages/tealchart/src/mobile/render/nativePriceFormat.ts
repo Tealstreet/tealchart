@@ -8,7 +8,12 @@ export function normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision: n
   'worklet';
   if (!Number.isFinite(pricePrecision) || pricePrecision < 0) return 0.01;
   if (pricePrecision > 0 && pricePrecision < 1) return pricePrecision;
-  return 10 ** -clampNativePriceDecimalsWorklet(pricePrecision);
+  // Built from a decimal literal rather than 10 ** -n. The result is read back
+  // with toString() to count decimals, and exponentiation is not specified to a
+  // bit-exact result — an engine whose pow returns 0.00010000000000000000209
+  // for 1e-4 counts 20 decimals instead of 4 and formats prices with 20 places.
+  // Parsing a decimal literal is exact and identical on every engine.
+  return Number(`1e-${clampNativePriceDecimalsWorklet(pricePrecision)}`);
 }
 
 export function getNativeTradeLinePriceDecimalsWorklet(pricePrecision: number): number {
