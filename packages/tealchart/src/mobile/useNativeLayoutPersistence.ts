@@ -381,6 +381,9 @@ export function useNativeLayoutPersistence({
       return;
     }
 
+    // The guard above narrows saveLoadAdapter, but that narrowing does not reach
+    // into loadInitialLayout: it is a nested function over a mutable binding.
+    const adapter = saveLoadAdapter;
     let cancelled = false;
 
     async function loadInitialLayout(): Promise<void> {
@@ -388,7 +391,7 @@ export function useNativeLayoutPersistence({
         const currentLayout =
           (await loadNativeCurrentLayoutState(currentLayoutStorage, currentLayoutStorageKey)) ??
           chartStore.currentLayout.get();
-        const charts = await saveLoadAdapter.getAllCharts();
+        const charts = await adapter.getAllCharts();
         const indexedCurrentLayout =
           currentLayout.layoutId != null
             ? charts.find((chart) => String(chart.id) === String(currentLayout.layoutId))
@@ -402,7 +405,7 @@ export function useNativeLayoutPersistence({
           return;
         }
 
-        const result = await loadAsTealchart(layoutId, saveLoadAdapter);
+        const result = await loadAsTealchart(layoutId, adapter);
         if (cancelled) return;
 
         applyingLayoutRef.current = true;
