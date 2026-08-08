@@ -513,6 +513,22 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
     defaultInputs: {},
     isOverlay: true,
   },
+
+  stackedImbalanceAggregated: {
+    customId: 'stackedImbalanceAggregated',
+    tvStudyId: 'Tealstreet-StackedImbalanceAggregated@tv-basicstudies-1',
+    inputMappings: {},
+    defaultInputs: {},
+    isOverlay: true,
+  },
+
+  absorptionAggregated: {
+    customId: 'absorptionAggregated',
+    tvStudyId: 'Tealstreet-AbsorptionAggregated@tv-basicstudies-1',
+    inputMappings: {},
+    defaultInputs: {},
+    isOverlay: true,
+  },
 };
 
 // ============================================================================
