@@ -58,6 +58,7 @@ import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { ResolutionInput } from './utils/normalizeResolution';
 
 import { LOADING_OPACITY } from './constants';
@@ -207,7 +208,7 @@ const getResolveSymbolName = (
 /**
  * Main widget class (equivalent to TradingView's IChartingLibraryWidget)
  */
-export class TealchartWidget {
+export class TealchartWidget implements ITealchartWebWidget {
   private _container: HTMLElement;
   private _options: TealchartWidgetOptions;
   private _datafeed: IBasicDataFeed;
@@ -3780,9 +3781,13 @@ export class TealchartWidget {
    * Save chart to server
    * @stub Not yet implemented
    */
-  saveChartToServer(_onComplete?: () => void, onFail?: () => void, _options?: { chartName?: string }): void {
+  saveChartToServer(
+    _onComplete?: () => void,
+    onFail?: (error: SaveChartErrorInfo) => void,
+    _options?: SaveChartToServerOptions,
+  ): void {
     this._logger?.warn(LogCategory.Layout, 'Method not implemented: saveChartToServer');
-    onFail?.();
+    onFail?.({ message: 'Method not implemented: saveChartToServer' });
   }
 
   // ============================================================================
