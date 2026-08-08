@@ -58,6 +58,7 @@ import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import { applyChartOverridesToRenderOptions } from './overrides';
 import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { ResolutionInput } from './utils/normalizeResolution';
 
@@ -3433,36 +3434,7 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Apply style overrides (TradingView-style dot-notation paths)
    */
   applyOverrides(overrides: ChartOverrides): void {
-    // Map TradingView override paths to our render options
-    const newOptions: Partial<RenderOptions> = { ...this._renderOptions };
-
-    if (overrides['mainSeriesProperties.candleStyle.upColor']) {
-      newOptions.upColor = overrides['mainSeriesProperties.candleStyle.upColor'];
-    }
-    if (overrides['mainSeriesProperties.candleStyle.downColor']) {
-      newOptions.downColor = overrides['mainSeriesProperties.candleStyle.downColor'];
-    }
-    if (overrides['paneProperties.background']) {
-      newOptions.backgroundColor = overrides['paneProperties.background'];
-    }
-    if (overrides['paneProperties.vertGridProperties.color']) {
-      newOptions.gridColor = overrides['paneProperties.vertGridProperties.color'];
-    }
-    if (overrides['paneProperties.horzGridProperties.color']) {
-      newOptions.gridColor = overrides['paneProperties.horzGridProperties.color'];
-    }
-    if (overrides['scalesProperties.textColor']) {
-      newOptions.textColor = overrides['scalesProperties.textColor'];
-    }
-    if (overrides['paneProperties.crossHairProperties.color']) {
-      newOptions.crosshairColor = overrides['paneProperties.crossHairProperties.color'];
-    }
-    if (overrides['volumePaneProperties.showVolume'] !== undefined) {
-      newOptions.showVolume = overrides['volumePaneProperties.showVolume'];
-    }
-    if (overrides['volumePaneProperties.volumeHeight'] !== undefined) {
-      newOptions.volumeHeight = overrides['volumePaneProperties.volumeHeight'];
-    }
+    const newOptions = applyChartOverridesToRenderOptions(this._renderOptions, overrides);
 
     this._renderOptions = newOptions;
 

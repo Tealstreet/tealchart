@@ -475,12 +475,16 @@ describe('imperative chart API contract', () => {
 
   it('exposes TradingView-style chart access from the Skia handle', () => {
     const source = readSource('SkiaTealchart.tsx');
-    const handleBlock = source.match(/export interface SkiaTealchartHandle \{[\s\S]*?\n\}/)?.[0] ?? '';
+    const handleBlock = source.match(/export interface SkiaTealchartHandle[^{]*\{[\s\S]*?\n\}/)?.[0] ?? '';
 
     expect(handleBlock).toContain('chart(index?: number): TealchartApi;');
     expect(handleBlock).toContain('activeChart(): TealchartApi;');
     expect(handleBlock).not.toContain('addTealscriptIndicator');
     expect(handleBlock).not.toContain('removeTealscriptIndicator');
+
+    // The native handle must carry the same widget contract as the web widget,
+    // or a shared host lifecycle cannot drive both.
+    expect(handleBlock).toContain('extends ITealchartWidget');
   });
 
   it('keeps the shared widget contract aligned to the consumed TradingView surface', () => {
