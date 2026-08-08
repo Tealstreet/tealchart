@@ -203,7 +203,11 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     expect(views[0].props.style).toEqual(expect.arrayContaining([expect.objectContaining({ zIndex: 70 })]));
     expect(views[0].props.pointerEvents).toBe('none');
     expect(scrollViews[0].props.canCancelContentTouches).toBe(false);
-    expect(scrollViews[0].props.delaysContentTouches).toBe(false);
+    // delaysContentTouches is gone from React Native's ScrollView types as of
+    // 0.81 — both RCTScrollView.m and the Fabric component set it to NO
+    // unconditionally at init, so it is no longer passed and must not be
+    // asserted. The behaviour it encoded is now the platform default.
+    expect(scrollViews[0].props.delaysContentTouches).toBeUndefined();
     expect(scrollViews[0].props.keyboardShouldPersistTaps).toBe('always');
     expect(deleteButton?.props.hitSlop).toEqual({ left: 8, right: 8, top: 8, bottom: 8 });
   });
