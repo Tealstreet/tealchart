@@ -812,3 +812,4 @@ export type {
   TealchartCoreActions,
   UseTealchartCoreReturn,
 } from './core/useTealchartCore';
+export type { ITealchartWebWidget, ITealchartWidget } from './widgetContract';

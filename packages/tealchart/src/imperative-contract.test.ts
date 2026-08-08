@@ -191,6 +191,28 @@ const TRADINGVIEW_DATAFEED_CHART_METHODS = [
 
 const TRADINGVIEW_DATAFEED_QUOTES_METHODS = ['getQuotes', 'subscribeQuotes', 'unsubscribeQuotes'].sort();
 
+// The IChartingLibraryWidget subset Tealstreet hosts actually call. Deliberately
+// not the whole interface — every member here must be implementable natively.
+const TRADINGVIEW_WIDGET_METHODS = [
+  'activeChart',
+  'activeChartIndex',
+  'applyOverrides',
+  'applyStudiesOverrides',
+  'chart',
+  'chartsCount',
+  'headerReady',
+  'onChartReady',
+  'onContextMenu',
+  'remove',
+  'saveChartToServer',
+  'setCSSCustomProperty',
+  'subscribe',
+].sort();
+
+const TRADINGVIEW_WEB_WIDGET_METHODS = ['onShortcut'];
+
+const KNOWN_STUB_WIDGET_METHODS = ['applyStudiesOverrides', 'saveChartToServer', 'setCSSCustomProperty'];
+
 const TRADINGVIEW_BUNDLE_ORDER_EXTENSION_METHODS = [
   'setOrderId',
   'setCancelAsSubmit',
@@ -453,12 +475,54 @@ describe('imperative chart API contract', () => {
 
   it('exposes TradingView-style chart access from the Skia handle', () => {
     const source = readSource('SkiaTealchart.tsx');
-    const handleBlock = source.match(/export interface SkiaTealchartHandle \{[\s\S]*?\n\}/)?.[0] ?? '';
+    const handleBlock = source.match(/export interface SkiaTealchartHandle[^{]*\{[\s\S]*?\n\}/)?.[0] ?? '';
 
     expect(handleBlock).toContain('chart(index?: number): TealchartApi;');
     expect(handleBlock).toContain('activeChart(): TealchartApi;');
     expect(handleBlock).not.toContain('addTealscriptIndicator');
     expect(handleBlock).not.toContain('removeTealscriptIndicator');
+
+    // The native handle must carry the same widget contract as the web widget,
+    // or a shared host lifecycle cannot drive both.
+    expect(handleBlock).toContain('extends ITealchartWidget');
+  });
+
+  it('keeps the shared widget contract aligned to the consumed TradingView surface', () => {
+    const contract = readSource('widgetContract.ts');
+
+    expect(extractTopLevelFunctionNames(extractExportedInterface(contract, 'ITealchartWidget'))).toEqual(
+      TRADINGVIEW_WIDGET_METHODS,
+    );
+    expect(extractTopLevelFunctionNames(extractExportedInterface(contract, 'ITealchartWebWidget'))).toEqual(
+      TRADINGVIEW_WEB_WIDGET_METHODS,
+    );
+
+    // DOM types must not reach the shared half — React Native has to satisfy it.
+    expect(extractExportedInterface(contract, 'ITealchartWidget')).not.toContain('KeyboardEvent');
+
+    expect(readSource('TealchartWidget.ts')).toContain('export class TealchartWidget implements ITealchartWebWidget {');
+  });
+
+  it('flags widget contract members that are accepted and dropped', () => {
+    const contractBlock = extractExportedInterface(readSource('widgetContract.ts'), 'ITealchartWidget');
+
+    // These compile but do nothing. The @stub tag must sit in the JSDoc directly
+    // above its own member, or a consumer reading the contract mistakes shape
+    // for behavior. A file-scoped `toContain('@stub')` would pass vacuously.
+    for (const method of KNOWN_STUB_WIDGET_METHODS) {
+      const declaration = contractBlock.indexOf(`${method}(`);
+      expect(declaration, method).toBeGreaterThan(0);
+
+      const preceding = contractBlock.slice(0, declaration);
+      const commentStart = preceding.lastIndexOf('/**');
+      const commentEnd = preceding.lastIndexOf('*/');
+      expect(commentStart, method).toBeGreaterThan(-1);
+      expect(commentEnd, method).toBeGreaterThan(commentStart);
+      expect(preceding.slice(commentStart, commentEnd), method).toContain('@stub');
+
+      // Nothing may sit between that JSDoc and the member it documents.
+      expect(preceding.slice(commentEnd + 2).trim(), method).toBe('');
+    }
   });
 
   it('does not export stale native-only indicator handle types', () => {
