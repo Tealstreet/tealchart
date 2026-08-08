@@ -449,7 +449,6 @@ function NativeUserDrawingSelectionActionOverlayView({
       >
         <ScrollView
           canCancelContentTouches={false}
-          delaysContentTouches={false}
           horizontal
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
@@ -504,7 +503,6 @@ function NativeUserDrawingSelectionActionOverlayView({
         <ScrollView
           accessibilityLabel={activePopoverGroup.presentation?.popoverLabel ?? activePopoverGroup.label}
           canCancelContentTouches={false}
-          delaysContentTouches={false}
           horizontal
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
