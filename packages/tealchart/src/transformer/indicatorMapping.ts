@@ -505,6 +505,14 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
     defaultInputs: {},
     isOverlay: true,
   },
+
+  absorption: {
+    customId: 'absorption',
+    tvStudyId: 'Tealstreet-Absorption@tv-basicstudies-1',
+    inputMappings: {},
+    defaultInputs: {},
+    isOverlay: true,
+  },
 };
 
 // ============================================================================
