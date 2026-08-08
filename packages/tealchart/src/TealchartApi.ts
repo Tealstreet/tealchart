@@ -1777,6 +1777,11 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
+    // The returned object uses method shorthand, so each method binds its own
+    // `this` — this alias is how `remove()` below reaches the chart. Arrow
+    // properties would also work, but this package is consumed as source by
+    // several hosts, so the rewrite carries risk for no behavioural gain.
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const api = this;
 
     return {
