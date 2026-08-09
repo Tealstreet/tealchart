@@ -50,3 +50,4 @@ export type { AsyncStorageLike, TealchartKeyValueStorage } from './transformer/s
 // Native passive chart exports.
 export { AVAILABLE_TIMEFRAMES as MOBILE_TIMEFRAMES } from './state/chartState';
 export type { TimeframeOption as MobileTimeframeOption } from './state/chartState';
+export type { ITealchartWidget } from './widgetContract';

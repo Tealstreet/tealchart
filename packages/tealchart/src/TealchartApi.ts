@@ -1777,7 +1777,9 @@ export class TealchartApi {
    */
   private _createStudyApi(studyId: string): IStudyApi {
     const studies = this._studies;
-    const api = this;
+    // Arrow keeps `this` on the instance; the returned object's method shorthand
+    // would otherwise rebind it, which is why this used to alias `this`.
+    const notifyStudyRemoved = () => this._onStudyRemove?.(studyId);
 
     return {
       applyOverrides(overrides: Record<string, unknown>): void {
@@ -1791,7 +1793,7 @@ export class TealchartApi {
       // Extended methods for full control
       remove(): void {
         if (studies.delete(studyId)) {
-          api._onStudyRemove?.(studyId);
+          notifyStudyRemoved();
         }
       },
 

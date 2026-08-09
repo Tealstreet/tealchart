@@ -18,6 +18,7 @@ import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCros
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
 import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
@@ -108,6 +109,8 @@ import {
   getNativeOrderObjectId as getOrderObjectId,
   getNativePositionObjectId as getPositionObjectId,
 } from './mobile/utils/tradeLineLayout';
+import { EventEmitter } from './events/EventEmitter';
+import { applyChartOverridesToRenderOptions } from './overrides';
 import { getChartStore } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
@@ -131,7 +134,12 @@ function disposeNativeResizeSnapshot(snapshot: NativeResizeSnapshot | null): voi
   snapshot?.image.dispose();
 }
 
-export interface SkiaTealchartHandle {
+/**
+ * Satisfies the same widget contract as the web `TealchartWidget`, so one host
+ * lifecycle can drive either platform. `changeTheme` is a Tealstreet extension
+ * with no TradingView counterpart, so it stays an own member.
+ */
+export interface SkiaTealchartHandle extends ITealchartWidget {
   chart(index?: number): TealchartApi;
   activeChart(): TealchartApi;
   changeTheme(theme: ChartThemeInput): void;
@@ -445,6 +453,42 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineRows,
     viewportSyncEpoch,
   } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled });
+  // Imperative overrides layer over the prop, mirroring imperativeTheme. Reset
+  // when the prop changes so a host that later drives renderOptions by prop is
+  // not permanently clobbered by one applyOverrides call.
+  const [imperativeRenderOptions, setImperativeRenderOptions] = useState<Partial<RenderOptions> | null>(null);
+  useEffect(() => {
+    setImperativeRenderOptions(null);
+  }, [renderOptions]);
+  const effectiveRenderOptions = useMemo(
+    () => (imperativeRenderOptions ? { ...renderOptions, ...imperativeRenderOptions } : renderOptions),
+    [imperativeRenderOptions, renderOptions],
+  );
+
+  const widgetEmitterRef = useRef<EventEmitter | null>(null);
+  if (!widgetEmitterRef.current) widgetEmitterRef.current = new EventEmitter();
+  const widgetEmitter = widgetEmitterRef.current;
+  const widgetDisposedRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      widgetDisposedRef.current = true;
+      widgetEmitter.removeAllListeners();
+    };
+  }, [widgetEmitter]);
+
+  // Handle members read through refs: useImperativeHandle deps stay narrow, so a
+  // member closing over props or state directly would freeze at first render.
+  const effectiveRenderOptionsRef = useRef(effectiveRenderOptions);
+  effectiveRenderOptionsRef.current = effectiveRenderOptions;
+
+  // Mirrors the web widget, which emits chart_loaded once the first bars land.
+  const chartReadyRef = useRef(false);
+  useEffect(() => {
+    if (chartReadyRef.current || isLoading || bars.length === 0) return;
+    chartReadyRef.current = true;
+    widgetEmitter.emit('chart_loaded');
+  }, [bars.length, isLoading, widgetEmitter]);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -457,11 +501,64 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       activeChart(): TealchartApi {
         return chartApi;
       },
+      activeChartIndex(): number {
+        return 0;
+      },
+      chartsCount(): number {
+        return 1;
+      },
       changeTheme(nextTheme: ChartThemeInput): void {
         setImperativeTheme(nextTheme);
       },
+      applyOverrides(overrides): void {
+        // Accumulate the overrides alone, never a snapshot of the merged result.
+        // Snapshotting props here would pin them for the render between a prop
+        // change and the reset effect, flashing the previous theme.
+        setImperativeRenderOptions((current) => applyChartOverridesToRenderOptions(current ?? {}, overrides));
+      },
+      /** @stub Accepted and dropped — study overrides are not applied yet. */
+      applyStudiesOverrides(): void {},
+      headerReady(): Promise<void> {
+        return Promise.resolve();
+      },
+      onChartReady(callback: () => void): void {
+        if (widgetDisposedRef.current) return;
+        if (chartReadyRef.current) {
+          callback();
+          return;
+        }
+        // One-shot, matching the web widget, which clears its ready callbacks
+        // after firing. Leaving them subscribed would re-run them on reload.
+        const once = () => {
+          widgetEmitter.unsubscribe('chart_loaded', once);
+          callback();
+        };
+        widgetEmitter.subscribe('chart_loaded', once);
+      },
+      onContextMenu(callback: ContextMenuCallback): void {
+        setImperativeContextMenu(() => callback);
+      },
+      /**
+       * React owns this component's teardown — unmount effects dispose Skia
+       * images, timers and subscriptions. Tearing those down while still mounted
+       * would render freed Skia resources, so this only marks the widget dead.
+       */
+      remove(): void {
+        widgetDisposedRef.current = true;
+        widgetEmitter.removeAllListeners();
+      },
+      /** @stub Accepted and dropped — native persists through its save/load adapter. */
+      saveChartToServer(_onComplete?: () => void, onFail?: (error: SaveChartErrorInfo) => void): void {
+        onFail?.({ message: 'Method not implemented: saveChartToServer' });
+      },
+      /** @stub Accepted and dropped — there is no CSS surface to target. */
+      setCSSCustomProperty(): void {},
+      subscribe(event, callback): void {
+        if (widgetDisposedRef.current) return;
+        widgetEmitter.subscribe(event, callback as (...args: unknown[]) => void);
+      },
     }),
-    [chartApi, setImperativeTheme],
+    [chartApi, setImperativeTheme, widgetEmitter],
   );
 
   const { frame, margins, onLayout, options } = useNativeSkiaLayoutRuntime({
@@ -472,7 +569,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     pricePrecision: nativePricePrecision,
     propHeight: layoutPropHeight,
     propWidth: layoutPropWidth,
-    renderOptions,
+    renderOptions: effectiveRenderOptions,
     showTopBar,
     theme,
     topBarHeight: STATIC_TOP_BAR_HEIGHT,
@@ -568,21 +665,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativeResetViewButtonVisible, setNativeResetViewButtonVisible] = useState(false);
   const [nativeContextMenu, setNativeContextMenu] = useState<NativeCrosshairContextMenuState | null>(null);
   const nativeResetViewButtonTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasNativeContextMenu = Boolean(onContextMenu);
+  // The callback can arrive as a prop or through the imperative widget contract.
+  // Both must feed one source, or gesture gating reads a different value than the
+  // handler and the "+" menu never opens.
+  const [imperativeContextMenu, setImperativeContextMenu] = useState<ContextMenuCallback | null>(null);
+  const activeContextMenu = imperativeContextMenu ?? onContextMenu ?? null;
+  const hasNativeContextMenu = Boolean(activeContextMenu);
   const closeNativeContextMenu = useCallback(() => {
     setNativeContextMenu(null);
     crosshair.visible.value = false;
   }, [crosshair]);
   const handleNativeContextMenuTap = useCallback(
     (time: number, price: number, anchorX: number, anchorY: number) => {
-      const items = onContextMenu?.(time, price) ?? [];
+      const items = activeContextMenu?.(time, price) ?? [];
       setNativeContextMenu(items.length > 0 ? { anchorX, anchorY, items } : null);
     },
-    [onContextMenu],
+    [activeContextMenu],
   );
   useEffect(() => {
-    if (!onContextMenu) setNativeContextMenu(null);
-  }, [onContextMenu]);
+    if (!activeContextMenu) setNativeContextMenu(null);
+  }, [activeContextMenu]);
   const clearNativeResetViewButtonTimer = useCallback(() => {
     if (nativeResetViewButtonTimerRef.current) {
       clearTimeout(nativeResetViewButtonTimerRef.current);
