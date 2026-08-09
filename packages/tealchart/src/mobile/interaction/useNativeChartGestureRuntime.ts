@@ -24,7 +24,7 @@ import type {
   NativeTimeScaleGestureState,
 } from './nativeViewportGestureState';
 
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useSharedValue } from 'react-native-reanimated';
 
@@ -509,11 +509,19 @@ export function useNativeChartGestureRuntime({
     });
   }, [controlZones, dataFrame, drawingSelectionEnabled, handleDrawingSelectionTap]);
 
+  // Drag zones are recomputed from bar data, so they get a new identity on every
+  // tick. Held as a shared value the worklet reads at touch time, they stay out
+  // of the gesture's dependencies and no longer rebuild it several times a second.
+  const drawingEditDragZonesShared = useSharedValue<readonly NativeGestureControlZone[]>(drawingEditDragZones);
+  useEffect(() => {
+    drawingEditDragZonesShared.value = drawingEditDragZones;
+  }, [drawingEditDragZones, drawingEditDragZonesShared]);
+
   const drawingEditDragGesture = useMemo<GestureType>(() => {
     return createNativeUserDrawingEditDragGesture({
       controlZones,
       dragActive: drawingEditDragActive,
-      dragZones: drawingEditDragZones,
+      dragZones: drawingEditDragZonesShared,
       enabled: drawingSelectionEnabled,
       frame: dataFrame,
       onBeginDrag: stableOnDrawingEditDragBegin,
@@ -524,7 +532,7 @@ export function useNativeChartGestureRuntime({
     controlZones,
     dataFrame,
     drawingEditDragActive,
-    drawingEditDragZones,
+    drawingEditDragZonesShared,
     drawingSelectionEnabled,
     stableOnDrawingEditDragBegin,
     stableOnDrawingEditDragEnd,
