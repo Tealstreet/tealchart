@@ -3,16 +3,11 @@
  *
  * Import from '@tealstreet/tealchart/native' (web) or '@packages/tealchart/native' (mobile)
  * to get Skia-based components without breaking web builds.
+ *
+ * This file only re-exports ./src/index.native, which package.json `exports`
+ * already maps './native' to. Consumers whose bundler rewrites the subpath to a
+ * file path land here instead of the exports map, so the two surfaces must not
+ * drift — listing exports twice is what previously dropped them at runtime.
  */
 
-export { SkiaTealchart } from './src/SkiaTealchart';
-export type { SkiaTealchartHandle, SkiaTealchartProps } from './src/SkiaTealchart';
-export {
-  BUILTIN_CHART_THEMES,
-  DARK_CHART_THEME,
-  LIGHT_CHART_THEME,
-  chartThemeToRenderOptions,
-  mergeChartThemeRenderOptions,
-  resolveChartTheme,
-} from './src/theme';
-export type { ChartTheme, ChartThemeInput, ChartThemeName, ChartThemeRenderOptions } from './src/theme';
+export * from './src/index.native';
