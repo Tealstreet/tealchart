@@ -16,7 +16,14 @@ interface NativeGestureTouchEvent {
 export interface NativeUserDrawingEditDragGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
   dragActive: SharedValue<boolean>;
-  dragZones?: readonly NativeGestureControlZone[];
+  /**
+   * A shared value, not a plain array. The drag zones are derived from bar data
+   * and so change on every tick; as a captured worklet value they forced this
+   * gesture — and therefore the whole composed chart gesture — to be rebuilt
+   * several times a second, reconfiguring every native handler on the main
+   * thread while Fabric committed on the JS thread.
+   */
+  dragZones: SharedValue<readonly NativeGestureControlZone[]>;
   enabled: boolean;
   frame: NativeChartFrame | null;
   onBeginDrag: (x: number, y: number) => void;
@@ -33,7 +40,7 @@ function getNativeTouchPoint(event: NativeGestureTouchEvent): { x: number; y: nu
 export function createNativeUserDrawingEditDragGesture({
   controlZones = [],
   dragActive,
-  dragZones = [],
+  dragZones,
   enabled,
   frame,
   onBeginDrag,
@@ -57,7 +64,7 @@ export function createNativeUserDrawingEditDragGesture({
       if (
         !point ||
         isNativeGestureControlPoint(controlZones, point.x, point.y) ||
-        !isNativeGestureControlPoint(dragZones, point.x, point.y)
+        !isNativeGestureControlPoint(dragZones.value, point.x, point.y)
       ) {
         stateManager.fail();
       }
