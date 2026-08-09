@@ -94,6 +94,7 @@ describe('user drawing render model', () => {
         {
           id: 'line',
           kind: 'trendLine',
+          extend: 'none',
           paneId: 'main',
           visible: true,
           locked: false,
@@ -115,7 +116,6 @@ describe('user drawing render model', () => {
       },
       selection: {
         drawingId: 'line',
-        paneId: 'main',
       },
     });
     const options = { draftPreviewAnchor: { time: 60, price: 80 }, now: 5 };
