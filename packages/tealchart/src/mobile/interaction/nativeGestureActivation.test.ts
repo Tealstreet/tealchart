@@ -268,7 +268,7 @@ describe('native gesture activation', () => {
     const gesture = createNativeUserDrawingEditDragGesture({
       controlZones: [{ x1: 0, x2: 30, y1: 0, y2: 30 }],
       dragActive: shared(false),
-      dragZones: [{ x1: 70, x2: 100, y1: 70, y2: 100 }],
+      dragZones: shared([{ x1: 70, x2: 100, y1: 70, y2: 100 }]),
       enabled: true,
       frame,
       onBeginDrag: (x, y) => {
@@ -304,6 +304,43 @@ describe('native gesture activation', () => {
     expect(began).toEqual([[80, 80]]);
     expect(moved).toEqual([[90, 72]]);
     expect(ended).toBe(1);
+  });
+
+  it('reads drag zones from the shared value so moving them does not rebuild the gesture', () => {
+    // Drag zones are derived from bar data and change on every tick. If the
+    // gesture captured them by value it had to be rebuilt to follow them, which
+    // reconfigured every native handler on the main thread several times a
+    // second and raced Fabric's mounting transaction.
+    const dragZones = shared<readonly { x1: number; x2: number; y1: number; y2: number }[]>([
+      { x1: 70, x2: 100, y1: 70, y2: 100 },
+    ]);
+    const gesture = createNativeUserDrawingEditDragGesture({
+      dragActive: shared(false),
+      dragZones,
+      enabled: true,
+      frame,
+      onBeginDrag: () => undefined,
+      onEndDrag: () => undefined,
+      onMoveDrag: () => undefined,
+    }) as any;
+
+    const insideOriginal = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: 80 }], allTouches: [{ x: 80, y: 80 }] },
+      insideOriginal,
+    );
+    expect(insideOriginal.failed).toBe(false);
+
+    // Same gesture object, zones moved out from under it.
+    dragZones.value = [{ x1: 0, x2: 20, y1: 0, y2: 20 }];
+
+    const nowOutside = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 80, y: 80 }], allTouches: [{ x: 80, y: 80 }] }, nowOutside);
+    expect(nowOutside.failed).toBe(true);
+
+    const nowInside = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 10, y: 10 }], allTouches: [{ x: 10, y: 10 }] }, nowInside);
+    expect(nowInside.failed).toBe(false);
   });
 
   it('routes selected drawing action taps through native hit targets', () => {
