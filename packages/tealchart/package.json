@@ -73,7 +73,7 @@
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@napi-rs/canvas": "^1.0.2",
-    "@shopify/react-native-skia": "2.2.12",
+    "@shopify/react-native-skia": "2.10.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
