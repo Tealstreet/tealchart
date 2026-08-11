@@ -618,23 +618,6 @@ export type { LogEntry, LogCategoryType, TealchartLoggerOptions } from './debug'
 export { EventEmitter, Subscription } from './events/EventEmitter';
 export type { EventCallback } from './events/EventEmitter';
 
-// Chart settings controls (shared by the web modal and the native overlay)
-export {
-  CHART_SETTINGS_CONTROLS,
-  CHART_SETTINGS_TABS,
-  createChartPropertyControl,
-  getChartSettingsControlsForTab,
-  getPopulatedChartSettingsTabs,
-  SHOW_VOLUME_CONTROL_ID,
-} from './settings/chartSettingsControls';
-export type {
-  ChartSettingControl,
-  ChartSettingControlKind,
-  ChartSettingControlValue,
-  ChartSettingsControlContext,
-  ChartSettingsTab,
-} from './settings/chartSettingsControls';
-
 // Types
 export type {
   // Core chart types
@@ -642,8 +625,6 @@ export type {
   Viewport,
   RenderOptions,
   ChartOverrides,
-  ChartProperties,
-  ChartPropertyKey,
   ChartMargins,
   InteractionState,
   CrosshairState,

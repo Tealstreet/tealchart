@@ -58,8 +58,6 @@ import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
-
 import { applyChartOverridesToRenderOptions } from './overrides';
 import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { ResolutionInput } from './utils/normalizeResolution';
@@ -1147,7 +1145,6 @@ export class TealchartWidget implements ITealchartWebWidget {
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
       onSymbolClick: this._options.onSymbolClick,
-      chartSettingsContext: this._createChartSettingsContext(),
       onIntervalChange: (interval) => {
         this._chartApi.setResolution(interval);
       },
@@ -1621,40 +1618,6 @@ export class TealchartWidget implements ITealchartWebWidget {
   /**
    * Mark the layout as having unsaved changes and schedule auto-save
    */
-  /**
-   * Context the settings modal writes through.
-   *
-   * Built here rather than in the UI layer because two of the four operations
-   * are private to the widget: marking the layout dirty, and pushing a changed
-   * setting into _renderOptions so it actually draws. A modal that only wrote
-   * to the store would persist a setting the chart never applied.
-   */
-  private _createChartSettingsContext(): ChartSettingsControlContext {
-    return {
-      getSettings: () => this._getCurrentSettings(),
-      setSetting: (key, value) => {
-        this._chartStore?.settings.setKey(key, value);
-        if (key === 'showVolume') {
-          this._renderOptions = { ...this._renderOptions, showVolume: Boolean(value) };
-          this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
-        }
-      },
-      setChartProperties: (properties) => {
-        this._chartStore?.settings.setKey('chartProperties', properties);
-        if (properties) {
-          this._renderOptions = applyChartOverridesToRenderOptions(this._renderOptions, properties);
-          this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
-        }
-      },
-      markLayoutDirty: () => this._markDirty(),
-    };
-  }
-
-  /** Theme + host options, before any persisted or imperative overrides. */
-  private _baseRenderOptions(): Partial<RenderOptions> {
-    return mergeChartThemeRenderOptions(this._options.theme, this._options.renderOptions);
-  }
-
   private _markDirty(): void {
     if (!this._chartStore) return;
     this._chartStore.isDirty.set(true);
@@ -3475,12 +3438,6 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     this._renderOptions = newOptions;
 
-    // Keep the persisted toggle in step, or an override-hidden volume still
-    // saves as visible and comes back on the next load.
-    if (overrides['volumePaneProperties.showVolume'] !== undefined && this._chartStore) {
-      this._chartStore.settings.setKey('showVolume', newOptions.showVolume ?? true);
-    }
-
     // Re-render if already mounted. OPTIONS so color overrides also re-theme the
     // renderer and the DOM chrome (CSS vars), matching changeTheme().
     if (this._ui && this._bars.length > 0) {
@@ -3888,23 +3845,9 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('volumeHeight', settings.volumeHeight);
       this._chartStore.settings.setKey('chartType', settings.chartType || 'candle');
       this._chartStore.settings.setKey('autoScale', settings.autoScale);
-      this._chartStore.settings.setKey('chartProperties', settings.chartProperties);
-      this._chartStore.settings.setKey('preservedTvProperties', settings.preservedTvProperties);
       this._chartStore.settings.setKey('symbol', settings.symbol || this._symbol);
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
-
-    // The store alone does not render. Volume is drawn from _renderOptions, so a
-    // loaded layout has to reach it or the chart shows the previous layout's
-    // volume while claiming the new one's on the next save.
-    // Rebuilt from the base rather than merged into the current options.
-    // _renderOptions is cumulative: merging would leave the previous layout's
-    // colours in place for any property the new layout does not set, so the
-    // chart would draw layout A while saving layout B.
-    this._renderOptions = {
-      ...applyChartOverridesToRenderOptions(this._baseRenderOptions(), settings.chartProperties ?? {}),
-      showVolume: settings.showVolume,
-    };
 
     this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), {
       markLayoutDirty: false,
@@ -4225,10 +4168,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     return {
       symbol: this._symbol,
       interval: this._interval,
-      showVolume: storeSettings?.showVolume ?? this._renderOptions.showVolume ?? true,
-      // Height stays sourced from what actually renders. The settings store is
-      // seeded from DEFAULT_CHART_SETTINGS, not from the host's renderOptions,
-      // so reading height from it would save a value the chart never drew.
+      showVolume: this._renderOptions.showVolume ?? true,
       volumeHeight: this._renderOptions.volumeHeight ?? 0.2,
       chartType: storeSettings?.chartType ?? 'candle',
       autoScale: storeSettings?.autoScale ?? true,
@@ -4242,8 +4182,6 @@ export class TealchartWidget implements ITealchartWebWidget {
         : undefined,
       indicators,
       userDrawingState: this._userDrawingState,
-      chartProperties: storeSettings?.chartProperties,
-      preservedTvProperties: storeSettings?.preservedTvProperties,
       version: 1,
     };
   }
@@ -4286,17 +4224,11 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Change theme
    */
   changeTheme(theme: ChartThemeInput): void {
-    // Persisted chart properties are re-applied on top: a theme change rebuilds
-    // from theme + host options, which would otherwise silently drop the user's
-    // saved colours while the store kept saving them.
-    this._renderOptions = applyChartOverridesToRenderOptions(
-      {
-        ...this._renderOptions,
-        ...chartThemeToRenderOptions(theme),
-        ...this._options.renderOptions,
-      },
-      this._chartStore?.settings.get().chartProperties ?? {},
-    );
+    this._renderOptions = {
+      ...this._renderOptions,
+      ...chartThemeToRenderOptions(theme),
+      ...this._options.renderOptions,
+    };
 
     if (this._ui) {
       this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);

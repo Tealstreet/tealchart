@@ -55,8 +55,6 @@ export interface TvChartContent {
   panes: TvPane[];
   /** Drawing tools (lines, annotations, etc.) */
   drawings?: unknown[];
-  /** Appearance properties, hoisted from charts[0].chartProperties when present */
-  chartProperties?: unknown;
   /** Chart version from TradingView */
   version?: number;
   /** Multi-chart layout array (each chart has its own panes/sources) */
@@ -79,8 +77,6 @@ export interface TvChartLayout {
   panes: TvChartPane[];
   sources?: TvSource[];
   mainSourceId?: string;
-  /** Per-chart appearance properties: { paneProperties, scalesProperties, ... } */
-  chartProperties?: unknown;
 }
 
 /**
@@ -121,8 +117,6 @@ export interface TvSourceState {
   plots?: TvPlot[];
   /** Whether the study is visible */
   visible?: boolean;
-  /** Main-series candle styling. Lives here in a layout, not in mainSourceProperties. */
-  candleStyle?: Record<string, unknown>;
 }
 
 /**

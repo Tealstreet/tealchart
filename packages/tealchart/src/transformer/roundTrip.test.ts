@@ -50,52 +50,6 @@ describe('Transformer round-trip (toTvFormat → fromTvFormat)', () => {
     expect(result2.data.showVolume).toBe(false);
   });
 
-  it('preserves sparse chart properties', () => {
-    const settings = createSettings({
-      chartProperties: {
-        'paneProperties.background': '#101418',
-        'mainSeriesProperties.candleStyle.upColor': '#12c48b',
-      },
-    });
-    const tv = toTvFormat(settings, 'Test');
-    const result = fromTvFormat(tv);
-
-    expect(result.data.chartProperties).toEqual({
-      'paneProperties.background': '#101418',
-      'mainSeriesProperties.candleStyle.upColor': '#12c48b',
-    });
-  });
-
-  it('drops unknown and wrong-typed chart properties from stored layout content', () => {
-    // Layout content is untrusted — foreign TradingView layouts and hand-edited
-    // stores both land here. Anything outside the supported union must not be
-    // trusted into a typed field.
-    const settings = createSettings({
-      chartProperties: {
-        'paneProperties.background': '#101418',
-        // Real TradingView paths we do not support yet.
-        'paneProperties.gridLinesMode': 'both',
-        'scalesProperties.fontSize': 12,
-        // Not a path at all.
-        'nonsense.key': 'x',
-      } as never,
-    });
-    const tv = toTvFormat(settings, 'Test');
-    const result = fromTvFormat(tv);
-
-    expect(result.data.chartProperties).toEqual({ 'paneProperties.background': '#101418' });
-  });
-
-  it('leaves chart properties undefined when nothing was customized', () => {
-    // Sparse by design — an empty object would merge against the defaults and
-    // wipe stored values, so "unset" has to stay absent rather than become {}.
-    const settings = createSettings();
-    const tv = toTvFormat(settings, 'Test');
-    const result = fromTvFormat(tv);
-
-    expect(result.data.chartProperties).toBeUndefined();
-  });
-
   it('preserves volumeHeight', () => {
     const settings = createSettings({ volumeHeight: 0.35 });
     const tv = toTvFormat(settings, 'Test');
