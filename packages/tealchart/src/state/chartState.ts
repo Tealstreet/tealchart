@@ -1,5 +1,5 @@
 import type { MapStore, WritableAtom } from 'nanostores';
-import type { ChartProperties, PreservedTvProperties, ResolutionString } from '../types';
+import type { ResolutionString } from '../types';
 import type { UserDrawingState } from '../drawings';
 import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
 
@@ -81,20 +81,6 @@ export interface ChartSettings {
   indicators: IndicatorInstance[];
   /** Persisted user drawing markup */
   userDrawingState?: UserDrawingState;
-  /**
-   * Sparse TradingView-keyed chart properties the user has changed.
-   *
-   * Left out of DEFAULT_CHART_SETTINGS on purpose. safeDeepMerge only walks
-   * keys present in the defaults and recurses into plain objects, so a default
-   * of `{}` here would merge against an empty object and wipe the stored map.
-   * Same reason viewport and userDrawingState are absent from the defaults.
-   */
-  chartProperties?: ChartProperties;
-  /**
-   * TradingView properties carried through from an imported layout so that
-   * saving does not delete the ones Tealchart does not model.
-   */
-  preservedTvProperties?: PreservedTvProperties;
   /** Schema version for migrations */
   version: number;
 }

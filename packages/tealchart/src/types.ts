@@ -345,68 +345,11 @@ export interface ChartOverrides {
   'scalesProperties.textColor'?: string;
   // Crosshair properties
   'paneProperties.crossHairProperties.color'?: string;
-  // Volume properties.
-  //
-  // Tealchart extensions, NOT TradingView paths — no `volumePaneProperties`
-  // family exists in the charting library. TradingView models volume as a
-  // Volume study source in the layout, which is what ChartSettings.showVolume
-  // and volumeHeight serialize to. These remain because applyOverrides is the
-  // only imperative way to toggle native volume rendering; prefer the settings
-  // fields for anything persisted.
+  // Volume properties
   'volumePaneProperties.showVolume'?: boolean;
   'volumePaneProperties.volumeHeight'?: number;
   // Allow arbitrary string keys for extensibility
   [key: string]: string | number | boolean | undefined;
-}
-
-/**
- * The chart property paths Tealchart persists into a saved layout.
- *
- * Deliberately a literal union rather than `Partial<ChartOverrides>`: that type
- * carries an index signature, so every key is already optional and a typo'd
- * path would type-check and then silently never apply. Persisted data has to be
- * stricter than the runtime override API.
- *
- * Every member must be a real TradingView override path — verified against the
- * vendored charting_library.d.ts. Add a path here only when a control writes it
- * and `applyChartOverridesToRenderOptions` renders it, so we never persist keys
- * that do nothing.
- */
-export type ChartPropertyKey =
-  | 'mainSeriesProperties.candleStyle.upColor'
-  | 'mainSeriesProperties.candleStyle.downColor'
-  | 'paneProperties.background'
-  | 'paneProperties.vertGridProperties.color'
-  | 'paneProperties.horzGridProperties.color'
-  | 'paneProperties.crossHairProperties.color'
-  | 'scalesProperties.textColor';
-
-/**
- * Sparse map of persisted chart properties. Only values the user actually
- * changed are stored, so defaults stay free to evolve.
- *
- * Values are strings because every supported path is currently a color. Widen
- * this and `sanitizeChartProperties` together when the first numeric or boolean
- * property lands — allowing a type the sanitizer strips would let a value save
- * and then silently vanish on reload.
- */
-export type ChartProperties = Partial<Record<ChartPropertyKey, string>>;
-
-/**
- * TradingView property objects carried through untouched from an imported layout.
- *
- * Tealchart models seven properties; a real TradingView layout carries dozens
- * (gradient backgrounds, legend toggles, wick and border colors, scale label
- * options). Saving rebuilds layout content from scratch, so without stashing
- * the originals an import-then-save silently deletes everything we do not
- * model. These blobs are re-seeded on export and then overwritten with the
- * user's Tealchart values, so ours win and theirs survive.
- */
-export interface PreservedTvProperties {
-  /** charts[0].chartProperties as imported. */
-  chartProperties?: Record<string, unknown>;
-  /** The main series source's candleStyle as imported. */
-  candleStyle?: Record<string, unknown>;
 }
 
 // Chart margins
