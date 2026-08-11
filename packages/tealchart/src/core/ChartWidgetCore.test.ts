@@ -129,6 +129,62 @@ describe('ChartWidgetCore data identity', () => {
     expect(emitted).toEqual([{ interval: '5', firstTime: 2_000_000, source: 'history' }]);
   });
 
+  it('emits both loading edges for an interval change that starts while already loading', () => {
+    // Consumers reject updates whose context does not match their own, so every
+    // context needs its own true/false pair. Deduping on the boolean alone
+    // swallowed the `true` when a switch began mid-load, leaving only a closing
+    // `false` — and a consumer that dropped that one edge stayed stuck loading,
+    // which froze the native chart for ~20-35s per switch.
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const loading: Array<{ loading: boolean; interval: string }> = [];
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '15',
+      onLoadingChanged: (isLoading, context) => {
+        loading.push({ loading: isLoading, interval: context.interval });
+      },
+    });
+
+    core.initialize();
+    expect(loading).toEqual([{ loading: true, interval: '15' }]);
+
+    // Switch while the first load is still in flight.
+    core.setInterval('5');
+    expect(loading).toEqual([
+      { loading: true, interval: '15' },
+      { loading: true, interval: '5' },
+    ]);
+
+    historyRequests[1]!.onResult(makeBars(2_000_000, 5 * 60_000, 3));
+    expect(loading).toEqual([
+      { loading: true, interval: '15' },
+      { loading: true, interval: '5' },
+      { loading: false, interval: '5' },
+    ]);
+  });
+
+  it('does not re-emit an unchanged loading flag for the same context', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const loading: Array<{ loading: boolean; interval: string }> = [];
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '15',
+      onLoadingChanged: (isLoading, context) => {
+        loading.push({ loading: isLoading, interval: context.interval });
+      },
+    });
+
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 15 * 60_000, 3));
+
+    expect(loading).toEqual([
+      { loading: true, interval: '15' },
+      { loading: false, interval: '15' },
+    ]);
+  });
+
   it('ignores ticks from stale bar subscriptions after an interval change', () => {
     const { datafeed, historyRequests, subscriptions, unsubscribedGuids } = createControlledDatafeed();
     const emitted: Array<{ interval: string; lastTime: number; source: string }> = [];
