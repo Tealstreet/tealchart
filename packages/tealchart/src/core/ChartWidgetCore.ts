@@ -151,6 +151,8 @@ export class ChartWidgetCore {
   // State flags
   protected _isLoading = false;
   protected _isLoadingMoreBars = false;
+  protected _lastEmittedLoading: { loading: boolean; symbol: string; interval: string } | null = null;
+  protected _lastEmittedLoadingMoreBars: { loading: boolean; symbol: string; interval: string } | null = null;
   protected _hasQueuedLeftHistoryBackfill = false;
   protected _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   protected _hasMoreHistoricalData = true;
@@ -245,20 +247,45 @@ export class ChartWidgetCore {
   // Bar Management
   // ============================================================================
 
+  /**
+   * True when this flag was already emitted for exactly this data context.
+   *
+   * Deduping on the boolean alone is not enough. Consumers reject updates whose
+   * context does not match their own (see dataContextMatches in
+   * useTealchartCore), and a symbol/interval change can start a new load while
+   * the flag is already true — so `true` is swallowed as a no-op and only the
+   * closing `false` is ever sent for that context. If the consumer's own
+   * context has not caught up at that instant it drops that single edge, and
+   * nothing re-sends it: the consumer stays stuck loading forever, which held
+   * the native chart's render snapshot and froze it for ~20-35s per switch.
+   * Keying on the context guarantees each context gets its own transitions.
+   */
+  protected _loadingFlagEmittedFor(
+    last: { loading: boolean; symbol: string; interval: string } | null,
+    loading: boolean,
+    context: ChartWidgetDataContext,
+  ): boolean {
+    return (
+      last !== null && last.loading === loading && last.symbol === context.symbol && last.interval === context.interval
+    );
+  }
+
   protected _setLoading(loading: boolean): void {
     if (this._disposed) return;
-    if (this._isLoading !== loading) {
-      this._isLoading = loading;
-      this._onLoadingChanged?.(loading, this._getDataContext());
-    }
+    this._isLoading = loading;
+    const context = this._getDataContext();
+    if (this._loadingFlagEmittedFor(this._lastEmittedLoading, loading, context)) return;
+    this._lastEmittedLoading = { loading, symbol: context.symbol, interval: context.interval };
+    this._onLoadingChanged?.(loading, context);
   }
 
   protected _setLoadingMoreBars(loading: boolean): void {
     if (this._disposed) return;
-    if (this._isLoadingMoreBars !== loading) {
-      this._isLoadingMoreBars = loading;
-      this._onLoadingMoreBarsChanged?.(loading, this._getDataContext());
-    }
+    this._isLoadingMoreBars = loading;
+    const context = this._getDataContext();
+    if (this._loadingFlagEmittedFor(this._lastEmittedLoadingMoreBars, loading, context)) return;
+    this._lastEmittedLoadingMoreBars = { loading, symbol: context.symbol, interval: context.interval };
+    this._onLoadingMoreBarsChanged?.(loading, context);
   }
 
   protected _getDataContext(): ChartWidgetDataContext {
