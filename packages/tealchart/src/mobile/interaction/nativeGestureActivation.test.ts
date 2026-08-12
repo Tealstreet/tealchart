@@ -31,6 +31,7 @@ import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDra
 import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
+  createNativePriceAxisResetTapGesture,
   createNativeResetViewTapGesture,
   createNativeTradeLineActionTapGesture,
   createNativeUserDrawingTapGesture,
@@ -732,6 +733,44 @@ describe('native gesture activation', () => {
     });
     visibleResetTapGesture.handlers.onEnd({ x: layout.centerX + layout.hitRadius + 1, y: layout.centerY }, true);
     expect(visibleReset).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets the view on a double tap of the price axis', () => {
+    const onResetView = vi.fn();
+    const priceAxisResetTapGesture = createNativePriceAxisResetTapGesture({ frame, onResetView }) as any;
+
+    expect(priceAxisResetTapGesture.config.numberOfTaps).toBe(2);
+
+    // Inside the axis: right of priceAxisHitLeft, within the main pane.
+    priceAxisResetTapGesture.handlers.onEnd({ x: frame.priceAxisHitLeft + 10, y: 80 }, true);
+    expect(onResetView).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves double taps outside the price axis alone', () => {
+    const onResetView = vi.fn();
+    const priceAxisResetTapGesture = createNativePriceAxisResetTapGesture({ frame, onResetView }) as any;
+
+    // Left of the axis — the plot, where double tap must not reset.
+    priceAxisResetTapGesture.handlers.onEnd({ x: frame.priceAxisHitLeft - 10, y: 80 }, true);
+    // Below the main pane — the time axis.
+    priceAxisResetTapGesture.handlers.onEnd({ x: frame.priceAxisHitLeft + 10, y: frame.mainPane.bottom + 10 }, true);
+    // A failed tap sequence.
+    priceAxisResetTapGesture.handlers.onEnd({ x: frame.priceAxisHitLeft + 10, y: 80 }, false);
+
+    expect(onResetView).not.toHaveBeenCalled();
+  });
+
+  it('leaves price-axis double taps that land on a control zone to their owner', () => {
+    const onResetView = vi.fn();
+    const priceAxisResetTapGesture = createNativePriceAxisResetTapGesture({
+      controlZones: [{ x1: frame.priceAxisHitLeft, x2: frame.priceAxisHitLeft + 40, y1: 70, y2: 90 }],
+      frame,
+      onResetView,
+    }) as any;
+
+    priceAxisResetTapGesture.handlers.onEnd({ x: frame.priceAxisHitLeft + 10, y: 80 }, true);
+
+    expect(onResetView).not.toHaveBeenCalled();
   });
 
   it('does not route crosshair context-menu button taps to reset gestures', () => {

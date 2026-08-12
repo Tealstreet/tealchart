@@ -767,6 +767,13 @@ export class ChartCore {
       onCursorChange: (cursor) => this.applyCursor(cursor),
       onPaneDoubleClick: (paneId, point) => {
         if (!this.viewport) return;
+        // Double-clicking the price axis resets the view — the same outcome as
+        // the reset button, reached from the axis the user was just scaling.
+        // Checked before the drawing intent, which has nothing to find out here.
+        if (this.isOverPriceAxis(point.x)) {
+          this.resetViewport();
+          return;
+        }
         this.options.onPaneDoubleClick?.(paneId, point, this.getUserDrawingSpaces(this.viewport));
       },
     });
@@ -1396,6 +1403,11 @@ export class ChartCore {
 
     // Resize triggers a full repaint via the widget's render scheduler
     this.scheduleRender();
+  }
+
+  /** Whether an x coordinate falls in the right-hand price axis. */
+  isOverPriceAxis(x: number): boolean {
+    return x >= this.options.width - this.margins.right;
   }
 
   /**
