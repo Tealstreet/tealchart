@@ -59,6 +59,9 @@ import { getChartStore } from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
+import type { ChartSettingsControlContext } from '../settings/chartSettingsControls';
+
+import { ChartSettingsModal } from './ChartSettingsModal';
 import { ChartTopBar } from './ChartTopBar';
 import { applyChromeThemeVars } from './chromeTheme';
 import { div, span } from './dom';
@@ -111,6 +114,8 @@ export interface TealchartWidgetUIOptions {
   onIntervalChange?: (interval: ResolutionString) => void;
   /** Callback when the symbol control is clicked */
   onSymbolClick?: () => void;
+  /** Supplies the chart settings modal. Omitted hosts get no gear. */
+  chartSettingsContext?: ChartSettingsControlContext;
   /** Callback when indicator is added */
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
   /** Indicators available in this chart runtime */
@@ -286,6 +291,7 @@ export class TealchartWidgetUI {
   private legend: ChartLegend | null = null;
   private indicatorsModal: IndicatorsModal | null = null;
   private settingsModal: IndicatorSettingsModal | null = null;
+  private chartSettingsModal: ChartSettingsModal | null = null;
 
   // State (not used for rendering, just for API access)
   private isLoading = false;
@@ -466,10 +472,63 @@ export class TealchartWidgetUI {
     this.settingsModal = new IndicatorSettingsModal();
     this.settingsModal.mount(this.rootEl);
 
+    if (this.options.chartSettingsContext) {
+      this.chartSettingsModal = new ChartSettingsModal(this.options.chartSettingsContext);
+      this.chartSettingsModal.mount(this.rootEl);
+      this.rootEl.appendChild(this.createChartSettingsButton());
+    }
+
     // Mount layout selector modal to rootEl (if layout callbacks are provided)
     this.topBar?.getLayoutSelector()?.mount(this.rootEl);
 
     // No loading overlay — empty canvas grid renders while bars load
+  }
+
+  /**
+   * The settings gear. Bottom-right, matching where TradingView puts it.
+   * Native keeps its reset-view affordance bottom-centre, so this corner is free
+   * on both platforms.
+   */
+  private createChartSettingsButton(): HTMLElement {
+    const button = div({
+      style: {
+        position: 'absolute',
+        right: '8px',
+        bottom: '8px',
+        width: '28px',
+        height: '28px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        zIndex: '4',
+        color: 'var(--tealchart-chrome-text, #b2b5be)',
+        background: 'var(--tealchart-chrome-bg, rgba(22, 23, 26, 0.85))',
+        border: '1px solid var(--tealchart-chrome-border, rgba(255, 255, 255, 0.08))',
+      },
+    });
+    button.setAttribute('data-tealchart-chart-settings-button', 'true');
+    button.setAttribute('role', 'button');
+    button.setAttribute('tabindex', '0');
+    button.setAttribute('aria-label', 'Chart settings');
+    button.title = 'Chart settings';
+    button.innerHTML =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">' +
+      '<circle cx="12" cy="12" r="3"/>' +
+      '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' +
+      '</svg>';
+
+    const open = () => this.chartSettingsModal?.open();
+    button.addEventListener('click', open);
+    button.addEventListener('keydown', (event) => {
+      const key = (event as KeyboardEvent).key;
+      if (key === 'Enter' || key === ' ') {
+        event.preventDefault();
+        open();
+      }
+    });
+    return button;
   }
 
   // ============================================================================
