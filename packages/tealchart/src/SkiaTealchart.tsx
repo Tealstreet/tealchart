@@ -71,6 +71,9 @@ import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
+import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
+
+import { NativeChartSettingsButton, NativeChartSettingsOverlay } from './mobile/render/NativeChartSettingsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
@@ -288,6 +291,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => chartStore.settings.get().preservedTvProperties,
   );
   const [nativeShowVolume, setNativeShowVolume] = useState(() => chartStore.settings.get().showVolume);
+  const [nativeChartSettingsOpen, setNativeChartSettingsOpen] = useState(false);
   useEffect(() => {
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
     setNativeChartProperties(chartStore.settings.get().chartProperties);
@@ -806,6 +810,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [applyNativeViewport, chartApi, chartStore, interval, replaceNativeUserDrawingState, symbol],
   );
+  // Writes go straight to the store; the store listener above pushes the value
+  // into effectiveRenderOptions, so the sheet does not touch rendering itself.
+  const nativeChartSettingsContext = useMemo<ChartSettingsControlContext>(
+    () => ({
+      getSettings: () => chartStore.settings.get(),
+      setSetting: (key, value) => chartStore.settings.setKey(key, value),
+      setChartProperties: (properties) => chartStore.settings.setKey('chartProperties', properties),
+      markLayoutDirty: markNativeLayoutDirtyIfReady,
+    }),
+    [chartStore, markNativeLayoutDirtyIfReady],
+  );
+
   const nativeLayoutSettings = createNativeChartLayoutSettings({
     autoScale: nativeAutoScaleEnabled,
     chartProperties: nativeChartProperties,
@@ -1619,6 +1635,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           menu={nativeContextMenu}
           onClose={closeNativeContextMenu}
           renderOptions={options}
+          textColor={textColor}
+        />
+      ) : null}
+      <NativeChartSettingsButton
+        backgroundColor={backgroundColor}
+        bottomInset={frame?.dimensions.margins.bottom ?? 0}
+        rightInset={frame?.dimensions.margins.right ?? 0}
+        gridColor={gridColor}
+        onPress={() => setNativeChartSettingsOpen(true)}
+        textColor={nativeMutedTextColor}
+      />
+      {nativeChartSettingsOpen ? (
+        <NativeChartSettingsOverlay
+          activeBackgroundColor={gridColor}
+          backgroundColor={backgroundColor}
+          context={nativeChartSettingsContext}
+          gridColor={gridColor}
+          mutedTextColor={nativeMutedTextColor}
+          onClose={() => setNativeChartSettingsOpen(false)}
           textColor={textColor}
         />
       ) : null}
