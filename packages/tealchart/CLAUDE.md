@@ -12,6 +12,51 @@ Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
+**Native hit-testing rule:** Rendering a control and receiving its taps are two
+separate decisions. The overlay rule above only covers rendering. Taps on native
+chart chrome belong to the chart's gesture layer — there is exactly one hit-test
+system and it is already built. Never add a parallel touch path.
+
+A native control drawn over the Skia canvas must:
+
+1. Render passively — `pointerEvents="none"`, no `Pressable`, no `onPress`.
+2. Report its own box with `onLayout` and turn that into an
+   `NativeOverlayActionHitTarget` (see `resolveNativeChartSettingsActionTargets`,
+   or `resolveNativeLegendActionTargets` for the multi-row case). Derive the rect
+   from the measured layout, never from recomputed geometry — measured rects
+   cannot drift from the glyph, hand-derived ones always do.
+3. Feed those targets into `overlayActionTargets` so
+   `createNativeOverlayActionTapGesture` owns the tap, **and** into
+   `nativeGestureControlZones` so pan/crosshair/drawing gestures fail their start
+   over the control.
+
+The chart legend and the settings gear are the reference implementations. A
+`Pressable` overlay puts the hit box in a different coordinate space to every
+other chart control, and the two then disagree in ways that are extremely
+tedious to chase — a gear built that way had a dead half for a day.
+
+Grow small targets inward with hit slop only. Slop pushed past the canvas edge
+buys nothing, because the gesture layer never sees touches outside it.
+
+The top bar and left tool rail predate this and still use `Pressable` plus one
+coarse reserved band. That is legacy, not a second sanctioned pattern; do not
+copy it.
+
+**Icon rule:** There is exactly one icon language, and it is already defined. Never
+use emoji, system glyphs, font icons, or a bespoke inline SVG for chrome.
+
+- **Native:** `<NativeDrawingIcon name="..." />`, whose paths come from
+  `src/drawings/icons.ts` (`DRAWING_ICONS`). This is what the left tool rail,
+  selection toolbar, and layout selector already use.
+- **Web:** the `icons` helpers in `src/ui/dom.ts`.
+
+The two registries are intentionally the same Feather-style 24x24 stroke set, so a
+given concept looks identical on both platforms — `gear` exists in both, for
+example. If an icon you need is missing, **add it to both registries** and use it
+from there; do not inline a one-off path at the call site, and do not reach for a
+character like ⚙ because it is quicker. A stray emoji renders at the system font's
+weight and colour and immediately looks foreign next to the real chrome.
+
 **Key classes:**
 
 | Class                 | File                                  | Purpose                                                            |

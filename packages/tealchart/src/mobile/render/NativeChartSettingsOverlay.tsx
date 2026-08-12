@@ -6,11 +6,15 @@
  * settings/chartSettingsControls.ts and neither platform's UI changes.
  */
 
+import type { LayoutRectangle } from 'react-native';
 import type { ChartSettingControl, ChartSettingsControlContext } from '../../settings/chartSettingsControls';
+import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 
 import React, { useState } from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+
+import { NativeDrawingIcon } from './NativeDrawingIcon';
 
 import { getChartSettingsControlsForTab, getPopulatedChartSettingsTabs } from '../../settings/chartSettingsControls';
 
@@ -190,56 +194,94 @@ export function NativeChartSettingsOverlayImpl(props: NativeChartSettingsOverlay
 
 export const NativeChartSettingsOverlay = React.memo(NativeChartSettingsOverlayImpl);
 
+export interface NativeChartSettingsActionCommand {
+  type: 'openChartSettings';
+}
+
+export type NativeChartSettingsActionHitTarget = NativeOverlayActionHitTarget<NativeChartSettingsActionCommand>;
+
 export interface NativeChartSettingsButtonProps {
   backgroundColor: string;
-  /** Price-axis width, so the gear clears the last-price tag. */
-  rightInset: number;
-  /** Time-axis height, so the gear clears the time labels. */
-  bottomInset: number;
-  gridColor: string;
-  onPress: () => void;
+  /** Time-axis height. The cell is square on this. */
+  axisHeight: number;
+  onLayoutRectChange: (layout: LayoutRectangle) => void;
   textColor: string;
 }
 
+/**
+ * Corner controls are small and sit against two screen edges, so the drawn cell
+ * alone is a mean target. Grown inward only — outward would push the rect off
+ * the canvas, where no touch is delivered.
+ */
+const SETTINGS_BUTTON_HIT_SLOP = { bottom: 0, left: 10, right: 0, top: 10 };
+
 const buttonStyles = StyleSheet.create({
-  // Inset by the axis sizes so it sits inside the plot area's bottom-right
-  // corner. The axis intersection is not usable: the last-price tag is two
-  // lines tall and reaches into that corner whenever price sits low in range.
+  // Sits on the intersection of the time and price axis rails, not floating over
+  // the candles. Square and flush to both edges so the glyph lands on the corner
+  // itself: sizing the cell to the full price-axis width would centre the glyph
+  // half an axis in from the edge.
+  // It draws above the Skia canvas, so it also covers the last-price tag on the
+  // rare frames where that tag spills down into the time-axis row.
   button: {
     alignItems: 'center',
-    borderRadius: 4,
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 26,
+    bottom: 0,
     justifyContent: 'center',
     position: 'absolute',
-    width: 26,
+    right: 0,
     zIndex: 60,
   },
-  glyph: { fontSize: 13, lineHeight: 16 },
 });
+
+/**
+ * Turn the button's own measured box into a gesture hit target.
+ *
+ * The rect comes from `onLayout` rather than from recomputed geometry, so the
+ * tappable area is the drawn area by construction — the two cannot drift the way
+ * hand-derived rects do.
+ */
+export function resolveNativeChartSettingsActionTargets(
+  layout: LayoutRectangle | null,
+): NativeChartSettingsActionHitTarget[] {
+  if (!layout || layout.width <= 0 || layout.height <= 0) return [];
+
+  return [
+    {
+      command: { type: 'openChartSettings' },
+      enabled: true,
+      x1: layout.x - SETTINGS_BUTTON_HIT_SLOP.left,
+      x2: layout.x + layout.width + SETTINGS_BUTTON_HIT_SLOP.right,
+      y1: layout.y - SETTINGS_BUTTON_HIT_SLOP.top,
+      y2: layout.y + layout.height + SETTINGS_BUTTON_HIT_SLOP.bottom,
+    },
+  ];
+}
 
 /**
  * Bottom-right gear, mirroring the web chrome. The reset-view affordance is
  * bottom-centre on native, so this corner is free.
+ *
+ * Passive by design: it draws and reports its box, and the chart's gesture layer
+ * owns the tap, exactly as the legend action buttons do. A `Pressable` here would
+ * be a second, parallel hit path in a different coordinate space to every other
+ * chart control.
  */
 export function NativeChartSettingsButtonImpl({
+  axisHeight,
   backgroundColor,
-  bottomInset,
-  gridColor,
-  onPress,
-  rightInset,
+  onLayoutRectChange,
   textColor,
 }: NativeChartSettingsButtonProps) {
   return (
-    <Pressable
+    <View
       accessibilityLabel="Chart settings"
       accessibilityRole="button"
-      hitSlop={{ bottom: 8, left: 8, right: 8, top: 8 }}
-      onPress={onPress}
-      style={[buttonStyles.button, { backgroundColor, borderColor: gridColor, bottom: bottomInset + 6, right: rightInset + 6 }]}
+      onLayout={(event) => onLayoutRectChange(event.nativeEvent.layout)}
+      pointerEvents="none"
+      style={[buttonStyles.button, { backgroundColor, height: axisHeight, width: axisHeight }]}
     >
-      <Text style={[buttonStyles.glyph, { color: textColor }]}>⚙</Text>
-    </Pressable>
+      {/* Same icon set as the left tool rail rather than a system emoji. */}
+      <NativeDrawingIcon color={textColor} name="gear" size={16} strokeWidth={1.75} />
+    </View>
   );
 }
 

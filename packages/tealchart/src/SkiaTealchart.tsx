@@ -1,4 +1,5 @@
 import type { SkImage } from '@shopify/react-native-skia';
+import type { LayoutRectangle } from 'react-native';
 import type { WorkerError } from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEventListener,
@@ -14,6 +15,7 @@ import type {
   NativeLegendIndicator,
   NativeLegendIndicatorPaneInfo,
 } from './mobile/render/NativeChartLegendOverlay';
+import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
@@ -73,7 +75,11 @@ import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrossha
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 
-import { NativeChartSettingsButton, NativeChartSettingsOverlay } from './mobile/render/NativeChartSettingsOverlay';
+import {
+  NativeChartSettingsButton,
+  NativeChartSettingsOverlay,
+  resolveNativeChartSettingsActionTargets,
+} from './mobile/render/NativeChartSettingsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
@@ -355,6 +361,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativeLegendActionTargets, setNativeLegendActionTargets] = useState<readonly NativeLegendActionHitTarget[]>(
     [],
   );
+  const [nativeChartSettingsButtonLayout, setNativeChartSettingsButtonLayout] = useState<LayoutRectangle | null>(null);
+  const handleNativeChartSettingsButtonLayout = useCallback((layout: LayoutRectangle) => {
+    setNativeChartSettingsButtonLayout((previous) =>
+      previous &&
+      previous.x === layout.x &&
+      previous.y === layout.y &&
+      previous.width === layout.width &&
+      previous.height === layout.height
+        ? previous
+        : layout,
+    );
+  }, []);
+  // Dropped while the sheet is open so the scrim tap that dismisses it cannot
+  // also land on the gear underneath and reopen it.
+  const nativeChartSettingsActionTargets = useMemo(
+    () => (nativeChartSettingsOpen ? [] : resolveNativeChartSettingsActionTargets(nativeChartSettingsButtonLayout)),
+    [nativeChartSettingsButtonLayout, nativeChartSettingsOpen],
+  );
   useEffect(() => {
     setNativeDisplayedInterval(interval);
   }, [interval]);
@@ -424,14 +448,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const handleNativeOverlayAction = useCallback(
     (command: unknown) => {
-      const legendCommand = command as NativeLegendActionCommand;
-      if (!legendCommand || typeof legendCommand.indicatorId !== 'string') return;
-      if (legendCommand.type === 'toggleIndicator') {
-        chartApi.toggleStudyVisibility(legendCommand.indicatorId);
+      const overlayCommand = command as NativeChartSettingsActionCommand | NativeLegendActionCommand | null;
+      if (!overlayCommand) return;
+      if (overlayCommand.type === 'openChartSettings') {
+        setNativeChartSettingsOpen(true);
         return;
       }
-      if (legendCommand.type === 'removeIndicator') {
-        chartApi.removeStudy(legendCommand.indicatorId);
+      if (typeof overlayCommand.indicatorId !== 'string') return;
+      if (overlayCommand.type === 'toggleIndicator') {
+        chartApi.toggleStudyVisibility(overlayCommand.indicatorId);
+        return;
+      }
+      if (overlayCommand.type === 'removeIndicator') {
+        chartApi.removeStudy(overlayCommand.indicatorId);
       }
     },
     [chartApi],
@@ -1334,12 +1363,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     zones.push(...nativeLegendActionTargets);
+    zones.push(...nativeChartSettingsActionTargets);
 
     return zones;
   }, [
     frame,
     hasDataViewport,
     leftToolRailLayout,
+    nativeChartSettingsActionTargets,
     nativeLegendActionTargets,
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
@@ -1347,6 +1378,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
+  const nativeOverlayActionTargets = useMemo(
+    () => [...nativeLegendActionTargets, ...nativeChartSettingsActionTargets],
+    [nativeChartSettingsActionTargets, nativeLegendActionTargets],
+  );
   const handleNativeResetViewTap = useCallback(
     (x: number, y: number) => {
       if (!frame || !hasDataViewport) return;
@@ -1401,7 +1436,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     leftToolRailLayout,
     orderDragState,
     orderDragZones,
-    overlayActionTargets: nativeLegendActionTargets,
+    overlayActionTargets: nativeOverlayActionTargets,
     onDrawingTap: handleNativeUserDrawingTap,
     onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
     onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
@@ -1640,10 +1675,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       ) : null}
       <NativeChartSettingsButton
         backgroundColor={backgroundColor}
-        bottomInset={frame?.dimensions.margins.bottom ?? 0}
-        rightInset={frame?.dimensions.margins.right ?? 0}
-        gridColor={gridColor}
-        onPress={() => setNativeChartSettingsOpen(true)}
+        axisHeight={frame?.dimensions.margins.bottom ?? 0}
+        onLayoutRectChange={handleNativeChartSettingsButtonLayout}
         textColor={nativeMutedTextColor}
       />
       {nativeChartSettingsOpen ? (
