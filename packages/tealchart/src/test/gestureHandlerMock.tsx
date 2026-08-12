@@ -26,6 +26,10 @@ function createMockGesture() {
       this.config.minDistance = value;
       return this;
     },
+    numberOfTaps(value: number) {
+      this.config.numberOfTaps = value;
+      return this;
+    },
     onBegin(callback: unknown) {
       this.handlers.onBegin = callback;
       return this;

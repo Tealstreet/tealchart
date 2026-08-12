@@ -16,6 +16,7 @@ interface NativeChartGestureInput {
   leftToolRailToggleTapGesture: GestureType;
   orderDragGesture: GestureType;
   overlayActionTapGesture: GestureType;
+  priceAxisResetTapGesture: GestureType;
   priceScaleGesture: GestureType;
   resetViewTapGesture: GestureType;
   selectedDrawingActionTapGesture: GestureType;
@@ -37,6 +38,7 @@ export function createNativeChartGesture({
   leftToolRailToggleTapGesture,
   orderDragGesture,
   overlayActionTapGesture,
+  priceAxisResetTapGesture,
   priceScaleGesture,
   resetViewTapGesture,
   selectedDrawingActionTapGesture,
@@ -60,6 +62,7 @@ export function createNativeChartGesture({
     crosshairPanGesture,
     Gesture.Exclusive(drawingEditDragGesture, drawingSelectionTapGesture, chartPanGesture),
     resetViewTapGesture,
+    priceAxisResetTapGesture,
     priceScaleGesture,
     timeScaleGesture,
   );
