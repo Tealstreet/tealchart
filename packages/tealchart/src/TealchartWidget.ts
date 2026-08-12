@@ -3438,6 +3438,12 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     this._renderOptions = newOptions;
 
+    // Keep the persisted toggle in step, or an override-hidden volume still
+    // saves as visible and comes back on the next load.
+    if (overrides['volumePaneProperties.showVolume'] !== undefined && this._chartStore) {
+      this._chartStore.settings.setKey('showVolume', newOptions.showVolume ?? true);
+    }
+
     // Re-render if already mounted. OPTIONS so color overrides also re-theme the
     // renderer and the DOM chrome (CSS vars), matching changeTheme().
     if (this._ui && this._bars.length > 0) {
@@ -3851,6 +3857,14 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
 
+    // The store alone does not render. Volume is drawn from _renderOptions, so a
+    // loaded layout has to reach it or the chart shows the previous layout's
+    // volume while claiming the new one's on the next save.
+    this._renderOptions = {
+      ...this._renderOptions,
+      showVolume: settings.showVolume,
+    };
+
     this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), {
       markLayoutDirty: false,
       source: 'layout',
@@ -4170,7 +4184,10 @@ export class TealchartWidget implements ITealchartWebWidget {
     return {
       symbol: this._symbol,
       interval: this._interval,
-      showVolume: this._renderOptions.showVolume ?? true,
+      showVolume: storeSettings?.showVolume ?? this._renderOptions.showVolume ?? true,
+      // Height stays sourced from what actually renders. The settings store is
+      // seeded from DEFAULT_CHART_SETTINGS, not from the host's renderOptions,
+      // so reading height from it would save a value the chart never drew.
       volumeHeight: this._renderOptions.volumeHeight ?? 0.2,
       chartType: storeSettings?.chartType ?? 'candle',
       autoScale: storeSettings?.autoScale ?? true,

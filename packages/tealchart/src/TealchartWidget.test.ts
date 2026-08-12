@@ -236,6 +236,36 @@ const userDrawingSpace: DrawingCoordinateSpace = {
   chartRight: 100,
 };
 
+describe('volume settings persistence', () => {
+  it('saves the volume height it actually renders, not the settings default', () => {
+    // The settings store is seeded from DEFAULT_CHART_SETTINGS (0.2) and is never
+    // seeded from the host's renderOptions, so reading height from the store
+    // saved a value the chart never drew and grew the pane on the next load.
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed, { renderOptions: { volumeHeight: 0.15 } });
+    completeInit(datafeed);
+
+    const saved = (widget as unknown as { _getCurrentSettings: () => { volumeHeight: number } })._getCurrentSettings();
+
+    expect(saved.volumeHeight).toBe(0.15);
+    widget.remove();
+  });
+
+  it('persists a volume toggle applied through applyOverrides', () => {
+    // applyOverrides only touched _renderOptions, so an override-hidden volume
+    // still saved as visible and reappeared on the next load.
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed);
+
+    widget.applyOverrides({ 'volumePaneProperties.showVolume': false });
+    const saved = (widget as unknown as { _getCurrentSettings: () => { showVolume: boolean } })._getCurrentSettings();
+
+    expect(saved.showVolume).toBe(false);
+    widget.remove();
+  });
+});
+
 function createWidget(datafeed: MockDatafeed, overrides: Partial<TealchartWidgetOptions> = {}): TealchartWidget {
   const container = document.createElement('div');
   return new TealchartWidget(container, {
