@@ -58,6 +58,8 @@ import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
+import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
+
 import { applyChartOverridesToRenderOptions } from './overrides';
 import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { ResolutionInput } from './utils/normalizeResolution';
@@ -1145,6 +1147,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
       onSymbolClick: this._options.onSymbolClick,
+      chartSettingsContext: this._createChartSettingsContext(),
       onIntervalChange: (interval) => {
         this._chartApi.setResolution(interval);
       },
@@ -1618,6 +1621,35 @@ export class TealchartWidget implements ITealchartWebWidget {
   /**
    * Mark the layout as having unsaved changes and schedule auto-save
    */
+  /**
+   * Context the settings modal writes through.
+   *
+   * Built here rather than in the UI layer because two of the four operations
+   * are private to the widget: marking the layout dirty, and pushing a changed
+   * setting into _renderOptions so it actually draws. A modal that only wrote
+   * to the store would persist a setting the chart never applied.
+   */
+  private _createChartSettingsContext(): ChartSettingsControlContext {
+    return {
+      getSettings: () => this._getCurrentSettings(),
+      setSetting: (key, value) => {
+        this._chartStore?.settings.setKey(key, value);
+        if (key === 'showVolume') {
+          this._renderOptions = { ...this._renderOptions, showVolume: Boolean(value) };
+          this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
+        }
+      },
+      setChartProperties: (properties) => {
+        this._chartStore?.settings.setKey('chartProperties', properties);
+        if (properties) {
+          this._renderOptions = applyChartOverridesToRenderOptions(this._renderOptions, properties);
+          this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
+        }
+      },
+      markLayoutDirty: () => this._markDirty(),
+    };
+  }
+
   private _markDirty(): void {
     if (!this._chartStore) return;
     this._chartStore.isDirty.set(true);
