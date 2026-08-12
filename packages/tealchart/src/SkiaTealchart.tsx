@@ -287,14 +287,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativePreservedTvProperties, setNativePreservedTvProperties] = useState(
     () => chartStore.settings.get().preservedTvProperties,
   );
+  const [nativeShowVolume, setNativeShowVolume] = useState(() => chartStore.settings.get().showVolume);
   useEffect(() => {
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
     setNativeChartProperties(chartStore.settings.get().chartProperties);
     setNativePreservedTvProperties(chartStore.settings.get().preservedTvProperties);
+    setNativeShowVolume(chartStore.settings.get().showVolume);
     return chartStore.settings.listen((nextSettings) => {
       setNativeAutoScaleEnabled(nextSettings.autoScale);
       setNativeChartProperties(nextSettings.chartProperties);
       setNativePreservedTvProperties(nextSettings.preservedTvProperties);
+      setNativeShowVolume(nextSettings.showVolume);
     });
   }, [chartStore]);
   useEffect(() => {
@@ -468,9 +471,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   useEffect(() => {
     setImperativeRenderOptions(null);
   }, [renderOptions]);
+  // Volume comes from persisted settings so the layout and what is drawn cannot
+  // disagree. An imperative applyOverrides still wins, matching the widget
+  // contract where explicit calls beat stored state.
   const effectiveRenderOptions = useMemo(
-    () => (imperativeRenderOptions ? { ...renderOptions, ...imperativeRenderOptions } : renderOptions),
-    [imperativeRenderOptions, renderOptions],
+    () => ({
+      ...renderOptions,
+      showVolume: nativeShowVolume,
+      ...(imperativeRenderOptions ?? {}),
+    }),
+    [imperativeRenderOptions, nativeShowVolume, renderOptions],
   );
 
   const widgetEmitterRef = useRef<EventEmitter | null>(null);
@@ -803,10 +813,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chartType: 'candle',
     indicators: indicatorManager?.getLayoutIndicators() ?? [],
     interval: interval as ResolutionString,
-    showVolume: true,
+    showVolume: nativeShowVolume,
     symbol,
     userDrawingState: nativeUserDrawingState,
     viewport: hasDataViewport ? viewport : undefined,
+    // The native renderer sizes the volume pane from VOLUME_HEIGHT_RATIO, so
+    // persisting anything else would save a height that is never drawn.
     volumeHeight: VOLUME_HEIGHT_RATIO,
   });
   const {

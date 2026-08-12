@@ -345,7 +345,14 @@ export interface ChartOverrides {
   'scalesProperties.textColor'?: string;
   // Crosshair properties
   'paneProperties.crossHairProperties.color'?: string;
-  // Volume properties
+  // Volume properties.
+  //
+  // Tealchart extensions, NOT TradingView paths — no `volumePaneProperties`
+  // family exists in the charting library. TradingView models volume as a
+  // Volume study source in the layout, which is what ChartSettings.showVolume
+  // and volumeHeight serialize to. These remain because applyOverrides is the
+  // only imperative way to toggle native volume rendering; prefer the settings
+  // fields for anything persisted.
   'volumePaneProperties.showVolume'?: boolean;
   'volumePaneProperties.volumeHeight'?: number;
   // Allow arbitrary string keys for extensibility

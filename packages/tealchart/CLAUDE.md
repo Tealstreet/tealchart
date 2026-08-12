@@ -60,6 +60,8 @@ src/
 │   ├── SkiaCanvasContext.ts    # Mobile Skia adapter
 │   ├── WebCanvasContext.ts
 │   └── RenderScheduler.ts
+├── settings/                   # Declarative chart settings control registry
+│   └── chartSettingsControls.ts # Shared by the web modal + native overlay
 ├── state/                      # Nanostores chart state
 │   ├── chartState.ts           # Per-chart stores + persistent UI preferences
 │   ├── ChartApiContext.tsx     # Context provider for TealchartApi
