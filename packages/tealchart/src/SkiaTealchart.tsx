@@ -480,11 +480,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // contract where explicit calls beat stored state.
   const effectiveRenderOptions = useMemo(
     () => ({
-      ...renderOptions,
+      ...applyChartOverridesToRenderOptions(renderOptions ?? {}, nativeChartProperties ?? {}),
       showVolume: nativeShowVolume,
       ...(imperativeRenderOptions ?? {}),
     }),
-    [imperativeRenderOptions, nativeShowVolume, renderOptions],
+    [imperativeRenderOptions, nativeChartProperties, nativeShowVolume, renderOptions],
   );
 
   const widgetEmitterRef = useRef<EventEmitter | null>(null);

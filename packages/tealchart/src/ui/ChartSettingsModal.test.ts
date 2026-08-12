@@ -25,7 +25,7 @@ function createHarness(overrides: Partial<ChartSettings> = {}) {
   const modal = new ChartSettingsModal(context);
   modal.mount(host);
 
-  return { modal, host, markLayoutDirty, getSettings: () => settings };
+  return { modal, host, context, markLayoutDirty, getSettings: () => settings };
 }
 
 function getControlInput(host: HTMLElement, id: string): HTMLInputElement {
@@ -53,17 +53,16 @@ describe('ChartSettingsModal', () => {
   it('rebuilds rows on each open so external changes are not shown stale', () => {
     // Layout loads and imperative applyOverrides both change values while the
     // modal is closed.
-    const { modal, host, getSettings } = createHarness({ showVolume: true });
+    const { modal, host, context } = createHarness({ showVolume: true });
     modal.open();
     expect(getControlInput(host, 'showVolume').checked).toBe(true);
     modal.close();
 
-    getControlInput(host, 'showVolume');
-    const context = getSettings();
-    expect(context.showVolume).toBe(true);
+    // Something else changed the value while the sheet was closed.
+    context.setSetting('showVolume', false);
 
     modal.open();
-    expect(getControlInput(host, 'showVolume').checked).toBe(true);
+    expect(getControlInput(host, 'showVolume').checked).toBe(false);
   });
 
   it('writes through the control and marks the layout dirty', () => {

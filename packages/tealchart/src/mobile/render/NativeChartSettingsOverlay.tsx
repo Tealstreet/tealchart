@@ -22,8 +22,6 @@ export interface NativeChartSettingsOverlayProps {
   mutedTextColor: string;
   onClose: () => void;
   textColor: string;
-  /** Bumped by the host when settings change elsewhere, to re-read values. */
-  revision?: number;
 }
 
 const styles = StyleSheet.create({
@@ -121,10 +119,12 @@ export function NativeChartSettingsOverlayViewImpl({
               onControlWritten();
             }}
           />
-        ) : (
-          // Colour and numeric editors are deliberately read-only here until a
-          // control of that kind ships; showing an inert input would imply it works.
+        ) : control.kind === 'color' ? (
+          // Read-only until a colour control ships and a picker is chosen; an
+          // inert input would imply it can be edited.
           <View style={[styles.swatch, { backgroundColor: String(value), borderColor: gridColor }]} />
+        ) : (
+          <Text style={[styles.rowLabel, { color: mutedTextColor }]}>{String(value)}</Text>
         )}
       </View>
     );
@@ -174,15 +174,14 @@ export function NativeChartSettingsOverlayImpl(props: NativeChartSettingsOverlay
   const firstTabId = getPopulatedChartSettingsTabs()[0]?.id ?? '';
   const [activeTabId, setActiveTabId] = useState(firstTabId);
   // Controls write straight through the context, so a write needs an explicit
-  // re-read; `revision` covers changes made while the sheet is open from
-  // elsewhere, such as an imperative applyOverrides.
+  // re-read to show the new value.
   const [writeCount, setWriteCount] = useState(0);
 
   return (
     <NativeChartSettingsOverlayViewImpl
       {...props}
       activeTabId={activeTabId}
-      key={`${props.revision ?? 0}-${writeCount}`}
+      key={writeCount}
       onActiveTabIdChange={setActiveTabId}
       onControlWritten={() => setWriteCount((count) => count + 1)}
     />

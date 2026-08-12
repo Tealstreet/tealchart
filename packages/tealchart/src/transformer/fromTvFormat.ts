@@ -15,6 +15,7 @@ import {
   capturePreservedTvProperties,
   mergeChartProperties,
   readTvChartProperties,
+  sanitizePreservedTvProperties,
 } from './chartProperties';
 import { CHART_SETTINGS_VERSION } from '../state/safeDeepMerge';
 import { findMappingByTvStudyId, mapInputsFromTv } from './indicatorMapping';
@@ -159,7 +160,7 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
     ),
     preservedTvProperties:
       capturePreservedTvProperties(tvContent.chartProperties, mainSource?.state) ??
-      originalSettings?.preservedTvProperties,
+      sanitizePreservedTvProperties(originalSettings?.preservedTvProperties),
     version: CHART_SETTINGS_VERSION,
   };
 

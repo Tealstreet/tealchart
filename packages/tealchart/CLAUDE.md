@@ -46,6 +46,7 @@ src/
 │   ├── ChartCore.ts            # Canvas + Konva interactive lines
 │   ├── ChartTopBar.ts          # Timeframe selector + indicators + layouts
 │   ├── ChartLegend.ts          # Indicator legend + visibility toggles
+│   ├── ChartSettingsModal.ts       # Chart settings gear modal (registry-driven)
 │   ├── ContextMenu.ts
 │   ├── IndicatorsModal.ts
 │   ├── IndicatorSettingsModal.ts
@@ -77,6 +78,7 @@ src/
 │   ├── TealscriptManager.ts    # Web Worker lifecycle management
 │   └── useTealscript.ts        # React hook
 ├── transformer/                # TradingView layout interop (bidirectional)
+│   ├── chartProperties.ts      # Canonical TV chart-property placement
 │   ├── toTvFormat.ts           # CustomChart → TradingView layout
 │   ├── fromTvFormat.ts         # TradingView → CustomChart
 │   ├── indicatorMapping.ts     # Study ID mappings

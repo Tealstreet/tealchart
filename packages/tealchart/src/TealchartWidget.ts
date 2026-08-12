@@ -1650,6 +1650,11 @@ export class TealchartWidget implements ITealchartWebWidget {
     };
   }
 
+  /** Theme + host options, before any persisted or imperative overrides. */
+  private _baseRenderOptions(): Partial<RenderOptions> {
+    return mergeChartThemeRenderOptions(this._options.theme, this._options.renderOptions);
+  }
+
   private _markDirty(): void {
     if (!this._chartStore) return;
     this._chartStore.isDirty.set(true);
@@ -3892,8 +3897,12 @@ export class TealchartWidget implements ITealchartWebWidget {
     // The store alone does not render. Volume is drawn from _renderOptions, so a
     // loaded layout has to reach it or the chart shows the previous layout's
     // volume while claiming the new one's on the next save.
+    // Rebuilt from the base rather than merged into the current options.
+    // _renderOptions is cumulative: merging would leave the previous layout's
+    // colours in place for any property the new layout does not set, so the
+    // chart would draw layout A while saving layout B.
     this._renderOptions = {
-      ...this._renderOptions,
+      ...applyChartOverridesToRenderOptions(this._baseRenderOptions(), settings.chartProperties ?? {}),
       showVolume: settings.showVolume,
     };
 
@@ -4277,11 +4286,17 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Change theme
    */
   changeTheme(theme: ChartThemeInput): void {
-    this._renderOptions = {
-      ...this._renderOptions,
-      ...chartThemeToRenderOptions(theme),
-      ...this._options.renderOptions,
-    };
+    // Persisted chart properties are re-applied on top: a theme change rebuilds
+    // from theme + host options, which would otherwise silently drop the user's
+    // saved colours while the store kept saving them.
+    this._renderOptions = applyChartOverridesToRenderOptions(
+      {
+        ...this._renderOptions,
+        ...chartThemeToRenderOptions(theme),
+        ...this._options.renderOptions,
+      },
+      this._chartStore?.settings.get().chartProperties ?? {},
+    );
 
     if (this._ui) {
       this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
