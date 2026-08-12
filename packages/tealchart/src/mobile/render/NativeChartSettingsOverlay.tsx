@@ -12,8 +12,6 @@ import React, { useState } from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { NativeDrawingIcon } from './NativeDrawingIcon';
-
 import { getChartSettingsControlsForTab, getPopulatedChartSettingsTabs } from '../../settings/chartSettingsControls';
 
 export interface NativeChartSettingsOverlayProps {
@@ -194,27 +192,30 @@ export const NativeChartSettingsOverlay = React.memo(NativeChartSettingsOverlayI
 
 export interface NativeChartSettingsButtonProps {
   backgroundColor: string;
-  /** Time-axis height. The cell is square on this, so it hugs the corner. */
-  axisHeight: number;
+  /** Price-axis width, so the gear clears the last-price tag. */
+  rightInset: number;
+  /** Time-axis height, so the gear clears the time labels. */
+  bottomInset: number;
+  gridColor: string;
   onPress: () => void;
   textColor: string;
 }
 
 const buttonStyles = StyleSheet.create({
-  // Sits on the intersection of the time and price axis rails, not floating over
-  // the candles. Square and flush to both edges so the glyph lands on the corner
-  // itself: sizing the cell to the full price-axis width would centre the glyph
-  // half an axis in from the edge.
-  // It draws above the Skia canvas, so it also covers the last-price tag on the
-  // rare frames where that tag spills down into the time-axis row.
+  // Inset by the axis sizes so it sits inside the plot area's bottom-right
+  // corner. The axis intersection is not usable: the last-price tag is two
+  // lines tall and reaches into that corner whenever price sits low in range.
   button: {
     alignItems: 'center',
-    bottom: 0,
+    borderRadius: 4,
+    borderWidth: StyleSheet.hairlineWidth,
+    height: 26,
     justifyContent: 'center',
     position: 'absolute',
-    right: 0,
+    width: 26,
     zIndex: 60,
   },
+  glyph: { fontSize: 13, lineHeight: 16 },
 });
 
 /**
@@ -222,21 +223,22 @@ const buttonStyles = StyleSheet.create({
  * bottom-centre on native, so this corner is free.
  */
 export function NativeChartSettingsButtonImpl({
-  axisHeight,
   backgroundColor,
+  bottomInset,
+  gridColor,
   onPress,
+  rightInset,
   textColor,
 }: NativeChartSettingsButtonProps) {
   return (
     <Pressable
       accessibilityLabel="Chart settings"
       accessibilityRole="button"
-      hitSlop={{ bottom: 4, left: 8, right: 4, top: 8 }}
+      hitSlop={{ bottom: 8, left: 8, right: 8, top: 8 }}
       onPress={onPress}
-      style={[buttonStyles.button, { backgroundColor, height: axisHeight, width: axisHeight }]}
+      style={[buttonStyles.button, { backgroundColor, borderColor: gridColor, bottom: bottomInset + 6, right: rightInset + 6 }]}
     >
-      {/* Same icon set as the left tool rail rather than a system emoji. */}
-      <NativeDrawingIcon color={textColor} name="gear" size={16} strokeWidth={1.75} />
+      <Text style={[buttonStyles.glyph, { color: textColor }]}>⚙</Text>
     </Pressable>
   );
 }
