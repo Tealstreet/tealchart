@@ -1,4 +1,5 @@
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type { ChartSettings } from './state/chartState';
 import type {
   DrawingCoordinateSpace,
   UserDrawing,
