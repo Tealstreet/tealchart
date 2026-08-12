@@ -56,7 +56,7 @@ import {
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import { getChartStore } from '../state/chartState';
-import { TIME_AXIS_HEIGHT } from '../types';
+import { DEFAULT_MARGINS, TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
 import type { ChartSettingsControlContext } from '../settings/chartSettingsControls';
@@ -475,7 +475,7 @@ export class TealchartWidgetUI {
     if (this.options.chartSettingsContext) {
       this.chartSettingsModal = new ChartSettingsModal(this.options.chartSettingsContext);
       this.chartSettingsModal.mount(this.rootEl);
-      this.rootEl.appendChild(this.createChartSettingsButton());
+      this.chartArea.appendChild(this.createChartSettingsButton());
     }
 
     // Mount layout selector modal to rootEl (if layout callbacks are provided)
@@ -490,22 +490,25 @@ export class TealchartWidgetUI {
    * on both platforms.
    */
   private createChartSettingsButton(): HTMLElement {
+    // Fills the axis corner cell — where the time axis meets the price axis —
+    // rather than floating over the candles, matching TradingView. Sized from
+    // the same margins the renderer uses so it lines up with the axes.
+    const margins = { ...DEFAULT_MARGINS, ...this.options.renderOptions?.margins };
     const button = div({
       style: {
         position: 'absolute',
-        right: '8px',
-        bottom: '8px',
-        width: '28px',
-        height: '28px',
+        right: '0',
+        bottom: '0',
+        width: `${margins.right}px`,
+        height: `${margins.bottom}px`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: '4px',
         cursor: 'pointer',
         zIndex: '4',
         color: 'var(--tealchart-chrome-text, #b2b5be)',
-        background: 'var(--tealchart-chrome-bg, rgba(22, 23, 26, 0.85))',
-        border: '1px solid var(--tealchart-chrome-border, rgba(255, 255, 255, 0.08))',
+        background: 'var(--tealchart-chrome-bg, transparent)',
+        borderLeft: '1px solid var(--tealchart-chrome-border, rgba(255, 255, 255, 0.08))',
       },
     });
     button.setAttribute('data-tealchart-chart-settings-button', 'true');
@@ -514,7 +517,7 @@ export class TealchartWidgetUI {
     button.setAttribute('aria-label', 'Chart settings');
     button.title = 'Chart settings';
     button.innerHTML =
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">' +
       '<circle cx="12" cy="12" r="3"/>' +
       '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>' +
       '</svg>';

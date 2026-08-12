@@ -192,27 +192,28 @@ export const NativeChartSettingsOverlay = React.memo(NativeChartSettingsOverlayI
 
 export interface NativeChartSettingsButtonProps {
   backgroundColor: string;
-  /** Price-axis width, so the gear clears the last-price tag. */
-  rightInset: number;
-  /** Time-axis height, so the gear clears the time labels. */
-  bottomInset: number;
+  /** Price-axis width — the corner cell's width. */
+  axisWidth: number;
+  /** Time-axis height — the corner cell's height. */
+  axisHeight: number;
   gridColor: string;
   onPress: () => void;
   textColor: string;
 }
 
 const buttonStyles = StyleSheet.create({
-  // Inset by the axis sizes so it sits inside the plot area's bottom-right
-  // corner. The axis intersection is not usable: the last-price tag is two
-  // lines tall and reaches into that corner whenever price sits low in range.
+  // Occupies the axis corner cell — where the time axis meets the price axis —
+  // rather than floating over the candles. Matches TradingView, and the cell is
+  // chart chrome so it reads as part of the axis rather than an overlay.
+  // It draws above the Skia canvas, so it also covers the last-price tag on the
+  // rare frames where that tag spills down into the time-axis row.
   button: {
     alignItems: 'center',
-    borderRadius: 4,
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 26,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    bottom: 0,
     justifyContent: 'center',
     position: 'absolute',
-    width: 26,
+    right: 0,
     zIndex: 60,
   },
   glyph: { fontSize: 13, lineHeight: 16 },
@@ -223,20 +224,23 @@ const buttonStyles = StyleSheet.create({
  * bottom-centre on native, so this corner is free.
  */
 export function NativeChartSettingsButtonImpl({
+  axisHeight,
+  axisWidth,
   backgroundColor,
-  bottomInset,
   gridColor,
   onPress,
-  rightInset,
   textColor,
 }: NativeChartSettingsButtonProps) {
   return (
     <Pressable
       accessibilityLabel="Chart settings"
       accessibilityRole="button"
-      hitSlop={{ bottom: 8, left: 8, right: 8, top: 8 }}
+      hitSlop={{ bottom: 4, left: 8, right: 4, top: 8 }}
       onPress={onPress}
-      style={[buttonStyles.button, { backgroundColor, borderColor: gridColor, bottom: bottomInset + 6, right: rightInset + 6 }]}
+      style={[
+        buttonStyles.button,
+        { backgroundColor, borderLeftColor: gridColor, height: axisHeight, width: axisWidth },
+      ]}
     >
       <Text style={[buttonStyles.glyph, { color: textColor }]}>⚙</Text>
     </Pressable>

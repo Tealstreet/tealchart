@@ -118,10 +118,10 @@ describe('NativeChartSettingsOverlay', () => {
     const onPress = vi.fn();
     const button = NativeChartSettingsButtonImpl({
       backgroundColor: '#101418',
-      bottomInset: 24,
+      axisHeight: 24,
+      axisWidth: 56,
       gridColor: '#222831',
       onPress,
-      rightInset: 56,
       textColor: '#8a8f98',
     });
 
@@ -129,9 +129,9 @@ describe('NativeChartSettingsOverlay', () => {
     button.props.onPress?.();
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(collectByType(button, Text)).toHaveLength(1);
-    // Inset past the axes, or it lands under the two-line last-price tag.
+    // Fills the axis corner cell rather than floating over the candles.
     expect(button.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ bottom: 30, right: 62 })]),
+      expect.arrayContaining([expect.objectContaining({ height: 24, width: 56 })]),
     );
   });
 });
