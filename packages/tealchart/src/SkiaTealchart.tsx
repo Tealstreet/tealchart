@@ -284,12 +284,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
   }, [chartStore]);
   const [nativeChartProperties, setNativeChartProperties] = useState(() => chartStore.settings.get().chartProperties);
+  const [nativePreservedTvProperties, setNativePreservedTvProperties] = useState(
+    () => chartStore.settings.get().preservedTvProperties,
+  );
   useEffect(() => {
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
     setNativeChartProperties(chartStore.settings.get().chartProperties);
+    setNativePreservedTvProperties(chartStore.settings.get().preservedTvProperties);
     return chartStore.settings.listen((nextSettings) => {
       setNativeAutoScaleEnabled(nextSettings.autoScale);
       setNativeChartProperties(nextSettings.chartProperties);
+      setNativePreservedTvProperties(nextSettings.preservedTvProperties);
     });
   }, [chartStore]);
   useEffect(() => {
@@ -775,6 +780,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         ...chartStore.settings.get(),
         autoScale: settings.autoScale,
         chartProperties: settings.chartProperties,
+        preservedTvProperties: settings.preservedTvProperties,
         chartType: settings.chartType || 'candle',
         indicators: settings.indicators || [],
         interval: settings.interval || interval,
@@ -793,6 +799,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeLayoutSettings = createNativeChartLayoutSettings({
     autoScale: nativeAutoScaleEnabled,
     chartProperties: nativeChartProperties,
+    preservedTvProperties: nativePreservedTvProperties,
     chartType: 'candle',
     indicators: indicatorManager?.getLayoutIndicators() ?? [],
     interval: interval as ResolutionString,

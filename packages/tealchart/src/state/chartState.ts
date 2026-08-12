@@ -1,5 +1,5 @@
 import type { MapStore, WritableAtom } from 'nanostores';
-import type { ChartProperties, ResolutionString } from '../types';
+import type { ChartProperties, PreservedTvProperties, ResolutionString } from '../types';
 import type { UserDrawingState } from '../drawings';
 import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
 
@@ -90,6 +90,11 @@ export interface ChartSettings {
    * Same reason viewport and userDrawingState are absent from the defaults.
    */
   chartProperties?: ChartProperties;
+  /**
+   * TradingView properties carried through from an imported layout so that
+   * saving does not delete the ones Tealchart does not model.
+   */
+  preservedTvProperties?: PreservedTvProperties;
   /** Schema version for migrations */
   version: number;
 }
