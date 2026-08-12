@@ -14,11 +14,19 @@ export function createSyncPromise<T>(value: T): Promise<T> {
   const syncPromise: Promise<T> = {
     then: <TResult1 = T, TResult2 = never>(
       onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
-      _onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
+      onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
     ): Promise<TResult1 | TResult2> => {
       if (onfulfilled) {
-        const result = onfulfilled(value);
-        return Promise.resolve(result);
+        // A throwing callback must reject the chain, exactly as a real promise
+        // does. Letting it unwind synchronously instead skips the caller's
+        // .catch() — consumers hang their retry and cleanup off that, so a
+        // single transient failure would otherwise be permanent.
+        try {
+          return Promise.resolve(onfulfilled(value));
+        } catch (error) {
+          if (onrejected) return Promise.resolve(onrejected(error));
+          return Promise.reject(error);
+        }
       }
       return Promise.resolve(value as unknown as TResult1);
     },
