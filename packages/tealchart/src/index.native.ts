@@ -40,6 +40,23 @@ export {
 export type { ChartTheme, ChartThemeInput, ChartThemeName, ChartThemeRenderOptions } from './theme';
 export * from './types';
 
+// Chart settings controls (shared by the web modal and the native overlay)
+export {
+  CHART_SETTINGS_CONTROLS,
+  CHART_SETTINGS_TABS,
+  createChartPropertyControl,
+  getChartSettingsControlsForTab,
+  getPopulatedChartSettingsTabs,
+  SHOW_VOLUME_CONTROL_ID,
+} from './settings/chartSettingsControls';
+export type {
+  ChartSettingControl,
+  ChartSettingControlKind,
+  ChartSettingControlValue,
+  ChartSettingsControlContext,
+  ChartSettingsTab,
+} from './settings/chartSettingsControls';
+
 // React Native Skia component
 export { SkiaTealchart } from './SkiaTealchart';
 export type { SkiaTealchartHandle, SkiaTealchartProps } from './SkiaTealchart';
