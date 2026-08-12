@@ -12,6 +12,21 @@ Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
+**Icon rule:** There is exactly one icon language, and it is already defined. Never
+use emoji, system glyphs, font icons, or a bespoke inline SVG for chrome.
+
+- **Native:** `<NativeDrawingIcon name="..." />`, whose paths come from
+  `src/drawings/icons.ts` (`DRAWING_ICONS`). This is what the left tool rail,
+  selection toolbar, and layout selector already use.
+- **Web:** the `icons` helpers in `src/ui/dom.ts`.
+
+The two registries are intentionally the same Feather-style 24x24 stroke set, so a
+given concept looks identical on both platforms — `gear` exists in both, for
+example. If an icon you need is missing, **add it to both registries** and use it
+from there; do not inline a one-off path at the call site, and do not reach for a
+character like ⚙ because it is quicker. A stray emoji renders at the system font's
+weight and colour and immediately looks foreign next to the real chrome.
+
 **Key classes:**
 
 | Class                 | File                                  | Purpose                                                            |
