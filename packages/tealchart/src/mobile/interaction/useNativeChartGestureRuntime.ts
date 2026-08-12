@@ -41,6 +41,7 @@ import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDra
 import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
+  createNativePriceAxisResetTapGesture,
   createNativeResetViewTapGesture,
   createNativeTradeLineActionTapGesture,
   createNativeUserDrawingTapGesture,
@@ -92,6 +93,7 @@ export interface NativeChartGestureRuntimeInput {
   onSelectedDrawingActionPopoverGroupChange: Parameters<
     typeof createNativeSelectedDrawingActionTapGesture
   >[0]['onPopoverGroupChange'];
+  onPriceAxisResetTap: () => void;
   onResetViewTap: Parameters<typeof createNativeResetViewTapGesture>[0]['onResetViewTap'];
   panActive: SharedValue<boolean>;
   pinchActive: SharedValue<boolean>;
@@ -168,6 +170,7 @@ export function useNativeChartGestureRuntime({
   onOverlayAction = () => undefined,
   onSelectedDrawingAction,
   onSelectedDrawingActionPopoverGroupChange,
+  onPriceAxisResetTap,
   onResetViewTap,
   panActive,
   pinchActive,
@@ -203,6 +206,7 @@ export function useNativeChartGestureRuntime({
   const stableOnSelectedDrawingActionPopoverGroupChange = useLatestNativeCallback(
     onSelectedDrawingActionPopoverGroupChange,
   );
+  const stableOnPriceAxisResetTap = useLatestNativeCallback(onPriceAxisResetTap);
   const stableOnResetViewTap = useLatestNativeCallback(onResetViewTap);
   const resetTapStartX = useSharedValue(0);
   const resetTapStartY = useSharedValue(0);
@@ -570,6 +574,14 @@ export function useNativeChartGestureRuntime({
     stableOnResetViewTap,
   ]);
 
+  const priceAxisResetTapGesture = useMemo<GestureType>(() => {
+    return createNativePriceAxisResetTapGesture({
+      controlZones,
+      frame: chartInteractionFrame,
+      onResetView: stableOnPriceAxisResetTap,
+    });
+  }, [chartInteractionFrame, controlZones, stableOnPriceAxisResetTap]);
+
   const priceScaleGesture = useMemo<GestureType>(() => {
     return createNativePriceScaleGesture({
       beginNativeViewportInteraction: stableBeginNativeViewportInteraction,
@@ -630,6 +642,7 @@ export function useNativeChartGestureRuntime({
         leftToolRailToggleTapGesture,
         orderDragGesture,
         overlayActionTapGesture,
+        priceAxisResetTapGesture,
         priceScaleGesture,
         resetViewTapGesture,
         selectedDrawingActionTapGesture,
@@ -650,6 +663,7 @@ export function useNativeChartGestureRuntime({
       leftToolRailToggleTapGesture,
       orderDragGesture,
       overlayActionTapGesture,
+      priceAxisResetTapGesture,
       priceScaleGesture,
       resetViewTapGesture,
       selectedDrawingActionTapGesture,

@@ -25,6 +25,7 @@ import {
 } from './nativeResetViewButton';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { findNativeTradeLineActionZone } from './nativeTradeLineHitTest';
+import { canBeginNativePriceScaleGesture, getNativePriceScaleHitGeometry } from './nativeViewportGestureState';
 
 export interface NativeLeftToolRailToggleTapGestureInput {
   leftToolRailLayout: NativeLeftToolRailLayout | null;
@@ -42,6 +43,40 @@ export function createNativeLeftToolRailToggleTapGesture({
       if (!success) return;
       if (!isNativeLeftToolRailToggleTap(leftToolRailLayout, event.x, event.y)) return;
       runOnJS(onToggleCollapsed)();
+    });
+}
+
+export interface NativePriceAxisResetTapGestureInput {
+  controlZones?: readonly NativeGestureControlZone[];
+  frame: NativeChartFrame | null;
+  onResetView: () => void;
+}
+
+/**
+ * Double tap the price axis to reset the view — the same outcome as the reset
+ * button, reached from the axis the user was just scaling.
+ *
+ * Deliberately the same hit geometry the price-scale drag uses, so the two
+ * cannot disagree about where the axis is. The drag itself needs movement to
+ * activate, and the axis is outside the crosshair's region, so nothing else
+ * claims these taps.
+ */
+export function createNativePriceAxisResetTapGesture({
+  controlZones = [],
+  frame,
+  onResetView,
+}: NativePriceAxisResetTapGestureInput) {
+  if (!frame) return Gesture.Tap().enabled(false);
+  const geometry = getNativePriceScaleHitGeometry(frame);
+
+  return Gesture.Tap()
+    .numberOfTaps(2)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
+    .onEnd((event, success) => {
+      if (!success) return;
+      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
+      if (!canBeginNativePriceScaleGesture(geometry, event.x, event.y)) return;
+      runOnJS(onResetView)();
     });
 }
 

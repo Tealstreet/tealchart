@@ -1382,6 +1382,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => [...nativeLegendActionTargets, ...nativeChartSettingsActionTargets],
     [nativeChartSettingsActionTargets, nativeLegendActionTargets],
   );
+  // Same outcome as the reset button, different input. The button also hides
+  // itself on use; do that here too so a reveal from an earlier tap does not
+  // linger over an already-reset chart.
+  const handleNativePriceAxisResetTap = useCallback(() => {
+    if (!hasDataViewport) return;
+    resetNativeViewport();
+    hideNativeResetViewButton();
+  }, [hasDataViewport, hideNativeResetViewButton, resetNativeViewport]);
+
   const handleNativeResetViewTap = useCallback(
     (x: number, y: number) => {
       if (!frame || !hasDataViewport) return;
@@ -1447,6 +1456,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onOverlayAction: handleNativeOverlayAction,
     onSelectedDrawingAction: handleNativeSelectedDrawingAction,
     onSelectedDrawingActionPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
+    onPriceAxisResetTap: handleNativePriceAxisResetTap,
     onResetViewTap: handleNativeResetViewTap,
     panActive,
     pinchActive,
