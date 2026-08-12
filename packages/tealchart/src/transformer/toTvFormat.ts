@@ -131,6 +131,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
       autoScale: settings.autoScale,
       viewport: settings.viewport,
       userDrawingState: serializeUserDrawingStateForLayout(settings.userDrawingState),
+      chartProperties: settings.chartProperties,
     },
     // Preserve indicators that couldn't be mapped
     _tealstreetOriginalIndicators: settings.indicators.filter((ind) => {

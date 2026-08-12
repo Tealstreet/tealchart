@@ -3845,6 +3845,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('volumeHeight', settings.volumeHeight);
       this._chartStore.settings.setKey('chartType', settings.chartType || 'candle');
       this._chartStore.settings.setKey('autoScale', settings.autoScale);
+      this._chartStore.settings.setKey('chartProperties', settings.chartProperties);
       this._chartStore.settings.setKey('symbol', settings.symbol || this._symbol);
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
@@ -4182,6 +4183,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         : undefined,
       indicators,
       userDrawingState: this._userDrawingState,
+      chartProperties: storeSettings?.chartProperties,
       version: 1,
     };
   }
