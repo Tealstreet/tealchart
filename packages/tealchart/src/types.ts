@@ -385,6 +385,23 @@ export type ChartPropertyKey =
  */
 export type ChartProperties = Partial<Record<ChartPropertyKey, string>>;
 
+/**
+ * TradingView property objects carried through untouched from an imported layout.
+ *
+ * Tealchart models seven properties; a real TradingView layout carries dozens
+ * (gradient backgrounds, legend toggles, wick and border colors, scale label
+ * options). Saving rebuilds layout content from scratch, so without stashing
+ * the originals an import-then-save silently deletes everything we do not
+ * model. These blobs are re-seeded on export and then overwritten with the
+ * user's Tealchart values, so ours win and theirs survive.
+ */
+export interface PreservedTvProperties {
+  /** charts[0].chartProperties as imported. */
+  chartProperties?: Record<string, unknown>;
+  /** The main series source's candleStyle as imported. */
+  candleStyle?: Record<string, unknown>;
+}
+
 // Chart margins
 export interface ChartMargins {
   top: number;

@@ -11,6 +11,11 @@ import type { TransformResult, TvChartContent, TvChartData, TvPane, TvSource } f
 
 import { deserializeUserDrawingStateFromLayout } from '../drawings';
 import { sanitizeChartProperties } from '../overrides';
+import {
+  capturePreservedTvProperties,
+  mergeChartProperties,
+  readTvChartProperties,
+} from './chartProperties';
 import { CHART_SETTINGS_VERSION } from '../state/safeDeepMerge';
 import { findMappingByTvStudyId, mapInputsFromTv } from './indicatorMapping';
 import { TV_STYLE_TO_CHART_TYPE, TV_TO_LINE_STYLE } from './types';
@@ -68,6 +73,10 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
         if (firstChart.mainSourceId) {
           tvContent.mainSourceId = firstChart.mainSourceId;
         }
+      }
+      // chartProperties is per-chart in a real layout, not at the content root.
+      if (firstChart.chartProperties !== undefined) {
+        tvContent.chartProperties = firstChart.chartProperties;
       }
     }
   } catch (_e) {
@@ -138,7 +147,19 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
     viewport: originalSettings?.viewport,
     indicators,
     userDrawingState: deserializeUserDrawingStateFromLayout(originalSettings?.userDrawingState),
-    chartProperties: sanitizeChartProperties(originalSettings?.chartProperties),
+    // Merged per key rather than whole-blob: a real TradingView layout always
+    // serializes candleStyle, so an all-or-nothing precedence would discard the
+    // Tealstreet fallback entirely on the strength of one canonical hit.
+    chartProperties: mergeChartProperties(
+      sanitizeChartProperties(originalSettings?.chartProperties),
+      readTvChartProperties({
+        chartProperties: tvContent.chartProperties,
+        mainSeriesState: mainSource?.state,
+      }),
+    ),
+    preservedTvProperties:
+      capturePreservedTvProperties(tvContent.chartProperties, mainSource?.state) ??
+      originalSettings?.preservedTvProperties,
     version: CHART_SETTINGS_VERSION,
   };
 

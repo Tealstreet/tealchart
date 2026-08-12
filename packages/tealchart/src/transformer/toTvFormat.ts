@@ -6,9 +6,10 @@
  */
 
 import type { ChartSettings, IndicatorInstance } from '../state/chartState';
-import type { TvChartContent, TvChartData, TvPane, TvSource } from './types';
+import type { TvChartContent, TvChartData, TvPane, TvSource, TvSourceState } from './types';
 
 import { serializeUserDrawingStateForLayout } from '../drawings';
+import { writeTvChartProperties } from './chartProperties';
 import { findMappingByCustomId, mapInputsToTv } from './indicatorMapping';
 import { CHART_TYPE_TO_TV_STYLE, LINE_STYLE_TO_TV, TRANSFORMER_VERSION, TV_CHART_STYLES } from './types';
 
@@ -46,16 +47,32 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
   const sources: TvSource[] = [];
   const panes: TvPane[] = [];
 
-  // Main series source
+  // Main series source. Saving rebuilds content from scratch, so anything an
+  // imported layout carried has to be re-seeded here or it is silently deleted.
   const mainSourceId = 'main';
+  const preserved = settings.preservedTvProperties;
+  const mainSeriesState: TvSourceState = {
+    symbol: settings.symbol,
+    interval: settings.interval,
+    style: CHART_TYPE_TO_TV_STYLE[settings.chartType] ?? TV_CHART_STYLES.CANDLES,
+    ...(preserved?.candleStyle ? { candleStyle: { ...preserved.candleStyle } } : {}),
+  };
   sources.push({
     id: mainSourceId,
     type: 'MainSeries',
-    state: {
-      symbol: settings.symbol,
-      interval: settings.interval,
-      style: CHART_TYPE_TO_TV_STYLE[settings.chartType] ?? TV_CHART_STYLES.CANDLES,
-    },
+    state: mainSeriesState,
+  });
+
+  // Appearance goes in TradingView's canonical places: chartProperties for pane
+  // and scale settings, the main series' own state for candle styling. Seeded
+  // with the imported originals, then overwritten with the user's Tealchart
+  // values so ours win and theirs survive.
+  const chartProperties: Record<string, unknown> = preserved?.chartProperties
+    ? (JSON.parse(JSON.stringify(preserved.chartProperties)) as Record<string, unknown>)
+    : {};
+  writeTvChartProperties(settings.chartProperties, {
+    chartProperties,
+    mainSeriesState: mainSeriesState as unknown as Record<string, unknown>,
   });
 
   // Main pane with main series
@@ -119,6 +136,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
     mainSourceId,
     sources,
     panes,
+    ...(Object.keys(chartProperties).length > 0 ? { chartProperties } : {}),
     version: 1,
     // Tealstreet metadata
     _tealstreetTealchart: true,
@@ -132,6 +150,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
       viewport: settings.viewport,
       userDrawingState: serializeUserDrawingStateForLayout(settings.userDrawingState),
       chartProperties: settings.chartProperties,
+      preservedTvProperties: settings.preservedTvProperties,
     },
     // Preserve indicators that couldn't be mapped
     _tealstreetOriginalIndicators: settings.indicators.filter((ind) => {
