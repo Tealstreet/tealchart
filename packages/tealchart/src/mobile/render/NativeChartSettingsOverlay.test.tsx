@@ -3,16 +3,24 @@ import type { ChartSettings } from '../../state/chartState';
 import type { ChartSettingsControlContext } from '../../settings/chartSettingsControls';
 
 import { Switch, Text } from 'react-native';
+
+import { NativeDrawingIcon } from './NativeDrawingIcon';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_CHART_SETTINGS } from '../../state/chartState';
-import { NativeChartSettingsButtonImpl, NativeChartSettingsOverlayViewImpl } from './NativeChartSettingsOverlay';
+import {
+  NativeChartSettingsButtonImpl,
+  NativeChartSettingsOverlayViewImpl,
+  resolveNativeChartSettingsActionTargets,
+} from './NativeChartSettingsOverlay';
 
 interface TestElementProps {
   accessibilityLabel?: string;
   children?: ReactNode;
+  onLayout?: (event: { nativeEvent: { layout: { height: number; width: number; x: number; y: number } } }) => void;
   onPress?: () => void;
   onValueChange?: (value: boolean) => void;
+  pointerEvents?: string;
   value?: boolean;
 }
 
@@ -114,24 +122,47 @@ describe('NativeChartSettingsOverlay', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('exposes a labelled gear button', () => {
-    const onPress = vi.fn();
+  it('draws a labelled gear that reports its own box instead of handling touches', () => {
+    const onLayoutRectChange = vi.fn();
     const button = NativeChartSettingsButtonImpl({
       backgroundColor: '#101418',
-      bottomInset: 24,
-      gridColor: '#222831',
-      onPress,
-      rightInset: 56,
+      axisHeight: 24,
+      onLayoutRectChange,
       textColor: '#8a8f98',
     });
 
     expect(button.props.accessibilityLabel).toBe('Chart settings');
-    button.props.onPress?.();
-    expect(onPress).toHaveBeenCalledTimes(1);
-    expect(collectByType(button, Text)).toHaveLength(1);
-    // Inset past the axes, or it lands under the two-line last-price tag.
+    // Passive: taps belong to the chart gesture layer, so a second RN touch path
+    // here would put the hit box in a different coordinate space to the glyph.
+    expect(button.props.pointerEvents).toBe('none');
+    expect(button.props.onPress).toBeUndefined();
+
+    button.props.onLayout?.({ nativeEvent: { layout: { height: 24, width: 24, x: 378, y: 600 } } });
+    expect(onLayoutRectChange).toHaveBeenCalledWith({ height: 24, width: 24, x: 378, y: 600 });
+
+    // Square on the axis intersection, and drawn with the shared icon set
+    // rather than a system emoji glyph.
     expect(button.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ bottom: 30, right: 62 })]),
+      expect.arrayContaining([expect.objectContaining({ height: 24, width: 24 })]),
     );
+    expect(collectByType(button, Text)).toHaveLength(0);
+    expect(collectByType(button, NativeDrawingIcon)).toHaveLength(1);
+  });
+
+  it('derives the gear hit target from the measured box, grown inward only', () => {
+    const [target] = resolveNativeChartSettingsActionTargets({ height: 24, width: 24, x: 378, y: 600 });
+
+    expect(target?.command).toEqual({ type: 'openChartSettings' });
+    // Right and bottom stay flush: outside the canvas there is nothing to tap.
+    expect(target?.x2).toBe(402);
+    expect(target?.y2).toBe(624);
+    expect(target?.x1).toBe(368);
+    expect(target?.y1).toBe(590);
+  });
+
+  it('publishes no gear target before the button has been measured', () => {
+    // An unmeasured rect would reserve (0,0) and swallow taps in the top-left.
+    expect(resolveNativeChartSettingsActionTargets(null)).toEqual([]);
+    expect(resolveNativeChartSettingsActionTargets({ height: 0, width: 0, x: 0, y: 0 })).toEqual([]);
   });
 });
