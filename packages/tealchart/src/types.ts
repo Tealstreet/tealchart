@@ -352,6 +352,39 @@ export interface ChartOverrides {
   [key: string]: string | number | boolean | undefined;
 }
 
+/**
+ * The chart property paths Tealchart persists into a saved layout.
+ *
+ * Deliberately a literal union rather than `Partial<ChartOverrides>`: that type
+ * carries an index signature, so every key is already optional and a typo'd
+ * path would type-check and then silently never apply. Persisted data has to be
+ * stricter than the runtime override API.
+ *
+ * Every member must be a real TradingView override path — verified against the
+ * vendored charting_library.d.ts. Add a path here only when a control writes it
+ * and `applyChartOverridesToRenderOptions` renders it, so we never persist keys
+ * that do nothing.
+ */
+export type ChartPropertyKey =
+  | 'mainSeriesProperties.candleStyle.upColor'
+  | 'mainSeriesProperties.candleStyle.downColor'
+  | 'paneProperties.background'
+  | 'paneProperties.vertGridProperties.color'
+  | 'paneProperties.horzGridProperties.color'
+  | 'paneProperties.crossHairProperties.color'
+  | 'scalesProperties.textColor';
+
+/**
+ * Sparse map of persisted chart properties. Only values the user actually
+ * changed are stored, so defaults stay free to evolve.
+ *
+ * Values are strings because every supported path is currently a color. Widen
+ * this and `sanitizeChartProperties` together when the first numeric or boolean
+ * property lands — allowing a type the sanitizer strips would let a value save
+ * and then silently vanish on reload.
+ */
+export type ChartProperties = Partial<Record<ChartPropertyKey, string>>;
+
 // Chart margins
 export interface ChartMargins {
   top: number;

@@ -625,6 +625,8 @@ export type {
   Viewport,
   RenderOptions,
   ChartOverrides,
+  ChartProperties,
+  ChartPropertyKey,
   ChartMargins,
   InteractionState,
   CrosshairState,
