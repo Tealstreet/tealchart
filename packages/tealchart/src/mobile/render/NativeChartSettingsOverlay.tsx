@@ -6,7 +6,9 @@
  * settings/chartSettingsControls.ts and neither platform's UI changes.
  */
 
+import type { LayoutRectangle } from 'react-native';
 import type { ChartSettingControl, ChartSettingsControlContext } from '../../settings/chartSettingsControls';
+import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 
 import React, { useState } from 'react';
 
@@ -192,13 +194,26 @@ export function NativeChartSettingsOverlayImpl(props: NativeChartSettingsOverlay
 
 export const NativeChartSettingsOverlay = React.memo(NativeChartSettingsOverlayImpl);
 
+export interface NativeChartSettingsActionCommand {
+  type: 'openChartSettings';
+}
+
+export type NativeChartSettingsActionHitTarget = NativeOverlayActionHitTarget<NativeChartSettingsActionCommand>;
+
 export interface NativeChartSettingsButtonProps {
   backgroundColor: string;
-  /** Time-axis height. The cell is square on this, so it hugs the corner. */
+  /** Time-axis height. The cell is square on this. */
   axisHeight: number;
-  onPress: () => void;
+  onLayoutRectChange: (layout: LayoutRectangle) => void;
   textColor: string;
 }
+
+/**
+ * Corner controls are small and sit against two screen edges, so the drawn cell
+ * alone is a mean target. Grown inward only — outward would push the rect off
+ * the canvas, where no touch is delivered.
+ */
+const SETTINGS_BUTTON_HIT_SLOP = { bottom: 0, left: 10, right: 0, top: 10 };
 
 const buttonStyles = StyleSheet.create({
   // Sits on the intersection of the time and price axis rails, not floating over
@@ -218,26 +233,55 @@ const buttonStyles = StyleSheet.create({
 });
 
 /**
+ * Turn the button's own measured box into a gesture hit target.
+ *
+ * The rect comes from `onLayout` rather than from recomputed geometry, so the
+ * tappable area is the drawn area by construction — the two cannot drift the way
+ * hand-derived rects do.
+ */
+export function resolveNativeChartSettingsActionTargets(
+  layout: LayoutRectangle | null,
+): NativeChartSettingsActionHitTarget[] {
+  if (!layout || layout.width <= 0 || layout.height <= 0) return [];
+
+  return [
+    {
+      command: { type: 'openChartSettings' },
+      enabled: true,
+      x1: layout.x - SETTINGS_BUTTON_HIT_SLOP.left,
+      x2: layout.x + layout.width + SETTINGS_BUTTON_HIT_SLOP.right,
+      y1: layout.y - SETTINGS_BUTTON_HIT_SLOP.top,
+      y2: layout.y + layout.height + SETTINGS_BUTTON_HIT_SLOP.bottom,
+    },
+  ];
+}
+
+/**
  * Bottom-right gear, mirroring the web chrome. The reset-view affordance is
  * bottom-centre on native, so this corner is free.
+ *
+ * Passive by design: it draws and reports its box, and the chart's gesture layer
+ * owns the tap, exactly as the legend action buttons do. A `Pressable` here would
+ * be a second, parallel hit path in a different coordinate space to every other
+ * chart control.
  */
 export function NativeChartSettingsButtonImpl({
   axisHeight,
   backgroundColor,
-  onPress,
+  onLayoutRectChange,
   textColor,
 }: NativeChartSettingsButtonProps) {
   return (
-    <Pressable
+    <View
       accessibilityLabel="Chart settings"
       accessibilityRole="button"
-      hitSlop={{ bottom: 4, left: 8, right: 4, top: 8 }}
-      onPress={onPress}
+      onLayout={(event) => onLayoutRectChange(event.nativeEvent.layout)}
+      pointerEvents="none"
       style={[buttonStyles.button, { backgroundColor, height: axisHeight, width: axisHeight }]}
     >
       {/* Same icon set as the left tool rail rather than a system emoji. */}
       <NativeDrawingIcon color={textColor} name="gear" size={16} strokeWidth={1.75} />
-    </Pressable>
+    </View>
   );
 }
 

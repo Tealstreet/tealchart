@@ -1,10 +1,15 @@
+import type { NativeOverlayHitRect } from './nativeOverlayHitTargets';
+
+import { isPointInNativeHitRect } from './nativeOverlayHitTargets';
+
 export type NativeGestureControlZoneOwner = 'resetView';
 
-export interface NativeGestureControlZone {
-  x1: number;
-  x2: number;
-  y1: number;
-  y2: number;
+/**
+ * A reserved rect is an overlay hit rect with an owner. Sharing the shape means
+ * an action target can be registered as its own control zone without being
+ * restated — which is how the two stay identical.
+ */
+export interface NativeGestureControlZone extends NativeOverlayHitRect {
   /**
    * Gesture that owns this zone. The owning gesture must not treat its own
    * reserved rect as a foreign control, or it blocks its own taps.
@@ -24,7 +29,7 @@ export function isNativeGestureControlPoint(
   for (let index = 0; index < zones.length; index += 1) {
     const zone = zones[index];
     if (ignoreOwner !== undefined && zone.owner === ignoreOwner) continue;
-    if (x >= zone.x1 && x <= zone.x2 && y >= zone.y1 && y <= zone.y2) return true;
+    if (isPointInNativeHitRect(zone, x, y)) return true;
   }
   return false;
 }
