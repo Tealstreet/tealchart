@@ -251,6 +251,57 @@ describe('volume settings persistence', () => {
     widget.remove();
   });
 
+  it('applies a loaded layout\'s chart properties to what actually renders', () => {
+    // Persisting a property is useless if hydrate never reaches _renderOptions:
+    // the colour would survive a reload and then not be drawn.
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed);
+
+    const internals = widget as unknown as {
+      _handleLoadLayout: (settings: ChartSettings, warnings: string[], id: string, name: string) => void;
+      _renderOptions: { backgroundColor?: string };
+      _getCurrentSettings: () => ChartSettings;
+    };
+    internals._handleLoadLayout(
+      { ...internals._getCurrentSettings(), chartProperties: { 'paneProperties.background': '#101418' } },
+      [],
+      'layout-1',
+      'Layout 1',
+    );
+
+    expect(internals._renderOptions.backgroundColor).toBe('#101418');
+    widget.remove();
+  });
+
+  it('does not leak one layout\'s colours into the next', () => {
+    // _renderOptions is cumulative, so merging a loaded layout into it left the
+    // previous layout's colours in place for anything the new one omits — the
+    // chart drew layout A while saving layout B.
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed, { renderOptions: { backgroundColor: '#16171a' } });
+    completeInit(datafeed);
+
+    const internals = widget as unknown as {
+      _handleLoadLayout: (settings: ChartSettings, warnings: string[], id: string, name: string) => void;
+      _renderOptions: { backgroundColor?: string };
+      _getCurrentSettings: () => ChartSettings;
+    };
+    const base = internals._getCurrentSettings();
+
+    internals._handleLoadLayout(
+      { ...base, chartProperties: { 'paneProperties.background': '#101418' } },
+      [],
+      'a',
+      'A',
+    );
+    expect(internals._renderOptions.backgroundColor).toBe('#101418');
+
+    internals._handleLoadLayout({ ...base, chartProperties: undefined }, [], 'b', 'B');
+    expect(internals._renderOptions.backgroundColor).toBe('#16171a');
+    widget.remove();
+  });
+
   it('persists a volume toggle applied through applyOverrides', () => {
     // applyOverrides only touched _renderOptions, so an override-hidden volume
     // still saved as visible and reappeared on the next load.

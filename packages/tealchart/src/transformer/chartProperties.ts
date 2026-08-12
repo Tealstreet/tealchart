@@ -159,6 +159,19 @@ export function mergeChartProperties(...sources: (ChartProperties | undefined)[]
   return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
+/**
+ * Validate a preserved-properties blob that came back from stored layout JSON.
+ *
+ * The capture path guards its inputs, but the round-trip fallback reads a blob
+ * straight out of _tealstreetOriginalSettings, where a hand-edited or corrupted
+ * layout can put a string. Writing into that later assigns onto a primitive and
+ * throws in strict mode, breaking autosave.
+ */
+export function sanitizePreservedTvProperties(value: unknown): PreservedTvProperties | undefined {
+  if (!isPlainObject(value)) return undefined;
+  return capturePreservedTvProperties(value.chartProperties, { candleStyle: value.candleStyle });
+}
+
 /** Snapshot the foreign property objects an imported layout carried. */
 export function capturePreservedTvProperties(
   chartProperties: unknown,
