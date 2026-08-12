@@ -25,6 +25,7 @@ interface EventManagerCallbackProbe {
   onCrossHairMoved?: (x: number, y: number) => void;
   onCrosshairRender?: () => void;
   onCursorChange?: (cursor: string) => void;
+  onPaneDoubleClick?: (paneId: string, point: { x: number; y: number }) => void;
 }
 
 const eventManagerInstances = vi.hoisted(
@@ -314,6 +315,36 @@ describe('ChartCore viewport management', () => {
     core.resetViewport();
     const vp = core.getViewport();
     expect(vp!.priceMin).toBeGreaterThan(40_000);
+
+    core.dispose();
+  });
+
+  it('resets the view on a double click of the price axis', async () => {
+    const core = await createChartCore();
+    core.setBars(makeBars(10, 1_000_000, 60_000, 50_000));
+    core.setViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 });
+
+    const { callbacks } = eventManagerInstances[eventManagerInstances.length - 1];
+    // width 800 with the default right margin — comfortably inside the axis.
+    callbacks.onPaneDoubleClick?.('main', { x: 795, y: 200 });
+
+    expect(core.getViewport()!.priceMin).toBeGreaterThan(40_000);
+
+    core.dispose();
+  });
+
+  it('leaves a double click in the plot to the drawing handler', async () => {
+    const onPaneDoubleClick = vi.fn();
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({ container, width: 800, height: 600, onPaneDoubleClick });
+    core.setBars(makeBars(10, 1_000_000, 60_000, 50_000));
+    core.setViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 });
+
+    const { callbacks } = eventManagerInstances[eventManagerInstances.length - 1];
+    callbacks.onPaneDoubleClick?.('main', { x: 200, y: 200 });
+
+    expect(onPaneDoubleClick).toHaveBeenCalledTimes(1);
+    expect(core.getViewport()!.priceMax).toBe(1);
 
     core.dispose();
   });
