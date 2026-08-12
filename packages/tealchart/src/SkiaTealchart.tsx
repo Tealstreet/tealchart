@@ -71,6 +71,9 @@ import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
+import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
+
+import { NativeChartSettingsButton, NativeChartSettingsOverlay } from './mobile/render/NativeChartSettingsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
@@ -283,10 +286,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setUiPreferences(nextPreferences);
     });
   }, [chartStore]);
+  const [nativeChartProperties, setNativeChartProperties] = useState(() => chartStore.settings.get().chartProperties);
+  const [nativePreservedTvProperties, setNativePreservedTvProperties] = useState(
+    () => chartStore.settings.get().preservedTvProperties,
+  );
+  const [nativeShowVolume, setNativeShowVolume] = useState(() => chartStore.settings.get().showVolume);
+  const [nativeChartSettingsOpen, setNativeChartSettingsOpen] = useState(false);
   useEffect(() => {
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
+    setNativeChartProperties(chartStore.settings.get().chartProperties);
+    setNativePreservedTvProperties(chartStore.settings.get().preservedTvProperties);
+    setNativeShowVolume(chartStore.settings.get().showVolume);
     return chartStore.settings.listen((nextSettings) => {
       setNativeAutoScaleEnabled(nextSettings.autoScale);
+      setNativeChartProperties(nextSettings.chartProperties);
+      setNativePreservedTvProperties(nextSettings.preservedTvProperties);
+      setNativeShowVolume(nextSettings.showVolume);
     });
   }, [chartStore]);
   useEffect(() => {
@@ -460,9 +475,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   useEffect(() => {
     setImperativeRenderOptions(null);
   }, [renderOptions]);
+  // Volume comes from persisted settings so the layout and what is drawn cannot
+  // disagree. An imperative applyOverrides still wins, matching the widget
+  // contract where explicit calls beat stored state.
   const effectiveRenderOptions = useMemo(
-    () => (imperativeRenderOptions ? { ...renderOptions, ...imperativeRenderOptions } : renderOptions),
-    [imperativeRenderOptions, renderOptions],
+    () => ({
+      ...applyChartOverridesToRenderOptions(renderOptions ?? {}, nativeChartProperties ?? {}),
+      showVolume: nativeShowVolume,
+      ...(imperativeRenderOptions ?? {}),
+    }),
+    [imperativeRenderOptions, nativeChartProperties, nativeShowVolume, renderOptions],
   );
 
   const widgetEmitterRef = useRef<EventEmitter | null>(null);
@@ -771,6 +793,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       chartStore.settings.set({
         ...chartStore.settings.get(),
         autoScale: settings.autoScale,
+        chartProperties: settings.chartProperties,
+        preservedTvProperties: settings.preservedTvProperties,
         chartType: settings.chartType || 'candle',
         indicators: settings.indicators || [],
         interval: settings.interval || interval,
@@ -786,15 +810,31 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [applyNativeViewport, chartApi, chartStore, interval, replaceNativeUserDrawingState, symbol],
   );
+  // Writes go straight to the store; the store listener above pushes the value
+  // into effectiveRenderOptions, so the sheet does not touch rendering itself.
+  const nativeChartSettingsContext = useMemo<ChartSettingsControlContext>(
+    () => ({
+      getSettings: () => chartStore.settings.get(),
+      setSetting: (key, value) => chartStore.settings.setKey(key, value),
+      setChartProperties: (properties) => chartStore.settings.setKey('chartProperties', properties),
+      markLayoutDirty: markNativeLayoutDirtyIfReady,
+    }),
+    [chartStore, markNativeLayoutDirtyIfReady],
+  );
+
   const nativeLayoutSettings = createNativeChartLayoutSettings({
     autoScale: nativeAutoScaleEnabled,
+    chartProperties: nativeChartProperties,
+    preservedTvProperties: nativePreservedTvProperties,
     chartType: 'candle',
     indicators: indicatorManager?.getLayoutIndicators() ?? [],
     interval: interval as ResolutionString,
-    showVolume: true,
+    showVolume: nativeShowVolume,
     symbol,
     userDrawingState: nativeUserDrawingState,
     viewport: hasDataViewport ? viewport : undefined,
+    // The native renderer sizes the volume pane from VOLUME_HEIGHT_RATIO, so
+    // persisting anything else would save a height that is never drawn.
     volumeHeight: VOLUME_HEIGHT_RATIO,
   });
   const {
@@ -1595,6 +1635,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           menu={nativeContextMenu}
           onClose={closeNativeContextMenu}
           renderOptions={options}
+          textColor={textColor}
+        />
+      ) : null}
+      <NativeChartSettingsButton
+        backgroundColor={backgroundColor}
+        bottomInset={frame?.dimensions.margins.bottom ?? 0}
+        rightInset={frame?.dimensions.margins.right ?? 0}
+        gridColor={gridColor}
+        onPress={() => setNativeChartSettingsOpen(true)}
+        textColor={nativeMutedTextColor}
+      />
+      {nativeChartSettingsOpen ? (
+        <NativeChartSettingsOverlay
+          activeBackgroundColor={gridColor}
+          backgroundColor={backgroundColor}
+          context={nativeChartSettingsContext}
+          gridColor={gridColor}
+          mutedTextColor={nativeMutedTextColor}
+          onClose={() => setNativeChartSettingsOpen(false)}
           textColor={textColor}
         />
       ) : null}
