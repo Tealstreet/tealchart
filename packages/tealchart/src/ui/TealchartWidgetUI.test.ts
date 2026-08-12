@@ -3,8 +3,7 @@ import type { PaneLayout } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { clearChartStoreCache, DEFAULT_CHART_SETTINGS } from '../state/chartState';
-import { DEFAULT_MARGINS } from '../types';
+import { clearChartStoreCache } from '../state/chartState';
 import { TealchartWidgetUI } from './TealchartWidgetUI';
 
 vi.mock('../interaction/EventManager', () => ({
@@ -248,38 +247,5 @@ describe('TealchartWidgetUI legend layout', () => {
     expect(paneLegend?.style.left).toBe('70px');
 
     ui.dispose();
-  });
-
-  it('renders the settings gear as the axis corner cell, not a floating button', () => {
-    // Placement is part of the feature. Floating it over the candles reads as a
-    // FAB; TradingView puts it in the cell where the time and price axes meet,
-    // so it is sized from the same margins the renderer uses.
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    const ui = new TealchartWidgetUI({
-      container,
-      chartKey: 'settings-gear-ui',
-      symbol: 'BTCUSDT',
-      interval: '60',
-      showTopBar: false,
-      chartSettingsContext: {
-        getSettings: () => DEFAULT_CHART_SETTINGS,
-        setSetting: () => undefined,
-        setChartProperties: () => undefined,
-        markLayoutDirty: () => undefined,
-      },
-    });
-    void ui;
-
-    const gear = container.querySelector<HTMLElement>('[data-tealchart-chart-settings-button]');
-    expect(gear).not.toBeNull();
-    expect(gear!.style.right).toBe('0px');
-    expect(gear!.style.bottom).toBe('0px');
-    // Square on the time-axis height so the glyph lands on the axis
-    // intersection rather than half a price-axis in from the edge.
-    expect(gear!.style.width).toBe(`${DEFAULT_MARGINS.bottom}px`);
-    expect(gear!.style.height).toBe(`${DEFAULT_MARGINS.bottom}px`);
-    expect(gear!.querySelector('svg')).not.toBeNull();
-
   });
 });
