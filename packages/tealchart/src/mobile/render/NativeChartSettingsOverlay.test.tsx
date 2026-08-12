@@ -3,6 +3,8 @@ import type { ChartSettings } from '../../state/chartState';
 import type { ChartSettingsControlContext } from '../../settings/chartSettingsControls';
 
 import { Switch, Text } from 'react-native';
+
+import { NativeDrawingIcon } from './NativeDrawingIcon';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_CHART_SETTINGS } from '../../state/chartState';
@@ -118,20 +120,20 @@ describe('NativeChartSettingsOverlay', () => {
     const onPress = vi.fn();
     const button = NativeChartSettingsButtonImpl({
       backgroundColor: '#101418',
-      bottomInset: 24,
-      gridColor: '#222831',
+      axisHeight: 24,
       onPress,
-      rightInset: 56,
       textColor: '#8a8f98',
     });
 
     expect(button.props.accessibilityLabel).toBe('Chart settings');
     button.props.onPress?.();
     expect(onPress).toHaveBeenCalledTimes(1);
-    expect(collectByType(button, Text)).toHaveLength(1);
-    // Inset past the axes, or it lands under the two-line last-price tag.
+    // Square on the axis intersection, and drawn with the shared icon set
+    // rather than a system emoji glyph.
     expect(button.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ bottom: 30, right: 62 })]),
+      expect.arrayContaining([expect.objectContaining({ height: 24, width: 24 })]),
     );
+    expect(collectByType(button, Text)).toHaveLength(0);
+    expect(collectByType(button, NativeDrawingIcon)).toHaveLength(1);
   });
 });

@@ -1640,9 +1640,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       ) : null}
       <NativeChartSettingsButton
         backgroundColor={backgroundColor}
-        bottomInset={frame?.dimensions.margins.bottom ?? 0}
-        rightInset={frame?.dimensions.margins.right ?? 0}
-        gridColor={gridColor}
+        axisHeight={frame?.dimensions.margins.bottom ?? 0}
         onPress={() => setNativeChartSettingsOpen(true)}
         textColor={nativeMutedTextColor}
       />
