@@ -95,6 +95,23 @@ export function useNativeTealchartCoreRuntime({
     };
   }, [onTealscriptError]);
 
+  // Keyed on the PROP, in a layout effect, so `chartApi.symbol()` answers with
+  // the market the host asked for in the same commit the host asked for it.
+  //
+  // TradingView is imperative — a host calls chart(i).setSymbol() and reads
+  // chart(i).symbol() back immediately — and hosts wire their trading layer on
+  // that guarantee. Going through core state instead put the api two commits
+  // behind: prop -> core.setSymbol -> symbolChanged dispatch -> re-render ->
+  // apply. Anything reading the api inside that window, such as a host
+  // rebuilding line managers when the market changes, bound to the market the
+  // chart had just left.
+  useLayoutEffect(() => {
+    if (propSymbol && chartApi.symbol() !== propSymbol) chartApi.setSymbol(propSymbol);
+  }, [chartApi, propSymbol]);
+
+  // The core's own symbol still drives data loading, and reaches the api by the
+  // path above once it settles. Kept so a symbol changed from inside the chart
+  // converges too; a no-op whenever the layout effect already applied it.
   useEffect(() => {
     if (chartApi.symbol() !== symbol) chartApi.setSymbol(symbol);
   }, [chartApi, symbol]);

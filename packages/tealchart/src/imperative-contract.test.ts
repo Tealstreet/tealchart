@@ -490,6 +490,20 @@ describe('imperative chart API contract', () => {
     expect(handleBlock).toContain('extends ITealchartWidget');
   });
 
+  it('answers chart(i).symbol() with the controlled prop in the same commit', () => {
+    const source = readSource('mobile/useNativeTealchartCoreRuntime.ts');
+
+    // TradingView is imperative: a host sets a symbol and reads it straight
+    // back, and hosts wire their trading layer on that. The native chart takes
+    // the symbol as a prop instead, so the prop has to reach the api in the
+    // commit it arrives — keyed on the PROP, in a layout effect. Routing it
+    // through core state puts the api two commits behind, and a host rebuilding
+    // per-market state in that window binds to the market just left.
+    const layoutEffect = source.match(/useLayoutEffect\(\(\) => \{[\s\S]*?propSymbol[\s\S]*?\}, \[chartApi, propSymbol\]\);/)?.[0] ?? '';
+
+    expect(layoutEffect).toContain('chartApi.setSymbol(propSymbol)');
+  });
+
   it('keeps the shared widget contract aligned to the consumed TradingView surface', () => {
     const contract = readSource('widgetContract.ts');
 
