@@ -215,6 +215,12 @@ export interface ChartLabelSegment {
   textColor: string;
   /** Border color of the segment box */
   borderColor: string;
+  /**
+   * Draws a rail of TRADE_LINE_ACCENT_RAIL_WIDTH inside this segment's leading
+   * edge. Set on the first segment to carry the line's side color without
+   * filling anything.
+   */
+  accentColor?: string;
 }
 
 /**

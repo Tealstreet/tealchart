@@ -180,6 +180,7 @@ interface LineContentRefsProbe {
   priceAxisPrimaryText?: { listening(): boolean };
   priceAxisSecondaryText?: { listening(): boolean };
   segmentRects?: Array<{ fill(): string; x(): number; cornerRadius(): number | number[] }>;
+  segmentAccents?: Array<{ fill(): string } | undefined>;
   buttonRects?: Array<{ fill(): string; cornerRadius(): number | number[] }>;
 }
 
@@ -1348,9 +1349,9 @@ describe('ChartCore viewport management', () => {
       };
     };
     expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
-      backgroundColor: '#ee3355',
-      borderColor: '#2196F3',
-      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      backgroundColor: 'rgba(62, 136, 221, 1)',
+      borderColor: 'rgba(255, 255, 255, 0.10)',
+      textColor: '#ee3355',
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
       backgroundColor: '#2196F3',
@@ -1371,20 +1372,23 @@ describe('ChartCore viewport management', () => {
       iconColor: '#ffffff',
     });
     expect(bound.chartLabel?.buttons?.find((button) => button.type === 'tp')).toMatchObject({
-      backgroundColor: '#00aa77',
-      borderColor: 'rgba(255, 255, 255, 0.16)',
-      iconColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      backgroundColor: 'rgba(28, 153, 226, 1)',
+      borderColor: 'rgba(255, 255, 255, 0.10)',
+      iconColor: '#00aa77',
     });
     expect(bound.chartLabel?.buttons?.find((button) => button.type === 'sl')).toMatchObject({
-      backgroundColor: '#f97316',
-      borderColor: 'rgba(255, 255, 255, 0.16)',
-      iconColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      backgroundColor: 'rgba(72, 144, 203, 1)',
+      borderColor: 'rgba(255, 255, 255, 0.10)',
+      iconColor: '#f97316',
     });
     expect(bound.chartLabel?.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     const refs = manager.cachedLineGroups.get('position-1')?.getAttr('contentRefs') as LineContentRefsProbe;
     expect(refs.segmentRects?.[0]?.fill()).toBe('#2196F3');
     expect(refs.segmentRects?.[1]?.fill()).toBe('#2196F3');
-    expect(refs.segmentRects?.[2]?.fill()).toBe('#ee3355');
+    expect(refs.segmentRects?.[2]?.fill()).toBe('rgba(62, 136, 221, 1)');
+    // The side color arrives as a rail on the leading segment, not as a fill.
+    expect(refs.segmentAccents?.[0]?.fill()).toBe('#2196F3');
+    expect(refs.segmentAccents?.[1]).toBeUndefined();
     expect(refs.buttonRects?.[0]?.fill()).toBe('#2196F3');
     expect(refs.segmentRects?.[2]?.cornerRadius()).toEqual(0);
     expect(refs.buttonRects?.[0]?.cornerRadius()).toEqual(0);
@@ -1402,9 +1406,9 @@ describe('ChartCore viewport management', () => {
       borderColor: '#111111',
     });
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
-      backgroundColor: '#00aa77',
-      borderColor: '#ef5350',
-      textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      backgroundColor: 'rgba(15, 38, 31, 1)',
+      borderColor: 'rgba(255, 255, 255, 0.10)',
+      textColor: '#00aa77',
     });
     expect(core.getViewport()).not.toBeNull();
     core.dispose();
