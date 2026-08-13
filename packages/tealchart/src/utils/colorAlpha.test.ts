@@ -26,7 +26,7 @@ describe('tintOver', () => {
   });
 
   it('keeps the ground opacity so the label stays one object over the candles', () => {
-    expect(tintOver('rgba(32, 33, 42, 0.88)', '#f6465d', 0.18)).toBe('rgba(71, 40, 50, 0.88)');
+    expect(tintOver('rgba(32, 33, 42, 0.88)', '#f6465d', 0.18)).toBe('rgba(71, 40, 51, 0.88)');
   });
 
   it('falls back to the tint when a color cannot be read', () => {
