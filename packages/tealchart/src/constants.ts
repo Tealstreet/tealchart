@@ -29,6 +29,29 @@ export const DEFAULT_TRADE_LINE_LABEL_FONT = '600 12px -apple-system, BlinkMacSy
 /** Default separator/border color between order/position line label segments. */
 export const DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR = 'rgba(255, 255, 255, 0.16)';
 
+/**
+ * Hairline used for the label outline and the seams between its segments.
+ * Neighbouring segments stroke the same 1px column, so this reads as one rule.
+ */
+export const DEFAULT_TRADE_LINE_HAIRLINE_COLOR = 'rgba(255, 255, 255, 0.10)';
+
+/**
+ * How much of its own hue a colored label segment keeps as a background. Full
+ * strength fills turn the label into a bright bar across the candles and flatten
+ * every segment to the same importance; a tint keeps the color legible while the
+ * text carries it at full strength.
+ */
+export const TRADE_LINE_SEGMENT_TINT_ALPHA = 0.14;
+
+/** Warmer hues read weaker at the same alpha, so orange gets a touch more. */
+export const TRADE_LINE_WARM_SEGMENT_TINT_ALPHA = 0.18;
+
+/** Quantity and other data segments sit on the label ground and read as data. */
+export const DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR = '#e7eaf0';
+
+/** Width of the side-colored rail on the leading edge of a trade line label. */
+export const TRADE_LINE_ACCENT_RAIL_WIDTH = 3;
+
 /** Default dark text for filled positive/PnL and TP/SL segments. */
 export const DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR = '#1f2933';
 

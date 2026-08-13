@@ -11,7 +11,7 @@ import type { ChartMargins, PriceLineLabelBounds } from '../types';
 
 import Konva from 'konva';
 
-import { TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
+import { TRADE_LINE_ACCENT_RAIL_WIDTH, TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
@@ -102,6 +102,7 @@ interface CachedLineContentRefs {
   priceAxisPrimaryText?: Konva.Text;
   priceAxisSecondaryText?: Konva.Text;
   segmentRects?: Konva.Rect[];
+  segmentAccents?: Array<Konva.Rect | undefined>;
   segmentTexts?: Konva.Text[];
   buttonRects?: Konva.Rect[];
   buttonTexts?: Array<Konva.Text | undefined>;
@@ -349,6 +350,9 @@ export class PriceLineManager {
                 segment.textColor,
                 segment.backgroundColor,
                 segment.borderColor,
+                // Presence only: the rail's color is repainted on the fast path,
+                // but gaining or losing one needs the node rebuilt.
+                segment.accentColor ? '1' : '0',
               ].join('~'),
             )
             .join('|') ?? '';
@@ -513,6 +517,7 @@ export class PriceLineManager {
       const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
       refs.segmentRects?.[index]?.fill(segment.backgroundColor);
       refs.segmentRects?.[index]?.stroke(segment.borderColor);
+      if (segment.accentColor) refs.segmentAccents?.[index]?.fill(segment.accentColor);
       refs.segmentTexts?.[index]?.text(text);
       refs.segmentTexts?.[index]?.fill(segment.textColor);
     });
@@ -938,6 +943,7 @@ export class PriceLineManager {
       const segmentGroup = new Konva.Group({ listening: false });
       const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
       refs.segmentRects = [];
+      refs.segmentAccents = [];
       refs.segmentTexts = [];
 
       for (let i = 0; i < chartLabel.segments.length; i++) {
@@ -970,9 +976,25 @@ export class PriceLineManager {
           align: 'center',
           verticalAlign: 'middle',
         });
+        // Inset by half the stroke so the rail sits inside the hairline rather
+        // than painting over its inner half.
+        const accentRect = segment.accentColor
+          ? new Konva.Rect({
+              x: currentX + 0.5,
+              y: lineY - LABEL_HEIGHT / 2 + 0.5,
+              width: TRADE_LINE_ACCENT_RAIL_WIDTH,
+              height: LABEL_HEIGHT - 1,
+              fill: segment.accentColor,
+              cornerRadius: isFirst ? [2, 0, 0, 2] : 0,
+              listening: false,
+            })
+          : undefined;
+
         segmentGroup.add(segmentRect);
+        if (accentRect) segmentGroup.add(accentRect);
         segmentGroup.add(segmentText);
         refs.segmentRects.push(segmentRect);
+        refs.segmentAccents.push(accentRect);
         refs.segmentTexts.push(segmentText);
 
         currentX += textWidth;

@@ -115,10 +115,32 @@ describe('trade line label resolver', () => {
     const label = resolvePositionTradeLineLabel(createPositionLine(), '#12c48b', '#ff4d67');
 
     expect(label.segments.map((segment) => segment.text)).toEqual(['Long', '0.0034', '+$1.33 (+0.17%)']);
-    expect(label.segments[2]?.backgroundColor).toBe('#12c48b');
-    expect(label.segments[2]?.borderColor).toBe('#18aee8');
+    // PnL carries its state as tinted ground plus full-strength text.
+    expect(label.segments[2]?.backgroundColor).toBe('rgba(30, 58, 56, 1)');
+    expect(label.segments[2]?.textColor).toBe('#12c48b');
+    expect(label.segments[2]?.borderColor).toBe('rgba(255, 255, 255, 0.10)');
     expect(label.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     expect(label.buttons?.map((button) => button.icon)).toEqual(['⇄', '×', 'TP', 'SL']);
+  });
+
+  it('rails the leading segment in the line color on both line types', () => {
+    const orderLabel = resolveOrderTradeLineLabel(createOrderLine(), '#12c48b');
+    const positionLabel = resolvePositionTradeLineLabel(createPositionLine(), '#12c48b', '#ff4d67');
+
+    expect(orderLabel.segments[0]?.accentColor).toBe('#18aee8');
+    expect(orderLabel.segments.slice(1).every((segment) => segment.accentColor === undefined)).toBe(true);
+    expect(positionLabel.segments[0]?.accentColor).toBe('#18aee8');
+  });
+
+  it('tints the bracket buttons instead of filling them', () => {
+    const label = resolvePositionTradeLineLabel(createPositionLine(), '#12c48b', '#ff4d67');
+    const takeProfit = label.buttons?.find((button) => button.type === 'tp');
+    const stopLoss = label.buttons?.find((button) => button.type === 'sl');
+
+    expect(takeProfit?.backgroundColor).toBe('rgba(30, 58, 56, 1)');
+    expect(takeProfit?.iconColor).toBe('#12c48b');
+    expect(stopLoss?.backgroundColor).toBe('rgba(71, 50, 38, 1)');
+    expect(stopLoss?.iconColor).toBe('#f97316');
   });
 
   it('omits optional order controls when they are disabled', () => {
