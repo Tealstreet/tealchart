@@ -9,6 +9,8 @@ import {
 import { useMemo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 
+import { TRADE_LINE_ACCENT_RAIL_WIDTH } from '../../constants';
+
 export function createNativeTradeLineBoxPath(x: number, y: number, width: number, height: number, corners: NativeTradeLineCornerStyle) {
   const radius = 2;
   const leftRadius = corners === 'all' || corners === 'left' ? radius : 0;
@@ -82,4 +84,36 @@ export function NativeStaticTradeLineBox({
       <Path path={path} color={borderColor} style="stroke" strokeWidth={1} />
     </>
   );
+}
+
+/**
+ * The side-colored rail on the label's leading edge. Inset by half a stroke so
+ * it sits inside the segment's hairline instead of painting over its inner half.
+ */
+export function NativeStaticTradeLineAccentRail({
+  x,
+  y,
+  height,
+  color,
+  rounded,
+}: {
+  x: number;
+  y: number;
+  height: number;
+  color: string;
+  rounded: boolean;
+}) {
+  const path = useMemo(
+    () =>
+      createNativeTradeLineBoxPath(
+        x + 0.5,
+        y + 0.5,
+        TRADE_LINE_ACCENT_RAIL_WIDTH,
+        Math.max(0, height - 1),
+        rounded ? 'left' : 'none',
+      ),
+    [height, rounded, x, y],
+  );
+
+  return <Path path={path} color={color} />;
 }
