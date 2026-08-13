@@ -789,7 +789,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeUserDrawingDefaultStylesByKind = nativeUserDrawingState.defaultStylesByKind;
   const applyNativeLayoutSettings = useCallback(
     async (settings: ChartSettings) => {
-      const nextSymbol = settings.symbol || symbol;
+      // The native chart is a controlled component: `symbol` is owned by the
+      // host, so a layout restores everything except which market to show.
+      // Honouring the saved symbol would push a market from whenever the layout
+      // was saved back into the host — usually from another exchange — and the
+      // host then corrects itself while the chart stays on a symbol its account
+      // cannot resolve, which reads as a chart that never loads.
+      const nextSymbol = propSymbol || settings.symbol || symbol;
       if (nextSymbol && nextSymbol !== chartApi.symbol()) {
         chartApi.setSymbol(nextSymbol);
       }
@@ -837,7 +843,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         applyNativeViewport(settings.viewport);
       }
     },
-    [applyNativeViewport, chartApi, chartStore, interval, replaceNativeUserDrawingState, symbol],
+    [applyNativeViewport, chartApi, chartStore, interval, propSymbol, replaceNativeUserDrawingState, symbol],
   );
   // Writes go straight to the store; the store listener above pushes the value
   // into effectiveRenderOptions, so the sheet does not touch rendering itself.
