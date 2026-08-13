@@ -7,9 +7,10 @@ import type { ResolutionInput } from './utils/normalizeResolution';
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_COLOR,
+  DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
   DEFAULT_TRADE_LINE_LABEL_FONT,
-  DEFAULT_TRADE_LINE_SELL_COLOR,
+  DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR,
 } from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
@@ -126,8 +127,6 @@ const tealchartApiLineRenderSnapshotReaders = new WeakMap<TealchartApi, () => Te
 
 type AdapterCallback = OemsActionCallback;
 
-const DEFAULT_TRADE_LINE_DARK_TEXT_COLOR = '#0f1720';
-const DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR = '#ffffff';
 const DEFAULT_TRADE_ORDER_LINE_STYLE = 4;
 const DEFAULT_TRADE_POSITION_LINE_STYLE = 0;
 const DEFAULT_TRADE_LINE_WIDTH = 1;
@@ -164,46 +163,44 @@ interface PositionLineStyleDefaults {
   reverseButtonBorderColor: string;
 }
 
-function isDefaultSellTradeLineColor(color: string): boolean {
-  return color.toLowerCase() === DEFAULT_TRADE_LINE_SELL_COLOR.toLowerCase();
-}
-
 function getOrderLineStyleDefaults(lineColor: string): OrderLineStyleDefaults {
   return {
     bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     bodyTextColor: lineColor,
-    bodyBorderColor: lineColor,
+    bodyBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
     bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
     quantityBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    quantityTextColor: lineColor,
-    quantityBorderColor: lineColor,
+    quantityTextColor: DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR,
+    quantityBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
     quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
     cancelButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     cancelButtonIconColor: lineColor,
-    cancelButtonBorderColor: lineColor,
+    cancelButtonBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   };
 }
 
+/**
+ * The quantity used to be a solid slab of the side color. Together with a
+ * filled PnL segment and filled TP/SL buttons that left the label with four
+ * competing fills and no hierarchy, so it now sits on the same ground as
+ * everything else and the side color arrives via the leading accent rail.
+ */
 function getPositionLineStyleDefaults(lineColor: string): PositionLineStyleDefaults {
-  const quantityTextColor = isDefaultSellTradeLineColor(lineColor)
-    ? DEFAULT_TRADE_LINE_LIGHT_TEXT_COLOR
-    : DEFAULT_TRADE_LINE_DARK_TEXT_COLOR;
-
   return {
     bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     bodyTextColor: lineColor,
-    bodyBorderColor: lineColor,
+    bodyBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
     bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
-    quantityBackgroundColor: lineColor,
-    quantityTextColor,
-    quantityBorderColor: lineColor,
+    quantityBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
+    quantityTextColor: DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR,
+    quantityBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
     quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
     closeButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     closeButtonIconColor: lineColor,
-    closeButtonBorderColor: lineColor,
+    closeButtonBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
     reverseButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     reverseButtonIconColor: lineColor,
-    reverseButtonBorderColor: lineColor,
+    reverseButtonBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   };
 }
 

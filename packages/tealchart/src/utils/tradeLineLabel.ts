@@ -7,10 +7,24 @@ import type {
 } from '../types';
 
 import {
-  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
-  DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+  DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   STOP_LOSS_COLOR,
+  TRADE_LINE_SEGMENT_TINT_ALPHA,
+  TRADE_LINE_WARM_SEGMENT_TINT_ALPHA,
 } from '../constants';
+import { tintOver } from './colorAlpha';
+
+/**
+ * Puts the line's side color on the leading edge of the assembled label.
+ *
+ * Deliberately applied after assembly rather than inside buildBodySegments: an
+ * order with no body text contributes no segment, and the rail belongs to
+ * whichever segment ends up first.
+ */
+function withLeadingAccent(segments: ChartLabelSegment[], accentColor: string): ChartLabelSegment[] {
+  if (!segments.length || !accentColor) return segments;
+  return [{ ...segments[0], accentColor }, ...segments.slice(1)];
+}
 
 export interface OrderedTradeLineButtons<T extends ChartLabelButton> {
   inlineButtons: T[];
@@ -36,13 +50,13 @@ export function orderTradeLineButtonsForDisplay<T extends ChartLabelButton>(butt
 
 export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveColor: string): ChartLineLabel {
   const takeProfitColor = order.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  const takeProfitTextColor = order.brackets?.takeProfitTextColor ?? takeProfitColor;
   const stopLossColor = order.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = order.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  const stopLossTextColor = order.brackets?.stopLossTextColor ?? stopLossColor;
 
   return {
     offsetPercent: order.lineLength,
-    segments: [
+    segments: withLeadingAccent([
       ...buildBodySegments(
         order.text,
         order.textShort,
@@ -57,10 +71,11 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
         order.quantityTextColor,
         order.quantityBorderColor,
       ),
-    ],
+    ], order.lineColor),
     buttons: [
       ...buildBracketButtons(
         order.brackets !== null,
+        order.bodyBackgroundColor,
         takeProfitColor,
         takeProfitTextColor,
         stopLossColor,
@@ -94,13 +109,13 @@ export function resolvePositionTradeLineLabel(
         ? negativeColor
         : undefined;
   const takeProfitColor = position.brackets?.takeProfitColor ?? positiveColor;
-  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  const takeProfitTextColor = position.brackets?.takeProfitTextColor ?? takeProfitColor;
   const stopLossColor = position.brackets?.stopLossColor ?? STOP_LOSS_COLOR;
-  const stopLossTextColor = position.brackets?.stopLossTextColor ?? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
+  const stopLossTextColor = position.brackets?.stopLossTextColor ?? stopLossColor;
 
   return {
     offsetPercent: position.lineLength,
-    segments: [
+    segments: withLeadingAccent([
       ...buildBodySegments(
         position.text,
         position.textShort,
@@ -120,13 +135,17 @@ export function resolvePositionTradeLineLabel(
             {
               text: position.pnl,
               textShort: position.pnlShort || undefined,
-              backgroundColor: pnlStateColor ?? position.lineColor,
-              textColor: pnlStateColor ? DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR : position.bodyTextColor,
-              borderColor: position.lineColor,
+              backgroundColor: tintOver(
+                position.bodyBackgroundColor,
+                pnlStateColor ?? position.lineColor,
+                TRADE_LINE_SEGMENT_TINT_ALPHA,
+              ),
+              textColor: pnlStateColor ?? position.bodyTextColor,
+              borderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
             },
           ]
         : []),
-    ],
+    ], position.lineColor),
     buttons: [
       ...(position.reversible
         ? [
@@ -154,6 +173,7 @@ export function resolvePositionTradeLineLabel(
         : []),
       ...buildBracketButtons(
         position.brackets !== null,
+        position.bodyBackgroundColor,
         takeProfitColor,
         takeProfitTextColor,
         stopLossColor,
@@ -184,6 +204,7 @@ function buildBodySegments(
 
 function buildBracketButtons(
   enabled: boolean,
+  labelBackgroundColor: string,
   takeProfitColor: string,
   takeProfitTextColor: string,
   stopLossColor: string,
@@ -194,17 +215,17 @@ function buildBracketButtons(
     {
       type: 'tp',
       icon: 'TP',
-      backgroundColor: takeProfitColor,
+      backgroundColor: tintOver(labelBackgroundColor, takeProfitColor, TRADE_LINE_SEGMENT_TINT_ALPHA),
       iconColor: takeProfitTextColor,
-      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+      borderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
       tooltip: 'Drag to set Take Profit',
     },
     {
       type: 'sl',
       icon: 'SL',
-      backgroundColor: stopLossColor,
+      backgroundColor: tintOver(labelBackgroundColor, stopLossColor, TRADE_LINE_WARM_SEGMENT_TINT_ALPHA),
       iconColor: stopLossTextColor,
-      borderColor: DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR,
+      borderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
       tooltip: 'Drag to set Stop Loss',
     },
   ];

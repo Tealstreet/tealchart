@@ -5,7 +5,7 @@ import { Group, Skia } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { NativeAnimatedSkiaText } from './nativeSkiaText';
-import { NativeStaticTradeLineBox } from './NativeTradeLineBox';
+import { NativeStaticTradeLineAccentRail, NativeStaticTradeLineBox } from './NativeTradeLineBox';
 import { NativeTradeLineButtonIcon } from './NativeTradeLineButtonIcon';
 
 export function NativeTradeLineLabelBody({
@@ -75,6 +75,15 @@ function renderNativeTradeLineLabelBodyContent({
           borderColor={segment.borderColor}
           corners={segment.corners}
         />
+        {segment.accentColor ? (
+          <NativeStaticTradeLineAccentRail
+            x={segment.x}
+            y={0}
+            height={tradeLabelHeight}
+            color={segment.accentColor}
+            rounded={index === 0}
+          />
+        ) : null}
         <NativeAnimatedSkiaText
           x={segment.textX}
           y={textY}
