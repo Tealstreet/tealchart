@@ -4,7 +4,13 @@ import type { ComponentOptions } from './Component';
 
 import type { ChartChromeMetrics } from '../layout/chartGeometry';
 
-import { computeTopLeftLegendRect, rect, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
+import {
+  computeTopLeftLegendRect,
+  LEFT_TOOL_RAIL_ANIMATION_DURATION_MS,
+  LEFT_TOOL_RAIL_ANIMATION_EASING,
+  rect,
+  WEB_CHART_CHROME_METRICS,
+} from '../layout/chartGeometry';
 import { safeToFixed } from '../utils/safeNumber';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
@@ -109,6 +115,10 @@ const styles = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '12px',
     userSelect: 'none',
+    // The legend sits to the right of the left tool rail, so collapsing the
+    // rail moves it. Matching the rail's own timing makes the two read as one
+    // motion instead of the legend jumping after the rail has gone.
+    transition: `left ${LEFT_TOOL_RAIL_ANIMATION_DURATION_MS}ms ${LEFT_TOOL_RAIL_ANIMATION_EASING}`,
   } as Partial<CSSStyleDeclaration>,
 
   mainRow: {

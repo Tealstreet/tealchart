@@ -345,7 +345,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(collapsedRail?.getAttribute('aria-expanded')).toBe('false');
     expect(collapsedRail?.style.transition).toContain('transform');
     expect(collapsedRail?.style.width).toBe('50px');
-    expect(topBar.getElement().style.marginLeft).toBe('34px');
+    expect(topBar.getElement().style.marginLeft).toBe('14px');
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool category list"]')).toBeNull();
     const expandButton = document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]');
     expect(expandButton).not.toBeNull();
@@ -370,7 +370,7 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.style.transform).toBe(
       'translateX(-36px)',
     );
-    expect(restoredTopBar.getElement().style.marginLeft).toBe('34px');
+    expect(restoredTopBar.getElement().style.marginLeft).toBe('14px');
     expect(document.querySelector<HTMLButtonElement>('button[aria-label="Expand drawing toolbar"]')).not.toBeNull();
 
     restoredTopBar.unmount();
