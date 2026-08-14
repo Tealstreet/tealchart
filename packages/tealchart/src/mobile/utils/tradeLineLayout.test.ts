@@ -450,6 +450,96 @@ describe('native trade line layout', () => {
     expect(geometry?.segments[1]?.displayText).toBe('W');
   });
 
+  // The gap used to appear only when a cancel/close/reverse button happened to
+  // be shown, so the same label spaced itself differently depending on which
+  // actions were available. Web has always gapped a leading bracket group.
+  it('stands the bracket buttons off the label whether or not action buttons precede them', () => {
+    const gapBefore = (line: PositionLineRenderData) => {
+      const [geometry] = buildNativeTradeLineGeometries([], [line], {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      });
+      const buttons = geometry?.buttons ?? [];
+      const firstBracket = buttons.find((button) => button.type === 'tp');
+      const previous = buttons[buttons.indexOf(firstBracket!) - 1];
+      const segments = geometry?.segments ?? [];
+      const leftEdge = previous
+        ? previous.x + previous.width
+        : Math.max(...segments.map((segment) => segment.x + segment.width));
+
+      return { gap: (firstBracket?.x ?? 0) - leftEdge, geometry };
+    };
+
+    const withActions = gapBefore(
+      createPositionLine({ positionData: { entryPrice: 63600, isLong: true, notional: 2500 } }),
+    );
+    const withoutActions = gapBefore(
+      createPositionLine({
+        closeable: false,
+        reversible: false,
+        positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+      }),
+    );
+
+    expect(withActions.geometry?.buttons.map((button) => button.type)).toContain('reverse');
+    expect(withoutActions.geometry?.buttons.map((button) => button.type)).not.toContain('reverse');
+    expect(withoutActions.gap).toBe(withActions.gap);
+    expect(withoutActions.gap).toBeGreaterThan(0);
+  });
+
+  // The gap has to be reserved in the requested label width, not taken out of
+  // the text: measuring without it truncated the PnL segment in exactly the
+  // case the gap was added for.
+  it('widens the label for the gap instead of eating the segment text', () => {
+    const render = (overrides: Partial<PositionLineRenderData>) => {
+      const [geometry] = buildNativeTradeLineGeometries([], [
+        createPositionLine({
+          positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+          ...overrides,
+        }),
+      ], {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      });
+      return geometry?.segments.map((segment) => segment.displayText ?? segment.text) ?? [];
+    };
+
+    expect(render({ closeable: false, reversible: false })).toEqual(render({}));
+  });
+
+  // Standing off the segments means the two are separate pills, so each closes
+  // its own edge instead of running square into the gap between them.
+  it('rounds the seam it just opened between the segments and the brackets', () => {
+    const [geometry] = buildNativeTradeLineGeometries([], [
+      createPositionLine({
+        closeable: false,
+        reversible: false,
+        positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+      }),
+    ], {
+      dimensions,
+      pricePrecision: 0.1,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    });
+    const segments = geometry?.segments ?? [];
+    const buttons = geometry?.buttons ?? [];
+
+    expect(segments[segments.length - 1]?.corners).toBe('right');
+    expect(buttons[0]?.corners).toBe('left');
+    expect(buttons[buttons.length - 1]?.corners).toBe('right');
+  });
+
   it('builds stable position geometry with reverse, close, bracket actions, and no order drag zone', () => {
     const [geometry] = buildNativeTradeLineGeometries([], [
       createPositionLine({
