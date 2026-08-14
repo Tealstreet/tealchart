@@ -291,6 +291,49 @@ describe('native trade and price line layers', () => {
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:05');
   });
 
+  // `filled` is web's flag for a solid tag rather than an outline one. Native
+  // ignored it and always filled, so the tags sat over the grid labels behind.
+  it('leaves the price-axis tag body unfilled unless the label asks to be filled', () => {
+    const axisFont = matchFont({ fontSize: 11 });
+    const base: PriceLine = {
+      id: 'last-price',
+      price: 63777,
+      lineStyle: 'dotted',
+      color: '#12c48b',
+      label: { primaryText: '63,777.0' },
+      renderLineOnCanvas: true,
+      showAxisTag: true,
+    };
+    const render = (line: PriceLine) =>
+      AnimatedPriceLine({
+        axisFont,
+        bracketDragState: {
+          activeObjectId: shared(null),
+          activeObjectType: shared(null),
+          activeActionType: shared(null),
+          activePrice: shared(0),
+          startPrice: shared(0),
+          startY: shared(0),
+        },
+        frame,
+        line,
+        nowMs: shared(0),
+        pricePrecision: 0.1,
+        resolvedPriceAxisTags: shared([]),
+        sharedViewport,
+      });
+
+    const outline = collectElementsByType(render(base), NativePriceAxisTagBox)[0];
+    const solid = collectElementsByType(
+      render({ ...base, label: { ...base.label, filled: true } }),
+      NativePriceAxisTagBox,
+    )[0];
+
+    expect(outline.props.backgroundColor).toBeUndefined();
+    expect(outline.props.borderColor).toBe('#12c48b');
+    expect(solid.props.backgroundColor).toBe('#12c48b');
+  });
+
   it('uses resolved native price-axis tag centers for price-line labels', () => {
     const axisFont = matchFont({ fontSize: 11 });
     const line: PriceLine = {
