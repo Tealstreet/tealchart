@@ -5,6 +5,7 @@ import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import { matchFont, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
+import { DEFAULT_TRADE_LINE_LABEL_COLOR } from '../../constants';
 import { getNativePriceLineTagId, getNativeTradeLineTagId } from '../utils/priceAxisTagSources';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import {
@@ -293,7 +294,9 @@ describe('native trade and price line layers', () => {
 
   // `filled` is web's flag for a solid tag rather than an outline one. Native
   // ignored it and always filled, so the tags sat over the grid labels behind.
-  it('leaves the price-axis tag body unfilled unless the label asks to be filled', () => {
+  // Unfilled still keeps the shared dark backing every other tag in the lane
+  // uses - without it the grid reads straight through the tag.
+  it('backs an unfilled price-axis tag like every other tag in the lane', () => {
     const axisFont = matchFont({ fontSize: 11 });
     const base: PriceLine = {
       id: 'last-price',
@@ -329,7 +332,7 @@ describe('native trade and price line layers', () => {
       NativePriceAxisTagBox,
     )[0];
 
-    expect(outline.props.backgroundColor).toBeUndefined();
+    expect(outline.props.backgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(outline.props.borderColor).toBe('#12c48b');
     expect(solid.props.backgroundColor).toBe('#12c48b');
   });
