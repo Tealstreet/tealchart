@@ -3,14 +3,16 @@ import type { RenderOptions } from '../../types';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
 import { Group, Path as SkiaPath } from '@shopify/react-native-skia';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   getNativeLiveCandleGeometry,
+  getNativeLiveCandlesPath,
   getNativeLiveVolumeGeometry,
   NativeCandleVolumeLayer,
 } from './NativeCandleVolumeLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import { createNativeChartProjection } from './nativeProjection';
 
 function shared<T>(value: T) {
   return { value };
@@ -169,6 +171,62 @@ describe('NativeCandleVolumeLayer', () => {
     expect(downVolumeGeometry.bodyWidth).toBe(downGeometry.bodyWidth);
     expect(downVolumeGeometry.bodyY + downVolumeGeometry.bodyHeight).toBe(frame.mainPane.bottom);
     expect(downVolumeGeometry.bodyHeight).toBe(80);
+  });
+
+  // Each SkPath registers with Skia's runtime lifecycle monitor and is later
+  // finalized by Hermes' GC, so a path per candle scaled that traffic with the
+  // bar count on every animated frame. These pin the batching in place.
+  it('batches candles into one path per side however many bars are visible', () => {
+    const manyBars: NativeVisibleBar[] = Array.from({ length: 24 }, (_, index) => ({
+      ...bars[index % 2],
+      time: 15_000 * (index + 1),
+      sourceIndex: index,
+    }));
+    const wideViewport = { ...sharedViewport, endTime: shared(400_000) };
+    const rendered = renderFunctionChildren(
+      NativeCandleVolumeLayer({
+        frame,
+        options,
+        sharedViewport: wideViewport,
+        visibleBars: manyBars,
+        volumeHeight: 80,
+      }),
+    );
+
+    expect(collectElementsByType(rendered[0], SkiaPath)).toHaveLength(1);
+    expect(collectElementsByType(rendered[1], SkiaPath)).toHaveLength(1);
+    expect(collectElementsByType(rendered[0], SkiaPath)[0].props.color).toBe('#12c48b');
+    expect(collectElementsByType(rendered[1], SkiaPath)[0].props.color).toBe('#f04465');
+  });
+
+  it('batches projected candles into one path per side as well', () => {
+    const projection = createNativeChartProjection({
+      frame,
+      paneRanges: { main: { yMin: 63000, yMax: 64000 } },
+      viewport: { startTime: 0, endTime: 60_000 },
+    });
+    const rendered = renderFunctionChildren(
+      NativeCandleVolumeLayer({
+        frame,
+        options,
+        sharedViewport,
+        staticProjection: projection,
+        visibleBars: bars,
+        volumeHeight: 80,
+      }),
+    );
+
+    expect(collectElementsByType(rendered[0], SkiaPath)).toHaveLength(1);
+    expect(collectElementsByType(rendered[1], SkiaPath)).toHaveLength(1);
+  });
+
+  it('routes each bar into the path for its own side', () => {
+    // appendNativeRectPath closes once per rect: a visible candle is wick + body.
+    const upPath = getNativeLiveCandlesPath({ bars, frame, sharedViewport, side: 'up' });
+    const downPath = getNativeLiveCandlesPath({ bars, frame, sharedViewport, side: 'down' });
+
+    expect(vi.mocked(upPath.close).mock.calls).toHaveLength(2);
+    expect(vi.mocked(downPath.close).mock.calls).toHaveLength(2);
   });
 
   it('keeps OHLCV visible when paint extends into the right price-axis lane', () => {

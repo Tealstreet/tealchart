@@ -32,7 +32,7 @@ interface NativeLiveVolumeGeometry {
   opacity: number;
 }
 
-type NativeVolumePathSide = 'up' | 'down';
+type NativeOhlcvPathSide = 'up' | 'down';
 
 function appendNativeRectPath(path: SkPath, x: number, y: number, width: number, height: number): void {
   'worklet';
@@ -42,6 +42,27 @@ function appendNativeRectPath(path: SkPath, x: number, y: number, width: number,
   path.lineTo(x + width, y + height);
   path.lineTo(x, y + height);
   path.close();
+}
+
+function appendNativeCandlePath(path: SkPath, geometry: NativeLiveCandleGeometry): void {
+  'worklet';
+  if (!geometry.visible) return;
+
+  appendNativeRectPath(
+    path,
+    geometry.x - 0.5,
+    geometry.wickTopY,
+    1,
+    Math.max(1, geometry.wickBottomY - geometry.wickTopY),
+  );
+  if (geometry.bodyVisible) {
+    appendNativeRectPath(path, geometry.bodyX, geometry.bodyY, geometry.bodyWidth, geometry.bodyHeight);
+  }
+}
+
+function isNativeBarOnPathSide(bar: NativeVisibleBar, side: NativeOhlcvPathSide): boolean {
+  'worklet';
+  return side === 'up' ? bar.close >= bar.open : bar.close < bar.open;
 }
 
 function isNativeOhlcvHorizontallyVisible({
@@ -193,62 +214,58 @@ export function getNativeProjectedVolumeGeometry({
   };
 }
 
-function getNativeLiveCandlePath({
-  bar,
+/**
+ * One path for every candle of a side, not one path per candle.
+ *
+ * Each SkPath is a native object that registers with Skia's runtime lifecycle
+ * monitor and is torn down by Hermes' GC later, so a path per candle put a few
+ * hundred allocations through that registry every animated frame. Batching by
+ * side keeps the drawn result identical - the colour was already only ever a
+ * function of `close >= open` - while making the per-frame cost independent of
+ * how many bars are on screen.
+ */
+export function getNativeLiveCandlesPath({
+  bars,
   frame,
   sharedViewport,
+  side,
 }: {
-  bar: NativeVisibleBar;
+  bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   sharedViewport: NativeViewportSharedValues;
+  side: NativeOhlcvPathSide;
 }): SkPath {
   'worklet';
-  const geometry = getNativeLiveCandleGeometry({ bar, frame, sharedViewport });
   const path = Skia.Path.Make();
-  if (!geometry.visible) return path;
 
-  appendNativeRectPath(
-    path,
-    geometry.x - 0.5,
-    geometry.wickTopY,
-    1,
-    Math.max(1, geometry.wickBottomY - geometry.wickTopY),
-  );
-  if (geometry.bodyVisible) {
-    appendNativeRectPath(path, geometry.bodyX, geometry.bodyY, geometry.bodyWidth, geometry.bodyHeight);
+  for (let index = 0; index < bars.length; index += 1) {
+    const bar = bars[index];
+    if (!isNativeBarOnPathSide(bar, side)) continue;
+    appendNativeCandlePath(path, getNativeLiveCandleGeometry({ bar, frame, sharedViewport }));
   }
+
   return path;
 }
 
-function getNativeProjectedCandlePath({
-  bar,
+export function getNativeProjectedCandlesPath({
+  bars,
   frame,
   projection,
+  side,
 }: {
-  bar: NativeVisibleBar;
+  bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   projection: NativeChartProjection;
+  side: NativeOhlcvPathSide;
 }): SkPath {
-  const geometry = getNativeProjectedCandleGeometry({ bar, frame, projection });
   const path = Skia.Path.Make();
-  if (!geometry.visible) return path;
 
-  appendNativeRectPath(
-    path,
-    geometry.x - 0.5,
-    geometry.wickTopY,
-    1,
-    Math.max(1, geometry.wickBottomY - geometry.wickTopY),
-  );
-  if (geometry.bodyVisible) {
-    appendNativeRectPath(path, geometry.bodyX, geometry.bodyY, geometry.bodyWidth, geometry.bodyHeight);
+  for (const bar of bars) {
+    if (!isNativeBarOnPathSide(bar, side)) continue;
+    appendNativeCandlePath(path, getNativeProjectedCandleGeometry({ bar, frame, projection }));
   }
-  return path;
-}
 
-function shouldNativeVolumePathRenderBar(bar: NativeVisibleBar, side: NativeVolumePathSide): boolean {
-  'worklet';
-  return side === 'up' ? bar.close >= bar.open : bar.close < bar.open;
+  return path;
 }
 
 export function getNativeLiveVolumePath({
@@ -261,7 +278,7 @@ export function getNativeLiveVolumePath({
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   sharedViewport: NativeViewportSharedValues;
-  side: NativeVolumePathSide;
+  side: NativeOhlcvPathSide;
   volumeHeight: number;
 }): SkPath {
   'worklet';
@@ -272,7 +289,7 @@ export function getNativeLiveVolumePath({
 
   for (let index = 0; index < bars.length; index += 1) {
     const bar = bars[index];
-    if (!shouldNativeVolumePathRenderBar(bar, side)) continue;
+    if (!isNativeBarOnPathSide(bar, side)) continue;
 
     const geometry = getNativeLiveVolumeGeometry({
       bar,
@@ -299,14 +316,14 @@ export function getNativeProjectedVolumePath({
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   projection: NativeChartProjection;
-  side: NativeVolumePathSide;
+  side: NativeOhlcvPathSide;
   volumeHeight: number;
 }): SkPath {
   const path = Skia.Path.Make();
   const maxVolume = getNativeViewportMaxVolume(bars, projection.viewport.startTime, projection.viewport.endTime);
 
   for (const bar of bars) {
-    if (!shouldNativeVolumePathRenderBar(bar, side)) continue;
+    if (!isNativeBarOnPathSide(bar, side)) continue;
 
     const geometry = getNativeProjectedVolumeGeometry({ bar, frame, maxVolume, projection, volumeHeight });
     if (geometry.opacity <= 0 || geometry.bodyWidth <= 0 || geometry.bodyHeight <= 0) continue;
@@ -316,42 +333,47 @@ export function getNativeProjectedVolumePath({
   return path;
 }
 
-function NativeLiveCandle({
-  bar,
+function NativeLiveCandlePath({
+  bars,
   frame,
   options,
   sharedViewport,
+  side,
 }: {
-  bar: NativeVisibleBar;
+  bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   options: RenderOptions;
   sharedViewport: NativeViewportSharedValues;
+  side: NativeOhlcvPathSide;
 }) {
-  const candleColor = bar.close >= bar.open ? options.upColor : options.downColor;
+  const candleColor = side === 'up' ? options.upColor : options.downColor;
   const path = useDerivedValue(() =>
-    getNativeLiveCandlePath({
-      bar,
+    getNativeLiveCandlesPath({
+      bars,
       frame,
       sharedViewport,
+      side,
     }),
   );
 
   return <SkiaPath path={path} color={candleColor} />;
 }
 
-function NativeProjectedCandle({
-  bar,
+function NativeProjectedCandlePath({
+  bars,
   frame,
   options,
   projection,
+  side,
 }: {
-  bar: NativeVisibleBar;
+  bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   options: RenderOptions;
   projection: NativeChartProjection;
+  side: NativeOhlcvPathSide;
 }) {
-  const candleColor = bar.close >= bar.open ? options.upColor : options.downColor;
-  const path = getNativeProjectedCandlePath({ bar, frame, projection });
+  const candleColor = side === 'up' ? options.upColor : options.downColor;
+  const path = getNativeProjectedCandlesPath({ bars, frame, projection, side });
 
   return <SkiaPath path={path} color={candleColor} />;
 }
@@ -368,7 +390,7 @@ function NativeLiveVolumePath({
   frame: NativeChartFrame;
   options: RenderOptions;
   sharedViewport: NativeViewportSharedValues;
-  side: NativeVolumePathSide;
+  side: NativeOhlcvPathSide;
   volumeHeight: number;
 }) {
   const candleColor = side === 'up' ? options.upColor : options.downColor;
@@ -397,7 +419,7 @@ function NativeProjectedVolumePath({
   frame: NativeChartFrame;
   options: RenderOptions;
   projection: NativeChartProjection;
-  side: NativeVolumePathSide;
+  side: NativeOhlcvPathSide;
   volumeHeight: number;
 }) {
   const candleColor = side === 'up' ? options.upColor : options.downColor;
@@ -426,15 +448,20 @@ export function NativeCandleVolumeLayer({
   if (staticProjection) {
     return (
       <Group clip={ohlcvPrimitiveClip}>
-        {visibleBars.map((bar) => (
-          <NativeProjectedCandle
-            key={`candle-${bar.time}`}
-            bar={bar}
-            frame={frame}
-            options={options}
-            projection={staticProjection}
-          />
-        ))}
+        <NativeProjectedCandlePath
+          bars={visibleBars}
+          frame={frame}
+          options={options}
+          projection={staticProjection}
+          side="up"
+        />
+        <NativeProjectedCandlePath
+          bars={visibleBars}
+          frame={frame}
+          options={options}
+          projection={staticProjection}
+          side="down"
+        />
         {volumeHeight > 0 && (
           <>
             <NativeProjectedVolumePath
@@ -461,15 +488,20 @@ export function NativeCandleVolumeLayer({
 
   return (
     <Group clip={ohlcvPrimitiveClip}>
-      {visibleBars.map((bar) => (
-        <NativeLiveCandle
-          key={`candle-${bar.time}`}
-          bar={bar}
-          frame={frame}
-          options={options}
-          sharedViewport={sharedViewport}
-        />
-      ))}
+      <NativeLiveCandlePath
+        bars={visibleBars}
+        frame={frame}
+        options={options}
+        sharedViewport={sharedViewport}
+        side="up"
+      />
+      <NativeLiveCandlePath
+        bars={visibleBars}
+        frame={frame}
+        options={options}
+        sharedViewport={sharedViewport}
+        side="down"
+      />
       {volumeHeight > 0 && (
         <>
           <NativeLiveVolumePath
