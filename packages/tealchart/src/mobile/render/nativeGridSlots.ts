@@ -31,10 +31,24 @@ function getNativePriceSpacingAtIndex(magnitude: number, index: number): number 
   return multiplier * 10 ** (magnitude + powerOffset);
 }
 
+/**
+ * The finest spacing on the 1/2/5 ladder that still fits, which is the densest
+ * readable axis.
+ *
+ * This used to require the label count to land inside `[maxLabels / 2,
+ * maxLabels]`, then fall back to scanning the ladder *downwards* for anything
+ * with two or more labels. The window is 2x wide and consecutive ladder steps
+ * differ by up to 2.5x, so a step could clear the window entirely - and the
+ * downward fallback then answered with the coarsest spacing that qualified,
+ * i.e. the emptiest possible axis. That is why the price axis sometimes showed
+ * a single label until you scrunched the range and knocked it into the window.
+ *
+ * `maxLabels` comes from the minimum label spacing, so it is the only bound
+ * that was ever load-bearing; a floor on the count is what caused the misses.
+ */
 export function getNativePriceGridSpacing(priceMin: number, priceMax: number, priceHeight: number): number {
   'worklet';
   const maxLabels = Math.max(2, Math.floor(priceHeight / NATIVE_PRICE_GRID_MIN_LABEL_SPACING));
-  const minLabels = Math.max(4, Math.floor(maxLabels * 0.5));
   const priceRange = priceMax - priceMin;
   if (priceRange <= 0) return 0;
 
@@ -43,17 +57,10 @@ export function getNativePriceGridSpacing(priceMin: number, priceMax: number, pr
     const spacing = getNativePriceSpacingAtIndex(magnitude, index);
     const firstMarker = Math.floor(priceMin / spacing) * spacing;
     const count = Math.floor((priceMax + spacing * 0.01 - firstMarker) / spacing) + 1;
-    if (count >= minLabels && count <= maxLabels) return spacing;
+    if (count <= maxLabels) return spacing;
   }
 
-  for (let index = 10; index >= 0; index -= 1) {
-    const spacing = getNativePriceSpacingAtIndex(magnitude, index);
-    const firstMarker = Math.floor(priceMin / spacing) * spacing;
-    const count = Math.floor((priceMax + spacing * 0.01 - firstMarker) / spacing) + 1;
-    if (count <= maxLabels && count >= 2) return spacing;
-  }
-
-  return priceRange / Math.max(minLabels, 4);
+  return priceRange / 2;
 }
 
 export function getNativePriceGridSlot(input: {

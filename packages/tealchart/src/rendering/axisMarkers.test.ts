@@ -29,6 +29,48 @@ describe('axis marker generation', () => {
     ]);
   });
 
+  // The ladder steps by up to 2.5x and the old acceptance window was 2x wide,
+  // so a step could clear it - and the reversed fallback then answered with the
+  // coarsest spacing going, leaving one label on the axis.
+  it('fills the axis on ranges that fall between two ladder steps', () => {
+    const viewport: Viewport = {
+      startTime: 0,
+      endTime: 1,
+      priceMin: 104_352.5,
+      priceMax: 104_647.5,
+    };
+
+    const markers = generatePriceMarkers(viewport, 380);
+
+    // spacing 20 overshoots at 16 labels, spacing 50 is the finest that fits.
+    expect(markers.length).toBe(6);
+    expect(markers[1] - markers[0]).toBe(50);
+  });
+
+  it('never returns a near-empty axis across a sweep of price magnitudes', () => {
+    const priceHeight = 380;
+    const maxLabels = Math.floor(priceHeight / 24);
+
+    for (const mid of [0.0312, 0.87, 3.27, 47.2, 487.5, 3120, 63_400, 104_500]) {
+      for (let fraction = 0.002; fraction <= 0.6; fraction *= 1.09) {
+        const range = mid * fraction;
+        const viewport: Viewport = {
+          startTime: 0,
+          endTime: 1,
+          priceMin: mid - range / 2,
+          priceMax: mid + range / 2,
+        };
+
+        const inRange = generatePriceMarkers(viewport, priceHeight).filter(
+          (price) => price >= viewport.priceMin && price <= viewport.priceMax,
+        );
+
+        expect(inRange.length).toBeLessThanOrEqual(maxLabels);
+        expect(inRange.length).toBeGreaterThanOrEqual(4);
+      }
+    }
+  });
+
   it('aligns time markers to absolute interval boundaries', () => {
     const startTime = Date.UTC(2026, 6, 24, 0, 0, 0);
     const endTime = Date.UTC(2026, 6, 24, 16, 0, 0);
