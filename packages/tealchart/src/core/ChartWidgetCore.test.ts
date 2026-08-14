@@ -466,3 +466,93 @@ describe('ChartWidgetCore data identity', () => {
     expect(historyRequests).toHaveLength(2);
   });
 });
+
+// A datafeed's onReady is typically a deferred callback returning a static
+// config, and nothing in the resolve or load path reads that config. Waiting
+// for it cost 0.7-1.1s on a mobile warm start, where the main thread is
+// saturated at exactly the moment the chart mounts.
+describe('ChartWidgetCore first load', () => {
+  function createDeferredReadyDatafeed() {
+    const controlled = createControlledDatafeed();
+    let readyCallback: ((config: { supported_resolutions?: ResolutionString[] }) => void) | null = null;
+
+    return {
+      ...controlled,
+      datafeed: {
+        ...controlled.datafeed,
+        onReady(callback: (config: { supported_resolutions?: ResolutionString[] }) => void) {
+          readyCallback = callback;
+        },
+      } as IBasicDataFeed,
+      fireReady: (resolutions: ResolutionString[]) => readyCallback?.({ supported_resolutions: resolutions }),
+    };
+  }
+
+  it('requests bars without waiting for the datafeed to report ready', () => {
+    const { datafeed, historyRequests } = createDeferredReadyDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    core.initialize();
+
+    expect(historyRequests).toHaveLength(1);
+    expect(historyRequests[0]!.symbol).toBe('BTC');
+  });
+
+  it('still records supported resolutions when ready lands after the bars', () => {
+    const { datafeed, fireReady, historyRequests } = createDeferredReadyDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 5 * 60_000, 10));
+    fireReady(['1', '5'] as ResolutionString[]);
+
+    expect(core.getSupportedResolutions()).toEqual(['1', '5']);
+  });
+
+  // Resolving immediately makes this overlap likely: a host can call setSymbol
+  // in the same tick as initialize(), and the init resolve can land last.
+  it('discards an initial resolve that a later symbol change superseded', () => {
+    const controlled = createControlledDatafeed();
+    const pendingResolves: Array<{ symbol: string; onResolve: (info: LibrarySymbolInfo) => void }> = [];
+    const datafeed = {
+      ...controlled.datafeed,
+      resolveSymbol(symbolName: string, onResolve: (info: LibrarySymbolInfo) => void) {
+        pendingResolves.push({ symbol: symbolName, onResolve });
+      },
+    } as IBasicDataFeed;
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    core.initialize();
+    core.setSymbol('ETH');
+    pendingResolves[1]!.onResolve(makeSymbolInfo('ETH'));
+    pendingResolves[0]!.onResolve(makeSymbolInfo('BTC'));
+
+    expect(controlled.historyRequests).toHaveLength(1);
+    expect(controlled.historyRequests[0]!.symbol).toBe('ETH');
+  });
+});
+
+describe('ChartWidgetCore interval changes during a pending resolve', () => {
+  it('does not fetch the previous market under the new symbol', () => {
+    const controlled = createControlledDatafeed();
+    const pendingResolves: Array<{ symbol: string; onResolve: (info: LibrarySymbolInfo) => void }> = [];
+    const datafeed = {
+      ...controlled.datafeed,
+      resolveSymbol(symbolName: string, onResolve: (info: LibrarySymbolInfo) => void) {
+        pendingResolves.push({ symbol: symbolName, onResolve });
+      },
+    } as IBasicDataFeed;
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    core.initialize();
+    pendingResolves[0]!.onResolve(makeSymbolInfo('BTC'));
+    core.setSymbol('ETH');
+    core.setInterval('15');
+
+    expect(controlled.historyRequests.map((request) => request.symbol)).toEqual(['BTC']);
+
+    pendingResolves[1]!.onResolve(makeSymbolInfo('ETH'));
+
+    expect(controlled.historyRequests.map((request) => request.symbol)).toEqual(['BTC', 'ETH']);
+  });
+});

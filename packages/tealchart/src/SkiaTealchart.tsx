@@ -538,6 +538,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   useEffect(() => {
     if (chartReadyRef.current || isLoading || bars.length === 0) return;
     chartReadyRef.current = true;
+    console.log('[chartboot]', Date.now(), 'first-paint', bars.length);
     widgetEmitter.emit('chart_loaded');
   }, [bars.length, isLoading, widgetEmitter]);
 

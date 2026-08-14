@@ -544,55 +544,59 @@ export class TealchartWidget implements ITealchartWebWidget {
   // ============================================================================
 
   private _initialize(): void {
-    // Initialize datafeed
+    // The config only filters the timeframe selector, and nothing in the
+    // resolve or load path reads it, so the first bar load runs in parallel
+    // rather than queueing behind this callback. A datafeed's onReady is
+    // typically a setTimeout(0) returning a literal, and that hop cost 0.7-1.1s
+    // on a mobile warm start, where the main thread is saturated by account
+    // restore at exactly the moment the chart mounts.
     this._datafeed.onReady((config) => {
-      // Store supported resolutions from datafeed config (for filtering timeframe selector)
+      if (this._disposed) return;
       this._supportedResolutions = config.supported_resolutions ?? null;
+      this._ui?.setSupportedResolutions(this._supportedResolutions);
+    });
 
-      const resolveRequestId = ++this._resolveSymbolRequestId;
+    const resolveRequestId = ++this._resolveSymbolRequestId;
 
-      // Resolve symbol
-      this._datafeed.resolveSymbol(
-        this._initialResolveSymbol,
-        (symbolInfo) => {
-          if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
-            this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback (init)', {
-              symbol: symbolInfo.name,
-            });
-            return;
-          }
-          this._symbolInfo = symbolInfo;
-          this._chartApi.setSymbolInfo(symbolInfo);
-          // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
-          if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
-            this._renderOptions = {
-              ...this._renderOptions,
-              pricePrecision: 1 / symbolInfo.pricescale,
-            };
-          }
-          // Pass symbol/interval metadata for jailbreak indicators
+    // Resolve symbol
+    this._datafeed.resolveSymbol(
+      this._initialResolveSymbol,
+      (symbolInfo) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          this._logger?.debug(LogCategory.Widget, 'Discarded stale resolveSymbol callback (init)', {
+            symbol: symbolInfo.name,
+          });
+          return;
+        }
+        this._symbolInfo = symbolInfo;
+        this._chartApi.setSymbolInfo(symbolInfo);
+        // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
+        if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
           this._renderOptions = {
             ...this._renderOptions,
-            symbol: this._symbol,
-            resolutionString: this._interval,
-            exchange: ((symbolInfo as any).exchange || '').toLowerCase(),
+            pricePrecision: 1 / symbolInfo.pricescale,
           };
-          // Push supported resolutions to UI (filters timeframe selector)
-          this._ui?.setSupportedResolutions(this._supportedResolutions);
-          // Start loading bars immediately (don't wait for layout)
-          this._loadBars();
-          // Load active layout from adapter async (races with bar load)
-          this._loadLayoutFromAdapter();
-        },
-        (error) => {
-          if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
-            return;
-          }
-          this._logger?.error(LogCategory.Datafeed, 'Failed to resolve symbol', error);
-          this._setReady();
-        },
-      );
-    });
+        }
+        // Pass symbol/interval metadata for jailbreak indicators
+        this._renderOptions = {
+          ...this._renderOptions,
+          symbol: this._symbol,
+          resolutionString: this._interval,
+          exchange: ((symbolInfo as any).exchange || '').toLowerCase(),
+        };
+        // Start loading bars immediately (don't wait for layout)
+        this._loadBars();
+        // Load active layout from adapter async (races with bar load)
+        this._loadLayoutFromAdapter();
+      },
+      (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
+          return;
+        }
+        this._logger?.error(LogCategory.Datafeed, 'Failed to resolve symbol', error);
+        this._setReady();
+      },
+    );
   }
 
   /**
