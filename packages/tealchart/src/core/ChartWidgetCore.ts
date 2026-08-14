@@ -141,6 +141,9 @@ export class ChartWidgetCore {
   protected _symbol: string;
   protected _interval: ResolutionString;
   protected _symbolInfo: LibrarySymbolInfo | null = null;
+  // The symbol `_symbolInfo` was resolved for. `symbolInfo.name` cannot answer
+  // this: an exchange-prefixed request resolves to a clean-symbol name.
+  protected _symbolInfoSymbol: string | null = null;
   protected _bars: Bar[] = [];
   protected _viewport: Viewport | null = null;
   protected _plots: PlotOutput[] = [];
@@ -157,6 +160,7 @@ export class ChartWidgetCore {
   protected _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   protected _hasMoreHistoricalData = true;
   protected _loadBarsRequestId = 0;
+  protected _resolveSymbolRequestId = 0;
   protected _disposed = false;
 
   // Subscription tracking
@@ -205,24 +209,48 @@ export class ChartWidgetCore {
    */
   initialize(): void {
     if (this._disposed) return;
+    console.log('[chartboot]', Date.now(), 'core-initialize', this._symbol, this._interval);
+
+    // The config only feeds the timeframe selector, and nothing in the resolve
+    // or load path reads it — so the first bar load must not queue behind it.
+    // A datafeed's onReady is typically a setTimeout(0) returning a literal,
+    // and that hop cost 0.7-1.1s on a mobile warm start, where the main thread
+    // is saturated by account restore at exactly the moment the chart mounts.
     this._datafeed.onReady((config) => {
       if (this._disposed) return;
-      // Store supported resolutions from datafeed config
+      console.log('[chartboot]', Date.now(), 'datafeed-ready');
       this._supportedResolutions = config.supported_resolutions ?? null;
-      this._datafeed.resolveSymbol(
-        this._symbol,
-        (symbolInfo) => {
-          if (this._disposed) return;
-          this._symbolInfo = symbolInfo;
-          this._loadBars();
-        },
-        (error) => {
-          if (this._disposed) return;
-          console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
-          this._setLoading(false);
-        },
-      );
     });
+
+    this._resolveSymbolAndLoad(this._symbol);
+  }
+
+  /**
+   * Resolves a symbol and loads its bars, discarding a resolve that a newer one
+   * has superseded.
+   *
+   * The guard matters now that init resolves immediately: a host can call
+   * setSymbol in the same tick as initialize(), and without it the init
+   * callback can land last and load bars for the symbol the chart just left.
+   */
+  protected _resolveSymbolAndLoad(symbol: string): void {
+    const resolveRequestId = ++this._resolveSymbolRequestId;
+
+    this._datafeed.resolveSymbol(
+      symbol,
+      (symbolInfo) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
+        console.log('[chartboot]', Date.now(), 'symbol-resolved', symbol);
+        this._symbolInfo = symbolInfo;
+        this._symbolInfoSymbol = symbol;
+        this._loadBars();
+      },
+      (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
+        console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
+        this._setLoading(false);
+      },
+    );
   }
 
   /**
@@ -308,6 +336,12 @@ export class ChartWidgetCore {
   protected _loadBars(): void {
     if (this._disposed) return;
     if (!this._symbolInfo) return;
+    // An interval change loads directly, without resolving. If a symbol change
+    // is still resolving at that moment — a multi-second window on a cold
+    // exchange, where resolveSymbol polls for markets — the info in hand is the
+    // market we just left, and its bars would render under the new symbol. Its
+    // own resolve calls back here.
+    if (this._symbolInfoSymbol !== this._symbol) return;
 
     const requestId = ++this._loadBarsRequestId;
     this._setLoadingMoreBars(false);
@@ -329,11 +363,13 @@ export class ChartWidgetCore {
       firstDataRequest: true,
     };
 
+    console.log('[chartboot]', Date.now(), 'getbars-request', requestSymbol, requestInterval, countBack);
     this._datafeed.getBars(
       requestSymbolInfo,
       requestInterval,
       periodParams,
       (bars) => {
+        console.log('[chartboot]', Date.now(), 'getbars-response', requestSymbol, bars.length);
         if (this._disposed) return;
         if (requestId !== this._loadBarsRequestId) return;
         if (requestSymbol !== this._symbol || requestInterval !== this._interval) return;
@@ -577,19 +613,7 @@ export class ChartWidgetCore {
     this._clearQueuedLeftHistoryBackfill();
     this._setLoading(true);
 
-    this._datafeed.resolveSymbol(
-      symbol,
-      (symbolInfo) => {
-        if (this._disposed) return;
-        this._symbolInfo = symbolInfo;
-        this._loadBars();
-      },
-      (error) => {
-        if (this._disposed) return;
-        console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
-        this._setLoading(false);
-      },
-    );
+    this._resolveSymbolAndLoad(symbol);
   }
 
   setInterval(interval: ResolutionInput): void {
