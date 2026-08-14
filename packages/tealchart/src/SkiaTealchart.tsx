@@ -105,6 +105,7 @@ import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderMod
 import {
   createNativeChartLayoutSettings,
   resolveNativeDefaultLayoutPersistence,
+  shouldRestoreNativeLayoutViewport,
   useNativeLayoutPersistence,
 } from './mobile/useNativeLayoutPersistence';
 import { useNativeTealchartCoreRuntime } from './mobile/useNativeTealchartCoreRuntime';
@@ -839,7 +840,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         viewport: settings.viewport,
         volumeHeight: settings.volumeHeight,
       });
-      if (settings.viewport) {
+      const restoreViewport =
+        settings.viewport &&
+        shouldRestoreNativeLayoutViewport({ layoutSymbol: settings.symbol, symbol: nextSymbol });
+      if (restoreViewport) {
         applyNativeViewport(settings.viewport);
       }
     },
