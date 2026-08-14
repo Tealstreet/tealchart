@@ -41,6 +41,9 @@ import {
 import {
   computeLeftToolRailAvoidanceInset,
   computeTopLeftLegendRect,
+  LEFT_TOOL_RAIL_ANIMATION_DURATION_MS,
+  LEFT_TOOL_RAIL_ANIMATION_EASING,
+  LEFT_TOOL_RAIL_COLLAPSED_WIDTH,
   resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
@@ -165,9 +168,11 @@ const SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH = 304;
 const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
 const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
-const DRAWING_RAIL_ANIMATION_DURATION_MS = 160;
-const DRAWING_RAIL_COLLAPSE_TAB_WIDTH = 14;
-const DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH = 14;
+const DRAWING_RAIL_ANIMATION_DURATION_MS = LEFT_TOOL_RAIL_ANIMATION_DURATION_MS;
+const DRAWING_RAIL_COLLAPSE_TAB_WIDTH = LEFT_TOOL_RAIL_COLLAPSED_WIDTH;
+// What the rail still occupies once collapsed. Shared with the layout metrics
+// so the chrome that closes up behind it reserves exactly this much.
+const DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH = LEFT_TOOL_RAIL_COLLAPSED_WIDTH;
 const DRAWING_RAIL_COLLAPSE_TAB_OVERHANG = 6;
 
 // The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); flyouts
@@ -935,6 +940,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   private applyContainerLayout(): void {
+    // Animated so the bar closes the gap with the rail rather than snapping to
+    // it a frame later.
+    this.el.style.transition = `margin-left ${LEFT_TOOL_RAIL_ANIMATION_DURATION_MS}ms ${LEFT_TOOL_RAIL_ANIMATION_EASING}`;
     this.el.style.marginLeft = `${this.getLeftToolRailMetrics().leftToolRailWidth}px`;
   }
 
