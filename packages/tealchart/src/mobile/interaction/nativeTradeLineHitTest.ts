@@ -17,7 +17,11 @@ import type {
 import { resolveNativePriceAxisTagStack } from '../utils/priceAxisTagLayout';
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
 import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
-import { isNativeYInMainPane, sharedPriceToNativeY } from '../render/nativeSharedViewport';
+import {
+  getNativePriceAxisTagFloor,
+  isNativeYInMainPane,
+  sharedPriceToNativeY,
+} from '../render/nativeSharedViewport';
 
 export const NATIVE_TRADE_LABEL_HIT_SLOP = 8;
 
@@ -110,11 +114,7 @@ export function resolveNativePriceAxisTagCenters({
   if (bracketDragState.activeObjectId.value) {
     const bracketY = sharedPriceToNativeLineY(bracketDragState.activePrice.value, sharedViewport, frame);
     if (!isNativeYInMainPane(bracketY, frame)) {
-      return resolveNativePriceAxisTagStack(
-        sources,
-        frame.mainPane.top,
-        frame.mainPane.bottom,
-      );
+      return resolveNativePriceAxisTagStack(sources, frame.mainPane.top, getNativePriceAxisTagFloor(frame));
     }
     sources.push({
       id: getNativeBracketDragTagId(bracketDragState.activeObjectId.value, bracketDragState.activeBracketType.value),
@@ -124,11 +124,7 @@ export function resolveNativePriceAxisTagCenters({
     });
   }
 
-  return resolveNativePriceAxisTagStack(
-    sources,
-    frame.mainPane.top,
-    frame.mainPane.bottom,
-  );
+  return resolveNativePriceAxisTagStack(sources, frame.mainPane.top, getNativePriceAxisTagFloor(frame));
 }
 
 export function findNativeOrderDragZoneIndex({

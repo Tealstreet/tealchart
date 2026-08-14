@@ -30,6 +30,16 @@ export function isNativeYInMainPane(value: number, frame: NativeChartFrame): boo
   return value >= frame.mainPane.top && value <= frame.mainPane.bottom;
 }
 
+/**
+ * The lowest a price-axis label may reach. The time axis is chrome - it carries
+ * the date ticks and the settings gear - so a label that runs into it is drawn
+ * over rather than merely cramped.
+ */
+export function getNativePriceAxisTagFloor(frame: NativeChartFrame): number {
+  'worklet';
+  return Math.min(frame.mainPane.bottom, frame.timeAxisTop);
+}
+
 export function resolveNativeTradeLineLabelTopOffset(
   rows: readonly NativeTradeLineRow[],
   objectType: NativeTradeLineObjectType,
