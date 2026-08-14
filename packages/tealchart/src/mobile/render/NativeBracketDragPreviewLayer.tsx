@@ -288,6 +288,13 @@ export function AnimatedBracketDragPreview({
     return sharedPriceToNativeY(dragState.activePrice.value, sharedViewport, frame);
   });
   const color = useDerivedValue(() => dragState.activeColor.value || DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR);
+  // The tag and zone fills sit behind text so they use the tinted button colour.
+  // The price line is a hairline on a dark canvas and needs the bracket's own
+  // colour, or it reads as no line at all - which is how it looked outside
+  // partial mode, where the zone gave no other clue where the price was.
+  const lineColor = useDerivedValue(
+    () => dragState.activeLineColor.value || dragState.activeColor.value || DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  );
   const labelBackgroundColor = getNativeDarkLabelBackgroundColor();
   const lineStart = useDerivedValue(() => ({ x: frame.contentLeft, y: y.value }));
   const tagLayout = createNativeAxisLaneTagLayout(frame);
@@ -397,7 +404,7 @@ export function AnimatedBracketDragPreview({
 
   return (
     <Group opacity={previewOpacity}>
-      <SkiaLine p1={lineStart} p2={lineEnd} color={color} strokeWidth={1} style="stroke">
+      <SkiaLine p1={lineStart} p2={lineEnd} color={lineColor} strokeWidth={1.5} style="stroke">
         <DashPathEffect intervals={[4, 4]} />
       </SkiaLine>
       <Group opacity={partialPreviewOpacity}>

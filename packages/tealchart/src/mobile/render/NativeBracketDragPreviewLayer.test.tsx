@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { NativeBracketDragSharedValues } from '../interaction/nativeOemsDragState';
 
-import { matchFont } from '@shopify/react-native-skia';
+import { matchFont, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -80,6 +80,7 @@ function bracketDragState(): NativeBracketDragSharedValues {
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
     activeColor: shared('#12c48b'),
+    activeLineColor: shared('#f97316'),
   };
 }
 
@@ -151,6 +152,24 @@ describe('AnimatedBracketDragPreview', () => {
     expect(labels).toHaveLength(1);
     expect(labels[0].props.text.value).toBe('TP 63,777');
     expect(labels[0].props.maxCharacters).toBeGreaterThanOrEqual('TP 63,777'.length);
+  });
+
+  // The button fill is tinted down to sit behind label text, so stroking the
+  // price line with it left the drag with no visible line at all.
+  it('strokes the drag price line with the bracket colour, not the tinted button fill', () => {
+    const layer = AnimatedBracketDragPreview({
+      axisFont: matchFont({ fontSize: 11 }),
+      dragState: bracketDragState(),
+      frame,
+      pricePrecision: 0,
+      resolvedPriceAxisTags: shared([]),
+      sharedViewport,
+    });
+    const lines = collectElementsByType(layer, SkiaLine);
+    const priceLine = lines[0];
+
+    expect(priceLine.props.color.value).toBe('#f97316');
+    expect(priceLine.props.strokeWidth).toBeGreaterThan(1);
   });
 
   it('includes partial bracket context in the live drag preview label', () => {

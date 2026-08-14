@@ -128,6 +128,7 @@ function createBracketDragState(active = false): NativeBracketDragInteractionSta
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
     activeColor: shared(''),
+    activeLineColor: shared(''),
     startPrice: shared(0),
     pricePerPixel: shared(0),
   };

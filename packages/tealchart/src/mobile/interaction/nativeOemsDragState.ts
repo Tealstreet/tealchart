@@ -37,6 +37,8 @@ export interface NativeBracketDragSharedValues {
   activePartialPercent: SharedValue<number>;
   activePartialEnabled: SharedValue<boolean>;
   activeColor: SharedValue<string>;
+  /** The bracket's own colour, for the preview's price line stroke. */
+  activeLineColor: SharedValue<string>;
 }
 
 export interface NativeBracketDragInteractionState extends NativeBracketDragSharedValues {
@@ -113,6 +115,7 @@ export function clearNativeBracketDragState(state: NativeBracketDragInteractionS
   state.activePartialPercent.value = 100;
   state.activePartialEnabled.value = false;
   state.activeColor.value = '';
+  state.activeLineColor.value = '';
   state.active.value = false;
 }
 
@@ -137,6 +140,7 @@ export function beginNativeBracketDragState(
   state.activePartialPercent.value = 100;
   state.activePartialEnabled.value = zone.partialEnabled;
   state.activeColor.value = zone.color;
+  state.activeLineColor.value = zone.lineColor;
   state.startPrice.value = zone.dragPrice ?? zone.price;
   state.pricePerPixel.value = pricePerPixel;
   return true;
