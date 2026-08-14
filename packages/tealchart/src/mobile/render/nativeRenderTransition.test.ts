@@ -144,6 +144,38 @@ describe('native render transition data identity', () => {
     ).toBe(false);
   });
 
+  // A cached first paint is real history for the requested market. Fading it
+  // made a chart that had already drawn look like it was still fetching, then
+  // flash to full strength when the live response landed.
+  it('does not dim cached bars for the requested market while the live response loads', () => {
+    expect(
+      shouldDimNativeRenderForTransition({
+        barsContext: {
+          interval: '5',
+          requestId: 1,
+          source: 'history',
+          symbol: 'BTC',
+        },
+        barsLength: 300,
+        interval: '5',
+        isLoading: true,
+        symbol: 'BTC',
+      }),
+    ).toBe(false);
+  });
+
+  it('still dims while an empty chart is loading', () => {
+    expect(
+      shouldDimNativeRenderForTransition({
+        barsContext: null,
+        barsLength: 0,
+        interval: '5',
+        isLoading: true,
+        symbol: 'BTC',
+      }),
+    ).toBe(true);
+  });
+
   it('removes native render dimming when requested bars arrive', () => {
     expect(
       shouldDimNativeRenderForTransition({
