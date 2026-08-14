@@ -256,6 +256,10 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   // Loading state for timeframe changes
   private _isLoadingBars = false;
+  // The market `_bars` were loaded for. The fade means "these candles are not
+  // the market you asked for", not "a request is in flight" — cached history
+  // for the requested market is real data and must render at full strength.
+  private _barsMarketKey: string | null = null;
   private _wasLoadingBars = false;
   private _loadBarsRequestId = 0;
   private _resolveSymbolRequestId = 0;
@@ -640,6 +644,14 @@ export class TealchartWidget implements ITealchartWebWidget {
   // Number of bars to request initially - enough to fill viewport with buffer
   private static readonly INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
 
+  private _currentMarketKey(): string {
+    return `${this._symbol}\n${this._interval}`;
+  }
+
+  private _barsAreForRequestedMarket(): boolean {
+    return this._bars.length > 0 && this._barsMarketKey === this._currentMarketKey();
+  }
+
   private _buildInitialPeriodParams(): PeriodParams {
     const now = Date.now();
     const fromTime = now - TealchartWidget.INITIAL_BAR_COUNT * intervalToMs(this._interval);
@@ -672,6 +684,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (!normalizedBars.length) return;
 
     this._bars = normalizedBars;
+    this._barsMarketKey = this._currentMarketKey();
     this._plots = [];
     this._drawings = [];
     this._viewport = this._viewportController.handleBarsLoaded(normalizedBars, intervalToMs(this._interval));
@@ -721,6 +734,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         // Atomic data transition: set all state before markDirty so it renders in one frame
         this._bars = normalizedBars;
+        this._barsMarketKey = this._currentMarketKey();
 
         // Clear old plots — they belong to the old symbol/interval.
         // New visual outputs will arrive async via Tealscript callbacks.
@@ -1445,7 +1459,8 @@ export class TealchartWidget implements ITealchartWebWidget {
     }
 
     // Always update opacity + loading dots
-    this._ui.setCanvasOpacity(this._isLoadingBars ? LOADING_OPACITY : 1, this._bars.length > 0);
+    const showFaded = this._isLoadingBars && !this._barsAreForRequestedMarket();
+    this._ui.setCanvasOpacity(showFaded ? LOADING_OPACITY : 1, this._bars.length > 0);
 
     // Compute indicator pane Y ranges when plots have data
     if (dirty & (DIRTY.PLOTS | DIRTY.VIEWPORT | DIRTY.BARS | DIRTY.DATA_LOAD) && this._plots.length > 0) {

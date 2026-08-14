@@ -39,6 +39,15 @@ export function isNativeBarSnapshotPendingRequestedData({
   );
 }
 
+/**
+ * Whether to fade what is on screen.
+ *
+ * The fade means "these candles are not the market you asked for", not "a
+ * request is in flight". Cached history painted before the live response is
+ * real data for the requested market, and dimming it made a chart that had
+ * already drawn look like it was still fetching, then flash to full strength
+ * when the response landed. Bars for the market you just left still fade.
+ */
 export function shouldDimNativeRenderForTransition({
   barsContext,
   barsLength,
@@ -52,15 +61,14 @@ export function shouldDimNativeRenderForTransition({
   isLoading: boolean;
   symbol: string;
 }): boolean {
-  return (
-    isLoading ||
-    isNativeBarSnapshotPendingRequestedData({
-      barsContext,
-      barsLength,
-      interval,
-      symbol,
-    })
-  );
+  if (barsLength === 0) return isLoading;
+
+  return isNativeBarSnapshotPendingRequestedData({
+    barsContext,
+    barsLength,
+    interval,
+    symbol,
+  });
 }
 
 export function shouldHoldNativeRenderSnapshotForTransition({
