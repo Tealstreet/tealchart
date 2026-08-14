@@ -13,6 +13,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
 import { getNativePriceAxisTagBackgroundColor, getNativePriceAxisTagTextColor } from '../utils/nativeColor';
 import {
+  clampNativePriceAxisTagCenterY,
   findNativeResolvedPriceAxisTagCenterY,
   getNativeCountdownLayoutText,
   getNativePriceAxisPrimaryTextBaselineOffset,
@@ -35,7 +36,7 @@ import {
   NativePriceAxisTagBox,
   NativePriceAxisTagStaticText,
 } from './NativePriceAxisTag';
-import { sharedPriceToNativeY } from './nativeSharedViewport';
+import { getNativePriceAxisTagFloor, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
 
 function priceLineDash(lineStyle: PriceLine['lineStyle']): number[] | null {
@@ -118,7 +119,13 @@ export function AnimatedPriceLine({
   const labelCenterY = useDerivedValue(() =>
     resolveNativePriceLineAxisTagCenterY(resolvedPriceAxisTags.value, line.id, y.value),
   );
-  const labelY = useDerivedValue(() => labelCenterY.value - tagHeight / 2);
+  // Clamped here as well as in the stack: a tag whose price leaves the pane is
+  // filtered out of the resolved stack and falls back to its raw price Y, and
+  // the tag still draws. The line itself is not clamped - only the label.
+  const labelY = useDerivedValue(() =>
+    clampNativePriceAxisTagCenterY(labelCenterY.value, tagHeight, frame.mainPane.top, getNativePriceAxisTagFloor(frame)) -
+    tagHeight / 2,
+  );
   const primaryTextY = useDerivedValue(() => labelY.value + primaryTextBaselineOffset);
   const secondaryTextY = useDerivedValue(() => labelY.value + secondaryTextBaselineOffset);
   const lineStart = useDerivedValue(() => ({ x: frame.contentLeft, y: y.value }));
@@ -131,7 +138,9 @@ export function AnimatedPriceLine({
 
   if (staticProjection) {
     const staticY = staticProjection.priceToY(line.price);
-    const staticLabelY = staticY - tagHeight / 2;
+    const staticLabelY =
+      clampNativePriceAxisTagCenterY(staticY, tagHeight, frame.mainPane.top, getNativePriceAxisTagFloor(frame)) -
+      tagHeight / 2;
     const staticLineOpacity = isNativePriceLineYVisible(staticY, frame) ? 1 : 0;
     const staticLineStart = { x: frame.contentLeft, y: staticY };
     const staticLineEnd = { x: axisTag.x, y: staticY };
