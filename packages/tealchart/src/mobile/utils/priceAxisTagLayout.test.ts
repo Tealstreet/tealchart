@@ -236,6 +236,23 @@ describe('native price axis tag layout', () => {
     expect(findNativeResolvedPriceAxisTagCenterY(tags, 'tail', 0)).toBeGreaterThan(145);
   });
 
+  // The plot floor is the top of the time axis, which carries the date ticks
+  // and the settings gear. A label reaching into it gets drawn over.
+  it('keeps a fixed tag inside the plot instead of letting it reach the time axis', () => {
+    const tags = resolveNativePriceAxisTagStack(
+      // A two-line countdown tag, priced within the pane but near its floor.
+      [{ id: 'last', originalY: 195, height: 34, fixed: true }],
+      0,
+      200,
+    );
+
+    expect(tags).toHaveLength(1);
+    expect(tags[0].centerY + tags[0].height / 2).toBeLessThanOrEqual(200);
+    expect(tags[0].fixed).toBe(true);
+    // Still anchors the stack — it just cannot leave the plot to do it.
+    expect(tags[0].originalY).toBe(195);
+  });
+
   it('finds resolved tag centers by stable id with fallback', () => {
     const tags = resolveNativePriceAxisTagStack([{ id: 'last', originalY: 100, height: 22 }], 0, 200);
 
