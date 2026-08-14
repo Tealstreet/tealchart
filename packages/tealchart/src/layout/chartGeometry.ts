@@ -95,7 +95,20 @@ export const MOBILE_CHART_CHROME_METRICS: ChartChromeMetrics = {
   topLeftLegendMinHeight: 0,
 };
 
-export const LEFT_TOOL_RAIL_COLLAPSED_WIDTH = 34;
+/**
+ * How much room a collapsed left tool rail still occupies.
+ *
+ * A collapsed rail slides off-canvas and leaves only its re-open tab showing,
+ * so this is that tab's width - anything larger reserves space for a rail that
+ * is not there, which is what left a band of dead canvas between the plot and
+ * the legend. `ChartTopBar` slides the rail by `leftToolRailWidth` minus this,
+ * so the two must be the same number.
+ */
+export const LEFT_TOOL_RAIL_COLLAPSED_WIDTH = 14;
+
+/** How long the rail takes to slide, for anything animating alongside it. */
+export const LEFT_TOOL_RAIL_ANIMATION_DURATION_MS = 160;
+export const LEFT_TOOL_RAIL_ANIMATION_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 export const EMPTY_INSETS: Insets = {
   top: 0,
