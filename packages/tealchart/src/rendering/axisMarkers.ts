@@ -6,10 +6,26 @@ export interface TimeAxisMarker {
   step: number;
 }
 
+/**
+ * The finest spacing on the 1/2/5 ladder that still fits, which is the densest
+ * readable axis.
+ *
+ * This used to require the label count to land inside `[maxLabels / 2,
+ * maxLabels]`, then fall back to walking the ladder *backwards* for anything
+ * with two or more labels. The window is 2x wide and consecutive ladder steps
+ * differ by up to 2.5x, so a step could clear the window entirely - and the
+ * reversed fallback then answered with the coarsest spacing that qualified,
+ * i.e. the emptiest possible axis. That is why the price axis sometimes showed
+ * a single label until the range was scrunched into the window.
+ *
+ * `maxLabels` comes from the minimum label spacing, so it is the only bound
+ * that was ever load-bearing; a floor on the count is what caused the misses.
+ *
+ * Mirrored in native by `getNativePriceGridSpacing`.
+ */
 export function generatePriceMarkers(viewport: Viewport, priceHeight: number): number[] {
   const minLabelSpacing = 24;
-  const maxLabels = Math.floor(priceHeight / minLabelSpacing);
-  const minLabels = Math.max(4, Math.floor(maxLabels * 0.5));
+  const maxLabels = Math.max(2, Math.floor(priceHeight / minLabelSpacing));
   const priceRange = viewport.priceMax - viewport.priceMin;
   if (priceRange <= 0) return [];
 
@@ -28,34 +44,21 @@ export function generatePriceMarkers(viewport: Viewport, priceHeight: number): n
     2 * 10 ** (magnitude + 1),
   ].sort((a, b) => a - b);
 
+  const markersFor = (spacing: number): number[] => {
+    const firstMarker = Math.floor(viewport.priceMin / spacing) * spacing;
+    const markers: number[] = [];
+    for (let price = firstMarker; price <= viewport.priceMax + spacing * 0.01; price += spacing) {
+      markers.push(price);
+    }
+    return markers;
+  };
+
   for (const spacing of spacings) {
-    const firstMarker = Math.floor(viewport.priceMin / spacing) * spacing;
-    const markers: number[] = [];
-    for (let price = firstMarker; price <= viewport.priceMax + spacing * 0.01; price += spacing) {
-      markers.push(price);
-    }
-    if (markers.length >= minLabels && markers.length <= maxLabels) {
-      return markers;
-    }
+    const markers = markersFor(spacing);
+    if (markers.length <= maxLabels) return markers;
   }
 
-  for (const spacing of [...spacings].reverse()) {
-    const firstMarker = Math.floor(viewport.priceMin / spacing) * spacing;
-    const markers: number[] = [];
-    for (let price = firstMarker; price <= viewport.priceMax + spacing * 0.01; price += spacing) {
-      markers.push(price);
-    }
-    if (markers.length <= maxLabels && markers.length >= 2) {
-      return markers;
-    }
-  }
-
-  const step = priceRange / Math.max(minLabels, 4);
-  const markers: number[] = [];
-  for (let price = viewport.priceMin; price <= viewport.priceMax; price += step) {
-    markers.push(price);
-  }
-  return markers;
+  return markersFor(priceRange / 2);
 }
 
 export function generateTimeMarkers(viewport: Viewport, chartWidth: number): TimeAxisMarker[] {
