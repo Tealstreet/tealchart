@@ -141,6 +141,9 @@ export class ChartWidgetCore {
   protected _symbol: string;
   protected _interval: ResolutionString;
   protected _symbolInfo: LibrarySymbolInfo | null = null;
+  // The symbol `_symbolInfo` was resolved for. `symbolInfo.name` cannot answer
+  // this: an exchange-prefixed request resolves to a clean-symbol name.
+  protected _symbolInfoSymbol: string | null = null;
   protected _bars: Bar[] = [];
   protected _viewport: Viewport | null = null;
   protected _plots: PlotOutput[] = [];
@@ -157,6 +160,7 @@ export class ChartWidgetCore {
   protected _queuedLeftHistoryBackfillHint: HistoryBackfillRequestHint | undefined;
   protected _hasMoreHistoricalData = true;
   protected _loadBarsRequestId = 0;
+  protected _resolveSymbolRequestId = 0;
   protected _disposed = false;
 
   // Subscription tracking
@@ -205,24 +209,87 @@ export class ChartWidgetCore {
    */
   initialize(): void {
     if (this._disposed) return;
+
+    // The config only feeds the timeframe selector, and nothing in the resolve
+    // or load path reads it — so the first bar load must not queue behind it.
+    // A datafeed's onReady is typically a setTimeout(0) returning a literal,
+    // and that hop cost 0.7-1.1s on a mobile warm start, where the main thread
+    // is saturated by account restore at exactly the moment the chart mounts.
     this._datafeed.onReady((config) => {
       if (this._disposed) return;
-      // Store supported resolutions from datafeed config
       this._supportedResolutions = config.supported_resolutions ?? null;
-      this._datafeed.resolveSymbol(
-        this._symbol,
-        (symbolInfo) => {
-          if (this._disposed) return;
-          this._symbolInfo = symbolInfo;
-          this._loadBars();
-        },
-        (error) => {
-          if (this._disposed) return;
-          console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
-          this._setLoading(false);
-        },
-      );
     });
+
+    this._paintCachedBars();
+    this._resolveSymbolAndLoad(this._symbol);
+  }
+
+  protected _buildInitialPeriodParams(interval: string) {
+    const now = Date.now();
+    const fromTime = now - INITIAL_BAR_COUNT * getIntervalMs(interval);
+
+    return {
+      countBack: INITIAL_BAR_COUNT,
+      from: Math.floor(fromTime / 1000),
+      to: Math.floor(now / 1000),
+      firstDataRequest: true,
+    };
+  }
+
+  /**
+   * Paints whatever history the datafeed already holds, before resolving.
+   *
+   * Loading stays on: these bars are one request behind, and the live response
+   * replaces them. Leaving it on is also what keeps the chart's usual
+   * loading treatment — and its chart_loaded event — tied to real data.
+   */
+  protected _paintCachedBars(): void {
+    if (!this._datafeed.getCachedBars) {
+      return;
+    }
+
+    const cached = this._datafeed.getCachedBars(
+      this._symbol,
+      this._interval as ResolutionString,
+      this._buildInitialPeriodParams(this._interval),
+    );
+    if (!cached?.length) return;
+
+    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached), 'cache load');
+    if (!normalizedBars.length) return;
+
+    this._bars = normalizedBars;
+    this._plots = [];
+    this._emitBarsChanged('history');
+    this._scheduleRender();
+    this._indicatorManager?.setBars(normalizedBars);
+  }
+
+  /**
+   * Resolves a symbol and loads its bars, discarding a resolve that a newer one
+   * has superseded.
+   *
+   * The guard matters now that init resolves immediately: a host can call
+   * setSymbol in the same tick as initialize(), and without it the init
+   * callback can land last and load bars for the symbol the chart just left.
+   */
+  protected _resolveSymbolAndLoad(symbol: string): void {
+    const resolveRequestId = ++this._resolveSymbolRequestId;
+
+    this._datafeed.resolveSymbol(
+      symbol,
+      (symbolInfo) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
+        this._symbolInfo = symbolInfo;
+        this._symbolInfoSymbol = symbol;
+        this._loadBars();
+      },
+      (error) => {
+        if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
+        console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
+        this._setLoading(false);
+      },
+    );
   }
 
   /**
@@ -308,6 +375,12 @@ export class ChartWidgetCore {
   protected _loadBars(): void {
     if (this._disposed) return;
     if (!this._symbolInfo) return;
+    // An interval change loads directly, without resolving. If a symbol change
+    // is still resolving at that moment — a multi-second window on a cold
+    // exchange, where resolveSymbol polls for markets — the info in hand is the
+    // market we just left, and its bars would render under the new symbol. Its
+    // own resolve calls back here.
+    if (this._symbolInfoSymbol !== this._symbol) return;
 
     const requestId = ++this._loadBarsRequestId;
     this._setLoadingMoreBars(false);
@@ -317,17 +390,7 @@ export class ChartWidgetCore {
     const requestSymbolInfo = this._symbolInfo;
     this._setLoading(true);
 
-    const now = Date.now();
-    const intervalMs = getIntervalMs(requestInterval);
-    const countBack = INITIAL_BAR_COUNT;
-    const fromTime = now - countBack * intervalMs;
-
-    const periodParams = {
-      countBack,
-      from: Math.floor(fromTime / 1000),
-      to: Math.floor(now / 1000),
-      firstDataRequest: true,
-    };
+    const periodParams = this._buildInitialPeriodParams(requestInterval);
 
     this._datafeed.getBars(
       requestSymbolInfo,
@@ -577,19 +640,7 @@ export class ChartWidgetCore {
     this._clearQueuedLeftHistoryBackfill();
     this._setLoading(true);
 
-    this._datafeed.resolveSymbol(
-      symbol,
-      (symbolInfo) => {
-        if (this._disposed) return;
-        this._symbolInfo = symbolInfo;
-        this._loadBars();
-      },
-      (error) => {
-        if (this._disposed) return;
-        console.error('[ChartWidgetCore] Failed to resolve symbol:', error);
-        this._setLoading(false);
-      },
-    );
+    this._resolveSymbolAndLoad(symbol);
   }
 
   setInterval(interval: ResolutionInput): void {

@@ -852,6 +852,20 @@ export interface IDatafeedChartApi {
     onResult: HistoryCallback,
     onError: DatafeedErrorCallback,
   ): void;
+  /**
+   * Bars a datafeed already holds, returned synchronously, for painting while
+   * the live request is in flight. Takes a raw symbol rather than a
+   * LibrarySymbolInfo precisely so it can be asked before resolveSymbol — which
+   * on a cold exchange blocks for as long as its market list takes to load,
+   * though candles themselves need nothing from that list.
+   *
+   * Implementations must return a contiguous run ending at the most recent
+   * closed bar, or nothing. A set with a hole in it would render as a chart
+   * with missing history.
+   *
+   * Additive: this is not part of the TradingView datafeed interface.
+   */
+  getCachedBars?(symbol: string, resolution: ResolutionString, periodParams: PeriodParams): DatafeedBar[];
   subscribeBars(
     symbolInfo: LibrarySymbolInfo,
     resolution: ResolutionString,
