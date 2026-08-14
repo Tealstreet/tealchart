@@ -405,7 +405,9 @@ describe('native trade-line hit testing', () => {
     ).toBe(true);
   });
 
-  it('resolves price-axis tag centers from active drag state', () => {
+  // A dragged tag leaves the stack: in it, neighbours displaced it while it
+  // shoved them back, and the whole axis re-resolved every frame of the drag.
+  it('drops the dragged order from the tag stack and leaves the rest resolved', () => {
     const sources: NativePriceAxisTagSource[] = [
       {
         sourceType: 'order',
@@ -415,28 +417,40 @@ describe('native trade-line hit testing', () => {
         height: 18,
         priority: 90,
       },
+      {
+        sourceType: 'order',
+        tagId: 'order:order-2',
+        objectId: 'order-2',
+        price: 25,
+        height: 18,
+        priority: 90,
+      },
     ];
+    const resolveWith = (dragged?: string) =>
+      resolveNativePriceAxisTagCenters({
+        priceAxisTagSources: sources,
+        sharedViewport,
+        frame,
+        orderDragState: dragged ? orderDragState(dragged, 80) : orderDragState(),
+        bracketDragState: bracketDragState(),
+        priceAxisTagHeight: 22,
+      });
+
+    expect(resolveWith().map((tag) => tag.id).sort()).toEqual(['order:order-1', 'order:order-2']);
+    expect(resolveWith('order-1').map((tag) => tag.id)).toEqual(['order:order-2']);
+  });
+
+  it('never adds a bracket drag source to the stack', () => {
     const resolved = resolveNativePriceAxisTagCenters({
-      priceAxisTagSources: sources,
+      priceAxisTagSources: [],
       sharedViewport,
       frame,
-      orderDragState: orderDragState('order-1', 80),
+      orderDragState: orderDragState(),
       bracketDragState: bracketDragState('order-1', 40),
       priceAxisTagHeight: 22,
     });
 
-    expect(resolved).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'order:order-1',
-          centerY: 20,
-        }),
-        expect.objectContaining({
-          id: 'bracketDrag:order-1:tp',
-          centerY: 60,
-        }),
-      ]),
-    );
+    expect(resolved).toEqual([]);
   });
 
   it('suppresses the stale static bracket tag source while the matching bracket drag preview is active', () => {
@@ -466,11 +480,9 @@ describe('native trade-line hit testing', () => {
         bracketDragState: activeBracketDragState,
         priceAxisTagHeight: 22,
       }),
-    ).toEqual([
-      expect.objectContaining({
-        id: 'bracketDrag:order-1:tp',
-      }),
-    ]);
+      // The drag preview draws its own tag, pinned to the price, so nothing is
+      // left in the stack for this bracket while the drag is live.
+    ).toEqual([]);
   });
 
   it('clamps explicit offscreen price-line axis tags without stacking ordinary offscreen sources', () => {
