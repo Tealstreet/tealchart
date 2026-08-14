@@ -95,6 +95,32 @@ export function createNativeChartLayoutSettings(settings: Omit<ChartSettings, 'v
   };
 }
 
+/**
+ * A saved viewport carries a price range, and a price range only means anything
+ * on the market it was captured from.
+ *
+ * The native chart is controlled: the host owns `symbol`, so restoring a layout
+ * deliberately keeps the market on screen rather than the one the layout was
+ * saved with. Restoring that layout's viewport anyway pinned the price axis to
+ * the other market's prices - open a $3 market on a layout last saved at $100
+ * and the candles collapse into a sliver at the bottom of an axis that never
+ * refits, because a restored viewport counts as an explicit one and auto-scale
+ * stands down.
+ *
+ * With no saved viewport to apply, auto-scale fits the incoming bars, which is
+ * what opening a fresh market should do anyway.
+ */
+export function shouldRestoreNativeLayoutViewport({
+  layoutSymbol,
+  symbol,
+}: {
+  layoutSymbol: string | undefined;
+  symbol: string;
+}): boolean {
+  if (!layoutSymbol) return false;
+  return layoutSymbol === symbol;
+}
+
 export async function loadNativeCurrentLayoutState(
   storage: TealchartKeyValueStorage | null,
   key: string | null,
