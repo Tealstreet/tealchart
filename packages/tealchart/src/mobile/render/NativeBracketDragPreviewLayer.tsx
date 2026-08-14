@@ -27,6 +27,11 @@ const PARTIAL_MARKER_HEIGHT = 18;
 const PARTIAL_MARKER_PADDING_X = 6;
 const PARTIAL_MARKER_MIN_GAP = 8;
 const PARTIAL_MAIN_LABEL_HEIGHT = 22;
+// Roughly a fingertip. The markers and the summary pill are read *while* the
+// finger is down, so they have to clear it rather than merely not overlap the
+// drag zone - the old 5px put them directly under the thumb.
+const PARTIAL_THUMB_CLEARANCE = 44;
+const PARTIAL_SURFACE_GAP = 6;
 const PARTIAL_PREVIEW_INSET_X = 8;
 const PARTIAL_MARKERS = [
   { key: 'left-10', percent: 10, offset: -PARTIAL_ZONE_HALF_WIDTH, side: -1 },
@@ -130,6 +135,67 @@ function resolveNativePriceAxisTagCenterY(
 ): number {
   'worklet';
   return findNativeResolvedPriceAxisTagCenterY(resolvedPriceAxisTags, targetId, fallbackCenterY);
+}
+
+/**
+ * Where the marker rail and the summary pill sit relative to the finger.
+ *
+ * Resolved as a pair rather than independently: each one alone would happily
+ * fall back to the same side as the other near a pane edge and land on top of
+ * it. The pill takes the far side by default and stacks behind the markers when
+ * both are forced to share.
+ *
+ * The final clamp can pull a surface back inside the clearance on a short pane.
+ * That is deliberate - off-screen is worse than close to the thumb.
+ */
+export function resolveNativePartialSurfaceTops({
+  draggingDown,
+  fingerY,
+  labelHeight,
+  markerHeight,
+  paneBottom,
+  paneTop,
+}: {
+  draggingDown: boolean;
+  fingerY: number;
+  labelHeight: number;
+  markerHeight: number;
+  paneBottom: number;
+  paneTop: number;
+}): { labelTop: number; markerTop: number } {
+  'worklet';
+  const fitsBelow = (top: number, height: number) => top + height <= paneBottom - 2;
+  const fitsAbove = (top: number) => top >= paneTop + 2;
+
+  const markerBelow = fingerY + PARTIAL_THUMB_CLEARANCE;
+  const markerAbove = fingerY - PARTIAL_THUMB_CLEARANCE - markerHeight;
+  const markersGoBelow = draggingDown
+    ? fitsBelow(markerBelow, markerHeight) || !fitsAbove(markerAbove)
+    : !fitsAbove(markerAbove) && fitsBelow(markerBelow, markerHeight);
+  const markerRaw = markersGoBelow ? markerBelow : markerAbove;
+
+  // Opposite side from the markers where it fits, otherwise stacked beyond
+  // them. Both stay unclamped here on purpose: stacking off a clamped marker
+  // and then clamping again collapses the two onto the same edge.
+  const labelFar = markersGoBelow
+    ? fingerY - PARTIAL_THUMB_CLEARANCE - labelHeight
+    : fingerY + PARTIAL_THUMB_CLEARANCE;
+  const labelFarFits = markersGoBelow ? fitsAbove(labelFar) : fitsBelow(labelFar, labelHeight);
+  const labelRaw = labelFarFits
+    ? labelFar
+    : markersGoBelow
+      ? markerRaw + markerHeight + PARTIAL_SURFACE_GAP
+      : markerRaw - PARTIAL_SURFACE_GAP - labelHeight;
+
+  // Shift the pair as one so their separation survives. Clamping them
+  // independently is what let them land on top of each other near an edge.
+  const unionTop = Math.min(markerRaw, labelRaw);
+  const unionBottom = Math.max(markerRaw + markerHeight, labelRaw + labelHeight);
+  let shift = 0;
+  if (unionBottom > paneBottom - 2) shift = paneBottom - 2 - unionBottom;
+  if (unionTop + shift < paneTop + 2) shift = paneTop + 2 - unionTop;
+
+  return { labelTop: labelRaw + shift, markerTop: markerRaw + shift };
 }
 
 function isNativeBracketPreviewYVisible(value: number, frame: NativeChartFrame): boolean {
@@ -364,11 +430,18 @@ export function AnimatedBracketDragPreview({
   }));
   const zoneLeftOnBracket = useDerivedValue(() => ({ x: zoneLeft.value, y: y.value }));
   const zoneRightOnBracket = useDerivedValue(() => ({ x: zoneRight.value, y: y.value }));
-  const markerTop = useDerivedValue(() => {
-    const below = zoneBottom.value + 5;
-    if (below + PARTIAL_MARKER_HEIGHT <= frame.mainPane.bottom - 2) return below;
-    return Math.max(frame.mainPane.top + 2, zoneTop.value - PARTIAL_MARKER_HEIGHT - 5);
-  });
+  const partialSurfaceTops = useDerivedValue(() =>
+    resolveNativePartialSurfaceTops({
+      // Ties (no movement yet) read as downward, matching the old default side.
+      draggingDown: dragState.activeDragCurrentY.value >= dragState.activeDragStartY.value,
+      fingerY: dragState.activeDragCurrentY.value,
+      labelHeight: PARTIAL_MAIN_LABEL_HEIGHT,
+      markerHeight: PARTIAL_MARKER_HEIGHT,
+      paneBottom: frame.mainPane.bottom,
+      paneTop: frame.mainPane.top,
+    }),
+  );
+  const markerTop = useDerivedValue(() => partialSurfaceTops.value.markerTop);
   const markerBaselineY = useDerivedValue(() => markerTop.value + 13);
   const partialLabelText = useDerivedValue(
     () =>
@@ -391,11 +464,7 @@ export function AnimatedBracketDragPreview({
       Math.max(zoneLeft.value, zoneRight.value - partialLabelWidth.value),
     ),
   );
-  const partialLabelY = useDerivedValue(() => {
-    const above = zoneTop.value - PARTIAL_MAIN_LABEL_HEIGHT - 7;
-    if (above >= frame.mainPane.top + 2) return above;
-    return Math.min(frame.mainPane.bottom - PARTIAL_MAIN_LABEL_HEIGHT - 2, zoneBottom.value + 7);
-  });
+  const partialLabelY = useDerivedValue(() => partialSurfaceTops.value.labelTop);
   const partialLabelBaselineY = useDerivedValue(() => partialLabelY.value + 15);
   const partialLabelTextX = useDerivedValue(() => partialLabelX.value + PARTIAL_MARKER_PADDING_X);
   const previewOpacity = useDerivedValue(() =>

@@ -31,6 +31,10 @@ export interface NativeBracketDragSharedValues {
   activePrice: SharedValue<number>;
   activeEntryPrice: SharedValue<number>;
   activeDragStartX: SharedValue<number>;
+  /** Where the finger actually is. The dragged price is the bracket's, which
+   *  sits wherever the existing TP/SL is - not under the touch. */
+  activeDragStartY: SharedValue<number>;
+  activeDragCurrentY: SharedValue<number>;
   activeDragCurrentX: SharedValue<number>;
   activePositionNotional: SharedValue<number>;
   activePositionIsLong: SharedValue<boolean>;
@@ -110,6 +114,8 @@ export function clearNativeBracketDragState(state: NativeBracketDragInteractionS
   state.activeEntryPrice.value = 0;
   state.activeDragStartX.value = 0;
   state.activeDragCurrentX.value = 0;
+  state.activeDragStartY.value = 0;
+  state.activeDragCurrentY.value = 0;
   state.activePositionNotional.value = 0;
   state.activePositionIsLong.value = true;
   state.activePartialPercent.value = 100;
@@ -124,6 +130,7 @@ export function beginNativeBracketDragState(
   zone: NativeTradeLineActionZone,
   pricePerPixel: number,
   dragStartX = 0,
+  dragStartY = 0,
 ): boolean {
   'worklet';
   if (zone.actionType !== 'tp' && zone.actionType !== 'sl') return false;
@@ -135,6 +142,8 @@ export function beginNativeBracketDragState(
   state.activeEntryPrice.value = zone.entryPrice;
   state.activeDragStartX.value = dragStartX;
   state.activeDragCurrentX.value = dragStartX;
+  state.activeDragStartY.value = dragStartY;
+  state.activeDragCurrentY.value = dragStartY;
   state.activePositionNotional.value = zone.positionNotional;
   state.activePositionIsLong.value = zone.positionIsLong;
   state.activePartialPercent.value = 100;
@@ -155,6 +164,7 @@ export function updateNativeBracketDragState(
   if (!state.active.value) return false;
   state.activePrice.value = state.startPrice.value - translationY * state.pricePerPixel.value;
   state.activeDragCurrentX.value = state.activeDragStartX.value + translationX;
+  state.activeDragCurrentY.value = state.activeDragStartY.value + translationY;
   state.activePartialPercent.value = state.activePartialEnabled.value ? calculatePartialBracketPercentFromDelta(translationX) : 100;
   return true;
 }
