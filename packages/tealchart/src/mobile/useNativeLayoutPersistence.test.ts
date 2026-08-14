@@ -6,6 +6,7 @@ import {
   loadNativeCurrentLayoutState,
   resolveNativeDefaultLayoutPersistence,
   saveNativeCurrentLayoutState,
+  shouldRestoreNativeLayoutViewport,
 } from './useNativeLayoutPersistence';
 
 function createMemoryStorage(): TealchartKeyValueStorage & { values: Map<string, string> } {
@@ -21,6 +22,24 @@ function createMemoryStorage(): TealchartKeyValueStorage & { values: Map<string,
     },
   };
 }
+
+describe('restoring a saved layout viewport', () => {
+  it('restores it on the market it was saved from', () => {
+    expect(shouldRestoreNativeLayoutViewport({ layoutSymbol: 'BTCUSDT', symbol: 'BTCUSDT' })).toBe(true);
+  });
+
+  // The host owns the symbol, so a layout saved elsewhere still applies here -
+  // but its price range belongs to that other market and would pin the axis to
+  // prices this one never trades at.
+  it('drops it when the layout was saved on another market', () => {
+    expect(shouldRestoreNativeLayoutViewport({ layoutSymbol: 'BTCUSDT', symbol: 'XIAOMIUSDT' })).toBe(false);
+  });
+
+  it('drops it when the layout records no symbol to check against', () => {
+    expect(shouldRestoreNativeLayoutViewport({ layoutSymbol: undefined, symbol: 'XIAOMIUSDT' })).toBe(false);
+    expect(shouldRestoreNativeLayoutViewport({ layoutSymbol: '', symbol: 'XIAOMIUSDT' })).toBe(false);
+  });
+});
 
 describe('native layout persistence defaults', () => {
   it('creates a chart-key scoped storage adapter from native key/value storage', async () => {
