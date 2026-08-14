@@ -11,7 +11,11 @@ import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-na
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
-import { getNativePriceAxisTagBackgroundColor, getNativePriceAxisTagTextColor } from '../utils/nativeColor';
+import {
+  getNativeDarkLabelBackgroundColor,
+  getNativePriceAxisTagBackgroundColor,
+  getNativePriceAxisTagTextColor,
+} from '../utils/nativeColor';
 import {
   clampNativePriceAxisTagCenterY,
   findNativeResolvedPriceAxisTagCenterY,
@@ -112,14 +116,17 @@ export function AnimatedPriceLine({
   const secondaryTextBaselineOffset = getNativePriceAxisSecondaryTextBaselineOffset(tagHeight);
   // `filled` is web's flag for a solid price-axis tag rather than an outline
   // one, and native was ignoring it and always filling - which is why the tags
-  // were opaque slabs sitting over the grid labels behind them. Unfilled, the
-  // text takes the line colour, since there is no longer a background to
-  // contrast against.
+  // were opaque slabs sitting over the grid labels behind them.
+  //
+  // Unfilled does not mean transparent. Every other tag in this lane - the
+  // order and position price labels - sits on the same dark backing, which is
+  // what keeps the axis readable where a tag overlaps a grid label. Dropping
+  // the backing entirely let the grid read straight through the tag.
   const tagFilled = line.label.filled === true;
   const tagBackgroundColor = tagFilled
     ? getNativePriceAxisTagBackgroundColor(line.label.backgroundColor, line.color)
-    : undefined;
-  const tagColor = tagBackgroundColor
+    : getNativeDarkLabelBackgroundColor();
+  const tagColor = tagFilled
     ? getNativePriceAxisTagTextColor(line.label.textColor, tagBackgroundColor)
     : line.label.textColor || line.color;
   const bracketSuppressed = useDerivedValue(() =>
