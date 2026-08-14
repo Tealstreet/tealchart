@@ -501,6 +501,8 @@ export class ChartCore {
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
     this.oemsActions = new OemsActionManager<OemsTradingLineState>({
+      // Read live: the tick changes with the symbol, and the manager outlives it.
+      priceTolerance: () => this.options.renderOptions?.pricePrecision ?? 0,
       onChange: () => {
         this.reapplyOemsActionState();
         this.scheduleRender();

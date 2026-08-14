@@ -1146,6 +1146,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chartApi,
     forceUpdate,
     orderDragState,
+    pricePrecision: nativePricePrecision,
   });
 
   const {
