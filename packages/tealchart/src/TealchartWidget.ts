@@ -2190,6 +2190,12 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._ui?.setSymbol(options.newSymbol);
     }
 
+    // A price axis the user scaled by hand belongs to the market it was scaled
+    // on. The zoom level carries over; the price range is refit on load.
+    if (options.reason === 'symbol') {
+      this._viewportController.handleSymbolChange();
+    }
+
     // Update interval if changed
     if (options.newInterval !== undefined) {
       this._interval = options.newInterval;

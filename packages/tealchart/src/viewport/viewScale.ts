@@ -15,6 +15,31 @@ import { normalizeResolution, type ResolutionInput } from '../utils/normalizeRes
 
 export const VIEWPORT_ZOOM_IN_FACTOR = 0.8;
 
+/** What `captureViewScale` falls back to when it cannot measure the price axis. */
+export const DEFAULT_VIEW_SCALE_PRICE_PADDING = 0.05;
+
+/**
+ * Drop a hand-scaled price axis out of a captured view scale, keeping the time
+ * scale intact.
+ *
+ * The price padding is proportional, so it survives a symbol change happily -
+ * which is exactly the problem. Padding captured while the user had the price
+ * axis dragged wide open rebuilds that same squashed axis on the next market,
+ * where it means nothing. How far in they were zoomed should carry over; how
+ * they had fitted another market's prices should not.
+ *
+ * Web does not need this: auto-scale comes back on at `handleSymbolChange` and
+ * overwrites the restored price range outright. Native only auto-scales inside
+ * a gesture, so a restored viewport would stand until the user panned.
+ */
+export function withDefaultPricePadding(viewScale: ViewScaleState): ViewScaleState {
+  return {
+    ...viewScale,
+    pricePaddingTop: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+    pricePaddingBottom: DEFAULT_VIEW_SCALE_PRICE_PADDING,
+  };
+}
+
 /**
  * Convert a resolution string (e.g., "1", "5", "15", "60", "240", "1h", "1D", "1W")
  * to its duration in milliseconds.

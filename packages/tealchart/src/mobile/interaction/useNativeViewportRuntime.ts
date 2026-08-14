@@ -14,7 +14,7 @@ import { runOnJS } from 'react-native-worklets';
 
 import { resolveHistoryBackfillRequiredStartTime } from '../../core/historyBackfill';
 import { TealchartRenderer } from '../../TealchartRenderer';
-import { captureViewScale, intervalToMs, restoreViewport } from '../../viewport/viewScale';
+import { captureViewScale, intervalToMs, restoreViewport, withDefaultPricePadding } from '../../viewport/viewScale';
 import { createNativeChartProjection } from '../render/nativeProjection';
 import { getNativeCandidateTimeWindow, nativeViewportCoversCandidateTimeWindow } from '../render/nativeTimeWindow';
 import { createNativeAutoScaleBars } from './nativeAutoScale';
@@ -90,18 +90,19 @@ export function createNativeViewportDataKey(symbol: string, interval: string): s
   return `${symbol}\n${interval}`;
 }
 
-export function shouldPreserveNativeDataLoadViewScale({
-  nextInterval,
+/**
+ * The zoom level survives every data load - interval switch or symbol switch -
+ * matching web, where `handleBarsLoaded` always restores from the captured view
+ * scale. Only the price fit is symbol-specific, and that is what this drops.
+ */
+export function shouldResetNativeViewScalePricePadding({
   nextSymbol,
-  previousInterval,
   previousSymbol,
 }: {
-  nextInterval: string;
   nextSymbol: string;
-  previousInterval: string;
   previousSymbol: string;
 }): boolean {
-  return previousSymbol === nextSymbol && previousInterval !== nextInterval;
+  return previousSymbol !== nextSymbol;
 }
 
 export function captureNativeDataLoadViewScale({
@@ -109,19 +110,22 @@ export function captureNativeDataLoadViewScale({
   dataKey,
   hasDataViewport,
   interval,
+  resetPricePadding = false,
   viewport,
 }: {
   bars: readonly Bar[];
   dataKey: string;
   hasDataViewport: boolean;
   interval: string;
+  resetPricePadding?: boolean;
   viewport: Viewport;
 }): NativeDataLoadViewScaleCapture | null {
   if (!hasDataViewport || bars.length === 0) return null;
+  const viewScale = captureViewScale(viewport, [...bars], intervalToMs(interval));
   return {
     dataKey,
     sourceBars: bars,
-    viewScale: captureViewScale(viewport, [...bars], intervalToMs(interval)),
+    viewScale: resetPricePadding ? withDefaultPricePadding(viewScale) : viewScale,
   };
 }
 
@@ -213,7 +217,6 @@ export function useNativeViewportRuntime({
   const dataKey = createNativeViewportDataKey(symbol, interval);
   const previousDataKeyRef = useRef(dataKey);
   const previousSymbolRef = useRef(symbol);
-  const previousIntervalRef = useRef(interval);
   const loadedBarsRef = useRef<readonly Bar[]>(bars);
   const loadedBarsIntervalRef = useRef(loadedBarsInterval);
   const pendingDataLoadViewScaleRef = useRef<NativeDataLoadViewScaleCapture | null>(null);
@@ -314,36 +317,42 @@ export function useNativeViewportRuntime({
   useEffect(() => {
     if (previousDataKeyRef.current === dataKey) return;
     const previousSymbol = previousSymbolRef.current;
-    const previousInterval = previousIntervalRef.current;
-    const shouldPreserveViewScale = shouldPreserveNativeDataLoadViewScale({
-      nextInterval: interval,
-      nextSymbol: symbol,
-      previousInterval,
-      previousSymbol,
-    });
+    const symbolChanged = shouldResetNativeViewScalePricePadding({ nextSymbol: symbol, previousSymbol });
 
     pendingSharedViewportSyncEpochRef.current = null;
     pendingSharedViewportSyncTargetRef.current = null;
     setPendingSharedViewportSyncEpoch(null);
     resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
 
-    if (shouldPreserveViewScale) {
-      viewportOwnershipRef.current = cancelNativeViewportOwnership(viewportOwnershipRef.current);
-      const sourceBars = loadedBarsRef.current.length > 0 ? loadedBarsRef.current : bars;
-      pendingDataLoadViewScaleRef.current = captureNativeDataLoadViewScale({
-        bars: sourceBars,
-        dataKey,
-        hasDataViewport,
-        interval: loadedBarsIntervalRef.current,
-        viewport: candidateViewportRef.current ?? viewport,
-      });
-    } else {
-      pendingDataLoadViewScaleRef.current = null;
+    // A hand-scaled price axis belongs to the market it was scaled on, so a new
+    // market gets a clean slate and auto-scale back. An interval switch is the
+    // same market, and a deliberate price scale stands.
+    if (symbolChanged) {
       viewportOwnershipRef.current = createNativeViewportOwnershipState();
+      priceAutoScale.active.value = autoScaleEnabled;
+    } else {
+      viewportOwnershipRef.current = cancelNativeViewportOwnership(viewportOwnershipRef.current);
+    }
+
+    const sourceBars = loadedBarsRef.current.length > 0 ? loadedBarsRef.current : bars;
+    const capture = captureNativeDataLoadViewScale({
+      bars: sourceBars,
+      dataKey,
+      hasDataViewport,
+      interval: loadedBarsIntervalRef.current,
+      resetPricePadding: symbolChanged,
+      viewport: candidateViewportRef.current ?? viewport,
+    });
+    pendingDataLoadViewScaleRef.current = capture;
+
+    // Nothing to carry over - a first load, or bars that never arrived. Falling
+    // through to the incoming data's own viewport matters most on a symbol
+    // change: leaving the settled viewport in place would keep the axis on the
+    // previous market's prices with no restore coming to correct it.
+    if (!capture) {
       candidateViewportRef.current = autoViewport;
       setCandidateViewport(autoViewport);
       setSettledViewport(null);
-      priceAutoScale.active.value = autoScaleEnabled;
       if (autoViewport) {
         syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
         syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
@@ -353,7 +362,6 @@ export function useNativeViewportRuntime({
 
     previousDataKeyRef.current = dataKey;
     previousSymbolRef.current = symbol;
-    previousIntervalRef.current = interval;
   }, [
     autoScaleEnabled,
     autoViewport,

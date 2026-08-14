@@ -55,6 +55,23 @@ export class ViewportController {
   }
 
   /**
+   * Called when the chart switches to a different market.
+   *
+   * A manually scaled price axis is a statement about the prices of the market
+   * it was scaled on, so it must not survive the switch: auto-scale comes back
+   * for every pane and the next `handleBarsLoaded` refits prices to the bars
+   * that actually arrive. Without this, dragging the price axis once meant
+   * every later symbol inherited that market's range, which on a market priced
+   * far from it collapses the candles into an unreadable sliver.
+   *
+   * The captured viewScale is deliberately kept, so how far in the user was
+   * zoomed survives the switch. Only the price range is recomputed.
+   */
+  handleSymbolChange(): void {
+    this._autoScaleManager.resetAll();
+  }
+
+  /**
    * Called when the user clicks the reset button.
    *
    * Re-enables auto-scale for all panes, recalculates the default viewport,
