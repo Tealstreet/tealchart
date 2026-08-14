@@ -277,10 +277,18 @@ export function getNativeTradeLineActionButtonWidth(): number {
   return ACTION_BUTTON_WIDTH;
 }
 
-function getNativeTradeLineSegmentCorners(index: number, segmentCount: number, buttonCount: number): NativeTradeLineCornerStyle {
-  if (index === 0 && segmentCount === 1 && buttonCount === 0) return 'all';
+function getNativeTradeLineSegmentCorners(
+  index: number,
+  segmentCount: number,
+  buttonCount: number,
+  buttonsDetached = false,
+): NativeTradeLineCornerStyle {
+  // Detached buttons no longer continue the pill, so the segments close
+  // themselves off rather than running square into a gap.
+  const segmentsEndThePill = buttonCount === 0 || buttonsDetached;
+  if (index === 0 && segmentCount === 1 && segmentsEndThePill) return 'all';
   if (index === 0) return 'left';
-  if (index === segmentCount - 1 && buttonCount === 0) return 'right';
+  if (index === segmentCount - 1 && segmentsEndThePill) return 'right';
   return 'none';
 }
 
@@ -302,9 +310,14 @@ function getNativeTradeLineButtonCornersForVisibleButtons(
 
   const previous = index > 0 ? buttons[index - 1] : null;
   const next = index < buttons.length - 1 ? buttons[index + 1] : null;
-  const startsGroup = !previous || shouldInsertTradeLineButtonGap(previous, button);
+  const hasLeadingContent = segmentCount > 0;
+  const startsGroup = !previous || shouldInsertTradeLineButtonGap(previous, button, hasLeadingContent);
+  // `button` is never null here, so the leading-content branch cannot fire.
   const endsGroup = !next || shouldInsertTradeLineButtonGap(button, next);
-  const startsDetachedGroup = startsGroup && !(index === 0 && segmentCount > 0);
+  // A leading bracket button now stands off the segments, so it is detached
+  // from them and rounds its left edge rather than butting up square.
+  const leadingGap = index === 0 && shouldInsertTradeLineButtonGap(null, button, hasLeadingContent);
+  const startsDetachedGroup = startsGroup && (leadingGap || !(index === 0 && segmentCount > 0));
 
   if (startsDetachedGroup && endsGroup) return 'all';
   if (startsDetachedGroup) return 'left';
@@ -352,10 +365,26 @@ function getTradeLineButtonWidth(button: ChartLabelButton): number {
   return button.type === 'tp' || button.type === 'sl' ? BRACKET_BUTTON_WIDTH : ACTION_BUTTON_WIDTH;
 }
 
-function shouldInsertTradeLineButtonGap(previous: ChartLabelButton | null, next: ChartLabelButton): boolean {
-  if (!previous) return false;
-  const previousBracket = previous.type === 'tp' || previous.type === 'sl';
+/**
+ * The bracket buttons are their own group and stand off whatever precedes them.
+ *
+ * `hasLeadingContent` covers the case where they are the first buttons: the
+ * thing to their left is then the segment block rather than another button, and
+ * they should stand off that too. Without it the gap appeared only when a
+ * cancel/close/reverse button happened to be shown, so the same label spaced
+ * itself differently depending on which actions were available.
+ *
+ * With no segments either, there is nothing to stand off and a leading gap
+ * would just be a hole before the pill.
+ */
+function shouldInsertTradeLineButtonGap(
+  previous: ChartLabelButton | null,
+  next: ChartLabelButton,
+  hasLeadingContent = false,
+): boolean {
   const nextBracket = next.type === 'tp' || next.type === 'sl';
+  if (!previous) return hasLeadingContent && nextBracket;
+  const previousBracket = previous.type === 'tp' || previous.type === 'sl';
   return previousBracket !== nextBracket;
 }
 
@@ -365,10 +394,11 @@ function getNativeTradeLineActionPrice(line: OrderLineRenderData | PositionLineR
   return line.price;
 }
 
-function measureTradeLineButtonBlockWidth(buttons: readonly ChartLabelButton[]): number {
+function measureTradeLineButtonBlockWidth(buttons: readonly ChartLabelButton[], hasLeadingContent = false): number {
   return buttons.reduce((width, button, index) => {
     const previous = index > 0 ? buttons[index - 1] : null;
-    return width + (shouldInsertTradeLineButtonGap(previous, button) ? BRACKET_GAP : 0) + getTradeLineButtonWidth(button);
+    const gap = shouldInsertTradeLineButtonGap(previous, button, hasLeadingContent) ? BRACKET_GAP : 0;
+    return width + gap + getTradeLineButtonWidth(button);
   }, 0);
 }
 
@@ -386,11 +416,15 @@ function getTradeLineButtonPriority(button: ChartLabelButton): number {
   }
 }
 
-function fitTradeLineButtons(buttons: readonly ChartLabelButton[], availableWidth: number): {
+function fitTradeLineButtons(
+  buttons: readonly ChartLabelButton[],
+  availableWidth: number,
+  hasLeadingContent = false,
+): {
   visibleButtons: ChartLabelButton[];
   hiddenActionTypes: NativeTradeLineActionType[];
 } {
-  if (measureTradeLineButtonBlockWidth(buttons) <= availableWidth) {
+  if (measureTradeLineButtonBlockWidth(buttons, hasLeadingContent) <= availableWidth) {
     return {
       visibleButtons: [...buttons],
       hiddenActionTypes: [],
@@ -405,7 +439,7 @@ function fitTradeLineButtons(buttons: readonly ChartLabelButton[], availableWidt
   for (const candidate of candidates) {
     const nextIndexes = [...selectedIndexes, candidate.index].sort((a, b) => a - b);
     const nextButtons = nextIndexes.map((index) => buttons[index]);
-    if (measureTradeLineButtonBlockWidth(nextButtons) <= availableWidth) {
+    if (measureTradeLineButtonBlockWidth(nextButtons, hasLeadingContent) <= availableWidth) {
       selectedIndexes.add(candidate.index);
     }
   }
@@ -427,7 +461,10 @@ function measureTradeLineLabelContentWidth(
     (width, segment) => width + Math.ceil(textWidth(segment.textShort ?? segment.text)) + SEGMENT_HORIZONTAL_PADDING * 2,
     0,
   );
-  const buttonWidth = measureTradeLineButtonBlockWidth(buttons);
+  // Must account for the leading bracket gap too, or the label asks for 6px
+  // less than the geometry spends and the gap is taken out of the segment text
+  // instead of widening the label.
+  const buttonWidth = measureTradeLineButtonBlockWidth(buttons, segments.length > 0);
   return Math.max(TRADE_LINE_MIN_LABEL_WIDTH, Math.ceil(segmentWidth + buttonWidth));
 }
 
@@ -455,8 +492,13 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   });
   let currentX = layout.labelX;
   const availableWidth = layout.labelWidth;
-  const { visibleButtons, hiddenActionTypes } = fitTradeLineButtons(buttons, availableWidth);
-  const buttonBlockWidth = measureTradeLineButtonBlockWidth(visibleButtons);
+  // Measured against the segments we intend to draw; the advance below uses the
+  // ones that actually fit. Reserving a gap that then goes undrawn only makes
+  // the label narrower, whereas drawing one that was never reserved would open
+  // a hole before the pill.
+  const hasSegmentCandidates = segments.length > 0;
+  const { visibleButtons, hiddenActionTypes } = fitTradeLineButtons(buttons, availableWidth, hasSegmentCandidates);
+  const buttonBlockWidth = measureTradeLineButtonBlockWidth(visibleButtons, hasSegmentCandidates);
   let remainingSegmentWidth = Math.max(0, availableWidth - buttonBlockWidth);
   const segmentCandidates = segments.map((segment, sourceIndex) => {
     const text = segment.textShort ?? segment.text;
@@ -505,7 +547,7 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   }).filter((segment): segment is Omit<NativeTradeLineSegmentGeometry, 'corners'> => Boolean(segment));
   let previousButton: ChartLabelButton | null = null;
   const buttonGeometry = visibleButtons.map((button, index) => {
-    const gap = shouldInsertTradeLineButtonGap(previousButton, button) ? BRACKET_GAP : 0;
+    const gap = shouldInsertTradeLineButtonGap(previousButton, button, segmentGeometry.length > 0) ? BRACKET_GAP : 0;
     const width = getTradeLineButtonWidth(button);
     if (currentX + gap + width > layout.labelX + availableWidth) return null;
     currentX += gap;
@@ -524,9 +566,13 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     return geometry;
   }).filter((button): button is NativeTradeLineButtonGeometry => Boolean(button));
   const visibleButtonCount = buttonGeometry.length;
+  const buttonsDetachedFromSegments =
+    segmentGeometry.length > 0 &&
+    buttonGeometry.length > 0 &&
+    shouldInsertTradeLineButtonGap(null, buttonGeometry[0], true);
   const segmentGeometryWithCorners: NativeTradeLineSegmentGeometry[] = segmentGeometry.map((segment, index) => ({
     ...segment,
-    corners: getNativeTradeLineSegmentCorners(index, segmentGeometry.length, visibleButtonCount),
+    corners: getNativeTradeLineSegmentCorners(index, segmentGeometry.length, visibleButtonCount, buttonsDetachedFromSegments),
   }));
   const buttonGeometryWithCorners: NativeTradeLineButtonGeometry[] = buttonGeometry.map((button, index) => ({
     ...button,
