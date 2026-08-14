@@ -110,8 +110,18 @@ export function AnimatedPriceLine({
     ? getNativePriceAxisPrimaryTextBaselineOffset(tagHeight)
     : getNativePriceAxisSingleLineTextBaselineOffset(tagHeight);
   const secondaryTextBaselineOffset = getNativePriceAxisSecondaryTextBaselineOffset(tagHeight);
-  const tagBackgroundColor = getNativePriceAxisTagBackgroundColor(line.label.backgroundColor, line.color);
-  const tagColor = getNativePriceAxisTagTextColor(line.label.textColor, tagBackgroundColor);
+  // `filled` is web's flag for a solid price-axis tag rather than an outline
+  // one, and native was ignoring it and always filling - which is why the tags
+  // were opaque slabs sitting over the grid labels behind them. Unfilled, the
+  // text takes the line colour, since there is no longer a background to
+  // contrast against.
+  const tagFilled = line.label.filled === true;
+  const tagBackgroundColor = tagFilled
+    ? getNativePriceAxisTagBackgroundColor(line.label.backgroundColor, line.color)
+    : undefined;
+  const tagColor = tagBackgroundColor
+    ? getNativePriceAxisTagTextColor(line.label.textColor, tagBackgroundColor)
+    : line.label.textColor || line.color;
   const bracketSuppressed = useDerivedValue(() =>
     isNativeBracketPriceLineRefActive(line.nativeBracketRef, bracketDragState),
   );
