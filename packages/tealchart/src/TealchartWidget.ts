@@ -132,6 +132,7 @@ import {
   GapDetectionEvent,
   IBasicDataFeed,
   LibrarySymbolInfo,
+  PeriodParams,
   RenderOptions,
   ResolutionString,
   TealchartWidgetOptions,
@@ -556,6 +557,8 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._ui?.setSupportedResolutions(this._supportedResolutions);
     });
 
+    this._paintCachedBars();
+
     const resolveRequestId = ++this._resolveSymbolRequestId;
 
     // Resolve symbol
@@ -636,6 +639,45 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   // Number of bars to request initially - enough to fill viewport with buffer
   private static readonly INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
+
+  private _buildInitialPeriodParams(): PeriodParams {
+    const now = Date.now();
+    const fromTime = now - TealchartWidget.INITIAL_BAR_COUNT * intervalToMs(this._interval);
+
+    return {
+      countBack: TealchartWidget.INITIAL_BAR_COUNT,
+      from: Math.floor(fromTime / 1000),
+      to: Math.floor(now / 1000),
+      firstDataRequest: true,
+    };
+  }
+
+  /**
+   * Paints whatever history the datafeed already holds, before resolving.
+   *
+   * Loading stays on: these bars are one request behind, and the live response
+   * replaces them.
+   */
+  private _paintCachedBars(): void {
+    if (!this._datafeed.getCachedBars) return;
+
+    const cached = this._datafeed.getCachedBars(
+      this._symbol,
+      this._interval as ResolutionString,
+      this._buildInitialPeriodParams(),
+    );
+    if (!cached?.length) return;
+
+    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached), 'cache load');
+    if (!normalizedBars.length) return;
+
+    this._bars = normalizedBars;
+    this._plots = [];
+    this._drawings = [];
+    this._viewport = this._viewportController.handleBarsLoaded(normalizedBars, intervalToMs(this._interval));
+    this._scheduler.markDirty(DIRTY.DATA_LOAD);
+    this._tealScriptManager?.setBars(normalizedBars);
+  }
 
   private _loadBars(): void {
     if (!this._symbolInfo) {
