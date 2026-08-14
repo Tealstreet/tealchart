@@ -116,6 +116,39 @@ export function getNativePriceAxisSecondaryTextBaselineOffset(tagHeight: number)
   return Math.round(tagHeight * 0.79);
 }
 
+/**
+ * Keep a tag's whole box inside the plot, whatever its priority.
+ *
+ * `fixed` means the other tags give way to this one - the last-trade tag holds
+ * the price while the rest stack around it. It has never meant the tag may
+ * leave the chart, but it was reading that way: a two-line countdown tag near
+ * the low of the range spilled past the plot into the time axis, where the
+ * settings gear then drew over its countdown.
+ *
+ * Web bounds every label this way already, in
+ * `TealchartRenderer.calculatePriceLineLabelBounds`.
+ */
+export function clampNativePriceAxisTagCenterY(
+  centerY: number,
+  height: number,
+  minY: number,
+  maxY: number,
+): number {
+  'worklet';
+  return Math.max(minY + height / 2, Math.min(maxY - height / 2, centerY));
+}
+
+/**
+ * The floor only. Deliberately not the ceiling: a stack that cannot fit above a
+ * fixed tag is allowed to run past the top, and the existing overflow passes
+ * depend on that to avoid overlapping the tag they are stacking around. Below
+ * is different - that is where the time axis is.
+ */
+export function clampNativePriceAxisTagBottom(centerY: number, height: number, maxY: number): number {
+  'worklet';
+  return Math.min(centerY, maxY - height / 2);
+}
+
 export function resolveNativePriceAxisTagStack(
   sources: readonly NativePriceAxisTagCollisionSource[],
   minY: number,
@@ -132,8 +165,8 @@ export function resolveNativePriceAxisTagStack(
       originalY: source.originalY,
       centerY:
         source.fixed === true
-          ? source.originalY
-          : Math.max(minY + source.height / 2, Math.min(maxY - source.height / 2, source.originalY)),
+          ? clampNativePriceAxisTagBottom(source.originalY, source.height, maxY)
+          : clampNativePriceAxisTagCenterY(source.originalY, source.height, minY, maxY),
       height: source.height,
       priority: source.priority ?? 0,
       fixed: source.fixed === true,
@@ -316,6 +349,11 @@ export function resolveNativePriceAxisTagStack(
     if (!changed) break;
   }
 
+  // Deliberately not floor-clamped here. A movable tag stacked under a fixed
+  // one can need a few pixels more than the plot has, and clamping it would
+  // close the gap that keeps the two readable. Pinning the fixed tag at the
+  // source is what keeps the common case off the time axis; the rest is a
+  // crowded-stack trade-off the tests below pin down.
   return resolved.map((source) => ({
     id: source.id,
     originalY: source.originalY,
