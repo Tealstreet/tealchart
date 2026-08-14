@@ -40,6 +40,7 @@ describe('native interaction shared values', () => {
             positionNotional: 0,
             positionIsLong: true,
             color: '#00a',
+            lineColor: '#00a',
             x1: 82,
             x2: 102,
           },
@@ -83,6 +84,7 @@ describe('native interaction shared values', () => {
       positionNotional: 1_000,
       positionIsLong: true,
       color: '#00a',
+      lineColor: '#00a',
       x1: 82,
       x2: 108,
     } satisfies NativeTradeLineActionZone;

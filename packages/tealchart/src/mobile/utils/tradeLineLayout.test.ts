@@ -491,6 +491,12 @@ describe('native trade line layout', () => {
     expect(geometry?.actionZones.map((zone) => zone.positionNotional)).toEqual([2500, 2500, 2500, 2500]);
     expect(geometry?.actionZones.map((zone) => zone.positionIsLong)).toEqual([true, true, true, true]);
     expect(geometry?.actionZones.map((zone) => zone.dragPrice)).toEqual([63777, 63777, 65000, 62000]);
+    // The TP/SL buttons are tinted down to sit behind their label text, so the
+    // drag preview strokes its price line with the untinted bracket colour
+    // instead - and TP and SL must stay distinguishable.
+    const bracketZones = geometry?.actionZones.filter((zone) => zone.actionType === 'tp' || zone.actionType === 'sl');
+    expect(bracketZones?.map((zone) => zone.lineColor)).not.toEqual(bracketZones?.map((zone) => zone.color));
+    expect(new Set(bracketZones?.map((zone) => zone.lineColor)).size).toBe(2);
     expect(geometry?.dragZone).toBeNull();
   });
 

@@ -237,6 +237,13 @@ export interface ChartLabelButton {
   iconColor: string;
   /** Border color */
   borderColor: string;
+  /**
+   * The button's colour before it was tinted down to sit behind label text.
+   * TP/SL buttons carry the bracket's own green/red here, which is what the
+   * drag preview strokes its price line with - the tinted `backgroundColor`
+   * is near-invisible as a hairline on a dark canvas.
+   */
+  accentColor?: string;
   /** Tooltip text on hover */
   tooltip?: string;
 }

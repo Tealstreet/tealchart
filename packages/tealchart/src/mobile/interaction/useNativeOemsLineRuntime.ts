@@ -54,6 +54,7 @@ export interface NativeOemsLineRuntimeInput {
   chartApi: TealchartApi;
   forceUpdate: () => void;
   orderDragState: NativeOrderDragInteractionState;
+  pricePrecision: number;
 }
 
 export interface NativeOemsLineRuntime {
@@ -82,10 +83,15 @@ export function useNativeOemsLineRuntime({
   chartApi,
   forceUpdate,
   orderDragState,
+  pricePrecision,
 }: NativeOemsLineRuntimeInput): NativeOemsLineRuntime {
+  // The manager is built once but the tick follows the symbol, so it reads a ref.
+  const pricePrecisionRef = useRef(pricePrecision);
+  pricePrecisionRef.current = pricePrecision;
   const oemsActionsRef = useRef<OemsActionManager<NativeOemsTradingLineState> | null>(null);
   if (!oemsActionsRef.current) {
     oemsActionsRef.current = new OemsActionManager<NativeOemsTradingLineState>({
+      priceTolerance: () => pricePrecisionRef.current,
       onChange: forceUpdate,
     });
   }
