@@ -78,6 +78,8 @@ function bracketDragState(objectId = '', price = 0): NativeBracketDragSharedValu
     activeEntryPrice: shared(price),
     activeDragStartX: shared(0),
     activeDragCurrentX: shared(0),
+    activeDragStartY: shared(0),
+    activeDragCurrentY: shared(0),
     activePositionNotional: shared(0),
     activePositionIsLong: shared(true),
     activePartialPercent: shared(100),

@@ -10,6 +10,7 @@ import {
   NativePartialBoundaryLine,
   NativePartialMarker,
   NATIVE_BRACKET_PARTIAL_MARKER_TEXTS,
+  resolveNativePartialSurfaceTops,
   resolveNativeBracketPartialMarkerOffset,
   shouldShowNativeBracketPartialMarker,
 } from './NativeBracketDragPreviewLayer';
@@ -75,6 +76,8 @@ function bracketDragState(): NativeBracketDragSharedValues {
     activeEntryPrice: shared(63500),
     activeDragStartX: shared(270),
     activeDragCurrentX: shared(270),
+    activeDragStartY: shared(200),
+    activeDragCurrentY: shared(200),
     activePositionNotional: shared(2500),
     activePositionIsLong: shared(true),
     activePartialPercent: shared(100),
@@ -83,6 +86,71 @@ function bracketDragState(): NativeBracketDragSharedValues {
     activeLineColor: shared('#f97316'),
   };
 }
+
+describe('partial preview surface placement', () => {
+  const pane = { paneBottom: 400, paneTop: 0 };
+  const sizes = { labelHeight: 22, markerHeight: 18 };
+  const clearance = 44;
+
+  // The markers and pill are read while the finger is down, so both have to
+  // clear the fingertip, not merely miss the drag zone.
+  it('keeps both surfaces a thumb away from the finger', () => {
+    const down = resolveNativePartialSurfaceTops({ draggingDown: true, fingerY: 200, ...sizes, ...pane });
+
+    expect(down.markerTop).toBeGreaterThanOrEqual(200 + clearance);
+    expect(down.labelTop + sizes.labelHeight).toBeLessThanOrEqual(200 - clearance);
+  });
+
+  it('mirrors the sides when dragging up', () => {
+    const up = resolveNativePartialSurfaceTops({ draggingDown: false, fingerY: 200, ...sizes, ...pane });
+
+    expect(up.markerTop + sizes.markerHeight).toBeLessThanOrEqual(200 - clearance);
+    expect(up.labelTop).toBeGreaterThanOrEqual(200 + clearance);
+  });
+
+  // Resolved as a pair for this reason: independently, both fall back to the
+  // same side near an edge and land on top of each other.
+  it('stacks rather than overlapping when one side has no room', () => {
+    const nearBottom = resolveNativePartialSurfaceTops({ draggingDown: true, fingerY: 380, ...sizes, ...pane });
+    const markerSpan = [nearBottom.markerTop, nearBottom.markerTop + sizes.markerHeight];
+    const labelSpan = [nearBottom.labelTop, nearBottom.labelTop + sizes.labelHeight];
+
+    // Both are forced above the finger here; which one ends up outermost does
+    // not matter, only that they do not sit on top of each other.
+    const overlaps = markerSpan[0] < labelSpan[1] && labelSpan[0] < markerSpan[1];
+    expect(overlaps).toBe(false);
+    expect(markerSpan[1]).toBeLessThanOrEqual(380);
+    expect(labelSpan[1]).toBeLessThanOrEqual(380);
+  });
+
+  // The pane can be shorter than the two surfaces plus their clearance. They
+  // still must not be drawn on top of each other - unreadable beats cramped.
+  it('never overlaps the two surfaces, at any pane height or finger position', () => {
+    for (let paneBottom = 60; paneBottom <= 420; paneBottom += 20) {
+      for (let fingerY = 0; fingerY <= paneBottom; fingerY += 10) {
+        for (const draggingDown of [true, false]) {
+          const tops = resolveNativePartialSurfaceTops({
+            draggingDown,
+            fingerY,
+            ...sizes,
+            paneBottom,
+            paneTop: 0,
+          });
+          const overlaps =
+            tops.markerTop < tops.labelTop + sizes.labelHeight &&
+            tops.labelTop < tops.markerTop + sizes.markerHeight;
+
+          expect({ draggingDown, fingerY, overlaps, paneBottom }).toEqual({
+            draggingDown,
+            fingerY,
+            overlaps: false,
+            paneBottom,
+          });
+        }
+      }
+    }
+  });
+});
 
 describe('AnimatedBracketDragPreview', () => {
   it('formats position partial previews with PnL and distance context', () => {

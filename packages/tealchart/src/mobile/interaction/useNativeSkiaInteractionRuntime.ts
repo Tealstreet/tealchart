@@ -98,6 +98,8 @@ export function useNativeSkiaInteractionRuntime({
   const activeBracketDragEntryPrice = useSharedValue(0);
   const activeBracketDragStartX = useSharedValue(0);
   const activeBracketDragCurrentX = useSharedValue(0);
+  const activeBracketDragStartY = useSharedValue(0);
+  const activeBracketDragCurrentY = useSharedValue(0);
   const activeBracketDragPositionNotional = useSharedValue(0);
   const activeBracketDragPositionIsLong = useSharedValue(true);
   const activeBracketDragPartialPercent = useSharedValue(100);
@@ -180,6 +182,8 @@ export function useNativeSkiaInteractionRuntime({
       activeEntryPrice: activeBracketDragEntryPrice,
       activeDragStartX: activeBracketDragStartX,
       activeDragCurrentX: activeBracketDragCurrentX,
+      activeDragStartY: activeBracketDragStartY,
+      activeDragCurrentY: activeBracketDragCurrentY,
       activePositionNotional: activeBracketDragPositionNotional,
       activePositionIsLong: activeBracketDragPositionIsLong,
       activePartialPercent: activeBracketDragPartialPercent,
@@ -191,6 +195,8 @@ export function useNativeSkiaInteractionRuntime({
       activeBracketDragColor,
       activeBracketDragLineColor,
       activeBracketDragCurrentX,
+      activeBracketDragStartY,
+      activeBracketDragCurrentY,
       activeBracketDragEntryPrice,
       activeBracketDragObjectId,
       activeBracketDragObjectType,
