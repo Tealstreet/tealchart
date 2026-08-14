@@ -10,7 +10,7 @@ import {
   resolveNativeRenderViewport,
   restoreNativeDataLoadViewport,
   shouldRebaseNativeCandidateViewport,
-  shouldPreserveNativeDataLoadViewScale,
+  shouldResetNativeViewScalePricePadding,
   shouldSyncNativeCandidateViewport,
 } from './useNativeViewportRuntime';
 
@@ -38,6 +38,18 @@ function makeBars(
       volume: 100,
     };
   });
+}
+
+/** Flat bars, so a market's price level is whatever it is told to be. */
+function makeBarsAtPrice(count: number, interval: number, price: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    time: 1_000_000 + index * interval,
+    open: price,
+    high: price * 1.01,
+    low: price * 0.99,
+    close: price,
+    volume: 100,
+  }));
 }
 
 const autoViewport: Viewport = {
@@ -276,23 +288,61 @@ describe('useNativeViewportRuntime helpers', () => {
     expect((restored!.endTime - restored!.startTime) / (5 * 60_000)).toBeCloseTo(40, 4);
   });
 
-  it('preserves view scale only for same-symbol interval switches', () => {
-    expect(
-      shouldPreserveNativeDataLoadViewScale({
-        nextInterval: '5',
-        nextSymbol: 'BTC-USD',
-        previousInterval: '15',
-        previousSymbol: 'BTC-USD',
-      }),
-    ).toBe(true);
+  it('drops the captured price fit on a symbol switch but keeps it across intervals', () => {
+    expect(shouldResetNativeViewScalePricePadding({ nextSymbol: 'DOGE-USDC', previousSymbol: 'BTC-USD' })).toBe(true);
+    expect(shouldResetNativeViewScalePricePadding({ nextSymbol: 'BTC-USD', previousSymbol: 'BTC-USD' })).toBe(false);
+  });
 
-    expect(
-      shouldPreserveNativeDataLoadViewScale({
-        nextInterval: '15',
-        nextSymbol: 'DOGE-USDC',
-        previousInterval: '15',
-        previousSymbol: 'BTC-USD',
+  // Native only auto-scales inside a gesture, so unlike web nothing corrects a
+  // restored price range afterwards - it has to be neutralised at capture.
+  it('refits a hand-scaled price axis to the new market while keeping the zoom', () => {
+    const expensiveBars = makeBarsAtPrice(120, 60_000, 50_000);
+    const cheapBars = makeBarsAtPrice(120, 60_000, 3.27);
+    const dataKey = createNativeViewportDataKey('CHEAP-USD', '1');
+    // A price axis dragged far wider than the candles need.
+    const handScaled: Viewport = {
+      startTime: expensiveBars[80].time,
+      endTime: expensiveBars[119].time,
+      priceMin: 0,
+      priceMax: 200_000,
+    };
+
+    const carried = restoreNativeDataLoadViewport({
+      bars: cheapBars,
+      dataKey,
+      interval: '1',
+      pending: captureNativeDataLoadViewScale({
+        bars: expensiveBars,
+        dataKey,
+        hasDataViewport: true,
+        interval: '1',
+        viewport: handScaled,
       }),
-    ).toBe(false);
+    });
+    const refit = restoreNativeDataLoadViewport({
+      bars: cheapBars,
+      dataKey,
+      interval: '1',
+      pending: captureNativeDataLoadViewScale({
+        bars: expensiveBars,
+        dataKey,
+        hasDataViewport: true,
+        interval: '1',
+        resetPricePadding: true,
+        viewport: handScaled,
+      }),
+    });
+
+    expect(carried).not.toBeNull();
+    expect(refit).not.toBeNull();
+
+    // How much of the axis the candles actually get. Carrying the padding over
+    // rebuilds the same squashed axis on a market that never trades near it.
+    const candleFill = (vp: Viewport) => (3.27 * 1.01 - 3.27 * 0.99) / (vp.priceMax - vp.priceMin);
+    expect(candleFill(carried!)).toBeLessThan(0.02);
+    expect(candleFill(refit!)).toBeGreaterThan(0.5);
+
+    // Same zoom either way - only the price fit differs.
+    expect(refit!.endTime - refit!.startTime).toBe(carried!.endTime - carried!.startTime);
   });
 });

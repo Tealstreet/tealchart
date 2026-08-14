@@ -160,6 +160,78 @@ describe('ViewportController.handleBarsLoaded', () => {
 });
 
 // ---------------------------------------------------------------------------
+// handleSymbolChange
+// ---------------------------------------------------------------------------
+
+describe('ViewportController.handleSymbolChange', () => {
+  const intervalMs = 60_000;
+
+  // makeBars ramps 10 a bar, which turns any "cheap" market into an expensive
+  // one within a hundred bars. This one stays where it is put.
+  function makeFlatBars(count: number, price: number): Bar[] {
+    return Array.from({ length: count }, (_, i) => ({
+      time: 1_000_000 + i * intervalMs,
+      open: price,
+      high: price * 1.01,
+      low: price * 0.99,
+      close: price,
+      volume: 100 + i,
+    }));
+  }
+
+  // Drag the price axis on a $50k market, then switch to a market priced near
+  // $3. Carrying the manual range over leaves the candles as a sliver.
+  function scaleByHandThenSwitch() {
+    const controller = new ViewportController();
+    const bars = makeBars(100, { interval: intervalMs, basePrice: 50_000 });
+
+    controller.disableAutoScale('main');
+    controller.handleViewportChange(
+      { startTime: bars[30].time, endTime: bars[70].time, priceMin: 49_000, priceMax: 51_000 },
+      bars,
+      intervalMs,
+    );
+
+    return { bars, controller };
+  }
+
+  it('refits the price range to the new market rather than keeping a hand-scaled one', () => {
+    const { controller } = scaleByHandThenSwitch();
+    const cheapBars = makeFlatBars(100, 3.27);
+
+    controller.handleSymbolChange();
+    const result = controller.handleBarsLoaded(cheapBars, intervalMs);
+
+    expect(controller.isAutoScale('main')).toBe(true);
+    expect(controller.hasDisabledAutoScale()).toBe(false);
+    expect(result.priceMax).toBeLessThan(100);
+    expect(result.priceMin).toBeLessThan(result.priceMax);
+  });
+
+  it('keeps the zoom level across the switch', () => {
+    const { controller } = scaleByHandThenSwitch();
+    const cheapBars = makeFlatBars(100, 3.27);
+
+    controller.handleSymbolChange();
+    const result = controller.handleBarsLoaded(cheapBars, intervalMs);
+
+    expect(result.endTime - result.startTime).toBeCloseTo(40 * intervalMs, 0);
+  });
+
+  // An interval change is the same market, so a deliberate price scale stands.
+  it('is not applied on an interval change, which keeps the hand-scaled range', () => {
+    const { controller } = scaleByHandThenSwitch();
+    const sameMarketBars = makeBars(100, { interval: intervalMs, basePrice: 50_000 });
+
+    const result = controller.handleBarsLoaded(sameMarketBars, intervalMs);
+
+    expect(controller.isAutoScale('main')).toBe(false);
+    expect(result.priceMin).toBe(49_000);
+    expect(result.priceMax).toBe(51_000);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // handleReset
 // ---------------------------------------------------------------------------
 
