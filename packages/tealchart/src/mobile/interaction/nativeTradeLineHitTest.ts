@@ -41,6 +41,22 @@ export function getNativePriceAxisSourcePrice(
   return source.price;
 }
 
+/**
+ * A dragged line's tag leaves the de-overlap stack.
+ *
+ * While it was in, it was displaced by its neighbours and shoved them back, and
+ * the whole stack re-resolved every frame of the drag - so dragging one order
+ * made every other tag on the axis jitter. Out of the stack it pins to the drag
+ * price and draws above, which is how the crosshair tag has always behaved.
+ */
+export function isNativePriceAxisTagSourceSuppressedByOrderDrag(
+  source: NativePriceAxisTagSource,
+  orderDragState: NativeOrderDragSharedValues,
+): boolean {
+  'worklet';
+  return source.sourceType === 'order' && orderDragState.activeObjectId.value === source.objectId;
+}
+
 export function isNativePriceAxisTagSourceSuppressedByBracketDrag(
   source: NativePriceAxisTagSource,
   bracketDragState: NativeBracketDragSharedValues,
@@ -91,6 +107,7 @@ export function resolveNativePriceAxisTagCenters({
   for (let index = 0; index < priceAxisTagSources.length; index += 1) {
     const source = priceAxisTagSources[index];
     if (isNativePriceAxisTagSourceSuppressedByBracketDrag(source, bracketDragState)) continue;
+    if (isNativePriceAxisTagSourceSuppressedByOrderDrag(source, orderDragState)) continue;
     const priceY = sharedPriceToNativeLineY(getNativePriceAxisSourcePrice(source, orderDragState), sharedViewport, frame);
     if (!source.clampToPane && !isNativeYInMainPane(priceY, frame)) continue;
     sources.push({
@@ -108,19 +125,6 @@ export function resolveNativePriceAxisTagCenters({
       height: source.height,
       priority: source.priority,
       fixed: source.fixed,
-    });
-  }
-
-  if (bracketDragState.activeObjectId.value) {
-    const bracketY = sharedPriceToNativeLineY(bracketDragState.activePrice.value, sharedViewport, frame);
-    if (!isNativeYInMainPane(bracketY, frame)) {
-      return resolveNativePriceAxisTagStack(sources, frame.mainPane.top, getNativePriceAxisTagFloor(frame));
-    }
-    sources.push({
-      id: getNativeBracketDragTagId(bracketDragState.activeObjectId.value, bracketDragState.activeBracketType.value),
-      originalY: bracketY,
-      height: priceAxisTagHeight,
-      priority: 95,
     });
   }
 

@@ -12,7 +12,7 @@ import { Skia } from '@shopify/react-native-skia';
 
 import { AnimatedBracketDragPreview } from './NativeBracketDragPreviewLayer';
 import { AnimatedPriceLine } from './NativePriceLineLayer';
-import { AnimatedTradeLine } from './NativeTradeLineLayer';
+import { AnimatedTradeLine, AnimatedTradeLineDragTag } from './NativeTradeLineLayer';
 
 export function NativeChartTradeLinesLayer({
   axisFont,
@@ -115,6 +115,29 @@ export function NativeChartTradeLinesLayer({
             smallFont={smallFont}
             staticProjection={staticProjection}
             textFont={textFont}
+            tradeLabelHeight={tradeLabelHeight}
+          />
+        );
+      })}
+
+      {/* After every trade line, so a dragged tag floats above the rest instead
+          of being drawn in list order among them. */}
+      {lineSnapshot.orderLines.map((line) => {
+        const objectId = getOrderObjectId(line);
+        const geometry = tradeLineGeometries.find(
+          (candidate) => candidate.objectType === 'order' && candidate.objectId === objectId,
+        );
+        if (!geometry) return null;
+        return (
+          <AnimatedTradeLineDragTag
+            key={`order-drag-tag-${objectId}`}
+            axisFont={axisFont}
+            color={line.lineColor}
+            dragState={orderDragState}
+            frame={frame}
+            geometry={geometry}
+            pricePrecision={pricePrecision}
+            sharedViewport={sharedViewport}
             tradeLabelHeight={tradeLabelHeight}
           />
         );
