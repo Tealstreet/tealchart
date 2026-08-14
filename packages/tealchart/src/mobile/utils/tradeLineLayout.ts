@@ -47,7 +47,10 @@ export interface NativeTradeLineActionZone {
   partialEnabled: boolean;
   positionNotional: number;
   positionIsLong: boolean;
+  /** Fill for the drag preview's tag and zone - tinted to sit behind text. */
   color: string;
+  /** Stroke for the drag preview's price line - the bracket's own colour. */
+  lineColor: string;
   x1: number;
   x2: number;
 }
@@ -541,6 +544,7 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     positionNotional: positionData?.notional ?? 0,
     positionIsLong: positionData?.isLong ?? true,
     color: button.type === 'tp' || button.type === 'sl' ? button.backgroundColor : line.lineColor,
+    lineColor: button.accentColor ?? line.lineColor,
     x1: button.x - TRADE_LABEL_HIT_SLOP,
     x2: button.x + button.width + TRADE_LABEL_HIT_SLOP,
   }));

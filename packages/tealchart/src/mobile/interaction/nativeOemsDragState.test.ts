@@ -51,6 +51,7 @@ function createBracketDragState(): NativeBracketDragInteractionState {
     activePartialPercent: shared(100),
     activePartialEnabled: shared(false),
     activeColor: shared(''),
+    activeLineColor: shared(''),
     startPrice: shared(0),
     pricePerPixel: shared(0),
   };
@@ -151,6 +152,7 @@ describe('native OEMS drag state', () => {
       positionNotional: 1000,
       positionIsLong: true,
       color: '#00a',
+      lineColor: '#00a',
       x1: 20,
       x2: 40,
     };
@@ -194,6 +196,7 @@ describe('native OEMS drag state', () => {
       positionNotional: 0,
       positionIsLong: true,
       color: '#00a',
+      lineColor: '#00a',
       x1: 20,
       x2: 40,
     };
@@ -219,6 +222,7 @@ describe('native OEMS drag state', () => {
       positionNotional: 0,
       positionIsLong: true,
       color: '#00a',
+      lineColor: '#00a',
       x1: 20,
       x2: 40,
     };
@@ -245,6 +249,7 @@ describe('native OEMS drag state', () => {
       positionNotional: 1000,
       positionIsLong: true,
       color: '#00a',
+      lineColor: '#00a',
       x1: 20,
       x2: 40,
     };
@@ -285,6 +290,7 @@ describe('native OEMS drag state', () => {
       positionNotional: 1000,
       positionIsLong: true,
       color: '#00a',
+      lineColor: '#00a',
       x1: 20,
       x2: 40,
     };
