@@ -129,6 +129,34 @@ function createNativeIconPath(node: DrawingIconNode): SkPath | null {
   }
 }
 
+interface NativeIconGeometry {
+  paths: NativeIconPath[];
+  viewBox: NativeIconViewBox;
+}
+
+// An icon's geometry is fixed by its name, but it was parsed from SVG on every
+// render - each one minting SkPath host objects for the GC to finalize later.
+const nativeIconGeometryCache = new Map<string, NativeIconGeometry | null>();
+
+function getNativeIconGeometry(name: string): NativeIconGeometry | null {
+  const cached = nativeIconGeometryCache.get(name);
+  if (cached !== undefined) return cached;
+
+  const definition = getDrawingIconDefinition(name);
+  const geometry: NativeIconGeometry | null = definition
+    ? {
+        paths: definition.nodes.flatMap((node) => {
+          const path = createNativeIconPath(node);
+          return path ? [{ filled: node.filled === true, path }] : [];
+        }),
+        viewBox: parseIconViewBox(definition.viewBox),
+      }
+    : null;
+
+  nativeIconGeometryCache.set(name, geometry);
+  return geometry;
+}
+
 export function NativeDrawingIconImpl({
   color = '#9ca3af',
   name,
@@ -137,14 +165,10 @@ export function NativeDrawingIconImpl({
   strokeWidth = 1.8,
   style,
 }: NativeDrawingIconProps) {
-  const definition = getDrawingIconDefinition(name);
-  if (!definition) return null;
+  const geometry = getNativeIconGeometry(name);
+  if (!geometry) return null;
 
-  const viewBox = parseIconViewBox(definition.viewBox);
-  const paths: NativeIconPath[] = definition.nodes.flatMap((node) => {
-    const path = createNativeIconPath(node);
-    return path ? [{ filled: node.filled === true, path }] : [];
-  });
+  const { paths, viewBox } = geometry;
 
   const scaleX = size / viewBox.width;
   const scaleY = size / viewBox.height;
