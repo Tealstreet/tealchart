@@ -81,6 +81,12 @@ export interface OemsActionManagerOptions<TState extends OemsActionState = OemsA
   onChange?: () => void;
   onSettle?: (settlement: OemsActionSettlement<TState>) => void;
   stateEquals?: (expected: TState, actual: TState) => boolean;
+  /**
+   * Current price tick, read fresh so a symbol change is picked up. Confirming
+   * a price-bearing action against an exchange fill needs slack: see
+   * `createOemsStateEquals`.
+   */
+  priceTolerance?: () => number;
 }
 
 const DEFAULT_OEMS_ACTION_TIMEOUT_MS = 30000;
@@ -93,14 +99,47 @@ function getObjectKey(objectType: OemsActionObjectType, objectId: string): strin
   return `${objectType}:${objectId}`;
 }
 
-function defaultStateEquals<TState extends OemsActionState>(expected: TState, actual: TState): boolean {
-  for (const [key, expectedValue] of Object.entries(expected)) {
-    if (expectedValue === undefined) continue;
-    if (!Object.is(actual[key as keyof TState], expectedValue)) {
-      return false;
+// Typed against the state so adding a price-bearing field without listing it
+// here fails the build rather than silently keeping the exact comparison.
+const OEMS_PRICE_STATE_KEYS = new Set<keyof OemsActionState>(['price', 'takeProfit', 'stopLoss']);
+
+/**
+ * Compares an optimistic action against what the exchange came back with.
+ *
+ * Prices need a tolerance. We send the price the user dragged to, the exchange
+ * rounds it to its own tick, and the confirmation comes back a fraction away -
+ * so an exact comparison never confirms, and the optimistic overlay sits on the
+ * chart beside the real order until the action times out. Everything else still
+ * compares exactly.
+ *
+ * Where no tick is known, a small relative figure stands in for it.
+ */
+export function createOemsStateEquals<TState extends OemsActionState>(
+  getPriceTolerance?: () => number,
+): (expected: TState, actual: TState) => boolean {
+  return (expected, actual) => {
+    const reportedTick = getPriceTolerance?.() ?? 0;
+    const tick = Number.isFinite(reportedTick) && reportedTick > 0 ? reportedTick : 0;
+    for (const [key, expectedValue] of Object.entries(expected)) {
+      if (expectedValue === undefined) continue;
+      const actualValue = actual[key as keyof TState];
+      if (OEMS_PRICE_STATE_KEYS.has(key) && typeof expectedValue === 'number' && typeof actualValue === 'number') {
+        // The relative figure is a fallback for an unknown tick, not a floor
+        // under a known one: on a high-priced market it is many ticks wide, and
+        // it would confirm a nudge the exchange has not acted on yet.
+        // Widened by a hair: subtracting two large doubles a single tick apart
+        // lands just over the tick (120000.1 - 120000 is 0.1000000000058), and
+        // an exact-tick difference must always confirm.
+        const tolerance = (tick > 0 ? tick : Math.abs(expectedValue) * 1e-5) * (1 + 1e-9);
+        if (Math.abs(actualValue - expectedValue) <= tolerance) continue;
+        return false;
+      }
+      if (!Object.is(actualValue, expectedValue)) {
+        return false;
+      }
     }
-  }
-  return true;
+    return true;
+  };
 }
 
 export class OemsActionManager<TState extends OemsActionState = OemsActionState> {
@@ -121,7 +160,7 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
     this.clearTimer = options.clearTimeout ?? ((timeoutId) => clearTimeout(timeoutId));
     this.onChange = options.onChange;
     this.onSettle = options.onSettle;
-    this.stateEquals = options.stateEquals ?? defaultStateEquals;
+    this.stateEquals = options.stateEquals ?? createOemsStateEquals(options.priceTolerance);
   }
 
   startAction(args: OemsActionStartArgs<TState>): OemsActionStartResult<TState> {
