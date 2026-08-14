@@ -209,7 +209,6 @@ export class ChartWidgetCore {
    */
   initialize(): void {
     if (this._disposed) return;
-    console.log('[chartboot]', Date.now(), 'core-initialize', this._symbol, this._interval);
 
     // The config only feeds the timeframe selector, and nothing in the resolve
     // or load path reads it — so the first bar load must not queue behind it.
@@ -218,11 +217,52 @@ export class ChartWidgetCore {
     // is saturated by account restore at exactly the moment the chart mounts.
     this._datafeed.onReady((config) => {
       if (this._disposed) return;
-      console.log('[chartboot]', Date.now(), 'datafeed-ready');
       this._supportedResolutions = config.supported_resolutions ?? null;
     });
 
+    this._paintCachedBars();
     this._resolveSymbolAndLoad(this._symbol);
+  }
+
+  protected _buildInitialPeriodParams(interval: string) {
+    const now = Date.now();
+    const fromTime = now - INITIAL_BAR_COUNT * getIntervalMs(interval);
+
+    return {
+      countBack: INITIAL_BAR_COUNT,
+      from: Math.floor(fromTime / 1000),
+      to: Math.floor(now / 1000),
+      firstDataRequest: true,
+    };
+  }
+
+  /**
+   * Paints whatever history the datafeed already holds, before resolving.
+   *
+   * Loading stays on: these bars are one request behind, and the live response
+   * replaces them. Leaving it on is also what keeps the chart's usual
+   * loading treatment — and its chart_loaded event — tied to real data.
+   */
+  protected _paintCachedBars(): void {
+    if (!this._datafeed.getCachedBars) {
+      return;
+    }
+
+    const cached = this._datafeed.getCachedBars(
+      this._symbol,
+      this._interval as ResolutionString,
+      this._buildInitialPeriodParams(this._interval),
+    );
+    if (!cached?.length) return;
+
+    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached), 'cache load');
+    if (!normalizedBars.length) return;
+
+    this._bars = normalizedBars;
+    this._plots = [];
+    this._emitBarsChanged('history');
+    this._scheduleRender();
+    this._indicatorManager?.setBars(normalizedBars);
   }
 
   /**
@@ -240,7 +280,6 @@ export class ChartWidgetCore {
       symbol,
       (symbolInfo) => {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) return;
-        console.log('[chartboot]', Date.now(), 'symbol-resolved', symbol);
         this._symbolInfo = symbolInfo;
         this._symbolInfoSymbol = symbol;
         this._loadBars();
@@ -351,25 +390,13 @@ export class ChartWidgetCore {
     const requestSymbolInfo = this._symbolInfo;
     this._setLoading(true);
 
-    const now = Date.now();
-    const intervalMs = getIntervalMs(requestInterval);
-    const countBack = INITIAL_BAR_COUNT;
-    const fromTime = now - countBack * intervalMs;
+    const periodParams = this._buildInitialPeriodParams(requestInterval);
 
-    const periodParams = {
-      countBack,
-      from: Math.floor(fromTime / 1000),
-      to: Math.floor(now / 1000),
-      firstDataRequest: true,
-    };
-
-    console.log('[chartboot]', Date.now(), 'getbars-request', requestSymbol, requestInterval, countBack);
     this._datafeed.getBars(
       requestSymbolInfo,
       requestInterval,
       periodParams,
       (bars) => {
-        console.log('[chartboot]', Date.now(), 'getbars-response', requestSymbol, bars.length);
         if (this._disposed) return;
         if (requestId !== this._loadBarsRequestId) return;
         if (requestSymbol !== this._symbol || requestInterval !== this._interval) return;

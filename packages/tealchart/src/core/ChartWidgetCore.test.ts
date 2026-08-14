@@ -556,3 +556,125 @@ describe('ChartWidgetCore interval changes during a pending resolve', () => {
     expect(controlled.historyRequests.map((request) => request.symbol)).toEqual(['BTC', 'ETH']);
   });
 });
+
+// resolveSymbol blocks on the exchange's market list, which candles do not
+// need — so a datafeed that already holds history paints it straight away.
+describe('ChartWidgetCore cached first paint', () => {
+  function createCachingDatafeed(cachedBars: DatafeedBar[]) {
+    const controlled = createControlledDatafeed();
+    const pendingResolves: Array<{ symbol: string; onResolve: (info: LibrarySymbolInfo) => void }> = [];
+
+    return {
+      ...controlled,
+      pendingResolves,
+      datafeed: {
+        ...controlled.datafeed,
+        getCachedBars: () => cachedBars,
+        resolveSymbol(symbolName: string, onResolve: (info: LibrarySymbolInfo) => void) {
+          pendingResolves.push({ symbol: symbolName, onResolve });
+        },
+      } as IBasicDataFeed,
+    };
+  }
+
+  const intervalMs = 5 * 60_000;
+  const cached = makeBars(1_000_000, intervalMs, 10);
+
+  // The cache is keyed on symbol and resolution; asking with the wrong ones
+  // returns another market's history, or nothing at all.
+  it('asks the datafeed for the market and window it is about to request', () => {
+    const controlled = createControlledDatafeed();
+    const asked: Array<{ symbol: string; resolution: string; countBack: number; from: number; to: number }> = [];
+    const datafeed = {
+      ...controlled.datafeed,
+      getCachedBars: (symbol: string, resolution: ResolutionString, periodParams: PeriodParams) => {
+        asked.push({
+          symbol,
+          resolution,
+          countBack: periodParams.countBack,
+          from: periodParams.from,
+          to: periodParams.to,
+        });
+        return [];
+      },
+    } as IBasicDataFeed;
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    core.initialize();
+
+    expect(asked).toHaveLength(1);
+    expect(asked[0]!.symbol).toBe('BTC');
+    expect(asked[0]!.resolution).toBe('5');
+    expect(asked[0]!.countBack).toBe(controlled.historyRequests[0]!.periodParams.countBack);
+    expect(asked[0]!.to - asked[0]!.from).toBe(
+      controlled.historyRequests[0]!.periodParams.to - controlled.historyRequests[0]!.periodParams.from,
+    );
+  });
+
+  it('paints cached bars before the symbol has resolved', () => {
+    const emitted: number[] = [];
+    const { datafeed } = createCachingDatafeed(cached);
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '5',
+      onBarsChanged: (bars) => emitted.push(bars.length),
+    });
+
+    core.initialize();
+
+    expect(emitted).toEqual([10]);
+    expect(core.getBars()).toHaveLength(10);
+  });
+
+  // The cached set is one request behind, so the chart must keep showing its
+  // loading treatment until the live response lands.
+  it('stays loading through the cached paint', () => {
+    const loadingStates: boolean[] = [];
+    const { datafeed } = createCachingDatafeed(cached);
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '5',
+      onLoadingChanged: (loading) => loadingStates.push(loading),
+    });
+
+    core.initialize();
+
+    expect(loadingStates).not.toContain(false);
+  });
+
+  it('replaces the cached bars with the live response', () => {
+    const { datafeed, historyRequests, pendingResolves } = createCachingDatafeed(cached);
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    core.initialize();
+    pendingResolves[0]!.onResolve(makeSymbolInfo('BTC'));
+    historyRequests[0]!.onResult(makeBars(1_000_000, intervalMs, 300));
+
+    expect(core.getBars()).toHaveLength(300);
+  });
+
+  it('does nothing when the datafeed holds no cached bars', () => {
+    const emitted: number[] = [];
+    const { datafeed } = createCachingDatafeed([]);
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '5',
+      onBarsChanged: (bars) => emitted.push(bars.length),
+    });
+
+    core.initialize();
+
+    expect(emitted).toEqual([]);
+  });
+
+  it('works with a datafeed that does not implement the extension', () => {
+    const { datafeed, historyRequests } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '5' });
+
+    expect(() => core.initialize()).not.toThrow();
+    expect(historyRequests).toHaveLength(1);
+  });
+});
