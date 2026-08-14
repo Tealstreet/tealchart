@@ -11,7 +11,11 @@ import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-na
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { getNativeDarkLabelBackgroundColor } from '../utils/nativeColor';
-import { findNativeResolvedPriceAxisTagCenterY } from '../utils/priceAxisTagLayout';
+import {
+  clampNativePriceAxisTagCenterY,
+  findNativeResolvedPriceAxisTagCenterY,
+  getNativePriceAxisSingleLineTextBaselineOffset,
+} from '../utils/priceAxisTagLayout';
 import { getNativeTradeLineTagId } from '../utils/priceAxisTagSources';
 import {
   getNativeTradeLinePriceTagTextBaselineOffset,
@@ -21,6 +25,7 @@ import {
 import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativePriceAxisTag';
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
 import {
+  getNativePriceAxisTagFloor,
   isNativeYInMainPane,
   sharedPriceToNativeY,
 } from './nativeSharedViewport';
@@ -114,6 +119,12 @@ export function AnimatedTradeLine({
   const rightLineEnd = useDerivedValue(() => ({ x: Math.min(geometry.rightLineEndX, priceLabelX.value - 2), y: lineY.value }));
   const pendingOpacity = line.actionState?.isPending ? 0.55 : 1;
   const groupOpacity = useDerivedValue(() => (isNativeYInMainPane(rawY.value, frame) ? pendingOpacity : 0));
+  // While this line is being dragged its tag is drawn by the floating overlay
+  // above every other tag, so the in-place one stands down rather than drawing
+  // the same tag twice at the same price.
+  const axisTagOpacity = useDerivedValue(() =>
+    dragState && dragState.activeObjectId.value === geometry.objectId ? 0 : 1,
+  );
 
   if (staticProjection) {
     const staticRawY = staticProjection.priceToY(line.price);
@@ -213,20 +224,104 @@ export function AnimatedTradeLine({
         textFont={textFont}
         tradeLabelHeight={tradeLabelHeight}
       />
+      <Group opacity={axisTagOpacity}>
+        <NativePriceAxisTagBox
+          x={priceLabelX}
+          y={priceLabelY}
+          width={priceLabelWidth}
+          height={tradeLabelHeight + 2}
+          backgroundColor={getNativeDarkLabelBackgroundColor()}
+          borderColor={color}
+        />
+        <NativePriceAxisTagAnimatedText
+          x={priceLabelTextX}
+          y={priceTextY}
+          text={priceLabelText}
+          maxCharacters={Number.MAX_SAFE_INTEGER}
+          characterWidth={priceLabelCharacterWidth}
+          font={axisFont}
+          color={color}
+        />
+      </Group>
+    </Group>
+  );
+}
+
+/**
+ * The dragged line's price-axis tag, drawn after every other trade line so it
+ * floats above them.
+ *
+ * One of these per line, gated to the one being dragged - the same shape as
+ * AnimatedTradeLine, so colour and geometry stay static per instance instead of
+ * being looked up per frame.
+ *
+ * It reuses the line's own geometry rather than the axis lane, so it lands
+ * exactly where the in-place tag was and does not jump sideways when a drag
+ * starts. Pinned to the drag price and floor-clamped: out of the de-overlap
+ * stack, but still not allowed into the time axis.
+ */
+export function AnimatedTradeLineDragTag({
+  axisFont,
+  color,
+  dragState,
+  frame,
+  geometry,
+  pricePrecision,
+  sharedViewport,
+  tradeLabelHeight,
+}: {
+  axisFont: ReturnType<typeof Skia.Font>;
+  color: string;
+  dragState: NativeOrderDragSharedValues;
+  frame: NativeChartFrame;
+  geometry: NativeTradeLineGeometry;
+  pricePrecision: number;
+  sharedViewport: NativeViewportSharedValues;
+  tradeLabelHeight: number;
+}) {
+  const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
+  const tagHeight = tradeLabelHeight + 2;
+  const baselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(tagHeight);
+  const right = geometry.priceLabelX + geometry.priceLabelWidth;
+  const opacity = useDerivedValue(() => (dragState.activeObjectId.value === geometry.objectId ? 1 : 0));
+  const centerY = useDerivedValue(() =>
+    clampNativePriceAxisTagCenterY(
+      sharedPriceToNativeY(dragState.activePrice.value, sharedViewport, frame),
+      tagHeight,
+      frame.mainPane.top,
+      getNativePriceAxisTagFloor(frame),
+    ),
+  );
+  const text = useDerivedValue(() => formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision));
+  const width = useDerivedValue(() =>
+    Math.max(
+      geometry.priceLabelWidth,
+      Math.ceil(text.value.length * characterWidth) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2,
+    ),
+  );
+  const x = useDerivedValue(() => right - width.value);
+  const y = useDerivedValue(() => centerY.value - tagHeight / 2);
+  const textX = useDerivedValue(
+    () => right - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X - text.value.length * characterWidth,
+  );
+  const textY = useDerivedValue(() => y.value + baselineOffset);
+
+  return (
+    <Group opacity={opacity}>
       <NativePriceAxisTagBox
-        x={priceLabelX}
-        y={priceLabelY}
-        width={priceLabelWidth}
-        height={tradeLabelHeight + 2}
+        x={x}
+        y={y}
+        width={width}
+        height={tagHeight}
         backgroundColor={getNativeDarkLabelBackgroundColor()}
         borderColor={color}
       />
       <NativePriceAxisTagAnimatedText
-        x={priceLabelTextX}
-        y={priceTextY}
-        text={priceLabelText}
+        x={textX}
+        y={textY}
+        text={text}
         maxCharacters={Number.MAX_SAFE_INTEGER}
-        characterWidth={priceLabelCharacterWidth}
+        characterWidth={characterWidth}
         font={axisFont}
         color={color}
       />

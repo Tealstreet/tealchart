@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import type { PositionLineRenderData, PriceLine } from '../../types';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 
-import { matchFont, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Group, matchFont, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_TRADE_LINE_LABEL_COLOR } from '../../constants';
@@ -15,7 +15,7 @@ import {
 } from './NativePriceAxisTag';
 import { AnimatedPriceLine } from './NativePriceLineLayer';
 import { NativeTradeLineLabelBody } from './NativeTradeLineLabelBody';
-import { AnimatedTradeLine } from './NativeTradeLineLayer';
+import { AnimatedTradeLine, AnimatedTradeLineDragTag } from './NativeTradeLineLayer';
 
 function shared<T>(value: T) {
   return { value };
@@ -172,6 +172,80 @@ describe('native trade and price line layers', () => {
     expect(priceTexts).toHaveLength(1);
     expect(priceTexts[0].props.text.value).toBe('63,777.0');
     expect(priceTexts[0].props.maxCharacters).toBeGreaterThan(0);
+  });
+
+  function orderDrag(activeObjectId: string, price: number) {
+    return {
+      active: shared(true),
+      activeObjectId: shared(activeObjectId),
+      activePrice: shared(price),
+      startPrice: shared(price),
+      pricePerPixel: shared(1),
+    };
+  }
+
+  // A dragged tag leaves the de-overlap stack and floats: two things have to
+  // hold together or it draws twice, or not at all.
+  it('hands the dragged line its tag over to the floating overlay', () => {
+    const axisFont = matchFont({ fontSize: 11 });
+    const props = {
+      axisFont,
+      frame,
+      geometry,
+      line: positionLine,
+      pricePrecision: 0.1,
+      resolvedPriceAxisTags: shared([]),
+      sharedViewport,
+      smallFont: matchFont({ fontSize: 10 }),
+      textFont: matchFont({ fontSize: 11 }),
+      tradeLabelHeight: 18,
+    };
+    const idle = AnimatedTradeLine({ ...props, dragState: orderDrag('', 0) });
+    const dragging = AnimatedTradeLine({ ...props, dragState: orderDrag(geometry.objectId, 63_800) });
+    const tagOpacity = (layer: ReturnType<typeof AnimatedTradeLine>) => {
+      const boxes = collectElementsByType(layer, NativePriceAxisTagBox);
+      // Innermost enclosing group: the outer one carries the whole line's
+      // visibility, the inner one is the tag's own gate.
+      const groups = collectElementsByType(layer, Group).filter((candidate) =>
+        collectElementsByType(candidate, NativePriceAxisTagBox).includes(boxes[boxes.length - 1]),
+      );
+      return groups[groups.length - 1]?.props.opacity;
+    };
+
+    expect(sharedValueOf<number>(tagOpacity(idle))).toBe(1);
+    expect(sharedValueOf<number>(tagOpacity(dragging))).toBe(0);
+  });
+
+  it('pins the floating drag tag to the drag price instead of a stacked position', () => {
+    const overlay = AnimatedTradeLineDragTag({
+      axisFont: matchFont({ fontSize: 11 }),
+      color: '#18aee8',
+      dragState: orderDrag(geometry.objectId, 63_500),
+      frame,
+      geometry,
+      pricePrecision: 0.1,
+      sharedViewport,
+      tradeLabelHeight: 18,
+    });
+    const box = collectElementsByType(overlay, NativePriceAxisTagBox)[0];
+    const expectedY = frame.mainPane.top + ((64_000 - 63_500) / (64_000 - 63_000)) * frame.mainPane.height;
+
+    expect(sharedValueOf<number>(box.props.y) + sharedValueOf<number>(box.props.height) / 2).toBeCloseTo(expectedY, 4);
+  });
+
+  it('hides the floating drag tag when nothing is being dragged', () => {
+    const overlay = AnimatedTradeLineDragTag({
+      axisFont: matchFont({ fontSize: 11 }),
+      color: '#18aee8',
+      dragState: orderDrag('', 0),
+      frame,
+      geometry,
+      pricePrecision: 0.1,
+      sharedViewport,
+      tradeLabelHeight: 18,
+    });
+
+    expect(sharedValueOf<number>(collectElementsByType(overlay, Group)[0].props.opacity)).toBe(0);
   });
 
   it('renders full trade-line price-axis text when the tag grows left of the axis lane', () => {

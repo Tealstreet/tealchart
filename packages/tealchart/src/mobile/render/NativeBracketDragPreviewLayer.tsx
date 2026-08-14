@@ -11,14 +11,13 @@ import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../../constants';
 import { getNativeDarkLabelBackgroundColor, NATIVE_PRICE_AXIS_TAG_TEXT_COLOR } from '../utils/nativeColor';
 import { NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
-  findNativeResolvedPriceAxisTagCenterY,
+  clampNativePriceAxisTagCenterY,
   getNativePriceAxisSingleLineTextBaselineOffset,
 } from '../utils/priceAxisTagLayout';
-import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
 import { createNativeAxisLaneTagLayout, PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
 import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativePriceAxisTag';
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
-import { sharedPriceToNativeY } from './nativeSharedViewport';
+import { getNativePriceAxisTagFloor, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
 
 const PARTIAL_ZONE_HALF_WIDTH = 220;
@@ -126,15 +125,6 @@ export function formatNativeBracketPartialPreviewLabel({
   const pnl = ((priceDiff * notional) / entryPrice) * (normalizedPercent / 100);
   const pnlSign = pnl >= 0 ? '+' : '-';
   return `${pnlSign}$${formatNativeSignedFixed(pnl, 2)} | ${typeLabel} | ${percentText}`;
-}
-
-function resolveNativePriceAxisTagCenterY(
-  resolvedPriceAxisTags: readonly NativeResolvedPriceAxisTag[],
-  targetId: string,
-  fallbackCenterY: number,
-): number {
-  'worklet';
-  return findNativeResolvedPriceAxisTagCenterY(resolvedPriceAxisTags, targetId, fallbackCenterY);
 }
 
 /**
@@ -381,17 +371,24 @@ export function AnimatedBracketDragPreview({
   const tagTextX = useDerivedValue(
     () => tagRight - NATIVE_PRICE_AXIS_TAG_PADDING_X - tagText.value.length * axisCharacterWidth,
   );
+  // Pinned to the drag price rather than de-overlapped against the other tags:
+  // a dragged tag that drifts off the price it reports is worse than one that
+  // overlaps a neighbour for the length of a drag. Still floor-clamped, so it
+  // cannot ride down into the time axis - which is the one case the connector
+  // below still has to draw for.
   const labelCenterY = useDerivedValue(() => {
     if (!dragState.activeObjectId.value) return -1000;
-    return resolveNativePriceAxisTagCenterY(
-      resolvedPriceAxisTags.value,
-      getNativeBracketDragTagId(dragState.activeObjectId.value, dragState.activeBracketType.value),
+    return clampNativePriceAxisTagCenterY(
       y.value,
+      PRICE_AXIS_TAG_HEIGHT,
+      frame.mainPane.top,
+      getNativePriceAxisTagFloor(frame),
     );
   });
   const lineEnd = useDerivedValue(() => ({ x: tagX.value, y: y.value }));
   const connectorStart = useDerivedValue(() => ({ x: tagX.value, y: y.value }));
   const connectorEnd = useDerivedValue(() => ({ x: tagX.value, y: labelCenterY.value }));
+  // Only draws when the floor clamp has pulled the tag off its price.
   const connectorOpacity = useDerivedValue(() => (Math.abs(labelCenterY.value - y.value) > 2 ? 0.5 : 0));
   const labelY = useDerivedValue(() => labelCenterY.value - PRICE_AXIS_TAG_HEIGHT / 2);
   const textBaselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(PRICE_AXIS_TAG_HEIGHT);
