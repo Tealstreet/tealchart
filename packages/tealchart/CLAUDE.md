@@ -12,40 +12,35 @@ Canvas-based OHLCV charting library with a TradingView-compatible widget API.
 
 **Overlay UI rule:** Use real DOM nodes on web and real React Native nodes on mobile for controls, menus, buttons, popovers, context menus, floating action buttons, and toolbars whenever their size/value is not a high-frequency function of chart data. Canvas/Skia should own plot primitives and chart-derived labels that must stay inside the draw pass: candles, volume, grid, axes, crosshair, price/time labels, and projected drawing or trading geometry. The left drawing tool rail, reset-view affordance, context menus, price-axis plus menus, and similar chrome belong in overlay UI, not canvas/Skia.
 
-**Hit-testing rule:** What draws a control decides what receives its taps.
+**Native hit-testing rule:** Rendering a control and receiving its taps are two
+separate decisions. The overlay rule above only covers rendering. Taps on native
+chart chrome belong to the chart's gesture layer — there is exactly one hit-test
+system and it is already built. Never add a parallel touch path.
 
-- **Drawn into the canvas** — candles, axes, crosshair, trade and price lines,
-  user drawings, axis tags. These have no element to attach a handler to, so the
-  chart's hit-test system owns them: `hitTestUserDrawings` and `EventManager` on
-  web, the gesture runtime under `mobile/interaction/` on native.
-- **Not drawn into the canvas** — every DOM node on web and every React Native
-  node on mobile. These take their own events: `addEventListener` / `onclick` on
-  web, `onPress` on native. That is true whether the element sits in a reserved
-  chrome band (top bar, left tool rail) or floats over the plot (legend, gear,
-  selection toolbar, context menus).
+A native control drawn over the Skia canvas must:
 
-Never re-derive a rect for an element that already has a callback. `onPress`
-arrives in the element's own coordinate space and stays correct when the element
-moves, scrolls, or re-lays out. A rect measured with `onLayout` and re-projected
-into canvas space is the same information, worse: it is a copy that has to be
-kept in sync, and it will drift. A native top bar built that way had to have its
-horizontal scrolling disabled to hide the drift, and nobody noticed until the
-controls past the right edge became unreachable.
+1. Render passively — `pointerEvents="none"`, no `Pressable`, no `onPress`.
+2. Report its own box with `onLayout` and turn that into an
+   `NativeOverlayActionHitTarget` (see `resolveNativeChartSettingsActionTargets`,
+   or `resolveNativeLegendActionTargets` for the multi-row case). Derive the rect
+   from the measured layout, never from recomputed geometry — measured rects
+   cannot drift from the glyph, hand-derived ones always do.
+3. Feed those targets into `overlayActionTargets` so
+   `createNativeOverlayActionTapGesture` owns the tap, **and** into
+   `nativeGestureControlZones` so pan/crosshair/drawing gestures fail their start
+   over the control.
 
-The genuine problem is different and has a different fix. React Native touches
-and gesture-handler gestures do compete over the same area, so a React Native
-control that floats over the canvas must also report its box into
-`nativeGestureControlZones`, which makes pan/crosshair/drawing gestures fail
-their start underneath it. Measure that box with `onLayout` — suppression zones
-should come from measured layout, never from recomputed geometry. Controls in a
-reserved band get one coarse zone for the whole band instead.
-
-So: `onPress` for the tap, a control zone for the suppression, and no hit target
-in between. The left tool rail is the reference implementation on native, and
-web chrome has always worked this way.
+The chart legend and the settings gear are the reference implementations. A
+`Pressable` overlay puts the hit box in a different coordinate space to every
+other chart control, and the two then disagree in ways that are extremely
+tedious to chase — a gear built that way had a dead half for a day.
 
 Grow small targets inward with hit slop only. Slop pushed past the canvas edge
 buys nothing, because the gesture layer never sees touches outside it.
+
+The top bar and left tool rail predate this and still use `Pressable` plus one
+coarse reserved band. That is legacy, not a second sanctioned pattern; do not
+copy it.
 
 **Icon rule:** There is exactly one icon language, and it is already defined. Never
 use emoji, system glyphs, font icons, or a bespoke inline SVG for chrome.

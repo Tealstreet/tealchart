@@ -219,7 +219,7 @@ function renderNativeIndicatorLegendRow({
     <View
       key={indicator.id}
       onLayout={(event) => onRowLayout(rowKey, event)}
-      pointerEvents="box-none"
+      pointerEvents="none"
       style={[styles.indicatorRow, { opacity: rowOpacity }]}
     >
       <View pointerEvents="none" style={styles.indicatorTextGroup}>
@@ -238,7 +238,6 @@ function renderNativeIndicatorLegendRow({
           accessibilityRole="button"
           hitSlop={6}
           onLayout={(event) => onActionButtonLayout(toggleActionKey, 'toggleIndicator', indicator.id, event)}
-          onPress={() => onToggleIndicator?.(indicator.id)}
           style={styles.iconButton}
         >
           <NativeDrawingIcon
@@ -255,7 +254,6 @@ function renderNativeIndicatorLegendRow({
           accessibilityRole="button"
           hitSlop={6}
           onLayout={(event) => onActionButtonLayout(removeActionKey, 'removeIndicator', indicator.id, event)}
-          onPress={() => onRemoveIndicator?.(indicator.id)}
           style={styles.iconButton}
         >
           <NativeDrawingIcon color={mutedTextColor} name="trash" size={14} strokeWidth={2} />
