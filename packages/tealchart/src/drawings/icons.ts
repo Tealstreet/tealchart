@@ -68,7 +68,10 @@ export const DRAWING_ICONS = {
   chevronLeft: def([polyline('15 6 9 12 15 18')]),
   chevronRight: def([polyline('9 6 15 12 9 18')]),
   chevronDown: def([polyline('6 9 12 15 18 9')]),
-  indicators: def([line(15, 4, 9, 20), line(12, 8, 19, 8), line(5, 15, 12, 15)]),
+  indicators: def([
+    p('M16.5 4.4c-.7-.4-1.4-.7-2.2-.7-2 0-3.3 1.2-3.7 3.5L8.4 18.8c-.3 1.5-1.2 2.4-2.6 2.4-.6 0-1.2-.1-1.7-.4'),
+    line(7, 10, 16, 10),
+  ]),
 
   // --- Lines ---
   trendLine: def([line(5, 19, 19, 5), circle(5, 19, 2), circle(19, 5, 2)]),

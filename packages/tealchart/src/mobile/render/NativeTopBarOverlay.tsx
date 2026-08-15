@@ -1,3 +1,5 @@
+import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
+import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 import type { NativeTopBarActionCommand, NativeTopBarButtonGeometry, NativeTopBarLayout } from '../utils/topBarLayout';
 
 import React from 'react';
@@ -6,13 +8,47 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { NativeDrawingIcon } from './NativeDrawingIcon';
 
+export type NativeTopBarActionHitTarget = NativeOverlayActionHitTarget<NativeTopBarActionCommand>;
+
 export interface NativeTopBarOverlayProps {
   backgroundColor: string;
   gridColor: string;
   mutedTextColor: string;
-  onAction: (action: NativeTopBarActionCommand) => void;
+  onActionTargetsChange?: (targets: readonly NativeTopBarActionHitTarget[]) => void;
   textColor: string;
   topBarLayout: NativeTopBarLayout;
+}
+
+interface NativeTopBarOverlayImplProps extends NativeTopBarOverlayProps {
+  onButtonLayout?: (key: string, command: NativeTopBarActionCommand, event: LayoutChangeEvent) => void;
+  onSymbolLayout?: (event: LayoutChangeEvent) => void;
+}
+
+interface NativeTopBarActionOrigin {
+  command: NativeTopBarActionCommand;
+  enabled: boolean;
+  key: string;
+  left: number;
+  top: number;
+}
+
+interface NativeTopBarActionLayout {
+  command: NativeTopBarActionCommand;
+  layout: LayoutRectangle;
+}
+
+const TOP_BAR_ACTION_HIT_SLOP = { left: 3, right: 3, top: 4, bottom: 4 };
+const SYMBOL_ACTION_HIT_SLOP = { left: 0, right: 4, top: 0, bottom: 4 };
+
+const ignoreNativeTopBarButtonLayout = () => undefined;
+const ignoreNativeTopBarSymbolLayout = () => undefined;
+
+function areNativeLayoutRectanglesEqual(a: LayoutRectangle | undefined, b: LayoutRectangle): boolean {
+  return a?.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+}
+
+function nativeTopBarButtonKey(button: NativeTopBarButtonGeometry): string {
+  return `button:${button.type}:${button.interval ?? button.text}:${button.x}`;
 }
 
 function iconForButton(button: NativeTopBarButtonGeometry) {
@@ -30,17 +66,93 @@ function accessibilityLabelForButton(button: NativeTopBarButtonGeometry): string
   return 'Redo drawing action';
 }
 
+export function resolveNativeTopBarActionOrigins(topBarLayout: NativeTopBarLayout): NativeTopBarActionOrigin[] {
+  const origins: NativeTopBarActionOrigin[] = [];
+
+  if (topBarLayout.symbolHitRect) {
+    origins.push({
+      command: { type: 'symbol' },
+      enabled: true,
+      key: 'symbol',
+      left: 0,
+      top: 0,
+    });
+  }
+
+  for (const button of topBarLayout.buttons) {
+    origins.push({
+      command: button.interval ? { type: button.type, interval: button.interval } : { type: button.type },
+      enabled: button.enabled,
+      key: nativeTopBarButtonKey(button),
+      left: topBarLayout.scrollAreaX,
+      top: 0,
+    });
+  }
+
+  return origins;
+}
+
+export function resolveNativeTopBarActionTargets({
+  actionLayouts,
+  actionOrigins,
+}: {
+  actionLayouts: Readonly<Record<string, NativeTopBarActionLayout>>;
+  actionOrigins: readonly NativeTopBarActionOrigin[];
+}): NativeTopBarActionHitTarget[] {
+  const targets: NativeTopBarActionHitTarget[] = [];
+
+  for (const origin of actionOrigins) {
+    const actionLayout = actionLayouts[origin.key];
+    if (!actionLayout) continue;
+    const slop = origin.key === 'symbol' ? SYMBOL_ACTION_HIT_SLOP : TOP_BAR_ACTION_HIT_SLOP;
+    targets.push({
+      command: actionLayout.command,
+      enabled: origin.enabled,
+      x1: origin.left + actionLayout.layout.x - slop.left,
+      x2: origin.left + actionLayout.layout.x + actionLayout.layout.width + slop.right,
+      y1: origin.top + actionLayout.layout.y - slop.top,
+      y2: origin.top + actionLayout.layout.y + actionLayout.layout.height + slop.bottom,
+    });
+  }
+
+  return targets;
+}
+
+export function areNativeTopBarActionTargetsEqual(
+  a: readonly NativeTopBarActionHitTarget[],
+  b: readonly NativeTopBarActionHitTarget[],
+): boolean {
+  if (a.length !== b.length) return false;
+  for (let index = 0; index < a.length; index += 1) {
+    const left = a[index];
+    const right = b[index];
+    if (
+      left.command.type !== right.command.type ||
+      left.command.interval !== right.command.interval ||
+      left.enabled !== right.enabled ||
+      left.x1 !== right.x1 ||
+      left.x2 !== right.x2 ||
+      left.y1 !== right.y1 ||
+      left.y2 !== right.y2
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function NativeTopBarOverlayImpl({
   backgroundColor,
   gridColor,
   mutedTextColor,
-  onAction,
+  onButtonLayout = ignoreNativeTopBarButtonLayout,
+  onSymbolLayout = ignoreNativeTopBarSymbolLayout,
   textColor,
   topBarLayout,
-}: NativeTopBarOverlayProps) {
+}: NativeTopBarOverlayImplProps) {
   return (
     <View
-      pointerEvents="auto"
+      pointerEvents="none"
       style={[
         styles.overlay,
         {
@@ -87,8 +199,7 @@ export function NativeTopBarOverlayImpl({
         <Pressable
           accessibilityLabel="Change symbol"
           accessibilityRole="button"
-          hitSlop={{ left: 2, right: 4, top: 4, bottom: 4 }}
-          onPress={() => onAction({ type: 'symbol' })}
+          onLayout={onSymbolLayout}
           style={[
             styles.symbolButton,
             {
@@ -105,6 +216,8 @@ export function NativeTopBarOverlayImpl({
         bounces={false}
         horizontal
         keyboardShouldPersistTaps="handled"
+        pointerEvents="none"
+        scrollEnabled={false}
         scrollEventThrottle={16}
         showsHorizontalScrollIndicator={false}
         style={[
@@ -134,14 +247,14 @@ export function NativeTopBarOverlayImpl({
 
           {topBarLayout.buttons.map((button) => {
             const icon = iconForButton(button);
+            const command = button.interval ? { type: button.type, interval: button.interval } : { type: button.type };
             return (
               <Pressable
                 key={`native-top-bar-button-${button.type}-${button.interval ?? button.text}-${button.x}`}
                 accessibilityLabel={accessibilityLabelForButton(button)}
                 accessibilityRole="button"
                 disabled={!button.enabled}
-                hitSlop={{ left: 3, right: 3, top: 4, bottom: 4 }}
-                onPress={() => onAction(button)}
+                onLayout={(event) => onButtonLayout(nativeTopBarButtonKey(button), command, event)}
                 style={[
                   styles.button,
                   {
@@ -189,7 +302,65 @@ export function NativeTopBarOverlayImpl({
   );
 }
 
-export const NativeTopBarOverlay = React.memo(NativeTopBarOverlayImpl);
+function NativeTopBarOverlayRuntime(props: NativeTopBarOverlayProps) {
+  const [actionLayouts, setActionLayouts] = React.useState<Record<string, NativeTopBarActionLayout>>({});
+  const lastActionTargetsRef = React.useRef<readonly NativeTopBarActionHitTarget[]>([]);
+  const onActionTargetsChangeRef = React.useRef(props.onActionTargetsChange);
+  const actionOrigins = React.useMemo(() => resolveNativeTopBarActionOrigins(props.topBarLayout), [props.topBarLayout]);
+  const nativeTopBarActionTargets = React.useMemo(
+    () => resolveNativeTopBarActionTargets({ actionLayouts, actionOrigins }),
+    [actionLayouts, actionOrigins],
+  );
+
+  React.useEffect(() => {
+    onActionTargetsChangeRef.current = props.onActionTargetsChange;
+  }, [props.onActionTargetsChange]);
+  React.useEffect(() => {
+    if (areNativeTopBarActionTargetsEqual(lastActionTargetsRef.current, nativeTopBarActionTargets)) return;
+    lastActionTargetsRef.current = nativeTopBarActionTargets;
+    onActionTargetsChangeRef.current?.(nativeTopBarActionTargets);
+  }, [nativeTopBarActionTargets]);
+  React.useEffect(() => {
+    return () => {
+      lastActionTargetsRef.current = [];
+      onActionTargetsChangeRef.current?.([]);
+    };
+  }, []);
+
+  const handleSymbolLayout = React.useCallback((event: LayoutChangeEvent) => {
+    const nextLayout = event.nativeEvent.layout;
+    setActionLayouts((previous) => {
+      if (areNativeLayoutRectanglesEqual(previous.symbol?.layout, nextLayout)) return previous;
+      return {
+        ...previous,
+        symbol: { command: { type: 'symbol' }, layout: nextLayout },
+      };
+    });
+  }, []);
+  const handleButtonLayout = React.useCallback(
+    (key: string, command: NativeTopBarActionCommand, event: LayoutChangeEvent) => {
+      const nextLayout = event.nativeEvent.layout;
+      setActionLayouts((previous) => {
+        if (
+          previous[key]?.command.type === command.type &&
+          previous[key]?.command.interval === command.interval &&
+          areNativeLayoutRectanglesEqual(previous[key]?.layout, nextLayout)
+        ) {
+          return previous;
+        }
+        return {
+          ...previous,
+          [key]: { command, layout: nextLayout },
+        };
+      });
+    },
+    [],
+  );
+
+  return <NativeTopBarOverlayImpl {...props} onButtonLayout={handleButtonLayout} onSymbolLayout={handleSymbolLayout} />;
+}
+
+export const NativeTopBarOverlay = React.memo(NativeTopBarOverlayRuntime);
 NativeTopBarOverlay.displayName = 'NativeTopBarOverlay';
 
 const styles = StyleSheet.create({
