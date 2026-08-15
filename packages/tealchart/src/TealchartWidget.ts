@@ -56,13 +56,11 @@ import type {
 import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
+import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 import type { ChartSettings, ChartStore, IndicatorInstance, PlotStyleOverride } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
-
-import { applyChartOverridesToRenderOptions } from './overrides';
-import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 import type { ResolutionInput } from './utils/normalizeResolution';
+import type { ITealchartWebWidget, SaveChartErrorInfo, SaveChartToServerOptions } from './widgetContract';
 
 import { LOADING_OPACITY } from './constants';
 import {
@@ -113,6 +111,7 @@ import {
 } from './indicators/builtinIndicators';
 import { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import { DEFAULT_LAYOUT_NAME } from './layoutDefaults';
+import { applyChartOverridesToRenderOptions } from './overrides';
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
 import { getChartStore, hasChartStore } from './state/chartState';
@@ -300,6 +299,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   // Map from study ID to indicator config (for pane lookup)
   private _indicatorConfigMap = new Map<string, BuiltinIndicator>();
   private _indicatorDeclarationMap = new Map<string, IndicatorDeclarationMetadata>();
+  private _customTealscriptIndicators: BuiltinIndicator[];
   // Auto-save timer ID
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
   // Throttled crosshair emission (50ms matches TradingView's throttle in useWidgetStateManagement)
@@ -336,6 +336,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
     this._options = resolveDefaultLayoutPersistence(options);
+    this._customTealscriptIndicators = this._normalizeCustomTealscriptIndicators(options.customTealscriptIndicators);
     this._datafeed = options.datafeed;
     this._symbol = getCleanSymbol(options.symbol) ?? '';
     this._initialResolveSymbol = options.symbol;
@@ -624,7 +625,12 @@ export class TealchartWidget implements ITealchartWebWidget {
       loadAsTealchart(current.layoutId!, this._options.save_load_adapter!)
         .then((result) => {
           if (this._disposed) return;
-          this._handleLoadLayout(result.data, result.warnings, current.layoutId!, current.layoutName || DEFAULT_LAYOUT_NAME);
+          this._handleLoadLayout(
+            result.data,
+            result.warnings,
+            current.layoutId!,
+            current.layoutName || DEFAULT_LAYOUT_NAME,
+          );
           // Sync layout selector UI
           this._ui?.setCurrentLayout(current.layoutId, current.layoutName || DEFAULT_LAYOUT_NAME);
         })
@@ -1076,7 +1082,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     for (const instance of indicators) {
       // Look up the built-in indicator by ID
-      const builtinIndicator = getIndicatorById(instance.builtinId);
+      const builtinIndicator = this._getIndicatorById(instance.builtinId);
       if (!builtinIndicator) {
         this._logger?.warn(LogCategory.Indicators, `Unknown indicator ID: ${instance.builtinId}, skipping`);
         continue;
@@ -1555,13 +1561,36 @@ export class TealchartWidget implements ITealchartWebWidget {
   }
 
   private _getAvailableIndicators(): BuiltinIndicator[] {
-    return BUILTIN_INDICATORS.filter((indicator) => {
+    const builtins = BUILTIN_INDICATORS.filter((indicator) => {
       if (isJailbreakIndicator(indicator)) {
         return Boolean(this._options.jailbreakIndicatorFactories?.[indicator.id]);
       }
 
       return Boolean(this._tealScriptManager);
     });
+    if (!this._tealScriptManager) return builtins;
+
+    const builtinIds = new Set(builtins.map((indicator) => indicator.id));
+    const custom = this._customTealscriptIndicators.filter((indicator) => !builtinIds.has(indicator.id));
+    return [...builtins, ...custom];
+  }
+
+  private _normalizeCustomTealscriptIndicators(indicators: BuiltinIndicator[] | undefined): BuiltinIndicator[] {
+    return (indicators ?? [])
+      .filter((indicator) => indicator.code.trim() && !indicator.jailbreak)
+      .map((indicator) => ({
+        ...indicator,
+        sourceKind: indicator.sourceKind ?? 'custom_tealchart_study',
+      }));
+  }
+
+  private _getIndicatorById(id: string): BuiltinIndicator | undefined {
+    return getIndicatorById(id) ?? this._customTealscriptIndicators.find((indicator) => indicator.id === id);
+  }
+
+  setCustomTealscriptIndicators(indicators: BuiltinIndicator[]): void {
+    this._customTealscriptIndicators = this._normalizeCustomTealscriptIndicators(indicators);
+    this._ui?.setAvailableIndicators(this._getAvailableIndicators());
   }
 
   /**
@@ -1835,6 +1864,9 @@ export class TealchartWidget implements ITealchartWebWidget {
       id: instanceId,
       name: indicator.name,
       builtinId: indicator.id,
+      sourceKind: indicator.sourceKind ?? 'builtin',
+      sourceId: indicator.sourceId,
+      sourceHash: indicator.sourceHash,
       inputs: { ...defaultInputs },
       isVisible: true,
       createdAt: Date.now(),
@@ -1879,7 +1911,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     if (newVisible) {
       // Re-register the indicator if it was hidden
-      const builtin = getIndicatorById(instance.builtinId);
+      const builtin = this._getIndicatorById(instance.builtinId);
       if (builtin?.jailbreak) {
         const factory = this._options.jailbreakIndicatorFactories?.[builtin.id];
         if (factory) {
@@ -2009,7 +2041,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     const instance = this._chartStore.settings.get().indicators.find((ind) => ind.id === instanceId);
     if (!instance) return [];
 
-    const builtin = getIndicatorById(instance.builtinId);
+    const builtin = this._getIndicatorById(instance.builtinId);
     if (!builtin?.jailbreak) return [];
 
     return jailbreakInputsToInputDefinitions(builtin.jailbreak.inputs);
@@ -2105,7 +2137,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     const instance = this._chartStore.settings.get().indicators.find((ind) => ind.id === instanceId);
     if (!instance) return;
 
-    const builtin = getIndicatorById(instance.builtinId);
+    const builtin = this._getIndicatorById(instance.builtinId);
     if (!builtin?.jailbreak) return;
 
     // Merge new inputs with existing
@@ -3908,7 +3940,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Add indicators from loaded settings
     if (settings.indicators && settings.indicators.length > 0) {
       for (const indicator of settings.indicators) {
-        const builtinIndicator = getIndicatorById(indicator.builtinId);
+        const builtinIndicator = this._getIndicatorById(indicator.builtinId);
         if (!builtinIndicator) {
           this._logger?.warn(LogCategory.Indicators, `Unknown indicator: ${indicator.builtinId}`);
           continue;

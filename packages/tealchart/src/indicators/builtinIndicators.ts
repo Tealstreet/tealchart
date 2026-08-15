@@ -39,6 +39,12 @@ export interface JailbreakIndicatorMeta {
 export interface BuiltinIndicator {
   /** Unique identifier */
   id: string;
+  /** Source family for persisted provenance. Omitted means built-in. */
+  sourceKind?: 'builtin' | 'custom_tealchart_study';
+  /** Stable source row id when this indicator came from a user/custom catalog. */
+  sourceId?: string;
+  /** Source hash/version marker for future invalidation and diagnostics. */
+  sourceHash?: string;
   /** Display name */
   name: string;
   /** Category for grouping in the UI */

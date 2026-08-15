@@ -1,7 +1,7 @@
 import type { MapStore, WritableAtom } from 'nanostores';
-import type { ChartProperties, PreservedTvProperties, ResolutionString } from '../types';
 import type { UserDrawingState } from '../drawings';
 import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
+import type { ChartProperties, PreservedTvProperties, ResolutionString } from '../types';
 
 import { atom, computed, map } from 'nanostores';
 
@@ -43,6 +43,12 @@ export interface IndicatorInstance {
   name: string;
   /** Reference to BuiltinIndicator.id in builtinIndicators.ts */
   builtinId: string;
+  /** Source family for resolving the indicator definition. Omitted means built-in. */
+  sourceKind?: 'builtin' | 'custom_tealchart_study';
+  /** Stable source row id for custom indicator catalogs. */
+  sourceId?: string;
+  /** Source hash/version marker captured when the indicator was added. */
+  sourceHash?: string;
   /** User-configured input values */
   inputs: Record<string, unknown>;
   /** Style overrides for plots */
@@ -217,9 +223,7 @@ function getUiPreferencesStorageKey(chartKey: string): string {
   return `${getStorageKey(chartKey)}:ui-preferences`;
 }
 
-function createDefaultChartUiPreferences(
-  overrides?: Partial<ChartUiPreferences>,
-): ChartUiPreferences {
+function createDefaultChartUiPreferences(overrides?: Partial<ChartUiPreferences>): ChartUiPreferences {
   return {
     ...DEFAULT_CHART_UI_PREFERENCES,
     ...overrides,
@@ -234,16 +238,11 @@ function normalizeChartUiPreferences(
   const input = value as Partial<ChartUiPreferences>;
   return {
     leftToolRailCollapsed:
-      typeof input.leftToolRailCollapsed === 'boolean'
-        ? input.leftToolRailCollapsed
-        : defaults.leftToolRailCollapsed,
+      typeof input.leftToolRailCollapsed === 'boolean' ? input.leftToolRailCollapsed : defaults.leftToolRailCollapsed,
   };
 }
 
-function readUiPreferences(
-  raw: string | null,
-  defaults: ChartUiPreferences,
-): ChartUiPreferences {
+function readUiPreferences(raw: string | null, defaults: ChartUiPreferences): ChartUiPreferences {
   if (!raw) return { ...defaults };
   try {
     return normalizeChartUiPreferences(JSON.parse(raw), defaults);
@@ -252,11 +251,7 @@ function readUiPreferences(
   }
 }
 
-function saveUiPreferences(
-  storage: TealchartKeyValueStorage,
-  chartKey: string,
-  state: ChartUiPreferences,
-): void {
+function saveUiPreferences(storage: TealchartKeyValueStorage, chartKey: string, state: ChartUiPreferences): void {
   try {
     const result = storage.setItem(getUiPreferencesStorageKey(chartKey), JSON.stringify(state));
     if (result && typeof (result as Promise<void>).catch === 'function') {
