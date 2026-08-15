@@ -56,4 +56,35 @@ describe('IndicatorsModal', () => {
 
     modal.unmount();
   });
+
+  it('updates the open picker when the available indicator catalog changes', () => {
+    const movingAverage = BUILTIN_INDICATORS.find((indicator) => indicator.id === 'sma');
+    if (!movingAverage) {
+      throw new Error('Expected SMA indicator to exist');
+    }
+
+    const customIndicator = {
+      ...movingAverage,
+      id: 'custom-tealchart-study:demo',
+      sourceKind: 'custom_tealchart_study' as const,
+      sourceId: 'demo',
+      sourceHash: 'v1',
+      name: 'Demo Custom Study',
+      category: 'other' as const,
+      description: 'User-authored Tealscript study',
+    };
+    const modal = new IndicatorsModal({
+      indicators: [movingAverage],
+      onSelectIndicator: vi.fn(),
+    });
+
+    modal.mount(document.body);
+    modal.open();
+    expect(document.body.textContent).not.toContain('Demo Custom Study');
+
+    modal.setIndicators([movingAverage, customIndicator]);
+
+    expect(document.body.textContent).toContain('Demo Custom Study');
+    modal.unmount();
+  });
 });

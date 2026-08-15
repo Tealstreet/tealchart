@@ -300,8 +300,7 @@ export class IndicatorsModal extends Modal {
     const lowerQuery = query.toLowerCase();
     return this.getAvailableIndicators().filter(
       (indicator) =>
-        indicator.name.toLowerCase().includes(lowerQuery) ||
-        indicator.description?.toLowerCase().includes(lowerQuery),
+        indicator.name.toLowerCase().includes(lowerQuery) || indicator.description?.toLowerCase().includes(lowerQuery),
     );
   }
 
@@ -321,6 +320,13 @@ export class IndicatorsModal extends Modal {
     this.indicatorOptions.translations = translations;
     if (this.state.isOpen) {
       this.setTitle(translations?.title || 'Indicators');
+      this.renderList();
+    }
+  }
+
+  setIndicators(indicators: BuiltinIndicator[]): void {
+    this.indicatorOptions.indicators = indicators;
+    if (this.state.isOpen) {
       this.renderList();
     }
   }

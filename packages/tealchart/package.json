@@ -64,10 +64,10 @@
     "@nanostores/persistent": "^1.3.4",
     "@nanostores/react": "^1.1.0",
     "@tealstreet/tealscript": "*",
-    "jotai": "^2.20.1",
+    "jotai": "^2.20.2",
     "jotai-optics": "^0.4.0",
     "konva": "^10.3.0",
-    "nanostores": "^1.4.0",
+    "nanostores": "^1.4.2",
     "optics-ts": "^2.4.1"
   },
   "devDependencies": {
@@ -85,8 +85,8 @@
     "@vitest/ui": "^4.1.8",
     "cross-env": "^7.0.3",
     "eslint": "^9.28.0",
-    "jsdom": "^29.1.1",
-    "npm-run-all2": "^9.0.2",
+    "jsdom": "^30.0.1",
+    "npm-run-all2": "^9.0.3",
     "prettier": "^3.9.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -99,6 +99,6 @@
     "typescript": "^6.0.3",
     "vite": "^8.1.3",
     "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.10"
   }
 }

@@ -1,5 +1,4 @@
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { ChartSettings } from './state/chartState';
 import type {
   DrawingCoordinateSpace,
   UserDrawing,
@@ -7,7 +6,9 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from './drawings';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
+import type { ChartSettings } from './state/chartState';
 import type {
   Bar,
   DatafeedBar,
@@ -41,7 +42,9 @@ const setDrawingsCalls: DrawingOutput[][] = [];
 const setUserDrawingStateCalls: UserDrawingState[] = [];
 const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
+const setAvailableIndicatorsCalls: BuiltinIndicator[][] = [];
 const widgetUiOptionsCalls: Array<{
+  availableIndicators?: BuiltinIndicator[];
   onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
   onUserDrawingUndo?: () => void;
   onUserDrawingRedo?: () => void;
@@ -51,6 +54,7 @@ const widgetUiOptionsCalls: Array<{
 vi.mock('./ui/TealchartWidgetUI', () => ({
   TealchartWidgetUI: class {
     constructor(options: {
+      availableIndicators?: BuiltinIndicator[];
       onUserDrawingToolSelect?: (tool: UserDrawingTool) => void;
       onUserDrawingUndo?: () => void;
       onUserDrawingRedo?: () => void;
@@ -75,6 +79,9 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setPositionLines() {}
     setExecutionLines(lines: unknown) {
       setExecutionLinesCalls.push(lines);
+    }
+    setAvailableIndicators(indicators: BuiltinIndicator[]) {
+      setAvailableIndicatorsCalls.push(indicators);
     }
     setPriceLines() {}
     setPaneLayout() {}
@@ -252,7 +259,7 @@ describe('volume settings persistence', () => {
     widget.remove();
   });
 
-  it('applies a loaded layout\'s chart properties to what actually renders', () => {
+  it("applies a loaded layout's chart properties to what actually renders", () => {
     // Persisting a property is useless if hydrate never reaches _renderOptions:
     // the colour would survive a reload and then not be drawn.
     const datafeed = createMockDatafeed();
@@ -275,7 +282,7 @@ describe('volume settings persistence', () => {
     widget.remove();
   });
 
-  it('does not leak one layout\'s colours into the next', () => {
+  it("does not leak one layout's colours into the next", () => {
     // _renderOptions is cumulative, so merging a loaded layout into it left the
     // previous layout's colours in place for anything the new one omits — the
     // chart drew layout A while saving layout B.
@@ -290,12 +297,7 @@ describe('volume settings persistence', () => {
     };
     const base = internals._getCurrentSettings();
 
-    internals._handleLoadLayout(
-      { ...base, chartProperties: { 'paneProperties.background': '#101418' } },
-      [],
-      'a',
-      'A',
-    );
+    internals._handleLoadLayout({ ...base, chartProperties: { 'paneProperties.background': '#101418' } }, [], 'a', 'A');
     expect(internals._renderOptions.backgroundColor).toBe('#101418');
 
     internals._handleLoadLayout({ ...base, chartProperties: undefined }, [], 'b', 'B');
@@ -353,6 +355,7 @@ describe('TealchartWidget', () => {
     setUserDrawingStateCalls.length = 0;
     setRenderOptionsCalls.length = 0;
     setExecutionLinesCalls.length = 0;
+    setAvailableIndicatorsCalls.length = 0;
     widgetUiOptionsCalls.length = 0;
     // Return null so _renderRafId doesn't get stuck at 0 after
     // the callback synchronously sets it to null (assignment order issue).
@@ -387,6 +390,42 @@ describe('TealchartWidget', () => {
   // TealScript Rendering
   // ============================================================================
   describe('tealscript rendering', () => {
+    it('passes host-supplied custom Tealscript indicators to the picker and updates them live', () => {
+      const datafeed = createMockDatafeed();
+      const customIndicator: BuiltinIndicator = {
+        id: 'custom-tealchart-study:demo',
+        sourceKind: 'custom_tealchart_study',
+        sourceId: 'demo',
+        sourceHash: 'v1',
+        name: 'Demo Study',
+        category: 'other',
+        overlay: true,
+        code: 'indicator("Demo Study", overlay=true)\nplot(close)',
+      };
+      const widget = createWidget(datafeed, {
+        createTealscriptWorker: () =>
+          ({
+            postMessage() {},
+            addEventListener() {},
+            removeEventListener() {},
+            terminate() {},
+          }) as unknown as Worker,
+        customTealscriptIndicators: [customIndicator],
+      });
+
+      completeInit(datafeed);
+
+      expect(
+        widgetUiOptionsCalls.at(-1)?.availableIndicators?.some((indicator) => indicator.id === customIndicator.id),
+      ).toBe(true);
+
+      const updatedIndicator = { ...customIndicator, name: 'Updated Study', sourceHash: 'v2' };
+      widget.setCustomTealscriptIndicators([updatedIndicator]);
+
+      expect(setAvailableIndicatorsCalls.at(-1)?.some((indicator) => indicator.name === 'Updated Study')).toBe(true);
+      widget.remove();
+    });
+
     it('pushes drawing-only dirty updates without resetting plots', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);

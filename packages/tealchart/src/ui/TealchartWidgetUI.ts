@@ -22,6 +22,7 @@ import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from '../interaction/EventManager';
 import type { ChartChromeMetrics } from '../layout/chartGeometry';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
+import type { ChartSettingsControlContext } from '../settings/chartSettingsControls';
 import type { ChartStore, PlotStyleOverride } from '../state/chartState';
 import type {
   Awaitable,
@@ -59,8 +60,6 @@ import { getChartStore } from '../state/chartState';
 import { DEFAULT_MARGINS, TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
 import { ChartLegend } from './ChartLegend';
-import type { ChartSettingsControlContext } from '../settings/chartSettingsControls';
-
 import { ChartSettingsModal } from './ChartSettingsModal';
 import { ChartTopBar } from './ChartTopBar';
 import { applyChromeThemeVars } from './chromeTheme';
@@ -918,6 +917,11 @@ export class TealchartWidgetUI {
 
     // Update indicator pane legends (non-overlay indicators)
     this.updateIndicatorPaneLegends();
+  }
+
+  setAvailableIndicators(indicators: BuiltinIndicator[]): void {
+    this.options.availableIndicators = indicators;
+    this.indicatorsModal?.setIndicators(indicators);
   }
 
   /**
