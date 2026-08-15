@@ -356,7 +356,6 @@ function renderActionButton({
   gridColor,
   item,
   mutedTextColor,
-  onAction,
   textColor,
 }: {
   activeBackgroundColor: string;
@@ -365,7 +364,6 @@ function renderActionButton({
   gridColor: string;
   item: UserDrawingSelectedActionSurfaceItem;
   mutedTextColor: string;
-  onAction: (command: UserDrawingSelectedActionSurfaceCommand) => void;
   textColor: string;
 }) {
   const iconName = resolveDrawingSelectedActionIconName(item.command, item.swatchColor);
@@ -379,7 +377,6 @@ function renderActionButton({
       disabled={!item.enabled}
       hitSlop={ACTION_HIT_SLOP}
       key={`native-selected-drawing-action-${item.id}`}
-      onPress={() => onAction(item.command)}
       style={[
         styles.actionButton,
         {
@@ -417,8 +414,6 @@ function NativeUserDrawingSelectionActionOverlayView({
   gridColor,
   model,
   mutedTextColor,
-  onAction,
-  onPopoverGroupChange,
   openPopoverGroupId = null,
   textColor,
 }: NativeUserDrawingSelectionActionOverlayProps & {
@@ -431,7 +426,7 @@ function NativeUserDrawingSelectionActionOverlayView({
   return (
     <View
       accessibilityLabel="Selected drawing actions"
-      pointerEvents="box-none"
+      pointerEvents="none"
       style={[
         styles.overlay,
         {
@@ -443,7 +438,7 @@ function NativeUserDrawingSelectionActionOverlayView({
       ]}
     >
       <View
-        pointerEvents="box-none"
+        pointerEvents="none"
         style={[
           styles.surface,
           {
@@ -469,7 +464,6 @@ function NativeUserDrawingSelectionActionOverlayView({
                   accessibilityRole="button"
                   accessibilityState={{ expanded: openPopoverGroupId === group.id }}
                   hitSlop={ACTION_HIT_SLOP}
-                  onPress={() => onPopoverGroupChange(openPopoverGroupId === group.id ? null : group.id)}
                   style={[
                     styles.actionButton,
                     {
@@ -497,7 +491,6 @@ function NativeUserDrawingSelectionActionOverlayView({
                     gridColor,
                     item,
                     mutedTextColor,
-                    onAction,
                     textColor,
                   }),
                 )
@@ -530,7 +523,6 @@ function NativeUserDrawingSelectionActionOverlayView({
               gridColor,
               item,
               mutedTextColor,
-              onAction,
               textColor,
             }),
           )}

@@ -292,15 +292,6 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
   private createAction(args: OemsActionStartArgs<TState>): OemsAction<TState> {
     const startedAt = this.now();
     const sequence = ++this.nextSequence;
-    // Create the timer before the action so its id is set by the time any
-    // callback can run. Assigning `action.timeoutId` after `setTimer` leaves it
-    // null for a timer that fires synchronously — fake timers in tests, or a
-    // zero timeout — and the settle path then has no id to clear.
-    const actionRef: { current?: OemsAction<TState> } = {};
-    const timeoutId = this.setTimer(() => {
-      const pending = actionRef.current;
-      if (pending) this.timeOutAction(pending);
-    }, this.timeoutMs);
     const action: OemsAction<TState> = {
       sequence,
       objectType: args.objectType,
@@ -311,11 +302,13 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
       optimisticState: args.optimisticState ?? args.originalState,
       startedAt,
       expiresAt: startedAt + this.timeoutMs,
-      timeoutId,
+      timeoutId: null,
       confirmsRemoved: Boolean(args.confirmsRemoved),
       settleOnCallback: Boolean(args.settleOnCallback),
     };
-    actionRef.current = action;
+    action.timeoutId = this.setTimer(() => {
+      this.timeOutAction(action);
+    }, this.timeoutMs);
     return action;
   }
 

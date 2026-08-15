@@ -18,6 +18,7 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativeTopBarActionHitTarget } from './mobile/render/NativeTopBarOverlay';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
@@ -360,6 +361,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   });
   const [nativeDisplayedInterval, setNativeDisplayedInterval] = useState(interval);
   const [nativeLegendActionTargets, setNativeLegendActionTargets] = useState<readonly NativeLegendActionHitTarget[]>(
+    [],
+  );
+  const [nativeTopBarActionTargets, setNativeTopBarActionTargets] = useState<readonly NativeTopBarActionHitTarget[]>(
     [],
   );
   const [nativeChartSettingsButtonLayout, setNativeChartSettingsButtonLayout] = useState<LayoutRectangle | null>(null);
@@ -1118,8 +1122,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const overlayCommand = command as
         | NativeChartSettingsActionCommand
         | NativeLegendActionCommand
+        | Parameters<typeof handleNativeTopBarAction>[0]
         | null;
       if (!overlayCommand) return;
+      if (
+        overlayCommand.type === 'symbol' ||
+        overlayCommand.type === 'timeframe' ||
+        overlayCommand.type === 'indicators' ||
+        overlayCommand.type === 'layout' ||
+        overlayCommand.type === 'undo' ||
+        overlayCommand.type === 'redo'
+      ) {
+        handleNativeTopBarAction(overlayCommand);
+        return;
+      }
+      if (overlayCommand.type === 'openChartSettings') {
+        setNativeChartSettingsOpen(true);
+        return;
+      }
       if (!('indicatorId' in overlayCommand) || typeof overlayCommand.indicatorId !== 'string') return;
       if (overlayCommand.type === 'toggleIndicator') {
         chartApi.toggleStudyVisibility(overlayCommand.indicatorId);
@@ -1129,7 +1149,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         chartApi.removeStudy(overlayCommand.indicatorId);
       }
     },
-    [chartApi],
+    [chartApi, handleNativeTopBarAction],
   );
 
   const {
@@ -1374,6 +1394,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     zones.push(...nativeLegendActionTargets);
     zones.push(...nativeChartSettingsActionTargets);
+    zones.push(...nativeTopBarActionTargets);
 
     return zones;
   }, [
@@ -1385,12 +1406,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
     nativeResetViewButtonVisible,
+    nativeTopBarActionTargets,
     nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
   const nativeOverlayActionTargets = useMemo(
-    () => [],
-    [],
+    () => [...nativeLegendActionTargets, ...nativeChartSettingsActionTargets, ...nativeTopBarActionTargets],
+    [nativeChartSettingsActionTargets, nativeLegendActionTargets, nativeTopBarActionTargets],
   );
   // Same outcome as the reset button, different input. The button also hides
   // itself on use; do that here too so a reveal from an earlier tap does not
@@ -1606,7 +1628,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           backgroundColor={backgroundColor}
           gridColor={gridColor}
           mutedTextColor={nativeMutedTextColor}
-          onAction={handleNativeTopBarAction}
+          onActionTargetsChange={setNativeTopBarActionTargets}
           textColor={textColor}
           topBarLayout={topBarLayout}
         />
@@ -1697,7 +1719,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         backgroundColor={backgroundColor}
         axisHeight={frame?.dimensions.margins.bottom ?? 0}
         onLayoutRectChange={handleNativeChartSettingsButtonLayout}
-        onPress={() => setNativeChartSettingsOpen(true)}
         textColor={nativeMutedTextColor}
       />
       {nativeChartSettingsOpen ? (

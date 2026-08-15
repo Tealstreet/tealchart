@@ -22,7 +22,7 @@
     "prettier": "^3.8.3",
     "turbo": "^2.9.14",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.7"
   },
   "packageManager": "yarn@1.22.21",
   "engines": {

@@ -67,12 +67,7 @@ describe('UserDrawingObjectTreePanel', () => {
     expect(element?.style.position).toBe('fixed');
     expect(element?.style.right).toBe('16px');
     expect(element?.style.maxWidth).toBe('calc(100vw - 32px)');
-    // jsdom's CSS serializer rewrites calc() operands, so assert the intent
-    // rather than one engine's spelling of it.
-    expect([
-      'min(560px, calc(100vh - 72px))',
-      'min(560px, -72px + 100vh)',
-    ]).toContain(element?.style.maxHeight);
+    expect(element?.style.maxHeight).toBe('min(560px, calc(100vh - 72px))');
     expect(element?.style.overflow).toBe('hidden');
 
     const targetActions = element?.querySelector<HTMLElement>(
