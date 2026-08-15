@@ -18,6 +18,7 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativeTopBarActionHitTarget } from './mobile/render/NativeTopBarOverlay';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
@@ -362,6 +363,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativeLegendActionTargets, setNativeLegendActionTargets] = useState<readonly NativeLegendActionHitTarget[]>(
     [],
   );
+  const [nativeTopBarActionTargets, setNativeTopBarActionTargets] = useState<readonly NativeTopBarActionHitTarget[]>(
+    [],
+  );
   const [nativeChartSettingsButtonLayout, setNativeChartSettingsButtonLayout] = useState<LayoutRectangle | null>(null);
   const handleNativeChartSettingsButtonLayout = useCallback((layout: LayoutRectangle) => {
     setNativeChartSettingsButtonLayout((previous) =>
@@ -444,25 +448,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleNativeRemoveIndicator = useCallback(
     (indicatorId: string) => {
       chartApi.removeStudy(indicatorId);
-    },
-    [chartApi],
-  );
-  const handleNativeOverlayAction = useCallback(
-    (command: unknown) => {
-      const overlayCommand = command as NativeChartSettingsActionCommand | NativeLegendActionCommand | null;
-      if (!overlayCommand) return;
-      if (overlayCommand.type === 'openChartSettings') {
-        setNativeChartSettingsOpen(true);
-        return;
-      }
-      if (typeof overlayCommand.indicatorId !== 'string') return;
-      if (overlayCommand.type === 'toggleIndicator') {
-        chartApi.toggleStudyVisibility(overlayCommand.indicatorId);
-        return;
-      }
-      if (overlayCommand.type === 'removeIndicator') {
-        chartApi.removeStudy(overlayCommand.indicatorId);
-      }
     },
     [chartApi],
   );
@@ -1132,6 +1117,40 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [commitNativeTopBarRuntimeAction],
   );
+  const handleNativeOverlayAction = useCallback(
+    (command: unknown) => {
+      const overlayCommand = command as
+        | NativeChartSettingsActionCommand
+        | NativeLegendActionCommand
+        | Parameters<typeof handleNativeTopBarAction>[0]
+        | null;
+      if (!overlayCommand) return;
+      if (
+        overlayCommand.type === 'symbol' ||
+        overlayCommand.type === 'timeframe' ||
+        overlayCommand.type === 'indicators' ||
+        overlayCommand.type === 'layout' ||
+        overlayCommand.type === 'undo' ||
+        overlayCommand.type === 'redo'
+      ) {
+        handleNativeTopBarAction(overlayCommand);
+        return;
+      }
+      if (overlayCommand.type === 'openChartSettings') {
+        setNativeChartSettingsOpen(true);
+        return;
+      }
+      if (!('indicatorId' in overlayCommand) || typeof overlayCommand.indicatorId !== 'string') return;
+      if (overlayCommand.type === 'toggleIndicator') {
+        chartApi.toggleStudyVisibility(overlayCommand.indicatorId);
+        return;
+      }
+      if (overlayCommand.type === 'removeIndicator') {
+        chartApi.removeStudy(overlayCommand.indicatorId);
+      }
+    },
+    [chartApi, handleNativeTopBarAction],
+  );
 
   const {
     clearNativeBracketDrag,
@@ -1375,6 +1394,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
     zones.push(...nativeLegendActionTargets);
     zones.push(...nativeChartSettingsActionTargets);
+    zones.push(...nativeTopBarActionTargets);
 
     return zones;
   }, [
@@ -1386,12 +1406,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeOpenDrawingCategoryId,
     nativeResetViewButtonLayout,
     nativeResetViewButtonVisible,
+    nativeTopBarActionTargets,
     nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
   const nativeOverlayActionTargets = useMemo(
-    () => [...nativeLegendActionTargets, ...nativeChartSettingsActionTargets],
-    [nativeChartSettingsActionTargets, nativeLegendActionTargets],
+    () => [...nativeLegendActionTargets, ...nativeChartSettingsActionTargets, ...nativeTopBarActionTargets],
+    [nativeChartSettingsActionTargets, nativeLegendActionTargets, nativeTopBarActionTargets],
   );
   // Same outcome as the reset button, different input. The button also hides
   // itself on use; do that here too so a reveal from an earlier tap does not
@@ -1607,7 +1628,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           backgroundColor={backgroundColor}
           gridColor={gridColor}
           mutedTextColor={nativeMutedTextColor}
-          onAction={handleNativeTopBarAction}
+          onActionTargetsChange={setNativeTopBarActionTargets}
           textColor={textColor}
           topBarLayout={topBarLayout}
         />
