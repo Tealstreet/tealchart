@@ -7,10 +7,10 @@ import type { ResolutionInput } from './utils/normalizeResolution';
 import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_COLOR,
-  DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_LIGHT_TEXT_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
   DEFAULT_TRADE_LINE_LABEL_FONT,
-  DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR,
 } from './constants';
 import { Subscription } from './events/EventEmitter';
 import {
@@ -46,6 +46,7 @@ import {
   StudyInfo,
   SymbolExt,
 } from './types';
+import { pickReadableTextColor } from './utils/colorAlpha';
 import { normalizeResolution } from './utils/normalizeResolution';
 import { createSyncPromise } from './utils/syncPromise';
 
@@ -163,44 +164,53 @@ interface PositionLineStyleDefaults {
   reverseButtonBorderColor: string;
 }
 
+/**
+ * Seams and the label outline carry the side color rather than a hairline: with
+ * only the 3px rail and the body text tinted, an order label reads as a grey
+ * chip and the side has to be hunted for.
+ */
 function getOrderLineStyleDefaults(lineColor: string): OrderLineStyleDefaults {
   return {
     bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     bodyTextColor: lineColor,
-    bodyBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    bodyBorderColor: lineColor,
     bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
     quantityBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    quantityTextColor: DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR,
-    quantityBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    quantityTextColor: lineColor,
+    quantityBorderColor: lineColor,
     quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
     cancelButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     cancelButtonIconColor: lineColor,
-    cancelButtonBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    cancelButtonBorderColor: lineColor,
   };
 }
 
 /**
- * The quantity used to be a solid slab of the side color. Together with a
- * filled PnL segment and filled TP/SL buttons that left the label with four
- * competing fills and no hierarchy, so it now sits on the same ground as
- * everything else and the side color arrives via the leading accent rail.
+ * A position's size is the one segment that gets a solid fill of the side
+ * color, so the label has a single loud element and the rest — PnL, TP/SL —
+ * stays tinted underneath it. The ink on that fill is measured against the
+ * side color rather than fixed, since consumers theme it freely.
  */
 function getPositionLineStyleDefaults(lineColor: string): PositionLineStyleDefaults {
   return {
     bodyBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     bodyTextColor: lineColor,
-    bodyBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    bodyBorderColor: lineColor,
     bodyFont: DEFAULT_TRADE_LINE_LABEL_FONT,
-    quantityBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
-    quantityTextColor: DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR,
-    quantityBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    quantityBackgroundColor: lineColor,
+    quantityTextColor: pickReadableTextColor(
+      lineColor,
+      DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+      DEFAULT_TRADE_LINE_FILLED_SEGMENT_LIGHT_TEXT_COLOR,
+    ),
+    quantityBorderColor: lineColor,
     quantityFont: DEFAULT_TRADE_LINE_LABEL_FONT,
     closeButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     closeButtonIconColor: lineColor,
-    closeButtonBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    closeButtonBorderColor: lineColor,
     reverseButtonBackgroundColor: DEFAULT_TRADE_LINE_LABEL_COLOR,
     reverseButtonIconColor: lineColor,
-    reverseButtonBorderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+    reverseButtonBorderColor: lineColor,
   };
 }
 

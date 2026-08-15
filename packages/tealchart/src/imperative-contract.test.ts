@@ -12,6 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_TRADE_LINE_COLOR,
+  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   DEFAULT_TRADE_LINE_LABEL_COLOR,
   DEFAULT_TRADE_LINE_LABEL_FONT,
   DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
@@ -362,30 +363,30 @@ describe('imperative chart API contract', () => {
     expect(order.bodyTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(order.bodyFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(order.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(order.quantityTextColor).toBe('#e7eaf0');
+    expect(order.quantityTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(order.quantityFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(order.cancelButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(order.cancelButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
-    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
-    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
+    expect(order.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(order.cancelButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
 
     expect(positionLine.lineColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(positionLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.bodyFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
-    // Quantity is data on the label ground, not a filled slab of the side color.
-    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.quantityTextColor).toBe('#e7eaf0');
+    // The size is the label's one filled segment, with ink measured against it.
+    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.quantityTextColor).toBe(DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR);
     expect(positionLine.quantityFont).toBe(DEFAULT_TRADE_LINE_LABEL_FONT);
     expect(positionLine.reverseButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(positionLine.reverseButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(positionLine.closeButtonBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(positionLine.closeButtonIconColor).toBe(DEFAULT_TRADE_LINE_COLOR);
-    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
-    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
-    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
-    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_HAIRLINE_COLOR);
+    expect(positionLine.bodyBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.quantityBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.reverseButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
+    expect(positionLine.closeButtonBorderColor).toBe(DEFAULT_TRADE_LINE_COLOR);
     expect(DEFAULT_TRADE_LINE_SEGMENT_BORDER_COLOR).toBe('rgba(255, 255, 255, 0.16)');
     expect(DEFAULT_TRADE_LINE_HAIRLINE_COLOR).toBe('rgba(255, 255, 255, 0.10)');
   });
@@ -408,13 +409,13 @@ describe('imperative chart API contract', () => {
     expect(orderLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(orderLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
     expect(orderLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(orderLine.quantityTextColor).toBe('#e7eaf0');
+    expect(orderLine.quantityTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
     expect(orderLine.cancelButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
 
     expect(positionLine.bodyBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(positionLine.bodyTextColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
-    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
-    expect(positionLine.quantityTextColor).toBe('#e7eaf0');
+    expect(positionLine.quantityBackgroundColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
+    expect(positionLine.quantityTextColor).toBe(DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR);
     expect(positionLine.closeButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
     expect(positionLine.reverseButtonIconColor).toBe(DEFAULT_TRADE_LINE_SELL_COLOR);
   });

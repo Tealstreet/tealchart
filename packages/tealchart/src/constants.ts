@@ -46,14 +46,14 @@ export const TRADE_LINE_SEGMENT_TINT_ALPHA = 0.14;
 /** Warmer hues read weaker at the same alpha, so orange gets a touch more. */
 export const TRADE_LINE_WARM_SEGMENT_TINT_ALPHA = 0.18;
 
-/** Quantity and other data segments sit on the label ground and read as data. */
-export const DEFAULT_TRADE_LINE_NEUTRAL_TEXT_COLOR = '#e7eaf0';
-
 /** Width of the side-colored rail on the leading edge of a trade line label. */
 export const TRADE_LINE_ACCENT_RAIL_WIDTH = 3;
 
 /** Default dark text for filled positive/PnL and TP/SL segments. */
 export const DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR = '#1f2933';
+
+/** Ink for a filled segment whose fill is too dark to carry the dark text. */
+export const DEFAULT_TRADE_LINE_FILLED_SEGMENT_LIGHT_TEXT_COLOR = '#ffffff';
 
 /** Visible dotted stroke pattern for explicit dotted trade lines. */
 export const TRADE_LINE_DOTTED_DASH_PATTERN = [1, 5];
