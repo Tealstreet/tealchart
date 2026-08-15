@@ -28,6 +28,9 @@ yarn lint
 yarn test
 ```
 
+If this checkout is vendored into a React Native app, `yarn install` here can
+break that app — see [Vendoring tealchart as source](#vendoring-tealchart-as-source).
+
 ## Using tealchart
 
 ```ts
@@ -37,6 +40,61 @@ import { createTealchartWidget } from '@tealstreet/tealchart';
 // React Native (requires @shopify/react-native-skia + peers)
 import { SkiaTealchart } from '@tealstreet/tealchart/native';
 ```
+
+### Vendoring tealchart as source
+
+tealchart is not published as a built package yet, so React Native apps consume
+it as source — usually a submodule at `vendor/tealchart` with Metro aliases
+pointing at `packages/tealchart/src`. That puts tealchart's files **outside** the
+app's `node_modules`, and Metro resolves a bare import by walking up from the
+importing file's directory. `vendor/tealchart/node_modules` therefore wins over
+the app's copy.
+
+That matters because `yarn install` in this repo — which you need for
+`yarn typecheck`, `yarn lint`, and `yarn test` above — installs tealchart's own
+`react`, `react-native`, `react-native-reanimated`, `react-native-worklets`, and
+`react-native-gesture-handler`. The consuming app then loads a **second copy** of
+packages that must be singletons, bound to native code that only ever registered
+the first.
+
+A duplicate `react-native-worklets` is the dangerous one: it creates a second
+worklet runtime, which corrupts the Hermes heap. The app dies with
+`EXC_BAD_ACCESS` in `hermes::vm::*` at a different address and a different call
+site on every launch, with no JavaScript error and nothing pointing at module
+resolution. A duplicate `react-native-reanimated` is milder and usually surfaces
+as `"react-native-reanimated is not installed!"`.
+
+Guard against it in the consuming app's `metro.config.js` by resolving bare
+specifiers from the vendor tree as if they were required from the app root:
+
+```js
+const vendorRoot = path.join(__dirname, 'vendor/tealchart');
+const appRootOrigin = path.join(__dirname, 'package.json');
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (
+    context.originModulePath?.startsWith(vendorRoot) &&
+    !moduleName.startsWith('.') &&
+    !path.isAbsolute(moduleName)
+  ) {
+    try {
+      return context.resolveRequest(
+        { ...context, originModulePath: appRootOrigin },
+        moduleName,
+        platform,
+      );
+    } catch {
+      // Vendor-only dependency: fall through to default resolution.
+    }
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
+```
+
+Deleting `vendor/tealchart/node_modules` also fixes it, but only until the next
+time someone runs the checks in this repo. Prefer the resolver guard.
+
+This section becomes unnecessary once tealchart ships as a built package.
 
 ## Contributing
 
