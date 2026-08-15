@@ -584,13 +584,7 @@ describe('ChartWidgetCore cached first paint', () => {
   // returns another market's history, or nothing at all.
   it('asks the datafeed for the market and window it is about to request', () => {
     const controlled = createControlledDatafeed();
-    const asked: Array<{
-      symbol: string;
-      resolution: string;
-      countBack: number | undefined;
-      from: number;
-      to: number;
-    }> = [];
+    const asked: Array<{ symbol: string; resolution: string; countBack: PeriodParams['countBack']; from: number; to: number }> = [];
     const datafeed = {
       ...controlled.datafeed,
       getCachedBars: (symbol: string, resolution: ResolutionString, periodParams: PeriodParams) => {
