@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseColorChannels, tintOver } from './colorAlpha';
+import { parseColorChannels, pickReadableTextColor, tintOver } from './colorAlpha';
 
 describe('parseColorChannels', () => {
   it('reads short and long hex, with or without an alpha channel', () => {
@@ -31,5 +31,23 @@ describe('tintOver', () => {
 
   it('falls back to the tint when a color cannot be read', () => {
     expect(tintOver('currentColor', '#0ecb81', 0.14)).toBe('#0ecb81');
+  });
+});
+
+describe('pickReadableTextColor', () => {
+  const darkInk = '#1f2933';
+  const lightInk = '#ffffff';
+
+  it('keeps dark ink on saturated mid-tones a lightness threshold would misread', () => {
+    expect(pickReadableTextColor('#0ba7da', darkInk, lightInk)).toBe(darkInk);
+    expect(pickReadableTextColor('#fa6b67', darkInk, lightInk)).toBe(darkInk);
+  });
+
+  it('switches to light ink once the fill is dark enough', () => {
+    expect(pickReadableTextColor('#14161c', darkInk, lightInk)).toBe(lightInk);
+  });
+
+  it('falls back to the light ink when a color cannot be read', () => {
+    expect(pickReadableTextColor('currentColor', darkInk, lightInk)).toBe(lightInk);
   });
 });

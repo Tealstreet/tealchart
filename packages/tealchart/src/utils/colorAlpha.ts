@@ -77,6 +77,38 @@ export function formatRgba(red: number, green: number, blue: number, alpha: numb
  * text straight on the candlesticks. Mixing into the label's own ground gives
  * the tint while the label stays one solid, readable object.
  */
+export function getRelativeLuminance(channels: ColorChannels): number {
+  const [red, green, blue] = [channels.red, channels.green, channels.blue].map((channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+/**
+ * Picks whichever ink reads better on `background`, by WCAG contrast ratio.
+ *
+ * A lightness threshold gets this wrong on saturated mid-tones — the default
+ * buy blue sits below every sensible cutoff yet carries dark text at 6.7:1 and
+ * white at 2.8:1 — so the two candidates are measured rather than guessed.
+ */
+export function pickReadableTextColor(background: string, darkInk: string, lightInk: string): string {
+  const backgroundChannels = parseColorChannels(background);
+  const darkChannels = parseColorChannels(darkInk);
+  const lightChannels = parseColorChannels(lightInk);
+  if (!backgroundChannels || !darkChannels || !lightChannels) return lightInk;
+
+  const backgroundLuminance = getRelativeLuminance(backgroundChannels);
+  const contrast = (ink: ColorChannels) => {
+    const inkLuminance = getRelativeLuminance(ink);
+    const [lighter, darker] =
+      inkLuminance > backgroundLuminance ? [inkLuminance, backgroundLuminance] : [backgroundLuminance, inkLuminance];
+    return (lighter + 0.05) / (darker + 0.05);
+  };
+
+  return contrast(darkChannels) >= contrast(lightChannels) ? darkInk : lightInk;
+}
+
 export function tintOver(base: string, tint: string, ratio: number): string {
   const baseChannels = parseColorChannels(base);
   const tintChannels = parseColorChannels(tint);
