@@ -580,12 +580,18 @@ describe('imperative chart API contract', () => {
     expect(runtimeSource).toContain('const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);');
     expect(runtimeSource).toContain('confirmNativeOrderLineSnapshots(oemsActions, rawLineSnapshot.orderLines);');
     expect(runtimeSource).toContain('confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);');
+    // Projected, not mapped: the hold has to be able to add back a line whose
+    // row has left the feed mid-amend, which a per-line map cannot do. What the
+    // guard is really pinning is that native lines come from the adapter
+    // snapshot and pass through the OEMS layer on the way out.
     expect(runtimeSource).toContain(
-      'orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),',
+      'orderLines: orderHoldRef.current!.project(rawLineSnapshot.orderLines, oemsActions),',
     );
     expect(runtimeSource).toContain(
-      'positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),',
+      'positionLines: positionHoldRef.current!.project(rawLineSnapshot.positionLines, oemsActions),',
     );
+    expect(runtimeSource).toContain('applyNativeOrderActionState,');
+    expect(runtimeSource).toContain('applyNativePositionActionState,');
     expect(layerSource).toContain('{lineSnapshot.orderLines.map((line) => {');
     expect(layerSource).toContain('{lineSnapshot.positionLines.map((line) => {');
     expect(layerSource).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
