@@ -3,6 +3,7 @@ import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import type {
+  NativeOrderDragZone,
   NativeTradeLineActionType,
   NativeTradeLineActionZone,
   NativeTradeLineObjectType,
@@ -15,7 +16,15 @@ import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
 import { isNativeLeftToolRailToggleTap } from '../utils/leftToolRailLayout';
-import { isNativeCrosshairContextMenuButtonTap } from './nativeCrosshairContextMenu';
+import { resolveNativeCanvasTap } from './nativeCanvasTapResolver';
+import { toggleNativeCrosshair } from './nativeCrosshair';
+import {
+  isNativeCrosshairContextMenuButtonTap,
+  nativeCrosshairXToTime,
+  nativeCrosshairYToPrice,
+  resolveNativeCrosshairContextMenuButtonLayout,
+  resolveNativeCrosshairPriceLabelText,
+} from './nativeCrosshairContextMenu';
 import { isNativeGestureControlPoint } from './nativeGestureControlZones';
 import {
   isNativeResetViewButtonTap,
@@ -26,6 +35,136 @@ import {
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { findNativeTradeLineActionZone } from './nativeTradeLineHitTest';
 import { canBeginNativePriceScaleGesture, getNativePriceScaleHitGeometry } from './nativeViewportGestureState';
+
+export interface NativeCanvasTapGestureInput {
+  bracketDragActive: SharedValue<boolean>;
+  chartInteractionEnabled: boolean;
+  commitTradeLineAction: (
+    objectType: NativeTradeLineObjectType,
+    objectId: string,
+    actionType: NativeTradeLineActionType,
+  ) => void;
+  controlZones: readonly NativeGestureControlZone[];
+  crosshair: NativeCrosshairSharedValues;
+  drawingPlacementEnabled: boolean;
+  drawingSelectionEnabled: boolean;
+  frame: NativeChartFrame | null;
+  hasContextMenu: boolean;
+  onContextMenuTap: (time: number, price: number, anchorX: number, anchorY: number) => void;
+  onDrawingPlacementTap: (x: number, y: number) => void;
+  /** Calls `claim` when it takes the tap; otherwise the crosshair gets it. */
+  onDrawingSelectionTap: (x: number, y: number, claim: () => void) => void;
+  orderDragZones: SharedValue<NativeOrderDragZone[]>;
+  pricePrecision: number;
+  sharedViewport: NativeViewportSharedValues;
+  tradeLabelHeight: number;
+  tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
+  tradeLineRows: SharedValue<NativeTradeLineRow[]>;
+}
+
+/**
+ * The one gesture that owns a tap on the canvas.
+ *
+ * It replaces five that raced under `Gesture.Simultaneous`, each accepting
+ * every tap and filtering inside its own `onEnd`. The point is resolved once
+ * and exactly one outcome is dispatched, so the crosshair is the else-branch
+ * rather than a competitor that has to be told to stand down.
+ */
+export function createNativeCanvasTapGesture({
+  bracketDragActive,
+  chartInteractionEnabled,
+  commitTradeLineAction,
+  controlZones,
+  crosshair,
+  drawingPlacementEnabled,
+  drawingSelectionEnabled,
+  frame,
+  hasContextMenu,
+  onContextMenuTap,
+  onDrawingPlacementTap,
+  onDrawingSelectionTap,
+  orderDragZones,
+  pricePrecision,
+  sharedViewport,
+  tradeLabelHeight,
+  tradeLineActionZones,
+  tradeLineRows,
+}: NativeCanvasTapGestureInput) {
+  if (!frame) return Gesture.Tap().enabled(false);
+
+  const toggleCrosshairAt = (x: number, y: number) => {
+    toggleNativeCrosshair(crosshair, frame, x, y);
+  };
+
+  // Drawing hit-testing happens on the JS thread inside the consumer's handler,
+  // so ownership cannot be settled with the rest. Offering the tap and falling
+  // through is still a guarantee rather than an opt-in: the crosshair fires
+  // unless the drawing system actually claims, and no caller can forget to
+  // participate because the fallback lives here, not in them.
+  const offerToDrawings = (x: number, y: number) => {
+    if (drawingPlacementEnabled) {
+      onDrawingPlacementTap(x, y);
+      return;
+    }
+    let claimed = false;
+    onDrawingSelectionTap(x, y, () => {
+      claimed = true;
+    });
+    setTimeout(() => {
+      if (claimed) return;
+      toggleCrosshairAt(x, y);
+    }, 0);
+  };
+
+  return Gesture.Tap()
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
+    .onEnd((event, success) => {
+      if (!success) return;
+      const outcome = resolveNativeCanvasTap(
+        { x: event.x, y: event.y },
+        {
+          bracketDragActive: bracketDragActive.value,
+          chartInteractionEnabled,
+          controlZones,
+          crosshairVisible: crosshair.visible.value,
+          crosshairY: crosshair.y.value,
+          drawingTapEnabled: drawingPlacementEnabled || drawingSelectionEnabled,
+          frame,
+          hasContextMenu,
+          orderDragZones: orderDragZones.value,
+          pricePrecision,
+          sharedViewport,
+          tradeLabelHeight,
+          tradeLineActionZones: tradeLineActionZones.value,
+          tradeLineRows: tradeLineRows.value,
+        },
+      );
+
+      if (outcome.kind === 'none') return;
+      if (outcome.kind === 'tradeLineAction') {
+        runOnJS(commitTradeLineAction)(outcome.objectType, outcome.objectId, outcome.actionType);
+        return;
+      }
+      if (outcome.kind === 'crosshairContextMenu') {
+        // The menu opens at the crosshair, not at the finger.
+        const time = nativeCrosshairXToTime(crosshair.x.value, sharedViewport, frame);
+        const price = nativeCrosshairYToPrice(crosshair.y.value, sharedViewport, frame);
+        const layout = resolveNativeCrosshairContextMenuButtonLayout(
+          frame,
+          crosshair.y.value,
+          pricePrecision,
+          resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision),
+        );
+        runOnJS(onContextMenuTap)(time, price, layout.centerX, layout.centerY);
+        return;
+      }
+      if (outcome.kind === 'drawingThenCrosshair') {
+        runOnJS(offerToDrawings)(event.x, event.y);
+        return;
+      }
+      runOnJS(toggleCrosshairAt)(event.x, event.y);
+    });
+}
 
 export interface NativeLeftToolRailToggleTapGestureInput {
   leftToolRailLayout: NativeLeftToolRailLayout | null;
@@ -175,21 +314,6 @@ export interface NativeUserDrawingTapGestureInput {
   onDrawingTap: (x: number, y: number) => void;
 }
 
-export function createNativeUserDrawingTapGesture({
-  controlZones = [],
-  enabled,
-  frame,
-  onDrawingTap,
-}: NativeUserDrawingTapGestureInput) {
-  if (!frame || !enabled) return Gesture.Tap().enabled(false);
-  return Gesture.Tap()
-    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
-    .onEnd((event, success) => {
-      if (!success) return;
-      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
-      runOnJS(onDrawingTap)(event.x, event.y);
-    });
-}
 
 export interface NativeTradeLineActionTapGestureInput {
   bracketDragActive: SharedValue<boolean>;
@@ -206,33 +330,3 @@ export interface NativeTradeLineActionTapGestureInput {
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
 }
 
-export function createNativeTradeLineActionTapGesture({
-  bracketDragActive,
-  commitTradeLineAction,
-  controlZones = [],
-  frame,
-  sharedViewport,
-  tradeLabelHeight,
-  tradeLineActionZones,
-  tradeLineRows,
-}: NativeTradeLineActionTapGestureInput) {
-  if (!frame) return Gesture.Tap().enabled(false);
-  return Gesture.Tap()
-    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
-    .onEnd((event, success) => {
-      if (!success) return;
-      if (bracketDragActive.value) return;
-      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
-      const zone = findNativeTradeLineActionZone({
-        zones: tradeLineActionZones.value,
-        rows: tradeLineRows.value,
-        x: event.x,
-        y: event.y,
-        sharedViewport,
-        frame,
-        tradeLabelHeight,
-      });
-      if (!zone) return;
-      runOnJS(commitTradeLineAction)(zone.objectType, zone.objectId, zone.actionType);
-    });
-}

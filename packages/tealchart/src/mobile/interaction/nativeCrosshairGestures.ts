@@ -5,7 +5,6 @@ import type { NativeViewportSharedValues } from '../render/nativeSharedViewport'
 import type { NativeOrderDragZone, NativeTradeLineActionZone, NativeTradeLineRow } from '../utils/tradeLineLayout';
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
-import type { NativeTapClaimSharedValues } from './nativeTapClaim';
 
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
@@ -21,7 +20,6 @@ import {
 import { isNativeGestureControlPoint } from './nativeGestureControlZones';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
-import { beginNativeTapClaimScope, isNativeTapClaimed } from './nativeTapClaim';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
 
 const NATIVE_CROSSHAIR_LONG_PRESS_MIN_DURATION_MS = 2000;
@@ -143,71 +141,11 @@ export interface NativeCrosshairGestureInput {
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   pricePrecision?: number;
   sharedViewport: NativeViewportSharedValues;
-  tapClaim?: NativeTapClaimSharedValues;
   tradeLabelHeight: number;
   tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
 }
 
-export function createNativeCrosshairTapGesture({
-  controlZones = [],
-  crosshair,
-  frame,
-  hasContextMenu = false,
-  orderDragZones,
-  pricePrecision = 2,
-  sharedViewport,
-  tapClaim,
-  tradeLabelHeight,
-  tradeLineActionZones,
-  tradeLineRows,
-}: NativeCrosshairGestureInput) {
-  if (!frame) return Gesture.Tap().enabled(false);
-  const toggleCrosshairAfterTapClaim = (x: number, y: number, sequence: number) => {
-    setTimeout(() => {
-      if (tapClaim && isNativeTapClaimed(tapClaim, sequence)) return;
-      toggleNativeCrosshairAtPoint({
-        controlZones,
-        crosshair,
-        frame,
-        hasContextMenu,
-        orderDragZones,
-        point: { x, y },
-        pricePrecision,
-        sharedViewport,
-        tradeLabelHeight,
-        tradeLineActionZones,
-        tradeLineRows,
-      });
-    }, 0);
-  };
-
-  return Gesture.Tap()
-    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
-    .onTouchesDown(() => {
-      if (tapClaim) beginNativeTapClaimScope(tapClaim);
-    })
-    .onEnd((event, success) => {
-      if (!success) return;
-      if (tapClaim) {
-        runOnJS(toggleCrosshairAfterTapClaim)(event.x, event.y, tapClaim.sequence.value);
-        return;
-      }
-      toggleNativeCrosshairAtPoint({
-        controlZones,
-        crosshair,
-        frame,
-        hasContextMenu,
-        orderDragZones,
-        point: { x: event.x, y: event.y },
-        pricePrecision,
-        sharedViewport,
-        tradeLabelHeight,
-        tradeLineActionZones,
-        tradeLineRows,
-      });
-    });
-}
 
 export function createNativeCrosshairLongPressGesture({
   controlZones = [],
@@ -305,39 +243,3 @@ export interface NativeCrosshairContextMenuTapGestureInput {
   sharedViewport: NativeViewportSharedValues;
 }
 
-export function createNativeCrosshairContextMenuTapGesture({
-  crosshair,
-  frame,
-  hasContextMenu,
-  onContextMenuTap,
-  pricePrecision = 2,
-  sharedViewport,
-}: NativeCrosshairContextMenuTapGestureInput) {
-  if (!frame || !hasContextMenu) return Gesture.Tap().enabled(false);
-  return Gesture.Tap()
-    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
-    .onEnd((event, success) => {
-      if (!success || !crosshair.visible.value) return;
-      if (
-        !isNativeCrosshairContextMenuButtonTap({
-          frame,
-          crosshairY: crosshair.y.value,
-          pricePrecision,
-          sharedViewport,
-          x: event.x,
-          y: event.y,
-        })
-      ) {
-        return;
-      }
-      const time = nativeCrosshairXToTime(crosshair.x.value, sharedViewport, frame);
-      const price = nativeCrosshairYToPrice(crosshair.y.value, sharedViewport, frame);
-      const layout = resolveNativeCrosshairContextMenuButtonLayout(
-        frame,
-        crosshair.y.value,
-        pricePrecision,
-        resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision),
-      );
-      runOnJS(onContextMenuTap)(time, price, layout.centerX, layout.centerY);
-    });
-}

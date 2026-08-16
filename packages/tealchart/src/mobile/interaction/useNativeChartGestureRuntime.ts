@@ -17,7 +17,6 @@ import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import type { NativeBracketDragInteractionState, NativeOrderDragInteractionState } from './nativeOemsDragState';
 import type { NativeOverlayActionHitTarget } from './nativeOverlayActionGestures';
-import type { NativeTapClaimSharedValues } from './nativeTapClaim';
 import type {
   NativeChartAxisPinchGestureState,
   NativeChartPanGestureState,
@@ -31,21 +30,17 @@ import { useSharedValue } from 'react-native-reanimated';
 
 import { createNativeChartGesture } from './nativeChartGestures';
 import {
-  createNativeCrosshairContextMenuTapGesture,
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
-  createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
-import { claimNativeTap } from './nativeTapClaim';
 import {
+  createNativeCanvasTapGesture,
   createNativeLeftToolRailToggleTapGesture,
   createNativePriceAxisResetTapGesture,
   createNativeResetViewTapGesture,
-  createNativeTradeLineActionTapGesture,
-  createNativeUserDrawingTapGesture,
 } from './nativeTapGestures';
 import { createNativeUserDrawingEditDragGesture } from './nativeUserDrawingEditGestures';
 import {
@@ -90,7 +85,7 @@ export interface NativeChartGestureRuntimeInput {
   onDrawingEditDragMove: (x: number, y: number) => void;
   onDrawingSelectionTap: (x: number, y: number, claimTap: () => void) => void;
   onLeftToolRailToggleTap: () => void;
-  onContextMenuTap: Parameters<typeof createNativeCrosshairContextMenuTapGesture>[0]['onContextMenuTap'];
+  onContextMenuTap: Parameters<typeof createNativeCanvasTapGesture>[0]['onContextMenuTap'];
   onOverlayAction?: (command: unknown) => void;
   onSelectedDrawingAction: Parameters<typeof createNativeSelectedDrawingActionTapGesture>[0]['onAction'];
   onSelectedDrawingActionPopoverGroupChange: Parameters<
@@ -220,24 +215,12 @@ export function useNativeChartGestureRuntime({
   const resetTapStartY = useSharedValue(0);
   const resetTapStartedOnButton = useSharedValue(false);
   const resetTapBlockedByContextMenuButton = useSharedValue(false);
-  const tapClaimSequence = useSharedValue(0);
-  const tapClaimClaimedSequence = useSharedValue(0);
-  const tapClaim = useMemo<NativeTapClaimSharedValues>(
-    () => ({
-      claimedSequence: tapClaimClaimedSequence,
-      sequence: tapClaimSequence,
-    }),
-    [tapClaimClaimedSequence, tapClaimSequence],
-  );
-  const claimTap = useCallback(() => {
-    claimNativeTap(tapClaim);
-  }, [tapClaim]);
   const drawingEditDragActive = useSharedValue(false);
   const handleDrawingSelectionTap = useCallback(
-    (x: number, y: number) => {
-      stableOnDrawingSelectionTap(x, y, claimTap);
+    (x: number, y: number, claim: () => void) => {
+      stableOnDrawingSelectionTap(x, y, claim);
     },
-    [claimTap, stableOnDrawingSelectionTap],
+    [stableOnDrawingSelectionTap],
   );
   const resetTapGestureState = useMemo(
     () => ({
@@ -285,29 +268,46 @@ export function useNativeChartGestureRuntime({
     tradeLineRows,
   ]);
 
-  const crosshairTapGesture = useMemo<GestureType>(() => {
-    return createNativeCrosshairTapGesture({
+  // One gesture owns the canvas tap. It replaces the crosshair tap, the
+  // crosshair context-menu tap, the trade-line action tap and both drawing
+  // taps, which used to race under Gesture.Simultaneous and each decide for
+  // themselves whether the tap was theirs.
+  const canvasTapGesture = useMemo<GestureType>(() => {
+    return createNativeCanvasTapGesture({
+      bracketDragActive,
+      chartInteractionEnabled: !drawingInputEnabled,
+      commitTradeLineAction: stableCommitTradeLineAction,
       controlZones,
       crosshair,
-      frame: crosshairInteractionFrame,
+      drawingPlacementEnabled: drawingInputEnabled,
+      drawingSelectionEnabled,
+      frame: dataFrame,
       hasContextMenu,
+      onContextMenuTap: stableOnContextMenuTap,
+      onDrawingPlacementTap: stableOnDrawingTap,
+      onDrawingSelectionTap: stableOnDrawingSelectionTap,
       orderDragZones,
       pricePrecision,
       sharedViewport,
-      tapClaim,
       tradeLabelHeight,
       tradeLineActionZones,
       tradeLineRows,
     });
   }, [
+    bracketDragActive,
     controlZones,
-    crosshairInteractionFrame,
     crosshair,
+    dataFrame,
+    drawingInputEnabled,
+    drawingSelectionEnabled,
     hasContextMenu,
     orderDragZones,
     pricePrecision,
     sharedViewport,
-    tapClaim,
+    stableCommitTradeLineAction,
+    stableOnContextMenuTap,
+    stableOnDrawingSelectionTap,
+    stableOnDrawingTap,
     tradeLabelHeight,
     tradeLineActionZones,
     tradeLineRows,
@@ -364,17 +364,6 @@ export function useNativeChartGestureRuntime({
     tradeLineActionZones,
     tradeLineRows,
   ]);
-
-  const crosshairContextMenuTapGesture = useMemo<GestureType>(() => {
-    return createNativeCrosshairContextMenuTapGesture({
-      crosshair,
-      frame: crosshairInteractionFrame,
-      hasContextMenu,
-      onContextMenuTap: stableOnContextMenuTap,
-      pricePrecision,
-      sharedViewport,
-    });
-  }, [crosshairInteractionFrame, crosshair, hasContextMenu, pricePrecision, sharedViewport, stableOnContextMenuTap]);
 
   const orderDragGesture = useMemo<GestureType>(() => {
     return createNativeOrderDragGesture({
@@ -466,28 +455,6 @@ export function useNativeChartGestureRuntime({
     tradeLineRows,
   ]);
 
-  const tradeLineActionTapGesture = useMemo<GestureType>(() => {
-    return createNativeTradeLineActionTapGesture({
-      bracketDragActive,
-      commitTradeLineAction: stableCommitTradeLineAction,
-      controlZones,
-      frame: chartInteractionFrame,
-      sharedViewport,
-      tradeLabelHeight,
-      tradeLineActionZones,
-      tradeLineRows,
-    });
-  }, [
-    bracketDragActive,
-    chartInteractionFrame,
-    controlZones,
-    sharedViewport,
-    stableCommitTradeLineAction,
-    tradeLabelHeight,
-    tradeLineActionZones,
-    tradeLineRows,
-  ]);
-
   const selectedDrawingActionTapGesture = useMemo<GestureType>(() => {
     return createNativeSelectedDrawingActionTapGesture({
       enabled: selectedDrawingActionTargets.length > 0,
@@ -504,24 +471,6 @@ export function useNativeChartGestureRuntime({
       targets: overlayActionTargets,
     });
   }, [overlayActionTargets, stableOnOverlayAction]);
-
-  const drawingTapGesture = useMemo<GestureType>(() => {
-    return createNativeUserDrawingTapGesture({
-      controlZones,
-      enabled: drawingInputEnabled,
-      frame: dataFrame,
-      onDrawingTap: stableOnDrawingTap,
-    });
-  }, [controlZones, dataFrame, drawingInputEnabled, stableOnDrawingTap]);
-
-  const drawingSelectionTapGesture = useMemo<GestureType>(() => {
-    return createNativeUserDrawingTapGesture({
-      controlZones,
-      enabled: drawingSelectionEnabled,
-      frame: dataFrame,
-      onDrawingTap: handleDrawingSelectionTap,
-    });
-  }, [controlZones, dataFrame, drawingSelectionEnabled, handleDrawingSelectionTap]);
 
   // Drag zones are recomputed from bar data, so they get a new identity on every
   // tick. Held as a shared value the worklet reads at touch time, they stay out
@@ -646,13 +595,10 @@ export function useNativeChartGestureRuntime({
         chartAxisPinchGesture,
         bracketDragGesture,
         chartPanGesture,
-        crosshairContextMenuTapGesture,
+        canvasTapGesture,
         crosshairLongPressGesture,
         crosshairPanGesture,
-        crosshairTapGesture,
         drawingEditDragGesture,
-        drawingSelectionTapGesture,
-        drawingTapGesture,
         leftToolRailToggleTapGesture,
         orderDragGesture,
         overlayActionTapGesture,
@@ -661,19 +607,15 @@ export function useNativeChartGestureRuntime({
         resetViewTapGesture,
         selectedDrawingActionTapGesture,
         timeScaleGesture,
-        tradeLineActionTapGesture,
       }),
     [
       chartAxisPinchGesture,
       bracketDragGesture,
       chartPanGesture,
-      crosshairContextMenuTapGesture,
+      canvasTapGesture,
       crosshairLongPressGesture,
       crosshairPanGesture,
-      crosshairTapGesture,
       drawingEditDragGesture,
-      drawingSelectionTapGesture,
-      drawingTapGesture,
       leftToolRailToggleTapGesture,
       orderDragGesture,
       overlayActionTapGesture,
@@ -682,7 +624,6 @@ export function useNativeChartGestureRuntime({
       resetViewTapGesture,
       selectedDrawingActionTapGesture,
       timeScaleGesture,
-      tradeLineActionTapGesture,
     ],
   );
 

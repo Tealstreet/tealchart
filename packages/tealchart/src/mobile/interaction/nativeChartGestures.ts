@@ -5,14 +5,11 @@ import { Gesture } from 'react-native-gesture-handler';
 interface NativeChartGestureInput {
   chartAxisPinchGesture: GestureType;
   bracketDragGesture: GestureType;
+  canvasTapGesture: GestureType;
   chartPanGesture: GestureType;
   crosshairLongPressGesture: GestureType;
   crosshairPanGesture: GestureType;
-  crosshairContextMenuTapGesture: GestureType;
-  crosshairTapGesture: GestureType;
   drawingEditDragGesture: GestureType;
-  drawingSelectionTapGesture: GestureType;
-  drawingTapGesture: GestureType;
   leftToolRailToggleTapGesture: GestureType;
   orderDragGesture: GestureType;
   overlayActionTapGesture: GestureType;
@@ -21,20 +18,16 @@ interface NativeChartGestureInput {
   resetViewTapGesture: GestureType;
   selectedDrawingActionTapGesture: GestureType;
   timeScaleGesture: GestureType;
-  tradeLineActionTapGesture: GestureType;
 }
 
 export function createNativeChartGesture({
   chartAxisPinchGesture,
   bracketDragGesture,
+  canvasTapGesture,
   chartPanGesture,
   crosshairLongPressGesture,
   crosshairPanGesture,
-  crosshairContextMenuTapGesture,
-  crosshairTapGesture,
   drawingEditDragGesture,
-  drawingSelectionTapGesture,
-  drawingTapGesture,
   leftToolRailToggleTapGesture,
   orderDragGesture,
   overlayActionTapGesture,
@@ -43,24 +36,21 @@ export function createNativeChartGesture({
   resetViewTapGesture,
   selectedDrawingActionTapGesture,
   timeScaleGesture,
-  tradeLineActionTapGesture,
 }: NativeChartGestureInput): SimultaneousGesture {
-  // Ordering is not ownership. Each broad canvas gesture must reject reserved
-  // control zones before it can compete with overlay action gestures.
+  // Canvas taps are owned by canvasTapGesture, which resolves the point once
+  // and dispatches a single outcome. The gestures listed alongside it are drags,
+  // pinches and chrome - none of them competes for a plain tap on the plot.
   return Gesture.Simultaneous(
     bracketDragGesture,
-    tradeLineActionTapGesture,
+    canvasTapGesture,
     selectedDrawingActionTapGesture,
     overlayActionTapGesture,
     orderDragGesture,
-    drawingTapGesture,
     leftToolRailToggleTapGesture,
     chartAxisPinchGesture,
-    crosshairContextMenuTapGesture,
-    crosshairTapGesture,
     crosshairLongPressGesture,
     crosshairPanGesture,
-    Gesture.Exclusive(drawingEditDragGesture, drawingSelectionTapGesture, chartPanGesture),
+    Gesture.Exclusive(drawingEditDragGesture, chartPanGesture),
     resetViewTapGesture,
     priceAxisResetTapGesture,
     priceScaleGesture,
