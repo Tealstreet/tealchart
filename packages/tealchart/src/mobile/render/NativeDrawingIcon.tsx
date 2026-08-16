@@ -174,7 +174,9 @@ export function NativeDrawingIconImpl({
   const scaleY = size / viewBox.height;
 
   return (
-    <Canvas style={[{ height: size, opacity, width: size }, style]}>
+    // A Skia canvas is touch-opaque, so without this the glyph swallows taps
+    // aimed at the button drawing it and only the margin around it responds.
+    <Canvas pointerEvents="none" style={[{ height: size, opacity, width: size }, style]}>
       <Group transform={[{ scaleX }, { scaleY }, { translateX: -viewBox.minX }, { translateY: -viewBox.minY }]}>
         {paths.map((iconPath, index) => (
           <Path
