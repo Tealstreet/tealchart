@@ -18,7 +18,6 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
-import type { NativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
@@ -86,6 +85,7 @@ import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
+import { resolveSettledNativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
@@ -1410,23 +1410,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // back to the pre-drag range and the pane visibly snapped back before
   // settling, so it is held until the frame agrees and only then released.
   useEffect(() => {
-    const overrides = paneRangeOverrides.value;
-    const paneIds = Object.keys(overrides);
-    if (paneIds.length === 0 || !frame) return;
-
-    const remaining: NativePaneRangeOverrides = {};
-    let settled = false;
-    for (const paneId of paneIds) {
-      const override = overrides[paneId];
-      const pane = frame.panes.find((entry) => entry.id === paneId);
-      if (pane && pane.yMin === override.yMin && pane.yMax === override.yMax) {
-        settled = true;
-        continue;
-      }
-      if (pane) remaining[paneId] = override;
-      else settled = true;
+    if (!frame) return;
+    if (!resolveSettledNativePaneRangeOverrides({ overrides: paneRangeOverrides.value, panes: frame.panes }).settled) {
+      return;
     }
-    if (settled) paneRangeOverrides.value = remaining;
+
+    // Hand the pane back a frame late, for the same reason the order drag does.
+    // These layers read the override from a shared value but fall back to the
+    // pane from their closure. Clearing the shared value re-evaluates them on
+    // the UI thread at once, while the closure carrying the committed range only
+    // reaches it on Reanimated's next propagation - so the pane drew one frame
+    // at its PRE-drag scale before the new one landed. That is the flap.
+    //
+    // Re-resolved inside the frame rather than reusing what was computed above,
+    // so a drag that started in the meantime keeps its own override.
+    const handle = requestAnimationFrame(() => {
+      const { remaining, settled } = resolveSettledNativePaneRangeOverrides({
+        overrides: paneRangeOverrides.value,
+        panes: frame.panes,
+      });
+      if (settled) paneRangeOverrides.value = remaining;
+    });
+    return () => cancelAnimationFrame(handle);
   }, [frame, paneRangeOverrides]);
 
   const handleNativePriceAxisResetTap = useCallback(() => {

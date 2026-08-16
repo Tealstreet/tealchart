@@ -33,6 +33,41 @@ export function nativePaneValueToYWithRange(value: number, pane: NativePaneFrame
 }
 
 /**
+ * Works out which overrides the frame has caught up with.
+ *
+ * An override outlives its gesture on purpose: the commit reaches the pane
+ * through React, so dropping it on release would leave the in-between renders
+ * falling back to the pre-drag range. It is retired only once the frame agrees,
+ * or once its pane is gone.
+ */
+export function resolveSettledNativePaneRangeOverrides({
+  overrides,
+  panes,
+}: {
+  overrides: NativePaneRangeOverrides;
+  panes: readonly NativePaneFrame[];
+}): { remaining: NativePaneRangeOverrides; settled: boolean } {
+  const remaining: NativePaneRangeOverrides = {};
+  let settled = false;
+
+  for (const paneId of Object.keys(overrides)) {
+    const override = overrides[paneId];
+    const pane = panes.find((entry) => entry.id === paneId);
+    if (!pane) {
+      settled = true;
+      continue;
+    }
+    if (pane.yMin === override.yMin && pane.yMax === override.yMax) {
+      settled = true;
+      continue;
+    }
+    remaining[paneId] = override;
+  }
+
+  return { remaining, settled };
+}
+
+/**
  * Slide a pane's range by a vertical drag. Matches the main viewport's sign
  * convention in `panViewport`: dragging down raises the values on screen.
  */

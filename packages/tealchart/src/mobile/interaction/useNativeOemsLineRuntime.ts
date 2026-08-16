@@ -196,6 +196,15 @@ export function useNativeOemsLineRuntime({
     });
   }, [orderDragState]);
 
+  /** The bracket preview's version of the same hand-off, for the same reason:
+   *  the line's optimistic bracket arrives by closure, the preview goes away by
+   *  shared value. */
+  const releaseNativeBracketDragAfterCommit = useCallback(() => {
+    requestAnimationFrame(() => {
+      clearNativeBracketDragState(bracketDragInteractionState);
+    });
+  }, [bracketDragInteractionState]);
+
   const clearNativeBracketDrag = useCallback(() => {
     clearNativeBracketDragState(bracketDragInteractionState);
   }, [bracketDragInteractionState]);
@@ -314,10 +323,10 @@ export function useNativeOemsLineRuntime({
     if (!pendingObserved && !settled) return;
 
     bracketHandoffRef.current = null;
-    clearNativeBracketDrag();
+    releaseNativeBracketDragAfterCommit();
   }, [
     bracketDragInteractionState,
-    clearNativeBracketDrag,
+    releaseNativeBracketDragAfterCommit,
     lineSnapshot.orderLines,
     lineSnapshot.positionLines,
     oemsActions,
