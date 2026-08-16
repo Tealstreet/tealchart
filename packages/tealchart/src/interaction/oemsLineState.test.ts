@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { OemsActionManager } from './oemsActionManager';
 import {
   applyOemsBracketActionState,
-  getOemsOrderHoldSignature,
   OemsLineHold,
   applyOemsOrderActionState,
+  defaultOemsOrderIdentity,
   applyOemsPositionActionState,
   getOemsOrderObjectId,
   getOemsPositionObjectId,
@@ -109,13 +109,18 @@ describe('applyOems*ActionState with no existing brackets', () => {
 });
 
 describe('OemsLineHold', () => {
-  const hold = () =>
+  // What a host supplies: a comparison over what IT knows an order is. Size
+  // here, deliberately not colour - the chart has no business reading styling,
+  // and a faded in-flight line used to fail its own identity check.
+  const sameOrder = (a: OrderLineRenderData, b: OrderLineRenderData) => a.quantity === b.quantity;
+
+  const hold = (isSame: typeof sameOrder = sameOrder) =>
     new OemsLineHold<OrderLineRenderData>(
       'order',
       getOemsOrderObjectId,
       (line) => ({ price: line.price }),
       applyOemsOrderActionState,
-      getOemsOrderHoldSignature,
+      isSame,
     );
 
   const line = (id: string, price: number) =>
@@ -130,6 +135,41 @@ describe('OemsLineHold', () => {
       optimisticState: { price: to },
       callback: () => new Promise<never>(() => {}),
     });
+
+  // The default is TradingView's: an order is its order id. A host whose ids
+  // survive an amend needs nothing else, and one that cancels-and-replaces has
+  // to say so by passing its own comparison.
+  describe('default identity', () => {
+    const byId = (a: OrderLineRenderData, b: OrderLineRenderData) => defaultOemsOrderIdentity(a, b);
+
+    it('treats two rows as one order only when the id matches', () => {
+      expect(byId(line('order-1', 100), line('order-1', 110))).toBe(true);
+      expect(byId(line('order-1', 100), line('order-2', 100))).toBe(false);
+    });
+
+    it('holds nothing for a line carrying no id at all', () => {
+      const manager = pendingManager();
+      const projector = hold(byId);
+      const anonymous = orderLine({ id: 'line-x', orderId: undefined, price: 100 });
+
+      projector.project([anonymous], manager);
+      startMove(manager, 'line-x', 110);
+
+      expect(projector.project([], manager)).toEqual([]);
+    });
+
+    it('still applies optimistic state to rows that are present', () => {
+      const manager = pendingManager();
+      const projector = hold(byId);
+
+      projector.project([line('order-1', 100)], manager);
+      startMove(manager, 'order-1', 110);
+
+      const projected = projector.project([line('order-1', 100)], manager);
+      expect(projected).toHaveLength(1);
+      expect(projected[0].price).toBe(110);
+    });
+  });
 
   it('keeps the line on the chart at the dragged price after its row leaves the feed', () => {
     const manager = pendingManager();

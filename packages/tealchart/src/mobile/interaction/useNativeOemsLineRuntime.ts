@@ -1,3 +1,4 @@
+import type { OemsLineIdentities } from '../../interaction/oemsLineState';
 import type {
   ExecutionLineRenderData,
   OrderLineRenderData,
@@ -19,10 +20,10 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import {
-  getOemsOrderHoldSignature,
   getOemsOrderLineState,
+  defaultOemsOrderIdentity,
+  defaultOemsPositionIdentity,
   getOemsOrderObjectId,
-  getOemsPositionHoldSignature,
   getOemsPositionLineState,
   getOemsPositionObjectId,
   OemsLineHold,
@@ -62,6 +63,14 @@ export interface NativeOemsLineSnapshot {
 }
 
 export interface NativeOemsLineRuntimeInput {
+  /**
+   * Opt in to holding a dragged line through a cancel-and-replace amend.
+   *
+   * Supply this only when your ids change across an amend. A host that keeps
+   * its own optimistic row under the original id should leave it unset: the
+   * chart will trust the ids it is given and hold nothing.
+   */
+  oemsLineIdentity?: OemsLineIdentities;
   bracketDragInteractionState: NativeBracketDragInteractionState;
   bracketDragState: NativeBracketDragSharedValues;
   chartApi: TealchartApi;
@@ -91,6 +100,7 @@ export interface NativeOemsLineRuntime {
 }
 
 export function useNativeOemsLineRuntime({
+  oemsLineIdentity,
   bracketDragInteractionState,
   bracketDragState,
   chartApi,
@@ -134,7 +144,7 @@ export function useNativeOemsLineRuntime({
       getOemsOrderObjectId,
       getOemsOrderLineState,
       applyNativeOrderActionState,
-      getOemsOrderHoldSignature,
+      oemsLineIdentity?.order ?? defaultOemsOrderIdentity,
     );
   }
   const positionHoldRef = useRef<OemsLineHold<PositionLineRenderData> | null>(null);
@@ -144,7 +154,7 @@ export function useNativeOemsLineRuntime({
       getOemsPositionObjectId,
       getOemsPositionLineState,
       applyNativePositionActionState,
-      getOemsPositionHoldSignature,
+      oemsLineIdentity?.position ?? defaultOemsPositionIdentity,
     );
   }
 

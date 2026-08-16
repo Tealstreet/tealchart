@@ -140,18 +140,58 @@ export function confirmOemsPositionLineSnapshots(
 }
 
 /**
+ * Answers "are these two rows the same order?" - a question only the host can
+ * answer, because only the host knows what an order is.
+ */
+export type OemsLineIdentity<TLine> = (a: TLine, b: TLine) => boolean;
+
+/** What a host passes to override the defaults below, per object type. */
+export interface OemsLineIdentities {
+  order?: OemsLineIdentity<OrderLineRenderData>;
+  position?: OemsLineIdentity<PositionLineRenderData>;
+}
+
+/**
+ * The defaults are TradingView's own notion of identity: an order is its order
+ * id, a position is its position id - which in most hosts is the symbol.
+ *
+ * A line carrying neither identifies as nothing, not even as itself, and the
+ * hold declines to hold it rather than guessing from its other fields. Hosts
+ * whose ids survive an amend need nothing else; hosts that cancel-and-replace
+ * pass their own comparison, because only they know the two rows are one order.
+ */
+export function defaultOemsOrderIdentity(a: OrderLineRenderData, b: OrderLineRenderData): boolean {
+  return Boolean(a.orderId) && a.orderId === b.orderId;
+}
+
+export function defaultOemsPositionIdentity(a: PositionLineRenderData, b: PositionLineRenderData): boolean {
+  return Boolean(a.positionId) && a.positionId === b.positionId;
+}
+
+/**
  * Keeps a dragged line on the chart while the venue catches up.
  *
  * Without this, a host that does not maintain its own optimistic order store
  * gets a hole: the user drops a line, the app cancels the old order, the row
  * leaves the feed, and there is nothing left to draw the optimistic price on -
  * so the line vanishes until a replacement arrives seconds later. Hosts that DO
- * keep an optimistic store never hit it, because their row never leaves, which
- * is why this went unnoticed for so long.
+ * keep an optimistic store never hit it, because their row never leaves.
  *
- * Two halves, and they only work together. Holding a vanished line without
- * retiring it would draw the held line AND the replacement side by side on any
- * venue where an amend is a cancel followed by a place - which is most of them.
+ * Holding is OPT IN, and the opt in is the identity function. A host that keeps
+ * its own identity across an amend passes nothing and gets a passthrough - the
+ * chart trusts the ids it is given, the way TradingView's line adapter does.
+ *
+ * This used to hash the line's own fields instead, and the hash included
+ * `lineColor`. A line whose order is in flight is faded, so the row was captured
+ * as `rgba(237,57,95,0.4)` and came back settled as `rgb(237,57,95)`: same
+ * order, different string, no match, and the dragged line sat on the chart next
+ * to its replacement forever. Identity is not the chart's to guess, and colour
+ * is not identity - TradingView's own order model carries no colour at all.
+ *
+ * Equality rather than a hash because a hash is a serialisation, and that
+ * serialisation is where the bug lived. A host comparing fields directly can
+ * use a numeric tolerance, ignore anything transient, or treat a synthesised
+ * bracket id as its parent - none of which survives being flattened to a key.
  */
 export class OemsLineHold<TLine> {
   private readonly lastSeen = new Map<string, TLine>();
@@ -161,7 +201,7 @@ export class OemsLineHold<TLine> {
     private readonly getId: (line: TLine) => string,
     private readonly getState: (line: TLine) => OemsTradingLineState,
     private readonly apply: (line: TLine, manager: OemsActionManager<OemsTradingLineState>) => TLine,
-    private readonly getSignature: (line: TLine) => string,
+    private readonly isSameLine: OemsLineIdentity<TLine>,
   ) {}
 
   project(lines: readonly TLine[], manager: OemsActionManager<OemsTradingLineState>): TLine[] {
@@ -187,14 +227,15 @@ export class OemsLineHold<TLine> {
 
       const held = this.lastSeen.get(action.objectId);
       if (!held) continue;
+      // A line that does not identify as itself has no identity to hold onto.
+      if (!this.isSameLine(held, held)) continue;
 
-      // The replacement, if it has arrived, is an unclaimed row that looks like
-      // what we dragged. `confirmState` still has the last word: it compares the
-      // optimistic price against the candidate within a tick, so a lookalike at
-      // a different price does not retire the hold.
-      const signature = this.getSignature(held);
+      // The replacement, if it has arrived, is an unclaimed row the host calls
+      // the same order. `confirmState` still has the last word: it compares the
+      // optimistic price against the candidate within a tick, so a match at a
+      // different price does not retire the hold.
       const replacement = projected.find(
-        (line) => !spokenFor.has(this.getId(line)) && this.getSignature(line) === signature,
+        (line) => !spokenFor.has(this.getId(line)) && this.isSameLine(held, line),
       );
       if (replacement && manager.confirmState(this.objectType, action.objectId, this.getState(replacement))) {
         this.lastSeen.delete(action.objectId);
@@ -211,14 +252,4 @@ export class OemsLineHold<TLine> {
 
     return projected;
   }
-}
-
-/** Identity for a held line, minus the price - the price is what changed, and
- *  `confirmState` compares it separately with the venue's tick tolerance. */
-export function getOemsOrderHoldSignature(line: OrderLineRenderData): string {
-  return `${line.quantity}|${line.lineColor}`;
-}
-
-export function getOemsPositionHoldSignature(line: PositionLineRenderData): string {
-  return `${line.quantity}|${line.lineColor}`;
 }

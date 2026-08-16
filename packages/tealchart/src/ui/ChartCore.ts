@@ -10,6 +10,7 @@
  * This is the vanilla equivalent of Tealchart.tsx
  */
 
+import type { OemsLineIdentities } from '../interaction/oemsLineState';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
@@ -61,12 +62,12 @@ import {
 import {
   applyOemsOrderActionState,
   applyOemsPositionActionState,
-  getOemsOrderHoldSignature,
-  getOemsPositionHoldSignature,
   OemsLineHold,
   confirmOemsOrderLineSnapshots,
   confirmOemsPositionLineSnapshots,
   getOemsOrderLineState,
+  defaultOemsOrderIdentity,
+  defaultOemsPositionIdentity,
   getOemsOrderObjectId,
   getOemsPositionLineState,
   getOemsPositionObjectId,
@@ -120,6 +121,14 @@ export interface IndicatorPaneInfo {
 }
 
 export interface ChartCoreOptions {
+  /**
+   * Opt in to holding a dragged line through a cancel-and-replace amend.
+   *
+   * Supply this only when your ids change across an amend. A host that keeps
+   * its own optimistic row under the original id should leave it unset: the
+   * chart will trust the ids it is given and hold nothing.
+   */
+  oemsLineIdentity?: OemsLineIdentities;
   /** Container element */
   container: HTMLElement;
   /** Initial width */
@@ -444,20 +453,10 @@ export class ChartCore {
   // Keeps a dragged line on the chart while its row is out of the feed, and
   // retires the hold when a matching row returns under any id. See the
   // optimistic-holding section of this package's CLAUDE.md.
-  private readonly orderHold = new OemsLineHold<OrderLineRenderData>(
-    'order',
-    getOemsOrderObjectId,
-    getOemsOrderLineState,
-    applyOemsOrderActionState,
-    getOemsOrderHoldSignature,
-  );
-  private readonly positionHold = new OemsLineHold<PositionLineRenderData>(
-    'position',
-    getOemsPositionObjectId,
-    getOemsPositionLineState,
-    applyOemsPositionActionState,
-    getOemsPositionHoldSignature,
-  );
+  // Built in the constructor rather than as field initialisers: they need
+  // `options`, which is not assigned until the constructor body runs.
+  private readonly orderHold: OemsLineHold<OrderLineRenderData>;
+  private readonly positionHold: OemsLineHold<PositionLineRenderData>;
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
   /** Auto-scale computed Y ranges from AutoScaleManager (set by TealchartWidget each render) */
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
@@ -528,6 +527,20 @@ export class ChartCore {
 
   constructor(options: ChartCoreOptions) {
     this.options = options;
+    this.orderHold = new OemsLineHold<OrderLineRenderData>(
+      'order',
+      getOemsOrderObjectId,
+      getOemsOrderLineState,
+      applyOemsOrderActionState,
+      options.oemsLineIdentity?.order ?? defaultOemsOrderIdentity,
+    );
+    this.positionHold = new OemsLineHold<PositionLineRenderData>(
+      'position',
+      getOemsPositionObjectId,
+      getOemsPositionLineState,
+      applyOemsPositionActionState,
+      options.oemsLineIdentity?.position ?? defaultOemsPositionIdentity,
+    );
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
     this.oemsActions = new OemsActionManager<OemsTradingLineState>({
