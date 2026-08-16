@@ -12,6 +12,7 @@ import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
 import { NativeChartTradeLinesLayer } from './NativeChartTradeLinesLayer';
 import { NativeCrosshairLayer } from './NativeCrosshairLayer';
+import { NativeIndicatorPaneAxisLayer } from './NativeIndicatorPaneAxisLayer';
 import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
 
@@ -114,24 +115,30 @@ describe('NativeChartCanvasLayers', () => {
     expect(children.map((child) => child.type)).toEqual([NativeChartChromeLayer, Group]);
     expect((plotGroup.props.children as ReactElement[]).map((child) => child.type)).toEqual([
       NativeChartPrimitiveLayer,
+      NativeIndicatorPaneAxisLayer,
       NativeCandleVolumeLayer,
       NativeIndicatorPlotLayer,
       NativeChartPrimitiveLayer,
+      NativeIndicatorPaneAxisLayer,
       NativeUserDrawingLayer,
       NativeChartTradeLinesLayer,
       NativeCrosshairLayer,
     ]);
 
     const plotChildren = plotGroup.props.children as ReactElement[];
+    // Both axis layers are split the same way as the main pane's: grid lines
+    // under the plots, value labels over them.
     expect(plotChildren[0]?.props).toMatchObject({ showAxisLabels: false, showGridLines: true });
-    expect(plotChildren[2]?.props).toMatchObject({
+    expect(plotChildren[1]?.props).toMatchObject({ showAxisLabels: false, showGridLines: true });
+    expect(plotChildren[3]?.props).toMatchObject({
       indicatorPaneInfo: {},
       plots: [],
       totalBarCount: 0,
       visibleBars: [],
     });
-    expect(plotChildren[3]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
-    expect(plotChildren[6]?.props).toMatchObject({ hasContextMenu: false });
+    expect(plotChildren[4]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
+    expect(plotChildren[5]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
+    expect(plotChildren[8]?.props).toMatchObject({ hasContextMenu: false });
   });
 
   it('applies loading opacity inside the Skia plot layer', () => {
