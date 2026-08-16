@@ -18,23 +18,18 @@ import {
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
 import {
-  createNativeCrosshairContextMenuTapGesture,
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
-  createNativeCrosshairTapGesture,
 } from './nativeCrosshairGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { NATIVE_RESET_VIEW_HIT_SIZE, resolveNativeResetViewButtonLayout } from './nativeResetViewButton';
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
-import { claimNativeTap } from './nativeTapClaim';
 import {
   createNativeLeftToolRailToggleTapGesture,
   createNativePriceAxisResetTapGesture,
   createNativeResetViewTapGesture,
-  createNativeTradeLineActionTapGesture,
-  createNativeUserDrawingTapGesture,
 } from './nativeTapGestures';
 import { createNativeUserDrawingEditDragGesture } from './nativeUserDrawingEditGestures';
 import {
@@ -175,96 +170,6 @@ const viewportValue: Viewport = {
 };
 
 describe('native gesture activation', () => {
-  it('toggles crosshair on tap and moves it by drag translation while visible', () => {
-    const crosshair = createCrosshair();
-    const viewport = sharedViewport(viewportValue);
-    const tradeLineRows = shared([]);
-    const tradeLineActionZones = shared([]);
-    const orderDragZones = shared([]);
-    const crosshairTapGesture = createNativeCrosshairTapGesture({
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-    const crosshairPanGesture = createNativeCrosshairPanGesture({
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-
-    expect(crosshairTapGesture.config.maxDistance).toBe(NATIVE_TAP_MAX_DISTANCE);
-    crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
-    expect(crosshair.visible.value).toBe(true);
-    expect(crosshair.x.value).toBe(80);
-    expect(crosshair.y.value).toBe(60);
-
-    const accepted = mockStateManager();
-    crosshairPanGesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 120, y: 100 }], allTouches: [{ x: 120, y: 100 }] },
-      accepted,
-    );
-    expect(accepted.failed).toBe(false);
-
-    crosshairPanGesture.handlers.onBegin({ x: 120, y: 100 });
-    crosshairPanGesture.handlers.onUpdate({ translationX: 30, translationY: -40 });
-    expect(crosshair.x.value).toBe(110);
-    expect(crosshair.y.value).toBe(frame.mainPane.top);
-
-    crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
-    expect(crosshair.visible.value).toBe(false);
-  });
-
-  it('defers crosshair taps so drawing selection can claim the release', () => {
-    vi.useFakeTimers();
-    try {
-      const crosshair = createCrosshair();
-      const viewport = sharedViewport(viewportValue);
-      const tradeLineRows = shared([]);
-      const tradeLineActionZones = shared([]);
-      const orderDragZones = shared([]);
-      const tapClaim = tapClaimState();
-      const crosshairTapGesture = createNativeCrosshairTapGesture({
-        crosshair,
-        frame,
-        orderDragZones,
-        sharedViewport: viewport,
-        tapClaim,
-        tradeLabelHeight: 18,
-        tradeLineActionZones,
-        tradeLineRows,
-      }) as any;
-
-      crosshairTapGesture.handlers.onTouchesDown({
-        changedTouches: [{ x: 80, y: 60 }],
-        allTouches: [{ x: 80, y: 60 }],
-      });
-      crosshairTapGesture.handlers.onEnd({ x: 80, y: 60 }, true);
-      claimNativeTap(tapClaim);
-      vi.runOnlyPendingTimers();
-      expect(crosshair.visible.value).toBe(false);
-
-      crosshairTapGesture.handlers.onTouchesDown({
-        changedTouches: [{ x: 82, y: 62 }],
-        allTouches: [{ x: 82, y: 62 }],
-      });
-      crosshairTapGesture.handlers.onEnd({ x: 82, y: 62 }, true);
-      vi.runOnlyPendingTimers();
-      expect(crosshair.visible.value).toBe(true);
-      expect(crosshair.x.value).toBe(82);
-      expect(crosshair.y.value).toBe(62);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
   it('routes selected drawing drags only after the start point is accepted', () => {
     const began: [number, number][] = [];
     const moved: [number, number][] = [];
@@ -417,30 +322,6 @@ describe('native gesture activation', () => {
     expect(crosshair.visible.value).toBe(false);
   });
 
-  it('leaves the reset view reveal strip to reset gestures instead of crosshair toggles', () => {
-    const crosshair = createCrosshair();
-    const viewport = sharedViewport(viewportValue);
-    const tradeLineRows = shared([]);
-    const tradeLineActionZones = shared([]);
-    const orderDragZones = shared([]);
-    const crosshairTapGesture = createNativeCrosshairTapGesture({
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-
-    crosshairTapGesture.handlers.onEnd({ x: 150, y: 100 }, true);
-    expect(crosshair.visible.value).toBe(false);
-
-    crosshair.visible.value = true;
-    crosshairTapGesture.handlers.onEnd({ x: 150, y: 100 }, true);
-    expect(crosshair.visible.value).toBe(true);
-  });
-
   it('leaves reset and overlay zones to their owners on long press', () => {
     const crosshair = createCrosshair();
     const viewport = sharedViewport(viewportValue);
@@ -464,154 +345,6 @@ describe('native gesture activation', () => {
 
     crosshairLongPressGesture.handlers.onStart({ x: 90, y: 90 });
     expect(crosshair.visible.value).toBe(false);
-  });
-
-  it('opens the context menu from the crosshair plus button without toggling crosshair', () => {
-    const crosshair = createCrosshair(true);
-    crosshair.x.value = (frame.contentLeft + frame.contentRight) / 2;
-    crosshair.y.value = 80;
-    const viewport = sharedViewport(viewportValue);
-    const tradeLineRows = shared([]);
-    const tradeLineActionZones = shared([]);
-    const orderDragZones = shared([]);
-    const onContextMenuTap = vi.fn();
-    const priceLabelText = resolveNativeCrosshairPriceLabelText(frame, viewport, crosshair.y.value, 2);
-    const layout = resolveNativeCrosshairContextMenuButtonLayout(frame, crosshair.y.value, 2, priceLabelText);
-    const crosshairTapGesture = createNativeCrosshairTapGesture({
-      crosshair,
-      frame,
-      hasContextMenu: true,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-    const contextMenuTapGesture = createNativeCrosshairContextMenuTapGesture({
-      crosshair,
-      frame,
-      hasContextMenu: true,
-      onContextMenuTap,
-      sharedViewport: viewport,
-    }) as any;
-
-    crosshairTapGesture.handlers.onEnd({ x: layout.centerX, y: layout.centerY }, true);
-    expect(crosshair.visible.value).toBe(true);
-
-    contextMenuTapGesture.handlers.onEnd({ x: layout.centerX, y: layout.centerY }, true);
-    expect(onContextMenuTap).toHaveBeenCalledWith(1_500, expect.any(Number), layout.centerX, layout.centerY);
-    expect(crosshair.visible.value).toBe(true);
-  });
-
-  it('does not start crosshair interactions over trade controls or with multiple touches', () => {
-    const crosshair = createCrosshair();
-    const viewport = sharedViewport(viewportValue);
-    const tradeLineRows = shared([{ objectType: 'order' as const, objectId: 'order-1', price: 63_000 }]);
-    const tradeLineActionZones = shared([
-      {
-        objectType: 'order' as const,
-        objectId: 'order-1',
-        actionType: 'cancel' as const,
-        price: 63_000,
-        entryPrice: 63_000,
-        partialEnabled: false,
-        positionNotional: 0,
-        positionIsLong: true,
-        color: '#00a8d8',
-        x1: 70,
-        x2: 100,
-      },
-    ]);
-    const orderDragZones = shared([{ objectId: 'order-1', price: 63_000, x1: 110, x2: 140 }]);
-    const crosshairTapGesture = createNativeCrosshairTapGesture({
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-    const crosshairPanGesture = createNativeCrosshairPanGesture({
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-
-    crosshairTapGesture.handlers.onEnd({ x: 80, y: 88 }, true);
-    expect(crosshair.visible.value).toBe(false);
-
-    crosshair.visible.value = true;
-    const actionZone = mockStateManager();
-    crosshairPanGesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 80, y: 88 }], allTouches: [{ x: 80, y: 88 }] },
-      actionZone,
-    );
-    expect(actionZone.failed).toBe(true);
-
-    const orderZone = mockStateManager();
-    crosshairPanGesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 120, y: 88 }], allTouches: [{ x: 120, y: 88 }] },
-      orderZone,
-    );
-    expect(orderZone.failed).toBe(true);
-
-    const multiTouch = mockStateManager();
-    crosshairPanGesture.handlers.onTouchesDown(
-      {
-        changedTouches: [{ x: 80, y: 88 }],
-        allTouches: [
-          { x: 80, y: 88 },
-          { x: 120, y: 90 },
-        ],
-      },
-      multiTouch,
-    );
-    expect(multiTouch.failed).toBe(true);
-  });
-
-  it('leaves overlay control zones to overlay gesture owners instead of crosshair gestures', () => {
-    const crosshair = createCrosshair();
-    const viewport = sharedViewport(viewportValue);
-    const tradeLineRows = shared([]);
-    const tradeLineActionZones = shared([]);
-    const orderDragZones = shared([]);
-    const controlZones = [{ x1: 70, x2: 130, y1: 70, y2: 120 }];
-    const crosshairTapGesture = createNativeCrosshairTapGesture({
-      controlZones,
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-    const crosshairPanGesture = createNativeCrosshairPanGesture({
-      controlZones,
-      crosshair,
-      frame,
-      orderDragZones,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-
-    crosshairTapGesture.handlers.onEnd({ x: 90, y: 90 }, true);
-    expect(crosshair.visible.value).toBe(false);
-
-    crosshair.visible.value = true;
-    const blocked = mockStateManager();
-    crosshairPanGesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 90, y: 90 }], allTouches: [{ x: 90, y: 90 }] },
-      blocked,
-    );
-    expect(blocked.failed).toBe(true);
   });
 
   it('keeps chart pan enabled while crosshair is hidden and blocks it while crosshair is visible', () => {
@@ -875,59 +608,6 @@ describe('native gesture activation', () => {
     expandedGesture.handlers.onEnd({ x: collapsedRect!.x + 1, y: expandedRect!.y + 1 }, true);
 
     expect(onToggle).toHaveBeenCalledTimes(2);
-  });
-
-  it('blocks drawing taps over overlay control zones', () => {
-    const onDrawingTap = vi.fn();
-    const drawingTapGesture = createNativeUserDrawingTapGesture({
-      controlZones: [{ x1: 0, x2: 40, y1: 40, y2: 140 }],
-      enabled: true,
-      frame,
-      onDrawingTap,
-    }) as any;
-
-    drawingTapGesture.handlers.onEnd({ x: 20, y: 80 }, true);
-    drawingTapGesture.handlers.onEnd({ x: 80, y: 80 }, true);
-
-    expect(onDrawingTap).toHaveBeenCalledTimes(1);
-    expect(onDrawingTap).toHaveBeenCalledWith(80, 80);
-  });
-
-  it('leaves overlay control zones to overlay gesture owners instead of trade-line actions', () => {
-    const viewport = sharedViewport(viewportValue);
-    const tradeLineRows = shared([{ objectType: 'order' as const, objectId: 'order-1', price: 63_000 }]);
-    const tradeLineActionZones = shared([
-      {
-        objectType: 'order' as const,
-        objectId: 'order-1',
-        actionType: 'cancel' as const,
-        price: 63_000,
-        entryPrice: 63_000,
-        partialEnabled: false,
-        positionNotional: 0,
-        positionIsLong: true,
-        color: '#00a8d8',
-        x1: 70,
-        x2: 100,
-      },
-    ]);
-    const commitTradeLineAction = vi.fn();
-    const tradeLineActionTapGesture = createNativeTradeLineActionTapGesture({
-      bracketDragActive: shared(false),
-      commitTradeLineAction,
-      controlZones: [{ x1: 70, x2: 100, y1: 80, y2: 96 }],
-      frame,
-      sharedViewport: viewport,
-      tradeLabelHeight: 18,
-      tradeLineActionZones,
-      tradeLineRows,
-    }) as any;
-
-    tradeLineActionTapGesture.handlers.onEnd({ x: 80, y: 88 }, true);
-    tradeLineActionTapGesture.handlers.onEnd({ x: 80, y: 72 }, true);
-
-    expect(commitTradeLineAction).toHaveBeenCalledTimes(1);
-    expect(commitTradeLineAction).toHaveBeenCalledWith('order', 'order-1', 'cancel');
   });
 
   it('leaves overlay control zones to overlay gesture owners instead of price and time scale drags', () => {

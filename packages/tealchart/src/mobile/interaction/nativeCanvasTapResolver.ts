@@ -57,6 +57,15 @@ export type NativeCanvasTapOutcome =
 
 export interface NativeCanvasTapContext {
   bracketDragActive: boolean;
+  /**
+   * False while a drawing is being placed, which suspends trade-line actions,
+   * the crosshair and its context menu.
+   *
+   * This arrived as three separate nullable frames - `chartInteractionFrame`,
+   * `crosshairInteractionFrame` and `dataFrame` - where the first two were the
+   * same expression written twice. There is one frame and one flag.
+   */
+  chartInteractionEnabled: boolean;
   controlZones: readonly NativeGestureControlZone[];
   crosshairVisible: boolean;
   crosshairY: number;
@@ -86,7 +95,7 @@ export function resolveNativeCanvasTap(
 
   // Mid-bracket-drag the action buttons are not live, matching the gate the
   // trade-line tap applied for itself.
-  if (!ctx.bracketDragActive) {
+  if (ctx.chartInteractionEnabled && !ctx.bracketDragActive) {
     const zone = findNativeTradeLineActionZone({
       zones: ctx.tradeLineActionZones,
       rows: ctx.tradeLineRows,
@@ -110,6 +119,7 @@ export function resolveNativeCanvasTap(
   // beside the crosshair and gating it on control zones would suppress
   // legitimate taps near chrome.
   if (
+    ctx.chartInteractionEnabled &&
     ctx.hasContextMenu &&
     ctx.crosshairVisible &&
     isNativeCrosshairContextMenuButtonTap({
@@ -129,6 +139,7 @@ export function resolveNativeCanvasTap(
   if (isNativeResetViewRevealTap(ctx.frame, point.x, point.y)) return { kind: 'none' };
 
   if (ctx.drawingTapEnabled) return { kind: 'drawingThenCrosshair' };
+  if (!ctx.chartInteractionEnabled) return { kind: 'none' };
 
   // A tap on a trade-line row or order drag zone belongs to that line even when
   // it misses an action button, so the crosshair must not swallow it.
