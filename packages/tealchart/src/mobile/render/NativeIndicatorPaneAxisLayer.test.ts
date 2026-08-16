@@ -40,13 +40,14 @@ function slotsFor(pane: { yMin: number; yMax: number; top?: number; height?: num
 }
 
 describe('NativeIndicatorPaneAxisLayer', () => {
-  // A pane this short admits only its two end ticks, and for a 0-100 oscillator
-  // those land exactly on pane.top and pane.bottom. Culling the edges left the
-  // axis completely blank, which is what shipped.
-  it('keeps the end ticks of a short fixed-range pane', () => {
+  // Two properties at once. The end ticks land exactly on pane.top and
+  // pane.bottom, and culling them left the axis blank. And an indicator pane is
+  // a fraction of the main pane's height carrying a full range, so on the main
+  // pane's label spacing it got nothing between them.
+  it('fills a short fixed-range pane rather than showing only its ends', () => {
     const visible = slotsFor({ yMin: 0, yMax: 100 }).filter((slot) => slot.visible);
 
-    expect(visible.map((slot) => slot.labelText)).toEqual(['0', '100']);
+    expect(visible.map((slot) => slot.labelText)).toEqual(['0', '50', '100']);
   });
 
   it('keeps every label inside its own pane', () => {
