@@ -1179,6 +1179,72 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  // The partial branch of _drawBracketPreview had no coverage at all, so the
+  // marker ladder, its dimming and the summary pill's corner were unverified.
+  it('draws the partial marker ladder on one arm, each percent once', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: { pricePrecision: 0 },
+    });
+
+    core.setBars(makeBars(5));
+    const fillText = vi.fn();
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      roundRect: vi.fn(),
+      measureText: (text: string) => ({ width: text.length * 7 }),
+      setLineDash: vi.fn(),
+      fillText,
+      font: '',
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 1,
+      textAlign: 'left',
+      textBaseline: 'top',
+      globalAlpha: 1,
+    };
+    const privateCore = core as unknown as {
+      _bracketDragState: unknown;
+      _drawBracketPreview(ctx: CanvasRenderingContext2D): void;
+    };
+
+    privateCore._bracketDragState = {
+      type: 'sl',
+      positionId: 'position-1',
+      price: 49900,
+      entryPrice: 50000,
+      partialPercent: 50,
+      partialEnabled: true,
+      dragStartX: 300,
+      dragCurrentX: 420,
+      positionData: { entryPrice: 50000, isLong: true, notional: 1000 },
+      color: '#f97316',
+    };
+    privateCore._drawBracketPreview(ctx as unknown as CanvasRenderingContext2D);
+
+    const percentCalls = fillText.mock.calls.filter((call) => /^\d+%$/.test(String(call[0])));
+    const texts = percentCalls.map((call) => String(call[0]));
+    expect(texts).toEqual(['100%', '75%', '50%', '25%', '10%']);
+
+    // Dragging right lays the ladder out to the right of the origin, once.
+    const xs = percentCalls.map((call) => Number(call[1]));
+    expect(xs.every((x) => x >= 300)).toBe(true);
+    expect(new Set(xs).size).toBe(xs.length);
+
+    core.dispose();
+  });
+
   it('draws the active bracket drag price on the price axis overlay', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({

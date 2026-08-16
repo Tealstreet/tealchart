@@ -19,6 +19,7 @@ import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativeP
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
 import { getNativePriceAxisTagFloor, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
+import { PARTIAL_BRACKET_PERCENTS, resolvePartialBracketMarkers } from '../../interaction/partialBrackets';
 
 const PARTIAL_ZONE_HALF_WIDTH = 220;
 const PARTIAL_MARKER_INTERVAL = 55;
@@ -32,19 +33,7 @@ const PARTIAL_MAIN_LABEL_HEIGHT = 22;
 const PARTIAL_THUMB_CLEARANCE = 44;
 const PARTIAL_SURFACE_GAP = 6;
 const PARTIAL_PREVIEW_INSET_X = 8;
-const PARTIAL_MARKERS = [
-  { key: 'left-10', percent: 10, offset: -PARTIAL_ZONE_HALF_WIDTH, side: -1 },
-  { key: 'left-25', percent: 25, offset: -PARTIAL_MARKER_INTERVAL * 3, side: -1 },
-  { key: 'left-50', percent: 50, offset: -PARTIAL_MARKER_INTERVAL * 2, side: -1 },
-  { key: 'left-75', percent: 75, offset: -PARTIAL_MARKER_INTERVAL, side: -1 },
-  { key: 'center-100', percent: 100, offset: 0, side: 0 },
-  { key: 'right-75', percent: 75, offset: PARTIAL_MARKER_INTERVAL, side: 1 },
-  { key: 'right-50', percent: 50, offset: PARTIAL_MARKER_INTERVAL * 2, side: 1 },
-  { key: 'right-25', percent: 25, offset: PARTIAL_MARKER_INTERVAL * 3, side: 1 },
-  { key: 'right-10', percent: 10, offset: PARTIAL_ZONE_HALF_WIDTH, side: 1 },
-] as const;
-
-export const NATIVE_BRACKET_PARTIAL_MARKER_TEXTS = PARTIAL_MARKERS.map((marker) => `${marker.percent}%`);
+export const NATIVE_BRACKET_PARTIAL_MARKER_TEXTS = PARTIAL_BRACKET_PERCENTS.map((percent) => `${percent}%`);
 
 function clampWorklet(value: number, min: number, max: number): number {
   'worklet';
@@ -55,44 +44,6 @@ function formatNativeSignedFixed(value: number, decimals: number): string {
   'worklet';
   if (!Number.isFinite(value)) return '0.00';
   return Math.abs(value).toFixed(decimals);
-}
-
-export function resolveNativeBracketPartialMarkerOffset(percent: number, side: number): number {
-  'worklet';
-  if (percent >= 100) return 0;
-  const direction = side < 0 ? -1 : 1;
-  if (percent <= 10) return direction * PARTIAL_ZONE_HALF_WIDTH;
-  if (percent <= 25) return direction * PARTIAL_MARKER_INTERVAL * 3;
-  if (percent <= 50) return direction * PARTIAL_MARKER_INTERVAL * 2;
-  return direction * PARTIAL_MARKER_INTERVAL;
-}
-
-export function shouldShowNativeBracketPartialMarker({
-  activeCenter,
-  activeWidth,
-  isActive,
-  markerCenter,
-  markerWidth,
-  zoneLeft,
-  zoneRight,
-}: {
-  activeCenter: number;
-  activeWidth: number;
-  isActive: boolean;
-  markerCenter: number;
-  markerWidth: number;
-  zoneLeft: number;
-  zoneRight: number;
-}): boolean {
-  'worklet';
-  if (isActive) return true;
-
-  const naturalLeft = markerCenter - markerWidth / 2;
-  const naturalRight = markerCenter + markerWidth / 2;
-  if (naturalLeft < zoneLeft || naturalRight > zoneRight) return false;
-
-  const activeClearance = Math.abs(markerCenter - activeCenter);
-  return activeClearance >= (markerWidth + activeWidth) / 2 + PARTIAL_MARKER_MIN_GAP;
 }
 
 export function formatNativeBracketPartialPreviewLabel({
@@ -197,7 +148,7 @@ export function NativePartialMarker({
   activeColor,
   axisCharacterWidth,
   dragState,
-  marker,
+  markerIndex,
   markerBaselineY,
   markerTop,
   zoneLeft,
@@ -207,63 +158,43 @@ export function NativePartialMarker({
   activeColor: SharedValue<string>;
   axisCharacterWidth: number;
   dragState: NativeBracketDragSharedValues;
-  marker: (typeof PARTIAL_MARKERS)[number];
+  markerIndex: number;
   markerBaselineY: SharedValue<number>;
   markerTop: SharedValue<number>;
   zoneLeft: SharedValue<number>;
   zoneRight: SharedValue<number>;
   axisFont: ReturnType<typeof Skia.Font>;
 }) {
-  const text = `${marker.percent}%`;
+  const text = `${PARTIAL_BRACKET_PERCENTS[markerIndex]}%`;
   const inactiveMarkerFill = getNativeDarkLabelBackgroundColor();
   const markerWidth = Math.ceil(text.length * axisCharacterWidth) + PARTIAL_MARKER_PADDING_X * 2;
-  const activeMarkerWidth = useDerivedValue(() => {
-    const percent = Math.round(dragState.activePartialPercent.value);
-    const activeTextLength = percent >= 100 ? 4 : `${percent}%`.length;
-    return Math.ceil(activeTextLength * axisCharacterWidth) + PARTIAL_MARKER_PADDING_X * 2;
-  });
-  const markerCenter = useDerivedValue(() => dragState.activeDragStartX.value + marker.offset);
-  const markerX = useDerivedValue(() =>
-    clampWorklet(
-      markerCenter.value - markerWidth / 2,
-      zoneLeft.value,
-      Math.max(zoneLeft.value, zoneRight.value - markerWidth),
-    ),
+  // One shared resolver decides where every marker sits, which arm is drawn,
+  // and which of them dim - so the ladder cannot drift from web's.
+  const resolved = useDerivedValue(
+    () =>
+      resolvePartialBracketMarkers({
+        dragStartX: dragState.activeDragStartX.value,
+        currentX: dragState.activeDragCurrentX.value,
+        zoneLeft: zoneLeft.value,
+        zoneRight: zoneRight.value,
+        characterWidth: axisCharacterWidth,
+        paddingX: PARTIAL_MARKER_PADDING_X,
+        minGap: PARTIAL_MARKER_MIN_GAP,
+      })[markerIndex],
   );
+  const markerX = useDerivedValue(() => resolved.value.centerX - resolved.value.width / 2);
   const markerTextX = useDerivedValue(() => markerX.value + PARTIAL_MARKER_PADDING_X);
-  const isActive = useDerivedValue(() => {
-    if (!dragState.activePartialEnabled.value) return false;
-    const dragSide = dragState.activeDragCurrentX.value < dragState.activeDragStartX.value ? -1 : 1;
-    const percent = Math.round(dragState.activePartialPercent.value);
-    return marker.percent === percent && (marker.side === 0 || marker.side === dragSide);
-  });
-  const activeMarkerCenter = useDerivedValue(() => {
-    const dragSide = dragState.activeDragCurrentX.value < dragState.activeDragStartX.value ? -1 : 1;
-    return (
-      dragState.activeDragStartX.value +
-      resolveNativeBracketPartialMarkerOffset(Math.round(dragState.activePartialPercent.value), dragSide)
-    );
-  });
-  const shouldShow = useDerivedValue(() =>
-    shouldShowNativeBracketPartialMarker({
-      activeCenter: activeMarkerCenter.value,
-      activeWidth: activeMarkerWidth.value,
-      isActive: isActive.value,
-      markerCenter: markerCenter.value,
-      markerWidth,
-      zoneLeft: zoneLeft.value,
-      zoneRight: zoneRight.value,
-    }),
+  const isActive = useDerivedValue(
+    () => dragState.activePartialEnabled.value && resolved.value.isActive,
   );
   const markerBorderColor = useDerivedValue(() => (isActive.value ? activeColor.value : 'rgba(160, 166, 176, 0.45)'));
   const markerFill = useDerivedValue(() => (isActive.value ? activeColor.value : inactiveMarkerFill));
-  const markerOpacity = useDerivedValue(() =>
-    dragState.activeObjectId.value && dragState.activePartialEnabled.value && shouldShow.value
-      ? isActive.value
-        ? 0.94
-        : 0.74
-      : 0,
-  );
+  const markerOpacity = useDerivedValue(() => {
+    if (!dragState.activeObjectId.value || !dragState.activePartialEnabled.value) return 0;
+    // Crowded markers dim rather than disappearing, so the ladder stops
+    // blinking out and back under the finger.
+    return (isActive.value ? 0.94 : 0.74) * resolved.value.opacity;
+  });
 
   return (
     <Group opacity={markerOpacity}>
@@ -298,21 +229,32 @@ export function NativePartialMarker({
 
 export function NativePartialBoundaryLine({
   dragState,
-  marker,
+  markerIndex,
   zoneBottom,
   zoneLeft,
   zoneRight,
   zoneTop,
 }: {
   dragState: NativeBracketDragSharedValues;
-  marker: (typeof PARTIAL_MARKERS)[number];
+  markerIndex: number;
   zoneBottom: SharedValue<number>;
   zoneLeft: SharedValue<number>;
   zoneRight: SharedValue<number>;
   zoneTop: SharedValue<number>;
 }) {
-  const markerX = useDerivedValue(() =>
-    clampWorklet(dragState.activeDragStartX.value + marker.offset, zoneLeft.value, zoneRight.value),
+  // Same ladder as the markers, so a boundary line cannot sit anywhere its
+  // marker does not.
+  const markerX = useDerivedValue(
+    () =>
+      resolvePartialBracketMarkers({
+        dragStartX: dragState.activeDragStartX.value,
+        currentX: dragState.activeDragCurrentX.value,
+        zoneLeft: zoneLeft.value,
+        zoneRight: zoneRight.value,
+        characterWidth: 0,
+        paddingX: 0,
+        minGap: 0,
+      })[markerIndex].centerX,
   );
   const markerLineStart = useDerivedValue(() => ({ x: markerX.value, y: zoneTop.value }));
   const markerLineEnd = useDerivedValue(() => ({ x: markerX.value, y: zoneBottom.value }));
@@ -425,12 +367,26 @@ export function AnimatedBracketDragPreview({
     ),
   );
   const zoneWidth = useDerivedValue(() => Math.max(1, zoneRight.value - zoneLeft.value));
+  // The drawn zone follows the arm being dragged, matching the one-sided marker
+  // ladder above it. zoneLeft/zoneRight stay two-sided because they are also the
+  // bounds the ladder is clamped inside.
+  const armLeft = useDerivedValue(() =>
+    dragState.activeDragCurrentX.value < dragState.activeDragStartX.value
+      ? zoneLeft.value
+      : clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value),
+  );
+  const armRight = useDerivedValue(() =>
+    dragState.activeDragCurrentX.value < dragState.activeDragStartX.value
+      ? clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value)
+      : zoneRight.value,
+  );
+  const armWidth = useDerivedValue(() => Math.max(1, armRight.value - armLeft.value));
   const dragOrigin = useDerivedValue(() => ({
     x: clampWorklet(dragState.activeDragStartX.value, partialBoundsLeft, partialBoundsRight),
     y: entryY.value,
   }));
-  const zoneLeftOnBracket = useDerivedValue(() => ({ x: zoneLeft.value, y: y.value }));
-  const zoneRightOnBracket = useDerivedValue(() => ({ x: zoneRight.value, y: y.value }));
+  const zoneLeftOnBracket = useDerivedValue(() => ({ x: armLeft.value, y: y.value }));
+  const zoneRightOnBracket = useDerivedValue(() => ({ x: armRight.value, y: y.value }));
   const partialSurfaceTops = useDerivedValue(() =>
     resolveNativePartialSurfaceTops({
       // Ties (no movement yet) read as downward, matching the old default side.
@@ -479,18 +435,18 @@ export function AnimatedBracketDragPreview({
       </SkiaLine>
       <Group opacity={partialPreviewOpacity}>
         <RoundedRect
-          x={zoneLeft}
+          x={armLeft}
           y={zoneTop}
-          width={zoneWidth}
+          width={armWidth}
           height={zoneHeight}
           r={4}
           color={color}
           opacity={0.08}
         />
         <RoundedRect
-          x={zoneLeft}
+          x={armLeft}
           y={zoneTop}
-          width={zoneWidth}
+          width={armWidth}
           height={zoneHeight}
           r={4}
           color={color}
@@ -502,24 +458,24 @@ export function AnimatedBracketDragPreview({
         </RoundedRect>
         <SkiaLine p1={dragOrigin} p2={zoneLeftOnBracket} color={color} strokeWidth={1} opacity={0.6} />
         <SkiaLine p1={dragOrigin} p2={zoneRightOnBracket} color={color} strokeWidth={1} opacity={0.6} />
-        {PARTIAL_MARKERS.slice(1, -1).map((marker) => (
+        {PARTIAL_BRACKET_PERCENTS.slice(1).map((percent, index) => (
           <NativePartialBoundaryLine
-            key={`partial-line-${marker.key}`}
+            key={`partial-line-${percent}`}
             dragState={dragState}
-            marker={marker}
+            markerIndex={index + 1}
             zoneBottom={zoneBottom}
             zoneLeft={zoneLeft}
             zoneRight={zoneRight}
             zoneTop={zoneTop}
           />
         ))}
-        {PARTIAL_MARKERS.map((marker) => (
+        {PARTIAL_BRACKET_PERCENTS.map((percent, index) => (
           <NativePartialMarker
-            key={marker.key}
+            key={`partial-marker-${percent}`}
             activeColor={color}
             axisCharacterWidth={axisCharacterWidth}
             dragState={dragState}
-            marker={marker}
+            markerIndex={index}
             markerBaselineY={markerBaselineY}
             markerTop={markerTop}
             zoneLeft={zoneLeft}
