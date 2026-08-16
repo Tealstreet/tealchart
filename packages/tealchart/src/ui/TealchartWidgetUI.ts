@@ -1,3 +1,4 @@
+import type { OemsLineIdentities } from '../interaction/oemsLineState';
 import type { DrawingOutput, InputDefinition, PlotOutput } from '@tealstreet/tealscript';
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
@@ -97,6 +98,15 @@ const TOP_BAR_HEIGHT = WEB_CHART_CHROME_METRICS.topBarHeight;
 // ============================================================================
 
 export interface TealchartWidgetUIOptions {
+  /**
+   * Opt in to holding a dragged line through a cancel-and-replace amend by
+   * answering "are these two rows the same order?".
+   *
+   * Defaults to the id, like TradingView. Supply this only when your ids change
+   * across an amend; a host whose optimistic row keeps the original id needs
+   * nothing here.
+   */
+  oemsLineIdentity?: OemsLineIdentities;
   /** Container element */
   container: HTMLElement;
   /** Chart key for state persistence */
@@ -552,6 +562,7 @@ export class TealchartWidgetUI {
       margins,
       chartLabelMinX: this.getChartLabelMinX(),
       renderOptions: this.options.renderOptions,
+      oemsLineIdentity: this.options.oemsLineIdentity,
       onViewportChange: this.options.onViewportChange,
       onRequestMoreBars: this.options.onRequestMoreBars,
       onOrderMove: this.options.onOrderMove,
