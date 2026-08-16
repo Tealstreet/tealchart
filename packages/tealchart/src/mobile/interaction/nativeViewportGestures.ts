@@ -2,6 +2,7 @@ import type { GestureStateManager } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
+import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeOrderDragZone, NativeTradeLineActionZone, NativeTradeLineRow } from '../utils/tradeLineLayout';
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
@@ -18,6 +19,9 @@ import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
 import { getNativePaneAtY, getNativePriceAxisPaneAt } from '../render/nativeChartFrame';
+import {
+  resolveNativeIndicatorPaneTranslateRange,
+} from '../render/nativePaneRangeOverride';
 import { isNativeGestureControlPoint } from './nativeGestureControlZones';
 import { resolveNativeIndicatorPaneScaleRange } from './nativeIndicatorPaneScale';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
@@ -138,7 +142,9 @@ export interface NativeChartPanGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
   crosshair?: NativeCrosshairSharedValues;
   frame: NativeChartFrame | null;
+  onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   panActive: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
@@ -154,7 +160,9 @@ export function createNativeChartPanGesture({
   controlZones = [],
   crosshair,
   frame,
+  onIndicatorPaneScale,
   orderDragZones,
+  paneRangeOverrides,
   panActive,
   sharedViewport,
   tradeLabelHeight,
@@ -193,20 +201,42 @@ export function createNativeChartPanGesture({
         stateManager.fail();
         return;
       }
-      chartPanGestureState.lockVertical.value = getNativePaneAtY(frame, point.y)?.type === 'indicator';
+      const pane = getNativePaneAtY(frame, point.y);
+      chartPanGestureState.indicatorPaneTarget.value =
+        pane && pane.type === 'indicator' && pane.yMax > pane.yMin
+          ? { id: pane.id, height: pane.height, startYMin: pane.yMin, startYMax: pane.yMax, yMin: pane.yMin, yMax: pane.yMax }
+          : null;
     })
     .onBegin(() => {
       beginNativeChartPanGestureStateFromFrame(chartPanGestureState, frame);
       runOnJS(beginNativeViewportInteraction)();
     })
     .onUpdate((event) => {
-      updateNativeChartPanGestureState(
-        chartPanGestureState,
-        event.translationX,
-        chartPanGestureState.lockVertical.value ? 0 : event.translationY,
-      );
+      // The two components are independent. Time slides across every pane; the
+      // vertical drag moves only the pane it started in, so the main viewport
+      // takes no vertical delta while one is targeted.
+      const pane = chartPanGestureState.indicatorPaneTarget.value;
+      updateNativeChartPanGestureState(chartPanGestureState, event.translationX, pane ? 0 : event.translationY);
+      if (!pane) return;
+
+      const next = resolveNativeIndicatorPaneTranslateRange({
+        paneHeight: pane.height,
+        startYMax: pane.startYMax,
+        startYMin: pane.startYMin,
+        translationY: event.translationY,
+      });
+      chartPanGestureState.indicatorPaneTarget.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
+      if (paneRangeOverrides) {
+        paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
+      }
     })
     .onEnd(() => {
+      // Only when the drag actually moved vertically. A sideways pan through an
+      // indicator pane must not silently pin its range against auto-scale.
+      const pane = chartPanGestureState.indicatorPaneTarget.value;
+      if (pane && onIndicatorPaneScale && pane.yMin !== pane.startYMin) {
+        runOnJS(onIndicatorPaneScale)(pane.id, pane.yMin, pane.yMax);
+      }
       const nextViewport = getNativeViewportGestureCommit(panActive, sharedViewport);
       if (!nextViewport) return;
       runOnJS(commitPanViewport)(nextViewport);
@@ -360,6 +390,7 @@ export interface NativePriceScaleGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   priceScaleActive: SharedValue<boolean>;
   priceScaleGestureState: NativePriceScaleGestureState;
   sharedViewport: NativeViewportSharedValues;
@@ -372,6 +403,7 @@ export function createNativePriceScaleGesture({
   controlZones = [],
   frame,
   onIndicatorPaneScale,
+  paneRangeOverrides,
   priceScaleActive,
   priceScaleGestureState,
   sharedViewport,
@@ -434,6 +466,9 @@ export function createNativePriceScaleGesture({
           translationY: event.translationY,
         });
         indicatorPane.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
+        if (paneRangeOverrides) {
+          paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
+        }
         return;
       }
       updateNativePriceScaleGestureState(priceScaleGestureState, event.translationY);

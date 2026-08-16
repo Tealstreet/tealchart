@@ -1649,12 +1649,23 @@ export class EventManager {
         priceMax: newPriceMax,
       };
     } else {
-      // For indicator panes (or main pane with auto-scale): only update time axis
+      // Time is a property of the whole chart, so it moves here whatever pane the
+      // drag started in.
       nextViewport = {
         ...viewport,
         startTime: newStartTime,
         endTime: newEndTime,
       };
+
+      // The vertical half belongs to the pane the drag started in, and to that
+      // pane alone. Dropping it — which is what used to happen — left an
+      // indicator pane unable to be moved through its own values at all.
+      // Only on real vertical movement: a sideways pan must not pin the pane
+      // against auto-scale as a side effect.
+      if (this.state.draggedPaneId !== 'main' && dy !== 0) {
+        this.callbacks.onAutoScaleDisabled?.(this.state.draggedPaneId);
+        this.callbacks.onPaneYRangeChange?.(this.state.draggedPaneId, newPriceMin, newPriceMax);
+      }
     }
 
     // Request more bars for the viewport we are moving toward, not the previous committed viewport.

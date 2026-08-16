@@ -28,11 +28,12 @@ export interface NativePriceAutoScaleSharedValues {
 
 export interface NativeChartPanGestureState {
   /**
-   * Set when a pan starts inside an indicator pane. Those panes carry their own
-   * value scale, so a vertical drag there must not haul the main price viewport
-   * around — web suppresses the same movement via `isAutoScale`.
+   * Set when a pan starts inside an indicator pane. A drag there is two
+   * independent components: the horizontal one slides time across every pane,
+   * the vertical one moves only this pane's values. So the main viewport must
+   * not take the vertical delta.
    */
-  lockVertical: SharedValue<boolean>;
+  indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
   active: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   startViewport: NativeViewportSharedValues;
@@ -169,7 +170,11 @@ export function getNativeTimeScaleHitGeometry(frame: NativeChartFrame | null): N
   'worklet';
   const timeLeft = frame?.contentLeft ?? 0;
   const timeRight = frame ? frame.contentLeft + frame.contentWidth : 0;
-  const axisTop = frame?.mainPane.bottom ?? 0;
+  // The time axis, not "everything below the main pane". With indicator panes
+  // present those are wildly different: mainPane.bottom sits above the first
+  // indicator pane, so every drag inside one was read as a time-axis scale and
+  // stretched the visible time range instead of panning.
+  const axisTop = frame?.timeAxisTop ?? 0;
   const axisBottom = frame?.dimensions.height ?? 0;
   return {
     timeLeft,

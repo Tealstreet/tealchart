@@ -9,6 +9,7 @@ import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
+import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
@@ -39,6 +40,7 @@ export interface NativeChartCanvasLayersProps {
   hasContextMenu: boolean;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   indicatorPlots: readonly PlotOutput[];
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
   lineSnapshot: {
     orderLines: readonly OrderLineRenderData[];
@@ -79,6 +81,7 @@ export function NativeChartCanvasLayers({
   hasContextMenu,
   indicatorPaneInfo,
   indicatorPlots,
+  paneRangeOverrides,
   indicatorTotalBarCount,
   lineSnapshot,
   options,
@@ -123,6 +126,7 @@ export function NativeChartCanvasLayers({
             axisFont={axisFont}
             frame={frame}
             gridColor={gridColor}
+            paneRangeOverrides={paneRangeOverrides}
             showAxisLabels={false}
             showGridLines={true}
             textColor={textColor}
@@ -140,6 +144,7 @@ export function NativeChartCanvasLayers({
           <NativeIndicatorPlotLayer
             frame={frame}
             indicatorPaneInfo={indicatorPaneInfo}
+            paneRangeOverrides={paneRangeOverrides}
             plots={indicatorPlots}
             sharedViewport={sharedViewport}
             staticProjection={staticProjection}
@@ -163,6 +168,7 @@ export function NativeChartCanvasLayers({
             axisFont={axisFont}
             frame={frame}
             gridColor={gridColor}
+            paneRangeOverrides={paneRangeOverrides}
             showAxisLabels={true}
             showGridLines={false}
             textColor={textColor}
