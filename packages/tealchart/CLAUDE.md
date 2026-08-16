@@ -298,6 +298,27 @@ appearing or disappearing never costs you the adapter — glyde's
 A host that destroys its adapter is telling the chart the order is gone. The
 chart believes it, because that is the contract.
 
+### Drag state on native: `active` vs `activeObjectId`
+
+A trade-line drag holds two pieces of state and they retire at different times.
+
+- `active` is **gesture arbitration**. The axis pinch fails outright while it is
+  true, and the drag's own touch guard skips its checks. It must fall on the
+  frame the finger lifts — `releaseNativeOrderDragGesture` /
+  `releaseNativeBracketDragGesture`, called from the commit branch of `onEnd`.
+- `activeObjectId` is **the preview**. It survives the gesture so the line keeps
+  drawing at the dropped price until the projection carries it, and it is
+  retired by `shouldClear*DragForSnapshot`.
+
+Holding `active` until the projection caught up looked equivalent and was not.
+When a host removed its adapter instead of re-pointing it, the hand-off never
+came, and `active` stranded true forever: no axis pinch, and the next touch
+resumed the dead drag rather than starting a new one — a drag that silently did
+nothing until something else cleared it.
+
+The hand-off therefore also retires on a line that has **gone**, not only on one
+that went pending. `!line` is a terminal state, not a reason to keep waiting.
+
 ## Frame timing on native
 
 Two bugs lived here, and both are invisible on web because the browser's

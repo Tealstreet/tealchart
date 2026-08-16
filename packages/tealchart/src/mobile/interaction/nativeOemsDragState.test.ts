@@ -14,6 +14,7 @@ import {
   getNativeBracketDragCommit,
   getNativeOrderDragCommit,
   hasNativeBracketDragMoved,
+  releaseNativeOrderDragGesture,
   shouldClearNativeBracketDragForSnapshot,
   shouldClearNativeOrderDragForSnapshot,
   type NativeBracketDragInteractionState,
@@ -334,6 +335,38 @@ describe('native OEMS drag state', () => {
     ).toBe(true);
   });
 
+  // A host that removes its adapter instead of re-pointing it leaves the drag
+  // holding a line that will never come back. Waiting for it stranded `active`,
+  // which fails the axis pinch and swallows the next touch as a dead drag.
+  it('clears an order drag whose line has gone', () => {
+    const state = createOrderDragState();
+    state.activeObjectId.value = 'order-1';
+    state.activePrice.value = 125;
+
+    expect(
+      shouldClearNativeOrderDragForSnapshot({
+        state,
+        orderLines: [orderLine('order-2', 100)],
+        getOrderObjectId: (line) => line.id,
+      }),
+    ).toBe(true);
+  });
+
+  it('drops the order gesture on release while the preview keeps its line', () => {
+    const state = createOrderDragState();
+    const zone: NativeOrderDragZone = { objectId: 'order-1', price: 100, x1: 0, x2: 10 };
+    beginNativeOrderDragState(state, zone, 2);
+
+    releaseNativeOrderDragGesture(state);
+
+    expect(state.active.value).toBe(false);
+    expect(state.activeObjectId.value).toBe('order-1');
+    expect(state.activePrice.value).toBe(100);
+    // Nothing may resume it: the price only tracks a live gesture.
+    expect(updateNativeOrderDragState(state, 40)).toBe(false);
+    expect(getNativeOrderDragCommit(state, 40)).toBeNull();
+  });
+
   it('clears bracket drags when the active order or position snapshot becomes pending', () => {
     const state = createBracketDragState();
     state.activeObjectId.value = 'position-1';
@@ -367,6 +400,17 @@ describe('native OEMS drag state', () => {
         state,
         orderLines: [orderLine('order-1', 100, true)],
         positionLines: [positionLine('position-1', 100)],
+        getOrderObjectId,
+        getPositionObjectId,
+      }),
+    ).toBe(true);
+
+    state.activeObjectId.value = 'order-gone';
+    expect(
+      shouldClearNativeBracketDragForSnapshot({
+        state,
+        orderLines: [orderLine('order-1', 100)],
+        positionLines: [],
         getOrderObjectId,
         getPositionObjectId,
       }),
