@@ -219,7 +219,12 @@ export function useNativeViewportRuntime({
   const previousSymbolRef = useRef(symbol);
   const loadedBarsRef = useRef<readonly Bar[]>(bars);
   const loadedBarsIntervalRef = useRef(loadedBarsInterval);
-  const pendingDataLoadViewScaleRef = useRef<NativeDataLoadViewScaleCapture | null>(null);
+  // State, not a ref. `pendingDataLoadViewport` below is derived from this, and
+  // a ref cleared imperatively cannot invalidate the memo that reads it - the
+  // derived viewport stayed non-null after being applied, which left
+  // `dataLoadRenderBlocked` true and the chart rendering through a static
+  // projection that ignores every drag.
+  const [pendingDataLoadViewScale, setPendingDataLoadViewScale] = useState<NativeDataLoadViewScaleCapture | null>(null);
   const nextSharedViewportSyncEpochRef = useRef(0);
   const pendingSharedViewportSyncEpochRef = useRef<number | null>(null);
   const pendingSharedViewportSyncTargetRef = useRef<Viewport | null>(null);
@@ -245,9 +250,9 @@ export function useNativeViewportRuntime({
         bars: viewportBars,
         dataKey,
         interval,
-        pending: pendingDataLoadViewScaleRef.current,
+        pending: pendingDataLoadViewScale,
       }),
-    [dataKey, interval, viewportBars],
+    [dataKey, interval, pendingDataLoadViewScale, viewportBars],
   );
 
   useEffect(() => {
@@ -343,7 +348,7 @@ export function useNativeViewportRuntime({
       resetPricePadding: symbolChanged,
       viewport: candidateViewportRef.current ?? viewport,
     });
-    pendingDataLoadViewScaleRef.current = capture;
+    setPendingDataLoadViewScale(capture);
 
     // Nothing to carry over - a first load, or bars that never arrived. Falling
     // through to the incoming data's own viewport matters most on a symbol
@@ -384,7 +389,7 @@ export function useNativeViewportRuntime({
   useLayoutEffect(() => {
     if (!pendingDataLoadViewport) return;
 
-    pendingDataLoadViewScaleRef.current = null;
+    setPendingDataLoadViewScale(null);
     loadedBarsRef.current = bars;
     loadedBarsIntervalRef.current = loadedBarsInterval;
     viewportOwnershipRef.current = cancelNativeViewportOwnership(

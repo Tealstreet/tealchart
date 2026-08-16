@@ -53,7 +53,12 @@ describe('UserDrawingPropertiesPanel', () => {
     expect(element?.style.position).toBe('fixed');
     expect(element?.style.right).toBe('16px');
     expect(element?.style.maxWidth).toBe('calc(100vw - 32px)');
-    expect(element?.style.maxHeight).toBe('min(620px, calc(100vh - 72px))');
+    // jsdom's CSS serializer rewrites calc() operands, so assert the intent
+    // rather than one engine's spelling of it.
+    expect([
+      'min(620px, calc(100vh - 72px))',
+      'min(620px, -72px + 100vh)',
+    ]).toContain(element?.style.maxHeight);
     expect(element?.style.overflow).toBe('hidden');
 
     const lineControls = element?.querySelector<HTMLElement>('[data-tealchart-user-drawing-properties-controls="line"]');
