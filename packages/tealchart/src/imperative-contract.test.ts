@@ -585,10 +585,12 @@ describe('imperative chart API contract', () => {
     // guard is really pinning is that native lines come from the adapter
     // snapshot and pass through the OEMS layer on the way out.
     expect(runtimeSource).toContain(
-      'orderLines: orderHoldRef.current!.project(rawLineSnapshot.orderLines, oemsActions),',
+      // No hold to project through: a line is identified by its adapter, so a
+      // venue re-key never orphans its action and nothing needs resurrecting.
+      'orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),',
     );
     expect(runtimeSource).toContain(
-      'positionLines: positionHoldRef.current!.project(rawLineSnapshot.positionLines, oemsActions),',
+      'positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),',
     );
     expect(runtimeSource).toContain('applyNativeOrderActionState,');
     expect(runtimeSource).toContain('applyNativePositionActionState,');
