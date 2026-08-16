@@ -367,12 +367,26 @@ export function AnimatedBracketDragPreview({
     ),
   );
   const zoneWidth = useDerivedValue(() => Math.max(1, zoneRight.value - zoneLeft.value));
+  // The drawn zone follows the arm being dragged, matching the one-sided marker
+  // ladder above it. zoneLeft/zoneRight stay two-sided because they are also the
+  // bounds the ladder is clamped inside.
+  const armLeft = useDerivedValue(() =>
+    dragState.activeDragCurrentX.value < dragState.activeDragStartX.value
+      ? zoneLeft.value
+      : clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value),
+  );
+  const armRight = useDerivedValue(() =>
+    dragState.activeDragCurrentX.value < dragState.activeDragStartX.value
+      ? clampWorklet(dragState.activeDragStartX.value, zoneLeft.value, zoneRight.value)
+      : zoneRight.value,
+  );
+  const armWidth = useDerivedValue(() => Math.max(1, armRight.value - armLeft.value));
   const dragOrigin = useDerivedValue(() => ({
     x: clampWorklet(dragState.activeDragStartX.value, partialBoundsLeft, partialBoundsRight),
     y: entryY.value,
   }));
-  const zoneLeftOnBracket = useDerivedValue(() => ({ x: zoneLeft.value, y: y.value }));
-  const zoneRightOnBracket = useDerivedValue(() => ({ x: zoneRight.value, y: y.value }));
+  const zoneLeftOnBracket = useDerivedValue(() => ({ x: armLeft.value, y: y.value }));
+  const zoneRightOnBracket = useDerivedValue(() => ({ x: armRight.value, y: y.value }));
   const partialSurfaceTops = useDerivedValue(() =>
     resolveNativePartialSurfaceTops({
       // Ties (no movement yet) read as downward, matching the old default side.
@@ -421,18 +435,18 @@ export function AnimatedBracketDragPreview({
       </SkiaLine>
       <Group opacity={partialPreviewOpacity}>
         <RoundedRect
-          x={zoneLeft}
+          x={armLeft}
           y={zoneTop}
-          width={zoneWidth}
+          width={armWidth}
           height={zoneHeight}
           r={4}
           color={color}
           opacity={0.08}
         />
         <RoundedRect
-          x={zoneLeft}
+          x={armLeft}
           y={zoneTop}
-          width={zoneWidth}
+          width={armWidth}
           height={zoneHeight}
           r={4}
           color={color}

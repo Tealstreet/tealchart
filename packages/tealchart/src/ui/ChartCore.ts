@@ -52,7 +52,12 @@ import {
 } from '../drawings';
 import { EventManager } from '../interaction/EventManager';
 import { OemsActionManager } from '../interaction/oemsActionManager';
-import { PARTIAL_BRACKET_ZONE_HALF_WIDTH, resolvePartialBracketMarkers } from '../interaction/partialBrackets';
+import {
+  PARTIAL_BRACKET_MARKER_INTERVAL,
+  PARTIAL_BRACKET_PERCENTS,
+  PARTIAL_BRACKET_ZONE_HALF_WIDTH,
+  resolvePartialBracketMarkers,
+} from '../interaction/partialBrackets';
 import {
   applyOemsOrderActionState,
   applyOemsPositionActionState,
@@ -2729,10 +2734,15 @@ export class ChartCore {
     ctx.save();
 
     // ========= Zone visualization =========
-    const zoneHalfWidth = 220;
     const centerX = state.dragStartX;
-    const leftEdge = Math.max(0, centerX - zoneHalfWidth);
-    const rightEdge = Math.min(chartWidth, centerX + zoneHalfWidth);
+    // The zone follows the arm being dragged, like the marker ladder above it.
+    // A two-sided zone under a one-sided ladder reads as a bug.
+    const armEdge =
+      state.dragCurrentX < centerX
+        ? Math.max(0, centerX - PARTIAL_BRACKET_ZONE_HALF_WIDTH)
+        : Math.min(chartWidth, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH);
+    const leftEdge = Math.min(centerX, armEdge);
+    const rightEdge = Math.max(centerX, armEdge);
 
     const top = Math.min(entryY, bracketY);
     const bottom = Math.max(entryY, bracketY);
@@ -2768,17 +2778,14 @@ export class ChartCore {
       }
       ctx.stroke();
 
-      // Zone boundary lines at 55px intervals
+      // Boundary lines sit under their own markers, on the dragged arm only.
       ctx.globalAlpha = 0.3;
-      const zoneOffsets = [55, 110, 165];
-      for (const offset of zoneOffsets) {
+      const boundaryDirection = state.dragCurrentX < centerX ? -1 : 1;
+      for (let index = 1; index < PARTIAL_BRACKET_PERCENTS.length; index += 1) {
+        const boundaryX = centerX + boundaryDirection * index * PARTIAL_BRACKET_MARKER_INTERVAL;
         ctx.beginPath();
-        ctx.moveTo(centerX - offset, top);
-        ctx.lineTo(centerX - offset, bottom);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(centerX + offset, top);
-        ctx.lineTo(centerX + offset, bottom);
+        ctx.moveTo(boundaryX, top);
+        ctx.lineTo(boundaryX, bottom);
         ctx.stroke();
       }
 
@@ -2868,7 +2875,7 @@ export class ChartCore {
         dragStartX: centerX,
         currentX: state.dragCurrentX,
         zoneLeft: Math.max(0, centerX - PARTIAL_BRACKET_ZONE_HALF_WIDTH),
-        zoneRight: Math.min(this.options.width, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH),
+        zoneRight: Math.min(chartWidth, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH),
         characterWidth: 0,
         paddingX: 0,
         minGap: 0,
