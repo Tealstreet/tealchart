@@ -1480,6 +1480,13 @@ export interface ChartPane {
   yMax: number;
   /** Whether the Y-axis range is fixed (false for main, true for RSI 0-100, etc.) */
   fixedRange: boolean;
+  /**
+   * Set false once the user scales this pane's axis by hand, which pins the
+   * range against auto-scale. Distinct from `fixedRange`: that one declares a
+   * range the indicator was authored with, and also makes the pane a merge
+   * target for other indicators sharing it.
+   */
+  autoScale?: boolean;
   /** Indicator instance IDs rendered in this pane (only for type: 'indicator') */
   indicatorIds?: string[];
 }

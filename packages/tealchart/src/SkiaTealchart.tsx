@@ -1395,6 +1395,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Same outcome as the reset button, different input. The button also hides
   // itself on use; do that here too so a reveal from an earlier tap does not
   // linger over an already-reset chart.
+  // Dragging an indicator pane's axis pins that pane's range, the same trade as
+  // web: the user has said what they want to see, so auto-scale stops moving it.
+  const handleNativeIndicatorPaneScale = useCallback(
+    (paneId: string, yMin: number, yMax: number) => {
+      indicatorManager?.setIndicatorPaneManualRange(paneId, yMin, yMax);
+    },
+    [indicatorManager],
+  );
+
   const handleNativePriceAxisResetTap = useCallback(() => {
     if (!hasDataViewport) return;
     resetNativeViewport();
@@ -1457,6 +1466,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     orderDragZones,
     overlayActionTargets: nativeOverlayActionTargets,
     onDrawingTap: handleNativeUserDrawingTap,
+    onIndicatorPaneScale: handleNativeIndicatorPaneScale,
     onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
     onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
     onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,

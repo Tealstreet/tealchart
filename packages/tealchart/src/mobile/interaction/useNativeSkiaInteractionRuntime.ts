@@ -18,6 +18,7 @@ import type {
   NativeChartAxisPinchGestureState,
   NativeChartPanGestureState,
   NativePriceAutoScaleSharedValues,
+  NativeIndicatorPaneScaleTarget,
   NativePriceScaleGestureState,
   NativeTimeScaleGestureState,
   NativeViewportGestureMetrics,
@@ -218,9 +219,11 @@ export function useNativeSkiaInteractionRuntime({
     }),
     [bracketDragActive, bracketDragPricePerPixel, bracketDragStartPrice, bracketDragState],
   );
+  const panLockVertical = useSharedValue(false);
   const chartPanGestureState = useMemo<NativeChartPanGestureState>(
     () => ({
       active: panActive,
+      lockVertical: panLockVertical,
       sharedViewport,
       startViewport: panStartViewport,
       metrics: panMetrics,
@@ -232,6 +235,7 @@ export function useNativeSkiaInteractionRuntime({
       activePanPricePerPixel,
       activePanTimePerPixel,
       panActive,
+      panLockVertical,
       panMetrics,
       panStartViewport,
       priceAutoScale,
@@ -262,6 +266,7 @@ export function useNativeSkiaInteractionRuntime({
       sharedViewport,
     ],
   );
+  const indicatorPaneScaleTarget = useSharedValue<NativeIndicatorPaneScaleTarget | null>(null);
   const priceScaleGestureState = useMemo<NativePriceScaleGestureState>(
     () => ({
       active: priceScaleActive,
@@ -269,8 +274,16 @@ export function useNativeSkiaInteractionRuntime({
       startViewport: panStartViewport,
       priceAutoScale,
       activeAnchorPrice: activePriceScaleAnchorPrice,
+      indicatorPaneTarget: indicatorPaneScaleTarget,
     }),
-    [activePriceScaleAnchorPrice, panStartViewport, priceAutoScale, priceScaleActive, sharedViewport],
+    [
+      activePriceScaleAnchorPrice,
+      indicatorPaneScaleTarget,
+      panStartViewport,
+      priceAutoScale,
+      priceScaleActive,
+      sharedViewport,
+    ],
   );
   const timeScaleGestureState = useMemo<NativeTimeScaleGestureState>(
     () => ({

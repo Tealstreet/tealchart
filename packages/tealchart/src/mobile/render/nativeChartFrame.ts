@@ -104,6 +104,23 @@ export function isPointInNativePriceAxis(frame: NativeChartFrame, x: number, y: 
   return x >= frame.priceAxisHitLeft && x <= frame.priceAxisRight && y >= frame.mainPane.top && y <= frame.mainPane.bottom;
 }
 
+/** The pane a vertical position falls in, main or indicator. */
+export function getNativePaneAtY(frame: NativeChartFrame, y: number): NativePaneFrame | null {
+  'worklet';
+  return frame.panes.find((pane) => y >= pane.top && y <= pane.bottom) ?? null;
+}
+
+/**
+ * The pane whose price-axis band a point falls in. The axis runs the full height
+ * of the plot area, so which pane an axis drag scales is decided by where it
+ * started vertically.
+ */
+export function getNativePriceAxisPaneAt(frame: NativeChartFrame, x: number, y: number): NativePaneFrame | null {
+  'worklet';
+  if (x < frame.priceAxisHitLeft || x > frame.priceAxisRight) return null;
+  return getNativePaneAtY(frame, y);
+}
+
 export function isPointInNativeTimeAxis(frame: NativeChartFrame, x: number, y: number): boolean {
   return x >= frame.contentLeft && x <= frame.contentRight && y >= frame.timeAxisTop && y <= frame.timeAxisBottom;
 }

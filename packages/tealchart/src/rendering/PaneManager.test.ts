@@ -426,6 +426,59 @@ describe('PaneManager', () => {
     });
   });
 
+  describe('manual pane range', () => {
+    it('pins a hand-scaled pane against auto-scale', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const paneId = pm.getIndicatorPanes()[0].id;
+
+      pm.setPaneManualRange(paneId, -5, 5);
+      pm.updatePaneRange(paneId, -100, 100);
+
+      const pane = pm.getIndicatorPanes()[0];
+      expect(pane.yMin).toBe(-5);
+      expect(pane.yMax).toBe(5);
+    });
+
+    it('hands the pane back to auto-scale on reset', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const paneId = pm.getIndicatorPanes()[0].id;
+
+      pm.setPaneManualRange(paneId, -5, 5);
+      pm.resetPaneAutoScale(paneId);
+      pm.updatePaneRange(paneId, -100, 100);
+
+      const pane = pm.getIndicatorPanes()[0];
+      expect(pane.yMin).toBe(-100);
+      expect(pane.yMax).toBe(100);
+    });
+
+    // fixedRange also makes a pane a merge target for indicators declaring the
+    // same range, so a hand-scaled pane must not borrow it.
+    it('does not turn a hand-scaled pane into a merge target', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const paneId = pm.getIndicatorPanes()[0].id;
+      pm.setPaneManualRange(paneId, 0, 100);
+
+      pm.addIndicator({ indicatorId: 'rsi_1', overlay: false, yAxisRange: { min: 0, max: 100 } });
+
+      expect(pm.getIndicatorPanes()).toHaveLength(2);
+    });
+
+    it('ignores an inverted or non-finite range', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const paneId = pm.getIndicatorPanes()[0].id;
+      const before = { ...pm.getIndicatorPanes()[0] };
+
+      pm.setPaneManualRange(paneId, 10, 10);
+      pm.setPaneManualRange(paneId, 10, -10);
+      pm.setPaneManualRange(paneId, Number.NaN, 5);
+
+      const pane = pm.getIndicatorPanes()[0];
+      expect(pane.yMin).toBe(before.yMin);
+      expect(pane.yMax).toBe(before.yMax);
+    });
+  });
+
   describe('getLayout (legacy)', () => {
     it('returns legacy PaneLayout format', () => {
       pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });

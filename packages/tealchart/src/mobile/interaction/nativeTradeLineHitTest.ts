@@ -278,5 +278,12 @@ export function canBeginNativeChartPan({
     return false;
   }
 
-  return x >= frame.contentLeft && x < frame.priceAxisHitLeft && y >= frame.mainPane.top && y <= frame.mainPane.bottom;
+  // Any pane, not just the main one. Bounding this to mainPane meant a drag
+  // starting inside an indicator pane began no gesture at all, so those panes
+  // could not be panned or scrolled through time.
+  return (
+    x >= frame.contentLeft &&
+    x < frame.priceAxisHitLeft &&
+    frame.panes.some((pane) => y >= pane.top && y <= pane.bottom)
+  );
 }
