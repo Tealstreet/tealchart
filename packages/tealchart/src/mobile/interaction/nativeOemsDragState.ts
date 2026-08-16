@@ -257,10 +257,17 @@ export function shouldClearNativeOrderDragForSnapshot({
   orderLines,
   getOrderObjectId,
 }: {
-  state: NativeOrderDragSharedValues;
+  state: NativeOrderDragInteractionState;
   orderLines: readonly OrderLineRenderData[];
   getOrderObjectId: (line: OrderLineRenderData) => string;
 }): boolean {
+  // Only a released gesture hands off. While the finger is down the gesture
+  // owns the line: a snapshot landing before the first movement matches the
+  // drag price exactly, and one landing mid-amend may not carry the line at
+  // all - either would have yanked the drag away mid-gesture and dropped the
+  // line back where it started, with nothing left to move it.
+  if (state.active.value) return false;
+
   const objectId = state.activeObjectId.value;
   if (!objectId) return false;
 
@@ -280,17 +287,21 @@ export function shouldClearNativeBracketDragForSnapshot({
   getOrderObjectId,
   getPositionObjectId,
 }: {
-  state: NativeBracketDragSharedValues;
+  state: NativeBracketDragInteractionState;
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
   getOrderObjectId: (line: OrderLineRenderData) => string;
   getPositionObjectId: (line: PositionLineRenderData) => string;
 }): boolean {
+  // Same rule as the order drag: the hand-off is what happens after the finger
+  // lifts, never during.
+  if (state.active.value) return false;
+
   const objectId = state.activeObjectId.value;
   if (!objectId) return false;
 
-  // Same rule as the order drag: a preview whose line has gone has nothing left
-  // to hand off to, and retiring it beats waiting out the handoff timeout.
+  // A preview whose line has gone has nothing left to hand off to, and retiring
+  // it beats waiting out the handoff timeout.
   if (state.activeObjectType.value === 'order') {
     const line = orderLines.find((candidate) => getOrderObjectId(candidate) === objectId);
     return !line || line.actionState?.isPending === true;

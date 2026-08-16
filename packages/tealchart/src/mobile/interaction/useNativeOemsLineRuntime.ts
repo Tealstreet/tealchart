@@ -6,7 +6,6 @@ import type {
 import type { TealchartApi } from '../../TealchartApi';
 import type {
   NativeBracketDragInteractionState,
-  NativeBracketDragSharedValues,
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
@@ -60,7 +59,6 @@ export interface NativeOemsLineSnapshot {
 
 export interface NativeOemsLineRuntimeInput {
   bracketDragInteractionState: NativeBracketDragInteractionState;
-  bracketDragState: NativeBracketDragSharedValues;
   chartApi: TealchartApi;
   forceUpdate: () => void;
   orderDragState: NativeOrderDragInteractionState;
@@ -89,7 +87,6 @@ export interface NativeOemsLineRuntime {
 
 export function useNativeOemsLineRuntime({
   bracketDragInteractionState,
-  bracketDragState,
   chartApi,
   forceUpdate,
   orderDragState,
@@ -252,8 +249,11 @@ export function useNativeOemsLineRuntime({
   }, [releaseNativeOrderDragAfterCommit, lineSnapshot.orderLines, orderDragState]);
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
+    // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot`.
+    if (bracketDragInteractionState.active.value) return;
+
     const pendingObserved = shouldClearNativeBracketDragForSnapshot({
-      state: bracketDragState,
+      state: bracketDragInteractionState,
       orderLines: lineSnapshot.orderLines,
       positionLines: lineSnapshot.positionLines,
       getOrderObjectId: getNativeOrderObjectId,
@@ -270,7 +270,13 @@ export function useNativeOemsLineRuntime({
 
     bracketHandoffRef.current = null;
     clearNativeBracketDrag();
-  }, [bracketDragState, clearNativeBracketDrag, lineSnapshot.orderLines, lineSnapshot.positionLines, oemsActions]);
+  }, [
+    bracketDragInteractionState,
+    clearNativeBracketDrag,
+    lineSnapshot.orderLines,
+    lineSnapshot.positionLines,
+    oemsActions,
+  ]);
 
   const syncNativeOemsDragStateForSnapshot = useCallback(() => {
     syncNativeOrderDragStateForSnapshot();

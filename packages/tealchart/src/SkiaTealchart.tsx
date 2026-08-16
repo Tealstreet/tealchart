@@ -1143,7 +1143,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     syncNativeOemsDragStateForSnapshot,
   } = useNativeOemsLineRuntime({
     bracketDragInteractionState,
-    bracketDragState,
     chartApi,
     forceUpdate,
     orderDragState,

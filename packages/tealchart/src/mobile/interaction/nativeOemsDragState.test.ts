@@ -335,6 +335,51 @@ describe('native OEMS drag state', () => {
     ).toBe(true);
   });
 
+  // The hand-off is what happens after the finger lifts. Running it during the
+  // gesture dropped the line back to its pre-drag price and left nothing able to
+  // move it: a snapshot landing before the first movement matches the drag price
+  // exactly, and one landing mid-amend may not carry the line at all.
+  it('never retires a drag while the finger is still down', () => {
+    const state = createOrderDragState();
+    const zone: NativeOrderDragZone = { objectId: 'order-1', price: 100, x1: 0, x2: 10 };
+    beginNativeOrderDragState(state, zone, 2);
+    const getOrderObjectId = (line: OrderLineRenderData) => line.id;
+
+    for (const orderLines of [
+      [orderLine('order-1', 100)],
+      [orderLine('order-1', 100, true)],
+      [orderLine('order-2', 100)],
+    ]) {
+      expect(shouldClearNativeOrderDragForSnapshot({ state, orderLines, getOrderObjectId })).toBe(false);
+    }
+
+    releaseNativeOrderDragGesture(state);
+    expect(
+      shouldClearNativeOrderDragForSnapshot({
+        state,
+        orderLines: [orderLine('order-1', 100)],
+        getOrderObjectId,
+      }),
+    ).toBe(true);
+  });
+
+  it('never retires a bracket preview while the finger is still down', () => {
+    const state = createBracketDragState();
+    state.active.value = true;
+    state.activeObjectId.value = 'position-1';
+    state.activeObjectType.value = 'position';
+
+    expect(
+      shouldClearNativeBracketDragForSnapshot({
+        state,
+        orderLines: [],
+        positionLines: [positionLine('position-1', 100, true)],
+        getOrderObjectId: (line) => line.id,
+        getPositionObjectId: (line) => line.id,
+      }),
+    ).toBe(false);
+  });
+
   // A host that removes its adapter instead of re-pointing it leaves the drag
   // holding a line that will never come back. Waiting for it stranded `active`,
   // which fails the axis pinch and swallows the next touch as a dead drag.
