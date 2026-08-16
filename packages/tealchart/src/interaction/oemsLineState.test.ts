@@ -1,12 +1,13 @@
 import type { OrderLineRenderData, PositionLineRenderData } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { OemsActionManager } from './oemsActionManager';
 import {
   applyOemsBracketActionState,
   OemsLineHold,
   applyOemsOrderActionState,
+  DEFAULT_OEMS_HOLD_GRACE_MS,
   defaultOemsOrderIdentity,
   applyOemsPositionActionState,
   getOemsOrderObjectId,
@@ -114,14 +115,21 @@ describe('OemsLineHold', () => {
   // and a faded in-flight line used to fail its own identity check.
   const sameOrder = (a: OrderLineRenderData, b: OrderLineRenderData) => a.quantity === b.quantity;
 
-  const hold = (isSame: typeof sameOrder = sameOrder) =>
+  let clock = 0;
+  const hold = (isSame: typeof sameOrder = sameOrder, graceMs = DEFAULT_OEMS_HOLD_GRACE_MS) =>
     new OemsLineHold<OrderLineRenderData>(
       'order',
       getOemsOrderObjectId,
       (line) => ({ price: line.price }),
       applyOemsOrderActionState,
       isSame,
+      graceMs,
+      () => clock,
     );
+
+  beforeEach(() => {
+    clock = 0;
+  });
 
   const line = (id: string, price: number) =>
     orderLine({ id, orderId: id, price, quantity: '0.5', lineColor: '#ff0000' });
@@ -168,6 +176,51 @@ describe('OemsLineHold', () => {
       const projected = projector.project([line('order-1', 100)], manager);
       expect(projected).toHaveLength(1);
       expect(projected[0].price).toBe(110);
+    });
+  });
+
+  // Unbounded, a hold that never matches is worse than no hold at all: a
+  // duplicate line that lasts until the action's 30s timeout, where TradingView
+  // would have shown a gap that healed itself.
+  describe('grace', () => {
+    it('drops an unmatched hold once the venue has had its round trip', () => {
+      const manager = pendingManager();
+      const projector = hold();
+
+      projector.project([line('order-1', 100)], manager);
+      startMove(manager, 'order-1', 110);
+
+      expect(projector.project([], manager)).toHaveLength(1);
+
+      clock += DEFAULT_OEMS_HOLD_GRACE_MS;
+      expect(projector.project([], manager)).toHaveLength(0);
+    });
+
+    it('keeps holding while the venue is still within its round trip', () => {
+      const manager = pendingManager();
+      const projector = hold();
+
+      projector.project([line('order-1', 100)], manager);
+      startMove(manager, 'order-1', 110);
+      projector.project([], manager);
+
+      clock += DEFAULT_OEMS_HOLD_GRACE_MS - 1;
+      expect(projector.project([], manager)).toHaveLength(1);
+    });
+
+    it('does not drop a hold that matched inside the grace', () => {
+      const manager = pendingManager();
+      const projector = hold();
+
+      projector.project([line('order-1', 100)], manager);
+      startMove(manager, 'order-1', 110);
+      projector.project([], manager);
+
+      clock += DEFAULT_OEMS_HOLD_GRACE_MS - 1;
+      const settled = projector.project([line('order-2', 110)], manager);
+
+      expect(settled).toHaveLength(1);
+      expect(settled[0].id).toBe('order-2');
     });
   });
 

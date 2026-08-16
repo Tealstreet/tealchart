@@ -193,8 +193,25 @@ export function defaultOemsPositionIdentity(a: PositionLineRenderData, b: Positi
  * use a numeric tolerance, ignore anything transient, or treat a synthesised
  * bracket id as its parent - none of which survives being flattened to a key.
  */
+/**
+ * How long an unmatched hold survives before the line is dropped.
+ *
+ * This caps the downside at TradingView's behaviour. TradingView holds nothing:
+ * when a row leaves the feed its line goes, and the replacement draws when it
+ * arrives - a brief gap that heals itself. Holding is meant to be strictly
+ * better than that, and it is, right up until identity fails; then it is far
+ * worse, because a duplicate line persists where a gap would have healed.
+ *
+ * Bounded, the trade is safe: hold long enough to cover a venue round trip when
+ * identity works, and fall back to a flicker rather than a lasting duplicate
+ * when it does not. The action's own 30s timeout is far too long to be the
+ * thing that ends it.
+ */
+export const DEFAULT_OEMS_HOLD_GRACE_MS = 1200;
+
 export class OemsLineHold<TLine> {
   private readonly lastSeen = new Map<string, TLine>();
+  private readonly heldSince = new Map<string, number>();
 
   constructor(
     private readonly objectType: 'order' | 'position',
@@ -202,6 +219,8 @@ export class OemsLineHold<TLine> {
     private readonly getState: (line: TLine) => OemsTradingLineState,
     private readonly apply: (line: TLine, manager: OemsActionManager<OemsTradingLineState>) => TLine,
     private readonly isSameLine: OemsLineIdentity<TLine>,
+    private readonly graceMs: number = DEFAULT_OEMS_HOLD_GRACE_MS,
+    private readonly now: () => number = () => Date.now(),
   ) {}
 
   project(lines: readonly TLine[], manager: OemsActionManager<OemsTradingLineState>): TLine[] {
@@ -239,6 +258,18 @@ export class OemsLineHold<TLine> {
       );
       if (replacement && manager.confirmState(this.objectType, action.objectId, this.getState(replacement))) {
         this.lastSeen.delete(action.objectId);
+        this.heldSince.delete(action.objectId);
+        continue;
+      }
+
+      // Nothing matched. Give the venue its round trip, then let the line go
+      // rather than leaving a dead one on the chart until the action expires.
+      const since = this.heldSince.get(action.objectId);
+      if (since === undefined) {
+        this.heldSince.set(action.objectId, this.now());
+      } else if (this.now() - since >= this.graceMs) {
+        this.lastSeen.delete(action.objectId);
+        this.heldSince.delete(action.objectId);
         continue;
       }
 
@@ -248,6 +279,7 @@ export class OemsLineHold<TLine> {
     for (const id of Array.from(this.lastSeen.keys())) {
       if (present.has(id) || spokenFor.has(id)) continue;
       this.lastSeen.delete(id);
+      this.heldSince.delete(id);
     }
 
     return projected;
