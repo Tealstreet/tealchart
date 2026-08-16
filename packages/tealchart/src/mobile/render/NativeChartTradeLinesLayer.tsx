@@ -133,6 +133,8 @@ export function NativeChartTradeLinesLayer({
             key={`order-drag-tag-${objectId}`}
             axisFont={axisFont}
             color={line.lineColor}
+            backgroundColor={line.bodyBackgroundColor}
+            textColor={line.bodyTextColor}
             dragState={orderDragState}
             frame={frame}
             geometry={geometry}
