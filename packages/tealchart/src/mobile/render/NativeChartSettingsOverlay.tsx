@@ -205,6 +205,7 @@ export interface NativeChartSettingsButtonProps {
   /** Time-axis height. The cell is square on this. */
   axisHeight: number;
   onLayoutRectChange: (layout: LayoutRectangle) => void;
+  onPress: () => void;
   textColor: string;
 }
 
@@ -233,11 +234,12 @@ const buttonStyles = StyleSheet.create({
 });
 
 /**
- * Turn the button's own measured box into a gesture hit target.
+ * Turn the button's own measured box into a gesture control zone.
  *
- * The rect comes from `onLayout` rather than from recomputed geometry, so the
- * tappable area is the drawn area by construction — the two cannot drift the way
- * hand-derived rects do.
+ * The button takes its own tap through `onPress`; this rect exists only so the
+ * canvas pan/crosshair/drawing gestures fail their start underneath it. The rect
+ * comes from `onLayout` rather than recomputed geometry, so the suppressed area
+ * is the drawn area by construction.
  */
 export function resolveNativeChartSettingsActionTargets(
   layout: LayoutRectangle | null,
@@ -260,28 +262,32 @@ export function resolveNativeChartSettingsActionTargets(
  * Bottom-right gear, mirroring the web chrome. The reset-view affordance is
  * bottom-centre on native, so this corner is free.
  *
- * Passive by design: it draws and reports its box, and the chart's gesture layer
- * owns the tap, exactly as the legend action buttons do. A `Pressable` here would
- * be a second, parallel hit path in a different coordinate space to every other
- * chart control.
+ * It is a React Native view, so it takes its own tap through `onPress`. It also
+ * reports its measured box, which becomes a gesture control zone — the gear sits
+ * on the axis corner where canvas pan and crosshair are live, and those must fail
+ * their start under it rather than compete with the press.
  */
 export function NativeChartSettingsButtonImpl({
   axisHeight,
   backgroundColor,
   onLayoutRectChange,
+  onPress,
   textColor,
 }: NativeChartSettingsButtonProps) {
   return (
-    <View
+    <Pressable
       accessibilityLabel="Chart settings"
       accessibilityRole="button"
+      hitSlop={SETTINGS_BUTTON_HIT_SLOP}
       onLayout={(event) => onLayoutRectChange(event.nativeEvent.layout)}
-      pointerEvents="none"
+      onPress={onPress}
       style={[buttonStyles.button, { backgroundColor, height: axisHeight, width: axisHeight }]}
     >
       {/* Same icon set as the left tool rail rather than a system emoji. */}
-      <NativeDrawingIcon color={textColor} name="gear" size={16} strokeWidth={1.75} />
-    </View>
+      <View pointerEvents="none">
+        <NativeDrawingIcon color={textColor} name="gear" size={16} strokeWidth={1.75} />
+      </View>
+    </Pressable>
   );
 }
 
