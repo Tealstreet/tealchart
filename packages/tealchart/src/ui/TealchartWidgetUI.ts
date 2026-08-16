@@ -1001,6 +1001,11 @@ export class TealchartWidgetUI {
   /**
    * Resize the chart
    */
+  /** In-chart overlay layer. Chart-contained panels mount here, not on document.body. */
+  getOverlayRoot(): HTMLElement {
+    return this.overlayRoot;
+  }
+
   resize(width?: number, height?: number): void {
     const rect = this.chartArea.getBoundingClientRect();
     const w = width ?? rect.width;

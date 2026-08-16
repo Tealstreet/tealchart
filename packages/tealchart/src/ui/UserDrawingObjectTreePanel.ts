@@ -15,6 +15,8 @@ import { button, div, input, span } from './dom';
 
 export interface UserDrawingObjectTreePanelOptions {
   model: UserDrawingObjectTreeModel;
+  /** Chart overlay layer to mount into. The panel is chart-contained, not viewport-level. */
+  parent: HTMLElement;
   onDispatch: (action: UserDrawingObjectTreeDispatchAction) => boolean;
   onClose?: () => void;
   renderOptions?: Partial<RenderOptions>;
@@ -22,12 +24,16 @@ export interface UserDrawingObjectTreePanelOptions {
 
 const styles = {
   panel: {
-    position: 'fixed',
+    // Chart-contained, like every other panel. Anchored to the chart's overlay
+    // layer rather than the viewport, or it lands outside the chart entirely on
+    // any page where the chart is not full-bleed.
+    position: 'absolute',
     top: '56px',
     right: '16px',
     width: '320px',
-    maxWidth: 'calc(100vw - 32px)',
-    maxHeight: 'min(560px, calc(100vh - 72px))',
+    maxWidth: 'calc(100% - 32px)',
+    maxHeight: 'calc(100% - 72px)',
+    pointerEvents: 'auto',
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: 'var(--bg, rgba(17, 19, 26, 0.96))',
@@ -171,17 +177,16 @@ export class UserDrawingObjectTreePanel {
         'data-tealchart-user-drawing-object-tree-panel': 'true',
       },
     });
-    // Portaled to document.body, so theme it directly (can't inherit root vars).
     applyChromeThemeVars(this.el, options.renderOptions);
     this.el.addEventListener('mousedown', (event) => event.stopPropagation());
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());
     this.el.addEventListener('contextmenu', (event) => event.stopPropagation());
-    document.body.appendChild(this.el);
+    options.parent.appendChild(this.el);
     this.render();
   }
 
-  /** Re-apply theme vars (portaled to body, so it can't inherit live root changes). */
+  /** Re-apply theme vars explicitly; the overlay layer does not restyle children. */
   setRenderOptions(renderOptions: Partial<RenderOptions> | undefined): void {
     applyChromeThemeVars(this.el, renderOptions);
   }

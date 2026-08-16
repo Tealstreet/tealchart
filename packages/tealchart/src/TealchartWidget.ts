@@ -3143,8 +3143,12 @@ export class TealchartWidget implements ITealchartWebWidget {
       return;
     }
 
+    const overlayRoot = this._ui?.getOverlayRoot();
+    if (!overlayRoot) return;
+
     this._userDrawingObjectTreePanel = new UserDrawingObjectTreePanel({
       model,
+      parent: overlayRoot,
       renderOptions: this._renderOptions,
       onDispatch: (action) => this.dispatchUserDrawingObjectTreeAction(action),
       onClose: () => {
