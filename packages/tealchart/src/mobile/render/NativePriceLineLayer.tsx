@@ -11,11 +11,7 @@ import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-na
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
-import {
-  getNativeDarkLabelBackgroundColor,
-  getNativePriceAxisTagBackgroundColor,
-  getNativePriceAxisTagTextColor,
-} from '../utils/nativeColor';
+import { resolvePriceAxisTagStyle } from '../../utils/priceAxisTagStyle';
 import {
   clampNativePriceAxisTagCenterY,
   findNativeResolvedPriceAxisTagCenterY,
@@ -114,21 +110,15 @@ export function AnimatedPriceLine({
     ? getNativePriceAxisPrimaryTextBaselineOffset(tagHeight)
     : getNativePriceAxisSingleLineTextBaselineOffset(tagHeight);
   const secondaryTextBaselineOffset = getNativePriceAxisSecondaryTextBaselineOffset(tagHeight);
-  // `filled` is web's flag for a solid price-axis tag rather than an outline
-  // one, and native was ignoring it and always filling - which is why the tags
-  // were opaque slabs sitting over the grid labels behind them.
-  //
-  // Unfilled does not mean transparent. Every other tag in this lane - the
-  // order and position price labels - sits on the same dark backing, which is
-  // what keeps the axis readable where a tag overlaps a grid label. Dropping
-  // the backing entirely let the grid read straight through the tag.
-  const tagFilled = line.label.filled === true;
-  const tagBackgroundColor = tagFilled
-    ? getNativePriceAxisTagBackgroundColor(line.label.backgroundColor, line.color)
-    : getNativeDarkLabelBackgroundColor();
-  const tagColor = tagFilled
-    ? getNativePriceAxisTagTextColor(line.label.textColor, tagBackgroundColor)
-    : line.label.textColor || line.color;
+  // Price lines are the only tags that honour `filled`; everything else in this
+  // lane is a trading line and always fills. Unfilled still keeps the dark
+  // backing rather than going transparent, which is what stops the grid reading
+  // straight through a tag that overlaps it.
+  const { filled: tagFilled, backgroundColor: tagBackgroundColor, textColor: tagColor } = resolvePriceAxisTagStyle({
+    type: 'price',
+    label: line.label,
+    color: line.color,
+  });
   const bracketSuppressed = useDerivedValue(() =>
     isNativeBracketPriceLineRefActive(line.nativeBracketRef, bracketDragState),
   );

@@ -13,6 +13,7 @@ import Konva from 'konva';
 
 import { TRADE_LINE_ACCENT_RAIL_WIDTH, TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
 import { PRICE_AXIS_RIGHT_PADDING } from '../types';
+import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
 
@@ -491,17 +492,15 @@ export class PriceLineManager {
     const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
     if (!refs) return;
 
-    const shouldFillPriceAxisLabel = bound.type !== 'price' || bound.label.filled;
-    if (shouldFillPriceAxisLabel) {
-      refs.priceAxisRect?.fill(bound.label.backgroundColor || bound.color);
-      refs.priceAxisRect?.fillEnabled(true);
-    } else {
-      refs.priceAxisRect?.fillEnabled(false);
-    }
-    refs.priceAxisRect?.stroke(bound.color);
+    // Unfilled keeps the dark backing rather than going transparent, so the
+    // grid cannot read straight through a tag that overlaps it.
+    const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color: bound.color });
+    refs.priceAxisRect?.fill(tagStyle.backgroundColor);
+    refs.priceAxisRect?.fillEnabled(true);
+    refs.priceAxisRect?.stroke(tagStyle.borderColor);
 
     refs.priceAxisPrimaryText?.text(bound.label.primaryText);
-    refs.priceAxisPrimaryText?.fill(bound.label.textColor || (bound.type === 'price' ? bound.color : '#ffffff'));
+    refs.priceAxisPrimaryText?.fill(tagStyle.textColor);
 
     if (refs.priceAxisSecondaryText) {
       if (bound.countdownToTime !== undefined) {
@@ -509,7 +508,7 @@ export class PriceLineManager {
       } else {
         refs.priceAxisSecondaryText.text(bound.label.secondaryText || '');
       }
-      refs.priceAxisSecondaryText.fill(bound.label.textColor || (bound.type === 'price' ? bound.color : '#ffffff'));
+      refs.priceAxisSecondaryText.fill(tagStyle.textColor);
     }
 
     const useNarrowText = this.options.width < 400;
@@ -1296,8 +1295,8 @@ export class PriceLineManager {
       );
     }
 
-    // Price axis label (filled for trading lines)
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+    const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color: bound.color });
 
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
     const priceAxisRect = new Konva.Rect({
@@ -1305,8 +1304,8 @@ export class PriceLineManager {
       y: priceAxisLabelY,
       width: bound.width,
       height: bound.height,
-      fill: bound.label.backgroundColor || bound.color,
-      stroke: bound.color,
+      fill: tagStyle.backgroundColor,
+      stroke: tagStyle.borderColor,
       strokeWidth: 1,
       cornerRadius: 2,
       listening: false,
@@ -1324,7 +1323,7 @@ export class PriceLineManager {
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
-        fill: bound.label.textColor || '#ffffff',
+        fill: tagStyle.textColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
@@ -1339,7 +1338,7 @@ export class PriceLineManager {
         text: secondaryText,
         fontSize: 11,
         fontFamily,
-        fill: bound.label.textColor || '#ffffff',
+        fill: tagStyle.textColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
@@ -1363,7 +1362,7 @@ export class PriceLineManager {
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
-        fill: bound.label.textColor || '#ffffff',
+        fill: tagStyle.textColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
