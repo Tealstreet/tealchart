@@ -90,6 +90,39 @@ src/
 The renderer is pure canvas with no React state — testable
 independently of any framework.
 
+## Trade lines: identity and the host contract
+
+`createOrderLine()` returns an **adapter**, and that adapter *is* the line's
+identity for as long as it exists. Tealchart never infers which order a line
+represents — the venue's `orderId` is payload you attach, not a name the chart
+answers to. This mirrors TradingView, whose line adapter carries no order
+identity at all.
+
+Two rules follow, and dragging misbehaves if you break either.
+
+**Keep the adapter alive across an amend.** On most venues an amend is a cancel
+followed by a place, so the order comes back under a *different* id. Re-point the
+adapter you already have rather than removing it and creating another. Removing
+an adapter tells the chart the line is gone, and it will believe you — including
+in the middle of a drag the user has not finished.
+
+**Register callbacks once.** Bind them as closures that read your current line at
+call time:
+
+```ts
+adapter.onMove((nextPrice) => entry.line.onMove?.(nextPrice, entry.line.price));
+adapter.onCancel(() => entry.line.onCancel?.());
+```
+
+Re-registering per update forces you to rebuild the adapter whenever a handler
+appears or disappears, which throws away the identity of an order that never
+moved.
+
+An optimistic order store is **not** required. While a drag is in flight the
+chart draws the price the user dragged to, and confirms against what comes back
+with a tick of slack for venue rounding. A host that has such a store is not
+penalised for it either.
+
 ## Mobile
 
 ```tsx

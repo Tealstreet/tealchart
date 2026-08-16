@@ -243,45 +243,81 @@ Platform-specific rendering:
 
 When adding features like TP/SL drag preview, crosshair improvements, or new line types — implement for both platforms.
 
-## Optimistic holding (OEMS)
+## Line identity (OEMS)
 
-Dragging a trade line starts an **action** (`interaction/oemsActionManager.ts`).
-Until the venue confirms it, the chart draws the price the user dragged to
-rather than the price the feed still reports. This is the chart's own job — a
-host is not expected to build an optimistic order store to make dragging feel
-right, and one that has built one is not penalised for it.
+**A line is the adapter it was drawn from.** `createOrderLine()` mints `order_1`,
+`order_2`... and returns an adapter that lives until the host removes it. That id
+is the line's identity everywhere in the OEMS layer, and it is the only thing
+that survives what the venue does.
 
-**Identity is the line's id, but confirmation is by field.** `confirmState`
-compares the optimistic state against what came back, with the price allowed a
-tick of slack (`createOemsStateEquals`) — the venue rounds to its own tick and
-an exact comparison would never match.
+This is TradingView's model. Its line adapter has no order identity at all — it
+is a line at a price, and the venue's id is payload a host attaches, not a name
+the chart answers to. `getOemsOrderObjectId` returns `line.id` for exactly that
+reason.
 
-**A move survives its row disappearing.** On most venues an amend is a cancel
-followed by a place, so the order leaves the feed and returns as a *different*
-order with a different id. `OemsLineHold` keeps the last line it saw and puts it
-back at the dragged price while the row is gone, then retires itself when an
-unclaimed row matching the held line's signature — quantity and colour, not
-price — is accepted by `confirmState`. Both halves are required: holding
-without retiring draws the held line beside the replacement forever.
+**Never key on `orderId`.** On most venues an amend is a cancel and a place, so
+the venue's id changes mid-action. Keying on it orphans the pending action the
+moment the host re-points its adapter at the replacement, and the chart then
+draws a line the host has already retired — beside its replacement. The
+precedence `orderId || id` lived in three places at once
+(`oemsLineState`, `PriceLineManager`, `tradeLineLayout`); if you add a fourth,
+actions get started under one id and looked up under another.
 
-Actions that *expect* the row to go (`confirmsRemoved`: cancel, close, reverse)
-are never held. A cancelled order leaving is the point of cancelling it.
+**Colour is not identity, and neither is any other styling.** A previous version
+hashed `quantity|lineColor` to recognise a replacement. A line whose order is in
+flight is faded by the host, so it hashed as `rgba(...,0.4)` and came back as
+`rgb(...)`: same order, no match, two lines until a 30s timeout. The logic layer
+reads no presentation field, and there is nothing left in it to tempt you.
 
-**Two identical resting orders can be confused for one another** while one is
-mid-amend. That is transient and self-correcting, and it is the price of not
-requiring venues to preserve ids — which most of them do not.
+**Confirmation is still by field.** `confirmState` compares the optimistic state
+against what came back, with the price allowed a tick of slack
+(`createOemsStateEquals`) — the venue rounds to its own tick and an exact
+comparison would never match.
 
 **A bracket the user drags into existence has no order yet.** The optimistic
 TP/SL is merged into `brackets` even when the line has none
 (`applyOemsBracketActionState`), or it would have nowhere to live. Bracket
-*creation* still settles on the callback rather than the echo
-(`settleOnCallback`), which is deliberate — see `3c84ee37` — because the echo
-may arrive as its own order line and never as a bracket on the parent.
+*creation* settles on the callback rather than the echo (`settleOnCallback`),
+which is deliberate — see `3c84ee37` — because the echo may arrive as its own
+order line and never as a bracket on the parent.
 
-**The adapter is shared.** `interaction/oemsLineState.ts` is used by both
+**The adapter module is shared.** `interaction/oemsLineState.ts` is used by both
 `ChartCore` and the native runtime. It was duplicated once, drifted, and the
-drift was invisible because the tests passed `{}` where the render data
-actually carries `null`.
+drift was invisible because the tests passed `{}` where the render data actually
+carries `null`.
+
+### What hosts must do
+
+**Keep the adapter alive across an amend.** Do not remove a line and create
+another because the venue reissued its id, or because the set of available
+actions changed. Re-point the adapter you already have. Register callbacks
+**once**, as closures that read your current line at call time, so a handler
+appearing or disappearing never costs you the adapter — glyde's
+`bindOrderLineCallbacks` is the reference shape.
+
+A host that destroys its adapter is telling the chart the order is gone. The
+chart believes it, because that is the contract.
+
+## Frame timing on native
+
+Two bugs lived here, and both are invisible on web because the browser's
+animation frame collapses them. Skia commits per notification and draws them.
+
+**Removals are deferred, additions are not.** A host reconciling its feed removes
+a stale line in one store update and creates the replacement in the next — real
+time apart. Painting between them draws a frame with no line. Deferring the
+*notification* does not work: any unrelated line ticking triggers one, and with
+live orders that is constant. The **deletion** is deferred instead
+(`LINE_REMOVAL_COALESCE_MS`), and creating a line flushes pending removals, so
+remove-then-create collapses into a single paint.
+
+**Shared values move faster than closures.** `livePrice` reads the drag from a
+shared value and falls back to `line.price` from its closure. Writing a shared
+value re-evaluates the worklet on the UI thread at once, but a new closure
+reaches it only on Reanimated's next propagation. Releasing the drag the moment
+the snapshot went pending handed the line to a closure still holding the
+*original* price — one frame at the old position, ~23ms. The hand-off waits a
+frame. Any worklet mixing a shared value with a captured one has this hazard.
 
 ## Gotchas
 
