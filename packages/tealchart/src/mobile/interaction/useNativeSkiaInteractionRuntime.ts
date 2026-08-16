@@ -14,6 +14,7 @@ import type {
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
+import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type {
   NativeChartAxisPinchGestureState,
   NativeChartPanGestureState,
@@ -44,6 +45,7 @@ export interface NativeSkiaInteractionRuntime {
   priceAutoScale: NativePriceAutoScaleSharedValues;
   priceScaleActive: ReturnType<typeof useSharedValue<boolean>>;
   priceScaleGestureState: NativePriceScaleGestureState;
+  paneRangeOverrides: ReturnType<typeof useSharedValue<NativePaneRangeOverrides>>;
   sharedPriceAxisTagSources: ReturnType<typeof useSharedValue<NativePriceAxisTagSource[]>>;
   sharedViewport: NativeViewportSharedValues;
   timeScaleActive: ReturnType<typeof useSharedValue<boolean>>;
@@ -219,11 +221,12 @@ export function useNativeSkiaInteractionRuntime({
     }),
     [bracketDragActive, bracketDragPricePerPixel, bracketDragStartPrice, bracketDragState],
   );
-  const panLockVertical = useSharedValue(false);
+  const panIndicatorPaneTarget = useSharedValue<NativeIndicatorPaneScaleTarget | null>(null);
+  const paneRangeOverrides = useSharedValue<NativePaneRangeOverrides>({});
   const chartPanGestureState = useMemo<NativeChartPanGestureState>(
     () => ({
       active: panActive,
-      lockVertical: panLockVertical,
+      indicatorPaneTarget: panIndicatorPaneTarget,
       sharedViewport,
       startViewport: panStartViewport,
       metrics: panMetrics,
@@ -235,7 +238,7 @@ export function useNativeSkiaInteractionRuntime({
       activePanPricePerPixel,
       activePanTimePerPixel,
       panActive,
-      panLockVertical,
+      panIndicatorPaneTarget,
       panMetrics,
       panStartViewport,
       priceAutoScale,
@@ -313,6 +316,7 @@ export function useNativeSkiaInteractionRuntime({
     priceAutoScale,
     priceScaleActive,
     priceScaleGestureState,
+    paneRangeOverrides,
     sharedPriceAxisTagSources,
     sharedViewport,
     timeScaleActive,

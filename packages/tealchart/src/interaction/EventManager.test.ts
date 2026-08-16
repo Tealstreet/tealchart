@@ -944,4 +944,87 @@ describe('EventManager drawing drag routing', () => {
 
     manager.dispose();
   });
+
+  it('moves an indicator pane through its own values while time pans for everyone', () => {
+    // A drag inside an indicator pane is two independent components: the
+    // horizontal one slides time across every pane, the vertical one belongs to
+    // that pane alone. The vertical half used to be dropped entirely, so an
+    // indicator pane could not be moved through its own values at all.
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRafFrame = () => {
+      for (const callback of rafCallbacks.splice(0)) callback(0);
+    };
+
+    const container = createContainer();
+    const onPaneYRangeChange = vi.fn();
+    const onAutoScaleDisabled = vi.fn();
+    const onViewportChangeInternal = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getPaneAtY: (y: number) =>
+          y > 400
+            ? { paneId: 'pane_1', yMin: 0, yMax: 100, paneHeight: 100 }
+            : { paneId: 'main', yMin: 0, yMax: 100, paneHeight: 400 },
+        onPaneYRangeChange,
+        onAutoScaleDisabled,
+        onViewportChangeInternal,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 400, clientY: 450 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 380, clientY: 460 }));
+    flushRafFrame();
+
+    const viewport = onViewportChangeInternal.mock.calls.at(-1)?.[0];
+    expect(viewport.startTime).not.toBe(0);
+
+    expect(onPaneYRangeChange).toHaveBeenCalled();
+    const [paneId, yMin, yMax] = onPaneYRangeChange.mock.calls.at(-1)!;
+    expect(paneId).toBe('pane_1');
+    expect(yMax - yMin).toBeCloseTo(100, 6);
+    expect(yMin).toBeGreaterThan(0);
+    expect(onAutoScaleDisabled).toHaveBeenCalledWith('pane_1');
+
+    manager.dispose();
+    vi.unstubAllGlobals();
+  });
+
+  it('does not pin an indicator pane when the pan is purely sideways', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRafFrame = () => {
+      for (const callback of rafCallbacks.splice(0)) callback(0);
+    };
+
+    const container = createContainer();
+    const onPaneYRangeChange = vi.fn();
+    const onAutoScaleDisabled = vi.fn();
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getPaneAtY: () => ({ paneId: 'pane_1', yMin: 0, yMax: 100, paneHeight: 100 }),
+        onPaneYRangeChange,
+        onAutoScaleDisabled,
+        onViewportChangeInternal: vi.fn(),
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 400, clientY: 450 }));
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 360, clientY: 450 }));
+    flushRafFrame();
+
+    expect(onPaneYRangeChange).not.toHaveBeenCalled();
+    expect(onAutoScaleDisabled).not.toHaveBeenCalled();
+
+    manager.dispose();
+    vi.unstubAllGlobals();
+  });
 });
