@@ -458,16 +458,22 @@ export class TealchartWidget implements ITealchartWebWidget {
           // For now, assume 'name' is the Tealscript code for built-in indicators
           // In the future, we can have a registry of built-in scripts
           await this._tealScriptManager.addScript(request.studyId, request.name, request.inputs);
+          const definition = this._getIndicatorForStudyRequest(request.name);
           this._indicatorConfigMap.set(request.studyId, {
             id: request.studyId,
             name: request.displayName,
-            category: 'other',
+            category: definition?.category ?? 'other',
             overlay: request.forceOverlay,
             code: request.name,
+            yAxisRange: definition?.yAxisRange,
           });
+          // The single place a Tealscript study claims a pane. Callers that go
+          // on to await createStudy must not add one too, or every non-overlay
+          // indicator lands in two panes.
           this._paneManager.addIndicator({
             indicatorId: request.studyId,
             overlay: request.forceOverlay,
+            yAxisRange: definition?.yAxisRange,
           });
           // Push current bars to the new script
           if (this._bars.length > 0) {
@@ -1118,13 +1124,6 @@ export class TealchartWidget implements ITealchartWebWidget {
             // Store indicator config for pane lookup
             this._indicatorConfigMap.set(studyId, builtinIndicator);
 
-            // Register with pane manager
-            this._paneManager.addIndicator({
-              indicatorId: studyId,
-              overlay: builtinIndicator.overlay,
-              yAxisRange: builtinIndicator.yAxisRange,
-            });
-
             // Apply visibility state
             if (!instance.isVisible) {
               this._chartApi.toggleStudyVisibility(studyId);
@@ -1588,6 +1587,14 @@ export class TealchartWidget implements ITealchartWebWidget {
     return getIndicatorById(id) ?? this._customTealscriptIndicators.find((indicator) => indicator.id === id);
   }
 
+  /**
+   * A study create request carries the Tealscript source in `name`, so the only
+   * way back to the definition — and to its yAxisRange — is to match on code.
+   */
+  private _getIndicatorForStudyRequest(name: string): BuiltinIndicator | undefined {
+    return this._getIndicatorById(name) ?? this._getAvailableIndicators().find((entry) => entry.code === name);
+  }
+
   setCustomTealscriptIndicators(indicators: BuiltinIndicator[]): void {
     this._customTealscriptIndicators = this._normalizeCustomTealscriptIndicators(indicators);
     this._ui?.setAvailableIndicators(this._getAvailableIndicators());
@@ -1653,13 +1660,6 @@ export class TealchartWidget implements ITealchartWebWidget {
 
           // Store indicator config for pane lookup
           this._indicatorConfigMap.set(studyId, indicator);
-
-          // Register with pane manager (non-overlay indicators get their own pane)
-          this._paneManager.addIndicator({
-            indicatorId: studyId,
-            overlay: indicator.overlay,
-            yAxisRange: indicator.yAxisRange,
-          });
 
           // Persist to settings
           this._persistAddIndicator(instanceId, indicator);
@@ -3968,11 +3968,6 @@ export class TealchartWidget implements ITealchartWebWidget {
               this._indicatorStudyMap.set(indicator.id, studyId);
               this._studyInstanceMap.set(studyId, indicator.id);
               this._indicatorConfigMap.set(studyId, builtinIndicator);
-              this._paneManager.addIndicator({
-                indicatorId: studyId,
-                overlay: builtinIndicator.overlay,
-                yAxisRange: builtinIndicator.yAxisRange,
-              });
               this._scheduler.markDirty(DIRTY.FULL);
             }
           });
