@@ -10,7 +10,7 @@ import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import { getNativeDarkLabelBackgroundColor } from '../utils/nativeColor';
+import { resolvePriceAxisTagStyle } from '../../utils/priceAxisTagStyle';
 import {
   clampNativePriceAxisTagCenterY,
   findNativeResolvedPriceAxisTagCenterY,
@@ -117,6 +117,15 @@ export function AnimatedTradeLine({
   const leftLineEnd = useDerivedValue(() => ({ x: geometry.leftLineEndX, y: lineY.value }));
   const rightLineStart = useDerivedValue(() => ({ x: geometry.rightLineStartX, y: lineY.value }));
   const rightLineEnd = useDerivedValue(() => ({ x: Math.min(geometry.rightLineEndX, priceLabelX.value - 2), y: lineY.value }));
+  // A trading line's tag fills with its own colour, the same rule web applies.
+  // These three tags were hardcoded dark with a coloured border, which is what
+  // made native's order and position tags read differently from every other
+  // runtime.
+  const tagStyle = resolvePriceAxisTagStyle({
+    type: 'order',
+    label: { backgroundColor: line.bodyBackgroundColor, textColor: line.bodyTextColor },
+    color,
+  });
   const pendingOpacity = line.actionState?.isPending ? 0.55 : 1;
   const groupOpacity = useDerivedValue(() => (isNativeYInMainPane(rawY.value, frame) ? pendingOpacity : 0));
   // While this line is being dragged its tag is drawn by the floating overlay
@@ -177,8 +186,8 @@ export function AnimatedTradeLine({
           y={staticPriceLabelY}
           width={geometry.priceLabelWidth}
           height={tradeLabelHeight + 2}
-          backgroundColor={getNativeDarkLabelBackgroundColor()}
-          borderColor={color}
+          backgroundColor={tagStyle.backgroundColor}
+          borderColor={tagStyle.borderColor}
         />
         <NativePriceAxisTagAnimatedText
           x={staticPriceLabelTextX}
@@ -187,7 +196,7 @@ export function AnimatedTradeLine({
           maxCharacters={Number.MAX_SAFE_INTEGER}
           characterWidth={priceLabelCharacterWidth}
           font={axisFont}
-          color={color}
+          color={tagStyle.textColor}
         />
       </Group>
     );
@@ -230,8 +239,8 @@ export function AnimatedTradeLine({
           y={priceLabelY}
           width={priceLabelWidth}
           height={tradeLabelHeight + 2}
-          backgroundColor={getNativeDarkLabelBackgroundColor()}
-          borderColor={color}
+          backgroundColor={tagStyle.backgroundColor}
+          borderColor={tagStyle.borderColor}
         />
         <NativePriceAxisTagAnimatedText
           x={priceLabelTextX}
@@ -240,7 +249,7 @@ export function AnimatedTradeLine({
           maxCharacters={Number.MAX_SAFE_INTEGER}
           characterWidth={priceLabelCharacterWidth}
           font={axisFont}
-          color={color}
+          color={tagStyle.textColor}
         />
       </Group>
     </Group>
@@ -263,6 +272,8 @@ export function AnimatedTradeLine({
 export function AnimatedTradeLineDragTag({
   axisFont,
   color,
+  backgroundColor,
+  textColor,
   dragState,
   frame,
   geometry,
@@ -272,6 +283,10 @@ export function AnimatedTradeLineDragTag({
 }: {
   axisFont: ReturnType<typeof Skia.Font>;
   color: string;
+  /** The dragged line's own body colours, so the floating tag matches the tag it
+   *  stands in for rather than inventing its own look. */
+  backgroundColor?: string;
+  textColor?: string;
   dragState: NativeOrderDragSharedValues;
   frame: NativeChartFrame;
   geometry: NativeTradeLineGeometry;
@@ -279,6 +294,7 @@ export function AnimatedTradeLineDragTag({
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
 }) {
+  const tagStyle = resolvePriceAxisTagStyle({ type: 'order', label: { backgroundColor, textColor }, color });
   const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
   const tagHeight = tradeLabelHeight + 2;
   const baselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(tagHeight);
@@ -313,8 +329,8 @@ export function AnimatedTradeLineDragTag({
         y={y}
         width={width}
         height={tagHeight}
-        backgroundColor={getNativeDarkLabelBackgroundColor()}
-        borderColor={color}
+        backgroundColor={tagStyle.backgroundColor}
+        borderColor={tagStyle.borderColor}
       />
       <NativePriceAxisTagAnimatedText
         x={textX}
@@ -323,7 +339,7 @@ export function AnimatedTradeLineDragTag({
         maxCharacters={Number.MAX_SAFE_INTEGER}
         characterWidth={characterWidth}
         font={axisFont}
-        color={color}
+        color={tagStyle.textColor}
       />
     </Group>
   );
