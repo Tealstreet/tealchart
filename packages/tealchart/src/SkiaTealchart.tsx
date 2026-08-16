@@ -1,4 +1,3 @@
-import type { OemsLineIdentities } from './interaction/oemsLineState';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { LayoutRectangle } from 'react-native';
 import type { WorkerError } from '@tealstreet/tealscript';
@@ -158,16 +157,6 @@ export interface SkiaTealchartHandle extends ITealchartWidget {
 }
 
 export interface SkiaTealchartProps {
-  /**
-   * Opt in to holding a dragged line through a cancel-and-replace amend by
-   * answering "are these two rows the same order?".
-   *
-   * Defaults to the id, like TradingView. Supply this only when your ids change
-   * across an amend; a host whose optimistic row keeps the original id needs
-   * nothing here.
-   */
-  oemsLineIdentity?: OemsLineIdentities;
-
   chartKey?: string;
   width?: number;
   height?: number;
@@ -206,7 +195,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     symbol: propSymbol,
     interval: propInterval = '15',
     renderOptions,
-    oemsLineIdentity,
     theme = 'Dark',
     margins: marginsProp,
     priceLines,
@@ -1154,7 +1142,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     lineSnapshot,
     syncNativeOemsDragStateForSnapshot,
   } = useNativeOemsLineRuntime({
-    oemsLineIdentity,
     bracketDragInteractionState,
     bracketDragState,
     chartApi,
