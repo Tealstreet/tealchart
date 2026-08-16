@@ -155,7 +155,9 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
 
     expect(duplicateButton).not.toBeUndefined();
     expect(deleteButton).not.toBeUndefined();
-    expect(deleteButton?.props.onPress).toBeUndefined();
+    // React Native chrome takes its own taps rather than exporting a rect for
+    // the canvas gesture layer to hit-test.
+    expect(deleteButton?.props.onPress).toBeInstanceOf(Function);
     expect(icons.some((icon) => icon.props.name === 'trash')).toBe(true);
   });
 
@@ -191,7 +193,7 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     expect(model?.position.left).toBeGreaterThanOrEqual(0);
   });
 
-  it('renders action controls as a passive visual overlay', () => {
+  it('lets touches reach the action controls while staying transparent elsewhere', () => {
     const overlay = renderOverlay();
     const views = collectElementsByType(overlay, View);
     const scrollViews = collectElementsByType(overlay, ScrollView);
@@ -201,7 +203,10 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
 
     expect(views[0].props.style).toEqual(expect.arrayContaining([expect.objectContaining({ height: 36 })]));
     expect(views[0].props.style).toEqual(expect.arrayContaining([expect.objectContaining({ zIndex: 70 })]));
-    expect(views[0].props.pointerEvents).toBe('none');
+    // box-none, not none: the surface itself is not a target, but the buttons
+    // inside it must still receive their own presses.
+    expect(views[0].props.pointerEvents).toBe('box-none');
+    expect(deleteButton?.props.onPress).toBeInstanceOf(Function);
     expect(scrollViews[0].props.canCancelContentTouches).toBe(false);
     // delaysContentTouches is gone from React Native's ScrollView types as of
     // 0.81 — both RCTScrollView.m and the Fabric component set it to NO
