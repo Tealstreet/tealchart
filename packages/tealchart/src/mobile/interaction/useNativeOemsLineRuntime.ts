@@ -18,6 +18,15 @@ import type {
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { OemsActionManager } from '../../interaction/oemsActionManager';
+import {
+  getOemsOrderHoldSignature,
+  getOemsOrderLineState,
+  getOemsOrderObjectId,
+  getOemsPositionHoldSignature,
+  getOemsPositionLineState,
+  getOemsPositionObjectId,
+  OemsLineHold,
+} from '../../interaction/oemsLineState';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
 import {
   getNativeOrderObjectId,
@@ -105,10 +114,33 @@ export function useNativeOemsLineRuntime({
     confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);
   }, [oemsActions, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
 
+  // Held across renders: the hold has to remember the line that just left the
+  // feed, and a fresh projector every render would have nothing to remember.
+  const orderHoldRef = useRef<OemsLineHold<OrderLineRenderData> | null>(null);
+  if (!orderHoldRef.current) {
+    orderHoldRef.current = new OemsLineHold(
+      'order',
+      getOemsOrderObjectId,
+      getOemsOrderLineState,
+      applyNativeOrderActionState,
+      getOemsOrderHoldSignature,
+    );
+  }
+  const positionHoldRef = useRef<OemsLineHold<PositionLineRenderData> | null>(null);
+  if (!positionHoldRef.current) {
+    positionHoldRef.current = new OemsLineHold(
+      'position',
+      getOemsPositionObjectId,
+      getOemsPositionLineState,
+      applyNativePositionActionState,
+      getOemsPositionHoldSignature,
+    );
+  }
+
   const lineSnapshot = useMemo(
     () => ({
-      orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),
-      positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),
+      orderLines: orderHoldRef.current!.project(rawLineSnapshot.orderLines, oemsActions),
+      positionLines: positionHoldRef.current!.project(rawLineSnapshot.positionLines, oemsActions),
       executionLines: rawLineSnapshot.executionLines,
     }),
     [oemsActions, rawLineSnapshot.executionLines, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines],
