@@ -360,7 +360,24 @@ value re-evaluates the worklet on the UI thread at once, but a new closure
 reaches it only on Reanimated's next propagation. Releasing the drag the moment
 the snapshot went pending handed the line to a closure still holding the
 *original* price — one frame at the old position, ~23ms. The hand-off waits a
-frame. Any worklet mixing a shared value with a captured one has this hazard.
+frame.
+
+**Any worklet mixing a shared value with a captured one has this hazard, and it
+has bitten three times.** The shape to look for is a value that a gesture drives
+through a shared value and React commits through a prop, where JS clears the
+shared value to hand back over:
+
+| shared (immediate) | closure (a frame later) |
+| --- | --- |
+| `orderDragState.activePrice` | `line.price` |
+| `paneRangeOverrides[paneId]` | `pane.yMin` / `pane.yMax` |
+| `bracketDragState.activeObjectId` | the line's optimistic `brackets` |
+
+Every one of them retires on a `requestAnimationFrame`, never inline. Indicator
+pane range is the one that is easy to miss, because the hold-until-the-frame-
+agrees logic looks like it already solves this — it makes the override survive
+the *commit*, but the release itself was still a frame early, so dragging or
+scaling a MACD pane snapped back to its pre-drag scale for one frame.
 
 ## Gotchas
 
