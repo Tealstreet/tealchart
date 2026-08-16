@@ -218,10 +218,29 @@ export class PaneManager {
    */
   updatePaneRange(paneId: string, yMin: number, yMax: number): void {
     const pane = this.panes.find((p) => p.id === paneId);
-    if (pane && !pane.fixedRange) {
+    if (pane && !pane.fixedRange && pane.autoScale !== false) {
       pane.yMin = yMin;
       pane.yMax = yMax;
     }
+  }
+
+  /**
+   * Pin a pane's range because the user scaled its axis by hand. Auto-scale
+   * stops fighting it, and unlike `fixedRange` this does not turn the pane into
+   * a merge target for other indicators that happen to share the range.
+   */
+  setPaneManualRange(paneId: string, yMin: number, yMax: number): void {
+    const pane = this.panes.find((p) => p.id === paneId);
+    if (!pane || !Number.isFinite(yMin) || !Number.isFinite(yMax) || yMax <= yMin) return;
+    pane.yMin = yMin;
+    pane.yMax = yMax;
+    pane.autoScale = false;
+  }
+
+  /** Hand a pane back to auto-scale. */
+  resetPaneAutoScale(paneId: string): void {
+    const pane = this.panes.find((p) => p.id === paneId);
+    if (pane) pane.autoScale = true;
   }
 
   /**
@@ -418,6 +437,7 @@ export class PaneManager {
         yMin: p.yMin,
         yMax: p.yMax,
         fixedRange: p.fixedRange,
+        autoScale: p.autoScale,
       })),
     };
   }

@@ -419,6 +419,21 @@ export class MobileIndicatorManager {
     return this._paneManager;
   }
 
+  /**
+   * Pin an indicator pane's value range because the user dragged its axis.
+   * Auto-scale leaves the pane alone from here; `resetIndicatorPaneAutoScale`
+   * hands it back.
+   */
+  setIndicatorPaneManualRange(paneId: string, yMin: number, yMax: number): void {
+    this._paneManager.setPaneManualRange(paneId, yMin, yMax);
+    this._onUpdate?.();
+  }
+
+  resetIndicatorPaneAutoScale(paneId: string): void {
+    this._paneManager.resetPaneAutoScale(paneId);
+    this._onUpdate?.();
+  }
+
   private _toParseError(error: unknown): WorkerError {
     if (error instanceof TealscriptParseError) {
       return {
