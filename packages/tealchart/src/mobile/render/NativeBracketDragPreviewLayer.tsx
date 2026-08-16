@@ -356,10 +356,14 @@ export function AnimatedBracketDragPreview({
   const tagLayout = createNativeAxisLaneTagLayout(frame);
   const tagRight = tagLayout.x + tagLayout.width;
   const axisCharacterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
-  const tagText = useDerivedValue(() => {
-    const bracket = dragState.activeBracketType.value.toUpperCase();
-    return `${bracket} ${formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision)}`;
-  });
+  // Bare price, like every other axis tag on either platform. The bracket type
+  // was spelled out here and nowhere else: the line is already the bracket's
+  // colour and the button that started the drag is still on screen, so the
+  // prefix only bought width - the tag is the widest thing on the axis and it
+  // pushed the price itself out of alignment with the tags above and below.
+  const tagText = useDerivedValue(() =>
+    formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision),
+  );
   const tagWidth = useDerivedValue(() =>
     Math.max(
       tagLayout.width,
@@ -550,13 +554,20 @@ export function AnimatedBracketDragPreview({
         />
       </Group>
       <SkiaLine p1={connectorStart} p2={connectorEnd} color={color} strokeWidth={1} opacity={connectorOpacity} />
+      {/* Solid in the bracket's own colour with dark text, which is what web's
+          preview tag does (ChartCore._drawBracketPreviewPriceAxisLabel) and what
+          the real bracket line's tag does through `label.filled`. This drew a
+          dark box with a coloured outline instead, so the one tag the user is
+          actually looking at was the only one styled differently. Border and
+          fill share a colour rather than dropping the border, so the box keeps
+          its exact footprint. */}
       <NativePriceAxisTagBox
         x={tagX}
         y={labelY}
         width={tagWidth}
         height={PRICE_AXIS_TAG_HEIGHT}
-        backgroundColor={labelBackgroundColor}
-        borderColor={color}
+        backgroundColor={lineColor}
+        borderColor={lineColor}
       />
       <NativePriceAxisTagAnimatedText
         x={tagTextX}
@@ -565,8 +576,8 @@ export function AnimatedBracketDragPreview({
         maxCharacters={Number.MAX_SAFE_INTEGER}
         characterWidth={axisCharacterWidth}
         font={axisFont}
-        color={NATIVE_PRICE_AXIS_TAG_TEXT_COLOR}
-        characterSet="0123456789,.-:+TPSL"
+        color={DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR}
+        characterSet="0123456789,.-:+"
       />
     </Group>
   );
