@@ -24,6 +24,7 @@ import {
   beginNativeOrderDragState,
   clearNativeBracketDragState,
   releaseNativeBracketDragGesture,
+  releaseNativeOrderDragGesture,
   clearNativeOrderDragState,
   finalizeNativeBracketDragState,
   finalizeNativeOrderDragState,
@@ -144,6 +145,8 @@ export function createNativeOrderDragGesture({
         clearNativeOrderDragState(orderDragState);
         return;
       }
+      // Gesture over, preview not - see `releaseNativeOrderDragGesture`.
+      releaseNativeOrderDragGesture(orderDragState);
       runOnJS(commitOrderMove)(payload.objectId, payload.price);
     })
     .onFinalize((_event, success) => {

@@ -98,6 +98,26 @@ export function getNativeOrderDragCommit(
   };
 }
 
+/**
+ * Ends the gesture without ending the preview - the order-line mirror of
+ * `releaseNativeBracketDragGesture`, and for the same reason.
+ *
+ * `active` is what the other gestures arbitrate on: the axis pinch fails
+ * outright while it is true, and this gesture's own touch guard skips its
+ * checks. So it has to fall on the frame the finger lifts. Leaving it up until
+ * the projection caught up meant a commit whose line never came back - a host
+ * that removes its adapter instead of re-pointing it - stranded the whole
+ * gesture layer: no axis pinch, and the next touch resumed the dead drag
+ * instead of starting a new one.
+ *
+ * The preview draws off `activeObjectId`, which survives until
+ * `shouldClearNativeOrderDragForSnapshot` retires it.
+ */
+export function releaseNativeOrderDragGesture(state: NativeOrderDragInteractionState): void {
+  'worklet';
+  state.active.value = false;
+}
+
 export function finalizeNativeOrderDragState(state: NativeOrderDragInteractionState, success: boolean): boolean {
   'worklet';
   if (!state.active.value || success) return false;
@@ -245,7 +265,10 @@ export function shouldClearNativeOrderDragForSnapshot({
   if (!objectId) return false;
 
   const line = orderLines.find((candidate) => getOrderObjectId(candidate) === objectId);
-  if (!line) return false;
+  // Gone means there is nothing left to hand the drag to. Holding on was how a
+  // drag outlived its own line, and it never recovered: the hand-off only ever
+  // runs off a line that is still there.
+  if (!line) return true;
 
   return line.actionState?.isPending === true || Math.abs(line.price - state.activePrice.value) <= 1e-9;
 }
@@ -266,14 +289,16 @@ export function shouldClearNativeBracketDragForSnapshot({
   const objectId = state.activeObjectId.value;
   if (!objectId) return false;
 
+  // Same rule as the order drag: a preview whose line has gone has nothing left
+  // to hand off to, and retiring it beats waiting out the handoff timeout.
   if (state.activeObjectType.value === 'order') {
     const line = orderLines.find((candidate) => getOrderObjectId(candidate) === objectId);
-    return line?.actionState?.isPending === true;
+    return !line || line.actionState?.isPending === true;
   }
 
   if (state.activeObjectType.value === 'position') {
     const line = positionLines.find((candidate) => getPositionObjectId(candidate) === objectId);
-    return line?.actionState?.isPending === true;
+    return !line || line.actionState?.isPending === true;
   }
 
   return false;
