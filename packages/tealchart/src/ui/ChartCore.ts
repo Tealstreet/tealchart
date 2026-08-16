@@ -10,7 +10,6 @@
  * This is the vanilla equivalent of Tealchart.tsx
  */
 
-import type { OemsLineIdentities } from '../interaction/oemsLineState';
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type {
@@ -62,12 +61,9 @@ import {
 import {
   applyOemsOrderActionState,
   applyOemsPositionActionState,
-  OemsLineHold,
   confirmOemsOrderLineSnapshots,
   confirmOemsPositionLineSnapshots,
   getOemsOrderLineState,
-  defaultOemsOrderIdentity,
-  defaultOemsPositionIdentity,
   getOemsOrderObjectId,
   getOemsPositionLineState,
   getOemsPositionObjectId,
@@ -121,14 +117,6 @@ export interface IndicatorPaneInfo {
 }
 
 export interface ChartCoreOptions {
-  /**
-   * Opt in to holding a dragged line through a cancel-and-replace amend.
-   *
-   * Supply this only when your ids change across an amend. A host that keeps
-   * its own optimistic row under the original id should leave it unset: the
-   * chart will trust the ids it is given and hold nothing.
-   */
-  oemsLineIdentity?: OemsLineIdentities;
   /** Container element */
   container: HTMLElement;
   /** Initial width */
@@ -453,10 +441,6 @@ export class ChartCore {
   // Keeps a dragged line on the chart while its row is out of the feed, and
   // retires the hold when a matching row returns under any id. See the
   // optimistic-holding section of this package's CLAUDE.md.
-  // Built in the constructor rather than as field initialisers: they need
-  // `options`, which is not assigned until the constructor body runs.
-  private readonly orderHold: OemsLineHold<OrderLineRenderData>;
-  private readonly positionHold: OemsLineHold<PositionLineRenderData>;
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
   /** Auto-scale computed Y ranges from AutoScaleManager (set by TealchartWidget each render) */
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
@@ -527,20 +511,6 @@ export class ChartCore {
 
   constructor(options: ChartCoreOptions) {
     this.options = options;
-    this.orderHold = new OemsLineHold<OrderLineRenderData>(
-      'order',
-      getOemsOrderObjectId,
-      getOemsOrderLineState,
-      applyOemsOrderActionState,
-      options.oemsLineIdentity?.order ?? defaultOemsOrderIdentity,
-    );
-    this.positionHold = new OemsLineHold<PositionLineRenderData>(
-      'position',
-      getOemsPositionObjectId,
-      getOemsPositionLineState,
-      applyOemsPositionActionState,
-      options.oemsLineIdentity?.position ?? defaultOemsPositionIdentity,
-    );
     this.container = options.container;
     this.margins = { ...DEFAULT_MARGINS, ...options.margins };
     this.oemsActions = new OemsActionManager<OemsTradingLineState>({
@@ -915,7 +885,7 @@ export class ChartCore {
 
     this.rawOrderLines = lines;
     this.confirmOrderLineSnapshots(lines);
-    this.orderLines = this.orderHold.project(lines, this.oemsActions);
+    this.orderLines = lines.map((line) => applyOemsOrderActionState(line, this.oemsActions));
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -930,13 +900,13 @@ export class ChartCore {
 
     this.rawPositionLines = lines;
     this.confirmPositionLineSnapshots(lines);
-    this.positionLines = this.positionHold.project(lines, this.oemsActions);
+    this.positionLines = lines.map((line) => applyOemsPositionActionState(line, this.oemsActions));
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   private reapplyOemsActionState(): void {
-    this.orderLines = this.orderHold.project(this.rawOrderLines, this.oemsActions);
-    this.positionLines = this.positionHold.project(this.rawPositionLines, this.oemsActions);
+    this.orderLines = this.rawOrderLines.map((line) => applyOemsOrderActionState(line, this.oemsActions));
+    this.positionLines = this.rawPositionLines.map((line) => applyOemsPositionActionState(line, this.oemsActions));
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {

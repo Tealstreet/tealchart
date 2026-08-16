@@ -1,4 +1,3 @@
-import type { OemsLineIdentities } from '../../interaction/oemsLineState';
 import type {
   ExecutionLineRenderData,
   OrderLineRenderData,
@@ -21,12 +20,9 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import {
   getOemsOrderLineState,
-  defaultOemsOrderIdentity,
-  defaultOemsPositionIdentity,
   getOemsOrderObjectId,
   getOemsPositionLineState,
   getOemsPositionObjectId,
-  OemsLineHold,
 } from '../../interaction/oemsLineState';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
 import {
@@ -63,14 +59,6 @@ export interface NativeOemsLineSnapshot {
 }
 
 export interface NativeOemsLineRuntimeInput {
-  /**
-   * Opt in to holding a dragged line through a cancel-and-replace amend.
-   *
-   * Supply this only when your ids change across an amend. A host that keeps
-   * its own optimistic row under the original id should leave it unset: the
-   * chart will trust the ids it is given and hold nothing.
-   */
-  oemsLineIdentity?: OemsLineIdentities;
   bracketDragInteractionState: NativeBracketDragInteractionState;
   bracketDragState: NativeBracketDragSharedValues;
   chartApi: TealchartApi;
@@ -100,7 +88,6 @@ export interface NativeOemsLineRuntime {
 }
 
 export function useNativeOemsLineRuntime({
-  oemsLineIdentity,
   bracketDragInteractionState,
   bracketDragState,
   chartApi,
@@ -135,33 +122,11 @@ export function useNativeOemsLineRuntime({
     confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);
   }, [oemsActions, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
 
-  // Held across renders: the hold has to remember the line that just left the
-  // feed, and a fresh projector every render would have nothing to remember.
-  const orderHoldRef = useRef<OemsLineHold<OrderLineRenderData> | null>(null);
-  if (!orderHoldRef.current) {
-    orderHoldRef.current = new OemsLineHold(
-      'order',
-      getOemsOrderObjectId,
-      getOemsOrderLineState,
-      applyNativeOrderActionState,
-      oemsLineIdentity?.order ?? defaultOemsOrderIdentity,
-    );
-  }
-  const positionHoldRef = useRef<OemsLineHold<PositionLineRenderData> | null>(null);
-  if (!positionHoldRef.current) {
-    positionHoldRef.current = new OemsLineHold(
-      'position',
-      getOemsPositionObjectId,
-      getOemsPositionLineState,
-      applyNativePositionActionState,
-      oemsLineIdentity?.position ?? defaultOemsPositionIdentity,
-    );
-  }
 
   const lineSnapshot = useMemo(
     () => ({
-      orderLines: orderHoldRef.current!.project(rawLineSnapshot.orderLines, oemsActions),
-      positionLines: positionHoldRef.current!.project(rawLineSnapshot.positionLines, oemsActions),
+      orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),
+      positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),
       executionLines: rawLineSnapshot.executionLines,
     }),
     [oemsActions, rawLineSnapshot.executionLines, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines],
