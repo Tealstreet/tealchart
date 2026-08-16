@@ -8,7 +8,11 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeRightAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
-import { getNativePriceGridSlot, getNativePriceGridSlotCount } from './nativeGridSlots';
+import {
+  getNativePriceGridSlot,
+  getNativePriceGridSlotCount,
+  NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING,
+} from './nativeGridSlots';
 import { formatNativeIndicatorAxisTickWorklet } from './nativePriceFormat';
 import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
 
@@ -56,6 +60,7 @@ export function resolveNativeIndicatorPaneAxisSlot({
     priceMin: range.yMin,
     priceMax: range.yMax,
     priceHeight: pane.height,
+    minLabelSpacing: NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING,
   });
   const span = range.yMax - range.yMin;
   const y = span === 0 ? pane.top + pane.height / 2 : pane.top + ((range.yMax - slot.price) / span) * pane.height;
@@ -86,8 +91,9 @@ export function resolveNativeIndicatorPaneAxisSlots(
   const range = input.range ?? { yMin: pane.yMin, yMax: pane.yMax };
   if (pane.height <= 0 || range.yMax - range.yMin <= 0) return [];
 
-  return Array.from({ length: getNativePriceGridSlotCount(pane.height) }, (_, index) =>
-    resolveNativeIndicatorPaneAxisSlot({ ...input, index, range }),
+  return Array.from(
+    { length: getNativePriceGridSlotCount(pane.height, NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING) },
+    (_, index) => resolveNativeIndicatorPaneAxisSlot({ ...input, index, range }),
   );
 }
 
@@ -176,7 +182,7 @@ export function NativeIndicatorPaneAxisLayer({
       {frame.panes
         .filter((pane) => pane.type === 'indicator' && pane.height > 0)
         .map((pane) =>
-          Array.from({ length: getNativePriceGridSlotCount(pane.height) }, (_, index) => (
+          Array.from({ length: getNativePriceGridSlotCount(pane.height, NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING) }, (_, index) => (
             <NativeAnimatedIndicatorPaneAxisTick
               key={`${pane.id}-axis-${index}`}
               axisFont={axisFont}

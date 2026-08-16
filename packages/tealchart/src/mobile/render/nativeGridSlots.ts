@@ -1,4 +1,10 @@
 const NATIVE_PRICE_GRID_MIN_LABEL_SPACING = 24;
+/**
+ * Indicator panes are a fraction of the main pane's height but carry a full
+ * range, so the main pane's spacing leaves them with one or two ticks — a MACD
+ * pane showing nothing but `0`. They get a tighter ladder of their own.
+ */
+export const NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING = 15;
 const NATIVE_TIME_GRID_MIN_LABEL_SPACING = 70;
 const NATIVE_GRID_EXTRA_SLOT_COUNT = 2;
 
@@ -15,8 +21,11 @@ export interface NativeTimeGridSlot {
   showMonthLabel: boolean;
 }
 
-export function getNativePriceGridSlotCount(priceHeight: number): number {
-  return Math.max(2, Math.floor(priceHeight / NATIVE_PRICE_GRID_MIN_LABEL_SPACING) + NATIVE_GRID_EXTRA_SLOT_COUNT);
+export function getNativePriceGridSlotCount(
+  priceHeight: number,
+  minLabelSpacing = NATIVE_PRICE_GRID_MIN_LABEL_SPACING,
+): number {
+  return Math.max(2, Math.floor(priceHeight / minLabelSpacing) + NATIVE_GRID_EXTRA_SLOT_COUNT);
 }
 
 export function getNativeTimeGridSlotCount(chartWidth: number): number {
@@ -46,9 +55,14 @@ function getNativePriceSpacingAtIndex(magnitude: number, index: number): number 
  * `maxLabels` comes from the minimum label spacing, so it is the only bound
  * that was ever load-bearing; a floor on the count is what caused the misses.
  */
-export function getNativePriceGridSpacing(priceMin: number, priceMax: number, priceHeight: number): number {
+export function getNativePriceGridSpacing(
+  priceMin: number,
+  priceMax: number,
+  priceHeight: number,
+  minLabelSpacing = NATIVE_PRICE_GRID_MIN_LABEL_SPACING,
+): number {
   'worklet';
-  const maxLabels = Math.max(2, Math.floor(priceHeight / NATIVE_PRICE_GRID_MIN_LABEL_SPACING));
+  const maxLabels = Math.max(2, Math.floor(priceHeight / minLabelSpacing));
   const priceRange = priceMax - priceMin;
   if (priceRange <= 0) return 0;
 
@@ -68,9 +82,15 @@ export function getNativePriceGridSlot(input: {
   priceMin: number;
   priceMax: number;
   priceHeight: number;
+  minLabelSpacing?: number;
 }): NativePriceGridSlot {
   'worklet';
-  const spacing = getNativePriceGridSpacing(input.priceMin, input.priceMax, input.priceHeight);
+  const spacing = getNativePriceGridSpacing(
+    input.priceMin,
+    input.priceMax,
+    input.priceHeight,
+    input.minLabelSpacing ?? NATIVE_PRICE_GRID_MIN_LABEL_SPACING,
+  );
   if (spacing <= 0) return { visible: false, price: 0, spacing: 0 };
 
   const firstMarker = Math.floor(input.priceMin / spacing) * spacing;
