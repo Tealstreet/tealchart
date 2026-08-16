@@ -97,7 +97,7 @@ describe('NativeChartLegendOverlay', () => {
     expect(texts).toContain('...');
   });
 
-  it('renders overlay indicator action visuals as passive controls', () => {
+  it('routes overlay indicator actions through the buttons own onPress', () => {
     const onRemoveIndicator = vi.fn();
     const onToggleIndicator = vi.fn();
     const legend = NativeChartLegendOverlayImpl({
@@ -126,10 +126,16 @@ describe('NativeChartLegendOverlay', () => {
     const hidePress = buttons.find((button) => button.props.accessibilityLabel === 'Hide SMA')?.props.onPress;
     const removePress = buttons.find((button) => button.props.accessibilityLabel === 'Remove SMA')?.props.onPress;
 
-    expect(hidePress).toBeUndefined();
-    expect(removePress).toBeUndefined();
-    expect(onToggleIndicator).not.toHaveBeenCalled();
-    expect(onRemoveIndicator).not.toHaveBeenCalled();
+    // React Native chrome takes its own taps; a derived rect in canvas space
+    // would be a second copy of the same geometry, free to drift from the glyph.
+    expect(hidePress).toBeInstanceOf(Function);
+    expect(removePress).toBeInstanceOf(Function);
+
+    hidePress?.();
+    removePress?.();
+
+    expect(onToggleIndicator).toHaveBeenCalledWith('study_1');
+    expect(onRemoveIndicator).toHaveBeenCalledWith('study_1');
   });
 
   it('renders non-overlay indicator legends in their pane', () => {
