@@ -57,6 +57,18 @@ export type {
   ChartSettingsTab,
 } from './settings/chartSettingsControls';
 
+// Built-in indicators. Native resolves a builtin id to its code inside
+// `setOnStudyCreate`, so a host passing `createStudy('macd')` needs this
+// registry to build its picker - the web entry has always exported it.
+export {
+  BUILTIN_INDICATORS,
+  INDICATOR_CATEGORIES,
+  getIndicatorsByCategory,
+  getIndicatorById,
+  searchIndicators,
+} from './indicators';
+export type { BuiltinIndicator } from './indicators';
+
 // React Native Skia component
 export { SkiaTealchart } from './SkiaTealchart';
 export type { SkiaTealchartHandle, SkiaTealchartProps } from './SkiaTealchart';
