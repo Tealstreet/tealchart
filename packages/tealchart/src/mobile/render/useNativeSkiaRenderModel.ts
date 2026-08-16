@@ -267,10 +267,12 @@ export function useNativeSkiaRenderModel({
           line,
           pricePrecision,
           positiveColor: options.upColor,
+          orderLines: lineSnapshot.orderLines,
+          priceTolerance: priceTickSize,
         }),
       ),
     ],
-    [lineSnapshot.orderLines, lineSnapshot.positionLines, options.upColor, pricePrecision],
+    [lineSnapshot.orderLines, lineSnapshot.positionLines, options.upColor, pricePrecision, priceTickSize],
   );
   const nativePriceLines = useMemo(
     () => [...extraPriceLines, ...bracketPriceLines, ...(lastTradeLine ? [lastTradeLine] : [])],

@@ -1627,7 +1627,12 @@ describe('native gesture activation', () => {
     bracketDragGesture.handlers.onEnd({ translationX: 0, translationY: -8 });
     expect(clearNativeBracketDrag).not.toHaveBeenCalled();
     expect(commitBracketMove).toHaveBeenCalledWith('position', 'position-1', 'tp', expect.any(Number), undefined);
+    // The gesture ends, the preview does not. `active` falls so axis pinch, the
+    // TP/SL tap targets and this gesture's own touch guard are free again, while
+    // `activeObjectId` keeps the preview on screen until the projection carries
+    // the optimistic price. Clearing both here left a blank frame between the
+    // preview dying on the UI thread and commitBracketMove landing on the JS one.
     expect(bracketDragInteractionState.active.value).toBe(false);
-    expect(bracketDragInteractionState.activeObjectId.value).toBe('');
+    expect(bracketDragInteractionState.activeObjectId.value).toBe('position-1');
   });
 });
