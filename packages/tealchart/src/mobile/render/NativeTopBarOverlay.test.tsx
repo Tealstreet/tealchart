@@ -1,17 +1,12 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 import { createNativeTopBarLayout } from '../utils/topBarLayout';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
-import {
-  areNativeTopBarActionTargetsEqual,
-  NativeTopBarOverlayImpl,
-  resolveNativeTopBarActionOrigins,
-  resolveNativeTopBarActionTargets,
-} from './NativeTopBarOverlay';
+import { NativeTopBarOverlayImpl } from './NativeTopBarOverlay';
 
 const textWidth = (text: string) => text.length * 7;
 
@@ -20,8 +15,6 @@ interface TestElementProps {
   children?: ReactNode;
   name?: string;
   onPress?: () => void;
-  pointerEvents?: string;
-  scrollEnabled?: boolean;
   style?: { width?: number } | Array<{ width?: number }>;
 }
 
@@ -82,6 +75,7 @@ describe('NativeTopBarOverlay', () => {
       backgroundColor: '#101418',
       gridColor: '#222831',
       mutedTextColor: '#8a8f98',
+      onAction: vi.fn(),
       textColor: '#f0f3fa',
       topBarLayout: createLayout(),
     });
@@ -96,135 +90,69 @@ describe('NativeTopBarOverlay', () => {
     expect(iconNames.filter((name) => name === 'chevronDown')).toHaveLength(2);
     expect(pressables.length).toBe(createLayout().buttons.length + 1);
     expect(scrollViews).toHaveLength(1);
-    expect(scrollViews[0].props.pointerEvents).toBe('none');
-    expect(scrollViews[0].props.scrollEnabled).toBe(false);
     expect(contentViews.some((element) => styleWidth(element.props.style) === createLayout().scrollContentWidth)).toBe(
       true,
     );
     expect(pressables.some((element) => element.props.accessibilityLabel === 'Change symbol')).toBe(true);
-    expect(pressables.every((element) => element.props.onPress === undefined)).toBe(true);
   });
 
-  it('resolves measured symbol and button layouts into absolute overlay hit targets', () => {
-    const layout = createLayout();
-    const indicatorsButton = layout.buttons.find((button) => button.type === 'indicators');
-    const activeTimeframeButton = layout.buttons.find((button) => button.interval === '15');
-
-    expect(layout.symbolHitRect).toBeDefined();
-    expect(indicatorsButton).toBeDefined();
-    expect(activeTimeframeButton).toBeDefined();
-
-    const targets = resolveNativeTopBarActionTargets({
-      actionLayouts: {
-        symbol: {
-          command: { type: 'symbol' },
-          layout: layout.symbolHitRect!,
-        },
-        [`button:${activeTimeframeButton!.type}:${activeTimeframeButton!.interval}:${activeTimeframeButton!.x}`]: {
-          command: { type: 'timeframe', interval: '15' },
-          layout: activeTimeframeButton!,
-        },
-        [`button:${indicatorsButton!.type}:${indicatorsButton!.text}:${indicatorsButton!.x}`]: {
-          command: { type: 'indicators' },
-          layout: indicatorsButton!,
-        },
-      },
-      actionOrigins: resolveNativeTopBarActionOrigins(layout),
-    });
-
-    expect(targets).toEqual([
-      {
-        command: { type: 'symbol' },
-        enabled: true,
-        x1: 0,
-        x2: layout.symbolHitRect!.width + 4,
-        y1: 0,
-        y2: layout.height + 4,
-      },
-      {
-        command: { type: 'timeframe', interval: '15' },
-        enabled: true,
-        x1: layout.scrollAreaX + activeTimeframeButton!.x - 3,
-        x2: layout.scrollAreaX + activeTimeframeButton!.x + activeTimeframeButton!.width + 3,
-        y1: activeTimeframeButton!.y - 4,
-        y2: activeTimeframeButton!.y + activeTimeframeButton!.height + 4,
-      },
-      {
-        command: { type: 'indicators' },
-        enabled: true,
-        x1: layout.scrollAreaX + indicatorsButton!.x - 3,
-        x2: layout.scrollAreaX + indicatorsButton!.x + indicatorsButton!.width + 3,
-        y1: indicatorsButton!.y - 4,
-        y2: indicatorsButton!.y + indicatorsButton!.height + 4,
-      },
-    ]);
-  });
-
-  it('marks disabled top-bar buttons as disabled gesture targets', () => {
-    const layout = createNativeTopBarLayout({
-      width: 390,
-      height: 36,
-      symbol: 'BTC-USD',
-      interval: '15',
-      timeframes: AVAILABLE_TIMEFRAMES.filter((timeframe) => ['15'].includes(timeframe.value)),
-      textWidth,
-      titleTextWidth: textWidth,
-      textColor: '#f0f3fa',
+  it('dispatches the symbol command from the symbol header', () => {
+    const onAction = vi.fn();
+    const overlay = NativeTopBarOverlayImpl({
+      backgroundColor: '#101418',
+      gridColor: '#222831',
       mutedTextColor: '#8a8f98',
-      activeTextColor: '#12c48b',
-      activeBackgroundColor: '#24312b',
-      indicatorsEnabled: false,
-      undoEnabled: false,
-      redoEnabled: true,
+      onAction,
+      textColor: '#f0f3fa',
+      topBarLayout: createLayout(),
     });
-    const indicatorsButton = layout.buttons.find((button) => button.type === 'indicators');
-    const undoButton = layout.buttons.find((button) => button.type === 'undo');
-    const redoButton = layout.buttons.find((button) => button.type === 'redo');
+    const symbolPressable = collectElementsByType(overlay, Pressable).find(
+      (element) => element.props.accessibilityLabel === 'Change symbol',
+    );
 
-    expect(indicatorsButton).toBeDefined();
-    expect(undoButton).toBeDefined();
-    expect(redoButton).toBeDefined();
-
-    const targets = resolveNativeTopBarActionTargets({
-      actionLayouts: {
-        [`button:${indicatorsButton!.type}:${indicatorsButton!.text}:${indicatorsButton!.x}`]: {
-          command: { type: 'indicators' },
-          layout: indicatorsButton!,
-        },
-        [`button:${undoButton!.type}:${undoButton!.text}:${undoButton!.x}`]: {
-          command: { type: 'undo' },
-          layout: undoButton!,
-        },
-        [`button:${redoButton!.type}:${redoButton!.text}:${redoButton!.x}`]: {
-          command: { type: 'redo' },
-          layout: redoButton!,
-        },
-      },
-      actionOrigins: resolveNativeTopBarActionOrigins(layout),
-    });
-
-    expect(targets.map((target) => [target.command.type, target.enabled])).toEqual([
-      ['indicators', false],
-      ['undo', false],
-      ['redo', true],
-    ]);
+    expect(symbolPressable).toBeDefined();
+    symbolPressable!.props.onPress!();
+    expect(onAction).toHaveBeenCalledWith({ type: 'symbol' });
   });
 
-  it('compares action target payloads instead of array identity', () => {
-    const first = [
-      {
-        command: { type: 'timeframe' as const, interval: '15' as const },
-        enabled: true,
-        x1: 80,
-        x2: 116,
-        y1: 0,
-        y2: 36,
-      },
-    ];
-    const matching = first.map((target) => ({ ...target, command: { ...target.command } }));
-    const changed = [{ ...matching[0], command: { type: 'timeframe' as const, interval: '30' as const } }];
+  it('dispatches the selected button command directly', () => {
+    const onAction = vi.fn();
+    const layout = createLayout();
+    const overlay = NativeTopBarOverlayImpl({
+      backgroundColor: '#101418',
+      gridColor: '#222831',
+      mutedTextColor: '#8a8f98',
+      onAction,
+      textColor: '#f0f3fa',
+      topBarLayout: layout,
+    });
+    const activeButton = layout.buttons.find((button) => button.interval === '15');
+    const activePressable = collectElementsByType(overlay, Pressable).find(
+      (element) => element.props.accessibilityLabel === '15m timeframe',
+    );
 
-    expect(areNativeTopBarActionTargetsEqual(first, matching)).toBe(true);
-    expect(areNativeTopBarActionTargetsEqual(first, changed)).toBe(false);
+    expect(activeButton).toBeDefined();
+    expect(activePressable).toBeDefined();
+    activePressable!.props.onPress!();
+    expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'timeframe', interval: '15' }));
+  });
+
+  it('dispatches the layout selector command from the layout button', () => {
+    const onAction = vi.fn();
+    const overlay = NativeTopBarOverlayImpl({
+      backgroundColor: '#101418',
+      gridColor: '#222831',
+      mutedTextColor: '#8a8f98',
+      onAction,
+      textColor: '#f0f3fa',
+      topBarLayout: createLayout(),
+    });
+    const layoutPressable = collectElementsByType(overlay, Pressable).find(
+      (element) => element.props.accessibilityLabel === 'Chart layouts',
+    );
+
+    expect(layoutPressable).toBeDefined();
+    layoutPressable!.props.onPress!();
+    expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'layout' }));
   });
 });

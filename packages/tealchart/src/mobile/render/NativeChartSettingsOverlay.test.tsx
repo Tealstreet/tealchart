@@ -122,21 +122,24 @@ describe('NativeChartSettingsOverlay', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('draws a labelled gear that reports its own box instead of handling touches', () => {
+  it('takes its own tap and reports its box for gesture suppression', () => {
     const onLayoutRectChange = vi.fn();
+    const onPress = vi.fn();
     const button = NativeChartSettingsButtonImpl({
       backgroundColor: '#101418',
       axisHeight: 24,
       onLayoutRectChange,
+      onPress,
       textColor: '#8a8f98',
     });
 
     expect(button.props.accessibilityLabel).toBe('Chart settings');
-    // Passive: taps belong to the chart gesture layer, so a second RN touch path
-    // here would put the hit box in a different coordinate space to the glyph.
-    expect(button.props.pointerEvents).toBe('none');
-    expect(button.props.onPress).toBeUndefined();
+    // The gear is a React Native node, so it takes its own tap.
+    button.props.onPress?.();
+    expect(onPress).toHaveBeenCalledTimes(1);
 
+    // The measured box is still reported, but only so canvas pan/crosshair fail
+    // their start underneath it — the gear sits where those gestures are live.
     button.props.onLayout?.({ nativeEvent: { layout: { height: 24, width: 24, x: 378, y: 600 } } });
     expect(onLayoutRectChange).toHaveBeenCalledWith({ height: 24, width: 24, x: 378, y: 600 });
 
