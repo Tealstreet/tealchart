@@ -28,7 +28,7 @@ import type {
   CrosshairState as EventCrosshairState,
   PaneDividerInfo,
 } from '../interaction/EventManager';
-import type { OemsActionKind, OemsActionState } from '../interaction/oemsActionManager';
+import type { OemsActionKind } from '../interaction/oemsActionManager';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -52,6 +52,17 @@ import {
 } from '../drawings';
 import { EventManager } from '../interaction/EventManager';
 import { OemsActionManager } from '../interaction/oemsActionManager';
+import {
+  applyOemsOrderActionState,
+  applyOemsPositionActionState,
+  confirmOemsOrderLineSnapshots,
+  confirmOemsPositionLineSnapshots,
+  getOemsOrderLineState,
+  getOemsOrderObjectId,
+  getOemsPositionLineState,
+  getOemsPositionObjectId,
+  type OemsTradingLineState,
+} from '../interaction/oemsLineState';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
@@ -97,13 +108,6 @@ export interface IndicatorPaneInfo {
   explicitPlotZOrder?: boolean;
   name?: string;
   inputs?: Record<string, unknown>;
-}
-
-interface OemsTradingLineState extends OemsActionState {
-  price?: number;
-  takeProfit?: number;
-  stopLoss?: number;
-  visible?: boolean;
 }
 
 export interface ChartCoreOptions {
@@ -897,108 +901,37 @@ export class ChartCore {
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {
-    return line.orderId || line.id;
+    return getOemsOrderObjectId(line);
   }
 
   private getPositionObjectId(line: PositionLineRenderData): string {
-    return line.positionId || line.id;
+    return getOemsPositionObjectId(line);
   }
 
   private getOrderLineState(line: OrderLineRenderData): OemsTradingLineState {
-    return {
-      price: line.price,
-      takeProfit: line.brackets?.takeProfit,
-      stopLoss: line.brackets?.stopLoss,
-      visible: true,
-    };
+    return getOemsOrderLineState(line);
   }
 
   private getPositionLineState(line: PositionLineRenderData): OemsTradingLineState {
-    return {
-      price: line.price,
-      takeProfit: line.brackets?.takeProfit,
-      stopLoss: line.brackets?.stopLoss,
-      visible: true,
-    };
+    return getOemsPositionLineState(line);
   }
 
   private confirmOrderLineSnapshots(lines: OrderLineRenderData[]): void {
-    const seen = new Set(lines.map((line) => this.getOrderObjectId(line)));
-    for (const line of lines) {
-      this.oemsActions.confirmState('order', this.getOrderObjectId(line), this.getOrderLineState(line));
-    }
-
-    for (const action of this.oemsActions.getActions()) {
-      if (action.objectType === 'order' && action.confirmsRemoved && !seen.has(action.objectId)) {
-        this.oemsActions.confirmRemoved('order', action.objectId);
-      }
-    }
+    confirmOemsOrderLineSnapshots(this.oemsActions, lines);
   }
 
   private confirmPositionLineSnapshots(lines: PositionLineRenderData[]): void {
-    const seen = new Set(lines.map((line) => this.getPositionObjectId(line)));
-    for (const line of lines) {
-      this.oemsActions.confirmState('position', this.getPositionObjectId(line), this.getPositionLineState(line));
-    }
-
-    for (const action of this.oemsActions.getActions()) {
-      if (action.objectType === 'position' && action.confirmsRemoved && !seen.has(action.objectId)) {
-        this.oemsActions.confirmRemoved('position', action.objectId);
-      }
-    }
+    confirmOemsPositionLineSnapshots(this.oemsActions, lines);
   }
 
   private applyOrderActionState(line: OrderLineRenderData): OrderLineRenderData {
-    const objectId = this.getOrderObjectId(line);
-    const status = this.oemsActions.getObjectStatus('order', objectId, this.getOrderLineState(line));
-    if (!status.action) return { ...line, actionState: undefined };
-
-    return {
-      ...line,
-      price: typeof status.state.price === 'number' ? status.state.price : line.price,
-      brackets: this.applyBracketActionState(line.brackets, status.state),
-      actionState: {
-        kind: status.action.kind,
-        isPending: status.isPending,
-        isAwaitingCallback: status.isAwaitingCallback,
-        isAwaitingConfirmation: status.isAwaitingConfirmation,
-      },
-    };
+    return applyOemsOrderActionState(line, this.oemsActions);
   }
 
   private applyPositionActionState(line: PositionLineRenderData): PositionLineRenderData {
-    const objectId = this.getPositionObjectId(line);
-    const status = this.oemsActions.getObjectStatus('position', objectId, this.getPositionLineState(line));
-    if (!status.action) return { ...line, actionState: undefined };
-
-    return {
-      ...line,
-      price: typeof status.state.price === 'number' ? status.state.price : line.price,
-      brackets: this.applyBracketActionState(line.brackets, status.state),
-      actionState: {
-        kind: status.action.kind,
-        isPending: status.isPending,
-        isAwaitingCallback: status.isAwaitingCallback,
-        isAwaitingConfirmation: status.isAwaitingConfirmation,
-      },
-    };
+    return applyOemsPositionActionState(line, this.oemsActions);
   }
 
-  private applyBracketActionState<
-    TBracket extends OrderLineRenderData['brackets'] | PositionLineRenderData['brackets'],
-  >(brackets: TBracket, state: OemsTradingLineState): TBracket {
-    if (!brackets && typeof state.takeProfit !== 'number' && typeof state.stopLoss !== 'number') return brackets;
-    const nextBrackets = { ...(brackets ?? {}) };
-    if (typeof state.takeProfit === 'number') {
-      nextBrackets.takeProfit = state.takeProfit;
-    }
-    if (typeof state.stopLoss === 'number') {
-      nextBrackets.stopLoss = state.stopLoss;
-    }
-    return {
-      ...nextBrackets,
-    } as TBracket;
-  }
 
   /**
    * Set execution markers

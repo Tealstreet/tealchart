@@ -243,6 +243,46 @@ Platform-specific rendering:
 
 When adding features like TP/SL drag preview, crosshair improvements, or new line types — implement for both platforms.
 
+## Optimistic holding (OEMS)
+
+Dragging a trade line starts an **action** (`interaction/oemsActionManager.ts`).
+Until the venue confirms it, the chart draws the price the user dragged to
+rather than the price the feed still reports. This is the chart's own job — a
+host is not expected to build an optimistic order store to make dragging feel
+right, and one that has built one is not penalised for it.
+
+**Identity is the line's id, but confirmation is by field.** `confirmState`
+compares the optimistic state against what came back, with the price allowed a
+tick of slack (`createOemsStateEquals`) — the venue rounds to its own tick and
+an exact comparison would never match.
+
+**A move survives its row disappearing.** On most venues an amend is a cancel
+followed by a place, so the order leaves the feed and returns as a *different*
+order with a different id. `OemsLineHold` keeps the last line it saw and puts it
+back at the dragged price while the row is gone, then retires itself when an
+unclaimed row matching the held line's signature — quantity and colour, not
+price — is accepted by `confirmState`. Both halves are required: holding
+without retiring draws the held line beside the replacement forever.
+
+Actions that *expect* the row to go (`confirmsRemoved`: cancel, close, reverse)
+are never held. A cancelled order leaving is the point of cancelling it.
+
+**Two identical resting orders can be confused for one another** while one is
+mid-amend. That is transient and self-correcting, and it is the price of not
+requiring venues to preserve ids — which most of them do not.
+
+**A bracket the user drags into existence has no order yet.** The optimistic
+TP/SL is merged into `brackets` even when the line has none
+(`applyOemsBracketActionState`), or it would have nowhere to live. Bracket
+*creation* still settles on the callback rather than the echo
+(`settleOnCallback`), which is deliberate — see `3c84ee37` — because the echo
+may arrive as its own order line and never as a bracket on the parent.
+
+**The adapter is shared.** `interaction/oemsLineState.ts` is used by both
+`ChartCore` and the native runtime. It was duplicated once, drifted, and the
+drift was invisible because the tests passed `{}` where the render data
+actually carries `null`.
+
 ## Gotchas
 
 - `TealchartRenderer` is pure canvas — no React; test it independently
