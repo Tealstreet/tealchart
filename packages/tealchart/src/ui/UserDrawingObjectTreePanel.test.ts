@@ -48,7 +48,7 @@ describe('UserDrawingObjectTreePanel', () => {
     clearChartStoreCache();
   });
 
-  it('keeps the built-in panel constrained to viewport chrome and isolates chart events', () => {
+  it('keeps the built-in panel inside the chart overlay and isolates chart events', () => {
     const onDispatch = vi.fn(() => true);
     const onClose = vi.fn();
     const onChartClick = vi.fn();
@@ -56,23 +56,28 @@ describe('UserDrawingObjectTreePanel', () => {
     document.body.addEventListener('click', onChartClick);
     document.body.addEventListener('contextmenu', onChartContextMenu);
 
+    const overlay = document.createElement('div');
+    document.body.appendChild(overlay);
+
     new UserDrawingObjectTreePanel({
       model: resolveUserDrawingObjectTreeModel(state),
+      parent: overlay,
       onDispatch,
       onClose,
     });
 
     const element = document.querySelector<HTMLElement>('[data-tealchart-user-drawing-object-tree-panel="true"]');
     expect(element).not.toBeNull();
-    expect(element?.style.position).toBe('fixed');
+    // Chart-contained: mounted in the overlay layer and sized against it, not
+    // the viewport, or the panel lands outside the chart on any page where the
+    // chart is not full-bleed.
+    expect(element?.parentElement).toBe(overlay);
+    expect(element?.style.position).toBe('absolute');
     expect(element?.style.right).toBe('16px');
-    expect(element?.style.maxWidth).toBe('calc(100vw - 32px)');
-    // jsdom's CSS serializer rewrites calc() operands, so assert the intent
-    // rather than one engine's spelling of it.
-    expect([
-      'min(560px, calc(100vh - 72px))',
-      'min(560px, -72px + 100vh)',
-    ]).toContain(element?.style.maxHeight);
+    expect(element?.style.maxWidth).toBe('calc(100% - 32px)');
+    expect(element?.style.maxHeight).toBe('calc(100% - 72px)');
+    // The overlay layer is pointer-transparent; the panel must opt back in.
+    expect(element?.style.pointerEvents).toBe('auto');
     expect(element?.style.overflow).toBe('hidden');
 
     const targetActions = element?.querySelector<HTMLElement>(
