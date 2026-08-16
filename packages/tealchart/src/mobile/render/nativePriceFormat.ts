@@ -82,6 +82,16 @@ export function formatNativePriceAxisTickWorklet(price: number, spacing: number)
   return formatNativePriceWithDecimalsWorklet(price, getNativePriceAxisTickDecimalsWorklet(spacing));
 }
 
+/**
+ * An indicator pane's ticks are not prices, so the instrument's tick size has no
+ * bearing on them — MACD on a 2-decimal market still needs whatever the chosen
+ * step requires. Decimals come from the step alone.
+ */
+export function formatNativeIndicatorAxisTickWorklet(value: number, spacing: number): string {
+  'worklet';
+  return formatNativePriceWithDecimalsWorklet(value, getNativePriceAxisTickDecimalsWorklet(spacing));
+}
+
 export function formatNativePriceAxisTickWithPrecisionWorklet(
   price: number,
   spacing: number,
