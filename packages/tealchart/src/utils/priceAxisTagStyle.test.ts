@@ -26,6 +26,12 @@ describe('resolvePriceAxisTagStyle', () => {
       expect(style.backgroundColor).toBe('#12c48b');
     });
 
+    // `type` is optional on the web bounds, and absent has always meant a
+    // trading line there.
+    it('fills when the type is absent', () => {
+      expect(resolvePriceAxisTagStyle({ label: undefined, color: '#d9534f' }).filled).toBe(true);
+    });
+
     it('prefers an explicit label background over the line colour', () => {
       const style = resolvePriceAxisTagStyle({
         type: 'order',

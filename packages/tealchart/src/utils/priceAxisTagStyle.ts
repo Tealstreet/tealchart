@@ -59,7 +59,8 @@ export function resolvePriceAxisTagStyle({
   label,
   color,
 }: {
-  type: string;
+  /** Absent means a trading line, which fills - only `price` is ever an outline. */
+  type?: string;
   label: PriceAxisTagLabel | undefined;
   color: string;
 }): PriceAxisTagStyle {
