@@ -626,6 +626,7 @@ describe('native gesture activation', () => {
       cancelNativeViewportInteraction: () => {},
       chartPanGestureState: {
         active: panActive,
+        lockVertical: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -671,6 +672,7 @@ describe('native gesture activation', () => {
       cancelNativeViewportInteraction: () => {},
       chartPanGestureState: {
         active: panActive,
+        lockVertical: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -1080,6 +1082,7 @@ describe('native gesture activation', () => {
       cancelNativeViewportInteraction: () => {},
       chartPanGestureState: {
         active: panActive,
+        lockVertical: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -1353,6 +1356,7 @@ describe('native gesture activation', () => {
       cancelNativeViewportInteraction: () => {},
       chartPanGestureState: {
         active: panActive,
+        lockVertical: shared(false),
         sharedViewport: viewport,
         startViewport: panStartViewport,
         metrics: gestureMetrics(),

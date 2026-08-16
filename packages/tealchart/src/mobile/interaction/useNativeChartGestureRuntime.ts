@@ -82,6 +82,7 @@ export interface NativeChartGestureRuntimeInput {
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   onDrawingTap: (x: number, y: number) => void;
+  onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
   onDrawingEditDragBegin: (x: number, y: number) => void;
   onDrawingEditDragEnd: () => void;
   onDrawingEditDragMove: (x: number, y: number) => void;
@@ -125,6 +126,8 @@ export function resolveNativeCrosshairInteractionFrame({
   return drawingInputEnabled ? null : dataFrame;
 }
 
+const noopNativeIndicatorPaneScale = (_paneId: string, _yMin: number, _yMax: number) => undefined;
+
 function useLatestNativeCallback<T extends (...args: never[]) => void>(callback: T): T {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
@@ -161,6 +164,7 @@ export function useNativeChartGestureRuntime({
   orderDragState,
   orderDragZones,
   onDrawingTap,
+  onIndicatorPaneScale,
   onDrawingEditDragBegin,
   onDrawingEditDragEnd,
   onDrawingEditDragMove,
@@ -199,6 +203,7 @@ export function useNativeChartGestureRuntime({
   const stableOnDrawingEditDragMove = useLatestNativeCallback(onDrawingEditDragMove);
   const stableOnDrawingSelectionTap = useLatestNativeCallback(onDrawingSelectionTap);
   const stableOnDrawingTap = useLatestNativeCallback(onDrawingTap);
+  const stableOnIndicatorPaneScale = useLatestNativeCallback(onIndicatorPaneScale ?? noopNativeIndicatorPaneScale);
   const stableOnLeftToolRailToggleTap = useLatestNativeCallback(onLeftToolRailToggleTap);
   const stableOnContextMenuTap = useLatestNativeCallback(onContextMenuTap);
   const stableOnOverlayAction = useLatestNativeCallback(onOverlayAction);
@@ -589,6 +594,7 @@ export function useNativeChartGestureRuntime({
       commitPanViewport: stableCommitPanViewport,
       controlZones,
       frame: chartInteractionFrame,
+      onIndicatorPaneScale: stableOnIndicatorPaneScale,
       priceScaleActive,
       priceScaleGestureState,
       sharedViewport,
@@ -602,6 +608,7 @@ export function useNativeChartGestureRuntime({
     stableBeginNativeViewportInteraction,
     stableCancelNativeViewportInteraction,
     stableCommitPanViewport,
+    stableOnIndicatorPaneScale,
   ]);
 
   const timeScaleGesture = useMemo<GestureType>(() => {

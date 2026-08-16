@@ -27,6 +27,12 @@ export interface NativePriceAutoScaleSharedValues {
 }
 
 export interface NativeChartPanGestureState {
+  /**
+   * Set when a pan starts inside an indicator pane. Those panes carry their own
+   * value scale, so a vertical drag there must not haul the main price viewport
+   * around — web suppresses the same movement via `isAutoScale`.
+   */
+  lockVertical: SharedValue<boolean>;
   active: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   startViewport: NativeViewportSharedValues;
@@ -48,12 +54,30 @@ export interface NativeChartAxisPinchGestureState {
   activeStartSpanY: SharedValue<number>;
 }
 
+/**
+ * The indicator pane an axis drag is scaling, captured at touch-down.
+ *
+ * Lives on the gesture state rather than inside the gesture factory: the frame
+ * changes whenever a pane's range does, which rebuilds the gesture, and a target
+ * held in the factory would come back null mid-drag. When that happened the
+ * update fell through to the main-viewport path and both axes rescaled at once.
+ */
+export interface NativeIndicatorPaneScaleTarget {
+  id: string;
+  height: number;
+  startYMin: number;
+  startYMax: number;
+  yMin: number;
+  yMax: number;
+}
+
 export interface NativePriceScaleGestureState {
   active: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   startViewport: NativeViewportSharedValues;
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeAnchorPrice: SharedValue<number>;
+  indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
 }
 
 export interface NativeTimeScaleGestureState {

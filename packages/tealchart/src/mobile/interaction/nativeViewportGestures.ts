@@ -17,7 +17,9 @@ import type {
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
+import { getNativePaneAtY, getNativePriceAxisPaneAt } from '../render/nativeChartFrame';
 import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { resolveNativeIndicatorPaneScaleRange } from './nativeIndicatorPaneScale';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
 import {
   beginNativeChartAxisPinchGestureState,
@@ -189,14 +191,20 @@ export function createNativeChartPanGesture({
         })
       ) {
         stateManager.fail();
+        return;
       }
+      chartPanGestureState.lockVertical.value = getNativePaneAtY(frame, point.y)?.type === 'indicator';
     })
     .onBegin(() => {
       beginNativeChartPanGestureStateFromFrame(chartPanGestureState, frame);
       runOnJS(beginNativeViewportInteraction)();
     })
     .onUpdate((event) => {
-      updateNativeChartPanGestureState(chartPanGestureState, event.translationX, event.translationY);
+      updateNativeChartPanGestureState(
+        chartPanGestureState,
+        event.translationX,
+        chartPanGestureState.lockVertical.value ? 0 : event.translationY,
+      );
     })
     .onEnd(() => {
       const nextViewport = getNativeViewportGestureCommit(panActive, sharedViewport);
@@ -351,6 +359,7 @@ export interface NativePriceScaleGestureInput {
   commitPanViewport: (nextViewport: Viewport) => void;
   controlZones?: readonly NativeGestureControlZone[];
   frame: NativeChartFrame | null;
+  onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
   priceScaleActive: SharedValue<boolean>;
   priceScaleGestureState: NativePriceScaleGestureState;
   sharedViewport: NativeViewportSharedValues;
@@ -362,12 +371,18 @@ export function createNativePriceScaleGesture({
   commitPanViewport,
   controlZones = [],
   frame,
+  onIndicatorPaneScale,
   priceScaleActive,
   priceScaleGestureState,
   sharedViewport,
 }: NativePriceScaleGestureInput) {
   if (!frame) return Gesture.Pan().enabled(false);
   const geometry = getNativePriceScaleHitGeometry(frame);
+  // Which pane the drag scales is decided by where it went down, and held for
+  // the whole gesture so wandering into a neighbouring pane keeps scaling the
+  // one it started on. The target lives on the gesture state, not here — see
+  // NativeIndicatorPaneScaleTarget.
+  const indicatorPane = priceScaleGestureState.indicatorPaneTarget;
 
   return Gesture.Pan()
     .minDistance(2)
@@ -378,27 +393,66 @@ export function createNativePriceScaleGesture({
         return;
       }
       const point = getNativeTouchPoint(event);
-      if (
-        !point ||
-        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
-        !canBeginNativePriceScaleGesture(geometry, point.x, point.y)
-      ) {
+      if (!point || isNativeGestureControlPoint(controlZones, point.x, point.y)) {
         stateManager.fail();
+        return;
       }
+
+      indicatorPane.value = null;
+      if (canBeginNativePriceScaleGesture(geometry, point.x, point.y)) return;
+
+      const pane = onIndicatorPaneScale ? getNativePriceAxisPaneAt(frame, point.x, point.y) : null;
+      if (!pane || pane.type !== 'indicator' || !(pane.yMax > pane.yMin)) {
+        stateManager.fail();
+        return;
+      }
+      indicatorPane.value = {
+        id: pane.id,
+        height: pane.height,
+        startYMin: pane.yMin,
+        startYMax: pane.yMax,
+        yMin: pane.yMin,
+        yMax: pane.yMax,
+      };
     })
     .onBegin((event) => {
+      if (indicatorPane.value) return;
       beginNativePriceScaleGestureState(priceScaleGestureState, event.y, geometry.plotTop, geometry.plotHeight);
       runOnJS(beginNativeViewportInteraction)();
     })
     .onUpdate((event) => {
+      const pane = indicatorPane.value;
+      if (pane) {
+        // Tracked on the UI thread and committed once on release. Committing
+        // per update rebuilt the frame — and with it this gesture — on every
+        // frame of the drag, which is what made it crawl.
+        const next = resolveNativeIndicatorPaneScaleRange({
+          paneHeight: pane.height,
+          plotHeight: geometry.plotHeight,
+          startYMax: pane.startYMax,
+          startYMin: pane.startYMin,
+          translationY: event.translationY,
+        });
+        indicatorPane.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
+        return;
+      }
       updateNativePriceScaleGestureState(priceScaleGestureState, event.translationY);
     })
     .onEnd(() => {
+      const pane = indicatorPane.value;
+      if (pane) {
+        if (onIndicatorPaneScale) runOnJS(onIndicatorPaneScale)(pane.id, pane.yMin, pane.yMax);
+        return;
+      }
       const nextViewport = getNativeViewportGestureCommit(priceScaleActive, sharedViewport);
       if (!nextViewport) return;
       runOnJS(commitPanViewport)(nextViewport);
     })
     .onFinalize((_event, success) => {
+      if (indicatorPane.value) {
+        indicatorPane.value = null;
+        return;
+      }
       if (
         finalizeNativeViewportGestureState({
           active: priceScaleActive,
