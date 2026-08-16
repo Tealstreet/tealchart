@@ -40,13 +40,18 @@ const pendingManager = () => {
 };
 
 describe('getOems*ObjectId', () => {
-  it('prefers the trading id over the render id, on both object types', () => {
-    expect(getOemsOrderObjectId(orderLine({ id: 'line-x', orderId: 'order-9' }))).toBe('order-9');
-    expect(getOemsPositionObjectId(positionLine({ id: 'line-y', positionId: 'position-9' }))).toBe('position-9');
+  // The adapter's id, never the venue's. On most venues an amend is a cancel
+  // and a place, so `orderId` changes mid-action; keying on it orphaned the
+  // pending action and left the retired line drawn beside its replacement.
+  it('identifies a line by its adapter, not by the venue id it carries', () => {
+    expect(getOemsOrderObjectId(orderLine({ id: 'line-x', orderId: 'order-9' }))).toBe('line-x');
+    expect(getOemsPositionObjectId(positionLine({ id: 'line-y', positionId: 'position-9' }))).toBe('line-y');
   });
 
-  it('falls back to the render id when there is no trading id', () => {
-    expect(getOemsOrderObjectId(orderLine({ id: 'line-x', orderId: undefined }))).toBe('line-x');
+  it('is unmoved by the venue re-keying an order mid-flight', () => {
+    const before = orderLine({ id: 'line-x', orderId: 'venue-1' });
+    const after = orderLine({ id: 'line-x', orderId: 'venue-2' });
+    expect(getOemsOrderObjectId(after)).toBe(getOemsOrderObjectId(before));
   });
 });
 

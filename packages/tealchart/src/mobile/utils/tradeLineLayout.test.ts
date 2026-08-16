@@ -30,6 +30,7 @@ const measureVariableText = (text: string) =>
 
 function createOrderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRenderData {
   return {
+    // Adapter id is the identity; the exchange id is payload.
     id: 'adapter-order',
     orderId: 'exchange-order',
     price: 63777,
@@ -207,7 +208,9 @@ describe('native trade line layout', () => {
     });
 
     expect(geometry?.objectType).toBe('order');
-    expect(geometry?.objectId).toBe('exchange-order');
+    // The adapter id, not the exchange's - a venue re-key must not move a
+    // line's identity out from under a pending action.
+    expect(geometry?.objectId).toBe('adapter-order');
     expect(geometry?.priceLabelText).toBe('63,777.0');
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
     expect(geometry?.priceLabelTextX).toBeGreaterThanOrEqual(geometry?.priceLabelX ?? 0);
@@ -232,7 +235,7 @@ describe('native trade line layout', () => {
     expect(geometry?.actionZones.map((zone) => zone.actionType)).toEqual(['cancel', 'tp', 'sl']);
     expect(geometry?.actionZones.map((zone) => zone.price)).toEqual([63777, 63777, 63777]);
     expect(geometry?.actionZones.map((zone) => zone.dragPrice)).toEqual([63777, 65000, 62000]);
-    expect(geometry?.dragZone?.objectId).toBe('exchange-order');
+    expect(geometry?.dragZone?.objectId).toBe('adapter-order');
     const labelBodyRightX = Math.max(...(geometry?.segments ?? []).map((segment) => segment.x + segment.width));
     expect(geometry?.dragZone?.x1).toBe(geometry?.labelX);
     expect(geometry?.dragZone?.x2).toBe(labelBodyRightX);
@@ -559,7 +562,7 @@ describe('native trade line layout', () => {
     });
 
     expect(geometry?.objectType).toBe('position');
-    expect(geometry?.objectId).toBe('position-btc');
+    expect(geometry?.objectId).toBe('adapter-position');
     expect(geometry?.buttons.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     expect(geometry?.fitting).toEqual({
       mode: 'full',
@@ -592,8 +595,8 @@ describe('native trade line layout', () => {
 
   it('exports stable trade-line rows for native worklet collision resolution', () => {
     const geometries = buildNativeTradeLineGeometries(
-      [createOrderLine({ orderId: 'order-a', price: 100 })],
-      [createPositionLine({ positionId: 'position-b', price: 101 })],
+      [createOrderLine({ id: 'order-a', price: 100 })],
+      [createPositionLine({ id: 'position-b', price: 101 })],
       {
         dimensions,
         pricePrecision: 0.1,

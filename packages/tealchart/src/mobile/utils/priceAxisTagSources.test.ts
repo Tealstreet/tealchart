@@ -54,8 +54,8 @@ describe('native price axis tag sources', () => {
         },
       ],
       lastTradeLine: priceLine({ id: 'last', price: 103, priority: 100, label: { primaryText: '103', secondaryText: '09:59' } }),
-      orderLines: [{ id: 'generated-order', orderId: 'order-1', price: 99 } as OrderLineRenderData],
-      positionLines: [{ id: 'generated-position', positionId: 'position-1', price: 98 } as PositionLineRenderData],
+      orderLines: [{ id: 'order-1', orderId: 'venue-order-1', price: 99 } as OrderLineRenderData],
+      positionLines: [{ id: 'position-1', positionId: 'venue-position-1', price: 98 } as PositionLineRenderData],
       priceLineTagHeight: 22,
       tradeLineTagHeight: 21,
     });

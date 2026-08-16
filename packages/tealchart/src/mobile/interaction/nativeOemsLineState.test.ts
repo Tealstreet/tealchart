@@ -22,8 +22,9 @@ function createManager(): OemsActionManager<NativeOemsTradingLineState> {
 
 function orderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRenderData {
   return {
-    id: 'generated-order',
-    orderId: 'order-1',
+    // Adapter id is identity; the venue id differs on purpose.
+    id: 'order-1',
+    orderId: 'venue-order-1',
     price: 100,
     quantity: '0.10',
     quantityShort: '0.10',
@@ -60,7 +61,7 @@ function orderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRende
 
 function positionLine(overrides: Partial<PositionLineRenderData> = {}): PositionLineRenderData {
   return {
-    id: 'generated-position',
+    id: 'position-1',
     positionId: 'position-1',
     price: 100,
     quantity: '0.10',

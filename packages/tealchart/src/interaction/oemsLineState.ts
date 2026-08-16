@@ -17,12 +17,26 @@ export interface OemsTradingLineState extends OemsActionState {
   visible?: boolean;
 }
 
+/**
+ * A line's identity is the adapter it was drawn from, never the venue's id.
+ *
+ * `createOrderLine()` mints `order_1`, `order_2`... and hands back an adapter
+ * that lives until the host removes it. That id survives everything the venue
+ * does, which is the whole point: on most venues an amend is a cancel and a
+ * place, so `orderId` changes mid-action. Keying on it orphaned the pending
+ * action the moment the host re-pointed its adapter at the replacement, and the
+ * chart then redrew a line the host had already retired - two lines on screen.
+ *
+ * This is TradingView's model. Its line adapter has no order identity at all;
+ * it is a line at a price, and the host decides what it represents. The venue
+ * id is payload we carry for the host, not a name we answer to.
+ */
 export function getOemsOrderObjectId(line: OrderLineRenderData): string {
-  return line.orderId || line.id;
+  return line.id;
 }
 
 export function getOemsPositionObjectId(line: PositionLineRenderData): string {
-  return line.positionId || line.id;
+  return line.id;
 }
 
 export function getOemsOrderLineState(line: OrderLineRenderData): OemsTradingLineState {
