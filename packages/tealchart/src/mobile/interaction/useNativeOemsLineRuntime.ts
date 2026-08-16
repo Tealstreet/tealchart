@@ -51,6 +51,41 @@ import {
  *  stranded preview is not left on the chart. */
 const NATIVE_BRACKET_PREVIEW_HANDOFF_TIMEOUT_MS = 6000;
 
+export interface NativeOemsDragHandoff {
+  objectId: string;
+}
+
+/**
+ * Decides when a committed drag lets go of its line.
+ *
+ * Three states, and the third is the one that gets forgotten. A live gesture
+ * owns its line outright. A pending action means the optimistic price is drawn,
+ * so the preview has somewhere to hand off to. And an action that is simply
+ * *gone* - a rejected callback, a `false`, a timeout - has to release too, or
+ * the preview keeps drawing where the user dropped it while its drag zone stays
+ * at the price the venue still holds. The line then looks solid and untouchable:
+ * every tap lands on empty chart, because the line is not where it appears.
+ *
+ * `handoff` is set only between a commit and the projection catching up, which
+ * is what stops the gone-action branch from retiring a preview whose action has
+ * not been started yet - the commit reaches JS a frame after the finger lifts.
+ */
+export function shouldReleaseNativeOrderDragForSnapshot({
+  dragActive,
+  handoff,
+  hasAction,
+  pendingObserved,
+}: {
+  dragActive: boolean;
+  handoff: NativeOemsDragHandoff | null;
+  hasAction: (objectId: string) => boolean;
+  pendingObserved: boolean;
+}): boolean {
+  if (dragActive) return false;
+  if (pendingObserved) return true;
+  return handoff !== null && !hasAction(handoff.objectId);
+}
+
 export interface NativeOemsLineSnapshot {
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
@@ -105,6 +140,8 @@ export function useNativeOemsLineRuntime({
   const oemsActions = oemsActionsRef.current;
   const latestOrderLinesRef = useRef<OrderLineRenderData[]>([]);
   const latestPositionLinesRef = useRef<PositionLineRenderData[]>([]);
+  // Set only between an order commit and the projection carrying its price.
+  const orderHandoffRef = useRef<{ objectId: string } | null>(null);
   // Set only between a bracket commit and the projection carrying its price.
   const bracketHandoffRef = useRef<{
     objectId: string;
@@ -136,6 +173,7 @@ export function useNativeOemsLineRuntime({
   }, [rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
 
   const clearNativeOrderDrag = useCallback(() => {
+    orderHandoffRef.current = null;
     clearNativeOrderDragState(orderDragState);
   }, [orderDragState]);
 
@@ -172,6 +210,8 @@ export function useNativeOemsLineRuntime({
       });
       if (result.clearDrag) {
         clearNativeOrderDrag();
+      } else {
+        orderHandoffRef.current = { objectId };
       }
       if (result.forceUpdate) {
         forceUpdate();
@@ -237,16 +277,21 @@ export function useNativeOemsLineRuntime({
   );
 
   const syncNativeOrderDragStateForSnapshot = useCallback(() => {
-    if (
-      shouldClearNativeOrderDragForSnapshot({
+    const release = shouldReleaseNativeOrderDragForSnapshot({
+      dragActive: orderDragState.active.value,
+      handoff: orderHandoffRef.current,
+      hasAction: (objectId) => oemsActions.getAction('order', objectId) !== null,
+      pendingObserved: shouldClearNativeOrderDragForSnapshot({
         state: orderDragState,
         orderLines: lineSnapshot.orderLines,
         getOrderObjectId: getNativeOrderObjectId,
-      })
-    ) {
-      releaseNativeOrderDragAfterCommit();
-    }
-  }, [releaseNativeOrderDragAfterCommit, lineSnapshot.orderLines, orderDragState]);
+      }),
+    });
+    if (!release) return;
+
+    orderHandoffRef.current = null;
+    releaseNativeOrderDragAfterCommit();
+  }, [lineSnapshot.orderLines, oemsActions, orderDragState, releaseNativeOrderDragAfterCommit]);
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
     // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot`.

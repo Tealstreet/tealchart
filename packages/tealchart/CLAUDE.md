@@ -319,6 +319,20 @@ nothing until something else cleared it.
 The hand-off therefore also retires on a line that has **gone**, not only on one
 that went pending. `!line` is a terminal state, not a reason to keep waiting.
 
+**An action that fails still has to release the line.** A rejected callback, a
+`false`, or a timeout settles the action, and that can happen before any render
+sees it pending — so waiting for the pending state waits forever. The preview
+then keeps drawing where the user dropped it while its drag zone stays at the
+price the venue still holds: the line looks solid and healthy, and every tap
+lands on empty chart because it is not where it appears. `commitOrderMove`
+records a hand-off so `shouldReleaseNativeOrderDragForSnapshot` can tell "action
+gone" from "commit not started yet", which is the only reason that branch is
+safe.
+
+The host is not doing anything wrong here — throwing, rejecting, or returning
+`false` from `onMove` is the documented way to say a move failed, and the action
+layer honours it. It was the drag preview that had no failure path.
+
 **Nothing retires a live gesture.** The hand-off runs only while `active` is
 false, which is the whole reason these two pieces of state exist separately.
 Every retirement condition is true at some point during a normal drag — the
