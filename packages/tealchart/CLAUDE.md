@@ -319,6 +319,14 @@ nothing until something else cleared it.
 The hand-off therefore also retires on a line that has **gone**, not only on one
 that went pending. `!line` is a terminal state, not a reason to keep waiting.
 
+**Nothing retires a live gesture.** The hand-off runs only while `active` is
+false, which is the whole reason these two pieces of state exist separately.
+Every retirement condition is true at some point during a normal drag — the
+first snapshot after touch-down still carries the pre-drag price, so it matches
+`activePrice` exactly, and a snapshot arriving mid-amend may not carry the line
+at all. Firing on those dropped the line back where it started while the finger
+was still down, with `active` false afterwards so nothing could move it again.
+
 ## Frame timing on native
 
 Two bugs lived here, and both are invisible on web because the browser's
