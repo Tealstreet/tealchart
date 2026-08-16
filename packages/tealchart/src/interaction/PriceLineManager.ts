@@ -892,7 +892,7 @@ export class PriceLineManager {
         activeDrag.group.setAttr('lineY', movingY);
         dragRect.y(dragStartY);
         const currentBound = this.getCurrentBound(activeDrag.group, bound);
-        this.options.onOrderMoving?.(currentBound.orderId || currentBound.lineId, yToPrice(movingY));
+        this.options.onOrderMoving?.(currentBound.lineId, yToPrice(movingY));
         this.layer.batchDraw();
       });
 
@@ -913,7 +913,7 @@ export class PriceLineManager {
         dragRect.y(dragStartY);
 
         if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
-          this.options.onOrderMove?.(currentBound.orderId || currentBound.lineId, finalPrice);
+          this.options.onOrderMove?.(currentBound.lineId, finalPrice);
         } else {
           activeDrag.group.y(activeDrag.originalGroupY ?? 0);
           activeDrag.group.setAttr('lineY', activeDrag.originalY);
@@ -1094,7 +1094,7 @@ export class PriceLineManager {
               node: hitRect,
               type: 'tpsl',
               lineId: currentBound.lineId,
-              positionId: currentBound.positionId || currentBound.orderId || currentBound.lineId,
+              positionId: currentBound.lineId,
               buttonType,
               originalX,
               originalY,
@@ -1126,7 +1126,7 @@ export class PriceLineManager {
             if (buttonType === 'tp') {
               currentBound.callbacks?.onTPMove?.(price, partialPercent);
               this.options.onTPMovePreview?.(
-                activeDrag.positionId || currentBound.lineId,
+                currentBound.lineId,
                 price,
                 partialPercent,
                 activeDrag.startCenterX ?? startCenterX,
@@ -1135,7 +1135,7 @@ export class PriceLineManager {
             } else {
               currentBound.callbacks?.onSLMove?.(price, partialPercent);
               this.options.onSLMovePreview?.(
-                activeDrag.positionId || currentBound.lineId,
+                currentBound.lineId,
                 price,
                 partialPercent,
                 activeDrag.startCenterX ?? startCenterX,
@@ -1223,9 +1223,9 @@ export class PriceLineManager {
             const currentBound = this.getCurrentBound(group, bound);
             if (currentBound.actionState?.isPending) return;
             if (button.type === 'cancel') {
-              this.options.onOrderCancel?.(currentBound.orderId || currentBound.lineId);
+              this.options.onOrderCancel?.(currentBound.lineId);
             } else {
-              this.options.onPositionClose?.(currentBound.positionId || currentBound.lineId);
+              this.options.onPositionClose?.(currentBound.lineId);
             }
             this.options.onCursorChange?.('crosshair');
           });
@@ -1252,7 +1252,7 @@ export class PriceLineManager {
             e.cancelBubble = true;
             const currentBound = this.getCurrentBound(group, bound);
             if (currentBound.actionState?.isPending) return;
-            this.options.onPositionReverse?.(currentBound.positionId || currentBound.lineId);
+            this.options.onPositionReverse?.(currentBound.lineId);
             this.options.onCursorChange?.('crosshair');
           });
           hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));

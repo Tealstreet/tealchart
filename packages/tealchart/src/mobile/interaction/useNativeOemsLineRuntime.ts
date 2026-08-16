@@ -19,13 +19,10 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import {
-  getOemsOrderHoldSignature,
   getOemsOrderLineState,
   getOemsOrderObjectId,
-  getOemsPositionHoldSignature,
   getOemsPositionLineState,
   getOemsPositionObjectId,
-  OemsLineHold,
 } from '../../interaction/oemsLineState';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
 import {
@@ -125,33 +122,12 @@ export function useNativeOemsLineRuntime({
     confirmNativePositionLineSnapshots(oemsActions, rawLineSnapshot.positionLines);
   }, [oemsActions, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
 
-  // Held across renders: the hold has to remember the line that just left the
-  // feed, and a fresh projector every render would have nothing to remember.
-  const orderHoldRef = useRef<OemsLineHold<OrderLineRenderData> | null>(null);
-  if (!orderHoldRef.current) {
-    orderHoldRef.current = new OemsLineHold(
-      'order',
-      getOemsOrderObjectId,
-      getOemsOrderLineState,
-      applyNativeOrderActionState,
-      getOemsOrderHoldSignature,
-    );
-  }
-  const positionHoldRef = useRef<OemsLineHold<PositionLineRenderData> | null>(null);
-  if (!positionHoldRef.current) {
-    positionHoldRef.current = new OemsLineHold(
-      'position',
-      getOemsPositionObjectId,
-      getOemsPositionLineState,
-      applyNativePositionActionState,
-      getOemsPositionHoldSignature,
-    );
-  }
 
   const lineSnapshot = useMemo(
     () => ({
-      orderLines: orderHoldRef.current!.project(rawLineSnapshot.orderLines, oemsActions),
-      positionLines: positionHoldRef.current!.project(rawLineSnapshot.positionLines, oemsActions),
+
+      orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),
+      positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),
       executionLines: rawLineSnapshot.executionLines,
     }),
     [oemsActions, rawLineSnapshot.executionLines, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines],
@@ -164,6 +140,25 @@ export function useNativeOemsLineRuntime({
 
   const clearNativeOrderDrag = useCallback(() => {
     clearNativeOrderDragState(orderDragState);
+  }, [orderDragState]);
+
+  /**
+   * Hands the line back a frame late, on purpose.
+   *
+   * `livePrice` mixes a shared value with a captured one: it reads the drag off
+   * `dragState` but falls back to `line.price` from its closure. Clearing the
+   * drag re-evaluates that worklet on the UI thread immediately, while the
+   * closure carrying the optimistic price only reaches the UI thread on
+   * Reanimated's next propagation - so the line drew one frame at its ORIGINAL
+   * price before the new one landed. That is the flap on release.
+   *
+   * Waiting a frame lets the closure catch up first, so the drag lets go of a
+   * line that is already drawn where the user dropped it.
+   */
+  const releaseNativeOrderDragAfterCommit = useCallback(() => {
+    requestAnimationFrame(() => {
+      clearNativeOrderDragState(orderDragState);
+    });
   }, [orderDragState]);
 
   const clearNativeBracketDrag = useCallback(() => {
@@ -252,9 +247,9 @@ export function useNativeOemsLineRuntime({
         getOrderObjectId: getNativeOrderObjectId,
       })
     ) {
-      clearNativeOrderDrag();
+      releaseNativeOrderDragAfterCommit();
     }
-  }, [clearNativeOrderDrag, lineSnapshot.orderLines, orderDragState]);
+  }, [releaseNativeOrderDragAfterCommit, lineSnapshot.orderLines, orderDragState]);
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
     const pendingObserved = shouldClearNativeBracketDragForSnapshot({

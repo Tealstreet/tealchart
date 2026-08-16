@@ -1,3 +1,4 @@
+import { getOemsOrderObjectId, getOemsPositionObjectId } from '../../interaction/oemsLineState';
 import type { ChartDimensions } from './coordinates';
 import type { ChartLabelButton, ChartLabelSegment, OrderLineRenderData, PositionLineRenderData } from '../../types';
 
@@ -349,12 +350,15 @@ export function getNativeTradeLinePriceTagTextBaselineOffset(tradeLabelHeight: n
   return getNativeTradeLineTextBaselineOffset(tradeLabelHeight + 2);
 }
 
+// Delegating rather than re-deriving: this was a byte-identical third copy of
+// the same precedence, and the OEMS store is keyed by the shared one. Any drift
+// between them silently stops pending state from rendering.
 export function getNativeOrderObjectId(line: OrderLineRenderData): string {
-  return line.orderId || line.id;
+  return getOemsOrderObjectId(line);
 }
 
 export function getNativePositionObjectId(line: PositionLineRenderData): string {
-  return line.positionId || line.id;
+  return getOemsPositionObjectId(line);
 }
 
 function isOrderLineRenderData(line: OrderLineRenderData | PositionLineRenderData): line is OrderLineRenderData {

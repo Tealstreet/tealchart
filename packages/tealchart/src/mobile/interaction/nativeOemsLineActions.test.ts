@@ -20,8 +20,10 @@ function createManager(): OemsActionManager<NativeOemsTradingLineState> {
 
 function orderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRenderData {
   return {
-    id: 'generated-order',
-    orderId: 'order-1',
+    // The adapter id IS the identity; the venue id rides along as payload
+    // and is deliberately different, so a test keyed on it would fail.
+    id: 'order-1',
+    orderId: 'venue-order-1',
     price: 100,
     cancellable: true,
     brackets: { takeProfit: 120, stopLoss: 90 },
@@ -32,8 +34,8 @@ function orderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRende
 
 function positionLine(overrides: Partial<PositionLineRenderData> = {}): PositionLineRenderData {
   return {
-    id: 'generated-position',
-    positionId: 'position-1',
+    id: 'position-1',
+    positionId: 'venue-position-1',
     price: 100,
     brackets: { takeProfit: 120, stopLoss: 90 },
     callbacks: {},

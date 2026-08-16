@@ -17,12 +17,26 @@ export interface OemsTradingLineState extends OemsActionState {
   visible?: boolean;
 }
 
+/**
+ * A line's identity is the adapter it was drawn from, never the venue's id.
+ *
+ * `createOrderLine()` mints `order_1`, `order_2`... and hands back an adapter
+ * that lives until the host removes it. That id survives everything the venue
+ * does, which is the whole point: on most venues an amend is a cancel and a
+ * place, so `orderId` changes mid-action. Keying on it orphaned the pending
+ * action the moment the host re-pointed its adapter at the replacement, and the
+ * chart then redrew a line the host had already retired - two lines on screen.
+ *
+ * This is TradingView's model. Its line adapter has no order identity at all;
+ * it is a line at a price, and the host decides what it represents. The venue
+ * id is payload we carry for the host, not a name we answer to.
+ */
 export function getOemsOrderObjectId(line: OrderLineRenderData): string {
-  return line.orderId || line.id;
+  return line.id;
 }
 
 export function getOemsPositionObjectId(line: PositionLineRenderData): string {
-  return line.positionId || line.id;
+  return line.id;
 }
 
 export function getOemsOrderLineState(line: OrderLineRenderData): OemsTradingLineState {
@@ -137,88 +151,4 @@ export function confirmOemsPositionLineSnapshots(
       manager.confirmRemoved('position', action.objectId);
     }
   }
-}
-
-/**
- * Keeps a dragged line on the chart while the venue catches up.
- *
- * Without this, a host that does not maintain its own optimistic order store
- * gets a hole: the user drops a line, the app cancels the old order, the row
- * leaves the feed, and there is nothing left to draw the optimistic price on -
- * so the line vanishes until a replacement arrives seconds later. Hosts that DO
- * keep an optimistic store never hit it, because their row never leaves, which
- * is why this went unnoticed for so long.
- *
- * Two halves, and they only work together. Holding a vanished line without
- * retiring it would draw the held line AND the replacement side by side on any
- * venue where an amend is a cancel followed by a place - which is most of them.
- */
-export class OemsLineHold<TLine> {
-  private readonly lastSeen = new Map<string, TLine>();
-
-  constructor(
-    private readonly objectType: 'order' | 'position',
-    private readonly getId: (line: TLine) => string,
-    private readonly getState: (line: TLine) => OemsTradingLineState,
-    private readonly apply: (line: TLine, manager: OemsActionManager<OemsTradingLineState>) => TLine,
-    private readonly getSignature: (line: TLine) => string,
-  ) {}
-
-  project(lines: readonly TLine[], manager: OemsActionManager<OemsTradingLineState>): TLine[] {
-    const projected = lines.map((line) => this.apply(line, manager));
-
-    const present = new Set<string>();
-    for (const line of projected) {
-      const id = this.getId(line);
-      present.add(id);
-      this.lastSeen.set(id, line);
-    }
-
-    const actions = manager.getActions().filter((action) => action.objectType === this.objectType);
-    // A row that owns a pending action of its own is somebody else's; it must
-    // not be mistaken for the replacement another action is waiting on.
-    const spokenFor = new Set(actions.map((action) => action.objectId));
-
-    for (const action of actions) {
-      // A cancel is *supposed* to end with the row gone. Holding those would
-      // keep cancelled orders on the chart until the timeout.
-      if (action.confirmsRemoved) continue;
-      if (present.has(action.objectId)) continue;
-
-      const held = this.lastSeen.get(action.objectId);
-      if (!held) continue;
-
-      // The replacement, if it has arrived, is an unclaimed row that looks like
-      // what we dragged. `confirmState` still has the last word: it compares the
-      // optimistic price against the candidate within a tick, so a lookalike at
-      // a different price does not retire the hold.
-      const signature = this.getSignature(held);
-      const replacement = projected.find(
-        (line) => !spokenFor.has(this.getId(line)) && this.getSignature(line) === signature,
-      );
-      if (replacement && manager.confirmState(this.objectType, action.objectId, this.getState(replacement))) {
-        this.lastSeen.delete(action.objectId);
-        continue;
-      }
-
-      projected.push(this.apply(held, manager));
-    }
-
-    for (const id of Array.from(this.lastSeen.keys())) {
-      if (present.has(id) || spokenFor.has(id)) continue;
-      this.lastSeen.delete(id);
-    }
-
-    return projected;
-  }
-}
-
-/** Identity for a held line, minus the price - the price is what changed, and
- *  `confirmState` compares it separately with the venue's tick tolerance. */
-export function getOemsOrderHoldSignature(line: OrderLineRenderData): string {
-  return `${line.quantity}|${line.lineColor}`;
-}
-
-export function getOemsPositionHoldSignature(line: PositionLineRenderData): string {
-  return `${line.quantity}|${line.lineColor}`;
 }

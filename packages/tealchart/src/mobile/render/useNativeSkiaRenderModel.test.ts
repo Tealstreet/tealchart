@@ -44,7 +44,7 @@ const bars: Bar[] = [
 function createOrderLine(): OrderLineRenderData {
   return {
     id: 'adapter-order',
-    orderId: 'exchange-order',
+    orderId: 'adapter-order',
     price: 63500,
     quantity: '0.0003',
     quantityShort: '0.0003',
@@ -82,7 +82,7 @@ function createOrderLine(): OrderLineRenderData {
 function createPositionLine(): PositionLineRenderData {
   return {
     id: 'adapter-position',
-    positionId: 'position-btc',
+    positionId: 'adapter-position',
     price: 63777,
     quantity: '0.0024',
     quantityShort: '0.0024',
@@ -186,8 +186,8 @@ describe('useNativeSkiaRenderModel', () => {
       height: frame.mainPane.height,
     });
     expect(model.tradeLineGeometries.map((geometry) => `${geometry.objectType}:${geometry.objectId}`)).toEqual([
-      'order:exchange-order',
-      'position:position-btc',
+      'order:adapter-order',
+      'position:adapter-position',
     ]);
     expect(model.nativePriceLines.map((line) => line.id)).toEqual([
       'oracle',
@@ -198,10 +198,10 @@ describe('useNativeSkiaRenderModel', () => {
       'last-trade',
     ]);
     expect(model.nativePriceLines.flatMap((line) => (line.nativeBracketRef ? [line.nativeBracketRef] : []))).toEqual([
-      { objectType: 'order', objectId: 'exchange-order', bracketType: 'tp' },
-      { objectType: 'order', objectId: 'exchange-order', bracketType: 'sl' },
-      { objectType: 'position', objectId: 'position-btc', bracketType: 'tp' },
-      { objectType: 'position', objectId: 'position-btc', bracketType: 'sl' },
+      { objectType: 'order', objectId: 'adapter-order', bracketType: 'tp' },
+      { objectType: 'order', objectId: 'adapter-order', bracketType: 'sl' },
+      { objectType: 'position', objectId: 'adapter-position', bracketType: 'tp' },
+      { objectType: 'position', objectId: 'adapter-position', bracketType: 'sl' },
     ]);
     expect(model.priceAxisTagSources.map((source) => source.tagId)).toEqual([
       'priceLine:oracle',
@@ -210,8 +210,8 @@ describe('useNativeSkiaRenderModel', () => {
       'priceLine:adapter-position-tp',
       'priceLine:adapter-position-sl',
       'priceLine:last-trade',
-      'order:exchange-order',
-      'position:position-btc',
+      'order:adapter-order',
+      'position:adapter-position',
     ]);
   });
 
