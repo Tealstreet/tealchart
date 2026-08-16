@@ -18,6 +18,7 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
@@ -1401,13 +1402,33 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleNativeIndicatorPaneScale = useCallback(
     (paneId: string, yMin: number, yMax: number) => {
       indicatorManager?.setIndicatorPaneManualRange(paneId, yMin, yMax);
-      // The pane manager is now authoritative for this pane, so drop the live
-      // override in the same tick — leaving it would mask later auto-scale.
-      const { [paneId]: _committed, ...rest } = paneRangeOverrides.value;
-      paneRangeOverrides.value = rest;
     },
-    [indicatorManager, paneRangeOverrides],
+    [indicatorManager],
   );
+
+  // The override is what the layers drew from during the drag; the frame catches
+  // up a render later. Dropping it on commit meant those in-between frames fell
+  // back to the pre-drag range and the pane visibly snapped back before
+  // settling, so it is held until the frame agrees and only then released.
+  useEffect(() => {
+    const overrides = paneRangeOverrides.value;
+    const paneIds = Object.keys(overrides);
+    if (paneIds.length === 0 || !frame) return;
+
+    const remaining: NativePaneRangeOverrides = {};
+    let settled = false;
+    for (const paneId of paneIds) {
+      const override = overrides[paneId];
+      const pane = frame.panes.find((entry) => entry.id === paneId);
+      if (pane && pane.yMin === override.yMin && pane.yMax === override.yMax) {
+        settled = true;
+        continue;
+      }
+      if (pane) remaining[paneId] = override;
+      else settled = true;
+    }
+    if (settled) paneRangeOverrides.value = remaining;
+  }, [frame, paneRangeOverrides]);
 
   const handleNativePriceAxisResetTap = useCallback(() => {
     if (!hasDataViewport) return;

@@ -1,5 +1,4 @@
-import type { ChartPane } from './rendering/PaneManager';
-import type { ResolutionString, TealchartWidgetOptions } from './types';
+import type { ChartPane, ResolutionString, TealchartWidgetOptions } from './types';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -61,7 +60,7 @@ function createWidget(overrides: Partial<TealchartWidgetOptions> = {}): Tealchar
     symbol: 'BTCUSDT',
     interval: '60' as ResolutionString,
     datafeed: {
-      onReady: (cb) => setTimeout(() => cb({}), 0),
+      onReady: (cb: (configuration: unknown) => void) => setTimeout(() => cb({}), 0),
       resolveSymbol: () => {},
       getBars: () => {},
       subscribeBars: () => {},
