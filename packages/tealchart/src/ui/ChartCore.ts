@@ -55,6 +55,9 @@ import { OemsActionManager } from '../interaction/oemsActionManager';
 import {
   applyOemsOrderActionState,
   applyOemsPositionActionState,
+  getOemsOrderHoldSignature,
+  getOemsPositionHoldSignature,
+  OemsLineHold,
   confirmOemsOrderLineSnapshots,
   confirmOemsPositionLineSnapshots,
   getOemsOrderLineState,
@@ -432,6 +435,23 @@ export class ChartCore {
 
   // State
   private readonly oemsActions: OemsActionManager<OemsTradingLineState>;
+  // Keeps a dragged line on the chart while its row is out of the feed, and
+  // retires the hold when a matching row returns under any id. See the
+  // optimistic-holding section of this package's CLAUDE.md.
+  private readonly orderHold = new OemsLineHold<OrderLineRenderData>(
+    'order',
+    getOemsOrderObjectId,
+    getOemsOrderLineState,
+    applyOemsOrderActionState,
+    getOemsOrderHoldSignature,
+  );
+  private readonly positionHold = new OemsLineHold<PositionLineRenderData>(
+    'position',
+    getOemsPositionObjectId,
+    getOemsPositionLineState,
+    applyOemsPositionActionState,
+    getOemsPositionHoldSignature,
+  );
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
   /** Auto-scale computed Y ranges from AutoScaleManager (set by TealchartWidget each render) */
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
@@ -876,7 +896,7 @@ export class ChartCore {
 
     this.rawOrderLines = lines;
     this.confirmOrderLineSnapshots(lines);
-    this.orderLines = lines.map((line) => this.applyOrderActionState(line));
+    this.orderLines = this.orderHold.project(lines, this.oemsActions);
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -891,13 +911,13 @@ export class ChartCore {
 
     this.rawPositionLines = lines;
     this.confirmPositionLineSnapshots(lines);
-    this.positionLines = lines.map((line) => this.applyPositionActionState(line));
+    this.positionLines = this.positionHold.project(lines, this.oemsActions);
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
   private reapplyOemsActionState(): void {
-    this.orderLines = this.rawOrderLines.map((line) => this.applyOrderActionState(line));
-    this.positionLines = this.rawPositionLines.map((line) => this.applyPositionActionState(line));
+    this.orderLines = this.orderHold.project(this.rawOrderLines, this.oemsActions);
+    this.positionLines = this.positionHold.project(this.rawPositionLines, this.oemsActions);
   }
 
   private getOrderObjectId(line: OrderLineRenderData): string {
