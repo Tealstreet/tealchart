@@ -125,6 +125,7 @@ export function useNativeOemsLineRuntime({
 
   const lineSnapshot = useMemo(
     () => ({
+
       orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),
       positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),
       executionLines: rawLineSnapshot.executionLines,
@@ -139,6 +140,25 @@ export function useNativeOemsLineRuntime({
 
   const clearNativeOrderDrag = useCallback(() => {
     clearNativeOrderDragState(orderDragState);
+  }, [orderDragState]);
+
+  /**
+   * Hands the line back a frame late, on purpose.
+   *
+   * `livePrice` mixes a shared value with a captured one: it reads the drag off
+   * `dragState` but falls back to `line.price` from its closure. Clearing the
+   * drag re-evaluates that worklet on the UI thread immediately, while the
+   * closure carrying the optimistic price only reaches the UI thread on
+   * Reanimated's next propagation - so the line drew one frame at its ORIGINAL
+   * price before the new one landed. That is the flap on release.
+   *
+   * Waiting a frame lets the closure catch up first, so the drag lets go of a
+   * line that is already drawn where the user dropped it.
+   */
+  const releaseNativeOrderDragAfterCommit = useCallback(() => {
+    requestAnimationFrame(() => {
+      clearNativeOrderDragState(orderDragState);
+    });
   }, [orderDragState]);
 
   const clearNativeBracketDrag = useCallback(() => {
@@ -227,9 +247,9 @@ export function useNativeOemsLineRuntime({
         getOrderObjectId: getNativeOrderObjectId,
       })
     ) {
-      clearNativeOrderDrag();
+      releaseNativeOrderDragAfterCommit();
     }
-  }, [clearNativeOrderDrag, lineSnapshot.orderLines, orderDragState]);
+  }, [releaseNativeOrderDragAfterCommit, lineSnapshot.orderLines, orderDragState]);
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
     const pendingObserved = shouldClearNativeBracketDragForSnapshot({
