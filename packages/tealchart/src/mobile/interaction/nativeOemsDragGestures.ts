@@ -23,6 +23,7 @@ import {
   beginNativeBracketDragState,
   beginNativeOrderDragState,
   clearNativeBracketDragState,
+  releaseNativeBracketDragGesture,
   clearNativeOrderDragState,
   finalizeNativeBracketDragState,
   finalizeNativeOrderDragState,
@@ -239,7 +240,10 @@ export function createNativeBracketDragGesture({
         runOnJS(clearNativeBracketDrag)();
         return;
       }
-      clearNativeBracketDragState(bracketDragInteractionState);
+      // Gesture over, preview not. Only the commit branch hands off - the two
+      // branches above have no JS-side path that could ever retire a preview,
+      // so they must keep clearing outright.
+      releaseNativeBracketDragGesture(bracketDragInteractionState);
       runOnJS(commitBracketMove)(
         payload.objectType,
         payload.objectId,

@@ -51,6 +51,10 @@ import {
   type NativeOemsTradingLineState,
 } from './nativeOemsLineState';
 
+/** Long enough that a normal venue round trip never hits it, short enough that a
+ *  stranded preview is not left on the chart. */
+const NATIVE_BRACKET_PREVIEW_HANDOFF_TIMEOUT_MS = 6000;
+
 export interface NativeOemsLineSnapshot {
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
@@ -107,6 +111,13 @@ export function useNativeOemsLineRuntime({
   const oemsActions = oemsActionsRef.current;
   const latestOrderLinesRef = useRef<OrderLineRenderData[]>([]);
   const latestPositionLinesRef = useRef<PositionLineRenderData[]>([]);
+  // Set only between a bracket commit and the projection carrying its price.
+  const bracketHandoffRef = useRef<{
+    objectId: string;
+    objectType: NativeTradeLineObjectType;
+    seq: number;
+  } | null>(null);
+  const bracketHandoffSeqRef = useRef(0);
   const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
 
   useEffect(() => {
@@ -196,7 +207,20 @@ export function useNativeOemsLineRuntime({
         partialPercent,
       });
       if (result.clearDrag) {
+        bracketHandoffRef.current = null;
         clearNativeBracketDrag();
+      } else {
+        // Sequenced so a second drag voids the first drag's timeout: without it
+        // a re-drag of the same object inherits a timer that fires mid-gesture
+        // and drops the edit.
+        const seq = bracketHandoffSeqRef.current + 1;
+        bracketHandoffSeqRef.current = seq;
+        bracketHandoffRef.current = { objectId, objectType, seq };
+        setTimeout(() => {
+          if (bracketHandoffRef.current?.seq !== seq) return;
+          bracketHandoffRef.current = null;
+          clearNativeBracketDrag();
+        }, NATIVE_BRACKET_PREVIEW_HANDOFF_TIMEOUT_MS);
       }
       if (result.forceUpdate) {
         forceUpdate();
@@ -233,18 +257,25 @@ export function useNativeOemsLineRuntime({
   }, [clearNativeOrderDrag, lineSnapshot.orderLines, orderDragState]);
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
-    if (
-      shouldClearNativeBracketDragForSnapshot({
-        state: bracketDragState,
-        orderLines: lineSnapshot.orderLines,
-        positionLines: lineSnapshot.positionLines,
-        getOrderObjectId: getNativeOrderObjectId,
-        getPositionObjectId: getNativePositionObjectId,
-      })
-    ) {
-      clearNativeBracketDrag();
-    }
-  }, [bracketDragState, clearNativeBracketDrag, lineSnapshot.orderLines, lineSnapshot.positionLines]);
+    const pendingObserved = shouldClearNativeBracketDragForSnapshot({
+      state: bracketDragState,
+      orderLines: lineSnapshot.orderLines,
+      positionLines: lineSnapshot.positionLines,
+      getOrderObjectId: getNativeOrderObjectId,
+      getPositionObjectId: getNativePositionObjectId,
+    });
+    // `handoff` is set only between a commit and the projection catching up, so
+    // this cannot retire a preview whose action has not been started yet. Within
+    // that window a bracket action settles on its callback rather than on the
+    // feed, so it can be gone before any render sees it pending - retiring on
+    // "no action either" is what keeps that case off the timeout.
+    const handoff = bracketHandoffRef.current;
+    const settled = handoff ? !oemsActions.getAction(handoff.objectType, handoff.objectId) : false;
+    if (!pendingObserved && !settled) return;
+
+    bracketHandoffRef.current = null;
+    clearNativeBracketDrag();
+  }, [bracketDragState, clearNativeBracketDrag, lineSnapshot.orderLines, lineSnapshot.positionLines, oemsActions]);
 
   const syncNativeOemsDragStateForSnapshot = useCallback(() => {
     syncNativeOrderDragStateForSnapshot();

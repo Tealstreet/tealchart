@@ -208,6 +208,23 @@ export function getNativeBracketDragCommit(
   };
 }
 
+/**
+ * Ends the gesture without ending the preview.
+ *
+ * `active` is what the other gestures arbitrate on - axis pinch, the TP/SL tap
+ * targets and this gesture's own touch guard all refuse to start while it is
+ * true - so it has to fall on the frame the finger lifts. The preview draws off
+ * `activeObjectId` instead, which survives until the projection carries the
+ * optimistic price and `shouldClearNativeBracketDragForSnapshot` retires it.
+ *
+ * Clearing both here is what put a blank frame between the preview vanishing on
+ * the UI thread and `runOnJS(commitBracketMove)` landing on the JS thread.
+ */
+export function releaseNativeBracketDragGesture(state: NativeBracketDragInteractionState): void {
+  'worklet';
+  state.active.value = false;
+}
+
 export function finalizeNativeBracketDragState(state: NativeBracketDragInteractionState, success: boolean): boolean {
   'worklet';
   if (!state.active.value || success) return false;

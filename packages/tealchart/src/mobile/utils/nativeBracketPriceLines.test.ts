@@ -71,6 +71,55 @@ describe('native bracket price lines', () => {
     ]);
   });
 
+  // A bracket IS an order. While an optimistic bracket is pending, the host's
+  // own optimistic order row lands at the same price, and the chart drew the
+  // price twice - dashed in the bracket colour and again as the order line.
+  describe('order line dedupe', () => {
+    const bracketedLine = {
+      id: 'adapter-id',
+      price: 100,
+      brackets: { takeProfit: 120, stopLoss: 90 },
+    } as OrderLineRenderData;
+
+    const build = (orderLines: OrderLineRenderData[], priceTolerance = 0.5) =>
+      createNativeBracketPriceLines({
+        objectType: 'position',
+        objectId: 'position-1',
+        line: bracketedLine,
+        pricePrecision: 0.1,
+        positiveColor: '#12c48b',
+        orderLines,
+        priceTolerance,
+      }).map((line) => line.id);
+
+    it('drops a bracket already drawn by an order line at the same price', () => {
+      expect(build([{ id: 'optimistic', price: 90 } as OrderLineRenderData])).toEqual(['adapter-id-tp']);
+    });
+
+    it('tolerates the venue rounding the price to its own tick', () => {
+      expect(build([{ id: 'real', price: 90.4 } as OrderLineRenderData])).toEqual(['adapter-id-tp']);
+    });
+
+    it('keeps both brackets when no order line covers them', () => {
+      expect(build([{ id: 'entry', price: 100 } as OrderLineRenderData])).toEqual([
+        'adapter-id-tp',
+        'adapter-id-sl',
+      ]);
+    });
+
+    it('keeps every bracket when the caller passes no order lines', () => {
+      expect(
+        createNativeBracketPriceLines({
+          objectType: 'position',
+          objectId: 'position-1',
+          line: bracketedLine,
+          pricePrecision: 0.1,
+          positiveColor: '#12c48b',
+        }).map((line) => line.id),
+      ).toEqual(['adapter-id-tp', 'adapter-id-sl']);
+    });
+  });
+
   it('matches active bracket drag state by object type, object id, and bracket type', () => {
     const bracketRef = {
       objectType: 'order' as const,
