@@ -163,6 +163,44 @@ describe('NativeChartLegendOverlay', () => {
     expect(texts).toEqual(expect.arrayContaining(['MACD', '12 · 26 · 9']));
   });
 
+  it('routes indicator-pane legend actions through onPress too', () => {
+    const onRemoveIndicator = vi.fn();
+    const onToggleIndicator = vi.fn();
+    const legend = NativeChartLegendOverlayImpl({
+      activeIndicators: [{ id: 'study_2', inputs: { fast: 12, slow: 26, signal: 9 }, isVisible: false, name: 'MACD' }],
+      bars,
+      downColor: '#f04465',
+      frame: frameWithIndicatorPane,
+      gridColor: '#1f2630',
+      indicatorPaneInfo: {
+        study_2: { inputs: { fast: 12, slow: 26, signal: 9 }, name: 'MACD', overlay: false, paneId: 'pane_1' },
+      },
+      interval: '15',
+      isLoading: false,
+      leftToolRailLayout: null,
+      mutedTextColor: '#8a8f98',
+      onRemoveIndicator,
+      onToggleIndicator,
+      pricePrecision: 0.1,
+      symbol: 'BTC-USD',
+      textColor: '#f0f3fa',
+      upColor: '#12c48b',
+    });
+
+    const buttons = collectElementsByType(legend, Pressable);
+    const removePress = buttons.find((button) => button.props.accessibilityLabel === 'Remove MACD')?.props.onPress;
+    const hidePress = buttons.find((button) => button.props.accessibilityLabel === 'Show MACD')?.props.onPress;
+
+    expect(removePress).toBeInstanceOf(Function);
+    expect(hidePress).toBeInstanceOf(Function);
+
+    removePress?.();
+    hidePress?.();
+
+    expect(onRemoveIndicator).toHaveBeenCalledWith('study_2');
+    expect(onToggleIndicator).toHaveBeenCalledWith('study_2');
+  });
+
   it('resolves measured action button layouts into absolute overlay hit targets', () => {
     const targets = resolveNativeLegendActionTargets({
       actionLayouts: {

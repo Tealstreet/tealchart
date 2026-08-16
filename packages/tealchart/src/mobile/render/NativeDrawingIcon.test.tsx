@@ -69,4 +69,12 @@ describe('NativeDrawingIcon', () => {
   it('returns null for unknown icon names', () => {
     expect(NativeDrawingIconImpl({ name: 'not-authored' })).toBeNull();
   });
+
+  // The Skia canvas is touch-opaque. Without this the glyph swallows taps aimed
+  // at the button drawing it, leaving only the margin around it pressable.
+  it('never takes touches away from the control drawing it', () => {
+    const icon = NativeDrawingIconImpl({ color: '#d1d4dc', name: 'trash', size: 14, strokeWidth: 2 });
+
+    expect((icon as ReactElement).props.pointerEvents).toBe('none');
+  });
 });
