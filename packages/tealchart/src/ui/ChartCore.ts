@@ -53,6 +53,12 @@ import {
 import { EventManager } from '../interaction/EventManager';
 import { OemsActionManager } from '../interaction/oemsActionManager';
 import {
+  PARTIAL_BRACKET_MARKER_INTERVAL,
+  PARTIAL_BRACKET_PERCENTS,
+  PARTIAL_BRACKET_ZONE_HALF_WIDTH,
+  resolvePartialBracketMarkers,
+} from '../interaction/partialBrackets';
+import {
   applyOemsOrderActionState,
   applyOemsPositionActionState,
   getOemsOrderHoldSignature,
@@ -2728,11 +2734,15 @@ export class ChartCore {
     ctx.save();
 
     // ========= Zone visualization =========
-    const zoneHalfWidth = 220;
     const centerX = state.dragStartX;
-    const cursorOnRight = state.dragCurrentX > centerX;
-    const leftEdge = Math.max(0, centerX - zoneHalfWidth);
-    const rightEdge = Math.min(chartWidth, centerX + zoneHalfWidth);
+    // The zone follows the arm being dragged, like the marker ladder above it.
+    // A two-sided zone under a one-sided ladder reads as a bug.
+    const armEdge =
+      state.dragCurrentX < centerX
+        ? Math.max(0, centerX - PARTIAL_BRACKET_ZONE_HALF_WIDTH)
+        : Math.min(chartWidth, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH);
+    const leftEdge = Math.min(centerX, armEdge);
+    const rightEdge = Math.max(centerX, armEdge);
 
     const top = Math.min(entryY, bracketY);
     const bottom = Math.max(entryY, bracketY);
@@ -2768,17 +2778,14 @@ export class ChartCore {
       }
       ctx.stroke();
 
-      // Zone boundary lines at 55px intervals
+      // Boundary lines sit under their own markers, on the dragged arm only.
       ctx.globalAlpha = 0.3;
-      const zoneOffsets = [55, 110, 165];
-      for (const offset of zoneOffsets) {
+      const boundaryDirection = state.dragCurrentX < centerX ? -1 : 1;
+      for (let index = 1; index < PARTIAL_BRACKET_PERCENTS.length; index += 1) {
+        const boundaryX = centerX + boundaryDirection * index * PARTIAL_BRACKET_MARKER_INTERVAL;
         ctx.beginPath();
-        ctx.moveTo(centerX - offset, top);
-        ctx.lineTo(centerX - offset, bottom);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(centerX + offset, top);
-        ctx.lineTo(centerX + offset, bottom);
+        ctx.moveTo(boundaryX, top);
+        ctx.lineTo(boundaryX, bottom);
         ctx.stroke();
       }
 
@@ -2794,44 +2801,42 @@ export class ChartCore {
       const labelBoxY = isDraggingUp ? top - 4 - boxHeight : bottom + 4;
       const labelTextY = labelBoxY + boxHeight / 2;
 
-      const bottomLabels = [
-        { percent: 10, x: leftEdge, side: 'left' as const },
-        { percent: 25, x: centerX - 165, side: 'left' as const },
-        { percent: 50, x: centerX - 110, side: 'left' as const },
-        { percent: 75, x: centerX - 55, side: 'left' as const },
-        { percent: 100, x: centerX, side: 'center' as const },
-        { percent: 75, x: centerX + 55, side: 'right' as const },
-        { percent: 50, x: centerX + 110, side: 'right' as const },
-        { percent: 25, x: centerX + 165, side: 'right' as const },
-        { percent: 10, x: rightEdge, side: 'right' as const },
-      ];
+      // Same ladder native draws: one arm, dimmed rather than overlapping, and
+      // shifted as a piece to stay inside the zone. Canvas measures per string
+      // while native approximates from one character, so the shared resolver
+      // takes a character width - '%' and the digits are close enough at this
+      // size, and the box is padded either way.
+      const characterWidth = ctx.measureText('0').width;
+      const markers = resolvePartialBracketMarkers({
+        dragStartX: centerX,
+        currentX: state.dragCurrentX,
+        zoneLeft: leftEdge,
+        zoneRight: rightEdge,
+        characterWidth,
+        paddingX: padding,
+        minGap: 8,
+      });
 
-      for (const label of bottomLabels) {
-        const text = label.percent + '%';
-        const textWidth = ctx.measureText(text).width;
-        const boxWidth = textWidth + padding * 2;
-        const boxX = label.x - boxWidth / 2;
+      for (const marker of markers) {
+        const boxX = marker.centerX - marker.width / 2;
+        const isHighlighted = marker.isActive;
 
-        const isHighlighted =
-          label.percent === state.partialPercent &&
-          (label.side === 'center' ||
-            (label.side === 'right' && cursorOnRight) ||
-            (label.side === 'left' && !cursorOnRight));
-
+        ctx.globalAlpha = marker.opacity;
         if (isHighlighted) {
           ctx.fillStyle = color;
-          ctx.globalAlpha = 0.3;
-          ctx.fillRect(boxX, labelBoxY, boxWidth, boxHeight);
-          ctx.globalAlpha = 1.0;
+          ctx.globalAlpha = 0.3 * marker.opacity;
+          ctx.fillRect(boxX, labelBoxY, marker.width, boxHeight);
+          ctx.globalAlpha = marker.opacity;
         }
 
         ctx.fillStyle = bgColor;
-        ctx.fillRect(boxX, labelBoxY, boxWidth, boxHeight);
+        ctx.fillRect(boxX, labelBoxY, marker.width, boxHeight);
         ctx.strokeStyle = isHighlighted ? color : borderColor;
         ctx.lineWidth = 1;
-        ctx.strokeRect(boxX, labelBoxY, boxWidth, boxHeight);
+        ctx.strokeRect(boxX, labelBoxY, marker.width, boxHeight);
         ctx.fillStyle = isHighlighted ? color : '#787b86';
-        ctx.fillText(text, label.x, labelTextY);
+        ctx.fillText(marker.text, marker.centerX, labelTextY);
+        ctx.globalAlpha = 1.0;
       }
     }
 
@@ -2863,21 +2868,19 @@ export class ChartCore {
 
     let cornerX: number;
     if (isPartialMode) {
-      const offset =
-        state.partialPercent === 100
-          ? 0
-          : state.partialPercent === 75
-            ? 55
-            : state.partialPercent === 50
-              ? 110
-              : state.partialPercent === 25
-                ? 165
-                : 220;
-      if (offset === 0) {
-        cornerX = centerX;
-      } else {
-        cornerX = cursorOnRight ? centerX + offset : centerX - offset;
-      }
+      // The ladder was written out a second time here; it comes from the same
+      // resolver as the markers now, so the pill cannot point somewhere no
+      // marker sits.
+      const activeMarker = resolvePartialBracketMarkers({
+        dragStartX: centerX,
+        currentX: state.dragCurrentX,
+        zoneLeft: Math.max(0, centerX - PARTIAL_BRACKET_ZONE_HALF_WIDTH),
+        zoneRight: Math.min(chartWidth, centerX + PARTIAL_BRACKET_ZONE_HALF_WIDTH),
+        characterWidth: 0,
+        paddingX: 0,
+        minGap: 0,
+      }).find((marker) => marker.isActive);
+      cornerX = activeMarker ? activeMarker.centerX : centerX;
     } else {
       cornerX = state.dragStartX;
     }
