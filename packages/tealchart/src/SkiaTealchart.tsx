@@ -471,6 +471,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     priceAutoScale,
     priceScaleActive,
     priceScaleGestureState,
+    paneRangeOverrides,
     sharedPriceAxisTagSources,
     sharedViewport,
     timeScaleActive,
@@ -1400,8 +1401,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleNativeIndicatorPaneScale = useCallback(
     (paneId: string, yMin: number, yMax: number) => {
       indicatorManager?.setIndicatorPaneManualRange(paneId, yMin, yMax);
+      // The pane manager is now authoritative for this pane, so drop the live
+      // override in the same tick — leaving it would mask later auto-scale.
+      const { [paneId]: _committed, ...rest } = paneRangeOverrides.value;
+      paneRangeOverrides.value = rest;
     },
-    [indicatorManager],
+    [indicatorManager, paneRangeOverrides],
   );
 
   const handleNativePriceAxisResetTap = useCallback(() => {
@@ -1467,6 +1472,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     overlayActionTargets: nativeOverlayActionTargets,
     onDrawingTap: handleNativeUserDrawingTap,
     onIndicatorPaneScale: handleNativeIndicatorPaneScale,
+    paneRangeOverrides,
     onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
     onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
     onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,
@@ -1573,6 +1579,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 hasContextMenu={hasNativeContextMenu}
                 indicatorPaneInfo={nativeIndicatorPaneInfo}
                 indicatorPlots={nativeIndicatorPlots}
+                paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
                 options={options}

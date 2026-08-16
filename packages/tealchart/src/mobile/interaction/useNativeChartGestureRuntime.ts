@@ -2,6 +2,7 @@ import type { GestureType, SimultaneousGesture } from 'react-native-gesture-hand
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
+import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeSelectedDrawingActionHitTarget } from '../render/NativeUserDrawingSelectionActionOverlay';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
@@ -83,6 +84,7 @@ export interface NativeChartGestureRuntimeInput {
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   onDrawingTap: (x: number, y: number) => void;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   onDrawingEditDragBegin: (x: number, y: number) => void;
   onDrawingEditDragEnd: () => void;
   onDrawingEditDragMove: (x: number, y: number) => void;
@@ -165,6 +167,7 @@ export function useNativeChartGestureRuntime({
   orderDragZones,
   onDrawingTap,
   onIndicatorPaneScale,
+  paneRangeOverrides,
   onDrawingEditDragBegin,
   onDrawingEditDragEnd,
   onDrawingEditDragMove,
@@ -253,6 +256,8 @@ export function useNativeChartGestureRuntime({
       beginNativeViewportInteraction: stableBeginNativeViewportInteraction,
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       chartPanGestureState,
+      onIndicatorPaneScale: stableOnIndicatorPaneScale,
+      paneRangeOverrides,
       commitPanViewport: stableCommitPanViewport,
       controlZones,
       crosshair,
@@ -595,6 +600,7 @@ export function useNativeChartGestureRuntime({
       controlZones,
       frame: chartInteractionFrame,
       onIndicatorPaneScale: stableOnIndicatorPaneScale,
+      paneRangeOverrides,
       priceScaleActive,
       priceScaleGestureState,
       sharedViewport,
@@ -602,6 +608,7 @@ export function useNativeChartGestureRuntime({
   }, [
     chartInteractionFrame,
     controlZones,
+    paneRangeOverrides,
     priceScaleActive,
     priceScaleGestureState,
     sharedViewport,
