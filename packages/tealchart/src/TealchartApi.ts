@@ -393,6 +393,13 @@ export function getTealchartApiLineRenderSnapshot(api: TealchartApi): TealchartA
 /**
  * Per-chart API (equivalent to TradingView's IChartWidgetApi)
  */
+/**
+ * Long enough to cover a host's async reconcile - it removes the stale line and
+ * creates the replacement either side of an await - and short enough that a
+ * genuine cancel still feels immediate.
+ */
+const LINE_REMOVAL_COALESCE_MS = 250;
+
 export class TealchartApi {
   private _symbol: string;
   private _interval: ResolutionString;
@@ -410,6 +417,69 @@ export class TealchartApi {
   private _executionLines: Map<string, InternalExecutionLineAdapter> = new Map();
   private _lineIdCounter = 0;
   private _onLinesChanged?: () => void;
+  private _lineChangeFrame: ReturnType<typeof requestAnimationFrame> | null = null;
+  private _lineRemovalTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly _pendingLineRemovals = new Map<string, () => void>();
+
+  /**
+   * Coalesce line changes to a frame, the way TradingView repaints.
+   *
+   * A host reconciling its feed removes stale lines and creates replacements in
+   * one pass, and that pass is async - it awaits between the two. Notifying on a
+   * microtask let a render land in that gap and paint a frame with the line
+   * missing, which is the flap you see when dragging an order: the line is
+   * deleted and recreated by the host, and only this chart was fast enough to
+   * draw the hole. TradingView repaints on its own frame and never sees it.
+   *
+   * Costs at most one frame of latency on a line update, which is what the
+   * renderer would have waited for anyway.
+   */
+  private _notifyLinesChanged(): void {
+    if (this._lineChangeFrame !== null) return;
+    this._lineChangeFrame = requestAnimationFrame(() => {
+      this._lineChangeFrame = null;
+      this._onLinesChanged?.();
+    });
+  }
+
+  /**
+   * Defers a line's DELETION, not its notification.
+   *
+   * A host reconciling its feed removes a stale line and creates its
+   * replacement in two different passes - the optimistic row expires in one
+   * store update, the replacement arrives in the next - so they are real time
+   * apart. Painting between them draws a frame with no line, which is the flap
+   * when dragging an order. Web never shows it because the browser's animation
+   * frame collapses the paint; Skia commits per notification and draws it.
+   *
+   * Deferring the NOTIFICATION does not work: any unrelated line ticking
+   * triggers one, and with live orders that happens constantly - the removal
+   * gets painted by the next price update long before the replacement lands.
+   * So the line stays in the snapshot instead, and creating any line flushes
+   * the pending removals first, collapsing remove-then-create into a single
+   * paint of the replacement alone. No hole, and no duplicate either.
+   *
+   * A removal with nothing behind it simply lands a beat later.
+   */
+  private _flushPendingLineRemovals(): void {
+    if (this._pendingLineRemovals.size === 0) return;
+    for (const drop of this._pendingLineRemovals.values()) drop();
+    this._pendingLineRemovals.clear();
+    if (this._lineRemovalTimer !== null) {
+      clearTimeout(this._lineRemovalTimer);
+      this._lineRemovalTimer = null;
+    }
+  }
+
+  private _deferLineRemoval(key: string, drop: () => void): void {
+    this._pendingLineRemovals.set(key, drop);
+    if (this._lineRemovalTimer !== null) return;
+    this._lineRemovalTimer = setTimeout(() => {
+      this._lineRemovalTimer = null;
+      this._flushPendingLineRemovals();
+      this._notifyLinesChanged();
+    }, LINE_REMOVAL_COALESCE_MS);
+  }
   private _onOrderPriceChanged?: (orderId: string, newPrice: number) => void;
 
   // Studies
@@ -619,6 +689,8 @@ export class TealchartApi {
    */
   createOrderLine(options?: OrderLineOptions): Promise<FullOrderLineAdapter> {
     const id = `order_${++this._lineIdCounter}`;
+    // A replacement arriving is what the deferred removals were waiting for.
+    this._flushPendingLineRemovals();
     const adapter = this._createOrderLineAdapter(id, options);
     this._orderLines.set(id, adapter);
     this._onLinesChanged?.();
@@ -715,22 +787,18 @@ export class TealchartApi {
     const orderLines = this._orderLines;
     const onOrderPriceChanged = () => this._onOrderPriceChanged;
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
-    let notifyPending = false;
     const notifyChange = () => {
-      if (!notifyPending) {
-        notifyPending = true;
-        queueMicrotask(() => {
-          notifyPending = false;
-          this._onLinesChanged?.();
-        });
-      }
+      this._notifyLinesChanged();
+    };
+    const deferRemoval = (key: string, drop: () => void) => {
+      this._deferLineRemoval(key, drop);
+      this._notifyLinesChanged();
     };
 
     const adapter: InternalOrderLineAdapter = {
       // Lifecycle
       remove() {
-        orderLines.delete(id);
-        notifyChange();
+        deferRemoval(`order:${id}`, () => orderLines.delete(id));
       },
 
       // Price
@@ -1158,15 +1226,8 @@ export class TealchartApi {
     // Capture references for closure
     const positionLines = this._positionLines;
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
-    let notifyPending = false;
     const notifyChange = () => {
-      if (!notifyPending) {
-        notifyPending = true;
-        queueMicrotask(() => {
-          notifyPending = false;
-          this._onLinesChanged?.();
-        });
-      }
+      this._notifyLinesChanged();
     };
 
     const adapter: InternalPositionLineAdapter = {
@@ -1566,15 +1627,8 @@ export class TealchartApi {
     };
 
     const executionLines = this._executionLines;
-    let notifyPending = false;
     const notifyChange = () => {
-      if (!notifyPending) {
-        notifyPending = true;
-        queueMicrotask(() => {
-          notifyPending = false;
-          this._onLinesChanged?.();
-        });
-      }
+      this._notifyLinesChanged();
     };
 
     const adapter: InternalExecutionLineAdapter = {
@@ -1888,6 +1942,15 @@ export class TealchartApi {
    * @internal Clean up all subscriptions, lines, and studies
    */
   dispose(): void {
+    if (this._lineRemovalTimer !== null) {
+      clearTimeout(this._lineRemovalTimer);
+      this._lineRemovalTimer = null;
+    }
+    this._pendingLineRemovals.clear();
+    if (this._lineChangeFrame !== null) {
+      cancelAnimationFrame(this._lineChangeFrame);
+      this._lineChangeFrame = null;
+    }
     this._crossHairMovedSubscription.clear();
     this._symbolChangedSubscription.clear();
     this._intervalChangedSubscription.clear();
