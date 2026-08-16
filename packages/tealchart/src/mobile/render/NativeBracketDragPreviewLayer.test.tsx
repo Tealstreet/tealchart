@@ -15,7 +15,8 @@ import {
   shouldShowNativeBracketPartialMarker,
 } from './NativeBracketDragPreviewLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import { NativePriceAxisTagAnimatedText } from './NativePriceAxisTag';
+import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativePriceAxisTag';
+import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../../constants';
 
 function shared<T>(value: T) {
   return { value };
@@ -218,8 +219,31 @@ describe('AnimatedBracketDragPreview', () => {
     const labels = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
 
     expect(labels).toHaveLength(1);
-    expect(labels[0].props.text.value).toBe('TP 63,777');
-    expect(labels[0].props.maxCharacters).toBeGreaterThanOrEqual('TP 63,777'.length);
+    expect(labels[0].props.text.value).toBe('63,777');
+    expect(labels[0].props.maxCharacters).toBeGreaterThanOrEqual('63,777'.length);
+  });
+
+  // Web's preview tag fills solid with the bracket colour and writes dark text
+  // on it (ChartCore._drawBracketPreviewPriceAxisLabel), and so does the real
+  // bracket line's tag via `label.filled`. This one drew a dark box with a
+  // coloured outline, which made the tag the user is actually watching the only
+  // one styled differently.
+  it('fills the drag tag with the bracket colour rather than outlining a dark box', () => {
+    const layer = AnimatedBracketDragPreview({
+      axisFont: matchFont({ fontSize: 11 }),
+      dragState: bracketDragState(),
+      frame,
+      pricePrecision: 0,
+      resolvedPriceAxisTags: shared([]),
+      sharedViewport,
+    });
+    const boxes = collectElementsByType(layer, NativePriceAxisTagBox);
+    const labels = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
+
+    expect(boxes).toHaveLength(1);
+    expect(boxes[0].props.backgroundColor.value).toBe('#f97316');
+    expect(boxes[0].props.borderColor.value).toBe('#f97316');
+    expect(labels[0].props.color).toBe(DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR);
   });
 
   // The button fill is tinted down to sit behind label text, so stroking the
@@ -259,7 +283,7 @@ describe('AnimatedBracketDragPreview', () => {
     const boundaries = collectElementsByType(layer, NativePartialBoundaryLine);
 
     expect(labels).toHaveLength(1);
-    expect(labels[0].props.text.value).toBe('TP 63,777');
+    expect(labels[0].props.text.value).toBe('63,777');
     expect(labels[0].props.maxCharacters).toBe(Number.MAX_SAFE_INTEGER);
     expect(labels[0].props.characterSet).not.toContain('%');
     expect(markers).toHaveLength(NATIVE_BRACKET_PARTIAL_MARKER_TEXTS.length);
@@ -283,6 +307,6 @@ describe('AnimatedBracketDragPreview', () => {
     const labels = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
 
     expect(labels).toHaveLength(1);
-    expect(labels[0].props.text.value).toBe('TP 63,777');
+    expect(labels[0].props.text.value).toBe('63,777');
   });
 });

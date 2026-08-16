@@ -24,6 +24,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // jsdom setup dominates this suite (~11 min cumulative across 151 files), so
+    // wholly synchronous DOM tests can still exceed the 5s default when CI runs
+    // them in parallel. The tests are not slow; the environment is.
+    testTimeout: 30000,
+    hookTimeout: 30000,
     passWithNoTests: true,
     cache: {
       dir: '../../.cache/vitest/tealchart',

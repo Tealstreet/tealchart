@@ -2833,7 +2833,7 @@ export class ChartCore {
       ctx.setLineDash([]);
 
       // Partial % labels
-      ctx.font = '10px sans-serif';
+      ctx.font = `10px ${this.renderer.getFont()}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       const padding = 3;
@@ -2929,7 +2929,7 @@ export class ChartCore {
       cornerX = state.dragStartX;
     }
 
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.renderer.getFont()}`;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.setLineDash([]);
@@ -2992,7 +2992,7 @@ export class ChartCore {
 
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'left';
-      ctx.font = '10px sans-serif';
+      ctx.font = `10px ${this.renderer.getFont()}`;
       const rightLabelX = vertLineX + 6;
 
       const priceRange = state.price - state.entryPrice;
@@ -3063,7 +3063,7 @@ export class ChartCore {
     ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 2);
     ctx.fill();
     ctx.fillStyle = DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR;
-    ctx.font = '11px sans-serif';
+    ctx.font = `11px ${this.renderer.getFont()}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(priceText, labelX + labelWidth / 2, labelY + labelHeight / 2);
