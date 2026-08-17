@@ -106,7 +106,12 @@ export function NativeChartCanvasLayers({
 }: NativeChartCanvasLayersProps) {
   return (
     <>
-      <NativeChartChromeLayer backgroundColor={backgroundColor} frame={frame} gridColor={gridColor} />
+      <NativeChartChromeLayer
+        backgroundColor={backgroundColor}
+        frame={frame}
+        gridColor={gridColor}
+        separatorColor={textColor}
+      />
 
       {hasDataViewport && (
         <Group opacity={plotOpacity}>

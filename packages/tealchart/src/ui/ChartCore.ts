@@ -39,6 +39,8 @@ import {
   DEFAULT_BUY_CANDLE_COLOR,
   DEFAULT_SELL_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+  PANE_DIVIDER_HIGHLIGHT_BAND,
+  PANE_DIVIDER_HIGHLIGHT_LINE,
   STOP_LOSS_COLOR,
 } from '../constants';
 import {
@@ -221,8 +223,6 @@ export interface ChartCoreOptions {
 const PANE_OVERLAY_TOP_OFFSET = 0;
 
 // TradingView-style blue resize highlight drawn over a hovered pane divider.
-const PANE_DIVIDER_HIGHLIGHT_BAND = 'rgba(41, 98, 255, 0.12)';
-const PANE_DIVIDER_HIGHLIGHT_LINE = 'rgba(41, 98, 255, 0.6)';
 
 /**
  * Convert legacy PaneLayout to UnifiedPaneLayout

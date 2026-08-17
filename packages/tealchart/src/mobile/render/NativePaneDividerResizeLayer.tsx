@@ -1,9 +1,16 @@
 import type { SkImage } from '@shopify/react-native-skia';
 import type { SharedValue } from 'react-native-reanimated';
-import type { NativePaneDividerBand } from '../interaction/nativePaneDivider';
+import type { NativePaneDividerBand, NativePaneDividerTarget } from '../interaction/nativePaneDivider';
 
-import { Image as SkiaImage } from '@shopify/react-native-skia';
+import { Image as SkiaImage, Rect, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
+
+import {
+  PANE_DIVIDER_HIGHLIGHT_BAND,
+  PANE_DIVIDER_HIGHLIGHT_BAND_RADIUS,
+  PANE_DIVIDER_HIGHLIGHT_LINE,
+  PANE_DIVIDER_HIGHLIGHT_LINE_WIDTH,
+} from '../../constants';
 
 export interface NativePaneSnapshot {
   height: number;
@@ -36,13 +43,65 @@ function NativePaneDividerBandImage({
   return <SkiaImage fit="fill" height={height} image={image} width={width} x={0} y={y} />;
 }
 
+/**
+ * The grabbed divider, in web's blue. Drawn here rather than in the chart's
+ * chrome because the bitmaps sit above the live chart while a drag is in
+ * flight, and a highlight underneath them would be invisible.
+ */
+function NativePaneDividerHighlight({
+  bands,
+  target,
+  width,
+}: {
+  bands: SharedValue<NativePaneDividerBand[]>;
+  target: SharedValue<NativePaneDividerTarget | null>;
+  width: number;
+}) {
+  const dividerY = useDerivedValue(() => {
+    const current = target.value;
+    if (!current) return -1;
+    const currentBands = bands.value;
+    for (let index = 0; index < currentBands.length; index += 1) {
+      const band = currentBands[index]!;
+      if (band.paneId === current.paneBelowId) return band.top;
+    }
+    return current.y;
+  });
+  const bandY = useDerivedValue(() => dividerY.value - PANE_DIVIDER_HIGHLIGHT_BAND_RADIUS);
+  const opacity = useDerivedValue(() => (dividerY.value < 0 ? 0 : 1));
+  const lineStart = useDerivedValue(() => ({ x: 0, y: dividerY.value }));
+  const lineEnd = useDerivedValue(() => ({ x: width, y: dividerY.value }));
+
+  return (
+    <>
+      <Rect
+        color={PANE_DIVIDER_HIGHLIGHT_BAND}
+        height={PANE_DIVIDER_HIGHLIGHT_BAND_RADIUS * 2}
+        opacity={opacity}
+        width={width}
+        x={0}
+        y={bandY}
+      />
+      <SkiaLine
+        color={PANE_DIVIDER_HIGHLIGHT_LINE}
+        opacity={opacity}
+        p1={lineStart}
+        p2={lineEnd}
+        strokeWidth={PANE_DIVIDER_HIGHLIGHT_LINE_WIDTH}
+      />
+    </>
+  );
+}
+
 export function NativePaneDividerResizeLayer({
   bands,
   snapshots,
+  target,
   width,
 }: {
   bands: SharedValue<NativePaneDividerBand[]>;
   snapshots: readonly NativePaneSnapshot[];
+  target: SharedValue<NativePaneDividerTarget | null>;
   width: number;
 }) {
   return (
@@ -56,6 +115,7 @@ export function NativePaneDividerResizeLayer({
           width={width}
         />
       ))}
+      <NativePaneDividerHighlight bands={bands} target={target} width={width} />
     </>
   );
 }
