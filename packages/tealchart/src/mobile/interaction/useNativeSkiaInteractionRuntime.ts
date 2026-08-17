@@ -14,6 +14,7 @@ import type {
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
+import type { NativePaneDividerBand, NativePaneDividerTarget } from './nativePaneDivider';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type {
   NativeChartAxisPinchGestureState,
@@ -27,10 +28,13 @@ import type {
 
 import { useMemo } from 'react';
 
+import type { SharedValue } from 'react-native-reanimated';
+
 import { useSharedValue } from 'react-native-reanimated';
 
 export interface NativeSkiaInteractionRuntime {
   bracketDragActive: ReturnType<typeof useSharedValue<boolean>>;
+  paneDividerBands: SharedValue<NativePaneDividerBand[]>;
   bracketDragInteractionState: NativeBracketDragInteractionState;
   bracketDragState: NativeBracketDragSharedValues;
   chartAxisPinchGestureState: NativeChartAxisPinchGestureState;
@@ -222,11 +226,14 @@ export function useNativeSkiaInteractionRuntime({
     [bracketDragActive, bracketDragPricePerPixel, bracketDragStartPrice, bracketDragState],
   );
   const panIndicatorPaneTarget = useSharedValue<NativeIndicatorPaneScaleTarget | null>(null);
+  const panPaneDividerTarget = useSharedValue<NativePaneDividerTarget | null>(null);
   const paneRangeOverrides = useSharedValue<NativePaneRangeOverrides>({});
+  const paneDividerBands = useSharedValue<NativePaneDividerBand[]>([]);
   const chartPanGestureState = useMemo<NativeChartPanGestureState>(
     () => ({
       active: panActive,
       indicatorPaneTarget: panIndicatorPaneTarget,
+      paneDividerTarget: panPaneDividerTarget,
       sharedViewport,
       startViewport: panStartViewport,
       metrics: panMetrics,
@@ -239,6 +246,7 @@ export function useNativeSkiaInteractionRuntime({
       activePanTimePerPixel,
       panActive,
       panIndicatorPaneTarget,
+      panPaneDividerTarget,
       panMetrics,
       panStartViewport,
       priceAutoScale,
@@ -316,6 +324,7 @@ export function useNativeSkiaInteractionRuntime({
     priceAutoScale,
     priceScaleActive,
     priceScaleGestureState,
+    paneDividerBands,
     paneRangeOverrides,
     sharedPriceAxisTagSources,
     sharedViewport,

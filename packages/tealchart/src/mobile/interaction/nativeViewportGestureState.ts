@@ -2,6 +2,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { TimeRangeClampAnchor } from '../../viewport/timeRangeConstraints';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
+import type { NativePaneDividerTarget } from './nativePaneDivider';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeAutoScaleBar } from './nativeAutoScale';
 
@@ -34,6 +35,8 @@ export interface NativeChartPanGestureState {
    * not take the vertical delta.
    */
   indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
+  /** Divider being dragged, if the touch landed on a pane boundary. */
+  paneDividerTarget: SharedValue<NativePaneDividerTarget | null>;
   active: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   startViewport: NativeViewportSharedValues;
