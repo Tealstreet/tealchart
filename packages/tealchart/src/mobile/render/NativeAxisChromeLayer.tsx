@@ -6,9 +6,15 @@ export interface NativeAxisChromeLayerProps {
   backgroundColor: string;
   frame: NativeChartFrame;
   gridColor: string;
+  separatorColor: string;
 }
 
-export function NativeAxisChromeLayer({ backgroundColor, frame, gridColor }: NativeAxisChromeLayerProps) {
+export function NativeAxisChromeLayer({
+  backgroundColor,
+  frame,
+  gridColor,
+  separatorColor,
+}: NativeAxisChromeLayerProps) {
   return (
     <Group>
       <Rect
@@ -24,13 +30,16 @@ export function NativeAxisChromeLayer({ backgroundColor, frame, gridColor }: Nat
         color={gridColor}
         strokeWidth={1}
       />
+      {/* A pane boundary is a control, not a grid line — drawn heavier than one
+          so it reads as something you can grab. */}
       {frame.panes.slice(0, -1).map((pane) => (
         <SkiaLine
           key={`pane-separator-${pane.id}`}
-          p1={{ x: frame.contentLeft, y: pane.bottom + 0.5 }}
-          p2={{ x: frame.contentRight, y: pane.bottom + 0.5 }}
-          color={gridColor}
-          strokeWidth={1}
+          p1={{ x: frame.contentLeft, y: pane.bottom }}
+          p2={{ x: frame.contentRight, y: pane.bottom }}
+          color={separatorColor}
+          opacity={0.35}
+          strokeWidth={2}
         />
       ))}
     </Group>

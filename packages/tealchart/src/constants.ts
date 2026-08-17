@@ -64,3 +64,10 @@ export const STOP_LOSS_COLOR = '#f97316';
 
 /** Default positive PnL color shared by web canvas/Konva and mobile/Skia renderers. */
 export const POSITIVE_PNL_COLOR = DEFAULT_BUY_CANDLE_COLOR;
+
+/** Pane divider resize affordance. Shared so web and native cannot drift apart. */
+export const PANE_DIVIDER_HIGHLIGHT_BAND = 'rgba(41, 98, 255, 0.12)';
+export const PANE_DIVIDER_HIGHLIGHT_LINE = 'rgba(41, 98, 255, 0.6)';
+/** Half-height of the highlight band, and the divider's own stroke width. */
+export const PANE_DIVIDER_HIGHLIGHT_BAND_RADIUS = 3;
+export const PANE_DIVIDER_HIGHLIGHT_LINE_WIDTH = 2;

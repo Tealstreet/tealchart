@@ -408,67 +408,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
   }, []);
 
-  // One bitmap per pane, captured when a divider drag starts. The drag stretches
-  // these instead of re-laying-out the chart every frame; committing the real
-  // heights per frame is correct and unusably slow.
-  const [nativePaneSnapshots, setNativePaneSnapshots] = useState<readonly NativePaneSnapshot[]>([]);
-  const nativePaneSnapshotsRef = useRef<readonly NativePaneSnapshot[]>([]);
-  const replaceNativePaneSnapshots = useCallback((next: readonly NativePaneSnapshot[]) => {
-    for (const snapshot of nativePaneSnapshotsRef.current) snapshot.image.dispose();
-    nativePaneSnapshotsRef.current = next;
-    setNativePaneSnapshots(next);
-  }, []);
-  const nativePaneSnapshotFrameRef = useRef<NativeChartFrame | null>(null);
-  const nativePaneSnapshotReleaseRef = useRef<number | null>(null);
-  const cancelNativePaneSnapshotRelease = useCallback(() => {
-    if (nativePaneSnapshotReleaseRef.current === null) return;
-    cancelAnimationFrame(nativePaneSnapshotReleaseRef.current);
-    nativePaneSnapshotReleaseRef.current = null;
-  }, []);
-
-  const handleNativePaneDividerResizeStart = useCallback(() => {
-    // Grabbing again before the last release landed must not let that release
-    // wipe the bitmaps this drag just captured.
-    cancelNativePaneSnapshotRelease();
-    const canvas = canvasRef.current;
-    const currentFrame = nativePaneSnapshotFrameRef.current;
-    if (!canvas || !currentFrame) return;
-    try {
-      const captured: NativePaneSnapshot[] = [];
-      for (const pane of currentFrame.panes) {
-        if (pane.height <= 0) continue;
-        const image = canvas.makeImageSnapshot(
-          Skia.XYWHRect(0, pane.top, currentFrame.dimensions.width, pane.height),
-        );
-        if (!image) continue;
-        captured.push({ height: pane.height, image, paneId: pane.id, top: pane.top });
-      }
-      replaceNativePaneSnapshots(captured);
-    } catch {
-      replaceNativePaneSnapshots([]);
-    }
-  }, [canvasRef, cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
-
-  // Held one tick past the commit so the live chart has drawn the new heights
-  // before the bitmaps go, or the release flashes the pre-drag layout.
-  const handleNativePaneDividerResizeEnd = useCallback(() => {
-    cancelNativePaneSnapshotRelease();
-    nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
-      nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
-        nativePaneSnapshotReleaseRef.current = null;
-        replaceNativePaneSnapshots([]);
-      });
-    });
-  }, [cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
-
-  useEffect(
-    () => () => {
-      cancelNativePaneSnapshotRelease();
-      replaceNativePaneSnapshots([]);
-    },
-    [cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots],
-  );
-
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
   const nativeIndicatorPaneLayout = useMemo(() => {
     if (!nativeIndicatorPaneLayoutBase) return nativeIndicatorPaneLayoutBase;
@@ -575,6 +514,73 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     tradeLineRows,
     viewportSyncEpoch,
   } = useNativeSkiaInteractionRuntime({ autoScaleEnabled: nativeAutoScaleEnabled });
+
+  // One bitmap per pane, captured when a divider drag starts. The drag stretches
+  // these instead of re-laying-out the chart every frame; committing the real
+  // heights per frame is correct and unusably slow.
+  const [nativePaneSnapshots, setNativePaneSnapshots] = useState<readonly NativePaneSnapshot[]>([]);
+  const nativePaneSnapshotsRef = useRef<readonly NativePaneSnapshot[]>([]);
+  const replaceNativePaneSnapshots = useCallback((next: readonly NativePaneSnapshot[]) => {
+    for (const snapshot of nativePaneSnapshotsRef.current) snapshot.image.dispose();
+    nativePaneSnapshotsRef.current = next;
+    setNativePaneSnapshots(next);
+  }, []);
+  const nativePaneSnapshotFrameRef = useRef<NativeChartFrame | null>(null);
+  const nativePaneSnapshotReleaseRef = useRef<number | null>(null);
+  const cancelNativePaneSnapshotRelease = useCallback(() => {
+    if (nativePaneSnapshotReleaseRef.current === null) return;
+    cancelAnimationFrame(nativePaneSnapshotReleaseRef.current);
+    nativePaneSnapshotReleaseRef.current = null;
+  }, []);
+
+  const handleNativePaneDividerResizeStart = useCallback(() => {
+    // Grabbing again before the last release landed must not let that release
+    // wipe the bitmaps this drag just captured.
+    cancelNativePaneSnapshotRelease();
+    const canvas = canvasRef.current;
+    const currentFrame = nativePaneSnapshotFrameRef.current;
+    if (!canvas || !currentFrame) return;
+    try {
+      const captured: NativePaneSnapshot[] = [];
+      for (const pane of currentFrame.panes) {
+        if (pane.height <= 0) continue;
+        const image = canvas.makeImageSnapshot(
+          Skia.XYWHRect(0, pane.top, currentFrame.dimensions.width, pane.height),
+        );
+        if (!image) continue;
+        captured.push({ height: pane.height, image, paneId: pane.id, top: pane.top });
+      }
+      replaceNativePaneSnapshots(captured);
+    } catch {
+      replaceNativePaneSnapshots([]);
+    }
+  }, [canvasRef, cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
+
+  // Held one tick past the commit so the live chart has drawn the new heights
+  // before the bitmaps go, or the release flashes the pre-drag layout.
+  const handleNativePaneDividerResizeEnd = useCallback(() => {
+    cancelNativePaneSnapshotRelease();
+    nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
+      nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
+        nativePaneSnapshotReleaseRef.current = null;
+        // Cleared with the bitmaps, not at finalize: the bands still place them
+        // for the two frames the live chart needs to draw the committed heights.
+        // Leaving them set displaces every legend permanently, since the frame
+        // has by then moved the panes too.
+        paneDividerBands.value = [];
+        replaceNativePaneSnapshots([]);
+      });
+    });
+  }, [cancelNativePaneSnapshotRelease, paneDividerBands, replaceNativePaneSnapshots]);
+
+  useEffect(
+    () => () => {
+      cancelNativePaneSnapshotRelease();
+      replaceNativePaneSnapshots([]);
+    },
+    [cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots],
+  );
+
   // Imperative overrides layer over the prop, mirroring imperativeTheme. Reset
   // when the prop changes so a host that later drives renderOptions by prop is
   // not permanently clobbered by one applyOverrides call.
@@ -1739,6 +1745,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           <NativePaneDividerResizeLayer
             bands={paneDividerBands}
             snapshots={nativePaneSnapshots}
+            target={chartPanGestureState.paneDividerTarget}
             width={frame.dimensions.width}
           />
         ) : null}
@@ -1778,6 +1785,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           leftToolRailLayout={leftToolRailLayout}
           mutedTextColor={nativeMutedTextColor}
           onActionTargetsChange={setNativeLegendActionTargets}
+          paneDividerBands={paneDividerBands}
           onRemoveIndicator={handleNativeRemoveIndicator}
           onToggleIndicator={handleNativeToggleIndicator}
           pricePrecision={nativePricePrecision}
