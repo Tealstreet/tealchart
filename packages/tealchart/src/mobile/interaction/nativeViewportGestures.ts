@@ -231,6 +231,11 @@ export function createNativeChartPanGesture({
           : null;
     })
     .onBegin(() => {
+      // A divider drag resizes panes; it is not a viewport gesture. Starting one
+      // marks the pan active and takes viewport ownership, and since the divider
+      // branch commits no viewport, nothing ever hands either back — which left
+      // `panActive` stuck true and made every drag after the first a no-op.
+      if (chartPanGestureState.paneDividerTarget.value) return;
       beginNativeChartPanGestureStateFromFrame(chartPanGestureState, frame);
       runOnJS(beginNativeViewportInteraction)();
     })
