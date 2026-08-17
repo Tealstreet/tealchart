@@ -1267,7 +1267,11 @@ export class ChartCore {
     state: OemsTradingLineState;
   } | null {
     if (bound.type === 'order') {
-      const objectId = bound.orderId || bound.lineId;
+      // `lineId` IS the identity - it is the adapter's id, which is what the
+      // OEMS layer keys on. Preferring `bound.orderId` started actions under the
+      // venue's id and looked them up under the adapter's, so nothing on this
+      // line ever rendered as pending. See CLAUDE.md "Line identity (OEMS)".
+      const objectId = bound.lineId;
       const line = this.orderLines.find((candidate) => this.getOrderObjectId(candidate) === objectId);
       return {
         objectType: 'order',
@@ -1277,7 +1281,7 @@ export class ChartCore {
     }
 
     if (bound.type === 'position') {
-      const objectId = bound.positionId || bound.lineId;
+      const objectId = bound.lineId;
       const line = this.positionLines.find((candidate) => this.getPositionObjectId(candidate) === objectId);
       return {
         objectType: 'position',
@@ -2632,8 +2636,10 @@ export class ChartCore {
     dragStartX: number,
     dragCurrentX: number,
   ): void {
-    // Try position lines first
-    const position = this.positionLines.find((p) => (p.positionId || p.id) === lineId);
+    // Keyed on the adapter id, like everything else the OEMS layer touches. The
+    // venue-id precedence that used to be here failed its lookup outright for
+    // any host that sets an order/position id, so the drag ran with no preview.
+    const position = this.positionLines.find((p) => this.getPositionObjectId(p) === lineId);
     const positiveTradingColor = resolvePositiveTradingColor({
       ...this.renderer.getOptions(),
       ...this.options.renderOptions,
@@ -2659,7 +2665,7 @@ export class ChartCore {
     }
 
     // Fall back to order lines — use order price as entry
-    const order = this.orderLines.find((o) => (o.orderId || o.id) === lineId);
+    const order = this.orderLines.find((o) => this.getOrderObjectId(o) === lineId);
     if (order) {
       this._bracketDragState = {
         type,
