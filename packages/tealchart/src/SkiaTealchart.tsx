@@ -1785,7 +1785,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           leftToolRailLayout={leftToolRailLayout}
           mutedTextColor={nativeMutedTextColor}
           onActionTargetsChange={setNativeLegendActionTargets}
-          paneDividerBands={paneDividerBands}
           onRemoveIndicator={handleNativeRemoveIndicator}
           onToggleIndicator={handleNativeToggleIndicator}
           pricePrecision={nativePricePrecision}
