@@ -1106,6 +1106,63 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  // Both of these read an identity out of a bound or a line id. When they
+  // preferred the venue's id over the adapter's, a host that sets one - which is
+  // most of them - looked its own lines up under a name nothing else used: the
+  // bracket drag ran with no preview, and optimistic state was filed under an id
+  // no render ever asked about. See CLAUDE.md "Line identity (OEMS)".
+  it('keys bracket preview and optimistic state on the adapter id, not the venue id', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({ container, width: 800, height: 600 });
+
+    core.setBars(makeBars(5));
+    core.setPositionLines([
+      makePositionLine({
+        id: 'position_1',
+        positionId: 'BTC-USDC-Long',
+        positionData: { entryPrice: 50010, notional: 1, isLong: true },
+      }),
+    ]);
+    core.paint(DIRTY.FULL);
+
+    const privateCore = core as unknown as {
+      _updateBracketDragState(
+        type: 'tp' | 'sl',
+        lineId: string,
+        price: number,
+        partialPercent: number,
+        dragStartX: number,
+        dragCurrentX: number,
+      ): void;
+      _bracketDragState: { price: number } | null;
+      getBoundTradingObject(bound: PriceLineLabelBounds): { objectId: string } | null;
+    };
+
+    privateCore._updateBracketDragState('tp', 'position_1', 50500, 100, 0, 20);
+    expect(privateCore._bracketDragState).toMatchObject({ price: 50500 });
+
+    privateCore._bracketDragState = null;
+    privateCore._updateBracketDragState('tp', 'BTC-USDC-Long', 50500, 100, 0, 20);
+    expect(privateCore._bracketDragState).toBeNull();
+
+    const bound = {
+      lineId: 'position_1',
+      positionId: 'BTC-USDC-Long',
+      type: 'position',
+      price: 50010,
+      originalY: 0,
+      adjustedY: 0,
+      width: 0,
+      height: 0,
+      color: '#2196F3',
+      label: { primaryText: '50,010' },
+      lineStyle: 'solid',
+    } as PriceLineLabelBounds;
+    expect(privateCore.getBoundTradingObject(bound)?.objectId).toBe('position_1');
+
+    core.dispose();
+  });
+
   it('settles optimistic bracket creates when external order callbacks resolve', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({

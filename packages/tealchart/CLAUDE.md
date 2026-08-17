@@ -259,9 +259,18 @@ reason.
 the venue's id changes mid-action. Keying on it orphans the pending action the
 moment the host re-points its adapter at the replacement, and the chart then
 draws a line the host has already retired — beside its replacement. The
-precedence `orderId || id` lived in three places at once
-(`oemsLineState`, `PriceLineManager`, `tradeLineLayout`); if you add a fourth,
-actions get started under one id and looked up under another.
+precedence `orderId || id` lived in **seven** places: `oemsLineState`,
+`PriceLineManager` and `tradeLineLayout`, and four more inside `ChartCore`
+(`getBoundTradingObject` twice, `_updateBracketDragState` twice) that survived
+the first sweep. Web then started actions under the venue's id and looked them
+up under the adapter's, so nothing rendered as pending — and the bracket drag's
+`find` failed outright, which is a drag that works with no preview at all.
+
+If you are looking for another one: it is any `find` over `orderLines` or
+`positionLines`, and it must compare `getOemsOrderObjectId` /
+`getOemsPositionObjectId`, never a raw field. Note that only a host which
+actually sets `orderId`/`positionId` shows the symptom, so a fixture that leaves
+them undefined passes either way.
 
 **Colour is not identity, and neither is any other styling.** A previous version
 hashed `quantity|lineColor` to recognise a replacement. A line whose order is in
