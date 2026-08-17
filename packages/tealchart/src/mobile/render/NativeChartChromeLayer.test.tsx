@@ -46,6 +46,7 @@ describe('NativeChartChromeLayer', () => {
       backgroundColor: '#101418',
       frame,
       gridColor: '#222831',
+      separatorColor: '#d1d4dc',
     });
 
     const rootBackgrounds = collectElementsByType(layer, Rect);
@@ -66,6 +67,7 @@ describe('NativeChartChromeLayer', () => {
       backgroundColor: '#101418',
       frame,
       gridColor: '#222831',
+      separatorColor: '#d1d4dc',
     });
     const rects = collectElementsByType(layer, Rect);
     const lines = collectElementsByType(layer, SkiaLine);

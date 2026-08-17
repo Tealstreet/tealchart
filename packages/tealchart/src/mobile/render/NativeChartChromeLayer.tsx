@@ -11,12 +11,14 @@ export interface NativeChartChromeLayerProps {
   backgroundColor: string;
   frame: NativeChartFrame;
   gridColor: string;
+  separatorColor: string;
 }
 
 export function NativeChartChromeLayer({
   backgroundColor,
   frame,
   gridColor,
+  separatorColor,
 }: NativeChartChromeLayerProps) {
   return (
     <Group>
@@ -26,6 +28,7 @@ export function NativeChartChromeLayer({
         backgroundColor={backgroundColor}
         frame={frame}
         gridColor={gridColor}
+        separatorColor={separatorColor}
       />
     </Group>
   );
