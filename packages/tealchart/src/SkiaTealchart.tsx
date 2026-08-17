@@ -419,8 +419,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativePaneSnapshots(next);
   }, []);
   const nativePaneSnapshotFrameRef = useRef<NativeChartFrame | null>(null);
+  const nativePaneSnapshotReleaseRef = useRef<number | null>(null);
+  const cancelNativePaneSnapshotRelease = useCallback(() => {
+    if (nativePaneSnapshotReleaseRef.current === null) return;
+    cancelAnimationFrame(nativePaneSnapshotReleaseRef.current);
+    nativePaneSnapshotReleaseRef.current = null;
+  }, []);
 
   const handleNativePaneDividerResizeStart = useCallback(() => {
+    // Grabbing again before the last release landed must not let that release
+    // wipe the bitmaps this drag just captured.
+    cancelNativePaneSnapshotRelease();
     const canvas = canvasRef.current;
     const currentFrame = nativePaneSnapshotFrameRef.current;
     if (!canvas || !currentFrame) return;
@@ -438,17 +447,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     } catch {
       replaceNativePaneSnapshots([]);
     }
-  }, [canvasRef, replaceNativePaneSnapshots]);
+  }, [canvasRef, cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
 
   // Held one tick past the commit so the live chart has drawn the new heights
   // before the bitmaps go, or the release flashes the pre-drag layout.
   const handleNativePaneDividerResizeEnd = useCallback(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => replaceNativePaneSnapshots([]));
+    cancelNativePaneSnapshotRelease();
+    nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
+      nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
+        nativePaneSnapshotReleaseRef.current = null;
+        replaceNativePaneSnapshots([]);
+      });
     });
-  }, [replaceNativePaneSnapshots]);
+  }, [cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
 
-  useEffect(() => () => replaceNativePaneSnapshots([]), [replaceNativePaneSnapshots]);
+  useEffect(
+    () => () => {
+      cancelNativePaneSnapshotRelease();
+      replaceNativePaneSnapshots([]);
+    },
+    [cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots],
+  );
 
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
   const nativeIndicatorPaneLayout = useMemo(() => {
