@@ -1438,18 +1438,32 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     if (leftToolRailLayout) {
-      const drawerWidth =
-        nativeOpenDrawingCategoryId && !leftToolRailLayout.collapsed ? NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH : 0;
       const toggleHitRect = resolveNativeLeftToolRailToggleHitRect(leftToolRailLayout);
-      zones.push({
-        x1: leftToolRailLayout.x,
-        x2: Math.max(
-          leftToolRailLayout.x + leftToolRailLayout.width + drawerWidth,
-          toggleHitRect ? toggleHitRect.x + toggleHitRect.width : 0,
-        ),
-        y1: leftToolRailLayout.y,
-        y2: leftToolRailLayout.y + leftToolRailLayout.height,
-      });
+      if (leftToolRailLayout.collapsed) {
+        // Collapsed, the toggle is the only thing here that can be pressed.
+        // Reserving the rail's whole column anyway made a full-height strip
+        // down the left edge fail the chart pan, so the drag fell through to
+        // whatever contains the chart instead of panning it.
+        if (toggleHitRect) {
+          zones.push({
+            x1: toggleHitRect.x,
+            x2: toggleHitRect.x + toggleHitRect.width,
+            y1: toggleHitRect.y,
+            y2: toggleHitRect.y + toggleHitRect.height,
+          });
+        }
+      } else {
+        const drawerWidth = nativeOpenDrawingCategoryId ? NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH : 0;
+        zones.push({
+          x1: leftToolRailLayout.x,
+          x2: Math.max(
+            leftToolRailLayout.x + leftToolRailLayout.width + drawerWidth,
+            toggleHitRect ? toggleHitRect.x + toggleHitRect.width : 0,
+          ),
+          y1: leftToolRailLayout.y,
+          y2: leftToolRailLayout.y + leftToolRailLayout.height,
+        });
+      }
     }
 
     if (nativeResetViewButtonLayout && nativeResetViewButtonVisible && hasDataViewport) {
