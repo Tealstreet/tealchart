@@ -61,6 +61,17 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     }) {
       widgetUiOptionsCalls.push(options);
     }
+    // The real UI mounts chart-contained panels in its own overlay layer rather
+    // than on document.body, so a stand-in has to offer one or every panel the
+    // widget opens throws.
+    private overlayRoot: HTMLElement | null = null;
+    getOverlayRoot() {
+      if (!this.overlayRoot) {
+        this.overlayRoot = document.createElement('div');
+        document.body.appendChild(this.overlayRoot);
+      }
+      return this.overlayRoot;
+    }
     setBars(bars: Bar[]) {
       setBarsCalls.push([...bars]);
     }
@@ -99,7 +110,10 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setInterval() {}
     setSupportedResolutions() {}
     resize() {}
-    dispose() {}
+    dispose() {
+      this.overlayRoot?.remove();
+      this.overlayRoot = null;
+    }
     openIndicatorSettings() {}
     paint() {}
   },

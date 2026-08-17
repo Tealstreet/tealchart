@@ -360,6 +360,7 @@ describe('native gesture activation', () => {
       chartPanGestureState: {
         active: panActive,
         indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -406,6 +407,7 @@ describe('native gesture activation', () => {
       chartPanGestureState: {
         active: panActive,
         indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -763,6 +765,7 @@ describe('native gesture activation', () => {
       chartPanGestureState: {
         active: panActive,
         indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -1037,6 +1040,7 @@ describe('native gesture activation', () => {
       chartPanGestureState: {
         active: panActive,
         indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
         sharedViewport: viewport,
         startViewport: panStartViewport,
         metrics: gestureMetrics(),
