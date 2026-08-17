@@ -1,6 +1,7 @@
 import type { GestureType, SimultaneousGesture } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
+import type { NativePaneDividerBand, NativePaneHeight } from './nativePaneDivider';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
@@ -79,6 +80,10 @@ export interface NativeChartGestureRuntimeInput {
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   onDrawingTap: (x: number, y: number) => void;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
+  onPaneDividerResizeEnd?: () => void;
+  onPaneDividerResizeStart?: () => void;
+  onPaneHeightsChange?: (heights: NativePaneHeight[]) => void;
+  paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   onDrawingEditDragBegin: (x: number, y: number) => void;
   onDrawingEditDragEnd: () => void;
@@ -124,6 +129,8 @@ export function resolveNativeCrosshairInteractionFrame({
 }
 
 const noopNativeIndicatorPaneScale = (_paneId: string, _yMin: number, _yMax: number) => undefined;
+const noopNativePaneHeightsChange = (_heights: NativePaneHeight[]) => undefined;
+const noopNativePaneDividerResize = () => undefined;
 
 function useLatestNativeCallback<T extends (...args: never[]) => void>(callback: T): T {
   const callbackRef = useRef(callback);
@@ -162,6 +169,10 @@ export function useNativeChartGestureRuntime({
   orderDragZones,
   onDrawingTap,
   onIndicatorPaneScale,
+  onPaneDividerResizeEnd,
+  onPaneDividerResizeStart,
+  onPaneHeightsChange,
+  paneDividerBands,
   paneRangeOverrides,
   onDrawingEditDragBegin,
   onDrawingEditDragEnd,
@@ -202,6 +213,9 @@ export function useNativeChartGestureRuntime({
   const stableOnDrawingSelectionTap = useLatestNativeCallback(onDrawingSelectionTap);
   const stableOnDrawingTap = useLatestNativeCallback(onDrawingTap);
   const stableOnIndicatorPaneScale = useLatestNativeCallback(onIndicatorPaneScale ?? noopNativeIndicatorPaneScale);
+  const stableOnPaneHeightsChange = useLatestNativeCallback(onPaneHeightsChange ?? noopNativePaneHeightsChange);
+  const stableOnPaneDividerResizeStart = useLatestNativeCallback(onPaneDividerResizeStart ?? noopNativePaneDividerResize);
+  const stableOnPaneDividerResizeEnd = useLatestNativeCallback(onPaneDividerResizeEnd ?? noopNativePaneDividerResize);
   const stableOnLeftToolRailToggleTap = useLatestNativeCallback(onLeftToolRailToggleTap);
   const stableOnContextMenuTap = useLatestNativeCallback(onContextMenuTap);
   const stableOnOverlayAction = useLatestNativeCallback(onOverlayAction);
@@ -240,6 +254,10 @@ export function useNativeChartGestureRuntime({
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       chartPanGestureState,
       onIndicatorPaneScale: stableOnIndicatorPaneScale,
+      onPaneHeightsChange: stableOnPaneHeightsChange,
+      onPaneDividerResizeStart: stableOnPaneDividerResizeStart,
+      onPaneDividerResizeEnd: stableOnPaneDividerResizeEnd,
+      paneDividerBands,
       paneRangeOverrides,
       commitPanViewport: stableCommitPanViewport,
       controlZones,
@@ -260,6 +278,10 @@ export function useNativeChartGestureRuntime({
     sharedViewport,
     stableBeginNativeViewportInteraction,
     stableCancelNativeViewportInteraction,
+    stableOnPaneHeightsChange,
+    stableOnPaneDividerResizeStart,
+    stableOnPaneDividerResizeEnd,
+    paneDividerBands,
     stableCommitPanViewport,
     controlZones,
     crosshair,

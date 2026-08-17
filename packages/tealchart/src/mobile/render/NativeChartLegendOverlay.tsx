@@ -2,11 +2,14 @@ import type { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 import type { Bar } from '../../types';
 import type { NativeOverlayActionHitTarget } from '../interaction/nativeOverlayActionGestures';
 import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
+import type { SharedValue } from 'react-native-reanimated';
+import type { NativePaneDividerBand } from '../interaction/nativePaneDivider';
 import type { NativeChartFrame } from './nativeChartFrame';
 
 import React from 'react';
 
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
@@ -44,6 +47,7 @@ export interface NativeChartLegendOverlayProps {
   interval: string;
   isLoading: boolean;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
+  paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
   mutedTextColor: string;
   onActionTargetsChange?: (targets: readonly NativeLegendActionHitTarget[]) => void;
   onRemoveIndicator?: (indicatorId: string) => void;
@@ -290,6 +294,50 @@ function resolveNativeIndicatorPaneLegends({
     .filter((paneLegend) => paneLegend.indicators.length > 0);
 }
 
+/**
+ * The legend is a React view, so it is not in the frozen bitmaps a divider drag
+ * stretches. Without this it sits still while its pane moves out from under it.
+ * It rides the drag rather than scaling with it — it is chrome, not plot.
+ */
+function NativePaneLegendBlock({
+  borderColor,
+  children,
+  left,
+  maxWidth,
+  paneDividerBands,
+  paneId,
+  top,
+}: {
+  borderColor?: string;
+  children: React.ReactNode;
+  left: number;
+  maxWidth: number;
+  paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
+  paneId: string;
+  top: number;
+}) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const bands = paneDividerBands?.value;
+    if (!bands || bands.length === 0) return { transform: [{ translateY: 0 }] };
+    for (let index = 0; index < bands.length; index += 1) {
+      const band = bands[index]!;
+      if (band.paneId === paneId) return { transform: [{ translateY: band.top - band.srcTop }] };
+    }
+    return { transform: [{ translateY: 0 }] };
+  });
+
+  // One flat array: a nested style array is not reliably flattened here, and the
+  // absolute `top` silently going missing puts every legend at the container top.
+  return (
+    <Animated.View
+      pointerEvents="box-none"
+      style={[styles.legendBlock, styles.paneLegendBlock, { borderColor, left, maxWidth, top }, animatedStyle]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
 function resolveNativeLegendActionOrigins({
   indicatorPanes,
   left,
@@ -360,6 +408,7 @@ function NativeChartLegendOverlayView({
   interval,
   isLoading,
   leftToolRailLayout,
+  paneDividerBands,
   mutedTextColor,
   onActionButtonLayout,
   onRemoveIndicator,
@@ -426,14 +475,14 @@ function NativeChartLegendOverlayView({
       </View>
 
       {indicatorPanes.map(({ pane, indicators }) => (
-        <View
+        <NativePaneLegendBlock
           key={pane.id}
-          pointerEvents="box-none"
-          style={[
-            styles.legendBlock,
-            styles.paneLegendBlock,
-            { borderColor: gridColor, left, maxWidth, top: pane.top + 6 },
-          ]}
+          borderColor={gridColor}
+          left={left}
+          maxWidth={maxWidth}
+          paneDividerBands={paneDividerBands}
+          paneId={pane.id}
+          top={pane.top + 6}
         >
           {indicators.map((indicator) =>
             renderNativeIndicatorLegendRow({
@@ -448,7 +497,7 @@ function NativeChartLegendOverlayView({
               textColor,
             }),
           )}
-        </View>
+        </NativePaneLegendBlock>
       ))}
     </View>
   );
