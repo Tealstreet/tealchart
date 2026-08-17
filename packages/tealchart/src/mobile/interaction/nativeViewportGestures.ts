@@ -3,6 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
+import type { NativePaneDividerBand, NativePaneHeight } from './nativePaneDivider';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeOrderDragZone, NativeTradeLineActionZone, NativeTradeLineRow } from '../utils/tradeLineLayout';
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
@@ -19,6 +20,7 @@ import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
 import { getNativePaneAtY, getNativePriceAxisPaneAt } from '../render/nativeChartFrame';
+import { resolveNativePaneDividerAtY, resolveNativePaneDividerBands, resolveNativePaneDividerHeights } from './nativePaneDivider';
 import {
   resolveNativeIndicatorPaneTranslateRange,
 } from '../render/nativePaneRangeOverride';
@@ -143,6 +145,10 @@ export interface NativeChartPanGestureInput {
   crosshair?: NativeCrosshairSharedValues;
   frame: NativeChartFrame | null;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
+  onPaneDividerResizeEnd?: () => void;
+  onPaneDividerResizeStart?: () => void;
+  onPaneHeightsChange?: (heights: NativePaneHeight[]) => void;
+  paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   panActive: SharedValue<boolean>;
@@ -161,6 +167,10 @@ export function createNativeChartPanGesture({
   crosshair,
   frame,
   onIndicatorPaneScale,
+  onPaneDividerResizeEnd,
+  onPaneDividerResizeStart,
+  onPaneHeightsChange,
+  paneDividerBands,
   orderDragZones,
   paneRangeOverrides,
   panActive,
@@ -201,6 +211,19 @@ export function createNativeChartPanGesture({
         stateManager.fail();
         return;
       }
+      // A boundary between panes resizes them; it never pans or rescales, so it
+      // claims the touch outright and the other targets stay null.
+      const divider = frame && onPaneHeightsChange ? resolveNativePaneDividerAtY(frame, point.y) : null;
+      chartPanGestureState.paneDividerTarget.value = divider;
+      if (divider) {
+        chartPanGestureState.indicatorPaneTarget.value = null;
+        if (paneDividerBands) {
+          paneDividerBands.value = resolveNativePaneDividerBands({ target: divider, translationY: 0 });
+        }
+        if (onPaneDividerResizeStart) runOnJS(onPaneDividerResizeStart)();
+        return;
+      }
+
       const pane = getNativePaneAtY(frame, point.y);
       chartPanGestureState.indicatorPaneTarget.value =
         pane && pane.type === 'indicator' && pane.yMax > pane.yMin
@@ -215,6 +238,17 @@ export function createNativeChartPanGesture({
       // The two components are independent. Time slides across every pane; the
       // vertical drag moves only the pane it started in, so the main viewport
       // takes no vertical delta while one is targeted.
+      const divider = chartPanGestureState.paneDividerTarget.value;
+      if (divider) {
+        // Preview only. Each pane was captured to its own bitmap on touch-down,
+        // so the drag just moves those, entirely on the UI thread. The real
+        // heights are committed once, on release.
+        if (paneDividerBands) {
+          paneDividerBands.value = resolveNativePaneDividerBands({ target: divider, translationY: event.translationY });
+        }
+        return;
+      }
+
       const pane = chartPanGestureState.indicatorPaneTarget.value;
       updateNativeChartPanGestureState(chartPanGestureState, event.translationX, pane ? 0 : event.translationY);
       if (!pane) return;
@@ -230,7 +264,16 @@ export function createNativeChartPanGesture({
         paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
       }
     })
-    .onEnd(() => {
+    .onEnd((event) => {
+      const dividerTarget = chartPanGestureState.paneDividerTarget.value;
+      if (dividerTarget) {
+        if (onPaneHeightsChange) {
+          runOnJS(onPaneHeightsChange)(
+            resolveNativePaneDividerHeights({ target: dividerTarget, translationY: event.translationY }),
+          );
+        }
+        return;
+      }
       // Only when the drag actually moved vertically. A sideways pan through an
       // indicator pane must not silently pin its range against auto-scale.
       const pane = chartPanGestureState.indicatorPaneTarget.value;
@@ -242,6 +285,10 @@ export function createNativeChartPanGesture({
       runOnJS(commitPanViewport)(nextViewport);
     })
     .onFinalize((_event, success) => {
+      if (chartPanGestureState.paneDividerTarget.value) {
+        chartPanGestureState.paneDividerTarget.value = null;
+        if (onPaneDividerResizeEnd) runOnJS(onPaneDividerResizeEnd)();
+      }
       if (
         finalizeNativeViewportGestureState({
           active: panActive,

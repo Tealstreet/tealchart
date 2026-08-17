@@ -18,6 +18,8 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
+import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
+import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
 import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
@@ -43,7 +45,9 @@ import React, {
   useState,
 } from 'react';
 
-import { Canvas, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
+import { Canvas, Image as SkiaImage, Skia, useCanvasRef } from '@shopify/react-native-skia';
+
+import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
 import { StyleSheet, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 
@@ -388,7 +392,77 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision),
     [pricePrecision],
   );
-  const nativeIndicatorPaneLayout = indicatorManager?.getUnifiedLayout();
+  // Pane heights the user set by dragging a divider. Chart-owned, exactly as web
+  // keeps them in ChartCore rather than pushing them back into the manager.
+  const [nativePaneHeightOverrides, setNativePaneHeightOverrides] = useState<Readonly<Record<string, number>>>({});
+  const handleNativePaneHeightsChange = useCallback((heights: readonly { heightRatio: number; paneId: string }[]) => {
+    setNativePaneHeightOverrides((current) => {
+      let changed = false;
+      const next = { ...current };
+      for (const { heightRatio, paneId } of heights) {
+        if (next[paneId] === heightRatio) continue;
+        next[paneId] = heightRatio;
+        changed = true;
+      }
+      return changed ? next : current;
+    });
+  }, []);
+
+  // One bitmap per pane, captured when a divider drag starts. The drag stretches
+  // these instead of re-laying-out the chart every frame; committing the real
+  // heights per frame is correct and unusably slow.
+  const [nativePaneSnapshots, setNativePaneSnapshots] = useState<readonly NativePaneSnapshot[]>([]);
+  const nativePaneSnapshotsRef = useRef<readonly NativePaneSnapshot[]>([]);
+  const replaceNativePaneSnapshots = useCallback((next: readonly NativePaneSnapshot[]) => {
+    for (const snapshot of nativePaneSnapshotsRef.current) snapshot.image.dispose();
+    nativePaneSnapshotsRef.current = next;
+    setNativePaneSnapshots(next);
+  }, []);
+  const nativePaneSnapshotFrameRef = useRef<NativeChartFrame | null>(null);
+
+  const handleNativePaneDividerResizeStart = useCallback(() => {
+    const canvas = canvasRef.current;
+    const currentFrame = nativePaneSnapshotFrameRef.current;
+    if (!canvas || !currentFrame) return;
+    try {
+      const captured: NativePaneSnapshot[] = [];
+      for (const pane of currentFrame.panes) {
+        if (pane.height <= 0) continue;
+        const image = canvas.makeImageSnapshot(
+          Skia.XYWHRect(0, pane.top, currentFrame.dimensions.width, pane.height),
+        );
+        if (!image) continue;
+        captured.push({ height: pane.height, image, paneId: pane.id, top: pane.top });
+      }
+      replaceNativePaneSnapshots(captured);
+    } catch {
+      replaceNativePaneSnapshots([]);
+    }
+  }, [canvasRef, replaceNativePaneSnapshots]);
+
+  // Held one tick past the commit so the live chart has drawn the new heights
+  // before the bitmaps go, or the release flashes the pre-drag layout.
+  const handleNativePaneDividerResizeEnd = useCallback(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => replaceNativePaneSnapshots([]));
+    });
+  }, [replaceNativePaneSnapshots]);
+
+  useEffect(() => () => replaceNativePaneSnapshots([]), [replaceNativePaneSnapshots]);
+
+  const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
+  const nativeIndicatorPaneLayout = useMemo(() => {
+    if (!nativeIndicatorPaneLayoutBase) return nativeIndicatorPaneLayoutBase;
+    const panes = nativeIndicatorPaneLayoutBase.panes;
+    if (!panes.some((pane) => nativePaneHeightOverrides[pane.id] !== undefined)) return nativeIndicatorPaneLayoutBase;
+    return {
+      ...nativeIndicatorPaneLayoutBase,
+      panes: panes.map((pane) => {
+        const heightRatio = nativePaneHeightOverrides[pane.id];
+        return heightRatio === undefined ? pane : { ...pane, heightRatio };
+      }),
+    };
+  }, [nativeIndicatorPaneLayoutBase, nativePaneHeightOverrides]);
   const nativeIndicatorPlots = indicatorManager?.getPlots() ?? [];
   const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
     const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
@@ -472,6 +546,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     priceAutoScale,
     priceScaleActive,
     priceScaleGestureState,
+    paneDividerBands,
     paneRangeOverrides,
     sharedPriceAxisTagSources,
     sharedViewport,
@@ -609,6 +684,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     theme,
     topBarHeight: STATIC_TOP_BAR_HEIGHT,
   });
+
+  nativePaneSnapshotFrameRef.current = frame;
 
   const nativeBarsReadyForRequestedData = nativeBarsMatchRequestedData({
     barsContext,
@@ -1497,6 +1574,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     overlayActionTargets: nativeOverlayActionTargets,
     onDrawingTap: handleNativeUserDrawingTap,
     onIndicatorPaneScale: handleNativeIndicatorPaneScale,
+    onPaneHeightsChange: handleNativePaneHeightsChange,
+    onPaneDividerResizeStart: handleNativePaneDividerResizeStart,
+    onPaneDividerResizeEnd: handleNativePaneDividerResizeEnd,
+    paneDividerBands,
     paneRangeOverrides,
     onDrawingEditDragBegin: handleNativeUserDrawingEditDragBegin,
     onDrawingEditDragEnd: endNativeUserDrawingEditDrag,
@@ -1631,6 +1712,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           </GestureDetector>
         </View>
       ) : null}
+      <Canvas
+        style={[styles.snapshotLayer, nativePaneSnapshots.length === 0 && styles.hiddenSnapshotLayer]}
+        pointerEvents="none"
+      >
+        {nativePaneSnapshots.length > 0 && frame ? (
+          <NativePaneDividerResizeLayer
+            bands={paneDividerBands}
+            snapshots={nativePaneSnapshots}
+            width={frame.dimensions.width}
+          />
+        ) : null}
+      </Canvas>
       <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
         {resizeSnapshot ? (
           <SkiaImage
