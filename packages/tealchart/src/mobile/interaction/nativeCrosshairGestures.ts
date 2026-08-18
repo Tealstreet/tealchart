@@ -242,4 +242,3 @@ export interface NativeCrosshairContextMenuTapGestureInput {
   pricePrecision?: number;
   sharedViewport: NativeViewportSharedValues;
 }
-
