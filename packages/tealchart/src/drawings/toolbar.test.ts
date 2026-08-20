@@ -2622,6 +2622,45 @@ describe('user drawing toolbar descriptors', () => {
     ).toEqual({ left: 40, top: 80 });
   });
 
+  it('lifts a surface tall enough to reach back over its own drawing', () => {
+    // Web's surface is 70 tall against a -42 offset, so the preferred position
+    // alone put its lower half on the selected drawing - the trend line was
+    // covered by the toolbar bound to it.
+    const position = resolveUserDrawingActionSurfacePosition({
+      anchor: { x: 200, y: 200 },
+      viewport: { width: 600, height: 500 },
+      surface: { width: 300, height: 70 },
+      inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      selectionBounds: { x: 120, y: 200, width: 200, height: 160 },
+    });
+
+    expect(position).toEqual({ left: 50, top: 124 });
+  });
+
+  it('clears the drawing with a popover open, when the surface is taller still', () => {
+    const position = resolveUserDrawingActionSurfacePosition({
+      anchor: { x: 200, y: 200 },
+      viewport: { width: 600, height: 500 },
+      surface: { width: 300, height: 108 },
+      inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      selectionBounds: { x: 120, y: 200, width: 200, height: 160 },
+    });
+
+    expect(position.top + 108).toBeLessThanOrEqual(200);
+  });
+
+  it('flips below a drawing with the top of the plot against it', () => {
+    const position = resolveUserDrawingActionSurfacePosition({
+      anchor: { x: 200, y: 60 },
+      viewport: { width: 600, height: 500 },
+      surface: { width: 300, height: 70 },
+      inset: { left: 8, right: 8, top: 38, bottom: 8 },
+      selectionBounds: { x: 120, y: 60, width: 200, height: 120 },
+    });
+
+    expect(position.top).toBeGreaterThanOrEqual(186);
+  });
+
   it('keeps locked selected action surface mutations disabled except unlock', () => {
     const locked = {
       ...state,

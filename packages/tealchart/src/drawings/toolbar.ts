@@ -1791,15 +1791,24 @@ export function resolveUserDrawingActionSurfacePosition({
 
   let top = avoidChrome(clampNumber(preferredTop, minTop, maxTop));
 
-  // If chrome avoidance (or the top clamp) pushed the surface down onto the
-  // selected drawing, flip it below the selection so the object stays visible.
-  if (selectionBounds && top > preferredTop && overlapsRect(top, selectionBounds)) {
-    const belowTop = avoidChrome(
-      clampNumber(selectionBounds.y + selectionBounds.height + SELECTED_ACTION_SURFACE_AVOIDANCE_GAP, minTop, maxTop),
-    );
-    if (!overlapsRect(belowTop, selectionBounds)) {
-      top = belowTop;
-    }
+  // The surface must never sit on the drawing it belongs to. Its own height is
+  // enough to reach back over the selection from the preferred position - which
+  // a tall surface, or one with a popover open, always does - so the overlap is
+  // tested wherever it landed rather than only where chrome pushed it.
+  if (selectionBounds && overlapsRect(top, selectionBounds)) {
+    const candidates = [
+      // Above, hung off the selection's top edge rather than the anchor.
+      avoidChrome(
+        clampNumber(selectionBounds.y - SELECTED_ACTION_SURFACE_AVOIDANCE_GAP - surface.height, minTop, maxTop),
+      ),
+      avoidChrome(
+        clampNumber(selectionBounds.y + selectionBounds.height + SELECTED_ACTION_SURFACE_AVOIDANCE_GAP, minTop, maxTop),
+      ),
+    ];
+    const clear = candidates.find((candidate) => !overlapsRect(candidate, selectionBounds));
+    // A selection with no room either side keeps the chrome-avoided position;
+    // covering part of it beats leaving the plot.
+    if (clear !== undefined) top = clear;
   }
 
   return { left, top };
