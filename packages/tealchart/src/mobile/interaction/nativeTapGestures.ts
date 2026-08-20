@@ -329,4 +329,3 @@ export interface NativeTradeLineActionTapGestureInput {
   tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
 }
-
