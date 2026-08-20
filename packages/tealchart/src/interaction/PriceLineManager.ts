@@ -678,16 +678,17 @@ export class PriceLineManager {
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
     const fontFamily = this.getTextFontFamily();
 
-    // Border-only label
-    const shouldFill = Boolean(bound.label.filled);
+    // Unfilled keeps the dark backing rather than going transparent, matching
+    // updateLineContent - creating the node with the old filled-only rule is
+    // what made the tag flicker between the two every time it was rebuilt.
+    const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color: bound.color });
     const priceAxisRect = new Konva.Rect({
       x,
       y,
       width: bound.width,
       height: bound.height,
-      fill: shouldFill ? bound.label.backgroundColor || bound.color : undefined,
-      fillEnabled: shouldFill,
-      stroke: bound.color,
+      fill: tagStyle.backgroundColor,
+      stroke: tagStyle.borderColor,
       strokeWidth: 1,
       cornerRadius: 2,
       listening: false,
@@ -705,7 +706,7 @@ export class PriceLineManager {
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
-        fill: bound.label.textColor || bound.color,
+        fill: tagStyle.textColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
@@ -720,7 +721,7 @@ export class PriceLineManager {
         text: secondaryText,
         fontSize: 11,
         fontFamily,
-        fill: bound.label.textColor || bound.color,
+        fill: tagStyle.textColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
@@ -743,7 +744,7 @@ export class PriceLineManager {
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
-        fill: bound.label.textColor || bound.color,
+        fill: tagStyle.textColor,
         align: 'center',
         verticalAlign: 'middle',
         listening: false,
@@ -1019,6 +1020,16 @@ export class PriceLineManager {
         const isFirstInlinePill = isFirstInline && chartLabel.segments.length === 0;
 
         if (startsTPSLGroup || (i === 0 && isTPSL && tpslGap > 0)) {
+          // Bridge the gap so the bracket pill reads as part of the same label
+          // rather than a chip floating beside it.
+          segmentGroup.add(
+            new Konva.Line({
+              points: [currentX, lineY, currentX + tpslGap, lineY],
+              stroke: bound.color,
+              strokeWidth: 1,
+              listening: false,
+            }),
+          );
           currentX += tpslGap;
         }
 

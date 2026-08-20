@@ -414,6 +414,7 @@ export class EventManager {
   ): {
     isOverPriceAxis: boolean;
     isOverPaneDivider: boolean;
+    isOverInteractive: boolean;
     inDeadZone: boolean;
     shouldShowCrosshair: boolean;
     divider: ReturnType<NonNullable<EventManagerCallbacks['getDividerAtY']>> | null;
@@ -422,18 +423,32 @@ export class EventManager {
     const divider = this.callbacks.getDividerAtY?.(y) ?? null;
     const isOverPaneDivider = divider !== null && divider !== undefined;
     const inDeadZone = y < dims.topMargin || y > dims.height - dims.timeAxisHeight;
+    const isOverChrome = isOverPriceAxis || isOverPaneDivider || inDeadZone;
+    // Anything that would take the click owns the pointer while it is under it,
+    // so the crosshair stands down rather than drawing itself over the thing
+    // being aimed at - the hover counterpart of native's tap dead zones. That
+    // includes grabbable drawings, which take a click exactly as a label does.
+    const isOverInteractive =
+      !isOverChrome &&
+      (!!this.callbacks.isOverInteractiveElement?.(x, y) || !!this.callbacks.isOverUnlockedUserDrawing?.(x, y));
 
     return {
       isOverPriceAxis,
       isOverPaneDivider,
+      isOverInteractive,
       inDeadZone,
-      shouldShowCrosshair: !isOverPriceAxis && !isOverPaneDivider && !inDeadZone,
+      shouldShowCrosshair: !isOverChrome && !isOverInteractive,
       divider,
     };
   }
 
-  private updateCrosshairForMousePoint(x: number, y: number, options?: DrawingInputEventOptions): void {
-    const { shouldShowCrosshair } = this.resolveCrosshairHitState(x, y);
+  private updateCrosshairForMousePoint(
+    x: number,
+    y: number,
+    options?: DrawingInputEventOptions,
+    hitState = this.resolveCrosshairHitState(x, y),
+  ): void {
+    const { shouldShowCrosshair } = hitState;
     const wasVisible = this.crosshair.visible;
 
     this.crosshair.visible = shouldShowCrosshair;
@@ -762,15 +777,17 @@ export class EventManager {
       this.callbacks.onPaneDividerHover?.(crosshairHitState.divider);
     }
 
-    this.state.isOverInteractive =
-      !this.state.isOverPriceAxis &&
-      !this.state.isOverPaneDivider &&
-      !crosshairHitState.inDeadZone &&
-      !!this.callbacks.isOverInteractiveElement?.(x, y);
+    this.state.isOverInteractive = crosshairHitState.isOverInteractive;
 
-    // Update crosshair - hide when over price axis, divider, or in dead zones
+    // Update crosshair - hide over the price axis, a divider, a dead zone, or
+    // anything clickable.
     if (!this.state.isDragging) {
-      this.updateCrosshairForMousePoint(x, y, { constrainedPlacement: this._pendingMouseShift });
+      this.updateCrosshairForMousePoint(
+        x,
+        y,
+        { constrainedPlacement: this._pendingMouseShift },
+        crosshairHitState,
+      );
       // Re-assert cursor on every move. Konva/button handlers can set the cursor
       // directly, and relying only on state transitions can leave the container
       // stuck in pointer mode after an interaction completes.
@@ -779,8 +796,6 @@ export class EventManager {
       } else if (this.state.isOverPriceAxis) {
         this.callbacks.onCursorChange?.('ns-resize');
       } else if (this.state.isOverInteractive) {
-        this.callbacks.onCursorChange?.('pointer');
-      } else if (this.callbacks.isOverUnlockedUserDrawing?.(x, y)) {
         this.callbacks.onCursorChange?.('pointer');
       } else {
         this.callbacks.onCursorChange?.('crosshair');

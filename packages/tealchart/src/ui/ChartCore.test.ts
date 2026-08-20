@@ -1473,7 +1473,8 @@ describe('ChartCore viewport management', () => {
     };
     expect(bound.chartLabel?.segments.find((segment) => segment.text === '-$12.50')).toMatchObject({
       backgroundColor: 'rgba(62, 136, 221, 1)',
-      borderColor: 'rgba(255, 255, 255, 0.10)',
+      // Same outline as the rest of the pill, so its top and bottom edge join up.
+      borderColor: '#2196F3',
       textColor: '#ee3355',
     });
     expect(bound.chartLabel?.segments.find((segment) => segment.text === 'Long')).toMatchObject({
@@ -1494,14 +1495,15 @@ describe('ChartCore viewport management', () => {
       borderColor: '#2196F3',
       iconColor: '#ffffff',
     });
+    // Each bracket chip is outlined in its own ink rather than a shared hairline.
     expect(bound.chartLabel?.buttons?.find((button) => button.type === 'tp')).toMatchObject({
       backgroundColor: 'rgba(28, 153, 226, 1)',
-      borderColor: 'rgba(255, 255, 255, 0.10)',
+      borderColor: '#00aa77',
       iconColor: '#00aa77',
     });
     expect(bound.chartLabel?.buttons?.find((button) => button.type === 'sl')).toMatchObject({
       backgroundColor: 'rgba(72, 144, 203, 1)',
-      borderColor: 'rgba(255, 255, 255, 0.10)',
+      borderColor: '#f97316',
       iconColor: '#f97316',
     });
     expect(bound.chartLabel?.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
@@ -1530,7 +1532,7 @@ describe('ChartCore viewport management', () => {
     });
     expect(positiveBound.chartLabel?.segments.find((segment) => segment.text === '$12.50')).toMatchObject({
       backgroundColor: 'rgba(15, 38, 31, 1)',
-      borderColor: 'rgba(255, 255, 255, 0.10)',
+      borderColor: '#111111',
       textColor: '#00aa77',
     });
     expect(core.getViewport()).not.toBeNull();

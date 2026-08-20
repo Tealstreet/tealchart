@@ -42,7 +42,7 @@ describe('ChartLegend layout', () => {
     });
     legend.mount(document.body);
 
-    expect(legend.getElement().style.left).toBe('34px');
+    expect(legend.getElement().style.left).toBe('12px');
 
     legend.setChromeMetrics(resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, false));
     expect(legend.getElement().style.left).toBe('70px');
@@ -59,7 +59,7 @@ describe('ChartLegend layout', () => {
     });
     legend.mount(document.body);
 
-    expect(legend.getElement().style.left).toBe('34px');
+    expect(legend.getElement().style.left).toBe('12px');
 
     legend.setChromeMetrics(resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, false));
     expect(legend.getElement().style.left).toBe('70px');

@@ -565,10 +565,17 @@ export class TealchartWidgetUI {
       onCrossHairMoved: this.options.onCrossHairMoved,
       onUserDrawingInput: this.options.onUserDrawingInput,
       onUserDrawingSelection: this.options.onUserDrawingSelection,
-      onUserDrawingEditStart: this.options.onUserDrawingEditStart,
+      onUserDrawingEditStart: (point, spacesByPaneId, options) => {
+        const started = this.options.onUserDrawingEditStart?.(point, spacesByPaneId, options) === true;
+        this.setUserDrawingEditDragActive(started);
+        return started;
+      },
       onUserDrawingContextMenu: this.options.onUserDrawingContextMenu,
       onUserDrawingEditMove: this.options.onUserDrawingEditMove,
-      onUserDrawingEditEnd: this.options.onUserDrawingEditEnd,
+      onUserDrawingEditEnd: () => {
+        this.options.onUserDrawingEditEnd?.();
+        this.setUserDrawingEditDragActive(false);
+      },
       onUserDrawingMeasureStart: this.options.onUserDrawingMeasureStart,
       onUserDrawingMeasureMove: this.options.onUserDrawingMeasureMove,
       onUserDrawingMeasureEnd: this.options.onUserDrawingMeasureEnd,
@@ -730,6 +737,10 @@ export class TealchartWidgetUI {
       availability?.canUndo === true ? 'undo' : 'no-undo',
       availability?.canRedo === true ? 'redo' : 'no-redo',
     ].join('|');
+  }
+
+  private setUserDrawingEditDragActive(active: boolean): void {
+    this.topBar?.setUserDrawingEditDragActive(active);
   }
 
   private updateUserDrawingSelectionActionAnchor(): void {

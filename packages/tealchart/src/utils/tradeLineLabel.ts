@@ -7,7 +7,6 @@ import type {
 } from '../types';
 
 import {
-  DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
   STOP_LOSS_COLOR,
   TRADE_LINE_SEGMENT_TINT_ALPHA,
   TRADE_LINE_WARM_SEGMENT_TINT_ALPHA,
@@ -17,8 +16,11 @@ import { tintOver } from './colorAlpha';
 /**
  * Puts the line's side color on the leading edge of the assembled label.
  *
- * Deliberately applied after assembly rather than inside buildBodySegments: an
- * order with no body text contributes no segment, and the rail belongs to
+ * Positions only - the rail is what tells a position label apart from an order
+ * label at a glance, so orders deliberately go without it.
+ *
+ * Deliberately applied after assembly rather than inside buildBodySegments: a
+ * line with no body text contributes no segment, and the rail belongs to
  * whichever segment ends up first.
  */
 function withLeadingAccent(segments: ChartLabelSegment[], accentColor: string): ChartLabelSegment[] {
@@ -56,7 +58,7 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
 
   return {
     offsetPercent: order.lineLength,
-    segments: withLeadingAccent([
+    segments: [
       ...buildBodySegments(
         order.text,
         order.textShort,
@@ -71,7 +73,7 @@ export function resolveOrderTradeLineLabel(order: OrderLineRenderData, positiveC
         order.quantityTextColor,
         order.quantityBorderColor,
       ),
-    ], order.lineColor),
+    ],
     buttons: [
       ...buildBracketButtons(
         order.brackets !== null,
@@ -141,7 +143,10 @@ export function resolvePositionTradeLineLabel(
                 TRADE_LINE_SEGMENT_TINT_ALPHA,
               ),
               textColor: pnlStateColor ?? position.bodyTextColor,
-              borderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+              // Same outline as the segments beside it: a hairline here broke
+              // the pill's top and bottom edge, which read as the neighbouring
+              // segments being brighter rather than as PnL being quieter.
+              borderColor: position.bodyBorderColor,
             },
           ]
         : []),
@@ -218,7 +223,9 @@ function buildBracketButtons(
       backgroundColor: tintOver(labelBackgroundColor, takeProfitColor, TRADE_LINE_SEGMENT_TINT_ALPHA),
       accentColor: takeProfitColor,
       iconColor: takeProfitTextColor,
-      borderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+      // Outlined in its own ink rather than a hairline, so the bracket pair
+      // reads as two coloured chips instead of one grey block.
+      borderColor: takeProfitTextColor,
       tooltip: 'Drag to set Take Profit',
     },
     {
@@ -227,7 +234,7 @@ function buildBracketButtons(
       backgroundColor: tintOver(labelBackgroundColor, stopLossColor, TRADE_LINE_WARM_SEGMENT_TINT_ALPHA),
       accentColor: stopLossColor,
       iconColor: stopLossTextColor,
-      borderColor: DEFAULT_TRADE_LINE_HAIRLINE_COLOR,
+      borderColor: stopLossTextColor,
       tooltip: 'Drag to set Stop Loss',
     },
   ];

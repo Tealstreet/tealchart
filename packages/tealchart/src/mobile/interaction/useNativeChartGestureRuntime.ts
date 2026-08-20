@@ -40,6 +40,7 @@ import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDra
 import {
   createNativeCanvasTapGesture,
   createNativeLeftToolRailToggleTapGesture,
+  createNativePaneMaximizeTapGesture,
   createNativePriceAxisResetTapGesture,
   createNativeResetViewTapGesture,
 } from './nativeTapGestures';
@@ -97,6 +98,7 @@ export interface NativeChartGestureRuntimeInput {
     typeof createNativeSelectedDrawingActionTapGesture
   >[0]['onPopoverGroupChange'];
   onPriceAxisResetTap: () => void;
+  onTogglePaneMaximize?: (paneId: string) => void;
   onResetViewTap: Parameters<typeof createNativeResetViewTapGesture>[0]['onResetViewTap'];
   panActive: SharedValue<boolean>;
   pinchActive: SharedValue<boolean>;
@@ -184,6 +186,7 @@ export function useNativeChartGestureRuntime({
   onSelectedDrawingAction,
   onSelectedDrawingActionPopoverGroupChange,
   onPriceAxisResetTap,
+  onTogglePaneMaximize = () => undefined,
   onResetViewTap,
   panActive,
   pinchActive,
@@ -224,6 +227,7 @@ export function useNativeChartGestureRuntime({
     onSelectedDrawingActionPopoverGroupChange,
   );
   const stableOnPriceAxisResetTap = useLatestNativeCallback(onPriceAxisResetTap);
+  const stableOnTogglePaneMaximize = useLatestNativeCallback(onTogglePaneMaximize);
   const stableOnResetViewTap = useLatestNativeCallback(onResetViewTap);
   const resetTapStartX = useSharedValue(0);
   const resetTapStartY = useSharedValue(0);
@@ -563,6 +567,14 @@ export function useNativeChartGestureRuntime({
     });
   }, [chartInteractionFrame, controlZones, stableOnPriceAxisResetTap]);
 
+  const paneMaximizeTapGesture = useMemo<GestureType>(() => {
+    return createNativePaneMaximizeTapGesture({
+      controlZones,
+      frame: chartInteractionFrame,
+      onTogglePaneMaximize: stableOnTogglePaneMaximize,
+    });
+  }, [chartInteractionFrame, controlZones, stableOnTogglePaneMaximize]);
+
   const priceScaleGesture = useMemo<GestureType>(() => {
     return createNativePriceScaleGesture({
       beginNativeViewportInteraction: stableBeginNativeViewportInteraction,
@@ -624,6 +636,7 @@ export function useNativeChartGestureRuntime({
         leftToolRailToggleTapGesture,
         orderDragGesture,
         overlayActionTapGesture,
+        paneMaximizeTapGesture,
         priceAxisResetTapGesture,
         priceScaleGesture,
         resetViewTapGesture,
@@ -641,6 +654,7 @@ export function useNativeChartGestureRuntime({
       leftToolRailToggleTapGesture,
       orderDragGesture,
       overlayActionTapGesture,
+      paneMaximizeTapGesture,
       priceAxisResetTapGesture,
       priceScaleGesture,
       resetViewTapGesture,

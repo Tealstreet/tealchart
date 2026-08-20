@@ -28,6 +28,7 @@ import { NATIVE_RESET_VIEW_HIT_SIZE, resolveNativeResetViewButtonLayout } from '
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
 import {
   createNativeLeftToolRailToggleTapGesture,
+  createNativePaneMaximizeTapGesture,
   createNativePriceAxisResetTapGesture,
   createNativeResetViewTapGesture,
 } from './nativeTapGestures';
@@ -160,6 +161,14 @@ function tapClaimState() {
 const frame = createNativeChartFrameFromPanes({
   dimensions: { width: 220, height: 180, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
   panes: [{ id: 'main', type: 'main', top: 36, height: 104, yMin: 62_000, yMax: 64_000 }],
+});
+
+const multiPaneFrame = createNativeChartFrameFromPanes({
+  dimensions: { width: 220, height: 220, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
+  panes: [
+    { id: 'main', type: 'main', top: 36, height: 84, yMin: 62_000, yMax: 64_000 },
+    { id: 'pane_1', type: 'indicator', top: 120, height: 60, yMin: 0, yMax: 100 },
+  ],
 });
 
 const viewportValue: Viewport = {
@@ -498,6 +507,49 @@ describe('native gesture activation', () => {
     priceAxisResetTapGesture.handlers.onEnd({ x: frame.priceAxisHitLeft + 10, y: 80 }, false);
 
     expect(onResetView).not.toHaveBeenCalled();
+  });
+
+  it('maximizes the pane a double tap lands in when there is more than one', () => {
+    const onTogglePaneMaximize = vi.fn();
+    const gesture = createNativePaneMaximizeTapGesture({
+      frame: multiPaneFrame,
+      onTogglePaneMaximize,
+    }) as any;
+
+    expect(gesture.config.numberOfTaps).toBe(2);
+
+    gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 60 }, true);
+    expect(onTogglePaneMaximize).toHaveBeenCalledWith('main');
+
+    gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 150 }, true);
+    expect(onTogglePaneMaximize).toHaveBeenLastCalledWith('pane_1');
+  });
+
+  it('leaves pane-maximize double taps outside the plot alone', () => {
+    const onTogglePaneMaximize = vi.fn();
+    const gesture = createNativePaneMaximizeTapGesture({
+      controlZones: [{ x1: 0, x2: 40, y1: 50, y2: 70 }],
+      frame: multiPaneFrame,
+      onTogglePaneMaximize,
+    }) as any;
+
+    // The price axis, which owns its own double tap.
+    gesture.handlers.onEnd({ x: multiPaneFrame.priceAxisHitLeft + 5, y: 60 }, true);
+    // The time axis, below every pane.
+    gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: multiPaneFrame.timeAxisTop + 10 }, true);
+    // A control zone belonging to some other gesture.
+    gesture.handlers.onEnd({ x: 10, y: 60 }, true);
+    // A failed tap sequence.
+    gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 60 }, false);
+
+    expect(onTogglePaneMaximize).not.toHaveBeenCalled();
+  });
+
+  it('stays disabled on a single-pane chart so the crosshair keeps its taps', () => {
+    const onTogglePaneMaximize = vi.fn();
+    const gesture = createNativePaneMaximizeTapGesture({ frame, onTogglePaneMaximize }) as any;
+
+    expect(gesture.config.enabled).toBe(false);
   });
 
   it('leaves price-axis double taps that land on a control zone to their owner', () => {

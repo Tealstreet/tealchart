@@ -149,6 +149,19 @@ export function clampNativePriceAxisTagBottom(centerY: number, height: number, m
   return Math.min(centerY, maxY - height / 2);
 }
 
+/**
+ * Two tags are in the same run when the lower one is already sitting on the
+ * upper one's edge, which is what the stacking passes leave behind.
+ */
+function isNativePriceAxisTagPackedAgainst(
+  previous: { centerY: number; height: number },
+  current: { centerY: number; height: number },
+  gap: number,
+): boolean {
+  'worklet';
+  return current.centerY - current.height / 2 <= previous.centerY + previous.height / 2 + gap + 0.001;
+}
+
 export function resolveNativePriceAxisTagStack(
   sources: readonly NativePriceAxisTagCollisionSource[],
   minY: number,
@@ -277,10 +290,14 @@ export function resolveNativePriceAxisTagStack(
     resolved[index].centerY = Math.min(Math.max(resolved[index].centerY, minCenter), maxCenter);
   }
 
+  // Only the run packed against the overflowing edge gives way. Shifting every
+  // tag moved ones that had the axis to themselves, so a lone order tag ended
+  // up a slot below its own line because something else was crowded elsewhere.
   const last = resolved[resolved.length - 1];
   const bottomOverflow = last.centerY + last.height / 2 - maxY;
   if (bottomOverflow > 0) {
-    for (let index = 0; index < resolved.length; index += 1) {
+    for (let index = resolved.length - 1; index >= 0; index -= 1) {
+      if (index < resolved.length - 1 && !isNativePriceAxisTagPackedAgainst(resolved[index], resolved[index + 1], gap)) break;
       if (!resolved[index].fixed) resolved[index].centerY -= bottomOverflow;
     }
   }
@@ -296,6 +313,7 @@ export function resolveNativePriceAxisTagStack(
   const topOverflow = minY - (first.centerY - first.height / 2);
   if (topOverflow > 0) {
     for (let index = 0; index < resolved.length; index += 1) {
+      if (index > 0 && !isNativePriceAxisTagPackedAgainst(resolved[index - 1], resolved[index], gap)) break;
       if (!resolved[index].fixed) resolved[index].centerY += topOverflow;
     }
   }

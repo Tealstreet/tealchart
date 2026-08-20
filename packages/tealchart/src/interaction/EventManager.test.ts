@@ -285,6 +285,85 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('stands the crosshair down while the pointer is over an interactive element', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRafFrame = () => {
+      for (const callback of rafCallbacks.splice(0)) {
+        callback(0);
+      }
+    };
+    const container = createContainer();
+    const onCrossHairVisibilityChange = vi.fn();
+    const onCursorChange = vi.fn();
+    let overInteractive = false;
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        isOverInteractiveElement: () => overInteractive,
+        onCrossHairVisibilityChange,
+        onCursorChange,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 100, clientY: 100 }));
+    flushRafFrame();
+    expect(manager.getCrosshair().visible).toBe(true);
+
+    overInteractive = true;
+    container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 120, clientY: 110 }));
+    flushRafFrame();
+    expect(manager.getCrosshair().visible).toBe(false);
+    expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(false);
+    expect(onCursorChange).toHaveBeenLastCalledWith('pointer');
+
+    overInteractive = false;
+    container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 140, clientY: 120 }));
+    flushRafFrame();
+    expect(manager.getCrosshair().visible).toBe(true);
+    expect(onCrossHairVisibilityChange).toHaveBeenLastCalledWith(true);
+
+    manager.dispose();
+  });
+
+  it('stands the crosshair down over a grabbable drawing too', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRafFrame = () => {
+      for (const callback of rafCallbacks.splice(0)) {
+        callback(0);
+      }
+    };
+    const container = createContainer();
+    const onCursorChange = vi.fn();
+    let overDrawing = false;
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        isOverUnlockedUserDrawing: () => overDrawing,
+        onCursorChange,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 100, clientY: 100 }));
+    flushRafFrame();
+    expect(manager.getCrosshair().visible).toBe(true);
+
+    overDrawing = true;
+    container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 120, clientY: 110 }));
+    flushRafFrame();
+    expect(manager.getCrosshair().visible).toBe(false);
+    expect(onCursorChange).toHaveBeenLastCalledWith('pointer');
+
+    manager.dispose();
+  });
+
   it('keeps the crosshair visible and moving during canvas pan drag', () => {
     const rafCallbacks: FrameRequestCallback[] = [];
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {

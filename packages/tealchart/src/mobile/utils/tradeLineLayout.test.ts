@@ -543,6 +543,45 @@ describe('native trade line layout', () => {
     expect(buttons[buttons.length - 1]?.corners).toBe('right');
   });
 
+  it('bridges the bracket gap so TP/SL is not a detached chip', () => {
+    const [geometry] = buildNativeTradeLineGeometries([], [
+      createPositionLine({ positionData: { entryPrice: 63600, isLong: true, notional: 2500 } }),
+    ], {
+      dimensions,
+      pricePrecision: 0.1,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    });
+
+    const closeButton = geometry?.buttons.find((button) => button.type === 'close');
+    const takeProfitButton = geometry?.buttons.find((button) => button.type === 'tp');
+
+    expect(geometry?.bracketConnector?.x1).toBe((closeButton?.x ?? 0) + (closeButton?.width ?? 0));
+    expect(geometry?.bracketConnector?.x2).toBe(takeProfitButton?.x);
+    expect(geometry?.bracketConnector?.color).toBe(geometry?.segments[0]?.accentColor);
+  });
+
+  it('leaves no bracket connector on a label without brackets', () => {
+    const [geometry] = buildNativeTradeLineGeometries([], [
+      createPositionLine({
+        brackets: null,
+        positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+      }),
+    ], {
+      dimensions,
+      pricePrecision: 0.1,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    });
+
+    expect(geometry?.buttons.some((button) => button.type === 'tp')).toBe(false);
+    expect(geometry?.bracketConnector).toBeNull();
+  });
+
   it('builds stable position geometry with reverse, close, bracket actions, and no order drag zone', () => {
     const [geometry] = buildNativeTradeLineGeometries([], [
       createPositionLine({

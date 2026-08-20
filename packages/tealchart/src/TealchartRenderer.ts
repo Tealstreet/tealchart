@@ -46,6 +46,7 @@ import {
   Viewport,
 } from './types';
 import { resolveLabelCollisions } from './utils/labelCollision';
+import { resolvePriceAxisTagStyle } from './utils/priceAxisTagStyle';
 
 /**
  * TealchartRenderer - Pure canvas rendering for OHLCV data
@@ -928,22 +929,21 @@ export class TealchartRenderer {
       ctx.restore();
     }
 
-    // Draw label border with rounded corners
-    if (bound.label.filled) {
-      ctx.fillStyle = bound.label.backgroundColor || color;
-      ctx.beginPath();
-      ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
-      ctx.fill();
-    }
-    ctx.strokeStyle = color;
+    // Draw label border with rounded corners. Unfilled keeps the dark backing
+    // rather than going transparent, so the grid cannot read through the tag.
+    const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color });
+    ctx.fillStyle = tagStyle.backgroundColor;
+    ctx.beginPath();
+    ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
+    ctx.fill();
+    ctx.strokeStyle = tagStyle.borderColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
     ctx.stroke();
 
     // Draw text
-    const textColor = bound.label.textColor || color;
-    ctx.fillStyle = textColor;
+    ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -5010,21 +5010,21 @@ export class TealchartRenderer {
       ctx.restore();
     }
 
-    // Label border
-    if (bound.label.filled) {
-      ctx.fillStyle = bound.label.backgroundColor || color;
-      ctx.beginPath();
-      ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
-      ctx.fill();
-    }
-    ctx.strokeStyle = color;
+    // Label border. Unfilled keeps the dark backing rather than going
+    // transparent, so the grid cannot read through the tag.
+    const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color });
+    ctx.fillStyle = tagStyle.backgroundColor;
+    ctx.beginPath();
+    ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
+    ctx.fill();
+    ctx.strokeStyle = tagStyle.borderColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(labelX, labelY, bound.width, bound.height, 2);
     ctx.stroke();
 
     // Label text
-    ctx.fillStyle = bound.label.textColor || color;
+    ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

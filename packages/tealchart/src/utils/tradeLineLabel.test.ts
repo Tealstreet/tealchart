@@ -118,18 +118,19 @@ describe('trade line label resolver', () => {
     // PnL carries its state as tinted ground plus full-strength text.
     expect(label.segments[2]?.backgroundColor).toBe('rgba(30, 58, 56, 1)');
     expect(label.segments[2]?.textColor).toBe('#12c48b');
-    expect(label.segments[2]?.borderColor).toBe('rgba(255, 255, 255, 0.10)');
+    // The pill's outline runs unbroken across PnL rather than dropping to a hairline.
+    expect(label.segments[2]?.borderColor).toBe(label.segments[0]?.borderColor);
     expect(label.buttons?.map((button) => button.type)).toEqual(['reverse', 'close', 'tp', 'sl']);
     expect(label.buttons?.map((button) => button.icon)).toEqual(['⇄', '×', 'TP', 'SL']);
   });
 
-  it('rails the leading segment in the line color on both line types', () => {
+  it('rails the leading segment in the line color on positions only', () => {
     const orderLabel = resolveOrderTradeLineLabel(createOrderLine(), '#12c48b');
     const positionLabel = resolvePositionTradeLineLabel(createPositionLine(), '#12c48b', '#ff4d67');
 
-    expect(orderLabel.segments[0]?.accentColor).toBe('#18aee8');
-    expect(orderLabel.segments.slice(1).every((segment) => segment.accentColor === undefined)).toBe(true);
+    expect(orderLabel.segments.every((segment) => segment.accentColor === undefined)).toBe(true);
     expect(positionLabel.segments[0]?.accentColor).toBe('#18aee8');
+    expect(positionLabel.segments.slice(1).every((segment) => segment.accentColor === undefined)).toBe(true);
   });
 
   it('tints the bracket buttons instead of filling them', () => {

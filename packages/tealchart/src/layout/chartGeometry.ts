@@ -98,13 +98,12 @@ export const MOBILE_CHART_CHROME_METRICS: ChartChromeMetrics = {
 /**
  * How much room a collapsed left tool rail still occupies.
  *
- * A collapsed rail slides off-canvas and leaves only its re-open tab showing,
- * so this is that tab's width - anything larger reserves space for a rail that
- * is not there, which is what left a band of dead canvas between the plot and
- * the legend. `ChartTopBar` slides the rail by `leftToolRailWidth` minus this,
- * so the two must be the same number.
+ * Zero: the rail slides fully off-canvas and its re-open tab hangs past the
+ * rail's edge, floating over the plot rather than sitting in reserved chrome.
+ * Anything larger leaves a band of dead canvas beside the plot. `ChartTopBar`
+ * slides the rail by `leftToolRailWidth` minus this, so the two must agree.
  */
-export const LEFT_TOOL_RAIL_COLLAPSED_WIDTH = 14;
+export const LEFT_TOOL_RAIL_COLLAPSED_WIDTH = 0;
 
 /** How long the rail takes to slide, for anything animating alongside it. */
 export const LEFT_TOOL_RAIL_ANIMATION_DURATION_MS = 160;
@@ -175,9 +174,14 @@ export function resolveLeftToolRailWidth(
 }
 
 export function resolveLeftToolRailMetrics(metrics: ChartChromeMetrics, collapsed: boolean): ChartChromeMetrics {
+  const leftToolRailWidth = resolveLeftToolRailWidth(metrics, collapsed);
   return {
     ...metrics,
-    leftToolRailWidth: resolveLeftToolRailWidth(metrics, collapsed),
+    leftToolRailWidth,
+    // With no rail on canvas there is nothing to hold a gap beside, so the
+    // legend and label chrome close up to the edge instead of trailing the
+    // rail's orphaned inset.
+    leftToolRailInset: leftToolRailWidth === 0 ? 0 : metrics.leftToolRailInset,
   };
 }
 

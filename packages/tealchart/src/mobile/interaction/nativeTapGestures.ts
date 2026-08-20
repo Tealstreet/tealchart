@@ -15,6 +15,7 @@ import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
+import { getNativePaneAtY } from '../render/nativeChartFrame';
 import { isNativeLeftToolRailToggleTap } from '../utils/leftToolRailLayout';
 import { resolveNativeCanvasTap } from './nativeCanvasTapResolver';
 import { toggleNativeCrosshair } from './nativeCrosshair';
@@ -216,6 +217,39 @@ export function createNativePriceAxisResetTapGesture({
       if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
       if (!canBeginNativePriceScaleGesture(geometry, event.x, event.y)) return;
       runOnJS(onResetView)();
+    });
+}
+
+export interface NativePaneMaximizeTapGestureInput {
+  controlZones?: readonly NativeGestureControlZone[];
+  frame: NativeChartFrame | null;
+  onTogglePaneMaximize: (paneId: string) => void;
+}
+
+/**
+ * Double tap a pane to blow it up to the whole canvas, tap again to put the
+ * panes back - web's `onPaneDoubleClick`, which native never had.
+ *
+ * Only armed with a second pane on screen, so a plain chart's taps are left
+ * entirely to the crosshair.
+ */
+export function createNativePaneMaximizeTapGesture({
+  controlZones = [],
+  frame,
+  onTogglePaneMaximize,
+}: NativePaneMaximizeTapGestureInput) {
+  if (!frame || frame.panes.length <= 1) return Gesture.Tap().enabled(false);
+
+  return Gesture.Tap()
+    .numberOfTaps(2)
+    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
+    .onEnd((event, success) => {
+      if (!success) return;
+      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
+      if (event.x < frame.contentLeft || event.x >= frame.priceAxisHitLeft) return;
+      const pane = getNativePaneAtY(frame, event.y);
+      if (!pane) return;
+      runOnJS(onTogglePaneMaximize)(pane.id);
     });
 }
 
