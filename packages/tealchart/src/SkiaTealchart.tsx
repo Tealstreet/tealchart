@@ -124,6 +124,10 @@ import {
   getNativeOrderObjectId as getOrderObjectId,
   getNativePositionObjectId as getPositionObjectId,
 } from './mobile/utils/tradeLineLayout';
+import {
+  applyNativePaneHeightOverrides,
+  createNativePaneLayoutSignature,
+} from './mobile/utils/nativePaneLayoutOverrides';
 import { EventEmitter } from './events/EventEmitter';
 import { applyChartOverridesToRenderOptions } from './overrides';
 import { getChartStore } from './state/chartState';
@@ -423,18 +427,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
+  // Keyed on the signature, never on the layout object: the manager mints a new
+  // wrapper per call, so once a divider drag leaves height overrides behind an
+  // object-keyed memo hands back a new layout every render, and the frame and
+  // every gesture rebuild with it.
+  const nativePaneLayoutSignature = createNativePaneLayoutSignature(
+    nativeIndicatorPaneLayoutBase,
+    nativePaneHeightOverrides,
+  );
+  const nativePaneLayoutInputRef = useRef({
+    base: nativeIndicatorPaneLayoutBase,
+    overrides: nativePaneHeightOverrides,
+  });
+  nativePaneLayoutInputRef.current.base = nativeIndicatorPaneLayoutBase;
+  nativePaneLayoutInputRef.current.overrides = nativePaneHeightOverrides;
   const nativeIndicatorPaneLayout = useMemo(() => {
-    if (!nativeIndicatorPaneLayoutBase) return nativeIndicatorPaneLayoutBase;
-    const panes = nativeIndicatorPaneLayoutBase.panes;
-    if (!panes.some((pane) => nativePaneHeightOverrides[pane.id] !== undefined)) return nativeIndicatorPaneLayoutBase;
-    return {
-      ...nativeIndicatorPaneLayoutBase,
-      panes: panes.map((pane) => {
-        const heightRatio = nativePaneHeightOverrides[pane.id];
-        return heightRatio === undefined ? pane : { ...pane, heightRatio };
-      }),
-    };
-  }, [nativeIndicatorPaneLayoutBase, nativePaneHeightOverrides]);
+    const { base, overrides } = nativePaneLayoutInputRef.current;
+    return base ? applyNativePaneHeightOverrides(base, overrides) : base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativePaneLayoutSignature]);
   // The maximize toggle runs off a gesture callback, so it reads the panes from
   // a ref rather than closing over a layout that re-renders under it.
   const nativePaneLayoutRef = useRef(nativeIndicatorPaneLayout);
@@ -452,7 +463,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (samePanes) return;
     nativePaneMaximizeStateRef.current = IDLE_PANE_MAXIMIZE_STATE;
     setNativePaneHeightOverrides((current) => ({ ...current, ...savedHeightRatios }));
-  }, [nativeIndicatorPaneLayoutBase]);
+    // Keyed on the signature: the layout object itself is minted fresh per call.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativePaneLayoutSignature]);
 
   const nativeIndicatorPlots = indicatorManager?.getPlots() ?? [];
   const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {

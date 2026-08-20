@@ -3,7 +3,7 @@ import type { ChartThemeInput } from '../../theme';
 import type { ChartMargins, RenderOptions, UnifiedPaneLayout } from '../../types';
 import type { NativeChartFrame } from './nativeChartFrame';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
   computePaneGeometry,
@@ -13,6 +13,7 @@ import {
 } from '../../layout/chartGeometry';
 import { mergeChartThemeRenderOptions } from '../../theme';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from '../../types';
+import { createNativePaneLayoutSignature } from '../utils/nativePaneLayoutOverrides';
 import { createNativePriceAxisLaneWidth } from '../utils/nativePriceAxisLane';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 
@@ -154,26 +155,27 @@ export function useNativeSkiaLayoutRuntime({
     [dimensions.height, dimensions.width, leftToolRailCollapsed, margins, pricePrecision, themedRenderOptions],
   );
   const paneLayoutPanes = paneLayout?.panes;
-  const paneLayoutSignature =
-    (paneLayoutPanes ?? [])
-      .map((pane) =>
-        [
-          pane.id,
-          pane.type,
-          pane.heightRatio,
-          pane.yMin,
-          pane.yMax,
-          pane.fixedRange ? 'fixed' : 'auto',
-          pane.indicatorIds?.join(',') ?? '',
-        ].join(':'),
-      )
-      .join('|') || 'main';
+  // The same signature the consumer keys its layout memo on, so the two cannot
+  // disagree about what counts as a changed layout.
+  const paneLayoutSignature = createNativePaneLayoutSignature(paneLayout) || 'main';
+
+  // Held so the frame keys off the signature alone. Consumers rebuild a pane
+  // layout object per render once a divider drag has left height overrides
+  // behind, and taking that identity as a dep rebuilt the frame - and with it
+  // every gesture - on every render, so the gesture detector never settled.
+  const paneLayoutPanesRef = useRef(paneLayoutPanes);
+  const paneLayoutSignatureRef = useRef(paneLayoutSignature);
+  if (paneLayoutSignatureRef.current !== paneLayoutSignature) {
+    paneLayoutSignatureRef.current = paneLayoutSignature;
+    paneLayoutPanesRef.current = paneLayoutPanes;
+  }
 
   const frame = useMemo<NativeChartFrame | null>(() => {
+    const stablePaneLayoutPanes = paneLayoutPanesRef.current;
     if (dimensions.width <= 0 || dimensions.height <= 0) return null;
     const resolvedPaneLayout: UnifiedPaneLayout = {
-      panes: paneLayoutPanes?.length
-        ? paneLayoutPanes
+      panes: stablePaneLayoutPanes?.length
+        ? stablePaneLayoutPanes
         : [
             {
               id: 'main',
@@ -200,7 +202,7 @@ export function useNativeSkiaLayoutRuntime({
       },
       panes,
     });
-  }, [dimensions.height, dimensions.width, margins, paneLayoutPanes, paneLayoutSignature]);
+  }, [dimensions.height, dimensions.width, margins, paneLayoutSignature]);
 
   return {
     frame,
