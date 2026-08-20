@@ -14,6 +14,7 @@ import type {
 
 import { computePaneGeometry } from '../layout/chartGeometry';
 import { DEFAULT_INDICATOR_PANE_HEIGHT, MIN_PANE_HEIGHT, TIME_AXIS_HEIGHT } from '../types';
+import { IDLE_PANE_MAXIMIZE_STATE, type PaneMaximizeState, togglePaneMaximize } from '../utils/paneMaximize';
 
 /**
  * Computed pane position for rendering (legacy - use ComputedPane instead)
@@ -51,10 +52,8 @@ export class PaneManager {
   /** Pixels reserved for time axis */
   private timeAxisHeight = TIME_AXIS_HEIGHT;
 
-  /** Which pane is maximized (null = normal mode) */
-  private _maximizedPaneId: string | null = null;
-  /** Saved height ratios before maximize (for restore) */
-  private _savedHeightRatios: Map<string, number> | null = null;
+  /** Maximize bookkeeping, shared with native through `togglePaneMaximize`. */
+  private _maximizeState: PaneMaximizeState = IDLE_PANE_MAXIMIZE_STATE;
 
   constructor() {
     // Initialize with just the main pane
@@ -89,9 +88,7 @@ export class PaneManager {
     }
 
     // If maximized, restore first so the new pane gets proper layout
-    if (this._maximizedPaneId !== null) {
-      this._restoreFromMaximize();
-    }
+    this._restoreFromMaximize();
 
     // Check if we can add to an existing indicator pane with same yAxisRange
     const existingPane = this.findCompatiblePane(yAxisRange);
@@ -136,11 +133,11 @@ export class PaneManager {
         // Remove empty indicator panes
         if (indicatorIds.length === 0) {
           // If the maximized pane is being removed, restore first
-          if (this._maximizedPaneId === pane.id) {
+          if (this._maximizeState.maximizedPaneId === pane.id) {
             this._restoreFromMaximize();
           }
           // Also clean up saved ratios for this pane
-          this._savedHeightRatios?.delete(pane.id);
+          this._forgetSavedHeightRatio(pane.id);
 
           this.panes.splice(i, 1);
           this.rebalanceHeights();
@@ -340,8 +337,7 @@ export class PaneManager {
   reset(): void {
     this.panes = [this.createMainPane()];
     this.paneIdCounter = 0;
-    this._maximizedPaneId = null;
-    this._savedHeightRatios = null;
+    this._maximizeState = IDLE_PANE_MAXIMIZE_STATE;
   }
 
   // ===========================================================================
@@ -354,65 +350,46 @@ export class PaneManager {
    * No-op when only one pane exists.
    */
   toggleMaximizePane(paneId: string): void {
-    // No-op with only main pane
-    if (this.panes.length <= 1) return;
+    this._applyMaximizeToggle(togglePaneMaximize(this._maximizeState, this.panes, paneId));
+  }
 
-    // Verify pane exists
-    const targetPane = this.panes.find((p) => p.id === paneId);
-    if (!targetPane) return;
+  private _applyMaximizeToggle(toggled: ReturnType<typeof togglePaneMaximize>): void {
+    if (!toggled) return;
 
-    if (this._maximizedPaneId === paneId) {
-      // Restore from maximize
-      this._restoreFromMaximize();
-    } else {
-      // Save current ratios (only if not already maximized)
-      if (this._maximizedPaneId === null) {
-        this._savedHeightRatios = new Map();
-        for (const pane of this.panes) {
-          this._savedHeightRatios.set(pane.id, pane.heightRatio);
-        }
-      }
-
-      // Maximize: target gets 1.0, others get 0
-      for (const pane of this.panes) {
-        pane.heightRatio = pane.id === paneId ? 1.0 : 0;
-      }
-      this._maximizedPaneId = paneId;
+    for (const pane of this.panes) {
+      const heightRatio = toggled.heightRatios[pane.id];
+      if (heightRatio !== undefined) pane.heightRatio = heightRatio;
     }
+    this._maximizeState = toggled.state;
+  }
+
+  /** Put the panes back, for the layout changes that cannot stay maximized. */
+  private _restoreFromMaximize(): void {
+    const { maximizedPaneId } = this._maximizeState;
+    if (maximizedPaneId === null) return;
+    this._applyMaximizeToggle(togglePaneMaximize(this._maximizeState, this.panes, maximizedPaneId));
+    this._maximizeState = IDLE_PANE_MAXIMIZE_STATE;
+  }
+
+  private _forgetSavedHeightRatio(paneId: string): void {
+    const saved = this._maximizeState.savedHeightRatios;
+    if (!saved || saved[paneId] === undefined) return;
+    const { [paneId]: _removed, ...rest } = saved;
+    this._maximizeState = { ...this._maximizeState, savedHeightRatios: rest };
   }
 
   /**
    * Whether any pane is currently maximized
    */
   isMaximized(): boolean {
-    return this._maximizedPaneId !== null;
+    return this._maximizeState.maximizedPaneId !== null;
   }
 
   /**
    * Get the ID of the currently maximized pane (null if none)
    */
   getMaximizedPaneId(): string | null {
-    return this._maximizedPaneId;
-  }
-
-  /**
-   * Restore pane heights from saved ratios
-   */
-  private _restoreFromMaximize(): void {
-    if (!this._savedHeightRatios) return;
-
-    for (const pane of this.panes) {
-      const saved = this._savedHeightRatios.get(pane.id);
-      if (saved !== undefined) {
-        pane.heightRatio = saved;
-      }
-    }
-
-    // Clean up panes whose saved ratio no longer exists (added while maximized)
-    // They'll get rebalanced on next addIndicator
-
-    this._maximizedPaneId = null;
-    this._savedHeightRatios = null;
+    return this._maximizeState.maximizedPaneId;
   }
 
   // ===========================================================================

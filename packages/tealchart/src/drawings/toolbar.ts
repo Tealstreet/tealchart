@@ -1736,7 +1736,12 @@ export function resolveUserDrawingSelectedActionSurface(
 export function shouldRenderUserDrawingSelectedActionSurface(
   state: UserDrawingState | null | undefined,
   anchor: UserDrawingSelectionActionAnchor | null | undefined,
+  options: { editDragActive?: boolean } = {},
 ): boolean {
+  // The surface anchors to the selection, so it chases a drawing being moved or
+  // resized and sits under the finger or cursor doing the moving. It stands
+  // down for the drag and comes back where the drawing landed.
+  if (options.editDragActive === true) return false;
   if (!state || !anchor || state.draft || state.textEdit) return false;
   return getSelectedUserDrawing(state) !== null;
 }

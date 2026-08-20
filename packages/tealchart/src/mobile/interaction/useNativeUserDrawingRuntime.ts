@@ -85,6 +85,8 @@ export interface NativeUserDrawingRuntime {
   undoNativeUserDrawingCommand: () => boolean;
   updateNativeUserDrawingEditDrag: (point: DrawingScreenPoint) => boolean;
   userDrawingCommandAvailability: UserDrawingCommandAvailability;
+  /** True between an edit drag starting and ending, for chrome that must stand down. */
+  userDrawingEditDragActive: boolean;
   userDrawingRecentToolsByCategory: UserDrawingRecentToolByCategory;
   userDrawingState: UserDrawingState;
 }
@@ -452,6 +454,10 @@ export function useNativeUserDrawingRuntime({
     [createNativeUserDrawingId, dispatchNativeUserDrawingCommand],
   );
 
+  // React state rather than the drag ref: the selection action overlay is a
+  // React tree and has to re-render when a drag starts, not just when it ends.
+  const [userDrawingEditDragActive, setUserDrawingEditDragActive] = useState(false);
+
   const canBeginNativeUserDrawingEditDragAtPoint = useCallback(
     (point: DrawingScreenPoint, spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>) =>
       canBeginNativeUserDrawingEditDragAtPointFromState(stateRef.current, point, spacesByPaneId),
@@ -477,6 +483,7 @@ export function useNativeUserDrawingRuntime({
         drag: result.editDrag,
         transactionKey,
       };
+      setUserDrawingEditDragActive(true);
       return true;
     },
     [canBeginNativeUserDrawingEditDragAtPoint, dispatchNativeUserDrawingCommandResult],
@@ -498,6 +505,7 @@ export function useNativeUserDrawingRuntime({
 
   const endNativeUserDrawingEditDrag = useCallback(() => {
     editDragRef.current = null;
+    setUserDrawingEditDragActive(false);
   }, []);
 
   const selectNativeUserDrawingAtPoint = useCallback(
@@ -728,6 +736,7 @@ export function useNativeUserDrawingRuntime({
     undoNativeUserDrawingCommand,
     updateNativeUserDrawingEditDrag,
     userDrawingCommandAvailability,
+    userDrawingEditDragActive,
     userDrawingRecentToolsByCategory,
     userDrawingState,
   };

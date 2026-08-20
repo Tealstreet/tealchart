@@ -95,8 +95,16 @@ export interface NativeTradeLineGeometry {
   priceLabelWidth: number;
   segments: NativeTradeLineSegmentGeometry[];
   buttons: NativeTradeLineButtonGeometry[];
+  /** Bridges the bracket gap so TP/SL reads as part of the label, not a loose chip. */
+  bracketConnector: NativeTradeLineBracketConnector | null;
   dragZone: NativeOrderDragZone | null;
   actionZones: NativeTradeLineActionZone[];
+}
+
+export interface NativeTradeLineBracketConnector {
+  color: string;
+  x1: number;
+  x2: number;
 }
 
 export interface NativeTradeLineFittingState {
@@ -550,10 +558,12 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     return geometry;
   }).filter((segment): segment is Omit<NativeTradeLineSegmentGeometry, 'corners'> => Boolean(segment));
   let previousButton: ChartLabelButton | null = null;
+  let bracketConnector: NativeTradeLineBracketConnector | null = null;
   const buttonGeometry = visibleButtons.map((button, index) => {
     const gap = shouldInsertTradeLineButtonGap(previousButton, button, segmentGeometry.length > 0) ? BRACKET_GAP : 0;
     const width = getTradeLineButtonWidth(button);
     if (currentX + gap + width > layout.labelX + availableWidth) return null;
+    if (gap > 0) bracketConnector = { color: line.lineColor, x1: currentX, x2: currentX + gap };
     currentX += gap;
     const displayIcon = button.icon;
     const iconWidth = Math.ceil(smallTextWidth(displayIcon));
@@ -635,6 +645,7 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     priceLabelWidth: layout.priceLabelWidth,
     segments: segmentGeometryWithCorners,
     buttons: buttonGeometryWithCorners,
+    bracketConnector,
     dragZone:
       objectType === 'order' &&
       isOrderLineRenderData(line) &&

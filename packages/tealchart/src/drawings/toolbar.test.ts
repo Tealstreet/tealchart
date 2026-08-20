@@ -1938,6 +1938,9 @@ describe('user drawing toolbar descriptors', () => {
 
     expect(shouldRenderUserDrawingSelectedActionSurface(selected, anchor)).toBe(true);
     expect(shouldRenderUserDrawingSelectedActionSurface(selected, null)).toBe(false);
+    // Hidden while the selected drawing is being moved or resized.
+    expect(shouldRenderUserDrawingSelectedActionSurface(selected, anchor, { editDragActive: true })).toBe(false);
+    expect(shouldRenderUserDrawingSelectedActionSurface(selected, anchor, { editDragActive: false })).toBe(true);
     expect(shouldRenderUserDrawingSelectedActionSurface({ ...selected, selection: null }, anchor)).toBe(false);
     expect(
       shouldRenderUserDrawingSelectedActionSurface(

@@ -260,3 +260,37 @@ describe('native price axis tag layout', () => {
     expect(findNativeResolvedPriceAxisTagCenterY(tags, 'missing', 1)).toBe(1);
   });
 });
+
+describe('native price axis tag overflow', () => {
+  it('leaves a tag with the axis to itself on its own line when another overflows the top', () => {
+    // The last-trade tag is pinned and can poke above the pane; the order tag
+    // 260px below it has nothing to give way to.
+    const resolved = resolveNativePriceAxisTagStack(
+      [
+        { id: 'priceLine:last-trade', originalY: 40, height: 34, fixed: true },
+        { id: 'order:1', originalY: 300, height: 20 },
+      ],
+      30,
+      600,
+    );
+
+    expect(resolved.find((tag) => tag.id === 'order:1')?.centerY).toBe(300);
+  });
+
+  it('still moves the run that is packed against the overflowing edge', () => {
+    const resolved = resolveNativePriceAxisTagStack(
+      [
+        { id: 'order:1', originalY: 585, height: 20 },
+        { id: 'order:2', originalY: 595, height: 20 },
+        { id: 'order:3', originalY: 300, height: 20 },
+      ],
+      30,
+      600,
+    );
+    const bottom = resolved[resolved.length - 1];
+
+    expect(bottom.centerY + bottom.height / 2).toBeLessThanOrEqual(600);
+    // The distant tag keeps its place while the crowded pair closes up.
+    expect(resolved.find((tag) => tag.id === 'order:3')?.centerY).toBe(300);
+  });
+});
