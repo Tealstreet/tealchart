@@ -17,7 +17,7 @@ import { TealchartRenderer } from '../../TealchartRenderer';
 import { captureViewScale, intervalToMs, restoreViewport, withDefaultPricePadding } from '../../viewport/viewScale';
 import { createNativeChartProjection } from '../render/nativeProjection';
 import { getNativeCandidateTimeWindow, nativeViewportCoversCandidateTimeWindow } from '../render/nativeTimeWindow';
-import { createNativeAutoScaleBars } from './nativeAutoScale';
+import { createNativeAutoScaleBars, fitNativeRestoredViewportPrice } from './nativeAutoScale';
 import { resetNativeViewportGestureActiveFlags, syncNativeViewportGestureMetrics } from './nativeViewportGestureState';
 import {
   applyNativeViewportSync,
@@ -54,8 +54,15 @@ export interface NativeViewportRuntimeInput {
   viewportSyncEpoch: SharedValue<number>;
 }
 
+export interface NativeApplyViewportOptions {
+  /** The layout's own auto-scale setting, which the store has not applied yet during a restore. */
+  autoScaleEnabled?: boolean;
+  fitPriceToBars?: boolean;
+}
+
 export interface NativeViewportRuntime {
-  applyNativeViewport: (nextViewport?: Viewport | null) => boolean;
+  applyNativeViewport: (nextViewport?: Viewport | null, options?: NativeApplyViewportOptions) => boolean;
+  viewportGestureActive: boolean;
   beginNativeViewportInteraction: () => void;
   cancelNativeViewportInteraction: () => void;
   commitPanViewport: (nextViewport: Viewport) => void;
@@ -213,6 +220,14 @@ export function useNativeViewportRuntime({
   const [candidateViewport, setCandidateViewport] = useState<Viewport | null>(null);
   const [pendingSharedViewportSyncEpoch, setPendingSharedViewportSyncEpoch] = useState<number | null>(null);
   const viewportOwnershipRef = useRef<NativeViewportOwnershipState>(createNativeViewportOwnershipState());
+  // Mirrored into state as well as the ref: ownership is taken from the pan
+  // gesture's `onBegin` via runOnJS, and a ref alone re-renders nothing - the
+  // chart would stay on the frozen transition projection for the whole drag.
+  const [viewportGestureActive, setViewportGestureActive] = useState(false);
+  const setViewportOwnership = useCallback((next: NativeViewportOwnershipState) => {
+    viewportOwnershipRef.current = next;
+    setViewportGestureActive(next.nativeViewportOwned);
+  }, []);
   const candidateViewportRef = useRef<Viewport | null>(null);
   const dataKey = createNativeViewportDataKey(symbol, interval);
   const previousDataKeyRef = useRef(dataKey);
@@ -255,9 +270,12 @@ export function useNativeViewportRuntime({
     [dataKey, interval, pendingDataLoadViewScale, viewportBars],
   );
 
+  const autoScaleBars = useMemo(() => createNativeAutoScaleBars(viewportBars), [viewportBars]);
+  const pendingRestorePriceFitRef = useRef<{ autoScaleEnabled: boolean; viewport: Viewport } | null>(null);
+
   useEffect(() => {
-    priceAutoScale.bars.value = createNativeAutoScaleBars(viewportBars);
-  }, [priceAutoScale, viewportBars]);
+    priceAutoScale.bars.value = autoScaleBars;
+  }, [autoScaleBars, priceAutoScale]);
 
   useEffect(() => {
     priceAutoScale.active.value = autoScaleEnabled;
@@ -327,16 +345,20 @@ export function useNativeViewportRuntime({
     pendingSharedViewportSyncEpochRef.current = null;
     pendingSharedViewportSyncTargetRef.current = null;
     setPendingSharedViewportSyncEpoch(null);
+    // A restore still waiting on bars belongs to the market it was restored
+    // for; letting it fire on the next one would frame that market with another
+    // layout's window and claim it as a manual viewport.
+    pendingRestorePriceFitRef.current = null;
     resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
 
     // A hand-scaled price axis belongs to the market it was scaled on, so a new
     // market gets a clean slate and auto-scale back. An interval switch is the
     // same market, and a deliberate price scale stands.
     if (symbolChanged) {
-      viewportOwnershipRef.current = createNativeViewportOwnershipState();
+      setViewportOwnership(createNativeViewportOwnershipState());
       priceAutoScale.active.value = autoScaleEnabled;
     } else {
-      viewportOwnershipRef.current = cancelNativeViewportOwnership(viewportOwnershipRef.current);
+      setViewportOwnership(cancelNativeViewportOwnership(viewportOwnershipRef.current));
     }
 
     const sourceBars = loadedBarsRef.current.length > 0 ? loadedBarsRef.current : bars;
@@ -392,8 +414,10 @@ export function useNativeViewportRuntime({
     setPendingDataLoadViewScale(null);
     loadedBarsRef.current = bars;
     loadedBarsIntervalRef.current = loadedBarsInterval;
-    viewportOwnershipRef.current = cancelNativeViewportOwnership(
-      commitNativeViewportOwnership(viewportOwnershipRef.current, pendingDataLoadViewport),
+    setViewportOwnership(
+      cancelNativeViewportOwnership(
+        commitNativeViewportOwnership(viewportOwnershipRef.current, pendingDataLoadViewport),
+      ),
     );
     candidateViewportRef.current = pendingDataLoadViewport;
     setCandidateViewport(pendingDataLoadViewport);
@@ -452,7 +476,7 @@ export function useNativeViewportRuntime({
       nativeInteractionActive,
       viewport,
     });
-    viewportOwnershipRef.current = result.state;
+    setViewportOwnership(result.state);
     if (result.type === 'confirmed') {
       resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
     }
@@ -497,7 +521,7 @@ export function useNativeViewportRuntime({
       const candidateBefore = candidateViewportRef.current ?? viewport;
       const shouldRebase = shouldRebaseNativeCandidateViewport(candidateBefore, nextViewport);
       const hint = resolveNativeHistoryBackfillHint(nextViewport);
-      viewportOwnershipRef.current = commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport);
+      setViewportOwnership(commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport));
       candidateViewportRef.current = shouldRebase ? nextViewport : candidateBefore;
       setCandidateViewport(shouldRebase ? nextViewport : candidateBefore);
       setSettledViewport(nextViewport);
@@ -514,17 +538,20 @@ export function useNativeViewportRuntime({
   );
 
   const beginNativeViewportInteraction = useCallback(() => {
-    viewportOwnershipRef.current = beginNativeViewportOwnership(viewportOwnershipRef.current);
+    // Touching the chart in the gap before bars arrive settles the question the
+    // deferred restore fit was holding open.
+    pendingRestorePriceFitRef.current = null;
+    setViewportOwnership(beginNativeViewportOwnership(viewportOwnershipRef.current));
   }, []);
 
   const cancelNativeViewportInteraction = useCallback(() => {
-    viewportOwnershipRef.current = cancelNativeViewportOwnership(viewportOwnershipRef.current);
+    setViewportOwnership(cancelNativeViewportOwnership(viewportOwnershipRef.current));
   }, []);
 
   const resetNativeViewport = useCallback(() => {
     if (!autoViewport) return;
     priceAutoScale.active.value = true;
-    viewportOwnershipRef.current = createNativeViewportOwnershipState();
+    setViewportOwnership(createNativeViewportOwnershipState());
     candidateViewportRef.current = autoViewport;
     setCandidateViewport(autoViewport);
     setSettledViewport(null);
@@ -545,20 +572,66 @@ export function useNativeViewportRuntime({
   ]);
 
   const applyNativeViewport = useCallback(
-    (nextViewport?: Viewport | null): boolean => {
+    (nextViewport?: Viewport | null, options: NativeApplyViewportOptions = {}): boolean => {
       if (!nextViewport) return false;
-      viewportOwnershipRef.current = commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport);
-      candidateViewportRef.current = nextViewport;
-      setCandidateViewport(nextViewport);
-      setSettledViewport(nextViewport);
-      syncNativeSharedViewportIfChanged(sharedViewport, nextViewport);
-      syncNativeSharedViewportIfChanged(panStartViewport, nextViewport);
+      const autoScaleEnabledForFit = options.autoScaleEnabled ?? priceAutoScale.active.value;
+      // Fitted before it is committed, never after: the commit is what the
+      // confirmation, the candidate and the shared viewport are all compared
+      // against, and a viewport that gets adjusted downstream of it never
+      // confirms.
+      const viewportToApply =
+        options.fitPriceToBars === true
+          ? fitNativeRestoredViewportPrice({
+              autoScaleEnabled: autoScaleEnabledForFit,
+              autoViewport,
+              bars: autoScaleBars,
+              viewport: nextViewport,
+            })
+          : nextViewport;
+      // Bars may not have loaded yet when a layout restores, and the fit has
+      // nothing to measure against until they do. The restore is remembered so
+      // the first matching bars can re-frame it; without that the saved range
+      // stands forever, because committing it claims a manual viewport.
+      pendingRestorePriceFitRef.current =
+        options.fitPriceToBars === true && autoScaleEnabledForFit && autoScaleBars.length === 0
+          ? { autoScaleEnabled: autoScaleEnabledForFit, viewport: viewportToApply }
+          : null;
+      setViewportOwnership(commitNativeViewportOwnership(viewportOwnershipRef.current, viewportToApply));
+      candidateViewportRef.current = viewportToApply;
+      setCandidateViewport(viewportToApply);
+      setSettledViewport(viewportToApply);
+      syncNativeSharedViewportIfChanged(sharedViewport, viewportToApply);
+      syncNativeSharedViewportIfChanged(panStartViewport, viewportToApply);
       resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
-      onViewportChange?.(nextViewport);
+      onViewportChange?.(viewportToApply);
       return true;
     },
-    [onViewportChange, panActive, panStartViewport, pinchActive, priceScaleActive, sharedViewport, timeScaleActive],
+    [
+      autoScaleBars,
+      autoViewport,
+      onViewportChange,
+      panActive,
+      panStartViewport,
+      pinchActive,
+      priceAutoScale,
+      priceScaleActive,
+      sharedViewport,
+      timeScaleActive,
+    ],
   );
+
+  // The first bars that can actually be measured re-frame a layout restored
+  // before them. Nothing else would: the restore claimed a manual viewport, so
+  // the auto viewport is never adopted again.
+  useEffect(() => {
+    const pending = pendingRestorePriceFitRef.current;
+    if (!pending || autoScaleBars.length === 0) return;
+    pendingRestorePriceFitRef.current = null;
+    applyNativeViewport(pending.viewport, {
+      autoScaleEnabled: pending.autoScaleEnabled,
+      fitPriceToBars: true,
+    });
+  }, [applyNativeViewport, autoScaleBars]);
 
   return {
     applyNativeViewport,
@@ -570,5 +643,6 @@ export function useNativeViewportRuntime({
     projection,
     resetNativeViewport,
     viewport,
+    viewportGestureActive,
   };
 }

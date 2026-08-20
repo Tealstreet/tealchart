@@ -237,6 +237,38 @@ describe('PriceLineManager TP/SL dragging', () => {
     stage.destroy();
   });
 
+  it('bridges the bracket gap with a line so TP/SL joins the label', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+
+    manager.update([makePositionBound(100)]);
+
+    const lineGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('position-1');
+    const connector = lineGroup?.find(
+      (node: Konva.Node) => node instanceof Konva.Line && node.points().length === 4 && node.points()[1] === 100,
+    ) as Konva.Line[] | undefined;
+    const gapLine = connector?.find((line) => line.points()[2]! - line.points()[0]! === 6);
+
+    expect(gapLine).toBeDefined();
+    expect(gapLine!.points()[3]).toBe(100);
+    expect(gapLine!.stroke()).toBe('#23d18b');
+
+    manager.dispose();
+    stage.destroy();
+  });
+
   it('renders action button icons as centered vector strokes', () => {
     stubCanvasContext();
     const container = createContainer();
