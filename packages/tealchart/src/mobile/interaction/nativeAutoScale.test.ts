@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   applyNativePriceAutoScale,
   createNativeAutoScaleBars,
+  fitNativeRestoredViewportPrice,
   getNativeVisibleBarsBoundingBox,
 } from './nativeAutoScale';
 
@@ -87,5 +88,51 @@ describe('native price auto-scale', () => {
       priceMin: 99,
       priceMax: 101,
     });
+  });
+});
+
+describe('restored viewport price fit', () => {
+  const bars = createNativeAutoScaleBars(makeBars());
+  const autoViewport: Viewport = { startTime: 1_000, endTime: 4_000, priceMin: 95, priceMax: 125 };
+
+  it('re-fits a saved price range the market has left behind', () => {
+    const restored: Viewport = { startTime: 1_500, endTime: 3_500, priceMin: 40, priceMax: 60 };
+    const fitted = fitNativeRestoredViewportPrice({
+      autoScaleEnabled: true,
+      autoViewport,
+      bars,
+      viewport: restored,
+    });
+
+    // The saved window stands; only the price is derived.
+    expect(fitted.startTime).toBe(1_500);
+    expect(fitted.endTime).toBe(3_500);
+    expect(fitted).toEqual(applyNativePriceAutoScale(restored, bars));
+    expect(fitted.priceMin).toBeLessThan(101);
+    expect(fitted.priceMax).toBeGreaterThan(125);
+  });
+
+  it('leaves a hand-scaled axis alone', () => {
+    const restored: Viewport = { startTime: 1_500, endTime: 3_500, priceMin: 40, priceMax: 60 };
+
+    expect(
+      fitNativeRestoredViewportPrice({ autoScaleEnabled: false, autoViewport, bars, viewport: restored }),
+    ).toBe(restored);
+  });
+
+  it('falls back to the auto viewport when the saved window holds no bars', () => {
+    const restored: Viewport = { startTime: 90_000, endTime: 95_000, priceMin: 40, priceMax: 60 };
+
+    expect(fitNativeRestoredViewportPrice({ autoScaleEnabled: true, autoViewport, bars, viewport: restored })).toBe(
+      autoViewport,
+    );
+  });
+
+  it('keeps the saved viewport when there is no auto viewport to fall back to', () => {
+    const restored: Viewport = { startTime: 90_000, endTime: 95_000, priceMin: 40, priceMax: 60 };
+
+    expect(
+      fitNativeRestoredViewportPrice({ autoScaleEnabled: true, autoViewport: null, bars, viewport: restored }),
+    ).toBe(restored);
   });
 });

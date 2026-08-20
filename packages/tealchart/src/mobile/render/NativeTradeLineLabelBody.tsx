@@ -1,7 +1,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 
-import { Group, Skia } from '@shopify/react-native-skia';
+import { Group, Line as SkiaLine, Skia } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { NativeAnimatedSkiaText } from './nativeSkiaText';
@@ -62,8 +62,20 @@ function renderNativeTradeLineLabelBodyContent({
   tradeLabelHeight: number;
 }) {
   const textY = tradeLabelHeight / 2 + 4;
+  const connector = geometry.bracketConnector;
 
   return [
+    ...(connector
+      ? [
+          <SkiaLine
+            key={`${geometry.objectId}-bracket-connector`}
+            p1={{ x: connector.x1, y: tradeLabelHeight / 2 }}
+            p2={{ x: connector.x2, y: tradeLabelHeight / 2 }}
+            color={connector.color}
+            strokeWidth={1}
+          />,
+        ]
+      : []),
     ...geometry.segments.map((segment, index) => (
       <Group key={`${geometry.objectId}-segment-${index}`}>
         <NativeStaticTradeLineBox

@@ -237,3 +237,67 @@ describe('native render transition data identity', () => {
     ).toBe(false);
   });
 });
+
+describe('native render transition during a live gesture', () => {
+  const holdInput = {
+    barsContext: null,
+    barsLength: 500,
+    hasDataViewport: true,
+    interval: '15',
+    isLoading: true,
+    previousBarsLength: 500,
+    previousHasDataViewport: true,
+    previousProjectionReady: true,
+    projectionReady: true,
+    symbol: 'BTCUSDT',
+  };
+
+  it('keeps drawing live while a pan loads more history', () => {
+    expect(shouldHoldNativeRenderSnapshotForTransition(holdInput)).toBe(true);
+    expect(shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, viewportGestureActive: true })).toBe(false);
+  });
+
+  it('still holds when the bars on hand cannot be drawn, gesture or not', () => {
+    expect(
+      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, barsLength: 0, viewportGestureActive: true }),
+    ).toBe(true);
+    expect(
+      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, hasDataViewport: false, viewportGestureActive: true }),
+    ).toBe(true);
+    expect(
+      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, projectionReady: false, viewportGestureActive: true }),
+    ).toBe(true);
+  });
+
+  it('keeps the static projection while a data load blocks, unless a gesture owns the canvas', () => {
+    expect(shouldUseNativeStaticRenderProjectionForTransition({ dataLoadRenderBlocked: true, holdingSnapshot: false })).toBe(
+      true,
+    );
+    expect(
+      shouldUseNativeStaticRenderProjectionForTransition({
+        dataLoadRenderBlocked: true,
+        holdingSnapshot: false,
+        viewportGestureActive: true,
+      }),
+    ).toBe(false);
+    // A held snapshot outranks the gesture: there is nothing live to draw.
+    expect(
+      shouldUseNativeStaticRenderProjectionForTransition({
+        dataLoadRenderBlocked: false,
+        holdingSnapshot: true,
+        viewportGestureActive: true,
+      }),
+    ).toBe(true);
+  });
+
+  it('still holds for bars that belong to another market', () => {
+    expect(
+      shouldHoldNativeRenderSnapshotForTransition({
+        ...holdInput,
+        isLoading: false,
+        barsContext: { interval: '15', requestId: 1, source: 'history' as const, symbol: 'ETHUSDT' },
+        viewportGestureActive: true,
+      }),
+    ).toBe(true);
+  });
+});

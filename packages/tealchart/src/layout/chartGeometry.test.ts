@@ -171,10 +171,10 @@ describe('chart geometry', () => {
     expect(resolveLeftToolRailMetrics(MOBILE_CHART_CHROME_METRICS, true)).toEqual({
       ...MOBILE_CHART_CHROME_METRICS,
       leftToolRailWidth: LEFT_TOOL_RAIL_COLLAPSED_WIDTH,
+      leftToolRailInset: 0,
     });
-    expect(computeLeftToolRailAvoidanceInset(resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, true), 800, 304)).toBe(
-      WEB_CHART_CHROME_METRICS.leftToolRailInset + LEFT_TOOL_RAIL_COLLAPSED_WIDTH + 8,
-    );
+    // A collapsed rail drops its inset too, so overlays only keep the 8px gap.
+    expect(computeLeftToolRailAvoidanceInset(resolveLeftToolRailMetrics(WEB_CHART_CHROME_METRICS, true), 800, 304)).toBe(8);
   });
 
   it('tracks optional top-left legend overlay metadata without reserving canvas space', () => {

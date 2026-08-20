@@ -124,11 +124,16 @@ import {
   getNativeOrderObjectId as getOrderObjectId,
   getNativePositionObjectId as getPositionObjectId,
 } from './mobile/utils/tradeLineLayout';
+import {
+  applyNativePaneHeightOverrides,
+  createNativePaneLayoutSignature,
+} from './mobile/utils/nativePaneLayoutOverrides';
 import { EventEmitter } from './events/EventEmitter';
 import { applyChartOverridesToRenderOptions } from './overrides';
 import { getChartStore } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
+import { IDLE_PANE_MAXIMIZE_STATE, type PaneMaximizeState, togglePaneMaximize } from './utils/paneMaximize';
 
 const STATIC_TOP_BAR_HEIGHT = 36;
 const TRADE_LABEL_HEIGHT = 18;
@@ -408,19 +413,60 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
   }, []);
 
+  const nativePaneMaximizeStateRef = useRef<PaneMaximizeState>(IDLE_PANE_MAXIMIZE_STATE);
+  const handleNativeTogglePaneMaximize = useCallback(
+    (paneId: string) => {
+      const panes = nativePaneLayoutRef.current?.panes;
+      if (!panes) return;
+      const toggled = togglePaneMaximize(nativePaneMaximizeStateRef.current, panes, paneId);
+      if (!toggled) return;
+      nativePaneMaximizeStateRef.current = toggled.state;
+      setNativePaneHeightOverrides((current) => ({ ...current, ...toggled.heightRatios }));
+    },
+    [],
+  );
+
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
+  // Keyed on the signature, never on the layout object: the manager mints a new
+  // wrapper per call, so once a divider drag leaves height overrides behind an
+  // object-keyed memo hands back a new layout every render, and the frame and
+  // every gesture rebuild with it.
+  const nativePaneLayoutSignature = createNativePaneLayoutSignature(
+    nativeIndicatorPaneLayoutBase,
+    nativePaneHeightOverrides,
+  );
+  const nativePaneLayoutInputRef = useRef({
+    base: nativeIndicatorPaneLayoutBase,
+    overrides: nativePaneHeightOverrides,
+  });
+  nativePaneLayoutInputRef.current.base = nativeIndicatorPaneLayoutBase;
+  nativePaneLayoutInputRef.current.overrides = nativePaneHeightOverrides;
   const nativeIndicatorPaneLayout = useMemo(() => {
-    if (!nativeIndicatorPaneLayoutBase) return nativeIndicatorPaneLayoutBase;
-    const panes = nativeIndicatorPaneLayoutBase.panes;
-    if (!panes.some((pane) => nativePaneHeightOverrides[pane.id] !== undefined)) return nativeIndicatorPaneLayoutBase;
-    return {
-      ...nativeIndicatorPaneLayoutBase,
-      panes: panes.map((pane) => {
-        const heightRatio = nativePaneHeightOverrides[pane.id];
-        return heightRatio === undefined ? pane : { ...pane, heightRatio };
-      }),
-    };
-  }, [nativeIndicatorPaneLayoutBase, nativePaneHeightOverrides]);
+    const { base, overrides } = nativePaneLayoutInputRef.current;
+    return base ? applyNativePaneHeightOverrides(base, overrides) : base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativePaneLayoutSignature]);
+  // The maximize toggle runs off a gesture callback, so it reads the panes from
+  // a ref rather than closing over a layout that re-renders under it.
+  const nativePaneLayoutRef = useRef(nativeIndicatorPaneLayout);
+  nativePaneLayoutRef.current = nativeIndicatorPaneLayout;
+  // Panes added or removed while maximized restore first, the way web's
+  // PaneManager does - otherwise the survivors keep the 0 ratios that the
+  // vanished pane's maximize gave them and the chart renders empty.
+  useEffect(() => {
+    const { maximizedPaneId, savedHeightRatios } = nativePaneMaximizeStateRef.current;
+    if (!maximizedPaneId || !savedHeightRatios) return;
+    const panes = nativeIndicatorPaneLayoutBase?.panes ?? [];
+    const samePanes =
+      panes.length === Object.keys(savedHeightRatios).length &&
+      panes.every((pane) => savedHeightRatios[pane.id] !== undefined);
+    if (samePanes) return;
+    nativePaneMaximizeStateRef.current = IDLE_PANE_MAXIMIZE_STATE;
+    setNativePaneHeightOverrides((current) => ({ ...current, ...savedHeightRatios }));
+    // Keyed on the signature: the layout object itself is minted fresh per call.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativePaneLayoutSignature]);
+
   const nativeIndicatorPlots = indicatorManager?.getPlots() ?? [];
   const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
     const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
@@ -729,6 +775,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     projection,
     resetNativeViewport,
     viewport,
+    viewportGestureActive: nativeViewportGestureActive,
   } = useNativeViewportRuntime({
     autoScaleEnabled: nativeAutoScaleEnabled,
     bars,
@@ -780,6 +827,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     previousProjectionReady: Boolean(nativeRenderSnapshotRef.current.projection),
     projectionReady: Boolean(projection),
     symbol,
+    viewportGestureActive: nativeViewportGestureActive,
   });
   const nativeRenderSnapshot = shouldHoldNativeRenderSnapshot
     ? nativeRenderSnapshotRef.current
@@ -797,6 +845,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const useStaticNativeRenderProjection = shouldUseNativeStaticRenderProjectionForTransition({
     dataLoadRenderBlocked,
     holdingSnapshot: shouldHoldNativeRenderSnapshot,
+    viewportGestureActive: nativeViewportGestureActive,
   });
   const staticNativeRenderProjection = useStaticNativeRenderProjection ? nativeRenderProjection : null;
   const [nativeResetViewButtonVisible, setNativeResetViewButtonVisible] = useState(false);
@@ -860,6 +909,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     undoNativeUserDrawingCommand,
     updateNativeUserDrawingEditDrag,
     userDrawingCommandAvailability,
+    userDrawingEditDragActive: nativeUserDrawingEditDragActive,
     userDrawingRecentToolsByCategory,
     userDrawingState: nativeUserDrawingState,
   } = useNativeUserDrawingRuntime({
@@ -913,7 +963,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       replaceNativeUserDrawingState(settings.userDrawingState);
       chartStore.settings.set({
         ...chartStore.settings.get(),
-        autoScale: settings.autoScale,
+        autoScale: settings.autoScale ?? true,
         chartProperties: settings.chartProperties,
         preservedTvProperties: settings.preservedTvProperties,
         chartType: settings.chartType || 'candle',
@@ -929,7 +979,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         settings.viewport &&
         shouldRestoreNativeLayoutViewport({ layoutSymbol: settings.symbol, symbol: nextSymbol });
       if (restoreViewport) {
-        applyNativeViewport(settings.viewport);
+        applyNativeViewport(settings.viewport, {
+          // The store has not applied the layout's own auto-scale yet, so the
+          // restore has to carry it rather than read the previous chart's.
+          autoScaleEnabled: settings.autoScale !== false,
+          fitPriceToBars: true,
+        });
       }
     },
     [applyNativeViewport, chartApi, chartStore, interval, propSymbol, replaceNativeUserDrawingState, symbol],
@@ -1404,9 +1459,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       textColor,
     ],
   );
+  // Hidden for the drag, so its buttons stop taking taps and stop suppressing
+  // gestures underneath where they used to be.
   const nativeUserDrawingSelectionActionTargets = useMemo(
-    () => resolveNativeSelectedDrawingActionHitTargets(nativeUserDrawingSelectionActionOverlayModel),
-    [nativeUserDrawingSelectionActionOverlayModel],
+    () =>
+      nativeUserDrawingEditDragActive
+        ? []
+        : resolveNativeSelectedDrawingActionHitTargets(nativeUserDrawingSelectionActionOverlayModel),
+    [nativeUserDrawingEditDragActive, nativeUserDrawingSelectionActionOverlayModel],
   );
   const nativeUserDrawingEditDragZones = useMemo(
     () =>
@@ -1614,6 +1674,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onDrawingTap: handleNativeUserDrawingTap,
     onIndicatorPaneScale: handleNativeIndicatorPaneScale,
     onPaneHeightsChange: handleNativePaneHeightsChange,
+    onTogglePaneMaximize: handleNativeTogglePaneMaximize,
     onPaneDividerResizeStart: handleNativePaneDividerResizeStart,
     onPaneDividerResizeEnd: handleNativePaneDividerResizeEnd,
     paneDividerBands,
@@ -1830,7 +1891,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           toggleBackgroundColor={textColor}
         />
       )}
-      {frame && nativeUserDrawingSelectionActionAnchor && (
+      {frame && nativeUserDrawingSelectionActionAnchor && !nativeUserDrawingEditDragActive && (
         <NativeUserDrawingSelectionActionOverlay
           activeBackgroundColor={gridColor}
           activeTextColor={options.upColor}

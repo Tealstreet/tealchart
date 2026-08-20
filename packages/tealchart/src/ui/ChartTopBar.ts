@@ -94,6 +94,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   /** Resolved selected drawing action surface anchor in chart screen coordinates */
   userDrawingSelectionActionAnchor?: UserDrawingSelectionActionAnchor | null;
+  /** True while a drawing is being moved or resized; the action surface hides. */
+  userDrawingEditDragActive?: boolean;
   /** Whether selected drawing edit drags should duplicate before moving. */
   userDrawingDuplicateEditDragEnabled?: boolean;
   /** Callback when a drawing tool is selected */
@@ -169,11 +171,13 @@ const SELECTED_ACTION_SURFACE_ESTIMATED_HEIGHT = 70;
 const SELECTED_ACTION_SURFACE_POPOVER_OFFSET_Y = 34;
 const SELECTED_ACTION_SURFACE_POPOVER_ESTIMATED_HEIGHT = 74;
 const DRAWING_RAIL_ANIMATION_DURATION_MS = LEFT_TOOL_RAIL_ANIMATION_DURATION_MS;
-const DRAWING_RAIL_COLLAPSE_TAB_WIDTH = LEFT_TOOL_RAIL_COLLAPSED_WIDTH;
+const DRAWING_RAIL_COLLAPSE_TAB_WIDTH = 14;
 // What the rail still occupies once collapsed. Shared with the layout metrics
 // so the chrome that closes up behind it reserves exactly this much.
 const DRAWING_RAIL_COLLAPSE_TAB_VISIBLE_WIDTH = LEFT_TOOL_RAIL_COLLAPSED_WIDTH;
-const DRAWING_RAIL_COLLAPSE_TAB_OVERHANG = 6;
+// The tab clears the rail entirely, so it stays reachable once the rail has
+// slid all the way off-canvas.
+const DRAWING_RAIL_COLLAPSE_TAB_OVERHANG = DRAWING_RAIL_COLLAPSE_TAB_WIDTH;
 
 // The left tool rail has 4px top+bottom padding (`drawingToolRail.padding`); flyouts
 // cap their height to that content box so long lists don't overflow over the time axis.
@@ -1375,7 +1379,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.removeSelectedActionSurface();
     const state = this.options.userDrawingState;
     const anchor = this.options.userDrawingSelectionActionAnchor;
-    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor)) {
+    const editDragActive = this.options.userDrawingEditDragActive === true;
+    if (!state || !anchor || !shouldRenderUserDrawingSelectedActionSurface(state, anchor, { editDragActive })) {
       this.selectedActionPopoverGroupId = null;
       this.selectedActionPopoverDrawingId = null;
       return;
@@ -2080,6 +2085,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   setUserDrawingSelectionActionAnchor(anchor: UserDrawingSelectionActionAnchor | null): void {
     this.options.userDrawingSelectionActionAnchor = anchor;
+    this.renderSelectedActionSurface();
+  }
+
+  setUserDrawingEditDragActive(active: boolean): void {
+    if (this.options.userDrawingEditDragActive === active) return;
+    this.options.userDrawingEditDragActive = active;
     this.renderSelectedActionSurface();
   }
 

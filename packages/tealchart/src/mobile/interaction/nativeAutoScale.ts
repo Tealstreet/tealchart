@@ -95,3 +95,31 @@ export function applyNativePriceAutoScale(
     priceMin: bbox.lowest - dataRange * padding,
   };
 }
+
+/**
+ * The price half of a restored viewport, re-fitted to the bars it lands on.
+ *
+ * A saved layout carries absolute prices, so restoring one months later framed
+ * a market that had since moved far outside it - the axis sat where the price
+ * used to be and no candle was on screen until the first drag ran the gesture
+ * path's auto-scale. The saved time window still stands; only the price is
+ * derived. A window with no bars in it has nothing to frame, so the auto
+ * viewport takes over entirely.
+ */
+export function fitNativeRestoredViewportPrice({
+  autoScaleEnabled,
+  autoViewport,
+  bars,
+  viewport,
+}: {
+  autoScaleEnabled: boolean;
+  autoViewport: Viewport | null;
+  bars: readonly NativeAutoScaleBar[];
+  viewport: Viewport;
+}): Viewport {
+  if (!autoScaleEnabled) return viewport;
+  if (!getNativeVisibleBarsBoundingBox(bars, viewport.startTime, viewport.endTime)) {
+    return autoViewport ?? viewport;
+  }
+  return applyNativePriceAutoScale(viewport, bars);
+}
