@@ -762,6 +762,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     projection,
     resetNativeViewport,
     viewport,
+    viewportGestureActive: nativeViewportGestureActive,
   } = useNativeViewportRuntime({
     autoScaleEnabled: nativeAutoScaleEnabled,
     bars,
@@ -813,6 +814,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     previousProjectionReady: Boolean(nativeRenderSnapshotRef.current.projection),
     projectionReady: Boolean(projection),
     symbol,
+    viewportGestureActive: nativeViewportGestureActive,
   });
   const nativeRenderSnapshot = shouldHoldNativeRenderSnapshot
     ? nativeRenderSnapshotRef.current
@@ -830,6 +832,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const useStaticNativeRenderProjection = shouldUseNativeStaticRenderProjectionForTransition({
     dataLoadRenderBlocked,
     holdingSnapshot: shouldHoldNativeRenderSnapshot,
+    viewportGestureActive: nativeViewportGestureActive,
   });
   const staticNativeRenderProjection = useStaticNativeRenderProjection ? nativeRenderProjection : null;
   const [nativeResetViewButtonVisible, setNativeResetViewButtonVisible] = useState(false);

@@ -213,6 +213,14 @@ export function useNativeViewportRuntime({
   const [candidateViewport, setCandidateViewport] = useState<Viewport | null>(null);
   const [pendingSharedViewportSyncEpoch, setPendingSharedViewportSyncEpoch] = useState<number | null>(null);
   const viewportOwnershipRef = useRef<NativeViewportOwnershipState>(createNativeViewportOwnershipState());
+  // Mirrored into state as well as the ref: ownership is taken from the pan
+  // gesture's `onBegin` via runOnJS, and a ref alone re-renders nothing - the
+  // chart would stay on the frozen transition projection for the whole drag.
+  const [viewportGestureActive, setViewportGestureActive] = useState(false);
+  const setViewportOwnership = useCallback((next: NativeViewportOwnershipState) => {
+    viewportOwnershipRef.current = next;
+    setViewportGestureActive(next.nativeViewportOwned);
+  }, []);
   const candidateViewportRef = useRef<Viewport | null>(null);
   const dataKey = createNativeViewportDataKey(symbol, interval);
   const previousDataKeyRef = useRef(dataKey);
@@ -333,10 +341,10 @@ export function useNativeViewportRuntime({
     // market gets a clean slate and auto-scale back. An interval switch is the
     // same market, and a deliberate price scale stands.
     if (symbolChanged) {
-      viewportOwnershipRef.current = createNativeViewportOwnershipState();
+      setViewportOwnership(createNativeViewportOwnershipState());
       priceAutoScale.active.value = autoScaleEnabled;
     } else {
-      viewportOwnershipRef.current = cancelNativeViewportOwnership(viewportOwnershipRef.current);
+      setViewportOwnership(cancelNativeViewportOwnership(viewportOwnershipRef.current));
     }
 
     const sourceBars = loadedBarsRef.current.length > 0 ? loadedBarsRef.current : bars;
@@ -392,8 +400,10 @@ export function useNativeViewportRuntime({
     setPendingDataLoadViewScale(null);
     loadedBarsRef.current = bars;
     loadedBarsIntervalRef.current = loadedBarsInterval;
-    viewportOwnershipRef.current = cancelNativeViewportOwnership(
-      commitNativeViewportOwnership(viewportOwnershipRef.current, pendingDataLoadViewport),
+    setViewportOwnership(
+      cancelNativeViewportOwnership(
+        commitNativeViewportOwnership(viewportOwnershipRef.current, pendingDataLoadViewport),
+      ),
     );
     candidateViewportRef.current = pendingDataLoadViewport;
     setCandidateViewport(pendingDataLoadViewport);
@@ -452,7 +462,7 @@ export function useNativeViewportRuntime({
       nativeInteractionActive,
       viewport,
     });
-    viewportOwnershipRef.current = result.state;
+    setViewportOwnership(result.state);
     if (result.type === 'confirmed') {
       resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
     }
@@ -497,7 +507,7 @@ export function useNativeViewportRuntime({
       const candidateBefore = candidateViewportRef.current ?? viewport;
       const shouldRebase = shouldRebaseNativeCandidateViewport(candidateBefore, nextViewport);
       const hint = resolveNativeHistoryBackfillHint(nextViewport);
-      viewportOwnershipRef.current = commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport);
+      setViewportOwnership(commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport));
       candidateViewportRef.current = shouldRebase ? nextViewport : candidateBefore;
       setCandidateViewport(shouldRebase ? nextViewport : candidateBefore);
       setSettledViewport(nextViewport);
@@ -514,17 +524,17 @@ export function useNativeViewportRuntime({
   );
 
   const beginNativeViewportInteraction = useCallback(() => {
-    viewportOwnershipRef.current = beginNativeViewportOwnership(viewportOwnershipRef.current);
+    setViewportOwnership(beginNativeViewportOwnership(viewportOwnershipRef.current));
   }, []);
 
   const cancelNativeViewportInteraction = useCallback(() => {
-    viewportOwnershipRef.current = cancelNativeViewportOwnership(viewportOwnershipRef.current);
+    setViewportOwnership(cancelNativeViewportOwnership(viewportOwnershipRef.current));
   }, []);
 
   const resetNativeViewport = useCallback(() => {
     if (!autoViewport) return;
     priceAutoScale.active.value = true;
-    viewportOwnershipRef.current = createNativeViewportOwnershipState();
+    setViewportOwnership(createNativeViewportOwnershipState());
     candidateViewportRef.current = autoViewport;
     setCandidateViewport(autoViewport);
     setSettledViewport(null);
@@ -547,7 +557,7 @@ export function useNativeViewportRuntime({
   const applyNativeViewport = useCallback(
     (nextViewport?: Viewport | null): boolean => {
       if (!nextViewport) return false;
-      viewportOwnershipRef.current = commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport);
+      setViewportOwnership(commitNativeViewportOwnership(viewportOwnershipRef.current, nextViewport));
       candidateViewportRef.current = nextViewport;
       setCandidateViewport(nextViewport);
       setSettledViewport(nextViewport);
@@ -570,5 +580,6 @@ export function useNativeViewportRuntime({
     projection,
     resetNativeViewport,
     viewport,
+    viewportGestureActive,
   };
 }

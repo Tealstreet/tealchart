@@ -82,6 +82,7 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   previousProjectionReady,
   projectionReady,
   symbol,
+  viewportGestureActive = false,
 }: {
   barsContext: ChartWidgetBarsChangedContext | null;
   barsLength: number;
@@ -93,10 +94,15 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   previousProjectionReady: boolean;
   projectionReady: boolean;
   symbol: string;
+  /** A live pan or pinch drives the canvas from shared values; freezing it mid-drag reads as the chart jumping back a few frames. */
+  viewportGestureActive?: boolean;
 }): boolean {
   const canHoldPreviousSnapshot = previousBarsLength > 0 && previousHasDataViewport && previousProjectionReady;
   if (!canHoldPreviousSnapshot) return false;
-  if (barsLength === 0 || !hasDataViewport || !projectionReady || isLoading) return true;
+  if (barsLength === 0 || !hasDataViewport || !projectionReady) return true;
+  // Only the loading clause gives way to a gesture. The others mean the data on
+  // hand belongs to nothing the chart can draw, and holding is still right.
+  if (isLoading && !viewportGestureActive) return true;
 
   const barsMatchRequestedData = nativeBarsMatchRequestedData({
     barsContext,
@@ -112,9 +118,13 @@ export function shouldHoldNativeRenderSnapshotForTransition({
 export function shouldUseNativeStaticRenderProjectionForTransition({
   dataLoadRenderBlocked,
   holdingSnapshot,
+  viewportGestureActive = false,
 }: {
   dataLoadRenderBlocked: boolean;
   holdingSnapshot: boolean;
+  /** A live gesture drives the canvas from shared values, so a data-load block must not freeze it onto the JS-side projection. */
+  viewportGestureActive?: boolean;
 }): boolean {
-  return holdingSnapshot || dataLoadRenderBlocked;
+  if (holdingSnapshot) return true;
+  return dataLoadRenderBlocked && !viewportGestureActive;
 }
