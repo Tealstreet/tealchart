@@ -963,7 +963,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       replaceNativeUserDrawingState(settings.userDrawingState);
       chartStore.settings.set({
         ...chartStore.settings.get(),
-        autoScale: settings.autoScale,
+        autoScale: settings.autoScale ?? true,
         chartProperties: settings.chartProperties,
         preservedTvProperties: settings.preservedTvProperties,
         chartType: settings.chartType || 'candle',
@@ -979,7 +979,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         settings.viewport &&
         shouldRestoreNativeLayoutViewport({ layoutSymbol: settings.symbol, symbol: nextSymbol });
       if (restoreViewport) {
-        applyNativeViewport(settings.viewport);
+        applyNativeViewport(settings.viewport, {
+          // The store has not applied the layout's own auto-scale yet, so the
+          // restore has to carry it rather than read the previous chart's.
+          autoScaleEnabled: settings.autoScale !== false,
+          fitPriceToBars: true,
+        });
       }
     },
     [applyNativeViewport, chartApi, chartStore, interval, propSymbol, replaceNativeUserDrawingState, symbol],
