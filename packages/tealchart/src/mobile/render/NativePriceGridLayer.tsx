@@ -273,8 +273,8 @@ export function NativePriceGridLayer({
   // above stays per-slot - being all-plain, its mount and its geometry already
   // land in the same commit.
   // Labels merge the same way the lines did, into one Glyphs node. Text cannot
-  // join a path, but a monospace font over a fixed alphabet can be placed by
-  // arithmetic, so the whole axis is one node whose count never moves.
+  // join a path, but a fixed alphabet can be resolved to glyphs and advances
+  // once, so the whole axis is one node whose element count never moves.
   if (showAxisLabels && !showGridLines) {
     return (
       <NativePriceGridLabelGlyphs

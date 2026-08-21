@@ -5,7 +5,7 @@ import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRang
 
 import { memo, useMemo } from 'react';
 
-import { Glyphs, Group, Path as SkiaPath, Skia as SkiaApi, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Glyphs, Path as SkiaPath, Skia as SkiaApi } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeRightAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
@@ -18,11 +18,7 @@ import {
 import { formatNativeIndicatorAxisTickWorklet } from './nativePriceFormat';
 import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
 import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
-import {
-  measureNativeSkiaAxisCharacterWidth,
-  NATIVE_ANIMATED_TEXT_CHARACTERS,
-  NativeAnimatedSkiaText,
-} from './nativeSkiaText';
+import { measureNativeSkiaAxisCharacterWidth, NATIVE_ANIMATED_TEXT_CHARACTERS } from './nativeSkiaText';
 
 export interface NativeIndicatorPaneAxisSlot {
   labelText: string;
@@ -116,62 +112,6 @@ export function resolveNativeIndicatorPaneAxisSlots(
   );
 }
 
-function NativeAnimatedIndicatorPaneAxisTick({
-  axisFont,
-  characterWidth,
-  frame,
-  gridColor,
-  index,
-  labelMaxWidth,
-  labelRight,
-  maxCharacters,
-  pane,
-  paneRangeOverrides,
-  showAxisLabels,
-  showGridLines,
-  textColor,
-}: NativeIndicatorPaneAxisSlotInput & {
-  axisFont: ReturnType<typeof Skia.Font>;
-  gridColor: string;
-  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
-  showAxisLabels: boolean;
-  showGridLines: boolean;
-  textColor: string;
-  range?: NativePaneRange;
-}) {
-  const model = useDerivedValue(() =>
-    resolveNativeIndicatorPaneAxisSlot({
-      characterWidth,
-      frame,
-      index,
-      labelMaxWidth,
-      labelRight,
-      maxCharacters,
-      pane,
-      range: (() => {
-        const overrides = paneRangeOverrides?.value;
-        const override = overrides ? overrides[pane.id] : undefined;
-        return override ?? { yMin: pane.yMin, yMax: pane.yMax };
-      })(),
-    }),
-  );
-  const opacity = useDerivedValue(() => (model.value.visible ? 1 : 0));
-  const labelText = useDerivedValue(() => model.value.labelText);
-  const labelX = useDerivedValue(() => model.value.labelX);
-  const labelY = useDerivedValue(() => model.value.labelY);
-  const lineStart = useDerivedValue(() => model.value.lineStart);
-  const lineEnd = useDerivedValue(() => model.value.lineEnd);
-
-  return (
-    <Group opacity={opacity}>
-      {showGridLines && <SkiaLine p1={lineStart} p2={lineEnd} color={gridColor} strokeWidth={1} />}
-      {showAxisLabels && (
-        <NativeAnimatedSkiaText x={labelX} y={labelY} text={labelText} font={axisFont} color={textColor} />
-      )}
-    </Group>
-  );
-}
-
 export function NativeIndicatorPaneAxisLayerImpl({
   axisFont,
   frame,
@@ -206,62 +146,33 @@ export function NativeIndicatorPaneAxisLayerImpl({
   // one derived value. A node per layer instead of a node per tick - and, the
   // reason it is here, the element count stops depending on pane height, which
   // mount and unmount would otherwise put on the React commit.
-  // Labels merge like the lines, into one Glyphs node: monospace font, fixed
-  // alphabet, so the worklet places every pane's labels by arithmetic and the
-  // node count stops moving with pane heights.
-  if (showAxisLabels && !showGridLines) {
-    return (
-      <NativeIndicatorPaneAxisLabelGlyphs
-        axisFont={axisFont}
-        characterWidth={characterWidth}
-        frame={frame}
-        indicatorPanes={indicatorPanes}
-        labelMaxWidth={labelMaxWidth}
-        labelRight={labelRight}
-        maxCharacters={maxCharacters}
-        paneRangeOverrides={paneRangeOverrides}
-        slotCounts={slotCounts}
-        textColor={textColor}
-      />
-    );
-  }
-
-  if (showGridLines && !showAxisLabels) {
-    return (
-      <NativeIndicatorPaneAxisGridPath
-        frame={frame}
-        gridColor={gridColor}
-        indicatorPanes={indicatorPanes}
-        paneRangeOverrides={paneRangeOverrides}
-        slotCounts={slotCounts}
-      />
-    );
-  }
-
+  // Lines and labels are each one merged node, so every combination is served by
+  // composing them - there is no per-tick branch left to fall through to.
   return (
     <>
-      {indicatorPanes
-        .map((pane, paneIndex) =>
-          Array.from({ length: slotCounts[paneIndex] ?? 0 }, (_, index) => (
-            <NativeAnimatedIndicatorPaneAxisTick
-              key={`${pane.id}-axis-${index}`}
-              axisFont={axisFont}
-              characterWidth={characterWidth}
-              frame={frame}
-              gridColor={gridColor}
-              index={index}
-              labelMaxWidth={labelMaxWidth}
-              labelRight={labelRight}
-              maxCharacters={maxCharacters}
-              pane={pane}
-              paneRangeOverrides={paneRangeOverrides}
-              range={{ yMin: pane.yMin, yMax: pane.yMax }}
-              showAxisLabels={showAxisLabels}
-              showGridLines={showGridLines}
-              textColor={textColor}
-            />
-          )),
-        )}
+      {showGridLines ? (
+        <NativeIndicatorPaneAxisGridPath
+          frame={frame}
+          gridColor={gridColor}
+          indicatorPanes={indicatorPanes}
+          paneRangeOverrides={paneRangeOverrides}
+          slotCounts={slotCounts}
+        />
+      ) : null}
+      {showAxisLabels ? (
+        <NativeIndicatorPaneAxisLabelGlyphs
+          axisFont={axisFont}
+          characterWidth={characterWidth}
+          frame={frame}
+          indicatorPanes={indicatorPanes}
+          labelMaxWidth={labelMaxWidth}
+          labelRight={labelRight}
+          maxCharacters={maxCharacters}
+          paneRangeOverrides={paneRangeOverrides}
+          slotCounts={slotCounts}
+          textColor={textColor}
+        />
+      ) : null}
     </>
   );
 }
