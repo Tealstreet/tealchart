@@ -3,6 +3,8 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 
+import { memo } from 'react';
+
 import { Group, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
@@ -153,7 +155,7 @@ function NativeAnimatedIndicatorPaneAxisTick({
   );
 }
 
-export function NativeIndicatorPaneAxisLayer({
+export function NativeIndicatorPaneAxisLayerImpl({
   axisFont,
   frame,
   gridColor,
@@ -205,3 +207,8 @@ export function NativeIndicatorPaneAxisLayer({
     </>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeIndicatorPaneAxisLayer = memo(NativeIndicatorPaneAxisLayerImpl);
+NativeIndicatorPaneAxisLayer.displayName = 'NativeIndicatorPaneAxisLayer';

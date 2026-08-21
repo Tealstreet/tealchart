@@ -3,6 +3,8 @@ import type { NativeCrosshairSharedValues } from '../interaction/nativeCrosshair
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
+import { memo } from 'react';
+
 import { DashPathEffect, Group, RoundedRect, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
@@ -38,7 +40,7 @@ export interface NativeCrosshairLayerProps {
   sharedViewport: NativeViewportSharedValues;
 }
 
-export function NativeCrosshairLayer({
+export function NativeCrosshairLayerImpl({
   axisFont,
   crosshair,
   frame,
@@ -66,7 +68,8 @@ export function NativeCrosshairLayer({
     x: hasContextMenu
       ? Math.max(
           frame.contentLeft,
-          resolveNativeCrosshairContextMenuButtonLayout(frame, crosshair.y.value, pricePrecision, priceText.value).centerX -
+          resolveNativeCrosshairContextMenuButtonLayout(frame, crosshair.y.value, pricePrecision, priceText.value)
+            .centerX -
             NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS -
             NATIVE_CROSSHAIR_BUTTON_LINE_GAP,
         )
@@ -153,3 +156,8 @@ export function NativeCrosshairLayer({
     </Group>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeCrosshairLayer = memo(NativeCrosshairLayerImpl);
+NativeCrosshairLayer.displayName = 'NativeCrosshairLayer';

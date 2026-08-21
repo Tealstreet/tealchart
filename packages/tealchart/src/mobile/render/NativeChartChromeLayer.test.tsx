@@ -1,13 +1,10 @@
 import type { ReactElement, ReactNode } from 'react';
 
+import { Rect, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
-import {
-  Line as SkiaLine,
-  Rect,
-} from '@shopify/react-native-skia';
 
 import { NativeAxisChromeLayer } from './NativeAxisChromeLayer';
-import { NativeChartChromeLayer } from './NativeChartChromeLayer';
+import { NativeChartChromeLayerImpl } from './NativeChartChromeLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 
 function walkElements(node: ReactNode, visitor: (element: ReactElement) => void): void {
@@ -42,7 +39,7 @@ const frame = createNativeChartFrameFromPanes({
 
 describe('NativeChartChromeLayer', () => {
   it('keeps canvas chrome limited to chart-derived surfaces', () => {
-    const layer = NativeChartChromeLayer({
+    const layer = NativeChartChromeLayerImpl({
       backgroundColor: '#101418',
       frame,
       gridColor: '#222831',

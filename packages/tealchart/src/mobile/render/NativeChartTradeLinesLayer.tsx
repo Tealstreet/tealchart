@@ -8,13 +8,15 @@ import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
+import { memo } from 'react';
+
 import { Skia } from '@shopify/react-native-skia';
 
 import { AnimatedBracketDragPreview } from './NativeBracketDragPreviewLayer';
 import { AnimatedPriceLine } from './NativePriceLineLayer';
 import { AnimatedTradeLine, AnimatedTradeLineDragTag } from './NativeTradeLineLayer';
 
-export function NativeChartTradeLinesLayer({
+export function NativeChartTradeLinesLayerImpl({
   axisFont,
   bracketDragState,
   extraPriceLines,
@@ -156,3 +158,8 @@ export function NativeChartTradeLinesLayer({
     </>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeChartTradeLinesLayer = memo(NativeChartTradeLinesLayerImpl);
+NativeChartTradeLinesLayer.displayName = 'NativeChartTradeLinesLayer';

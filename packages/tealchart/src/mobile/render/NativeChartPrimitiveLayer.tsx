@@ -2,12 +2,14 @@ import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
+import { memo } from 'react';
+
 import { Skia } from '@shopify/react-native-skia';
 
 import { NativePriceGridLayer } from './NativePriceGridLayer';
 import { NativeTimeGridLayer } from './NativeTimeGridLayer';
 
-export function NativeChartPrimitiveLayer({
+export function NativeChartPrimitiveLayerImpl({
   axisFont,
   frame,
   gridColor,
@@ -57,3 +59,8 @@ export function NativeChartPrimitiveLayer({
     </>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeChartPrimitiveLayer = memo(NativeChartPrimitiveLayerImpl);
+NativeChartPrimitiveLayer.displayName = 'NativeChartPrimitiveLayer';
