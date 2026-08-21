@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 
 import { AnimatedBracketDragPreview } from './NativeBracketDragPreviewLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import { NativeChartTradeLinesLayer } from './NativeChartTradeLinesLayer';
+import { NativeChartTradeLinesLayerImpl } from './NativeChartTradeLinesLayer';
 import { AnimatedPriceLine } from './NativePriceLineLayer';
 import { AnimatedTradeLine } from './NativeTradeLineLayer';
 
@@ -91,8 +91,8 @@ describe('NativeChartTradeLinesLayer', () => {
       activeEntryPrice: shared(0),
       activeDragStartX: shared(0),
       activeDragCurrentX: shared(0),
-    activeDragStartY: shared(0),
-    activeDragCurrentY: shared(0),
+      activeDragStartY: shared(0),
+      activeDragCurrentY: shared(0),
       activePositionNotional: shared(0),
       activePositionIsLong: shared(true),
       activePartialPercent: shared(100),
@@ -120,7 +120,7 @@ describe('NativeChartTradeLinesLayer', () => {
     } as PositionLineRenderData;
 
     const resolvedPriceAxisTags = shared([]);
-    const layer = NativeChartTradeLinesLayer({
+    const layer = NativeChartTradeLinesLayerImpl({
       axisFont,
       bracketDragState,
       extraPriceLines,

@@ -783,6 +783,12 @@ export class TealchartApi {
     let _onTPMoveEnd: OemsPriceActionCallback | null = null;
     let _onSLMoveEnd: OemsPriceActionCallback | null = null;
 
+    // Minted once, not per render-data read: they delegate through the mutable
+    // `let` above, so a stable wrapper still calls whatever is assigned now, and
+    // a fresh one per read made every snapshot look changed to its consumers.
+    const moveWrapper: OemsPriceActionCallback = (price: number) => _onMoveCallback?.(price);
+    const movingWrapper: OemsPriceActionCallback = (price: number) => _onMovingCallback?.(price);
+
     // Capture references for closure
     const orderLines = this._orderLines;
     const onOrderPriceChanged = () => this._onOrderPriceChanged;
@@ -1118,16 +1124,8 @@ export class TealchartApi {
           ...data,
           editable: data.editable && !!_onMoveCallback,
           callbacks: {
-            onMove: _onMoveCallback
-              ? (price: number) => {
-                  return _onMoveCallback?.(price);
-                }
-              : undefined,
-            onMoving: _onMovingCallback
-              ? (price: number) => {
-                  return _onMovingCallback?.(price);
-                }
-              : undefined,
+            onMove: _onMoveCallback ? moveWrapper : undefined,
+            onMoving: _onMovingCallback ? movingWrapper : undefined,
             onTPClick: _onTPClick ?? undefined,
             onSLClick: _onSLClick ?? undefined,
             onTPMove: _onTPMove ?? undefined,

@@ -56,19 +56,38 @@ export function getNativeBarInterval(bars: readonly Bar[], fallbackInterval: num
   return Math.max(1, interval);
 }
 
+/** First index whose bar is at or after `time`, or `bars.length` if none is. */
+function findFirstNativeBarAtOrAfter(bars: readonly Bar[], time: number): number {
+  let low = 0;
+  let high = bars.length;
+  while (low < high) {
+    const middle = (low + high) >>> 1;
+    if (bars[middle].time < time) low = middle + 1;
+    else high = middle;
+  }
+  return low;
+}
+
 export function getNativeVisibleBars(bars: readonly Bar[], projection: NativeChartProjection): NativeVisibleBar[] {
-  const { frame, viewport } = projection;
+  const { viewport } = projection;
   const { startTime: visibleStartTime, endTime: visibleEndTime } = getNativeCandidateTimeWindow(viewport);
-  const visible = bars
-    .map((bar, sourceIndex) => ({ bar, sourceIndex }))
-    .filter(({ bar }) => bar.time >= visibleStartTime && bar.time <= visibleEndTime);
+  // A non-finite bound compares false against everything, so without this the
+  // scan would never terminate its window and would return the whole history.
+  if (!Number.isFinite(visibleStartTime) || !Number.isFinite(visibleEndTime)) return [];
   const interval = getNativeBarInterval(bars, viewport.endTime - viewport.startTime);
-  return visible.map(({ bar, sourceIndex }) => ({
-    ...bar,
-    interval,
-    sourceIndex,
-    x: projection.timeToX(bar.time),
-  }));
+
+  // Bars are time-ordered, so the window is a slice. Scanning and filtering the
+  // whole history instead allocated two throwaway objects per bar on every
+  // projection change, which is every committed pan and zoom.
+  const visible: NativeVisibleBar[] = [];
+  for (let index = findFirstNativeBarAtOrAfter(bars, visibleStartTime); index < bars.length; index += 1) {
+    const bar = bars[index];
+    // Skipped rather than breaking, matching the filter this replaced.
+    if (!Number.isFinite(bar.time)) continue;
+    if (bar.time > visibleEndTime) break;
+    visible.push({ ...bar, interval, sourceIndex: index, x: projection.timeToX(bar.time) });
+  }
+  return visible;
 }
 
 export function getNativeViewportMaxVolume(

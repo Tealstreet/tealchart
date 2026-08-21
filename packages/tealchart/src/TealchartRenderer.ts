@@ -3285,6 +3285,48 @@ export class TealchartRenderer {
   }
 
   /**
+   * The value under a y in whichever pane it lands in, with the decimals that
+   * pane's own axis would use.
+   *
+   * Deliberately separate from `publicYToPriceWithLayout`: that one is asked for
+   * a PRICE by order drags, the public crosshair event and context menus, and
+   * must keep answering against the main pane wherever the cursor is. Only a
+   * label that reads the pane under the cursor wants this.
+   */
+  publicYToPaneValueWithLayout(
+    y: number,
+    viewport: Viewport,
+    layout: UnifiedPaneLayout,
+    pricePrecision?: number,
+  ): { value: number; decimals: number } {
+    const computedPanes = this.computePanesLayout(layout, this.options.height);
+    const pane =
+      computedPanes.find((candidate) => candidate.height > 0 && y >= candidate.top && y < candidate.bottom) ??
+      computedPanes.find((candidate) => candidate.type === 'main');
+    if (!pane) return { value: 0, decimals: 2 };
+
+    if (pane.type === 'main') {
+      pane.yMin = viewport.priceMin;
+      pane.yMax = viewport.priceMax;
+    }
+
+    const range = pane.yMax - pane.yMin;
+    // Same ladder the pane's axis ticks use, so the two agree.
+    const decimals =
+      pane.type === 'main' && pricePrecision && pricePrecision > 0
+        ? getDecimalPlacesFromPrecision(pricePrecision)
+        : range >= 10
+          ? 0
+          : range >= 1
+            ? 1
+            : range >= 0.01
+              ? 2
+              : 3;
+
+    return { value: this.yToValue(y, pane), decimals };
+  }
+
+  /**
    * Convert X coordinate to time
    * Used for crosshair time display and event emission
    */
@@ -3667,6 +3709,10 @@ export class TealchartRenderer {
     // Render each pane with its specific price lines and TealScript drawings
     for (const pane of computedPanes) {
       if (paneIdFilter && !paneIdFilter.has(pane.id)) continue;
+      // Maximising another pane collapses this one to zero height. The main
+      // pane is deliberately unclipped, so without this its candles, markers
+      // and lines smear along the seam across the pane that was maximised.
+      if (pane.height <= 0) continue;
       const paneLabelBounds = labelBoundsByPane.get(pane.id) || [];
       const paneDrawings =
         pane.type === 'main' ? routedDrawings?.main : routedDrawings?.byPaneId.get(pane.id);

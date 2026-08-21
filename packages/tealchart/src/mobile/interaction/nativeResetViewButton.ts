@@ -54,6 +54,23 @@ export function isNativeResetViewButtonTap(
   return dx * dx + dy * dy <= layout.hitRadius * layout.hitRadius;
 }
 
+/**
+ * The visible reset button reserves its own circle, the way an overlay reserves
+ * a rect. It cannot live in the control-zone array: visibility is a shared
+ * value now, so React never learns it changed - which is the point, since the
+ * array's identity is what used to rebuild every gesture on every reveal.
+ */
+export function isNativeResetViewControlPoint(
+  frame: NativeChartFrame | null,
+  visible: boolean,
+  x: number,
+  y: number,
+): boolean {
+  'worklet';
+  if (!visible || !frame) return false;
+  return isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), x, y);
+}
+
 export function isNativeResetViewTapWithinTolerance(
   startX: number,
   startY: number,

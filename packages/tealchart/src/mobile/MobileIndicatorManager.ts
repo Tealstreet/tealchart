@@ -86,6 +86,35 @@ export interface MobileTealscriptIndicatorOptions {
   yAxisRange?: { min: number; max: number };
 }
 
+/**
+ * One indicator's last execution, reusable while its script, inputs and bars
+ * are all unchanged. Plots are stored already tagged with `scriptId`, so a
+ * reused entry also keeps the PlotOutput identities React memoisation keys on.
+ */
+interface CachedIndicatorResult {
+  ast: Program;
+  barsEpoch: number;
+  drawings: DrawingOutput[];
+  inputsKey: string;
+  plots: PlotOutput[];
+}
+
+let uncacheableInputsCounter = 0;
+
+/** Order-independent, so a re-minted inputs object is not a false cache miss. */
+function createIndicatorInputsKey(inputs: Record<string, unknown> | undefined): string {
+  const entries = Object.entries(inputs ?? {});
+  if (entries.length === 0) return '';
+  try {
+    return JSON.stringify(entries.sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0)));
+  } catch {
+    // Cyclic, BigInt or a throwing toJSON. A key that never matches costs this
+    // indicator its cache; throwing here would kill every later bar tick.
+    uncacheableInputsCounter += 1;
+    return `uncacheable:${uncacheableInputsCounter}`;
+  }
+}
+
 export type MobileIndicatorErrorCallback = (scriptId: string, error: WorkerError) => void;
 
 const MOBILE_INDICATOR_ERROR_EVENT = 'indicator:error';
@@ -115,6 +144,10 @@ export class MobileIndicatorManager {
   });
   private _lastErrorKeys: Map<string, string> = new Map();
   private _instanceCounter = 0;
+  private _resultCache: Map<string, CachedIndicatorResult> = new Map();
+  private _barsEpoch = 0;
+  private _plotsRevision = 0;
+  private _indicatorsRevision = 0;
 
   constructor() {
     this._paneManager = new PaneManager();
@@ -142,8 +175,21 @@ export class MobileIndicatorManager {
    * @param silent - If true, don't trigger onUpdate callback (use when batching with RAF)
    */
   setBars(bars: Bar[], silent = false): void {
+    // Epoch, not array identity: ChartWidgetCore appends a live bar in place and
+    // hands back the same array, which reference equality would read as no change.
     this._bars = bars;
+    this._barsEpoch += 1;
     this._recomputePlots(silent);
+  }
+
+  /** Advances whenever the plot set changes. */
+  getPlotsRevision(): number {
+    return this._plotsRevision;
+  }
+
+  /** Advances only when indicators are added, removed, retuned or hidden. */
+  getIndicatorsRevision(): number {
+    return this._indicatorsRevision;
   }
 
   /**
@@ -197,6 +243,7 @@ export class MobileIndicatorManager {
     });
 
     // Recompute plots with new indicator
+    this._indicatorsRevision += 1;
     this._recomputePlots();
 
     return instanceId;
@@ -247,6 +294,7 @@ export class MobileIndicatorManager {
       isVisible: true,
     });
 
+    this._indicatorsRevision += 1;
     this._recomputePlots();
 
     return instanceId;
@@ -281,8 +329,10 @@ export class MobileIndicatorManager {
     this._declarationCache.delete(instanceId);
     this._astCache.delete(instanceId);
     this._lastErrorKeys.delete(instanceId);
+    this._resultCache.delete(instanceId);
 
     // Recompute plots without this indicator
+    this._indicatorsRevision += 1;
     this._recomputePlots();
   }
 
@@ -293,6 +343,7 @@ export class MobileIndicatorManager {
     const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
     if (indicator) {
       indicator.inputs = inputs;
+      this._indicatorsRevision += 1;
       this._recomputePlots();
     }
   }
@@ -305,6 +356,7 @@ export class MobileIndicatorManager {
     if (!indicator || indicator.isVisible === isVisible) return;
 
     indicator.isVisible = isVisible;
+    this._indicatorsRevision += 1;
     this._recomputePlots();
   }
 
@@ -408,6 +460,7 @@ export class MobileIndicatorManager {
     const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
     if (indicator) {
       indicator.styleOverrides = styleOverrides;
+      this._indicatorsRevision += 1;
       this._onUpdate?.();
     }
   }
@@ -431,6 +484,9 @@ export class MobileIndicatorManager {
 
   resetIndicatorPaneAutoScale(paneId: string): void {
     this._paneManager.resetPaneAutoScale(paneId);
+    // The next recompute may be all cache hits and skip the range pass, so the
+    // pane would keep the range the user dragged it to.
+    this._updateAutoPaneRanges(this._plots);
     this._onUpdate?.();
   }
 
@@ -487,8 +543,11 @@ export class MobileIndicatorManager {
    */
   private _recomputePlots(silent = false): void {
     if (this._bars.length === 0) {
-      this._plots = [];
-      this._drawings = [];
+      if (this._plots.length > 0 || this._drawings.length > 0) {
+        this._plots = [];
+        this._drawings = [];
+        this._plotsRevision += 1;
+      }
       if (!silent) this._onUpdate?.();
       return;
     }
@@ -505,6 +564,17 @@ export class MobileIndicatorManager {
 
       if (!ast) {
         // Silently skip - no need to log for every bar update
+        continue;
+      }
+
+      // Nothing this indicator's output depends on has moved, so re-running the
+      // engine over every bar would only mint identical results. Hiding one
+      // indicator or adding another must not re-execute the ones left alone.
+      const inputsKey = createIndicatorInputsKey(inputs);
+      const cached = this._resultCache.get(instanceId);
+      if (cached && cached.ast === ast && cached.barsEpoch === this._barsEpoch && cached.inputsKey === inputsKey) {
+        allPlots.push(...cached.plots);
+        allDrawings.push(...cached.drawings);
         continue;
       }
 
@@ -535,22 +605,23 @@ export class MobileIndicatorManager {
         }
 
         this._declarationCache.set(instanceId, result.declaration);
+        if (ind.declaration?.explicitPlotZOrder !== result.declaration?.explicitPlotZOrder) {
+          this._indicatorsRevision += 1;
+        }
         ind.declaration = result.declaration;
 
         // Tag plots with the instance ID so renderer knows which pane to use
-        for (const plot of result.plots) {
-          allPlots.push({
-            ...plot,
-            scriptId: instanceId,
-          });
-        }
-
-        for (const drawing of result.drawings) {
-          allDrawings.push({
-            ...drawing,
-            scriptId: instanceId,
-          });
-        }
+        const taggedPlots = result.plots.map((plot) => ({ ...plot, scriptId: instanceId }));
+        const taggedDrawings = result.drawings.map((drawing) => ({ ...drawing, scriptId: instanceId }));
+        this._resultCache.set(instanceId, {
+          ast,
+          barsEpoch: this._barsEpoch,
+          drawings: taggedDrawings,
+          inputsKey,
+          plots: taggedPlots,
+        });
+        allPlots.push(...taggedPlots);
+        allDrawings.push(...taggedDrawings);
       } catch (err) {
         this._logger.error(LogCategory.Indicators, 'Error executing indicator', {
           indicatorId: indicator.id,
@@ -560,12 +631,28 @@ export class MobileIndicatorManager {
       }
     }
 
+    // Identical output means the pane ranges cannot have moved either, and
+    // holding the previous arrays keeps their identity stable for React.
+    if (this._plotsMatchCurrent(allPlots) && this._drawingsMatchCurrent(allDrawings)) {
+      if (!silent) this._onUpdate?.();
+      return;
+    }
+
     this._plots = allPlots;
     this._drawings = allDrawings;
+    this._plotsRevision += 1;
     this._updateAutoPaneRanges(allPlots);
 
     // Notify React to re-render (unless silent mode for RAF batching)
     if (!silent) this._onUpdate?.();
+  }
+
+  private _plotsMatchCurrent(plots: readonly PlotOutput[]): boolean {
+    return plots.length === this._plots.length && plots.every((plot, index) => plot === this._plots[index]);
+  }
+
+  private _drawingsMatchCurrent(drawings: readonly DrawingOutput[]): boolean {
+    return drawings.length === this._drawings.length && drawings.every((d, index) => d === this._drawings[index]);
   }
 
   private _updateAutoPaneRanges(plots: readonly PlotOutput[]): void {

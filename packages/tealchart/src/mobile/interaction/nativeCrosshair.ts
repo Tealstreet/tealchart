@@ -1,6 +1,8 @@
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 
+import { isPointInNativePlot } from '../render/nativeChartFrame';
+
 export interface NativeCrosshairSharedValues {
   visible: SharedValue<boolean>;
   x: SharedValue<number>;
@@ -14,9 +16,14 @@ function getNativeCrosshairMaxX(frame: NativeChartFrame): number {
   return Math.max(frame.contentLeft, frame.priceAxisHitLeft - 1);
 }
 
-export function isNativeCrosshairPointInMainPane(frame: NativeChartFrame, x: number, y: number): boolean {
+/**
+ * Any visible pane, not just the main one: the crosshair reads whichever pane
+ * the finger is over, the way TradingView's does, and its vertical line runs
+ * through all of them.
+ */
+export function isNativeCrosshairPointInPlot(frame: NativeChartFrame, x: number, y: number): boolean {
   'worklet';
-  return x >= frame.contentLeft && x < frame.priceAxisHitLeft && y >= frame.mainPane.top && y <= frame.mainPane.bottom;
+  return isPointInNativePlot(frame, x, y);
 }
 
 export function showNativeCrosshair(
@@ -26,7 +33,7 @@ export function showNativeCrosshair(
   y: number,
 ): boolean {
   'worklet';
-  if (!isNativeCrosshairPointInMainPane(frame, x, y)) return false;
+  if (!isNativeCrosshairPointInPlot(frame, x, y)) return false;
   crosshair.visible.value = true;
   crosshair.x.value = x;
   crosshair.y.value = y;
@@ -45,7 +52,7 @@ export function toggleNativeCrosshair(
   y: number,
 ): boolean {
   'worklet';
-  if (!isNativeCrosshairPointInMainPane(frame, x, y)) return false;
+  if (!isNativeCrosshairPointInPlot(frame, x, y)) return false;
   if (crosshair.visible.value) {
     hideNativeCrosshair(crosshair);
     return false;
@@ -75,6 +82,6 @@ export function updateNativeCrosshairDrag(
   );
   crosshair.y.value = Math.min(
     Math.max(crosshair.dragOriginY.value + translationY, frame.mainPane.top),
-    frame.mainPane.bottom,
+    frame.timeAxisTop,
   );
 }

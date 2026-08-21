@@ -388,6 +388,39 @@ agrees logic looks like it already solves this — it makes the override survive
 the *commit*, but the release itself was still a frame early, so dragging or
 scaling a MACD pane snapped back to its pre-drag scale for one frame.
 
+## Worklets do not hoist
+
+A `'worklet'` function declaration is rewritten by the Reanimated plugin into an
+assignment carrying a serialized closure. Function declarations hoist;
+assignments do not. So a worklet that calls another worklet **declared below it
+in the same file** captures `undefined`, and the call throws the moment it runs
+on the UI thread — `getNativePaneAtY is not a function`.
+
+Nothing catches this before a device does. TypeScript resolves the symbol
+happily, eslint sees a legal forward reference, and the test suite runs against
+`src/test/reanimatedMock.tsx`, which never builds a closure at all. Declare
+every worklet above its callers and read the ordering as load-bearing, not
+cosmetic.
+
+## Gesture rebuilds on native
+
+The chart's fifteen gestures are composed into one `Gesture.Simultaneous`, so a
+new identity for *any* of them rebuilds the composition and makes the
+`GestureDetector` re-attach. Nearly all of them take `controlZones`, which React
+derives from layout — so anything that reaches that array at UI speed rebuilds
+the entire gesture tree.
+
+The reset-view button was exactly that. Its visibility was React state and its
+zone lived in the array, so revealing it, and then dismissing it 2.5s later,
+rebuilt every gesture twice per tap and re-rendered the whole chart with it. It
+is a shared value now, and the gestures that must yield to the button resolve
+its circle from the frame at touch time (`isNativeResetViewControlPoint`)
+instead of reading a published zone.
+
+Anything else that moves faster than layout belongs in a shared value the
+worklets read, never in `controlZones`. `drawingEditDragZonesShared` is the
+other instance of the same shape.
+
 ## Gotchas
 
 - `TealchartRenderer` is pure canvas — no React; test it independently

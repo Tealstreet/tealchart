@@ -11,7 +11,7 @@ import type {
 } from '../utils/tradeLineLayout';
 
 import { isNativeCrosshairContextMenuButtonTap } from './nativeCrosshairContextMenu';
-import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
 import { canBeginNativeChartPan, findNativeTradeLineActionZone } from './nativeTradeLineHitTest';
 
@@ -68,6 +68,7 @@ export interface NativeCanvasTapContext {
   chartInteractionEnabled: boolean;
   controlZones: readonly NativeGestureControlZone[];
   crosshairVisible: boolean;
+  resetViewVisible?: SharedValue<boolean>;
   crosshairY: number;
   drawingTapEnabled: boolean;
   frame: NativeChartFrame;
@@ -91,7 +92,17 @@ export function resolveNativeCanvasTap(
   'worklet';
   // Chrome first, and it is the only gate that returns `none`: a tap that lands
   // on a bar or rail never belonged to the canvas at all.
-  if (isNativeGestureControlPoint(ctx.controlZones, point.x, point.y)) return { kind: 'none' };
+  if (
+    isNativeReservedControlPoint({
+      controlZones: ctx.controlZones,
+      frame: ctx.frame,
+      resetViewVisible: ctx.resetViewVisible,
+      x: point.x,
+      y: point.y,
+    })
+  ) {
+    return { kind: 'none' };
+  }
 
   // Mid-bracket-drag the action buttons are not live, matching the gate the
   // trade-line tap applied for itself.

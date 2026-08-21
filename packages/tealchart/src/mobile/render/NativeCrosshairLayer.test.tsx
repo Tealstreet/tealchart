@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { resolveNativeCrosshairContextMenuButtonLayout } from '../interaction/nativeCrosshairContextMenu';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import { NativeCrosshairLayer } from './NativeCrosshairLayer';
+import { NativeCrosshairLayerImpl } from './NativeCrosshairLayer';
 
 function shared<T>(value: T) {
   return { value };
@@ -55,7 +55,7 @@ const sharedViewport = {
 };
 
 function renderCrosshair(hasContextMenu = false) {
-  return NativeCrosshairLayer({
+  return NativeCrosshairLayerImpl({
     axisFont: matchFont({ fontSize: 11 }),
     crosshair: {
       visible: shared(true),

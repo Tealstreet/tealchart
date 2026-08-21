@@ -1,6 +1,6 @@
 import type { SkImage } from '@shopify/react-native-skia';
 import type { LayoutRectangle } from 'react-native';
-import type { WorkerError } from '@tealstreet/tealscript';
+import type { PlotOutput, WorkerError } from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEventListener,
   UserDrawingSelectedActionSurfaceCommand,
@@ -49,6 +49,7 @@ import { Canvas, Image as SkiaImage, Skia, useCanvasRef } from '@shopify/react-n
 
 import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
 import { StyleSheet, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import { GestureDetector } from 'react-native-gesture-handler';
 
 import { LOADING_OPACITY } from './constants';
@@ -142,6 +143,7 @@ const MOBILE_TOP_BAR_TIMEFRAME_VALUES = new Set<ResolutionString>(['1', '5', '15
 const NATIVE_CHART_UI_DEFAULTS = { leftToolRailCollapsed: true };
 const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>['anchors'] = [];
 const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
+const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 
 interface NativeResizeSnapshot {
@@ -467,7 +469,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nativePaneLayoutSignature]);
 
-  const nativeIndicatorPlots = indicatorManager?.getPlots() ?? [];
+  // Both counters are read every render; the manager advances them only when
+  // the thing each memo actually reads has moved.
+  const nativeIndicatorPlotsRevision = indicatorManager?.getPlotsRevision() ?? 0;
+  const nativeIndicatorsRevision = indicatorManager?.getIndicatorsRevision() ?? 0;
+  const nativeIndicatorPlots = useMemo<readonly PlotOutput[]>(
+    () => indicatorManager?.getPlots() ?? EMPTY_NATIVE_INDICATOR_PLOTS,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [indicatorManager, nativeIndicatorPlotsRevision],
+  );
   const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
     const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
     const panes = nativeIndicatorPaneLayout?.panes ?? [];
@@ -484,7 +494,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     return result;
-  }, [indicatorManager, nativeIndicatorPaneLayout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [indicatorManager, nativeIndicatorsRevision, nativeIndicatorPaneLayout]);
+  // Keyed on the indicator revision, never on the pane layout: hiding the only
+  // indicator in a pane leaves the layout untouched, so the eye icon and the
+  // dimmed row stayed on the value from before the tap.
   const nativeLegendIndicators = useMemo<readonly NativeLegendIndicator[]>(
     () =>
       indicatorManager?.getIndicators().map((indicator) => ({
@@ -493,7 +507,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         isVisible: indicator.isVisible,
         name: indicator.indicator.name,
       })) ?? [],
-    [indicatorManager, nativeIndicatorPaneLayout],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [indicatorManager, nativeIndicatorsRevision],
   );
   const nativeLegendIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeLegendIndicatorPaneInfo>>>(() => {
     const paneInfo = indicatorManager?.getIndicatorPaneInfo() ?? {};
@@ -513,7 +528,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     return result;
-  }, [indicatorManager, nativeIndicatorPaneLayout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [indicatorManager, nativeIndicatorsRevision, nativeIndicatorPaneLayout]);
   const handleNativeToggleIndicator = useCallback(
     (indicatorId: string) => {
       chartApi.toggleStudyVisibility(indicatorId);
@@ -848,7 +864,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     viewportGestureActive: nativeViewportGestureActive,
   });
   const staticNativeRenderProjection = useStaticNativeRenderProjection ? nativeRenderProjection : null;
-  const [nativeResetViewButtonVisible, setNativeResetViewButtonVisible] = useState(false);
+  // Shared, not React state: revealing the button and dismissing it 2.5s later
+  // used to re-render the whole chart and, because visibility was a control-zone
+  // dependency, rebuild every gesture with it.
+  const nativeResetViewButtonVisible = useSharedValue(false);
+  const nativeResetViewButtonVisibleRef = useRef(false);
+  const setNativeResetViewButtonVisible = useCallback(
+    (visible: boolean) => {
+      nativeResetViewButtonVisibleRef.current = visible;
+      nativeResetViewButtonVisible.value = visible;
+    },
+    [nativeResetViewButtonVisible],
+  );
   const [nativeContextMenu, setNativeContextMenu] = useState<NativeCrosshairContextMenuState | null>(null);
   const nativeResetViewButtonTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // The callback can arrive as a prop or through the imperative widget contract.
@@ -880,7 +907,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const hideNativeResetViewButton = useCallback(() => {
     clearNativeResetViewButtonTimer();
     setNativeResetViewButtonVisible(false);
-  }, [clearNativeResetViewButtonTimer]);
+  }, [clearNativeResetViewButtonTimer, setNativeResetViewButtonVisible]);
   const showNativeResetViewButton = useCallback(() => {
     clearNativeResetViewButtonTimer();
     setNativeResetViewButtonVisible(true);
@@ -888,7 +915,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       setNativeResetViewButtonVisible(false);
       nativeResetViewButtonTimerRef.current = null;
     }, NATIVE_RESET_VIEW_DISMISS_MS);
-  }, [clearNativeResetViewButtonTimer]);
+  }, [clearNativeResetViewButtonTimer, setNativeResetViewButtonVisible]);
 
   useEffect(
     () => () => {
@@ -896,6 +923,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [clearNativeResetViewButtonTimer],
   );
+
+  useEffect(() => {
+    if (hasDataViewport) return;
+    clearNativeResetViewButtonTimer();
+    setNativeResetViewButtonVisible(false);
+  }, [clearNativeResetViewButtonTimer, hasDataViewport, setNativeResetViewButtonVisible]);
 
   const {
     beginNativeUserDrawingEditDragAtPoint,
@@ -1001,21 +1034,39 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     [chartStore, markNativeLayoutDirtyIfReady],
   );
 
-  const nativeLayoutSettings = createNativeChartLayoutSettings({
-    autoScale: nativeAutoScaleEnabled,
-    chartProperties: nativeChartProperties,
-    preservedTvProperties: nativePreservedTvProperties,
-    chartType: 'candle',
-    indicators: indicatorManager?.getLayoutIndicators() ?? [],
-    interval: interval as ResolutionString,
-    showVolume: nativeShowVolume,
-    symbol,
-    userDrawingState: nativeUserDrawingState,
-    viewport: hasDataViewport ? viewport : undefined,
-    // The native renderer sizes the volume pane from VOLUME_HEIGHT_RATIO, so
-    // persisting anything else would save a height that is never drawn.
-    volumeHeight: VOLUME_HEIGHT_RATIO,
-  });
+  const nativeLayoutSettings = useMemo(
+    () =>
+      createNativeChartLayoutSettings({
+        autoScale: nativeAutoScaleEnabled,
+        chartProperties: nativeChartProperties,
+        preservedTvProperties: nativePreservedTvProperties,
+        chartType: 'candle',
+        indicators: indicatorManager?.getLayoutIndicators() ?? [],
+        interval: interval as ResolutionString,
+        showVolume: nativeShowVolume,
+        symbol,
+        userDrawingState: nativeUserDrawingState,
+        viewport: hasDataViewport ? viewport : undefined,
+        // The native renderer sizes the volume pane from VOLUME_HEIGHT_RATIO, so
+        // persisting anything else would save a height that is never drawn.
+        volumeHeight: VOLUME_HEIGHT_RATIO,
+      }),
+    // Every input, or a save quietly persists a stale snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      hasDataViewport,
+      indicatorManager,
+      interval,
+      nativeAutoScaleEnabled,
+      nativeChartProperties,
+      nativeIndicatorsRevision,
+      nativePreservedTvProperties,
+      nativeShowVolume,
+      nativeUserDrawingState,
+      symbol,
+      viewport,
+    ],
+  );
   const {
     deleteNativeLayout,
     getNativeLayouts,
@@ -1526,16 +1577,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       }
     }
 
-    if (nativeResetViewButtonLayout && nativeResetViewButtonVisible && hasDataViewport) {
-      zones.push({
-        owner: 'resetView',
-        x1: nativeResetViewButtonLayout.centerX - nativeResetViewButtonLayout.hitRadius,
-        x2: nativeResetViewButtonLayout.centerX + nativeResetViewButtonLayout.hitRadius,
-        y1: nativeResetViewButtonLayout.centerY - nativeResetViewButtonLayout.hitRadius,
-        y2: nativeResetViewButtonLayout.centerY + nativeResetViewButtonLayout.hitRadius,
-      });
-    }
-
     if (nativeUserDrawingSelectionActionOverlayModel) {
       zones.push({
         x1: nativeUserDrawingSelectionActionOverlayModel.position.left,
@@ -1555,13 +1596,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     return zones;
   }, [
     frame,
-    hasDataViewport,
     leftToolRailLayout,
     nativeChartSettingsActionTargets,
     nativeLegendActionTargets,
     nativeOpenDrawingCategoryId,
-    nativeResetViewButtonLayout,
-    nativeResetViewButtonVisible,
     nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
@@ -1621,7 +1659,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!frame || !hasDataViewport) return;
       const target = resolveNativeResetViewTapTarget({
         frame,
-        resetButtonVisible: nativeResetViewButtonVisible,
+        resetButtonVisible: nativeResetViewButtonVisibleRef.current,
         x,
         y,
         isControlTarget: isNativeGestureControlPoint(nativeGestureControlZones, x, y),
@@ -1641,7 +1679,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       hideNativeResetViewButton,
       isNativeTradeLineTouchTarget,
       nativeGestureControlZones,
-      nativeResetViewButtonVisible,
       resetNativeViewport,
       showNativeResetViewButton,
     ],
@@ -1694,7 +1731,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     pinchActive,
     pricePrecision: nativePricePrecision,
     priceScaleActive,
-    resetButtonVisible: nativeResetViewButtonVisible,
+    resetViewVisible: nativeResetViewButtonVisible,
     selectedDrawingActionTargets: nativeUserDrawingSelectionActionTargets,
     priceScaleGestureState,
     sharedViewport,
@@ -1916,8 +1953,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           viewportWidth={frame.dimensions.width}
         />
       )}
-      {nativeResetViewButtonLayout && nativeResetViewButtonVisible && hasDataViewport && (
-        <NativeResetViewButtonOverlay layout={nativeResetViewButtonLayout} />
+      {nativeResetViewButtonLayout && hasDataViewport && (
+        <NativeResetViewButtonOverlay layout={nativeResetViewButtonLayout} visible={nativeResetViewButtonVisible} />
       )}
       {frame && nativeContextMenu ? (
         <NativeCrosshairContextMenuOverlay

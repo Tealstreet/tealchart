@@ -25,9 +25,20 @@ export function sharedTimeToNativeX(time: number, sharedViewport: NativeViewport
   return frame.contentLeft + ratio * frame.contentWidth;
 }
 
+/**
+ * Maximising another pane collapses this one to zero height, and a zero-height
+ * pane draws nothing. Without this the containment test degenerates to a single
+ * y - the seam - and anything whose price lands there smears across the pane
+ * that was maximised.
+ */
+export function isNativeMainPaneVisible(frame: NativeChartFrame): boolean {
+  'worklet';
+  return frame.mainPane.height > 0;
+}
+
 export function isNativeYInMainPane(value: number, frame: NativeChartFrame): boolean {
   'worklet';
-  return value >= frame.mainPane.top && value <= frame.mainPane.bottom;
+  return isNativeMainPaneVisible(frame) && value >= frame.mainPane.top && value <= frame.mainPane.bottom;
 }
 
 /**

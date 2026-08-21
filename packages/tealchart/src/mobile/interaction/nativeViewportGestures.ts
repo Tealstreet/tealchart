@@ -24,7 +24,7 @@ import { resolveNativePaneDividerAtY, resolveNativePaneDividerBands, resolveNati
 import {
   resolveNativeIndicatorPaneTranslateRange,
 } from '../render/nativePaneRangeOverride';
-import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { resolveNativeIndicatorPaneScaleRange } from './nativeIndicatorPaneScale';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
 import {
@@ -88,6 +88,7 @@ function getNativeTwoTouchVector(event: NativeGestureTouchEvent): NativeTwoTouch
 function canBeginNativeChartAxisPinch({
   event,
   controlZones,
+  resetViewVisible,
   frame,
   orderDragZones,
   sharedViewport,
@@ -97,6 +98,7 @@ function canBeginNativeChartAxisPinch({
 }: {
   event: NativeGestureTouchEvent;
   controlZones: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   sharedViewport: NativeViewportSharedValues;
@@ -111,7 +113,7 @@ function canBeginNativeChartAxisPinch({
   const touchPoints = [vector.firstTouch, vector.secondTouch];
   for (let index = 0; index < touchPoints.length; index += 1) {
     const point = touchPoints[index];
-    if (isNativeGestureControlPoint(controlZones, point.x, point.y)) return null;
+    if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y })) return null;
   }
 
   const points = [...touchPoints, { x: vector.centerX, y: vector.centerY }];
@@ -142,6 +144,7 @@ export interface NativeChartPanGestureInput {
   chartPanGestureState: NativeChartPanGestureState;
   commitPanViewport: (nextViewport: Viewport) => void;
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   crosshair?: NativeCrosshairSharedValues;
   frame: NativeChartFrame | null;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
@@ -164,6 +167,7 @@ export function createNativeChartPanGesture({
   chartPanGestureState,
   commitPanViewport,
   controlZones = [],
+  resetViewVisible,
   crosshair,
   frame,
   onIndicatorPaneScale,
@@ -196,7 +200,7 @@ export function createNativeChartPanGesture({
       const point = getNativeTouchPoint(event);
       if (
         !point ||
-        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
+        isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y }) ||
         !canBeginNativeChartPan({
           actionZones: tradeLineActionZones.value,
           orderDragZones: orderDragZones.value,
@@ -315,6 +319,7 @@ export interface NativeChartAxisPinchGestureInput {
   chartAxisPinchGestureState: NativeChartAxisPinchGestureState;
   commitPanViewport: (nextViewport: Viewport) => void;
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
@@ -336,6 +341,7 @@ export function createNativeChartAxisPinchGesture({
   chartAxisPinchGestureState,
   commitPanViewport,
   controlZones = [],
+  resetViewVisible,
   frame,
   orderDragState,
   orderDragZones,
@@ -367,6 +373,7 @@ export function createNativeChartAxisPinchGesture({
       const vector = canBeginNativeChartAxisPinch({
         event,
         controlZones,
+        resetViewVisible,
         frame,
         orderDragZones,
         sharedViewport,
@@ -440,6 +447,7 @@ export interface NativePriceScaleGestureInput {
   cancelNativeViewportInteraction: () => void;
   commitPanViewport: (nextViewport: Viewport) => void;
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
@@ -453,6 +461,7 @@ export function createNativePriceScaleGesture({
   cancelNativeViewportInteraction,
   commitPanViewport,
   controlZones = [],
+  resetViewVisible,
   frame,
   onIndicatorPaneScale,
   paneRangeOverrides,
@@ -477,7 +486,7 @@ export function createNativePriceScaleGesture({
         return;
       }
       const point = getNativeTouchPoint(event);
-      if (!point || isNativeGestureControlPoint(controlZones, point.x, point.y)) {
+      if (!point || isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y })) {
         stateManager.fail();
         return;
       }
@@ -558,6 +567,7 @@ export interface NativeTimeScaleGestureInput {
   cancelNativeViewportInteraction: () => void;
   commitPanViewport: (nextViewport: Viewport) => void;
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   sharedViewport: NativeViewportSharedValues;
   timeScaleActive: SharedValue<boolean>;
@@ -569,6 +579,7 @@ export function createNativeTimeScaleGesture({
   cancelNativeViewportInteraction,
   commitPanViewport,
   controlZones = [],
+  resetViewVisible,
   frame,
   sharedViewport,
   timeScaleActive,
@@ -588,7 +599,7 @@ export function createNativeTimeScaleGesture({
       const point = getNativeTouchPoint(event);
       if (
         !point ||
-        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
+        isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y }) ||
         !canBeginNativeTimeScaleGesture(geometry, point.x, point.y)
       ) {
         stateManager.fail();

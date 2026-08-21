@@ -587,11 +587,15 @@ describe('imperative chart API contract', () => {
     expect(runtimeSource).toContain(
       // No hold to project through: a line is identified by its adapter, so a
       // venue re-key never orphans its action and nothing needs resurrecting.
-      'orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),',
+      'rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),',
     );
     expect(runtimeSource).toContain(
-      'positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),',
+      'rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),',
     );
+    // The OEMS pass reads live manager state that carries no revision, so it has
+    // to run every render. Memoising the build strands a pending order at the
+    // price it had before the action started.
+    expect(runtimeSource).not.toMatch(/useMemo(<[^>]*>)?\([\s\S]{0,240}applyNativeOrderActionState/);
     expect(runtimeSource).toContain('applyNativeOrderActionState,');
     expect(runtimeSource).toContain('applyNativePositionActionState,');
     expect(layerSource).toContain('{lineSnapshot.orderLines.map((line) => {');

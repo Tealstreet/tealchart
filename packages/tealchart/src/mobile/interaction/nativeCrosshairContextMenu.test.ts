@@ -13,6 +13,7 @@ import {
   nativeCrosshairYToPrice,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
+  resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
 
 function shared<T>(value: T): SharedValue<T> {
@@ -119,5 +120,48 @@ describe('native crosshair context menu geometry', () => {
     expect(nativeCrosshairXToTime((frame.contentLeft + frame.contentRight) / 2, viewport, frame)).toBe(1_500);
     expect(nativeCrosshairYToPrice(frame.mainPane.top, viewport, frame)).toBe(64_000);
     expect(nativeCrosshairYToPrice(frame.mainPane.bottom, viewport, frame)).toBe(62_000);
+  });
+});
+
+describe('crosshair readout across panes', () => {
+  const multiPaneFrame = createNativeChartFrameFromPanes({
+    dimensions: { width: 220, height: 220, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
+    panes: [
+      { id: 'main', type: 'main', top: 36, height: 84, yMin: 62_000, yMax: 64_000 },
+      { id: 'pane_1', type: 'indicator', top: 120, height: 60, yMin: 0, yMax: 100 },
+    ],
+  });
+  const viewport = sharedViewport({ startTime: 0, endTime: 1_000, priceMin: 62_000, priceMax: 64_000 });
+
+  it('reads an indicator pane on its own scale, not as a price', () => {
+    // Halfway down a 0-100 pane is 50. Formatted at the market's price
+    // precision it would read 50.00000 and mean nothing.
+    expect(resolveNativeCrosshairPriceLabelText(multiPaneFrame, viewport, 150, 5)).toBe('50');
+    // The price pane still formats as a price.
+    expect(resolveNativeCrosshairPriceLabelText(multiPaneFrame, viewport, 78, 2)).toContain('63,0');
+  });
+
+  it('follows a live axis drag on the indicator pane', () => {
+    const overrides = shared({ pane_1: { yMin: 0, yMax: 200 } });
+
+    expect(resolveNativeCrosshairPriceLabelText(multiPaneFrame, viewport, 150, 5, overrides)).toBe('100');
+  });
+
+  it('refuses the context-menu button outside the price pane', () => {
+    const buttonY = 150;
+    const layout = resolveNativeCrosshairContextMenuButtonLayout(multiPaneFrame, buttonY, 2);
+
+    // The button opens order actions at a price; an indicator pane has none, so
+    // a tap where it would sit must not be taken.
+    expect(
+      isNativeCrosshairContextMenuButtonTap({
+        frame: multiPaneFrame,
+        crosshairY: buttonY,
+        pricePrecision: 2,
+        sharedViewport: viewport,
+        x: layout.centerX,
+        y: layout.centerY,
+      }),
+    ).toBe(false);
   });
 });

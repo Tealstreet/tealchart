@@ -6,7 +6,7 @@ import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
-import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { isNativeGestureControlPoint, isNativeReservedControlPoint } from './nativeGestureControlZones';
 
 interface NativeGestureTouchEvent {
   allTouches: { x: number; y: number }[];
@@ -15,6 +15,7 @@ interface NativeGestureTouchEvent {
 
 export interface NativeUserDrawingEditDragGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   dragActive: SharedValue<boolean>;
   /**
    * A shared value, not a plain array. The drag zones are derived from bar data
@@ -39,6 +40,7 @@ function getNativeTouchPoint(event: NativeGestureTouchEvent): { x: number; y: nu
 
 export function createNativeUserDrawingEditDragGesture({
   controlZones = [],
+  resetViewVisible,
   dragActive,
   dragZones,
   enabled,
@@ -63,7 +65,7 @@ export function createNativeUserDrawingEditDragGesture({
       const point = getNativeTouchPoint(event);
       if (
         !point ||
-        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
+        isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y }) ||
         !isNativeGestureControlPoint(dragZones.value, point.x, point.y)
       ) {
         stateManager.fail();

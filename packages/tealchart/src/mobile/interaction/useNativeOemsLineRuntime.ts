@@ -24,6 +24,7 @@ import {
   getOemsPositionObjectId,
 } from '../../interaction/oemsLineState';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
+import { reuseNativeRenderList } from '../utils/nativeLineSnapshotReuse';
 import {
   getNativeOrderObjectId,
   getNativePositionObjectId,
@@ -157,15 +158,26 @@ export function useNativeOemsLineRuntime({
   }, [oemsActions, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines]);
 
 
-  const lineSnapshot = useMemo(
-    () => ({
-
-      orderLines: rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),
-      positionLines: rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),
-      executionLines: rawLineSnapshot.executionLines,
-    }),
-    [oemsActions, rawLineSnapshot.executionLines, rawLineSnapshot.orderLines, rawLineSnapshot.positionLines],
+  // Rebuilt every render on purpose: the action-state pass reads live manager
+  // state, and memoising the build would strand a pending order at its old
+  // price. Only the identities are held, so the geometry memos downstream -
+  // which measure Skia text - stop recomputing on renders that changed no line.
+  const previousLineSnapshotRef = useRef<NativeOemsLineSnapshot | null>(null);
+  const previousLineSnapshot = previousLineSnapshotRef.current;
+  const orderLines = reuseNativeRenderList(
+    previousLineSnapshot?.orderLines,
+    rawLineSnapshot.orderLines.map((line) => applyNativeOrderActionState(line, oemsActions)),
   );
+  const positionLines = reuseNativeRenderList(
+    previousLineSnapshot?.positionLines,
+    rawLineSnapshot.positionLines.map((line) => applyNativePositionActionState(line, oemsActions)),
+  );
+  const executionLines = reuseNativeRenderList(previousLineSnapshot?.executionLines, rawLineSnapshot.executionLines);
+  const lineSnapshot = useMemo<NativeOemsLineSnapshot>(
+    () => ({ orderLines, positionLines, executionLines }),
+    [executionLines, orderLines, positionLines],
+  );
+  previousLineSnapshotRef.current = lineSnapshot;
 
   useEffect(() => {
     latestOrderLinesRef.current = rawLineSnapshot.orderLines;
