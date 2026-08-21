@@ -288,6 +288,14 @@ export const DRAWING_ICONS = {
     p('M3 22v-6h6'),
     p('M21 12a9 9 0 0 1-15 6.7L3 16'),
   ]),
+  objectTree: def([
+    line(9, 6, 20, 6),
+    line(9, 12, 20, 12),
+    line(9, 18, 20, 18),
+    circle(4.5, 6, 1.4),
+    circle(4.5, 12, 1.4),
+    circle(4.5, 18, 1.4),
+  ]),
   plus: def([line(12, 5, 12, 19), line(5, 12, 19, 12)]),
   close: def([line(18, 6, 6, 18), line(6, 6, 18, 18)]),
   arrowUp: def([line(12, 19, 12, 5), polyline('6 11 12 5 18 11')]),
@@ -355,6 +363,8 @@ export function resolveDrawingSelectedActionIconName(
         default:
           return undefined;
       }
+    case 'openObjectTree':
+      return 'objectTree';
     case 'openProperties':
       return 'gear';
     case 'editText':

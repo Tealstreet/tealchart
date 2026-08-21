@@ -56,10 +56,11 @@ describe('drawing icon registry', () => {
     expect(resolveDrawingSelectedActionIconName({ type: 'styleAction', action: 'lockSelected' })).toBe('lock');
     expect(resolveDrawingSelectedActionIconName({ type: 'openProperties' })).toBe('gear');
     expect(resolveDrawingSelectedActionIconName({ type: 'editText', drawingId: 'd1' })).toBe('pencil');
+    // Unmapped, this fell back to drawing the '☰' glyph as text on native.
+    expect(resolveDrawingSelectedActionIconName({ type: 'openObjectTree' })).toBe('objectTree');
   });
 
   it('skips icons for color swatch items and unmapped commands', () => {
     expect(resolveDrawingSelectedActionIconName({ type: 'toolbarAction', action: 'deleteSelected' }, '#ff0000')).toBeUndefined();
-    expect(resolveDrawingSelectedActionIconName({ type: 'openObjectTree' })).toBeUndefined();
   });
 });

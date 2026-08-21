@@ -91,9 +91,10 @@ function isNativeSelectedDrawingActionSupported(command: UserDrawingSelectedActi
     case 'setIconName':
     case 'saveSelectedStyleAsDefault':
       return true;
+    case 'openObjectTree':
+      return true;
     case 'editText':
     case 'copySelected':
-    case 'openObjectTree':
     case 'openProperties':
     case 'setDuplicateEditDrag':
       return false;
