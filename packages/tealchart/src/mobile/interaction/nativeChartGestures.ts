@@ -21,6 +21,26 @@ interface NativeChartGestureInput {
   timeScaleGesture: GestureType;
 }
 
+/**
+ * The canvas tap toggles the crosshair, and the first tap of a double tap is
+ * still a tap - so maximising a pane also flipped the crosshair on the way
+ * through. Making the canvas tap wait for the double tap to fail costs the
+ * gesture-handler inter-tap window (200ms on iOS) and only where a double tap
+ * can actually happen: `createNativePaneMaximizeTapGesture` disables itself
+ * with a single pane, and waiting on a disabled gesture is not worth the risk.
+ *
+ * Applied to a freshly built gesture, never a memoised one - the relation
+ * appends rather than replaces.
+ */
+export function deferNativeCanvasTapToPaneMaximize(
+  canvasTapGesture: GestureType,
+  paneMaximizeTapGesture: GestureType,
+  paneCount: number,
+): GestureType {
+  if (paneCount <= 1) return canvasTapGesture;
+  return canvasTapGesture.requireExternalGestureToFail(paneMaximizeTapGesture);
+}
+
 export function createNativeChartGesture({
   chartAxisPinchGesture,
   bracketDragGesture,
