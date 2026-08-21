@@ -54,6 +54,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 
 import { LOADING_OPACITY } from './constants';
 import {
+  resolveUserDrawingObjectTreeModel,
   resolveUserDrawingRenderEntriesFromSlices,
   resolveUserDrawingSelectionActionAnchorFromDrawings,
 } from './drawings';
@@ -72,6 +73,7 @@ import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeS
 import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
 import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopBarActionRuntime';
 import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserDrawingRuntime';
+import { NativeUserDrawingObjectTreePanel } from './mobile/render/NativeUserDrawingObjectTreePanel';
 import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
 import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
@@ -1033,8 +1035,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativeResetViewButtonVisible(false);
   }, [clearNativeResetViewButtonTimer, hasDataViewport, setNativeResetViewButtonVisible]);
 
+  const [nativeObjectTreeOpen, setNativeObjectTreeOpen] = useState(false);
+  const openNativeObjectTree = useCallback(() => setNativeObjectTreeOpen(true), []);
+
   const {
     beginNativeUserDrawingEditDragAtPoint,
+    dispatchNativeUserDrawingObjectTreeAction,
     dispatchNativeUserDrawingSelectedAction,
     endNativeUserDrawingEditDrag,
     handleNativeUserDrawingInput,
@@ -1051,8 +1057,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   } = useNativeUserDrawingRuntime({
     initialUserDrawingState: userDrawingState,
     onUserDrawingCommand: handleNativeUserDrawingCommandForLayout,
+    onUserDrawingObjectTreeOpen: openNativeObjectTree,
     onUserDrawingStateChange,
   });
+  const nativeObjectTreeModel = useMemo(
+    () => resolveUserDrawingObjectTreeModel(nativeUserDrawingState),
+    [nativeUserDrawingState],
+  );
   const nativeUserDrawingDrawings = nativeUserDrawingState.drawings;
   const nativeUserDrawingSelection = nativeUserDrawingState.selection;
   const nativeUserDrawingDraft = nativeUserDrawingState.draft;
@@ -2119,6 +2130,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           onSave={handleNativeLayoutSelectorSave}
           onSaveAs={handleNativeLayoutSelectorSaveAs}
           saveStatus={nativeSaveStatus}
+          textColor={textColor}
+        />
+      ) : null}
+      {nativeObjectTreeOpen ? (
+        <NativeUserDrawingObjectTreePanel
+          backgroundColor={backgroundColor}
+          gridColor={gridColor}
+          model={nativeObjectTreeModel}
+          mutedTextColor={nativeMutedTextColor}
+          onClose={() => setNativeObjectTreeOpen(false)}
+          onDispatch={dispatchNativeUserDrawingObjectTreeAction}
           textColor={textColor}
         />
       ) : null}
