@@ -76,6 +76,8 @@ export interface EventManagerCallbacks {
   isAutoScale?: (paneId: string) => boolean;
   /** Check if position is over interactive Konva element */
   isOverInteractiveElement?: (x: number, y: number) => boolean;
+  /** Interactive, but drawn by the crosshair - so it must not stand it down. */
+  isOverCrosshairChrome?: (x: number, y: number) => boolean;
   /** Whether the point is over a grabbable (unlocked) user drawing — for the hover cursor only. */
   isOverUnlockedUserDrawing?: (x: number, y: number) => boolean;
   /** Get price from Y coordinate */
@@ -428,8 +430,12 @@ export class EventManager {
     // so the crosshair stands down rather than drawing itself over the thing
     // being aimed at - the hover counterpart of native's tap dead zones. That
     // includes grabbable drawings, which take a click exactly as a label does.
+    // Chrome the crosshair draws itself is excluded. It follows the cursor, so
+    // it would hide the crosshair, and hiding it takes the chrome away again.
+    const isOverCrosshairChrome = !!this.callbacks.isOverCrosshairChrome?.(x, y);
     const isOverInteractive =
       !isOverChrome &&
+      !isOverCrosshairChrome &&
       (!!this.callbacks.isOverInteractiveElement?.(x, y) || !!this.callbacks.isOverUnlockedUserDrawing?.(x, y));
 
     return {
