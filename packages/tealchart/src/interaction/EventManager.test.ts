@@ -330,6 +330,47 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  // Chrome the crosshair draws follows the cursor, so standing down for it hides
+  // the crosshair, which takes the chrome away, which brings both back next move
+  // - a flip per mousemove. It stays interactive, so a press on it cannot start
+  // a pan; it just may not decide whether the crosshair is up.
+  it('keeps the crosshair up over chrome it draws itself', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRafFrame = () => {
+      for (const callback of rafCallbacks.splice(0)) {
+        callback(0);
+      }
+    };
+    const container = createContainer();
+    let crosshairDrawn = false;
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        // The + button exists to be hit only once the crosshair has drawn it.
+        isOverInteractiveElement: () => crosshairDrawn,
+        isOverCrosshairChrome: () => crosshairDrawn,
+        onCrossHairVisibilityChange: (visible: boolean) => {
+          crosshairDrawn = visible;
+        },
+      }),
+    );
+
+    const visibility: boolean[] = [];
+    for (const clientX of [100, 101, 102, 103]) {
+      container.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX, clientY: 100 }));
+      flushRafFrame();
+      visibility.push(manager.getCrosshair().visible);
+    }
+
+    expect(visibility).toEqual([true, true, true, true]);
+
+    manager.dispose();
+  });
+
   it('stands the crosshair down over a grabbable drawing too', () => {
     const rafCallbacks: FrameRequestCallback[] = [];
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {

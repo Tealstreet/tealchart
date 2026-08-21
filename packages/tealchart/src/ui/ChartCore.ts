@@ -689,20 +689,12 @@ export class ChartCore {
         this.scheduleRender();
       },
       isOverInteractiveElement: (x, y) => {
-        // Check + button bounds (canvas-drawn, no DOM element)
-        if (this._plusButtonBounds) {
-          const b = this._plusButtonBounds;
-          const dx = x - b.x;
-          const dy = y - b.y;
-          if (dx * dx + dy * dy <= b.r * b.r) {
-            return true;
-          }
-        }
-        if (this.isOverKonvaInteractiveElement(x, y)) {
-          return true;
-        }
-        return false;
+        // The + button is canvas-drawn, so it has no element to take the press
+        // and this is what keeps a click on it from starting a pan.
+        if (this.isOverCrosshairPlusButton(x, y)) return true;
+        return this.isOverKonvaInteractiveElement(x, y);
       },
+      isOverCrosshairChrome: (x, y) => this.isOverCrosshairPlusButton(x, y),
       isOverUnlockedUserDrawing: (x, y) => this.isOverUnlockedUserDrawing(x, y),
       onAutoScaleDisabled: (paneId: string) => this.options.onAutoScaleDisabled?.(paneId),
       isAutoScale: (paneId: string) => this.options.isAutoScale?.(paneId) ?? true,
@@ -1138,6 +1130,23 @@ export class ChartCore {
   }
 
   /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */
+  /**
+   * The + button, which is drawn ON the crosshair line at the cursor's own y -
+   * so the pointer is inside it whenever it is in that strip at all.
+   *
+   * It suppresses input like any other click target, but it must never suppress
+   * the crosshair: doing so hid the crosshair, hiding cleared these bounds, and
+   * with no bounds the next move brought both back - a flip per mousemove, and
+   * a click landing on nothing about half the time.
+   */
+  private isOverCrosshairPlusButton(x: number, y: number): boolean {
+    const bounds = this._plusButtonBounds;
+    if (!bounds) return false;
+    const dx = x - bounds.x;
+    const dy = y - bounds.y;
+    return dx * dx + dy * dy <= bounds.r * bounds.r;
+  }
+
   private isOverUnlockedUserDrawing(x: number, y: number): boolean {
     const state = this.userDrawingState;
     if (!state || state.activeTool !== 'select' || !this.viewport) return false;

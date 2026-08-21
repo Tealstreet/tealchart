@@ -26,6 +26,8 @@ interface EventManagerCallbackProbe {
   onCrosshairRender?: () => void;
   onCursorChange?: (cursor: string) => void;
   onPaneDoubleClick?: (paneId: string, point: { x: number; y: number }) => void;
+  isOverInteractiveElement?: (x: number, y: number) => boolean;
+  isOverCrosshairChrome?: (x: number, y: number) => boolean;
 }
 
 const eventManagerInstances = vi.hoisted(
@@ -1983,6 +1985,26 @@ describe('ChartCore viewport management', () => {
 
     eventManagerInstances[0]?.callbacks.onCursorChange?.('pointer');
     expect(chartContainer.style.cursor).toBe('pointer');
+
+    core.dispose();
+  });
+
+  // The + button has to be both: interactive, so pressing it cannot start a pan,
+  // and reported as crosshair chrome, so it cannot stand the crosshair down. It
+  // is drawn on the crosshair line at the cursor's own y, so the pointer is
+  // inside it whenever it is in that strip - and suppressing the crosshair hid
+  // it, which cleared these bounds, which brought both back next move.
+  it('reports the + button as interactive and as crosshair chrome', async () => {
+    const core = await createChartCore();
+    const probe = eventManagerInstances[eventManagerInstances.length - 1];
+
+    // Stand in for a drawn + button, centred on the pointer as it always is.
+    const bounds = { x: 700, y: 300, r: 9 };
+    (core as unknown as { _plusButtonBounds: typeof bounds })._plusButtonBounds = bounds;
+
+    expect(probe?.callbacks.isOverInteractiveElement?.(bounds.x, bounds.y)).toBe(true);
+    expect(probe?.callbacks.isOverCrosshairChrome?.(bounds.x, bounds.y)).toBe(true);
+    expect(probe?.callbacks.isOverCrosshairChrome?.(bounds.x + 40, bounds.y)).toBe(false);
 
     core.dispose();
   });
