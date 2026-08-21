@@ -5,6 +5,8 @@ import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
+import { memo } from 'react';
+
 import { Group, Skia, Path as SkiaPath } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
@@ -428,7 +430,7 @@ function NativeProjectedVolumePath({
   return <SkiaPath path={path} color={candleColor} opacity={0.55} />;
 }
 
-export function NativeCandleVolumeLayer({
+export function NativeCandleVolumeLayerImpl({
   frame,
   options,
   sharedViewport,
@@ -525,3 +527,8 @@ export function NativeCandleVolumeLayer({
     </Group>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeCandleVolumeLayer = memo(NativeCandleVolumeLayerImpl);
+NativeCandleVolumeLayer.displayName = 'NativeCandleVolumeLayer';

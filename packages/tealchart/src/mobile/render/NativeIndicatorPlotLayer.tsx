@@ -7,7 +7,7 @@ import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 import { DashPathEffect, Group, Skia, Path as SkiaPath } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
@@ -440,7 +440,7 @@ function NativeIndicatorPlotPath({
   );
 }
 
-export function NativeIndicatorPlotLayer({
+export function NativeIndicatorPlotLayerImpl({
   frame,
   indicatorPaneInfo,
   paneRangeOverrides,
@@ -481,3 +481,8 @@ export function NativeIndicatorPlotLayer({
     </Group>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeIndicatorPlotLayer = memo(NativeIndicatorPlotLayerImpl);
+NativeIndicatorPlotLayer.displayName = 'NativeIndicatorPlotLayer';

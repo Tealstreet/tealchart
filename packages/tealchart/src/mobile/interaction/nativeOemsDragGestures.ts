@@ -18,7 +18,7 @@ import type {
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
-import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import {
   beginNativeBracketDragState,
   beginNativeOrderDragState,
@@ -64,6 +64,7 @@ function getLiveNativePricePerPixel(sharedViewport: NativeViewportSharedValues, 
 export interface NativeOrderDragGestureInput {
   commitOrderMove: (objectId: string, nextPrice: number) => void;
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
@@ -76,6 +77,7 @@ export interface NativeOrderDragGestureInput {
 export function createNativeOrderDragGesture({
   commitOrderMove,
   controlZones = [],
+  resetViewVisible,
   frame,
   orderDragState,
   orderDragZones,
@@ -96,7 +98,7 @@ export function createNativeOrderDragGesture({
       const point = getNativeTouchPoint(event);
       if (
         !point ||
-        isNativeGestureControlPoint(controlZones, point.x, point.y) ||
+        isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y }) ||
         findNativeTradeLineActionZone({
           zones: tradeLineActionZones.value,
           rows: tradeLineRows.value,
@@ -165,6 +167,7 @@ export interface NativeBracketDragGestureInput {
     partialPercent?: number,
   ) => void;
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
@@ -177,6 +180,7 @@ export function createNativeBracketDragGesture({
   clearNativeBracketDrag,
   commitBracketMove,
   controlZones = [],
+  resetViewVisible,
   frame,
   sharedViewport,
   tradeLabelHeight,
@@ -193,7 +197,7 @@ export function createNativeBracketDragGesture({
         return;
       }
       const point = getNativeTouchPoint(event);
-      if (!point || isNativeGestureControlPoint(controlZones, point.x, point.y)) {
+      if (!point || isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y })) {
         stateManager.fail();
         return;
       }

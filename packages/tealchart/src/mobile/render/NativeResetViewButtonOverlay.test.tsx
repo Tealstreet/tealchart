@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
+import type { SharedValue } from 'react-native-reanimated';
 
 import { View } from 'react-native';
 import { describe, expect, it } from 'vitest';
@@ -43,14 +44,17 @@ describe('NativeResetViewButtonOverlay', () => {
   it('draws the full reset hit radius as a visual-only overlay', () => {
     const overlay = NativeResetViewButtonOverlayImpl({
       layout: { centerX: 180, centerY: 300, radius: 14, hitRadius: 50 },
+      visible: { value: false } as SharedValue<boolean>,
     });
+    // The root is an Animated.View now - it stays mounted and fades - so the
+    // plain Views below it are the hit area and the button itself.
     const views = collectElementsByType(overlay, View);
     const hitArea = views.find((view) => flattenStyle(view.props.style).height === 100);
     const visualButton = views.find((view) => flattenStyle(view.props.style).height === 28);
     const icon = collectElementsByType(overlay, NativeDrawingIcon)[0];
 
-    expect(views[0].props.pointerEvents).toBe('none');
-    expect(flattenStyle(views[0].props.style)).toEqual(expect.objectContaining({ zIndex: 30 }));
+    expect(overlay.props.pointerEvents).toBe('none');
+    expect(flattenStyle(overlay.props.style)).toEqual(expect.objectContaining({ zIndex: 30 }));
     expect(flattenStyle(hitArea?.props.style)).toEqual(
       expect.objectContaining({
         height: 100,

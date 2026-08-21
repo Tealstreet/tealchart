@@ -1,8 +1,3 @@
-import type {
-  NativeBracketDragSharedValues,
-  NativeOrderDragSharedValues,
-  NativeTradeLineBracketType,
-} from './nativeOemsDragState';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativePriceAxisTagCollisionSource } from '../utils/priceAxisTagLayout';
@@ -13,19 +8,29 @@ import type {
   NativeTradeLineActionZone,
   NativeTradeLineRow,
 } from '../utils/tradeLineLayout';
+import type {
+  NativeBracketDragSharedValues,
+  NativeOrderDragSharedValues,
+  NativeTradeLineBracketType,
+} from './nativeOemsDragState';
 
-import { resolveNativePriceAxisTagStack } from '../utils/priceAxisTagLayout';
-import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
-import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
 import {
   getNativePriceAxisTagFloor,
+  isNativeMainPaneVisible,
   isNativeYInMainPane,
   sharedPriceToNativeY,
 } from '../render/nativeSharedViewport';
+import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
+import { resolveNativePriceAxisTagStack } from '../utils/priceAxisTagLayout';
+import { getNativeBracketDragTagId } from '../utils/priceAxisTagSources';
 
 export const NATIVE_TRADE_LABEL_HIT_SLOP = 8;
 
-export function sharedPriceToNativeLineY(price: number, sharedViewport: NativeViewportSharedValues, frame: NativeChartFrame): number {
+export function sharedPriceToNativeLineY(
+  price: number,
+  sharedViewport: NativeViewportSharedValues,
+  frame: NativeChartFrame,
+): number {
   'worklet';
   return sharedPriceToNativeY(price, sharedViewport, frame);
 }
@@ -102,13 +107,21 @@ export function resolveNativePriceAxisTagCenters({
   priceAxisTagHeight: number;
 }) {
   'worklet';
+  // A collapsed pane gives the stack a degenerate range to place tags in, and
+  // nothing it belongs to is on screen anyway.
+  if (!isNativeMainPaneVisible(frame)) return [];
+
   const sources: NativePriceAxisTagCollisionSource[] = [];
 
   for (let index = 0; index < priceAxisTagSources.length; index += 1) {
     const source = priceAxisTagSources[index];
     if (isNativePriceAxisTagSourceSuppressedByBracketDrag(source, bracketDragState)) continue;
     if (isNativePriceAxisTagSourceSuppressedByOrderDrag(source, orderDragState)) continue;
-    const priceY = sharedPriceToNativeLineY(getNativePriceAxisSourcePrice(source, orderDragState), sharedViewport, frame);
+    const priceY = sharedPriceToNativeLineY(
+      getNativePriceAxisSourcePrice(source, orderDragState),
+      sharedViewport,
+      frame,
+    );
     if (!source.clampToPane && !isNativeYInMainPane(priceY, frame)) continue;
     sources.push({
       id: source.tagId,
@@ -153,14 +166,21 @@ export function findNativeOrderDragZoneIndex({
     const priceY = sharedPriceToNativeLineY(zone.price, sharedViewport, frame);
     if (!isNativeYInMainPane(priceY, frame)) continue;
     const zoneTop = priceY - tradeLabelHeight / 2;
-    if (x >= zone.x1 && x <= zone.x2 && y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP && y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP) {
+    if (
+      x >= zone.x1 &&
+      x <= zone.x2 &&
+      y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
+      y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
+    ) {
       return index;
     }
   }
   return -1;
 }
 
-export function findNativeOrderDragZone(args: Parameters<typeof findNativeOrderDragZoneIndex>[0]): NativeOrderDragZone | null {
+export function findNativeOrderDragZone(
+  args: Parameters<typeof findNativeOrderDragZoneIndex>[0],
+): NativeOrderDragZone | null {
   'worklet';
   const index = findNativeOrderDragZoneIndex(args);
   return index >= 0 ? args.zones[index] : null;
@@ -188,7 +208,12 @@ export function findNativeTradeLineActionZoneIndex({
     const priceY = sharedPriceToNativeLineY(zone.price, sharedViewport, frame);
     if (!isNativeYInMainPane(priceY, frame)) continue;
     const zoneTop = priceY - tradeLabelHeight / 2;
-    if (x >= zone.x1 && x <= zone.x2 && y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP && y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP) {
+    if (
+      x >= zone.x1 &&
+      x <= zone.x2 &&
+      y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
+      y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
+    ) {
       return index;
     }
   }
@@ -203,7 +228,9 @@ export function findNativeTradeLineActionZone(
   return index >= 0 ? args.zones[index] : null;
 }
 
-export function isNativeBracketActionType(actionType: NativeTradeLineActionType): actionType is NativeTradeLineBracketType {
+export function isNativeBracketActionType(
+  actionType: NativeTradeLineActionType,
+): actionType is NativeTradeLineBracketType {
   'worklet';
   return actionType === 'tp' || actionType === 'sl';
 }
@@ -217,14 +244,21 @@ export function findNativeBracketDragZoneIndex(args: Parameters<typeof findNativ
     const priceY = sharedPriceToNativeLineY(zone.price, sharedViewport, frame);
     if (!isNativeYInMainPane(priceY, frame)) continue;
     const zoneTop = priceY - tradeLabelHeight / 2;
-    if (x >= zone.x1 && x <= zone.x2 && y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP && y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP) {
+    if (
+      x >= zone.x1 &&
+      x <= zone.x2 &&
+      y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
+      y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
+    ) {
       return index;
     }
   }
   return -1;
 }
 
-export function findNativeBracketDragZone(args: Parameters<typeof findNativeBracketDragZoneIndex>[0]): NativeTradeLineActionZone | null {
+export function findNativeBracketDragZone(
+  args: Parameters<typeof findNativeBracketDragZoneIndex>[0],
+): NativeTradeLineActionZone | null {
   'worklet';
   const index = findNativeBracketDragZoneIndex(args);
   return index >= 0 ? args.zones[index] : null;

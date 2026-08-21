@@ -96,18 +96,23 @@ export function getNativePaneFrame(frame: NativeChartFrame, paneId: string): Nat
   return frame.panes.find((pane) => pane.id === paneId) ?? null;
 }
 
-export function isPointInNativePlot(frame: NativeChartFrame, x: number, y: number): boolean {
-  return x >= frame.contentLeft && x < frame.priceAxisHitLeft && frame.panes.some((pane) => y >= pane.top && y <= pane.bottom);
-}
-
 export function isPointInNativePriceAxis(frame: NativeChartFrame, x: number, y: number): boolean {
   return x >= frame.priceAxisHitLeft && x <= frame.priceAxisRight && y >= frame.mainPane.top && y <= frame.mainPane.bottom;
 }
 
-/** The pane a vertical position falls in, main or indicator. */
+/**
+ * The pane a vertical position falls in, main or indicator. Zero-height panes
+ * are skipped: maximising one collapses the rest, and the seam would otherwise
+ * resolve to whichever collapsed pane happens to sit on it.
+ */
 export function getNativePaneAtY(frame: NativeChartFrame, y: number): NativePaneFrame | null {
   'worklet';
-  return frame.panes.find((pane) => y >= pane.top && y <= pane.bottom) ?? null;
+  return frame.panes.find((pane) => pane.height > 0 && y >= pane.top && y <= pane.bottom) ?? null;
+}
+
+export function isPointInNativePlot(frame: NativeChartFrame, x: number, y: number): boolean {
+  'worklet';
+  return x >= frame.contentLeft && x < frame.priceAxisHitLeft && getNativePaneAtY(frame, y) !== null;
 }
 
 /**

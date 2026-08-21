@@ -269,3 +269,145 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     );
   });
 });
+
+describe('MobileIndicatorManager recomputation cache', () => {
+  afterEach(() => {
+    clearChartStoreCache();
+  });
+
+  function addTwo(manager: MobileIndicatorManager) {
+    const left = manager.addTealscriptIndicator({
+      id: 'left',
+      name: 'Left',
+      code: 'indicator("Left")\nplot(close)',
+    });
+    const right = manager.addTealscriptIndicator({
+      id: 'right',
+      name: 'Right',
+      code: 'indicator("Right")\nplot(open)',
+    });
+    return { left, right };
+  }
+
+  function plotsFor(manager: MobileIndicatorManager, scriptId: string) {
+    return manager.getPlots().filter((plot) => plot.scriptId === scriptId);
+  }
+
+  it('leaves the other indicators untouched when one is hidden', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(4));
+    const { left, right } = addTwo(manager);
+    const beforeLeft = plotsFor(manager, left);
+
+    manager.setIndicatorVisibility(right, false);
+
+    expect(plotsFor(manager, right)).toHaveLength(0);
+    expect(plotsFor(manager, left)).toEqual(beforeLeft);
+    // Reference identity is the assertion: a re-execution would mint new objects.
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft[0]);
+  });
+
+  it('leaves the existing indicators untouched when another is added or removed', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(4));
+    const { left } = addTwo(manager);
+    const beforeLeft = plotsFor(manager, left)[0];
+
+    const added = manager.addTealscriptIndicator({ id: 'third', code: 'indicator("Third")\nplot(high)' });
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft);
+
+    manager.removeIndicator(added);
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft);
+    expect(plotsFor(manager, added)).toHaveLength(0);
+  });
+
+  it('re-executes only the indicator whose inputs changed', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(6));
+    const { left } = addTwo(manager);
+    const tuned = manager.addTealscriptIndicator({
+      id: 'tuned',
+      code: 'indicator("Tuned")\nlength = input.int(2, "length")\nplot(ta.sma(close, length))',
+    });
+    const beforeLeft = plotsFor(manager, left)[0];
+    const beforeTuned = plotsFor(manager, tuned)[0];
+
+    // The engine registers inputs as `input_<title>`, so a bare `length` key
+    // would re-execute with the default and prove nothing.
+    manager.updateInputs(tuned, { input_length: 4 });
+
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft);
+    expect(plotsFor(manager, tuned)[0]).not.toBe(beforeTuned);
+    expect(plotsFor(manager, tuned)[0]?.values).not.toEqual(beforeTuned?.values);
+  });
+
+  it('re-executes everything when bars advance, including an appended live bar', () => {
+    const manager = new MobileIndicatorManager();
+    const bars = makeBars(4);
+    manager.setBars(bars);
+    const { left } = addTwo(manager);
+    const beforeLeft = plotsFor(manager, left)[0];
+
+    // ChartWidgetCore appends the live bar in place and re-passes the same array,
+    // so an identity-keyed cache would freeze the plots here.
+    bars.push({ time: 1_700_000_240_000, open: 104, high: 106, low: 103, close: 105, volume: 1004 });
+    manager.setBars(bars);
+
+    expect(plotsFor(manager, left)[0]).not.toBe(beforeLeft);
+    expect(plotsFor(manager, left)[0]?.values).toHaveLength(5);
+  });
+
+  it('separates the plot revision from the indicator revision', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(4));
+    const { right } = addTwo(manager);
+
+    const indicatorsAfterAdd = manager.getIndicatorsRevision();
+    const plotsAfterAdd = manager.getPlotsRevision();
+
+    manager.setBars(makeBars(5));
+    expect(manager.getIndicatorsRevision()).toBe(indicatorsAfterAdd);
+    expect(manager.getPlotsRevision()).toBeGreaterThan(plotsAfterAdd);
+
+    const plotsAfterBars = manager.getPlotsRevision();
+    manager.setIndicatorVisibility(right, false);
+    expect(manager.getIndicatorsRevision()).toBeGreaterThan(indicatorsAfterAdd);
+    expect(manager.getPlotsRevision()).toBeGreaterThan(plotsAfterBars);
+  });
+
+  it('advances the indicator revision for a style override', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(4));
+    const { left } = addTwo(manager);
+    const before = manager.getIndicatorsRevision();
+
+    manager.updateStyleOverrides(left, [{ plotIndex: 0, color: '#ff0000' }]);
+
+    expect(manager.getIndicatorsRevision()).toBeGreaterThan(before);
+  });
+
+  it('keeps the plot arrays when bars go empty on an already empty chart', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars([]);
+    const before = manager.getPlots();
+    const revisionBefore = manager.getPlotsRevision();
+
+    manager.setBars([]);
+
+    expect(manager.getPlots()).toBe(before);
+    expect(manager.getPlotsRevision()).toBe(revisionBefore);
+  });
+
+  it('keeps the plot array identity when a recompute changes nothing', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(4));
+    const { left } = addTwo(manager);
+    const before = manager.getPlots();
+    const revisionBefore = manager.getPlotsRevision();
+
+    manager.updateInputs(left, {});
+
+    expect(manager.getPlots()).toBe(before);
+    expect(manager.getPlotsRevision()).toBe(revisionBefore);
+  });
+});

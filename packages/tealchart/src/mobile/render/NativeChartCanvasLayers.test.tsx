@@ -6,7 +6,7 @@ import { Group, matchFont } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
 import { NativeCandleVolumeLayer } from './NativeCandleVolumeLayer';
-import { NativeChartCanvasLayers } from './NativeChartCanvasLayers';
+import { NativeChartCanvasLayersImpl } from './NativeChartCanvasLayers';
 import { NativeChartChromeLayer } from './NativeChartChromeLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
@@ -53,8 +53,8 @@ describe('NativeChartCanvasLayers', () => {
         activeEntryPrice: shared(0),
         activeDragStartX: shared(0),
         activeDragCurrentX: shared(0),
-    activeDragStartY: shared(0),
-    activeDragCurrentY: shared(0),
+        activeDragStartY: shared(0),
+        activeDragCurrentY: shared(0),
         activePositionNotional: shared(0),
         activePositionIsLong: shared(true),
         activePartialPercent: shared(100),
@@ -108,7 +108,7 @@ describe('NativeChartCanvasLayers', () => {
   }
 
   it('keeps native chart surfaces in deterministic back-to-front order', () => {
-    const layer = NativeChartCanvasLayers(createLayerProps(true)) as ReactElement;
+    const layer = NativeChartCanvasLayersImpl(createLayerProps(true)) as ReactElement;
     const children = layer.props.children as ReactElement[];
     const plotGroup = children[1] as ReactElement;
 
@@ -142,7 +142,7 @@ describe('NativeChartCanvasLayers', () => {
   });
 
   it('applies loading opacity inside the Skia plot layer', () => {
-    const layer = NativeChartCanvasLayers({ ...createLayerProps(true), plotOpacity: 0.7 }) as ReactElement;
+    const layer = NativeChartCanvasLayersImpl({ ...createLayerProps(true), plotOpacity: 0.7 }) as ReactElement;
     const children = layer.props.children as ReactElement[];
     const plotGroup = children[1] as ReactElement;
 
@@ -151,7 +151,7 @@ describe('NativeChartCanvasLayers', () => {
   });
 
   it('renders chrome only before a data viewport exists', () => {
-    const layer = NativeChartCanvasLayers(createLayerProps(false)) as ReactElement;
+    const layer = NativeChartCanvasLayersImpl(createLayerProps(false)) as ReactElement;
 
     expect((layer.props.children as ReactElement[]).filter(Boolean).map((child) => child.type)).toEqual([
       NativeChartChromeLayer,

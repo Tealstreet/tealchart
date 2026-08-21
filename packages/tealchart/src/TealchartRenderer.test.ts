@@ -2626,7 +2626,74 @@ describe('TealchartRenderer coordinate transforms', () => {
     });
   });
 
+  describe('publicYToPaneValueWithLayout', () => {
+    const layout: UnifiedPaneLayout = {
+      panes: [
+        { id: 'main', type: 'main', heightRatio: 0.7, yMin: 0, yMax: 0, fixedRange: false },
+        { id: 'pane_1', type: 'indicator', heightRatio: 0.3, yMin: 0, yMax: 100, fixedRange: false },
+      ],
+      timeAxisHeight: 30,
+    };
+    const viewport = { startTime: 0, endTime: 1_000, priceMin: 62_000, priceMax: 64_000 };
+
+    function renderer() {
+      return new TealchartRenderer(createMockCtx(), { width: 800, height: 600 });
+    }
+
+    it('reads the price pane as a price, at the market precision', () => {
+      // Panes are laid out from y=0 over (600 - 30), so main spans 0..399.
+      const { value, decimals } = renderer().publicYToPaneValueWithLayout(0, viewport, layout, 0.01);
+
+      expect(value).toBe(64_000);
+      expect(decimals).toBe(2);
+    });
+
+    it('reads an indicator pane on its own scale, ignoring price precision', () => {
+      // 399..570 carries 100..0, so the midpoint is 50.
+      const { value, decimals } = renderer().publicYToPaneValueWithLayout(484.5, viewport, layout, 0.01);
+
+      expect(value).toBeCloseTo(50, 5);
+      // Its own axis ladder: a span of 100 wants no decimals at all.
+      expect(decimals).toBe(0);
+    });
+
+    it('resolves the seam to the pane that owns it', () => {
+      // 399 is main's exclusive bottom and the indicator pane's inclusive top.
+      expect(renderer().publicYToPaneValueWithLayout(399, viewport, layout, 0.01).value).toBeCloseTo(100, 5);
+    });
+
+    it('falls back to the price pane when a y lands past every pane', () => {
+      const { value } = renderer().publicYToPaneValueWithLayout(5_000, viewport, layout, 0.01);
+
+      expect(Number.isFinite(value)).toBe(true);
+    });
+  });
+
   describe('renderWithLayout', () => {
+    it('draws nothing for a pane another pane has maximised away', () => {
+      const ctx = createMockCtx();
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const paneSpy = vi.spyOn(renderer as any, 'renderPaneUnified');
+
+      const bars = makeBars(20);
+      const viewport = TealchartRenderer.calculateViewport(bars);
+      // What maximising the indicator pane leaves behind: the price pane keeps
+      // its identity but has no height, and the main pane is never clipped, so
+      // without the guard its candles and lines smear along the seam.
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0, yMin: 0, yMax: 0, fixedRange: false },
+          { id: 'pane_1', type: 'indicator', heightRatio: 1, yMin: -1, yMax: 1, fixedRange: false },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+
+      renderer.renderWithLayout(bars, viewport, layout, [], []);
+
+      const renderedPaneIds = paneSpy.mock.calls.map((call) => (call[0] as { id: string }).id);
+      expect(renderedPaneIds).toEqual(['pane_1']);
+    });
+
     it('reuses precomputed price line bounds when provided', () => {
       const ctx = createMockCtx();
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });

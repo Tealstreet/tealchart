@@ -1978,6 +1978,15 @@ export class ChartCore {
     }
   }
 
+  private isMainPaneVisible(): boolean {
+    const mainPane = computePaneGeometry({
+      paneLayout: this.getUnifiedLayout(),
+      height: this.options.height,
+      topOffset: this.margins.top,
+    }).find((pane) => pane.type === 'main');
+    return (mainPane?.height ?? 0) > 0;
+  }
+
   private getUserDrawingSpaces(viewport: Viewport): Map<string, DrawingCoordinateSpace> {
     const layout = this.getUnifiedLayout();
     const computedPanes = computePaneGeometry({
@@ -1988,6 +1997,9 @@ export class ChartCore {
     const spaces = new Map<string, DrawingCoordinateSpace>();
 
     for (const pane of computedPanes) {
+      // Maximising another pane collapses this one to zero height. Without this
+      // its drawings flatten onto the seam and paint over the maximised pane.
+      if (pane.height <= 0) continue;
       const yRange =
         pane.type === 'main' && !pane.fixedRange
           ? { yMin: viewport.priceMin, yMax: viewport.priceMax }
@@ -2429,13 +2441,16 @@ export class ChartCore {
 
     // Draw price label on right Y-axis (replaces HTML crosshair label)
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
-      const price = this.renderer.publicYToPriceWithLayout(y, this.viewport, this.getUnifiedLayout());
-      const pricePrecision = this.options.renderOptions?.pricePrecision;
-      let decimals = 2;
-      if (pricePrecision && pricePrecision > 0) {
-        decimals = getDecimalPlacesFromPrecision(pricePrecision);
-      }
-      const priceText = safeToFixed(price, decimals, 'crosshairPrice');
+      // The pane under the cursor, not always the price pane: an indicator pane
+      // carries its own scale, and RSI or MACD read as nonsense at market
+      // precision.
+      const { value, decimals } = this.renderer.publicYToPaneValueWithLayout(
+        y,
+        this.viewport,
+        this.getUnifiedLayout(),
+        this.options.renderOptions?.pricePrecision,
+      );
+      const priceText = safeToFixed(value, decimals, 'crosshairPrice');
       ctx.font = `11px ${font}`;
       const priceLabelWidth = ctx.measureText(priceText).width + 10;
       const priceLabelHeight = 18;
@@ -3022,7 +3037,9 @@ export class ChartCore {
     if (this.priceLineManager?.isDragging()) {
       return;
     }
-    this.priceLineManager?.update(this.labelBoundsCache, {
+    // Every interactive line is positioned against the main pane, so a
+    // collapsed one leaves them nowhere to go but the seam.
+    this.priceLineManager?.update(this.isMainPaneVisible() ? this.labelBoundsCache : [], {
       x: 0,
       y: 0,
       visible: false,

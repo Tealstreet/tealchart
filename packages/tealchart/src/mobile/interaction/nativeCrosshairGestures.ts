@@ -17,7 +17,7 @@ import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
-import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { isNativeGestureControlPoint, isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
@@ -43,6 +43,7 @@ function isNativeCrosshairSingleTouch(event: NativeCrosshairGestureEvent): boole
 
 function canBeginNativeCrosshairInteraction({
   controlZones,
+  resetViewVisible,
   frame,
   orderDragZones,
   point,
@@ -52,6 +53,7 @@ function canBeginNativeCrosshairInteraction({
   tradeLineRows,
 }: {
   controlZones: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   point: { x: number; y: number };
@@ -61,7 +63,7 @@ function canBeginNativeCrosshairInteraction({
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
 }): boolean {
   'worklet';
-  if (isNativeGestureControlPoint(controlZones, point.x, point.y)) return false;
+  if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y })) return false;
   return canBeginNativeChartPan({
     actionZones: tradeLineActionZones.value,
     orderDragZones: orderDragZones.value,
@@ -76,6 +78,7 @@ function canBeginNativeCrosshairInteraction({
 
 function toggleNativeCrosshairAtPoint({
   controlZones,
+  resetViewVisible,
   crosshair,
   frame,
   hasContextMenu,
@@ -88,6 +91,7 @@ function toggleNativeCrosshairAtPoint({
   tradeLineRows,
 }: {
   controlZones: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   crosshair: NativeCrosshairSharedValues;
   frame: NativeChartFrame;
   hasContextMenu: boolean;
@@ -118,6 +122,7 @@ function toggleNativeCrosshairAtPoint({
   if (
     !canBeginNativeCrosshairInteraction({
       controlZones,
+      resetViewVisible,
       frame,
       orderDragZones,
       point,
@@ -135,6 +140,7 @@ function toggleNativeCrosshairAtPoint({
 
 export interface NativeCrosshairGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   crosshair: NativeCrosshairSharedValues;
   frame: NativeChartFrame | null;
   hasContextMenu?: boolean;
@@ -149,6 +155,7 @@ export interface NativeCrosshairGestureInput {
 
 export function createNativeCrosshairLongPressGesture({
   controlZones = [],
+  resetViewVisible,
   crosshair,
   frame,
   hasContextMenu = false,
@@ -166,6 +173,7 @@ export function createNativeCrosshairLongPressGesture({
     .onStart((event) => {
       toggleNativeCrosshairAtPoint({
         controlZones,
+        resetViewVisible,
         crosshair,
         frame,
         hasContextMenu,
@@ -182,6 +190,7 @@ export function createNativeCrosshairLongPressGesture({
 
 export function createNativeCrosshairPanGesture({
   controlZones = [],
+  resetViewVisible,
   crosshair,
   frame,
   hasContextMenu = false,
@@ -214,6 +223,7 @@ export function createNativeCrosshairPanGesture({
           })) ||
         !canBeginNativeCrosshairInteraction({
           controlZones,
+          resetViewVisible,
           frame,
           orderDragZones,
           point,

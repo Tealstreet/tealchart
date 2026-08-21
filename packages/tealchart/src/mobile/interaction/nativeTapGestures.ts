@@ -26,7 +26,7 @@ import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
-import { isNativeGestureControlPoint } from './nativeGestureControlZones';
+import { isNativeGestureControlPoint, isNativeReservedControlPoint } from './nativeGestureControlZones';
 import {
   isNativeResetViewButtonTap,
   isNativeResetViewTapWithinTolerance,
@@ -47,6 +47,7 @@ export interface NativeCanvasTapGestureInput {
   ) => void;
   controlZones: readonly NativeGestureControlZone[];
   crosshair: NativeCrosshairSharedValues;
+  resetViewVisible?: SharedValue<boolean>;
   drawingPlacementEnabled: boolean;
   drawingSelectionEnabled: boolean;
   frame: NativeChartFrame | null;
@@ -76,6 +77,7 @@ export function createNativeCanvasTapGesture({
   chartInteractionEnabled,
   commitTradeLineAction,
   controlZones,
+  resetViewVisible,
   crosshair,
   drawingPlacementEnabled,
   drawingSelectionEnabled,
@@ -127,6 +129,7 @@ export function createNativeCanvasTapGesture({
           bracketDragActive: bracketDragActive.value,
           chartInteractionEnabled,
           controlZones,
+          resetViewVisible,
           crosshairVisible: crosshair.visible.value,
           crosshairY: crosshair.y.value,
           drawingTapEnabled: drawingPlacementEnabled || drawingSelectionEnabled,
@@ -188,6 +191,7 @@ export function createNativeLeftToolRailToggleTapGesture({
 
 export interface NativePriceAxisResetTapGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   onResetView: () => void;
 }
@@ -203,6 +207,7 @@ export interface NativePriceAxisResetTapGestureInput {
  */
 export function createNativePriceAxisResetTapGesture({
   controlZones = [],
+  resetViewVisible,
   frame,
   onResetView,
 }: NativePriceAxisResetTapGestureInput) {
@@ -214,7 +219,7 @@ export function createNativePriceAxisResetTapGesture({
     .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onEnd((event, success) => {
       if (!success) return;
-      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
+      if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: event.x, y: event.y })) return;
       if (!canBeginNativePriceScaleGesture(geometry, event.x, event.y)) return;
       runOnJS(onResetView)();
     });
@@ -222,6 +227,7 @@ export function createNativePriceAxisResetTapGesture({
 
 export interface NativePaneMaximizeTapGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
   onTogglePaneMaximize: (paneId: string) => void;
 }
@@ -235,6 +241,7 @@ export interface NativePaneMaximizeTapGestureInput {
  */
 export function createNativePaneMaximizeTapGesture({
   controlZones = [],
+  resetViewVisible,
   frame,
   onTogglePaneMaximize,
 }: NativePaneMaximizeTapGestureInput) {
@@ -245,7 +252,7 @@ export function createNativePaneMaximizeTapGesture({
     .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onEnd((event, success) => {
       if (!success) return;
-      if (isNativeGestureControlPoint(controlZones, event.x, event.y)) return;
+      if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: event.x, y: event.y })) return;
       if (event.x < frame.contentLeft || event.x >= frame.priceAxisHitLeft) return;
       const pane = getNativePaneAtY(frame, event.y);
       if (!pane) return;
@@ -255,6 +262,7 @@ export function createNativePaneMaximizeTapGesture({
 
 export interface NativeResetViewTapGestureState {
   blockedByContextMenuButton: SharedValue<boolean>;
+  maxTravel: SharedValue<number>;
   startX: SharedValue<number>;
   startY: SharedValue<number>;
   startedOnButton: SharedValue<boolean>;
@@ -262,32 +270,36 @@ export interface NativeResetViewTapGestureState {
 
 export interface NativeResetViewTapGestureInput {
   controlZones?: readonly NativeGestureControlZone[];
+  resetViewVisible?: SharedValue<boolean>;
   crosshair?: NativeCrosshairSharedValues;
   frame: NativeChartFrame | null;
   hasContextMenu?: boolean;
   onResetViewTap: (x: number, y: number) => void;
   pricePrecision?: number;
   resetTapGestureState: NativeResetViewTapGestureState;
-  resetButtonVisible?: boolean;
   sharedViewport?: NativeViewportSharedValues;
 }
 
 export function createNativeResetViewTapGesture({
   controlZones = [],
+  resetViewVisible,
   crosshair,
   frame,
   hasContextMenu = false,
   onResetViewTap,
   pricePrecision = 2,
   resetTapGestureState,
-  resetButtonVisible = false,
   sharedViewport,
 }: NativeResetViewTapGestureInput) {
   if (!frame) return Gesture.Tap().enabled(false);
   return Gesture.Tap()
-    .maxDistance(resetButtonVisible ? NATIVE_RESET_VIEW_HIT_SIZE / 2 : NATIVE_TAP_MAX_DISTANCE)
+    // Visibility is a shared value, and `maxDistance` is gesture config that
+    // cannot read one, so the permissive bound is always in force and the
+    // travel a hidden button demands is enforced in the handlers instead.
+    .maxDistance(NATIVE_RESET_VIEW_HIT_SIZE / 2)
     .onTouchesDown((event) => {
       const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
+      resetTapGestureState.maxTravel.value = 0;
       if (!touch) {
         resetTapGestureState.blockedByContextMenuButton.value = false;
         resetTapGestureState.startedOnButton.value = false;
@@ -295,9 +307,10 @@ export function createNativeResetViewTapGesture({
       }
       resetTapGestureState.startX.value = touch.x;
       resetTapGestureState.startY.value = touch.y;
-      // The visible button reserves its own control zone so pan and crosshair
-      // leave the tap alone; skip it here or the button blocks itself.
-      if (isNativeGestureControlPoint(controlZones, touch.x, touch.y, 'resetView')) {
+      const buttonVisible = resetViewVisible?.value === true;
+      // The button's own circle is resolved from the frame by the gestures that
+      // must yield to it, so this gesture only has to check foreign zones.
+      if (isNativeGestureControlPoint(controlZones, touch.x, touch.y)) {
         resetTapGestureState.blockedByContextMenuButton.value = true;
         resetTapGestureState.startedOnButton.value = false;
         return;
@@ -316,50 +329,40 @@ export function createNativeResetViewTapGesture({
       );
       resetTapGestureState.startedOnButton.value =
         !resetTapGestureState.blockedByContextMenuButton.value &&
-        resetButtonVisible &&
+        buttonVisible &&
         isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), touch.x, touch.y);
+    })
+    // `maxDistance` used to enforce this continuously. It measures travel, not
+    // displacement, so without it a flick that returns to where it started
+    // would read as a tap and reveal the button.
+    .onTouchesMove((event) => {
+      const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
+      if (!touch) return;
+      const dx = touch.x - resetTapGestureState.startX.value;
+      const dy = touch.y - resetTapGestureState.startY.value;
+      resetTapGestureState.maxTravel.value = Math.max(
+        resetTapGestureState.maxTravel.value,
+        Math.sqrt(dx * dx + dy * dy),
+      );
     })
     .onEnd((event, success) => {
       if (!success) return;
       if (resetTapGestureState.blockedByContextMenuButton.value) return;
-      if (resetButtonVisible) {
-        if (resetTapGestureState.startedOnButton.value) {
-          if (!isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), event.x, event.y)) return;
-        } else if (
-          !isNativeResetViewTapWithinTolerance(
-            resetTapGestureState.startX.value,
-            resetTapGestureState.startY.value,
-            event.x,
-            event.y,
-            NATIVE_TAP_MAX_DISTANCE,
-          )
-        ) {
-          return;
-        }
+      if (resetTapGestureState.startedOnButton.value) {
+        if (!isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), event.x, event.y)) return;
+      } else if (
+        resetTapGestureState.maxTravel.value > NATIVE_TAP_MAX_DISTANCE ||
+        !isNativeResetViewTapWithinTolerance(
+          resetTapGestureState.startX.value,
+          resetTapGestureState.startY.value,
+          event.x,
+          event.y,
+          NATIVE_TAP_MAX_DISTANCE,
+        )
+      ) {
+        return;
       }
       runOnJS(onResetViewTap)(event.x, event.y);
     });
 }
 
-export interface NativeUserDrawingTapGestureInput {
-  controlZones?: readonly NativeGestureControlZone[];
-  enabled: boolean;
-  frame: NativeChartFrame | null;
-  onDrawingTap: (x: number, y: number) => void;
-}
-
-
-export interface NativeTradeLineActionTapGestureInput {
-  bracketDragActive: SharedValue<boolean>;
-  commitTradeLineAction: (
-    objectType: NativeTradeLineObjectType,
-    objectId: string,
-    actionType: NativeTradeLineActionType,
-  ) => void;
-  controlZones?: readonly NativeGestureControlZone[];
-  frame: NativeChartFrame | null;
-  sharedViewport: NativeViewportSharedValues;
-  tradeLabelHeight: number;
-  tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
-  tradeLineRows: SharedValue<NativeTradeLineRow[]>;
-}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Group,
   Rect,
@@ -14,7 +14,7 @@ export interface NativeChartChromeLayerProps {
   separatorColor: string;
 }
 
-export function NativeChartChromeLayer({
+export function NativeChartChromeLayerImpl({
   backgroundColor,
   frame,
   gridColor,
@@ -33,3 +33,8 @@ export function NativeChartChromeLayer({
     </Group>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeChartChromeLayer = memo(NativeChartChromeLayerImpl);
+NativeChartChromeLayer.displayName = 'NativeChartChromeLayer';
