@@ -181,23 +181,28 @@ export function AnimatedTradeLine({
           textFont={textFont}
           tradeLabelHeight={tradeLabelHeight}
         />
-        <NativePriceAxisTagBox
-          x={geometry.priceLabelX}
-          y={staticPriceLabelY}
-          width={geometry.priceLabelWidth}
-          height={tradeLabelHeight + 2}
-          backgroundColor={tagStyle.backgroundColor}
-          borderColor={tagStyle.borderColor}
-        />
-        <NativePriceAxisTagAnimatedText
-          x={staticPriceLabelTextX}
-          y={staticPriceTextY}
-          text={staticPriceLabelText}
-          maxCharacters={Number.MAX_SAFE_INTEGER}
-          characterWidth={priceLabelCharacterWidth}
-          font={axisFont}
-          color={tagStyle.textColor}
-        />
+        {/* Stands down for a dragged line exactly as the live branch does. A
+            drag can be in flight while a data load holds this projection, and
+            without the gate its tag draws under the floating one. */}
+        <Group opacity={axisTagOpacity}>
+          <NativePriceAxisTagBox
+            x={geometry.priceLabelX}
+            y={staticPriceLabelY}
+            width={geometry.priceLabelWidth}
+            height={tradeLabelHeight + 2}
+            backgroundColor={tagStyle.backgroundColor}
+            borderColor={tagStyle.borderColor}
+          />
+          <NativePriceAxisTagAnimatedText
+            x={staticPriceLabelTextX}
+            y={staticPriceTextY}
+            text={staticPriceLabelText}
+            maxCharacters={Number.MAX_SAFE_INTEGER}
+            characterWidth={priceLabelCharacterWidth}
+            font={axisFont}
+            color={tagStyle.textColor}
+          />
+        </Group>
       </Group>
     );
   }

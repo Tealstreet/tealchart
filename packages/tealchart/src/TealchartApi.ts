@@ -471,7 +471,19 @@ export class TealchartApi {
     }
   }
 
-  private _deferLineRemoval(key: string, drop: () => void): void {
+  /**
+   * `replacementArrived` covers the other ordering. A create flushes pending
+   * removals because a replacement landing is what they were waiting for - but
+   * an amend is a cancel and a place, and the place can reach us first. Then the
+   * create flushes an empty map and the line it replaced sits here for the whole
+   * coalesce window, drawn on top of its own replacement: one line to look at,
+   * two sets of axis tags and two hit zones.
+   */
+  private _deferLineRemoval(key: string, drop: () => void, replacementArrived?: () => boolean): void {
+    if (replacementArrived?.()) {
+      drop();
+      return;
+    }
     this._pendingLineRemovals.set(key, drop);
     if (this._lineRemovalTimer !== null) return;
     this._lineRemovalTimer = setTimeout(() => {
@@ -796,15 +808,24 @@ export class TealchartApi {
     const notifyChange = () => {
       this._notifyLinesChanged();
     };
-    const deferRemoval = (key: string, drop: () => void) => {
-      this._deferLineRemoval(key, drop);
+    const deferRemoval = (key: string, drop: () => void, replacementArrived?: () => boolean) => {
+      this._deferLineRemoval(key, drop, replacementArrived);
       this._notifyLinesChanged();
     };
 
     const adapter: InternalOrderLineAdapter = {
       // Lifecycle
       remove() {
-        deferRemoval(`order:${id}`, () => orderLines.delete(id));
+        deferRemoval(
+          `order:${id}`,
+          () => orderLines.delete(id),
+          () => {
+            for (const [otherId, other] of orderLines) {
+              if (otherId !== id && other.getPrice() === data.price) return true;
+            }
+            return false;
+          },
+        );
       },
 
       // Price
