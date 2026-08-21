@@ -4,12 +4,10 @@ import type { Bar } from '../../types';
 import { Pressable, Text } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
+import { LOADING_DOT_COUNT } from '../../constants';
+
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import {
-  areNativeLegendActionTargetsEqual,
-  NativeChartLegendOverlayImpl,
-  resolveNativeLegendActionTargets,
-} from './NativeChartLegendOverlay';
+import { NativeChartLegendOverlayImpl, NativeLegendLoadingDots, NativeLoadingDot, areNativeLegendActionTargetsEqual, resolveNativeLegendActionTargets } from './NativeChartLegendOverlay';
 
 interface TestElementProps {
   children?: ReactNode;
@@ -91,10 +89,16 @@ describe('NativeChartLegendOverlay', () => {
     expect(texts).not.toContain('...');
   });
 
-  it('shows the loading marker while data is loading', () => {
-    const texts = collectElementsByType(renderLegend(true), Text).map((element) => element.props.children);
+  it('shows the animated loading dots while data is loading', () => {
+    const loading = collectElementsByType(renderLegend(true), NativeLegendLoadingDots);
+    const idle = collectElementsByType(renderLegend(false), NativeLegendLoadingDots);
 
-    expect(texts).toContain('...');
+    expect(loading).toHaveLength(1);
+    expect(idle).toHaveLength(0);
+    // Three of them, matching web's keyframed trio rather than a text ellipsis.
+    expect(collectElementsByType(NativeLegendLoadingDots(loading[0]!.props), NativeLoadingDot)).toHaveLength(
+      LOADING_DOT_COUNT,
+    );
   });
 
   it('routes overlay indicator actions through the buttons own onPress', () => {

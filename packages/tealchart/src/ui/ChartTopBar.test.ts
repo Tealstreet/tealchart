@@ -9,6 +9,11 @@ import { clearChartStoreCache } from '../state/chartState';
 import { ChartTopBar } from './ChartTopBar';
 import { renderDrawingIcon } from './dom';
 
+// The heaviest file in the suite: each case builds the whole toolbar DOM, and
+// under the full run's parallelism the slowest were tipping past the 5s default
+// and failing as timeouts rather than assertions.
+vi.setConfig({ testTimeout: 30_000 });
+
 const baseDrawingState: UserDrawingState = {
   version: 1,
   activeTool: 'select',
