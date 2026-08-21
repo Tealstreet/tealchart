@@ -71,3 +71,13 @@ export const PANE_DIVIDER_HIGHLIGHT_LINE = 'rgba(41, 98, 255, 0.6)';
 /** Half-height of the highlight band, and the divider's own stroke width. */
 export const PANE_DIVIDER_HIGHLIGHT_BAND_RADIUS = 3;
 export const PANE_DIVIDER_HIGHLIGHT_LINE_WIDTH = 2;
+
+/**
+ * The legend's loading indicator, shared so web's CSS keyframes and the native
+ * overlay's Reanimated timing describe the same animation rather than drifting.
+ */
+export const LOADING_DOT_COUNT = 3;
+export const LOADING_DOT_PERIOD_MS = 1400;
+export const LOADING_DOT_STAGGER_MS = 150;
+export const LOADING_DOT_MIN_OPACITY = 0.15;
+export const LOADING_DOT_MAX_OPACITY = 0.8;
