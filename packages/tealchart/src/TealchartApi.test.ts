@@ -63,6 +63,42 @@ describe('TealchartApi line removal coalescing', () => {
     api.dispose();
   });
 
+  // The other ordering. An amend is a cancel and a place, and the place can reach
+  // us first - then the create flushes an empty map and the line it replaced sits
+  // out the whole coalesce window drawn over its own replacement, which is one
+  // line to look at but two price-axis tags and two hit zones.
+  it('drops a removed line at once when its replacement is already there', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const line = await api.createOrderLine();
+    line.setPrice(100);
+
+    const replacement = await api.createOrderLine();
+    replacement.setPrice(100);
+    line.remove();
+
+    const lines = getTealchartApiLineRenderSnapshot(api).orderLines;
+    expect(lines).toHaveLength(1);
+    expect(lines[0].price).toBe(100);
+
+    api.dispose();
+  });
+
+  // Only a line standing in for the removed one counts. A removal with an
+  // unrelated line on the book still waits, or every cancel flashes.
+  it('still defers when the other line is not a replacement', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const line = await api.createOrderLine();
+    line.setPrice(100);
+
+    const unrelated = await api.createOrderLine();
+    unrelated.setPrice(250);
+    line.remove();
+
+    expect(getTealchartApiLineRenderSnapshot(api).orderLines).toHaveLength(2);
+
+    api.dispose();
+  });
+
   it('lets a removal with nothing behind it land on its own', async () => {
     vi.useFakeTimers();
     try {
