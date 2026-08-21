@@ -1,3 +1,4 @@
+import type { GestureStateManager } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
@@ -34,7 +35,6 @@ import {
   resolveNativeResetViewButtonLayout,
 } from './nativeResetViewButton';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
-import { findNativeTradeLineActionZone } from './nativeTradeLineHitTest';
 import { canBeginNativePriceScaleGesture, getNativePriceScaleHitGeometry } from './nativeViewportGestureState';
 
 export interface NativeCanvasTapGestureInput {
@@ -226,6 +226,22 @@ export function createNativePriceAxisResetTapGesture({
 }
 
 export interface NativePaneMaximizeTapGestureInput {
+  /**
+   * The canvas tap's own context. The double tap arms exactly where the single
+   * tap would toggle the crosshair, so the two only ever contend over that one
+   * outcome - see the `onTouchesDown` below.
+   */
+  bracketDragActive: SharedValue<boolean>;
+  chartInteractionEnabled: boolean;
+  crosshair: NativeCrosshairSharedValues;
+  drawingTapEnabled: boolean;
+  hasContextMenu: boolean;
+  orderDragZones: SharedValue<NativeOrderDragZone[]>;
+  pricePrecision: number;
+  sharedViewport: NativeViewportSharedValues;
+  tradeLabelHeight: number;
+  tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
+  tradeLineRows: SharedValue<NativeTradeLineRow[]>;
   controlZones?: readonly NativeGestureControlZone[];
   resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
@@ -240,16 +256,68 @@ export interface NativePaneMaximizeTapGestureInput {
  * entirely to the crosshair.
  */
 export function createNativePaneMaximizeTapGesture({
+  bracketDragActive,
+  chartInteractionEnabled,
   controlZones = [],
+  crosshair,
+  drawingTapEnabled,
+  hasContextMenu,
+  orderDragZones,
+  pricePrecision,
   resetViewVisible,
   frame,
   onTogglePaneMaximize,
+  sharedViewport,
+  tradeLabelHeight,
+  tradeLineActionZones,
+  tradeLineRows,
 }: NativePaneMaximizeTapGestureInput) {
   if (!frame || frame.panes.length <= 1) return Gesture.Tap().enabled(false);
 
   return Gesture.Tap()
     .numberOfTaps(2)
     .maxDistance(NATIVE_TAP_MAX_DISTANCE)
+    // Armed only where the canvas tap would toggle the crosshair, which is the
+    // one outcome the two contend over. Anywhere the single tap owns an action
+    // - a cancel button, the context-menu button, a drawing - this stands down
+    // at touch-down, so that tap neither waits on this gesture nor gets
+    // cancelled by it. Deciding in onEnd would be too late: recognition is what
+    // cancels the canvas tap, and an impatient double tap on a cancel button
+    // would maximise the pane instead of cancelling the order.
+    .onTouchesDown((event, stateManager: GestureStateManager) => {
+      const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
+      if (!touch) {
+        stateManager.fail();
+        return;
+      }
+      const outcome = resolveNativeCanvasTap(
+        { x: touch.x, y: touch.y },
+        {
+          bracketDragActive: bracketDragActive.value,
+          chartInteractionEnabled,
+          controlZones,
+          resetViewVisible,
+          crosshairVisible: crosshair.visible.value,
+          crosshairY: crosshair.y.value,
+          drawingTapEnabled,
+          frame,
+          hasContextMenu,
+          orderDragZones: orderDragZones.value,
+          pricePrecision,
+          sharedViewport,
+          tradeLabelHeight,
+          tradeLineActionZones: tradeLineActionZones.value,
+          tradeLineRows: tradeLineRows.value,
+        },
+      );
+      // `drawingThenCrosshair` counts as contended too: it means "offer this to
+      // the drawings, and toggle the crosshair if none of them wants it". That
+      // hit test runs on the JS thread, so the worklet cannot tell the two
+      // apart - and the crosshair half is the same conflict. It is also the
+      // default state, since the select tool is active out of the box, so
+      // treating it as owned would disarm the double tap everywhere.
+      if (outcome.kind !== 'crosshair' && outcome.kind !== 'drawingThenCrosshair') stateManager.fail();
+    })
     .onEnd((event, success) => {
       if (!success) return;
       if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: event.x, y: event.y })) return;

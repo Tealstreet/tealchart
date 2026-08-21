@@ -21,6 +21,7 @@ import {
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
 } from './nativeCrosshairGestures';
+import { deferNativeCanvasTapToPaneMaximize } from './nativeChartGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
@@ -182,6 +183,25 @@ const viewportValue: Viewport = {
   priceMin: 62_000,
   priceMax: 64_000,
 };
+
+function paneMaximizeInput(overrides: Record<string, unknown> = {}) {
+  return {
+    bracketDragActive: shared(false),
+    chartInteractionEnabled: true,
+    crosshair: createCrosshair(false),
+    drawingTapEnabled: false,
+    frame: multiPaneFrame,
+    hasContextMenu: false,
+    onTogglePaneMaximize: () => {},
+    orderDragZones: shared([]),
+    pricePrecision: 2,
+    sharedViewport: sharedViewport(viewportValue),
+    tradeLabelHeight: 18,
+    tradeLineActionZones: shared([]),
+    tradeLineRows: shared([]),
+    ...overrides,
+  } as never;
+}
 
 describe('native gesture activation', () => {
   it('routes selected drawing drags only after the start point is accepted', () => {
@@ -518,10 +538,7 @@ describe('native gesture activation', () => {
 
   it('maximizes the pane a double tap lands in when there is more than one', () => {
     const onTogglePaneMaximize = vi.fn();
-    const gesture = createNativePaneMaximizeTapGesture({
-      frame: multiPaneFrame,
-      onTogglePaneMaximize,
-    }) as any;
+    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ onTogglePaneMaximize })) as any;
 
     expect(gesture.config.numberOfTaps).toBe(2);
 
@@ -534,11 +551,9 @@ describe('native gesture activation', () => {
 
   it('leaves pane-maximize double taps outside the plot alone', () => {
     const onTogglePaneMaximize = vi.fn();
-    const gesture = createNativePaneMaximizeTapGesture({
-      controlZones: [{ x1: 0, x2: 40, y1: 50, y2: 70 }],
-      frame: multiPaneFrame,
-      onTogglePaneMaximize,
-    }) as any;
+    const gesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({ controlZones: [{ x1: 0, x2: 40, y1: 50, y2: 70 }], onTogglePaneMaximize }),
+    ) as any;
 
     // The price axis, which owns its own double tap.
     gesture.handlers.onEnd({ x: multiPaneFrame.priceAxisHitLeft + 5, y: 60 }, true);
@@ -554,7 +569,7 @@ describe('native gesture activation', () => {
 
   it('stays disabled on a single-pane chart so the crosshair keeps its taps', () => {
     const onTogglePaneMaximize = vi.fn();
-    const gesture = createNativePaneMaximizeTapGesture({ frame, onTogglePaneMaximize }) as any;
+    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ frame, onTogglePaneMaximize })) as any;
 
     expect(gesture.config.enabled).toBe(false);
   });
@@ -1452,5 +1467,116 @@ describe('native gesture activation', () => {
     // preview dying on the UI thread and commitBracketMove landing on the JS one.
     expect(bracketDragInteractionState.active.value).toBe(false);
     expect(bracketDragInteractionState.activeObjectId.value).toBe('position-1');
+  });
+});
+
+describe('canvas tap vs pane maximize double tap', () => {
+  function tap() {
+    return createNativePaneMaximizeTapGesture(paneMaximizeInput()) as any;
+  }
+
+  function canvasTap() {
+    return {
+      config: {} as Record<string, unknown>,
+      requireExternalGestureToFail(...gestures: unknown[]) {
+        this.config.requireToFail = [...((this.config.requireToFail as unknown[]) ?? []), ...gestures];
+        return this;
+      },
+    } as any;
+  }
+
+  it('stands down where the single tap owns an action, so the double tap cannot eat it', () => {
+    const zone = {
+      objectType: 'order' as const,
+      objectId: 'order-1',
+      actionType: 'cancel' as const,
+      price: 63_000,
+      x1: 80,
+      x2: 110,
+    };
+    const gesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({ tradeLineActionZones: shared([zone]) }),
+    ) as any;
+
+    // On a cancel button: recognising here would cancel the canvas tap that is
+    // waiting on this gesture, and the order would never be cancelled.
+    const onButton = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 95, y: 78 }], allTouches: [{ x: 95, y: 78 }] },
+      onButton,
+    );
+    expect(onButton.failed).toBe(true);
+
+    // On open plot, where the single tap would only toggle the crosshair, the
+    // double tap stays armed.
+    const onPlot = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
+      onPlot,
+    );
+    expect(onPlot.failed).toBe(false);
+  });
+
+  it('stays armed in the default drawing-select state', () => {
+    // `drawingSelectionEnabled` is true out of the box, so the resolver answers
+    // `drawingThenCrosshair` for the whole plot. Treating that as owned would
+    // disarm the double tap everywhere.
+    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ drawingTapEnabled: true })) as any;
+    const manager = mockStateManager();
+
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
+      manager,
+    );
+
+    expect(manager.failed).toBe(false);
+  });
+
+  it('stands down on the crosshair context-menu button', () => {
+    const crosshair = createCrosshair(true);
+    crosshair.y.value = 78;
+    const gesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({ crosshair, hasContextMenu: true }),
+    ) as any;
+    const button = resolveNativeCrosshairContextMenuButtonLayout(multiPaneFrame, crosshair.y.value, 2);
+    const manager = mockStateManager();
+
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: button.centerX, y: button.centerY }], allTouches: [{ x: button.centerX, y: button.centerY }] },
+      manager,
+    );
+
+    expect(manager.failed).toBe(true);
+  });
+
+  it('makes the canvas tap wait out the double tap when a second pane exists', () => {
+    const canvasTapGesture = canvasTap();
+    const paneMaximizeTapGesture = tap();
+
+    deferNativeCanvasTapToPaneMaximize(canvasTapGesture, paneMaximizeTapGesture, 2);
+
+    expect(canvasTapGesture.config.requireToFail).toEqual([paneMaximizeTapGesture]);
+  });
+
+  it('leaves the canvas tap immediate when there is nothing to double tap', () => {
+    const canvasTapGesture = { config: {} as Record<string, unknown>, requireExternalGestureToFail() {
+      throw new Error('should not wait on a gesture that disables itself');
+    } } as any;
+
+    expect(deferNativeCanvasTapToPaneMaximize(canvasTapGesture, tap(), 1)).toBe(canvasTapGesture);
+    expect(canvasTapGesture.config.requireToFail).toBeUndefined();
+  });
+
+  it('appends, which is why the caller must hand it a freshly built gesture', () => {
+    // Pinning gesture-handler's behaviour, not endorsing it: applying the
+    // relation twice grows the list, so a memoised gesture would collect one
+    // entry per render. The runtime applies it inside the memo that builds it.
+    const canvasTapGesture = canvasTap();
+    const paneMaximizeTapGesture = tap();
+
+    deferNativeCanvasTapToPaneMaximize(canvasTapGesture, paneMaximizeTapGesture, 2);
+    deferNativeCanvasTapToPaneMaximize(canvasTapGesture, paneMaximizeTapGesture, 2);
+
+    expect((canvasTapGesture.config.requireToFail as unknown[]).length).toBe(2);
   });
 });
