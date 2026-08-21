@@ -96,11 +96,6 @@ export function getNativePaneFrame(frame: NativeChartFrame, paneId: string): Nat
   return frame.panes.find((pane) => pane.id === paneId) ?? null;
 }
 
-export function isPointInNativePlot(frame: NativeChartFrame, x: number, y: number): boolean {
-  'worklet';
-  return x >= frame.contentLeft && x < frame.priceAxisHitLeft && getNativePaneAtY(frame, y) !== null;
-}
-
 export function isPointInNativePriceAxis(frame: NativeChartFrame, x: number, y: number): boolean {
   return x >= frame.priceAxisHitLeft && x <= frame.priceAxisRight && y >= frame.mainPane.top && y <= frame.mainPane.bottom;
 }
@@ -113,6 +108,11 @@ export function isPointInNativePriceAxis(frame: NativeChartFrame, x: number, y: 
 export function getNativePaneAtY(frame: NativeChartFrame, y: number): NativePaneFrame | null {
   'worklet';
   return frame.panes.find((pane) => pane.height > 0 && y >= pane.top && y <= pane.bottom) ?? null;
+}
+
+export function isPointInNativePlot(frame: NativeChartFrame, x: number, y: number): boolean {
+  'worklet';
+  return x >= frame.contentLeft && x < frame.priceAxisHitLeft && getNativePaneAtY(frame, y) !== null;
 }
 
 /**

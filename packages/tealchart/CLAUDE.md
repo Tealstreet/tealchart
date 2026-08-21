@@ -388,6 +388,20 @@ agrees logic looks like it already solves this — it makes the override survive
 the *commit*, but the release itself was still a frame early, so dragging or
 scaling a MACD pane snapped back to its pre-drag scale for one frame.
 
+## Worklets do not hoist
+
+A `'worklet'` function declaration is rewritten by the Reanimated plugin into an
+assignment carrying a serialized closure. Function declarations hoist;
+assignments do not. So a worklet that calls another worklet **declared below it
+in the same file** captures `undefined`, and the call throws the moment it runs
+on the UI thread — `getNativePaneAtY is not a function`.
+
+Nothing catches this before a device does. TypeScript resolves the symbol
+happily, eslint sees a legal forward reference, and the test suite runs against
+`src/test/reanimatedMock.tsx`, which never builds a closure at all. Declare
+every worklet above its callers and read the ordering as load-bearing, not
+cosmetic.
+
 ## Gesture rebuilds on native
 
 The chart's fifteen gestures are composed into one `Gesture.Simultaneous`, so a
