@@ -438,13 +438,18 @@ branches build paths in a `useMemo` or inline, so their clip stays a plain rect.
 Either pairing is self-consistent; crossing them is what shears a pane for a
 frame.
 
-Do not be tempted to lift every clip out of the derived values instead. That
-direction reads as the tidier one and it is wrong here: `holdingSnapshot` forces
-`staticProjection` (`nativeRenderTransition.ts`), so during a maximize the plain
-branches are exactly the ones on screen, and a shared clip there would put the
-clip a propagation *behind* its own path - the inversion, in the other direction.
+Do not be tempted to lift every clip out of the derived values instead, nor to
+push every clip into them. Either blanket move crosses one branch's channels.
 Note too that capturing a plain number rather than `frame` changes nothing:
 anything captured in a worklet closure travels on the closure channel.
+
+Which branch is on screen when: `holdingSnapshot` comes from
+`shouldHoldNativeRenderSnapshotForTransition`, which keys on bars, symbol,
+interval, `isLoading` and projection readiness - **a pane maximize does not set
+it**. `nativeMaximizeSnapshot` is a different variable entirely. So during a
+maximize `staticProjection` is null and the live branches are the ones drawing.
+The static branches belong to data loads, where they are already atomic: being
+all-plain, their mount and their geometry land in the same commit.
 
 Shared-value props are free here. The Skia container restarts one mapper over
 every shared value in the tree and it fires once per frame, so a clip that only

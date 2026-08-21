@@ -1,8 +1,41 @@
-import { describe, expect, it } from 'vitest';
+import type { ReactElement, ReactNode } from 'react';
+
+import { Path as SkiaPath, Line as SkiaLine } from '@shopify/react-native-skia';
+import { describe, expect, it, vi } from 'vitest';
+
+// The layers are invoked as plain functions here, outside any renderer, so
+// React's own useMemo has no dispatcher to bind to. Evaluating it eagerly is
+// what a memo does on first render, which is all this test needs.
+vi.mock('react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react')>();
+  return { ...actual, useMemo: <T,>(factory: () => T) => factory() };
+});
 
 import { getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
+import { NativeIndicatorPaneAxisLayerImpl } from './NativeIndicatorPaneAxisLayer';
+import { NativeAnimatedSkiaText } from './nativeSkiaText';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import { resolveNativePriceGridSlotModel } from './NativePriceGridLayer';
+import { NativePriceGridLayer, resolveNativePriceGridSlotModel } from './NativePriceGridLayer';
+
+/** Counts nodes of a type, rendering intermediate components as it goes. */
+function countByType(node: ReactNode, type: unknown, seen = { total: 0 }): number {
+  if (node === null || node === undefined || typeof node === 'boolean') return seen.total;
+  if (Array.isArray(node)) {
+    for (const child of node) countByType(child, type, seen);
+    return seen.total;
+  }
+  if (typeof node !== 'object' || !('props' in node)) return seen.total;
+
+  const element = node as ReactElement<{ children?: ReactNode }>;
+  if (element.type === type) {
+    seen.total += 1;
+  } else if (typeof element.type === 'function') {
+    countByType((element.type as (props: unknown) => ReactNode)(element.props), type, seen);
+    return seen.total;
+  }
+  countByType(element.props.children, type, seen);
+  return seen.total;
+}
 import { resolveNativeTimeGridSlotModel } from './NativeTimeGridLayer';
 
 const frame = createNativeChartFrameFromPanes({
@@ -150,4 +183,120 @@ describe('native axis grid layers', () => {
 
     expect(narrowXs[1] - narrowXs[0]).toBeGreaterThan(wideXs[1] - wideXs[0]);
   });
+
+  // The point of merging the lines: mount and unmount happen on the React commit
+  // and cannot be made late, so an element count that tracks pane height changes
+  // the tree a frame before the canvas geometry follows it. One path per layer
+  // makes the count invariant - the geometry moves inside the path instead.
+  it('keeps the grid-line element count fixed as pane heights change', () => {
+    const axisFont = { measureText: () => ({ width: 7 }), getSize: () => 10 } as never;
+    const sharedViewport = {
+      startTime: { value: 0 },
+      endTime: { value: 60_000 },
+      priceMin: { value: 63_000 },
+      priceMax: { value: 64_000 },
+    } as never;
+
+    const framed = (mainHeight: number, indicatorHeight: number) =>
+      createNativeChartFrameFromPanes({
+        dimensions: frame.dimensions,
+        panes: [
+          { id: 'main', type: 'main', top: 24, height: mainHeight, yMin: 63000, yMax: 64000 },
+          { id: 'pane_1', type: 'indicator', top: 24 + mainHeight, height: indicatorHeight, yMin: 0, yMax: 100 },
+        ],
+      });
+
+    const priceGrid = (target: ReturnType<typeof framed>) =>
+      NativePriceGridLayer({
+        axisFont,
+        frame: target,
+        gridColor: '#222831',
+        pricePrecision: 0.1,
+        sharedViewport,
+        showAxisLabels: false,
+        showGridLines: true,
+        textColor: '#adb1b8',
+      });
+    const paneAxis = (target: ReturnType<typeof framed>) =>
+      NativeIndicatorPaneAxisLayerImpl({
+        axisFont,
+        frame: target,
+        gridColor: '#222831',
+        showAxisLabels: false,
+        showGridLines: true,
+        textColor: '#adb1b8',
+      });
+
+    const open = framed(264, 100);
+    const maximized = framed(364, 0);
+
+    for (const render of [priceGrid, paneAxis]) {
+      expect(countByType(render(open), SkiaPath)).toBe(1);
+      expect(countByType(render(maximized), SkiaPath)).toBe(1);
+      expect(countByType(render(open), SkiaLine)).toBe(0);
+    }
+  });
+
+  // The merged path passes zeroed label inputs, since it needs geometry only.
+  // If that ever moved a line, the grid would silently drift off its labels.
+  it('draws merged grid lines at the same y as the per-slot resolver', () => {
+    const rows = Array.from({ length: 4 }, (_, index) =>
+      resolveNativePriceGridSlotModel({
+        characterWidth,
+        frame,
+        index,
+        labelMaxWidth: priceLabelMaxWidth,
+        labelRight: priceLabelRight,
+        maxCharacters: priceMaxCharacters,
+        priceMax: 64_000,
+        priceMin: 63_000,
+        pricePrecision: 0.1,
+      }),
+    );
+    const zeroed = Array.from({ length: 4 }, (_, index) =>
+      resolveNativePriceGridSlotModel({
+        characterWidth: 0,
+        frame,
+        index,
+        labelMaxWidth: 0,
+        labelRight: 0,
+        maxCharacters: 0,
+        priceMax: 64_000,
+        priceMin: 63_000,
+        pricePrecision: 0.1,
+      }),
+    );
+
+    expect(zeroed.map((row) => row.visible)).toEqual(rows.map((row) => row.visible));
+    expect(zeroed.map((row) => row.lineStart)).toEqual(rows.map((row) => row.lineStart));
+    expect(zeroed.map((row) => row.lineEnd)).toEqual(rows.map((row) => row.lineEnd));
+  });
+
+  // slotCounts is indexed by position in the unfiltered indicator-pane list, so
+  // a collapsed pane in the middle would misalign every count after it.
+  it('keeps per-pane slot counts aligned when one pane collapses', () => {
+    const axisFont = { measureText: () => ({ width: 7 }), getSize: () => 10 } as never;
+    const threePanes = createNativeChartFrameFromPanes({
+      dimensions: frame.dimensions,
+      panes: [
+        { id: 'main', type: 'main', top: 24, height: 200, yMin: 63000, yMax: 64000 },
+        { id: 'pane_1', type: 'indicator', top: 224, height: 0, yMin: 0, yMax: 100 },
+        { id: 'pane_2', type: 'indicator', top: 224, height: 164, yMin: 0, yMax: 50 },
+      ],
+    });
+    const labels = NativeIndicatorPaneAxisLayerImpl({
+      axisFont,
+      frame: threePanes,
+      gridColor: '#222831',
+      showAxisLabels: true,
+      showGridLines: false,
+      textColor: '#adb1b8',
+    });
+
+    // Only the surviving pane contributes ticks, and they are its own.
+    const texts = countByType(labels, NativeAnimatedSkiaText);
+    expect(texts).toBeGreaterThan(0);
+    expect(countByType(labels, SkiaPath)).toBe(0);
+  });
 });
+
