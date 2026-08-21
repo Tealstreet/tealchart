@@ -414,20 +414,44 @@ while the plot paths that were already there lag a frame.
 
 That is the same hazard as the table above, in its mounted-versus-existing form.
 Maximising holds the last painted frame over the canvas and freezes the legend's
-geometry to match. A plain toggle applies in one commit, so the hold usually
-amounts to waiting out a single Reanimated propagation - two animation frames,
-the same wait the divider release takes. It is gated on the layout agreeing with
-the ratios that were asked for rather than on the frame count alone, which is
-what covers the transitions that take more than one commit, and what stops a bar
-tick's re-frame from releasing the hold early.
+geometry to match, and releases on two conditions: the layout agreeing with the
+ratios that were asked for, which covers transitions taking more than one commit
+and stops a bar tick's re-frame from releasing early, and **the closure channel
+having actually caught up**.
 
-**This covers the seam; it does not close it.** The cure is to give pane geometry
-one channel, so mounted and newly mounted layers read the same value on the same
-propagation. Note which direction: moving `frame` into a shared value puts it
-*ahead* of the closures and inverts the seam rather than removing it. The sound
-direction is to lift pane top/height/clip out of the derived values - they are
-static for the duration of a tap - so those layers settle on the React commit the
-way the chrome layer already does.
+The second one is the interesting half. There is no way to ask Reanimated whether
+a propagation has landed, so `nativeMaximizeHold.tsx` echoes pane geometry back
+through the same `useDerivedValue` the plot paths read `frame` through: when the
+echo reports the current geometry, the paths hold it too. This replaced a
+double-`requestAnimationFrame`, which was only ever a guess at the same thing, and
+which left one visible flap frame whenever the guess was short.
+
+**The echo has to be declared inside the canvas.** Skia renders `<Canvas>`
+children through its own react-reconciler root, and React flushes the outer root's
+passive effects before the inner root's layout effects run. An echo declared in
+`SkiaTealchart` therefore restarts its mapper in an *earlier* scheduler batch than
+the plot paths restart theirs. The two usually coalesce into one `mapperRun`, which
+is precisely the kind of coincidence that reports agreement a frame early.
+`NativePaneGeometryEcho` renders nothing and exists only to put that
+`useDerivedValue` in the plot layers' root, where the ordering is real rather than
+incidental.
+
+Two details are load-bearing. The echo key is **pane geometry only** - id, top,
+height - never the full layout signature, because that folds in `yMin`/`yMax` and
+autoscale rewrites those on every bar tick, so the gate would re-arm forever in a
+live market. And the wait is capped at four frames, because a divider drag
+overlapping the transition keeps geometry moving and the echo would never agree;
+without the cap a one-frame flap becomes a 250ms freeze at the hold ceiling.
+
+**This narrows the seam to the propagation itself; it does not remove the two
+channels.** The cure for that is to give pane geometry one channel, so mounted and
+newly mounted layers read the same value on the same propagation. Note which
+direction: moving `frame` into a shared value puts it *ahead* of the closures and
+inverts the seam rather than removing it. The sound direction is to lift pane
+top/height/clip out of the derived values - they are static for the duration of a
+tap - so those layers settle on the React commit the way the chrome layer already
+does. Note that capturing a plain number instead of `frame` does not achieve this:
+anything captured in a worklet closure travels on the closure channel.
 
 ## Gesture rebuilds on native
 

@@ -254,7 +254,9 @@ describe('NativeUserDrawingSelectionActionOverlay', () => {
     const commandTypes = model?.groups.flatMap((group) => group.items.map((item) => item.command.type)) ?? [];
 
     expect(commandTypes).not.toContain('editText');
-    expect(commandTypes).not.toContain('openObjectTree');
+    expect(commandTypes).not.toContain('openProperties');
+    // Native has a drawing object tree now, so this one is no longer filtered.
+    expect(commandTypes).toContain('openObjectTree');
     expect(commandTypes).toContain('toolbarAction');
   });
 });

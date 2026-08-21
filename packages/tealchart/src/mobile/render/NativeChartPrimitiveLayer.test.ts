@@ -135,8 +135,10 @@ describe('NativeChartPrimitiveLayer', () => {
   it('derives candle width from the live viewport range contract', () => {
     expect(getNativeCandleWidth(1_000, 2_000, 100)).toBe(10);
     expect(getNativeCandleWidth(1_000, 10_000, 100)).toBe(7);
-    expect(getNativeCandleWidth(1_000, 100_000, 100)).toBe(2);
-    expect(getNativeCandleWidth(1_000, 0, 100)).toBe(2);
+    // Both fall back to the render floor: the first is clamped by it, the
+    // second is the degenerate zero-range guard.
+    expect(getNativeCandleWidth(1_000, 100_000, 100)).toBe(1);
+    expect(getNativeCandleWidth(1_000, 0, 100)).toBe(1);
   });
 
   it('uses the minimum positive bar interval instead of a leading data gap', () => {

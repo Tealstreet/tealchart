@@ -21,6 +21,12 @@ export interface NativeTimeGridSlot {
   showMonthLabel: boolean;
 }
 
+/**
+ * The spacing rule caps gaps at `priceHeight / minLabelSpacing`, and a phase
+ * straddling both edges adds at most two markers, which is what
+ * `NATIVE_GRID_EXTRA_SLOT_COUNT` covers. The slot visibility epsilon can still
+ * admit one marker beyond that; it lands sub-pixel off the axis either way.
+ */
 export function getNativePriceGridSlotCount(
   priceHeight: number,
   minLabelSpacing = NATIVE_PRICE_GRID_MIN_LABEL_SPACING,
@@ -41,19 +47,12 @@ function getNativePriceSpacingAtIndex(magnitude: number, index: number): number 
 }
 
 /**
- * The finest spacing on the 1/2/5 ladder that still fits, which is the densest
- * readable axis.
+ * The finest spacing on the 1/2/5 ladder whose label pitch still clears
+ * `minLabelSpacing`. Pitch is set by the GAP count (`priceRange / spacing`), which
+ * depends only on the range - unlike the marker count, which also depends on where
+ * the grid happens to land, so a vertical pan flipped the axis between 1x and 2x.
  *
- * This used to require the label count to land inside `[maxLabels / 2,
- * maxLabels]`, then fall back to scanning the ladder *downwards* for anything
- * with two or more labels. The window is 2x wide and consecutive ladder steps
- * differ by up to 2.5x, so a step could clear the window entirely - and the
- * downward fallback then answered with the coarsest spacing that qualified,
- * i.e. the emptiest possible axis. That is why the price axis sometimes showed
- * a single label until you scrunched the range and knocked it into the window.
- *
- * `maxLabels` comes from the minimum label spacing, so it is the only bound
- * that was ever load-bearing; a floor on the count is what caused the misses.
+ * Mirrored on web by `generatePriceMarkers`.
  */
 export function getNativePriceGridSpacing(
   priceMin: number,
@@ -62,16 +61,14 @@ export function getNativePriceGridSpacing(
   minLabelSpacing = NATIVE_PRICE_GRID_MIN_LABEL_SPACING,
 ): number {
   'worklet';
-  const maxLabels = Math.max(2, Math.floor(priceHeight / minLabelSpacing));
+  const maxGaps = Math.max(2, priceHeight / minLabelSpacing);
   const priceRange = priceMax - priceMin;
   if (priceRange <= 0) return 0;
 
   const magnitude = Math.floor(Math.log10(priceRange));
   for (let index = 0; index <= 10; index += 1) {
     const spacing = getNativePriceSpacingAtIndex(magnitude, index);
-    const firstMarker = Math.floor(priceMin / spacing) * spacing;
-    const count = Math.floor((priceMax + spacing * 0.01 - firstMarker) / spacing) + 1;
-    if (count <= maxLabels) return spacing;
+    if (priceRange / spacing <= maxGaps) return spacing;
   }
 
   return priceRange / 2;

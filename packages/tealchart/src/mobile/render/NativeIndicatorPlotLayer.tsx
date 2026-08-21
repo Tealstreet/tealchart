@@ -226,7 +226,7 @@ function getNativeIndicatorHistogramPath({
     if (typeof point.value !== 'number' || !Number.isFinite(point.value)) continue;
 
     const slotWidth = timeRange > 0 ? (point.interval * frame.contentWidth) / timeRange : 0;
-    const barWidth = Math.max(2, slotWidth * 0.6);
+    const barWidth = Math.max(1, slotWidth * 0.6);
     const x = nativeIndicatorPointX({ frame, point, projection, sharedViewport });
     const y = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: point.value })

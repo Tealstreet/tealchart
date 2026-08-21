@@ -7,25 +7,16 @@ export interface TimeAxisMarker {
 }
 
 /**
- * The finest spacing on the 1/2/5 ladder that still fits, which is the densest
- * readable axis.
- *
- * This used to require the label count to land inside `[maxLabels / 2,
- * maxLabels]`, then fall back to walking the ladder *backwards* for anything
- * with two or more labels. The window is 2x wide and consecutive ladder steps
- * differ by up to 2.5x, so a step could clear the window entirely - and the
- * reversed fallback then answered with the coarsest spacing that qualified,
- * i.e. the emptiest possible axis. That is why the price axis sometimes showed
- * a single label until the range was scrunched into the window.
- *
- * `maxLabels` comes from the minimum label spacing, so it is the only bound
- * that was ever load-bearing; a floor on the count is what caused the misses.
+ * The finest spacing on the 1/2/5 ladder whose label pitch still clears
+ * `minLabelSpacing`. Pitch is set by the GAP count (`priceRange / spacing`), which
+ * depends only on the range - unlike the marker count, which also depends on where
+ * the grid happens to land and so flipped the axis between 1x and 2x labels mid-pan.
  *
  * Mirrored in native by `getNativePriceGridSpacing`.
  */
 export function generatePriceMarkers(viewport: Viewport, priceHeight: number): number[] {
   const minLabelSpacing = 24;
-  const maxLabels = Math.max(2, Math.floor(priceHeight / minLabelSpacing));
+  const maxGaps = Math.max(2, priceHeight / minLabelSpacing);
   const priceRange = viewport.priceMax - viewport.priceMin;
   if (priceRange <= 0) return [];
 
@@ -54,8 +45,7 @@ export function generatePriceMarkers(viewport: Viewport, priceHeight: number): n
   };
 
   for (const spacing of spacings) {
-    const markers = markersFor(spacing);
-    if (markers.length <= maxLabels) return markers;
+    if (priceRange / spacing <= maxGaps) return markersFor(spacing);
   }
 
   return markersFor(priceRange / 2);
