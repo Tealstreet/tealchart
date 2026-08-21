@@ -404,40 +404,92 @@ cosmetic.
 
 ## One commit, two channels
 
-Pane geometry reaches the canvas twice over. Plain props - `NativeAxisChromeLayer`,
-the plot layer's `clip` and `opacity`, and the legend, which is a React Native
-overlay outside the canvas entirely - take the new frame in the commit that
-produces it. Every `useDerivedValue` that closes over `frame` takes it one
-Reanimated propagation later. So a single React commit paints the chart two ways,
-and a pane maximize paints it several: newly mounted ticks evaluate immediately
-while the plot paths that were already there lag a frame.
+Pane geometry used to reach the canvas twice over: plain props took the new frame
+in the commit that produced it, while every `useDerivedValue` closing over `frame`
+took it one Reanimated propagation later. `Container.redraw()` re-records on the
+commit and paints immediately, then starts its mapper - so a commit painted with
+new props and old derived values, and a pane maximize sheared for a frame.
 
-That is the same hazard as the table above, in its mounted-versus-existing form.
-Maximising holds the last painted frame over the canvas and freezes the legend's
-geometry to match. A plain toggle applies in one commit, so the hold usually
-amounts to waiting out a single Reanimated propagation - two animation frames,
-the same wait the divider release takes. It is gated on the layout agreeing with
-the ratios that were asked for rather than on the frame count alone, which is
-what covers the transitions that take more than one commit, and what stops a bar
-tick's re-frame from releasing the hold early.
+**It does not any more, and the rule that keeps it that way is: inside the canvas,
+nothing reads pane geometry off a plain prop, and no element count depends on it.**
+A commit paints all-old, and the propagation after it paints all-new: two
+self-consistent frames. (With one exception, noted below - a maximize during a
+data load, where the static branches are on screen.)
 
-**A gate that observes the propagation was tried and reverted.** Echoing pane
-geometry back through a `useDerivedValue` and releasing on the echo is sound in
-principle, but the echo has to live inside the canvas to share the plot paths'
-reconciler root - and every `<Canvas>` child here is wrapped in `memo` for a
-reason. An unmemoized one re-renders on every parent render, which is every bar
-tick, and each of those invalidates the Skia scene graph and repaints. The chart
-became slow enough that double taps started missing the 200ms inter-tap window,
-so the maximize worked about half the time. If you try this again, `memo` is not
-optional, and the thing to measure is repaints per tick, not the flap.
+Two attempts to hide the seam failed first, and both are worth knowing about.
 
-**This covers the seam; it does not close it.** The cure is to give pane geometry
-one channel, so mounted and newly mounted layers read the same value on the same
-propagation. Note which direction: moving `frame` into a shared value puts it
-*ahead* of the closures and inverts the seam rather than removing it. The sound
-direction is to lift pane top/height/clip out of the derived values - they are
-static for the duration of a tap - so those layers settle on the React commit the
-way the chrome layer already does.
+A covering bitmap could never have worked. It lived in a sibling `<Canvas>` - its
+own reconciler root, its own `CAMetalLayer`, its own drawable present - and its
+visibility was an `opacity` toggle on a React Native view, a third pipeline again.
+Nothing ordered the three. At the *release* both orderings look identical, which
+is why two fixes aimed there changed nothing; at the *start* both orderings expose
+the live chart underneath. It also cost a `makeImageSnapshot` per tap, which is a
+full offscreen GPU render run synchronously on the JS thread.
+
+A gate that observed the propagation was tried and reverted. Echoing pane geometry
+back through a `useDerivedValue` and releasing on the echo is sound in principle,
+but the echo has to live inside the canvas to share the plot paths' reconciler
+root - and every `<Canvas>` child here is wrapped in `memo` for a reason. An
+unmemoized one re-renders on every parent render, which is every bar tick, and
+each of those invalidates the Skia scene graph and repaints. The chart became slow
+enough that double taps started missing the 200ms inter-tap window, so the
+maximize worked about half the time. If you try something like it again, `memo` is
+not optional, and the thing to measure is repaints per tick, not the flap.
+
+**What is left is the legend**, and it cannot be fixed this way: it is a React
+Native view outside the canvas, and it drops a pane's rows the moment that pane's
+height reaches zero. So it is held on the frame it was last drawn at until the
+layout agrees with the ratios that were asked for, then released one animation
+frame later - the frame the canvas repaints on. The ratio gate is what covers
+transitions taking more than one commit and stops a bar tick's re-frame releasing
+early; the 250ms ceiling is there so a layout that never converges cannot freeze
+the legend.
+
+**The seam closes per branch, not globally.** A `<Group clip>` must ride the same
+channel as the paths drawn inside it. Live branches build their paths in
+`useDerivedValue`, so their clip is a `useDerivedValue` too. Projected and static
+branches build paths in a `useMemo` or inline, so their clip stays a plain rect.
+Either pairing is self-consistent; crossing them is what shears a pane for a
+frame.
+
+Do not be tempted to lift every clip out of the derived values instead, nor to
+push every clip into them. Either blanket move crosses one branch's channels.
+Note too that capturing a plain number rather than `frame` changes nothing:
+anything captured in a worklet closure travels on the closure channel.
+
+Which branch is on screen when: `holdingSnapshot` comes from
+`shouldHoldNativeRenderSnapshotForTransition`, which keys on bars, symbol,
+interval, `isLoading` and projection readiness - **a pane maximize does not set
+it**. So during an ordinary maximize `staticProjection` is null and the live
+branches are the ones drawing. The static branches belong to data loads, where
+being all-plain makes them internally consistent on their own.
+
+The gap that leaves: a maximize tapped *while a data load is holding* puts the
+plot and candle layers on the commit channel and the grid on the derived one, so
+that combination can still shear for a frame. Rare, and not worth a bitmap.
+
+Shared-value props are free here. The Skia container restarts one mapper over
+every shared value in the tree and it fires once per frame, so a clip that only
+changes when `frame` changes adds no repaint that the sibling path was not
+already causing. Identity also stabilises, which *reduces* memo pressure.
+
+**Geometry must not decide what exists.** Mount and unmount happen on the React
+commit, full stop, so a layer that filters panes by `height > 0` or sizes a tick
+array from `pane.height` adds and removes nodes a frame before the canvas follows.
+Pooling ticks at the full plot height and hiding the spares was measured and
+rejected - it triples the node count and scales with pane count. What works is
+collapsing the whole layer into one node whose *contents* carry the geometry:
+the pane separators and both axis grid lines are a single derived `SkPath` each,
+and both axis label sets are a single `Glyphs` node each, laid out in a worklet
+from a char-to-glyph map resolved once on the JS thread. Three panes went from 136
+Skia nodes and 476 mapper dispatches to about four and four.
+
+Two traps in that last part. The axis font is **not** monospace - it resolves to
+the system font, and the "character width" beside it is a digit's ink bounds, not
+an advance - so glyph advances must come from `font.getGlyphWidths`, or every
+label loosens around its punctuation. And a character outside the label alphabet
+is dropped rather than drawn, so a new format character truncates labels silently;
+there is a test pinning the alphabet for that reason.
 
 ## Gesture rebuilds on native
 

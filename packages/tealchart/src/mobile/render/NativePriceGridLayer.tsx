@@ -4,7 +4,7 @@ import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { useMemo } from 'react';
 
-import { Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Glyphs, Group, Path as SkiaPath, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import {
@@ -15,7 +15,13 @@ import {
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
 import { getNativePriceGridSlot, getNativePriceGridSlotCount } from './nativeGridSlots';
 import { formatNativePriceAxisTickWithPrecisionWorklet } from './nativePriceFormat';
-import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
+import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
+import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
+import {
+  measureNativeSkiaAxisCharacterWidth,
+  NATIVE_ANIMATED_TEXT_CHARACTERS,
+  NativeAnimatedSkiaText,
+} from './nativeSkiaText';
 
 interface NativeStaticPriceGridSlot {
   labelText: string;
@@ -261,6 +267,47 @@ export function NativePriceGridLayer({
     );
   }
 
+  // Lines carry no text, so the whole grid merges into one path built in one
+  // derived value: a node per layer instead of a node per slot, and an element
+  // count that no longer depends on the main pane's height. The static branch
+  // above stays per-slot - being all-plain, its mount and its geometry already
+  // land in the same commit.
+  // Labels merge the same way the lines did, into one Glyphs node. Text cannot
+  // join a path, but a fixed alphabet can be resolved to glyphs and advances
+  // once, so the whole axis is one node whose element count never moves.
+  if (showAxisLabels && !showGridLines) {
+    return (
+      <NativePriceGridLabelGlyphs
+        axisFont={axisFont}
+        characterWidth={characterWidth}
+        frame={frame}
+        labelMaxWidth={labelMaxWidth}
+        labelRight={labelRight}
+        maxCharacters={maxCharacters}
+        pricePrecision={pricePrecision}
+        sharedViewport={sharedViewport}
+        slotCount={slotCount}
+        textColor={textColor}
+      />
+    );
+  }
+
+  if (showGridLines && !showAxisLabels) {
+    return (
+      <NativePriceGridLinePath
+        characterWidth={characterWidth}
+        frame={frame}
+        gridColor={gridColor}
+        labelMaxWidth={labelMaxWidth}
+        labelRight={labelRight}
+        maxCharacters={maxCharacters}
+        pricePrecision={pricePrecision}
+        sharedViewport={sharedViewport}
+        slotCount={slotCount}
+      />
+    );
+  }
+
   return (
     <>
       {Array.from({ length: slotCount }, (_, index) => (
@@ -283,4 +330,107 @@ export function NativePriceGridLayer({
       ))}
     </>
   );
+}
+
+/** The live price grid's lines as one stroked path. */
+function NativePriceGridLinePath({
+  characterWidth,
+  frame,
+  gridColor,
+  labelMaxWidth,
+  labelRight,
+  maxCharacters,
+  pricePrecision,
+  sharedViewport,
+  slotCount,
+}: {
+  characterWidth: number;
+  frame: NativeChartFrame;
+  gridColor: string;
+  labelMaxWidth: number;
+  labelRight: number;
+  maxCharacters: number;
+  pricePrecision: number;
+  sharedViewport: NativeViewportSharedValues;
+  slotCount: number;
+}) {
+  const path = useDerivedValue(() => {
+    const built = Skia.Path.Make();
+    for (let index = 0; index < slotCount; index += 1) {
+      const model = resolveNativePriceGridSlotModel({
+        characterWidth,
+        frame,
+        index,
+        labelMaxWidth,
+        labelRight,
+        maxCharacters,
+        priceMax: sharedViewport.priceMax.value,
+        priceMin: sharedViewport.priceMin.value,
+        pricePrecision,
+      });
+      if (!model.visible) continue;
+      built.moveTo(model.lineStart.x, model.lineStart.y);
+      built.lineTo(model.lineEnd.x, model.lineEnd.y);
+    }
+    return built;
+  });
+
+  return <SkiaPath path={path} color={gridColor} style="stroke" strokeWidth={1} />;
+}
+
+/** The live price axis's labels as one Glyphs node. */
+function NativePriceGridLabelGlyphs({
+  axisFont,
+  characterWidth,
+  frame,
+  labelMaxWidth,
+  labelRight,
+  maxCharacters,
+  pricePrecision,
+  sharedViewport,
+  slotCount,
+  textColor,
+}: {
+  axisFont: ReturnType<typeof Skia.Font>;
+  characterWidth: number;
+  frame: NativeChartFrame;
+  labelMaxWidth: number;
+  labelRight: number;
+  maxCharacters: number;
+  pricePrecision: number;
+  sharedViewport: NativeViewportSharedValues;
+  slotCount: number;
+  textColor: string;
+}) {
+  const glyphMetrics = useMemo(
+    () => createNativeAxisGlyphMetrics(axisFont, NATIVE_ANIMATED_TEXT_CHARACTERS),
+    [axisFont],
+  );
+  const glyphs = useDerivedValue(() => {
+    const out: NativeAxisGlyph[] = [];
+    for (let index = 0; index < slotCount; index += 1) {
+      const model = resolveNativePriceGridSlotModel({
+        characterWidth,
+        frame,
+        index,
+        labelMaxWidth,
+        labelRight,
+        maxCharacters,
+        priceMax: sharedViewport.priceMax.value,
+        priceMin: sharedViewport.priceMin.value,
+        pricePrecision,
+      });
+      if (!model.visible) continue;
+      appendNativeAxisLabelGlyphs({
+        glyphMetrics,
+        out,
+        text: model.labelText,
+        x: model.labelX,
+        y: model.labelY,
+      });
+    }
+    return out;
+  });
+
+  return <Glyphs font={axisFont} x={0} y={0} glyphs={glyphs} color={textColor} />;
 }

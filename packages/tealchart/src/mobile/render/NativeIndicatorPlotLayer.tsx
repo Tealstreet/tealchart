@@ -3,6 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
+import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import type { NativeVisibleBar } from './nativeVisibleBars';
@@ -279,7 +280,7 @@ function NativeLiveIndicatorPlotPath({
   style,
   dash,
 }: {
-  clip: { height: number; width: number; x: number; y: number };
+  clip: SharedValue<NativePrimitiveClip>;
   color: string;
   frame: NativeChartFrame;
   histbase: number;
@@ -400,12 +401,21 @@ function NativeIndicatorPlotPath({
     () => getNativeIndicatorPlotPoints({ plot, totalBarCount, visibleBars }),
     [plot, totalBarCount, visibleBars],
   );
-  const clip = { x: frame.contentLeft, y: pane.top, width: frame.contentWidth, height: pane.height };
+  // The clip travels the channel its own path travels, or it arrives a
+  // propagation apart from the thing it clips and shears the pane for a frame.
+  // The projected branch builds its path in a useMemo, so it keeps a plain rect.
+  const staticClip = { x: frame.contentLeft, y: pane.top, width: frame.contentWidth, height: pane.height };
+  const clip = useDerivedValue<NativePrimitiveClip>(() => ({
+    x: frame.contentLeft,
+    y: pane.top,
+    width: frame.contentWidth,
+    height: pane.height,
+  }));
 
   if (projection) {
     return (
       <NativeProjectedIndicatorPlotPath
-        clip={clip}
+        clip={staticClip}
         color={color}
         frame={frame}
         histbase={histbase}

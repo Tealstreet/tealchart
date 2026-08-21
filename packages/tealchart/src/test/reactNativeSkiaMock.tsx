@@ -26,6 +26,10 @@ function createPath(svg?: string) {
 const font = {
   getSize: () => 12,
   getTextWidth: (text: string) => text.length * 7,
+  // Codepoint as the id: distinct per character, and readable in assertions.
+  getGlyphIDs: (text: string) => Array.from(text, (character) => character.codePointAt(0) ?? 0),
+  // Punctuation advances narrower than a digit, which is the whole point.
+  getGlyphWidths: (ids: number[]) => ids.map((id) => (id >= 48 && id <= 57 ? 7 : 3)),
   measureText: (text: string) => ({ width: text.length * 7, height: 12 }),
   setSize: vi.fn(),
 };
@@ -87,6 +91,7 @@ export const Image = createSkiaComponent('Image');
 export const Line = createSkiaComponent('Line');
 export const Path = createSkiaComponent('Path');
 export const Text = createSkiaComponent('Text');
+export const Glyphs = createSkiaComponent('Glyphs');
 
 export const Skia = {
   Font: vi.fn(() => font),

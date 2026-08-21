@@ -57,7 +57,7 @@ const props = {
   options: { downColor: '#f00', upColor: '#0f0' },
   plotOpacity: 1,
   orderDragState: shared(null),
-  plotPrimitiveClip: { x: 0, y: 0, width: 0, height: 0 },
+  plotPrimitiveClip: { value: { x: 0, y: 0, width: 0, height: 0 } },
   pricePrecision: 2,
   nowMs: shared(0),
   resolvedPriceAxisTags: shared([]),

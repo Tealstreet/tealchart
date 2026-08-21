@@ -51,7 +51,7 @@ export interface NativeChartCanvasLayersProps {
   options: RenderOptions;
   plotOpacity: number;
   orderDragState: NativeOrderDragSharedValues;
-  plotPrimitiveClip: NativePrimitiveClip;
+  plotPrimitiveClip: SharedValue<NativePrimitiveClip>;
   pricePrecision: number;
   nowMs: SharedValue<number>;
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;

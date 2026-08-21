@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
-import { Rect, Line as SkiaLine } from '@shopify/react-native-skia';
-import { describe, expect, it } from 'vitest';
+import { Path as SkiaPath, Rect, Line as SkiaLine } from '@shopify/react-native-skia';
+import { describe, expect, it, vi } from 'vitest';
 
 import { NativeAxisChromeLayer } from './NativeAxisChromeLayer';
 import { NativeChartChromeLayerImpl } from './NativeChartChromeLayer';
@@ -85,4 +85,77 @@ describe('NativeChartChromeLayer', () => {
       strokeWidth: 1,
     });
   });
+
+  // One path for every separator rather than a line each, so the element count
+  // stops tracking pane geometry - mount and unmount happen on the React commit
+  // and are the half of a pane maximize that cannot be made late.
+  it('draws pane separators as a single path, skipping collapsed panes', () => {
+    const twoPanes = createNativeChartFrameFromPanes({
+      dimensions: frame.dimensions,
+      panes: [
+        { id: 'main', type: 'main', top: 36, height: 300, yMin: 62000, yMax: 66000 },
+        { id: 'pane_1', type: 'indicator', top: 336, height: 112, yMin: 0, yMax: 100 },
+      ],
+    });
+    const layer = NativeAxisChromeLayer({
+      backgroundColor: '#101418',
+      frame: twoPanes,
+      gridColor: '#222831',
+      separatorColor: '#d1d4dc',
+    });
+    const paths = collectElementsByType(layer, SkiaPath);
+
+    expect(paths).toHaveLength(1);
+    expect(paths[0].props).toMatchObject({ color: '#d1d4dc', style: 'stroke', strokeWidth: 2 });
+
+    const drawn = (paths[0].props as { path: { value: { lineTo: unknown } } }).path.value;
+    expect(vi.mocked(drawn.lineTo as never).mock.calls).toEqual([[twoPanes.contentRight, 336]]);
+  });
+
+  // Maximising the indicator pane collapses main, which is NOT the last pane, so
+  // it is the one the separator loop would otherwise draw - on a boundary the
+  // pane below already occupies, doubling the stroke.
+  it('emits no separator segment for a pane a maximize has collapsed', () => {
+    const collapsed = createNativeChartFrameFromPanes({
+      dimensions: frame.dimensions,
+      panes: [
+        { id: 'main', type: 'main', top: 36, height: 0, yMin: 62000, yMax: 66000 },
+        { id: 'pane_1', type: 'indicator', top: 36, height: 412, yMin: 0, yMax: 100 },
+      ],
+    });
+    const layer = NativeAxisChromeLayer({
+      backgroundColor: '#101418',
+      frame: collapsed,
+      gridColor: '#222831',
+      separatorColor: '#d1d4dc',
+    });
+    const drawn = (collectElementsByType(layer, SkiaPath)[0].props as { path: { value: { lineTo: unknown } } }).path
+      .value;
+
+    expect(vi.mocked(drawn.lineTo as never).mock.calls).toEqual([]);
+  });
+
+  // Maximising main pushes its boundary onto the chart's bottom edge, where the
+  // time-axis border already draws. A divider there is a 2px line on the frame.
+  it('emits no separator on a boundary that has reached the time axis', () => {
+    const mainMaximized = createNativeChartFrameFromPanes({
+      dimensions: frame.dimensions,
+      panes: [
+        { id: 'main', type: 'main', top: 36, height: 412, yMin: 62000, yMax: 66000 },
+        { id: 'pane_1', type: 'indicator', top: 448, height: 0, yMin: 0, yMax: 100 },
+      ],
+    });
+    const layer = NativeAxisChromeLayer({
+      backgroundColor: '#101418',
+      frame: mainMaximized,
+      gridColor: '#222831',
+      separatorColor: '#d1d4dc',
+    });
+    const drawn = (collectElementsByType(layer, SkiaPath)[0].props as { path: { value: { lineTo: unknown } } }).path
+      .value;
+
+    expect(mainMaximized.panes[0].bottom).toBe(mainMaximized.timeAxisTop);
+    expect(vi.mocked(drawn.lineTo as never).mock.calls).toEqual([]);
+  });
 });
+

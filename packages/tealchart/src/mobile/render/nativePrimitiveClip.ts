@@ -15,6 +15,7 @@ export interface NativePrimitiveClip {
  * that was maximised.
  */
 export function createNativeOhlcvPrimitiveClip(frame: NativeChartFrame): NativePrimitiveClip {
+  'worklet';
   if (frame.mainPane.height <= 0) return { x: 0, y: 0, width: 0, height: 0 };
   return {
     x: frame.contentLeft,
