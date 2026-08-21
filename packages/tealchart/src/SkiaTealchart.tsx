@@ -128,6 +128,7 @@ import {
 import {
   applyNativePaneHeightOverrides,
   createNativePaneLayoutSignature,
+  nativePaneHeightsMatchRatios,
 } from './mobile/utils/nativePaneLayoutOverrides';
 import { EventEmitter } from './events/EventEmitter';
 import { applyChartOverridesToRenderOptions } from './overrides';
@@ -145,6 +146,7 @@ const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>[
 const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
+const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
 
 interface NativeResizeSnapshot {
   height: number;
@@ -416,6 +418,46 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, []);
 
   const nativePaneMaximizeStateRef = useRef<PaneMaximizeState>(IDLE_PANE_MAXIMIZE_STATE);
+  // A maximize is one React commit, but its consumers do not land together: the
+  // plain props take the new geometry immediately while the worklet closures
+  // follow a propagation later, so the pane is drawn several different ways on
+  // the way to settling. The last painted frame covers that, over the canvas and
+  // the legend alike, until the layout agrees with the ratios that were asked
+  // for. It hides the seam rather than removing it - see the note in the
+  // package guidance about the single-channel refactor that would.
+  const nativeMaximizeSnapshotRef = useRef<SkImage | null>(null);
+  const [nativeMaximizeSnapshot, setNativeMaximizeSnapshotState] = useState<SkImage | null>(null);
+  const nativeMaximizeTargetRatiosRef = useRef<Readonly<Record<string, number>> | null>(null);
+  const nativeMaximizeReleaseRef = useRef<number | null>(null);
+  const nativeMaximizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nativeMaximizeFrameRef = useRef<NativeChartFrame | null>(null);
+
+  // Disposed outside the state updater, never inside it: a concurrent or
+  // StrictMode double-invocation would otherwise free an image still on screen.
+  const replaceNativeMaximizeSnapshot = useCallback((next: SkImage | null) => {
+    const previous = nativeMaximizeSnapshotRef.current;
+    nativeMaximizeSnapshotRef.current = next;
+    setNativeMaximizeSnapshotState(next);
+    if (previous && previous !== next) previous.dispose();
+  }, []);
+
+  const cancelNativeMaximizeRelease = useCallback(() => {
+    if (nativeMaximizeReleaseRef.current !== null) {
+      cancelAnimationFrame(nativeMaximizeReleaseRef.current);
+      nativeMaximizeReleaseRef.current = null;
+    }
+    if (nativeMaximizeTimeoutRef.current !== null) {
+      clearTimeout(nativeMaximizeTimeoutRef.current);
+      nativeMaximizeTimeoutRef.current = null;
+    }
+  }, []);
+
+  const endNativeMaximizeTransition = useCallback(() => {
+    cancelNativeMaximizeRelease();
+    nativeMaximizeTargetRatiosRef.current = null;
+    replaceNativeMaximizeSnapshot(null);
+  }, [cancelNativeMaximizeRelease, replaceNativeMaximizeSnapshot]);
+
   const handleNativeTogglePaneMaximize = useCallback(
     (paneId: string) => {
       const panes = nativePaneLayoutRef.current?.panes;
@@ -423,9 +465,25 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const toggled = togglePaneMaximize(nativePaneMaximizeStateRef.current, panes, paneId);
       if (!toggled) return;
       nativePaneMaximizeStateRef.current = toggled.state;
+
+      // Tapping again mid-transition must not let the old release wipe the
+      // bitmap this one is about to take.
+      cancelNativeMaximizeRelease();
+      const canvas = canvasRef.current;
+      try {
+        // Captured before the setState, so the surface still holds the frame the
+        // user is looking at rather than a half-applied one.
+        const image = canvas ? canvas.makeImageSnapshot() : null;
+        nativeMaximizeTargetRatiosRef.current = image ? toggled.heightRatios : null;
+        replaceNativeMaximizeSnapshot(image);
+      } catch {
+        nativeMaximizeTargetRatiosRef.current = null;
+        replaceNativeMaximizeSnapshot(null);
+      }
+
       setNativePaneHeightOverrides((current) => ({ ...current, ...toggled.heightRatios }));
     },
-    [],
+    [canvasRef, cancelNativeMaximizeRelease, replaceNativeMaximizeSnapshot],
   );
 
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
@@ -773,6 +831,51 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   });
 
   nativePaneSnapshotFrameRef.current = frame;
+
+  // Held while the transition runs, so the legend - plain React views outside
+  // the canvas, which a Skia bitmap cannot cover - stays on the geometry the
+  // snapshot was taken at instead of jumping a frame early.
+  if (!nativeMaximizeSnapshot && frame) nativeMaximizeFrameRef.current = frame;
+  const nativeLegendFrame = nativeMaximizeSnapshot ? (nativeMaximizeFrameRef.current ?? frame) : frame;
+
+  useLayoutEffect(() => {
+    if (!nativeMaximizeSnapshot) return;
+    const targetRatios = nativeMaximizeTargetRatiosRef.current;
+    if (!frame || !targetRatios) {
+      endNativeMaximizeTransition();
+      return;
+    }
+    // Normally already true on the first run - a plain toggle applies in one
+    // commit - so the release below comes down to waiting out one Reanimated
+    // propagation. The check is what covers the transitions that take more than
+    // one commit, and what keeps a bar tick's re-frame from releasing early.
+    if (!nativePaneHeightsMatchRatios(frame.panes, targetRatios)) return;
+    if (nativeMaximizeReleaseRef.current !== null) return;
+    nativeMaximizeReleaseRef.current = requestAnimationFrame(() => {
+      nativeMaximizeReleaseRef.current = requestAnimationFrame(() => {
+        nativeMaximizeReleaseRef.current = null;
+        endNativeMaximizeTransition();
+      });
+    });
+  }, [endNativeMaximizeTransition, frame, nativeMaximizeSnapshot]);
+
+  useEffect(() => {
+    if (!nativeMaximizeSnapshot || nativeMaximizeTimeoutRef.current !== null) return;
+    // Ceiling: a layout that never reaches its ratios must not freeze the chart.
+    nativeMaximizeTimeoutRef.current = setTimeout(() => {
+      nativeMaximizeTimeoutRef.current = null;
+      endNativeMaximizeTransition();
+    }, NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS);
+  }, [endNativeMaximizeTransition, nativeMaximizeSnapshot]);
+
+  useEffect(
+    () => () => {
+      cancelNativeMaximizeRelease();
+      nativeMaximizeSnapshotRef.current?.dispose();
+      nativeMaximizeSnapshotRef.current = null;
+    },
+    [cancelNativeMaximizeRelease],
+  );
 
   const nativeBarsReadyForRequestedData = nativeBarsMatchRequestedData({
     barsContext,
@@ -1862,13 +1965,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           />
         ) : null}
       </Canvas>
-      <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
+      <Canvas
+        style={[
+          styles.snapshotLayer,
+          !resizeSnapshotVisible && !nativeMaximizeSnapshot && styles.hiddenSnapshotLayer,
+        ]}
+        pointerEvents="none"
+      >
         {resizeSnapshot ? (
           <SkiaImage
             fit="fill"
             height={Math.max(propHeight ?? resizeSnapshot.height, 1)}
             image={resizeSnapshot.image}
             width={Math.max(propWidth ?? resizeSnapshot.width, 1)}
+            x={0}
+            y={0}
+          />
+        ) : nativeMaximizeSnapshot && frame ? (
+          <SkiaImage
+            fit="fill"
+            height={Math.max(frame.dimensions.height, 1)}
+            image={nativeMaximizeSnapshot}
+            width={Math.max(frame.dimensions.width, 1)}
             x={0}
             y={0}
           />
@@ -1888,7 +2006,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <NativeChartLegendOverlay
           bars={nativeRenderBars}
           downColor={options.downColor}
-          frame={frame}
+          frame={nativeLegendFrame ?? frame}
           gridColor={gridColor}
           activeIndicators={nativeLegendIndicators}
           indicatorPaneInfo={nativeLegendIndicatorPaneInfo}
