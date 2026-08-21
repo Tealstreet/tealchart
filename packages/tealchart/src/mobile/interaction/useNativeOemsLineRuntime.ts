@@ -16,6 +16,7 @@ import type {
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
+import type { OemsActionSettlement } from '../../interaction/oemsActionManager';
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import {
   getOemsOrderLineState,
@@ -87,6 +88,30 @@ export function shouldReleaseNativeOrderDragForSnapshot({
   return handoff !== null && !hasAction(handoff.objectId);
 }
 
+/**
+ * The same retirement, decided from a settle rather than a snapshot.
+ *
+ * A settle fires for a confirm, a `false`, a rejection and a timeout alike, so
+ * it is the deterministic signal; a snapshot is not, because a cancelled move
+ * rolls the price back to what it already was and the snapshot never changes.
+ */
+export function shouldReleaseNativeOrderDragOnSettle({
+  dragActive,
+  handoff,
+  objectId,
+  objectType,
+}: {
+  dragActive: boolean;
+  handoff: NativeOemsDragHandoff | null;
+  objectId: string;
+  objectType: string;
+}): boolean {
+  if (objectType !== 'order') return false;
+  if (handoff === null || handoff.objectId !== objectId) return false;
+  // Nothing retires a live gesture - see shouldReleaseNativeOrderDragForSnapshot.
+  return !dragActive;
+}
+
 export interface NativeOemsLineSnapshot {
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
@@ -132,10 +157,16 @@ export function useNativeOemsLineRuntime({
   const pricePrecisionRef = useRef(pricePrecision);
   pricePrecisionRef.current = pricePrecision;
   const oemsActionsRef = useRef<OemsActionManager<NativeOemsTradingLineState> | null>(null);
+  // Built once, so the settle handler is reached through a ref that each render
+  // refreshes - see where it is assigned for why the settle is load-bearing.
+  const onOemsActionSettledRef = useRef<((settlement: OemsActionSettlement<NativeOemsTradingLineState>) => void) | null>(
+    null,
+  );
   if (!oemsActionsRef.current) {
     oemsActionsRef.current = new OemsActionManager<NativeOemsTradingLineState>({
       priceTolerance: () => pricePrecisionRef.current,
       onChange: forceUpdate,
+      onSettle: (settlement) => onOemsActionSettledRef.current?.(settlement),
     });
   }
   const oemsActions = oemsActionsRef.current;
@@ -313,6 +344,34 @@ export function useNativeOemsLineRuntime({
     orderHandoffRef.current = null;
     releaseNativeOrderDragAfterCommit();
   }, [lineSnapshot.orderLines, oemsActions, orderDragState, releaseNativeOrderDragAfterCommit]);
+
+  /**
+   * The preview also has to retire on the settle, not only on a snapshot.
+   *
+   * `syncNativeOrderDragStateForSnapshot` is the only caller of the release
+   * predicate, and it runs from a layout effect keyed on the snapshot's order
+   * lines. A cancelled move settles by rolling the optimistic price back, so the
+   * snapshot comes back byte-identical, `reuseNativeRenderList` hands back the
+   * previous array, the effect never re-runs and the predicate is never asked.
+   * The preview then keeps drawing at the dropped price until some unrelated
+   * tick changes the snapshot - there is no timeout on it, unlike the bracket's.
+   *
+   * Settling is the deterministic signal: it fires for a confirm, a `false`, a
+   * rejection and a timeout alike. The live-gesture guard stays, because nothing
+   * may retire a drag the finger is still in.
+   */
+  onOemsActionSettledRef.current = (settlement) => {
+    const release = shouldReleaseNativeOrderDragOnSettle({
+      dragActive: orderDragState.active.value,
+      handoff: orderHandoffRef.current,
+      objectId: settlement.action.objectId,
+      objectType: settlement.action.objectType,
+    });
+    if (!release) return;
+
+    orderHandoffRef.current = null;
+    releaseNativeOrderDragAfterCommit();
+  };
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
     // Nothing retires a live gesture - see `shouldClearNativeOrderDragForSnapshot`.
