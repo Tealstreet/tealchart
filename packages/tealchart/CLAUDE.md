@@ -402,6 +402,33 @@ happily, eslint sees a legal forward reference, and the test suite runs against
 every worklet above its callers and read the ordering as load-bearing, not
 cosmetic.
 
+## One commit, two channels
+
+Pane geometry reaches the canvas twice over. Plain props - `NativeAxisChromeLayer`,
+the plot layer's `clip` and `opacity`, and the legend, which is a React Native
+overlay outside the canvas entirely - take the new frame in the commit that
+produces it. Every `useDerivedValue` that closes over `frame` takes it one
+Reanimated propagation later. So a single React commit paints the chart two ways,
+and a pane maximize paints it several: newly mounted ticks evaluate immediately
+while the plot paths that were already there lag a frame.
+
+That is the same hazard as the table above, in its mounted-versus-existing form.
+Maximising holds the last painted frame over the canvas and freezes the legend's
+geometry to match. A plain toggle applies in one commit, so the hold usually
+amounts to waiting out a single Reanimated propagation - two animation frames,
+the same wait the divider release takes. It is gated on the layout agreeing with
+the ratios that were asked for rather than on the frame count alone, which is
+what covers the transitions that take more than one commit, and what stops a bar
+tick's re-frame from releasing the hold early.
+
+**This covers the seam; it does not close it.** The cure is to give pane geometry
+one channel, so mounted and newly mounted layers read the same value on the same
+propagation. Note which direction: moving `frame` into a shared value puts it
+*ahead* of the closures and inverts the seam rather than removing it. The sound
+direction is to lift pane top/height/clip out of the derived values - they are
+static for the duration of a tap - so those layers settle on the React commit the
+way the chrome layer already does.
+
 ## Gesture rebuilds on native
 
 The chart's fifteen gestures are composed into one `Gesture.Simultaneous`, so a

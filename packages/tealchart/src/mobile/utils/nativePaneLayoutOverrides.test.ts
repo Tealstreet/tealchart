@@ -2,7 +2,11 @@ import type { UnifiedPaneLayout } from '../../types';
 
 import { describe, expect, it } from 'vitest';
 
-import { applyNativePaneHeightOverrides, createNativePaneLayoutSignature } from './nativePaneLayoutOverrides';
+import {
+  applyNativePaneHeightOverrides,
+  createNativePaneLayoutSignature,
+  nativePaneHeightsMatchRatios,
+} from './nativePaneLayoutOverrides';
 
 function createLayout(mainRatio = 0.75, indicatorRatio = 0.25): UnifiedPaneLayout {
   return {
@@ -76,5 +80,44 @@ describe('native pane layout overrides', () => {
 
     expect(applied.panes.map((pane) => pane.heightRatio)).toEqual([0.75, 0.4]);
     expect(applied.panes[1]?.indicatorIds).toEqual(['macd']);
+  });
+});
+
+describe('nativePaneHeightsMatchRatios', () => {
+  it('agrees once the panes are laid out at the target ratios', () => {
+    expect(
+      nativePaneHeightsMatchRatios([{ id: 'main', height: 70 }, { id: 'pane_1', height: 30 }], { main: 0.7, pane_1: 0.3 }),
+    ).toBe(true);
+  });
+
+  it('disagrees while the layout is still on its way there', () => {
+    // What a maximize looks like mid-flight: the ratios say one pane took
+    // everything, the frame still has both at their old heights.
+    expect(
+      nativePaneHeightsMatchRatios([{ id: 'main', height: 70 }, { id: 'pane_1', height: 30 }], { main: 1, pane_1: 0 }),
+    ).toBe(false);
+    expect(
+      nativePaneHeightsMatchRatios([{ id: 'main', height: 100 }, { id: 'pane_1', height: 0 }], { main: 1, pane_1: 0 }),
+    ).toBe(true);
+  });
+
+  it('normalises both sides, so ratios that do not sum to one still match', () => {
+    // A pane that appeared while another was maximised keeps its own height
+    // rather than a saved share, so the ratios it lands among sum past one.
+    expect(
+      nativePaneHeightsMatchRatios(
+        [
+          { id: 'main', height: 70 },
+          { id: 'pane_1', height: 30 },
+          { id: 'pane_2', height: 25 },
+        ],
+        { main: 0.7, pane_1: 0.3, pane_2: 0.25 },
+      ),
+    ).toBe(true);
+  });
+
+  it('ignores panes the ratios say nothing about, and refuses a frame with no height', () => {
+    expect(nativePaneHeightsMatchRatios([{ id: 'main', height: 100 }], { pane_9: 0.5 })).toBe(true);
+    expect(nativePaneHeightsMatchRatios([{ id: 'main', height: 0 }], { main: 1 })).toBe(false);
   });
 });

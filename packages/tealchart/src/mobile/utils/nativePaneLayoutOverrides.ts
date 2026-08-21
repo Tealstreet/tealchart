@@ -49,3 +49,34 @@ export function applyNativePaneHeightOverrides<T extends UnifiedPaneLayout>(
     }),
   };
 }
+
+/**
+ * Whether a frame has finished laying its panes out at the given ratios.
+ *
+ * A plain maximize applies in a single commit, so this is normally already true
+ * the first time it is asked and the hold that uses it comes down to waiting out
+ * one Reanimated propagation. It earns its place in the cases that take more
+ * than one commit - a pane added or removed while maximized restores first - and
+ * it is safer than counting frames, because the indicator manager rewrites pane
+ * ranges on any bar tick and mints a new frame mid-hold.
+ *
+ * Both sides are normalised: ratios do not always sum to one, since a pane that
+ * appeared while another was maximized keeps its own height rather than a saved
+ * share, and comparing a share against a raw ratio would never match.
+ */
+export function nativePaneHeightsMatchRatios(
+  panes: readonly { height: number; id: string }[],
+  ratios: Readonly<Record<string, number>>,
+): boolean {
+  const totalHeight = panes.reduce((sum, pane) => sum + pane.height, 0);
+  if (totalHeight <= 0) return false;
+  // Nothing the ratios say applies to the panes on hand, so there is nothing to
+  // wait for - holding until the ceiling would be the worse answer.
+  const totalRatio = panes.reduce((sum, pane) => sum + (ratios[pane.id] ?? 0), 0);
+  if (totalRatio <= 0) return true;
+  return panes.every((pane) => {
+    const target = ratios[pane.id];
+    if (target === undefined) return true;
+    return Math.abs(pane.height / totalHeight - target / totalRatio) <= 0.01;
+  });
+}
