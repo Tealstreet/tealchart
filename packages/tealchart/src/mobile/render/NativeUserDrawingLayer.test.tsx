@@ -40,10 +40,12 @@ const sharedViewport = {
 };
 
 const plotPrimitiveClip = {
-  x: frame.contentLeft,
-  y: frame.mainPane.top,
-  width: frame.contentWidth,
-  height: frame.mainPane.height,
+  value: {
+    x: frame.contentLeft,
+    y: frame.mainPane.top,
+    width: frame.contentWidth,
+    height: frame.mainPane.height,
+  },
 };
 
 function createLayerProps(state: UserDrawingState) {

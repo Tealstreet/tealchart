@@ -1,4 +1,5 @@
 import type { Skia } from '@shopify/react-native-skia';
+import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingCommandAvailability, UserDrawingRecentToolByCategory, UserDrawingTool } from '../../drawings';
 import type {
   Bar,
@@ -19,6 +20,7 @@ import type { NativeChartProjection } from './nativeProjection';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
 import { useMemo } from 'react';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
@@ -77,7 +79,7 @@ export interface NativeSkiaRenderModel {
   leftToolRailLayout: NativeLeftToolRailLayout | null;
   nativeMutedTextColor: string;
   nativePriceLines: readonly NativeRenderablePriceLine[];
-  plotPrimitiveClip: NativePrimitiveClip;
+  plotPrimitiveClip: SharedValue<NativePrimitiveClip>;
   priceAxisTagSources: NativePriceAxisTagSource[];
   smallFont: ReturnType<typeof Skia.Font>;
   textColor: string;
@@ -222,17 +224,17 @@ export function useNativeSkiaRenderModel({
     ],
   );
   const visibleBars = useMemo(() => (projection ? getNativeVisibleBars(bars, projection) : []), [bars, projection]);
-  const plotPrimitiveClip = useMemo<NativePrimitiveClip>(
-    () =>
-      frame
-        ? {
-            x: frame.contentLeft,
-            y: frame.mainPane.top,
-            width: Math.max(0, frame.priceAxisRight - frame.contentLeft),
-            height: frame.mainPane.height,
-          }
-        : { x: 0, y: 0, width: 0, height: 0 },
-    [frame],
+  // User drawings are drawn entirely from derived values, so their clip has to
+  // be one too - a plain rect would land a propagation ahead of what it clips.
+  const plotPrimitiveClip = useDerivedValue<NativePrimitiveClip>(() =>
+    frame
+      ? {
+          x: frame.contentLeft,
+          y: frame.mainPane.top,
+          width: Math.max(0, frame.priceAxisRight - frame.contentLeft),
+          height: frame.mainPane.height,
+        }
+      : { x: 0, y: 0, width: 0, height: 0 },
   );
   const lastBar = bars[bars.length - 1] ?? null;
   const lastTradeLine = useMemo(

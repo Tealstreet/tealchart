@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import { resolveNativeIndicatorPaneAxisSlots } from './NativeIndicatorPaneAxisLayer';
+import {
+  resolveNativeIndicatorPaneAxisSlot,
+  resolveNativeIndicatorPaneAxisSlots,
+} from './NativeIndicatorPaneAxisLayer';
 
 const dimensions = {
   width: 402,
@@ -96,5 +99,27 @@ describe('NativeIndicatorPaneAxisLayer', () => {
   it('renders nothing for a collapsed or rangeless pane', () => {
     expect(slotsFor({ yMin: 0, yMax: 100, height: 0 })).toEqual([]);
     expect(slotsFor({ yMin: 5, yMax: 5 })).toEqual([]);
+  });
+
+  // The batch helper returns early on a zero-height pane, so it never exercised
+  // the per-slot path. A pane collapsed by a maximize goes through that path,
+  // where top === bottom made every tick "visible" and dropped its label 10px
+  // below the seam, into the pane underneath.
+  it('draws nothing for a pane a maximize has collapsed', () => {
+    const frame = frameWith({ yMin: 0, yMax: 100 });
+    const indicator = frame.panes.find((entry) => entry.type === 'indicator')!;
+    const collapsed = { ...indicator, top: 400, bottom: 400, height: 0 };
+    const slot = resolveNativeIndicatorPaneAxisSlot({
+      characterWidth: 6,
+      frame,
+      index: 0,
+      labelMaxWidth: 56,
+      labelRight: 398,
+      maxCharacters: 9,
+      pane: collapsed,
+      range: { yMin: 0, yMax: 100 },
+    });
+
+    expect(slot.visible).toBe(false);
   });
 });
