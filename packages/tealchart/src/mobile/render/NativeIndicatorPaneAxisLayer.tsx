@@ -5,7 +5,7 @@ import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRang
 
 import { memo } from 'react';
 
-import { Group, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Group, Path as SkiaPath, Skia as SkiaApi, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeRightAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
@@ -38,6 +38,8 @@ interface NativeIndicatorPaneAxisSlotInput {
   maxCharacters: number;
   pane: NativePaneFrame;
   range: NativePaneRange;
+  /** Geometry-only callers skip the label formatting they would discard. */
+  skipLabel?: boolean;
 }
 
 /**
@@ -55,6 +57,7 @@ export function resolveNativeIndicatorPaneAxisSlot({
   maxCharacters,
   pane,
   range,
+  skipLabel,
 }: NativeIndicatorPaneAxisSlotInput): NativeIndicatorPaneAxisSlot {
   'worklet';
   const slot = getNativePriceGridSlot({
@@ -66,10 +69,14 @@ export function resolveNativeIndicatorPaneAxisSlot({
   });
   const span = range.yMax - range.yMin;
   const y = span === 0 ? pane.top + pane.height / 2 : pane.top + ((range.yMax - slot.price) / span) * pane.height;
-  const labelText = fitNativeAxisTextToCharacterCountWorklet(
-    formatNativeIndicatorAxisTickWorklet(slot.price, slot.spacing),
-    maxCharacters,
-  );
+  // The grid-line path needs geometry only, and formatting a string to throw it
+  // away is per slot per frame on the UI thread.
+  const labelText = skipLabel
+    ? ''
+    : fitNativeAxisTextToCharacterCountWorklet(
+        formatNativeIndicatorAxisTickWorklet(slot.price, slot.spacing),
+        maxCharacters,
+      );
 
   return {
     labelText,
@@ -182,13 +189,34 @@ export function NativeIndicatorPaneAxisLayerImpl({
   const labelRight = frame.priceAxisRight - 4;
   const labelMaxWidth = Math.max(0, labelRight - (frame.priceAxisLeft + 4));
   const maxCharacters = getNativeAxisTextCharacterCapacity(labelMaxWidth, characterWidth);
+  const indicatorPanes = frame.panes.filter((pane) => pane.type === 'indicator');
+  // getNativePriceGridSlotCount is not a worklet, so the bound is counted here
+  // and handed to the path below rather than derived inside it.
+  const slotCounts = indicatorPanes.map((pane) =>
+    pane.height > 0 ? getNativePriceGridSlotCount(pane.height, NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING) : 0,
+  );
+
+  // Grid lines carry no text, so every pane's ticks merge into one path built in
+  // one derived value. A node per layer instead of a node per tick - and, the
+  // reason it is here, the element count stops depending on pane height, which
+  // mount and unmount would otherwise put on the React commit.
+  if (showGridLines && !showAxisLabels) {
+    return (
+      <NativeIndicatorPaneAxisGridPath
+        frame={frame}
+        gridColor={gridColor}
+        indicatorPanes={indicatorPanes}
+        paneRangeOverrides={paneRangeOverrides}
+        slotCounts={slotCounts}
+      />
+    );
+  }
 
   return (
     <>
-      {frame.panes
-        .filter((pane) => pane.type === 'indicator' && pane.height > 0)
-        .map((pane) =>
-          Array.from({ length: getNativePriceGridSlotCount(pane.height, NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING) }, (_, index) => (
+      {indicatorPanes
+        .map((pane, paneIndex) =>
+          Array.from({ length: slotCounts[paneIndex] ?? 0 }, (_, index) => (
             <NativeAnimatedIndicatorPaneAxisTick
               key={`${pane.id}-axis-${index}`}
               axisFont={axisFont}
@@ -210,6 +238,56 @@ export function NativeIndicatorPaneAxisLayerImpl({
         )}
     </>
   );
+}
+
+/**
+ * Every indicator pane's grid lines as one stroked path. The loop runs to a
+ * bound counted on the JS side; resolveNativeIndicatorPaneAxisSlot culls the
+ * slots that fall outside their pane, including all of a collapsed one's.
+ */
+function NativeIndicatorPaneAxisGridPath({
+  frame,
+  gridColor,
+  indicatorPanes,
+  paneRangeOverrides,
+  slotCounts,
+}: {
+  frame: NativeChartFrame;
+  gridColor: string;
+  indicatorPanes: readonly NativePaneFrame[];
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
+  slotCounts: readonly number[];
+}) {
+  const path = useDerivedValue(() => {
+    const built = SkiaApi.Path.Make();
+    const overrides = paneRangeOverrides?.value;
+    for (let paneIndex = 0; paneIndex < indicatorPanes.length; paneIndex += 1) {
+      const pane = indicatorPanes[paneIndex];
+      if (!pane) continue;
+      const override = overrides ? overrides[pane.id] : undefined;
+      const range = override ?? { yMin: pane.yMin, yMax: pane.yMax };
+      const count = slotCounts[paneIndex] ?? 0;
+      for (let index = 0; index < count; index += 1) {
+        const slot = resolveNativeIndicatorPaneAxisSlot({
+          characterWidth: 0,
+          frame,
+          index,
+          labelMaxWidth: 0,
+          labelRight: 0,
+          maxCharacters: 0,
+          pane,
+          range,
+          skipLabel: true,
+        });
+        if (!slot.visible) continue;
+        built.moveTo(slot.lineStart.x, slot.lineStart.y);
+        built.lineTo(slot.lineEnd.x, slot.lineEnd.y);
+      }
+    }
+    return built;
+  });
+
+  return <SkiaPath path={path} color={gridColor} style="stroke" strokeWidth={1} />;
 }
 
 // Memoised: the chart owner re-renders on every unrelated UI state change, and
