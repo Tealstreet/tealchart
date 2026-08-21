@@ -2166,7 +2166,7 @@ export class TealchartRenderer {
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = barInterval * pixelsPerMs;
-    const barWidth = Math.max(2, slotWidth * 0.6);
+    const barWidth = Math.max(1, slotWidth * 0.6);
 
     const baselineY = this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight);
 
@@ -2463,8 +2463,10 @@ export class TealchartRenderer {
     if (!openValues || !highValues || !lowValues || !closeValues) return;
 
     const slotWidth = this.getSlotWidth(bars, viewport, chartWidth);
-    const bodyWidth = Math.max(2, slotWidth * 0.6);
-    const tickWidth = Math.max(3, bodyWidth * 0.45);
+    const bodyWidth = Math.max(1, slotWidth * 0.6);
+    // Legibility floor, but never wider than the body it marks - which is what
+    // a bare Math.max would give once the body reaches its own floor.
+    const tickWidth = Math.min(bodyWidth, Math.max(3, bodyWidth * 0.45));
     const fallbackColor = Array.isArray(plot.color) ? plot.color.find(Boolean) || '#2196F3' : plot.color || '#2196F3';
 
     const scanEnd = Math.min(bars.length, openValues.length, highValues.length, lowValues.length, closeValues.length);
@@ -5568,7 +5570,7 @@ export class TealchartRenderer {
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = barInterval * pixelsPerMs;
-    const barWidth = Math.max(2, slotWidth * 0.6);
+    const barWidth = Math.max(1, slotWidth * 0.6);
 
     const baselineY = this.valueToPaneY(this.getPlotHistbase(plot), paneOffset);
 

@@ -19,7 +19,7 @@ export function computeCandleCoordinates(
   chartWidth: number,
   priceToY: (price: number) => number,
   timeToX: (time: number) => number,
-  minCandleWidth = 3,
+  minCandleWidth = 1.5,
 ): CandleCoordinates[] {
   if (bars.length === 0) return [];
 

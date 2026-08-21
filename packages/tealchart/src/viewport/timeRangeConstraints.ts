@@ -1,7 +1,10 @@
 import type { Viewport } from '../types';
 
-export const DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX = 2;
-export const DEFAULT_MAX_VISIBLE_BARS = 1500;
+export const DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX = 1;
+// Sized so that DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX, not this cap, is what bounds
+// the range at realistic plot widths. At 1500 a 2560px chart could only zoom out
+// to 1500 bars, so halving the bar width bought desktop almost nothing.
+export const DEFAULT_MAX_VISIBLE_BARS = 3000;
 
 export type TimeRangeClampAnchor = 'right' | 'center' | { ratio: number };
 

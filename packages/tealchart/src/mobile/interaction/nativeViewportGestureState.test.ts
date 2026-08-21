@@ -13,6 +13,7 @@ import type {
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../../viewport/timeRangeConstraints';
 import {
   beginNativeChartAxisPinchGestureState,
   beginNativeChartPanGestureState,
@@ -465,8 +466,10 @@ describe('native viewport gesture state', () => {
 
     beginNativeTimeScaleGestureState(state);
     expect(updateNativeTimeScaleGestureState(state, Math.log(100) / 0.005)).toBe(true);
+    // contentWidth 4 / minimum bar width -> that many bars of 100ms each.
+    const maxRange = Math.floor(4 / DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX) * 100;
     expect(readViewport(state.sharedViewport)).toEqual({
-      startTime: 1_800,
+      startTime: 2_000 - maxRange,
       endTime: 2_000,
       priceMin: 100,
       priceMax: 200,
@@ -488,7 +491,10 @@ describe('native viewport gesture state', () => {
 
     beginNativeChartAxisPinchGestureState(state, 47.5, 52.5, 80, 80, frame);
     expect(updateNativeChartAxisPinchGestureState(state, 47.5, 52.5, 12, 80, frame)).toBe(true);
-    expect(readViewport(state.sharedViewport).startTime).toBeCloseTo(1_157.894737);
-    expect(readViewport(state.sharedViewport).endTime).toBeCloseTo(1_357.894737);
+    // The clamp width is derived; the anchor keeps the touch focal point fixed.
+    const maxRange = Math.floor(4 / DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX) * 100;
+    const clamped = readViewport(state.sharedViewport);
+    expect(clamped.endTime - clamped.startTime).toBeCloseTo(maxRange);
+    expect(clamped.startTime).toBeCloseTo(1_118.421053);
   });
 });
