@@ -3,9 +3,9 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
-import { Group, Path as SkiaPath, Skia as SkiaApi, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Glyphs, Group, Path as SkiaPath, Skia as SkiaApi, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeRightAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
@@ -16,7 +16,13 @@ import {
   NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING,
 } from './nativeGridSlots';
 import { formatNativeIndicatorAxisTickWorklet } from './nativePriceFormat';
-import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
+import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
+import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
+import {
+  measureNativeSkiaAxisCharacterWidth,
+  NATIVE_ANIMATED_TEXT_CHARACTERS,
+  NativeAnimatedSkiaText,
+} from './nativeSkiaText';
 
 export interface NativeIndicatorPaneAxisSlot {
   labelText: string;
@@ -200,6 +206,26 @@ export function NativeIndicatorPaneAxisLayerImpl({
   // one derived value. A node per layer instead of a node per tick - and, the
   // reason it is here, the element count stops depending on pane height, which
   // mount and unmount would otherwise put on the React commit.
+  // Labels merge like the lines, into one Glyphs node: monospace font, fixed
+  // alphabet, so the worklet places every pane's labels by arithmetic and the
+  // node count stops moving with pane heights.
+  if (showAxisLabels && !showGridLines) {
+    return (
+      <NativeIndicatorPaneAxisLabelGlyphs
+        axisFont={axisFont}
+        characterWidth={characterWidth}
+        frame={frame}
+        indicatorPanes={indicatorPanes}
+        labelMaxWidth={labelMaxWidth}
+        labelRight={labelRight}
+        maxCharacters={maxCharacters}
+        paneRangeOverrides={paneRangeOverrides}
+        slotCounts={slotCounts}
+        textColor={textColor}
+      />
+    );
+  }
+
   if (showGridLines && !showAxisLabels) {
     return (
       <NativeIndicatorPaneAxisGridPath
@@ -288,6 +314,70 @@ function NativeIndicatorPaneAxisGridPath({
   });
 
   return <SkiaPath path={path} color={gridColor} style="stroke" strokeWidth={1} />;
+}
+
+/** Every indicator pane's axis labels as one Glyphs node. */
+function NativeIndicatorPaneAxisLabelGlyphs({
+  axisFont,
+  characterWidth,
+  frame,
+  indicatorPanes,
+  labelMaxWidth,
+  labelRight,
+  maxCharacters,
+  paneRangeOverrides,
+  slotCounts,
+  textColor,
+}: {
+  axisFont: ReturnType<typeof Skia.Font>;
+  characterWidth: number;
+  frame: NativeChartFrame;
+  indicatorPanes: readonly NativePaneFrame[];
+  labelMaxWidth: number;
+  labelRight: number;
+  maxCharacters: number;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
+  slotCounts: readonly number[];
+  textColor: string;
+}) {
+  const glyphMetrics = useMemo(
+    () => createNativeAxisGlyphMetrics(axisFont, NATIVE_ANIMATED_TEXT_CHARACTERS),
+    [axisFont],
+  );
+  const glyphs = useDerivedValue(() => {
+    const out: NativeAxisGlyph[] = [];
+    const overrides = paneRangeOverrides?.value;
+    for (let paneIndex = 0; paneIndex < indicatorPanes.length; paneIndex += 1) {
+      const pane = indicatorPanes[paneIndex];
+      if (!pane) continue;
+      const override = overrides ? overrides[pane.id] : undefined;
+      const range = override ?? { yMin: pane.yMin, yMax: pane.yMax };
+      const count = slotCounts[paneIndex] ?? 0;
+      for (let index = 0; index < count; index += 1) {
+        const slot = resolveNativeIndicatorPaneAxisSlot({
+          characterWidth,
+          frame,
+          index,
+          labelMaxWidth,
+          labelRight,
+          maxCharacters,
+          pane,
+          range,
+        });
+        if (!slot.visible) continue;
+        appendNativeAxisLabelGlyphs({
+          glyphMetrics,
+          out,
+          text: slot.labelText,
+          x: slot.labelX,
+          y: slot.labelY,
+        });
+      }
+    }
+    return out;
+  });
+
+  return <Glyphs font={axisFont} x={0} y={0} glyphs={glyphs} color={textColor} />;
 }
 
 // Memoised: the chart owner re-renders on every unrelated UI state change, and

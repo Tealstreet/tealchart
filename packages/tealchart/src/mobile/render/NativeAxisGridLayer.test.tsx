@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
-import { Path as SkiaPath, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Glyphs, Path as SkiaPath, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
 // The layers are invoked as plain functions here, outside any renderer, so
@@ -13,9 +13,28 @@ vi.mock('react', async (importOriginal) => {
 
 import { getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import { NativeIndicatorPaneAxisLayerImpl } from './NativeIndicatorPaneAxisLayer';
-import { NativeAnimatedSkiaText } from './nativeSkiaText';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativePriceGridLayer, resolveNativePriceGridSlotModel } from './NativePriceGridLayer';
+
+/** First matching node's props, rendering intermediate components as it goes. */
+function firstPropsByType(node: ReactNode, type: unknown): Record<string, unknown> | null {
+  if (node === null || node === undefined || typeof node === 'boolean') return null;
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = firstPropsByType(child, type);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof node !== 'object' || !('props' in node)) return null;
+
+  const element = node as ReactElement<Record<string, unknown>>;
+  if (element.type === type) return element.props;
+  if (typeof element.type === 'function') {
+    return firstPropsByType((element.type as (props: unknown) => ReactNode)(element.props), type);
+  }
+  return firstPropsByType(element.props.children as ReactNode, type);
+}
 
 /** Counts nodes of a type, rendering intermediate components as it goes. */
 function countByType(node: ReactNode, type: unknown, seen = { total: 0 }): number {
@@ -189,7 +208,12 @@ describe('native axis grid layers', () => {
   // the tree a frame before the canvas geometry follows it. One path per layer
   // makes the count invariant - the geometry moves inside the path instead.
   it('keeps the grid-line element count fixed as pane heights change', () => {
-    const axisFont = { measureText: () => ({ width: 7 }), getSize: () => 10 } as never;
+    const axisFont = {
+      measureText: () => ({ width: 7 }),
+      getSize: () => 10,
+      getGlyphIDs: (text: string) => Array.from(text, (character) => character.codePointAt(0) ?? 0),
+      getGlyphWidths: (ids: number[]) => ids.map((id) => (id >= 48 && id <= 57 ? 7 : 3)),
+    } as never;
     const sharedViewport = {
       startTime: { value: 0 },
       endTime: { value: 60_000 },
@@ -275,7 +299,12 @@ describe('native axis grid layers', () => {
   // slotCounts is indexed by position in the unfiltered indicator-pane list, so
   // a collapsed pane in the middle would misalign every count after it.
   it('keeps per-pane slot counts aligned when one pane collapses', () => {
-    const axisFont = { measureText: () => ({ width: 7 }), getSize: () => 10 } as never;
+    const axisFont = {
+      measureText: () => ({ width: 7 }),
+      getSize: () => 10,
+      getGlyphIDs: (text: string) => Array.from(text, (character) => character.codePointAt(0) ?? 0),
+      getGlyphWidths: (ids: number[]) => ids.map((id) => (id >= 48 && id <= 57 ? 7 : 3)),
+    } as never;
     const threePanes = createNativeChartFrameFromPanes({
       dimensions: frame.dimensions,
       panes: [
@@ -293,10 +322,19 @@ describe('native axis grid layers', () => {
       textColor: '#adb1b8',
     });
 
-    // Only the surviving pane contributes ticks, and they are its own.
-    const texts = countByType(labels, NativeAnimatedSkiaText);
-    expect(texts).toBeGreaterThan(0);
-    expect(countByType(labels, SkiaPath)).toBe(0);
+    // slotCounts is indexed against the unfiltered pane list, so a misalignment
+    // would lay pane_2's ticks out against pane_1's zero height - which is what
+    // asserting on the glyph positions catches and a node count would not.
+    const glyphs = firstPropsByType(labels, Glyphs)?.glyphs as { value: Array<{ pos: { y: number } }> };
+    const ys = glyphs.value.map((glyph) => glyph.pos.y);
+
+    // If the counts misindexed, pane_2's ticks would be resolved against pane_1's
+    // zero height, where every slot reports invisible - so the axis would come
+    // back empty. Spanning several rows is what proves they used their own pane.
+    expect(ys.length).toBeGreaterThan(0);
+    expect(new Set(ys).size).toBeGreaterThan(1);
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(224);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(224 + 164);
   });
 });
 
