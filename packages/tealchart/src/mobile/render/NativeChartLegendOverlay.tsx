@@ -7,9 +7,18 @@ import type { NativeChartFrame } from './nativeChartFrame';
 import React from 'react';
 
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
 
+import {
+  LOADING_DOT_COUNT,
+  LOADING_DOT_MAX_OPACITY,
+  LOADING_DOT_MIN_OPACITY,
+  LOADING_DOT_PERIOD_MS,
+  LOADING_DOT_STAGGER_MS,
+} from '../../constants';
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
+import { isNativeMainPaneVisible } from './nativeSharedViewport';
 
 export interface NativeLegendIndicator {
   id: string;
@@ -281,13 +290,19 @@ function resolveNativeIndicatorPaneLegends({
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeLegendIndicatorPaneInfo>>;
 }): NativeIndicatorPaneLegend[] {
-  return frame.panes
-    .filter((pane) => pane.type === 'indicator')
-    .map((pane) => ({
-      pane,
-      indicators: activeIndicators.filter((indicator) => indicatorPaneInfo[indicator.id]?.paneId === pane.id),
-    }))
-    .filter((paneLegend) => paneLegend.indicators.length > 0);
+  return (
+    frame.panes
+      // Height, not just type: maximising another pane collapses this one to
+      // nothing, and its legend would otherwise float over the pane that was
+      // maximised - taking its action hit targets, and their reserved gesture
+      // zones, along with it.
+      .filter((pane) => pane.type === 'indicator' && pane.height > 0)
+      .map((pane) => ({
+        pane,
+        indicators: activeIndicators.filter((indicator) => indicatorPaneInfo[indicator.id]?.paneId === pane.id),
+      }))
+      .filter((paneLegend) => paneLegend.indicators.length > 0)
+  );
 }
 
 function resolveNativeLegendActionOrigins({
@@ -390,40 +405,42 @@ function NativeChartLegendOverlayView({
 
   return (
     <View pointerEvents="box-none" style={styles.root}>
-      <View pointerEvents="box-none" style={[styles.legendBlock, { left, maxWidth, top }]}>
-        <View pointerEvents="none" style={styles.row}>
-          <Text numberOfLines={1} style={[styles.symbol, { color: textColor }]}>
-            {symbol}
-          </Text>
-          <Text style={[styles.meta, { color: mutedTextColor }]}>{formatNativeLegendInterval(interval)}</Text>
-          {isLoading && <Text style={[styles.loadingDots, { color: mutedTextColor }]}>...</Text>}
-        </View>
-        {ohlcItems.length > 0 && (
+      {isNativeMainPaneVisible(frame) ? (
+        <View pointerEvents="box-none" style={[styles.legendBlock, { left, maxWidth, top }]}>
           <View pointerEvents="none" style={styles.row}>
-            {ohlcItems.map(([label, value]) => (
-              <View key={label} style={styles.ohlcItem}>
-                <Text style={[styles.ohlcLabel, { color: mutedTextColor }]}>{label}</Text>
-                <Text style={[styles.ohlcValue, { color: valueColor }]}>
-                  {formatNativeLegendPrice(value, pricePrecision)}
-                </Text>
-              </View>
-            ))}
+            <Text numberOfLines={1} style={[styles.symbol, { color: textColor }]}>
+              {symbol}
+            </Text>
+            <Text style={[styles.meta, { color: mutedTextColor }]}>{formatNativeLegendInterval(interval)}</Text>
           </View>
-        )}
-        {overlayIndicators.map((indicator) =>
-          renderNativeIndicatorLegendRow({
-            actionKeyPrefix: 'main',
-            indicator,
-            mutedTextColor,
-            onActionButtonLayout,
-            onRemoveIndicator,
-            onRowLayout,
-            onToggleIndicator,
-            paneInfo: indicatorPaneInfo[indicator.id],
-            textColor,
-          }),
-        )}
-      </View>
+          {isLoading && <NativeLegendLoadingDots color={mutedTextColor} />}
+          {ohlcItems.length > 0 && (
+            <View pointerEvents="none" style={styles.row}>
+              {ohlcItems.map(([label, value]) => (
+                <View key={label} style={styles.ohlcItem}>
+                  <Text style={[styles.ohlcLabel, { color: mutedTextColor }]}>{label}</Text>
+                  <Text style={[styles.ohlcValue, { color: valueColor }]}>
+                    {formatNativeLegendPrice(value, pricePrecision)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+          {overlayIndicators.map((indicator) =>
+            renderNativeIndicatorLegendRow({
+              actionKeyPrefix: 'main',
+              indicator,
+              mutedTextColor,
+              onActionButtonLayout,
+              onRemoveIndicator,
+              onRowLayout,
+              onToggleIndicator,
+              paneInfo: indicatorPaneInfo[indicator.id],
+              textColor,
+            }),
+          )}
+        </View>
+      ) : null}
 
       {indicatorPanes.map(({ pane, indicators }) => (
         <View
@@ -460,6 +477,40 @@ export function NativeChartLegendOverlayImpl(props: NativeChartLegendOverlayProp
     onActionButtonLayout: ignoreNativeLegendActionButtonLayout,
     onRowLayout: ignoreNativeLegendRowLayout,
   });
+}
+
+export function NativeLoadingDot({ color, index }: { color: string; index: number }) {
+  const pulse = useSharedValue(LOADING_DOT_MIN_OPACITY);
+
+  React.useEffect(() => {
+    // Web runs this as a CSS keyframe: half the period each way, reversed, with
+    // each dot started a stagger later so the three chase one another.
+    pulse.value = withDelay(
+      index * LOADING_DOT_STAGGER_MS,
+      withRepeat(
+        withTiming(LOADING_DOT_MAX_OPACITY, {
+          duration: LOADING_DOT_PERIOD_MS / 2,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        -1,
+        true,
+      ),
+    );
+  }, [index, pulse]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
+
+  return <Animated.Text style={[styles.loadingDot, { color }, animatedStyle]}>•</Animated.Text>;
+}
+
+export function NativeLegendLoadingDots({ color }: { color: string }) {
+  return (
+    <View pointerEvents="none" style={styles.loadingDots}>
+      {Array.from({ length: LOADING_DOT_COUNT }, (_, index) => (
+        <NativeLoadingDot key={index} color={color} index={index} />
+      ))}
+    </View>
+  );
 }
 
 function NativeChartLegendOverlayRuntime(props: NativeChartLegendOverlayProps) {
@@ -556,9 +607,14 @@ NativeChartLegendOverlay.displayName = 'NativeChartLegendOverlay';
 
 const styles = StyleSheet.create({
   loadingDots: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0,
+    flexDirection: 'row',
+    paddingLeft: 4,
+    paddingTop: 2,
+  },
+  loadingDot: {
+    fontSize: 20,
+    letterSpacing: 1,
+    lineHeight: 20,
   },
   meta: {
     fontSize: 11,

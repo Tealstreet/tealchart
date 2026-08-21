@@ -56,6 +56,13 @@ import {
   resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
+import {
+  LOADING_DOT_COUNT,
+  LOADING_DOT_MAX_OPACITY,
+  LOADING_DOT_MIN_OPACITY,
+  LOADING_DOT_PERIOD_MS,
+  LOADING_DOT_STAGGER_MS,
+} from '../constants';
 import { getChartStore } from '../state/chartState';
 import { DEFAULT_MARGINS, TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
@@ -446,15 +453,15 @@ export class TealchartWidgetUI {
         padding: '2px 0 0 4px',
       },
     });
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < LOADING_DOT_COUNT; i++) {
       const dot = span({ text: '•' });
-      dot.style.animation = `tc-pulse 1.4s ease-in-out ${i * 0.15}s infinite`;
+      dot.style.animation = `tc-pulse ${LOADING_DOT_PERIOD_MS}ms ease-in-out ${i * LOADING_DOT_STAGGER_MS}ms infinite`;
       this.loadingDots.appendChild(dot);
     }
     if (!document.getElementById('tc-pulse-keyframes')) {
       const style = document.createElement('style');
       style.id = 'tc-pulse-keyframes';
-      style.textContent = `@keyframes tc-pulse { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.8; } }`;
+      style.textContent = `@keyframes tc-pulse { 0%, 100% { opacity: ${LOADING_DOT_MIN_OPACITY}; } 50% { opacity: ${LOADING_DOT_MAX_OPACITY}; } }`;
       document.head.appendChild(style);
     }
     this.legend?.getElement()?.appendChild(this.loadingDots);
@@ -1086,6 +1093,11 @@ export class TealchartWidgetUI {
     // the ratio-accumulated position if geometry is unavailable.
     const paneTops = new Map((this.chartCore?.getIndicatorPaneTops() ?? []).map((p) => [p.paneId, p.top]));
 
+    // The mirror case: maximising an indicator pane collapses the price pane,
+    // and its legend would sit at the seam over whatever took its place.
+    const mainLegendElement = this.legend?.getElement();
+    if (mainLegendElement) mainLegendElement.style.display = mainPanePixelHeight > 0 ? '' : 'none';
+
     // Track which pane IDs we've seen (to remove stale legends)
     const currentPaneIds = new Set<string>();
 
@@ -1102,8 +1114,10 @@ export class TealchartWidgetUI {
         return info?.overlay === false && pane.indicatorIds.includes(ind.id);
       });
 
-      if (paneIndicators.length === 0) {
-        // No indicators for this pane, remove legend if it exists
+      // A pane maximised away has no height, and its legend would otherwise sit
+      // at the seam over the pane that took its place - so it goes with it, the
+      // same way an emptied pane's does.
+      if (paneIndicators.length === 0 || paneHeight <= 0) {
         const existing = this.indicatorPaneLegends.get(pane.id);
         if (existing) {
           existing.unmount();
