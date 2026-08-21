@@ -49,6 +49,7 @@ import { Canvas, Image as SkiaImage, Skia, useCanvasRef } from '@shopify/react-n
 
 import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
 import { StyleSheet, View } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import { useSharedValue } from 'react-native-reanimated';
 import { GestureDetector } from 'react-native-gesture-handler';
 
@@ -75,6 +76,11 @@ import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopB
 import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserDrawingRuntime';
 import { NativeUserDrawingObjectTreePanel } from './mobile/render/NativeUserDrawingObjectTreePanel';
 import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
+import {
+  createNativePaneGeometryKey,
+  NativePaneGeometryEcho,
+  shouldReleaseNativeMaximizeHold,
+} from './mobile/render/nativeMaximizeHold';
 import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
@@ -840,6 +846,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   if (!nativeMaximizeSnapshot && frame) nativeMaximizeFrameRef.current = frame;
   const nativeLegendFrame = nativeMaximizeSnapshot ? (nativeMaximizeFrameRef.current ?? frame) : frame;
 
+  // Echoed back through the same closure channel the plot paths read `frame`
+  // through, so the release below can observe that propagation instead of
+  // guessing at it with a frame count. Written from inside the canvas tree - see
+  // NativePaneGeometryEcho for why that placement is load-bearing.
+  const nativePaneGeometryKey = useMemo(() => createNativePaneGeometryKey(frame), [frame]);
+  const nativePaneGeometryEchoRef = useRef<SharedValue<string> | null>(null);
+  const nativePaneGeometryKeyRef = useRef(nativePaneGeometryKey);
+  nativePaneGeometryKeyRef.current = nativePaneGeometryKey;
+
   useLayoutEffect(() => {
     if (!nativeMaximizeSnapshot) return;
     const targetRatios = nativeMaximizeTargetRatiosRef.current;
@@ -853,12 +868,29 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     // one commit, and what keeps a bar tick's re-frame from releasing early.
     if (!nativePaneHeightsMatchRatios(frame.panes, targetRatios)) return;
     if (nativeMaximizeReleaseRef.current !== null) return;
-    nativeMaximizeReleaseRef.current = requestAnimationFrame(() => {
+
+    let framesWaited = 0;
+    const waitForGeometryEcho = () => {
+      if (
+        !shouldReleaseNativeMaximizeHold({
+          currentGeometryKey: nativePaneGeometryKeyRef.current,
+          framesWaited,
+          heightsMatch: true,
+          observedGeometryKey: nativePaneGeometryEchoRef.current?.value ?? '',
+        })
+      ) {
+        framesWaited += 1;
+        nativeMaximizeReleaseRef.current = requestAnimationFrame(waitForGeometryEcho);
+        return;
+      }
+      // One more frame, so the paths that just caught up are actually presented
+      // before the bitmap covering them comes off.
       nativeMaximizeReleaseRef.current = requestAnimationFrame(() => {
         nativeMaximizeReleaseRef.current = null;
         endNativeMaximizeTransition();
       });
-    });
+    };
+    nativeMaximizeReleaseRef.current = requestAnimationFrame(waitForGeometryEcho);
   }, [endNativeMaximizeTransition, frame, nativeMaximizeSnapshot]);
 
   useEffect(() => {
@@ -1959,6 +1991,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 visibleBars={visibleBars}
                 volumeHeight={volumeHeight}
               />
+              <NativePaneGeometryEcho echoRef={nativePaneGeometryEchoRef} geometryKey={nativePaneGeometryKey} />
             </Canvas>
           </GestureDetector>
         </View>
