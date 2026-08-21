@@ -30,6 +30,13 @@ function createMockGesture() {
       this.config.numberOfTaps = value;
       return this;
     },
+    // Concatenates, exactly as gesture-handler does, so a test can catch a
+    // relation being re-applied to a gesture that outlives one render.
+    requireExternalGestureToFail(...gestures: unknown[]) {
+      const existing = (this.config.requireToFail as unknown[] | undefined) ?? [];
+      this.config.requireToFail = [...existing, ...gestures];
+      return this;
+    },
     onBegin(callback: unknown) {
       this.handlers.onBegin = callback;
       return this;

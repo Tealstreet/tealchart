@@ -29,7 +29,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useSharedValue } from 'react-native-reanimated';
 
-import { createNativeChartGesture } from './nativeChartGestures';
+import { createNativeChartGesture, deferNativeCanvasTapToPaneMaximize } from './nativeChartGestures';
 import {
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
@@ -308,8 +308,45 @@ export function useNativeChartGestureRuntime({
   // crosshair context-menu tap, the trade-line action tap and both drawing
   // taps, which used to race under Gesture.Simultaneous and each decide for
   // themselves whether the tap was theirs.
+  const paneMaximizeTapGesture = useMemo<GestureType>(() => {
+    return createNativePaneMaximizeTapGesture({
+      bracketDragActive,
+      chartInteractionEnabled: !drawingInputEnabled,
+      controlZones,
+      crosshair,
+      drawingTapEnabled: drawingInputEnabled || drawingSelectionEnabled,
+      frame: chartInteractionFrame,
+      hasContextMenu,
+      onTogglePaneMaximize: stableOnTogglePaneMaximize,
+      orderDragZones,
+      pricePrecision,
+      resetViewVisible,
+      sharedViewport,
+      tradeLabelHeight,
+      tradeLineActionZones,
+      tradeLineRows,
+    });
+  }, [
+    bracketDragActive,
+    chartInteractionFrame,
+    controlZones,
+    crosshair,
+    drawingInputEnabled,
+    drawingSelectionEnabled,
+    hasContextMenu,
+    orderDragZones,
+    pricePrecision,
+    resetViewVisible,
+    sharedViewport,
+    stableOnTogglePaneMaximize,
+    tradeLabelHeight,
+    tradeLineActionZones,
+    tradeLineRows,
+  ]);
+
+  const chartPaneCount = chartInteractionFrame?.panes.length ?? 0;
   const canvasTapGesture = useMemo<GestureType>(() => {
-    return createNativeCanvasTapGesture({
+    const gesture = createNativeCanvasTapGesture({
       bracketDragActive,
       chartInteractionEnabled: !drawingInputEnabled,
       commitTradeLineAction: stableCommitTradeLineAction,
@@ -330,9 +367,12 @@ export function useNativeChartGestureRuntime({
       tradeLineActionZones,
       tradeLineRows,
     });
+    return deferNativeCanvasTapToPaneMaximize(gesture, paneMaximizeTapGesture, chartPaneCount);
   }, [
     bracketDragActive,
+    chartPaneCount,
     controlZones,
+    paneMaximizeTapGesture,
     resetViewVisible,
     crosshair,
     dataFrame,
@@ -591,15 +631,6 @@ export function useNativeChartGestureRuntime({
       onResetView: stableOnPriceAxisResetTap,
     });
   }, [chartInteractionFrame, controlZones, stableOnPriceAxisResetTap]);
-
-  const paneMaximizeTapGesture = useMemo<GestureType>(() => {
-    return createNativePaneMaximizeTapGesture({
-      controlZones,
-      resetViewVisible,
-      frame: chartInteractionFrame,
-      onTogglePaneMaximize: stableOnTogglePaneMaximize,
-    });
-  }, [chartInteractionFrame, controlZones, stableOnTogglePaneMaximize]);
 
   const priceScaleGesture = useMemo<GestureType>(() => {
     return createNativePriceScaleGesture({
