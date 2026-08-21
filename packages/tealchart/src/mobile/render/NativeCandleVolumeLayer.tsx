@@ -445,11 +445,15 @@ export function NativeCandleVolumeLayerImpl({
   visibleBars: readonly NativeVisibleBar[];
   volumeHeight: number;
 }) {
-  const ohlcvPrimitiveClip = createNativeOhlcvPrimitiveClip(frame);
+  // Same rule as the plot layer: the clip rides the channel its paths ride, so
+  // a pane whose height changes never paints clipped one way and drawn another.
+  // The projected branch builds its paths inline per render, so it stays plain.
+  const staticClip = createNativeOhlcvPrimitiveClip(frame);
+  const liveClip = useDerivedValue(() => createNativeOhlcvPrimitiveClip(frame));
 
   if (staticProjection) {
     return (
-      <Group clip={ohlcvPrimitiveClip}>
+      <Group clip={staticClip}>
         <NativeProjectedCandlePath
           bars={visibleBars}
           frame={frame}
@@ -489,7 +493,7 @@ export function NativeCandleVolumeLayerImpl({
   }
 
   return (
-    <Group clip={ohlcvPrimitiveClip}>
+    <Group clip={liveClip}>
       <NativeLiveCandlePath
         bars={visibleBars}
         frame={frame}

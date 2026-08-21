@@ -431,13 +431,32 @@ became slow enough that double taps started missing the 200ms inter-tap window,
 so the maximize worked about half the time. If you try this again, `memo` is not
 optional, and the thing to measure is repaints per tick, not the flap.
 
-**This covers the seam; it does not close it.** The cure is to give pane geometry
-one channel, so mounted and newly mounted layers read the same value on the same
-propagation. Note which direction: moving `frame` into a shared value puts it
-*ahead* of the closures and inverts the seam rather than removing it. The sound
-direction is to lift pane top/height/clip out of the derived values - they are
-static for the duration of a tap - so those layers settle on the React commit the
-way the chrome layer already does.
+**The seam closes per branch, not globally.** A `<Group clip>` must ride the same
+channel as the paths drawn inside it. Live branches build their paths in
+`useDerivedValue`, so their clip is a `useDerivedValue` too. Projected and static
+branches build paths in a `useMemo` or inline, so their clip stays a plain rect.
+Either pairing is self-consistent; crossing them is what shears a pane for a
+frame.
+
+Do not be tempted to lift every clip out of the derived values instead. That
+direction reads as the tidier one and it is wrong here: `holdingSnapshot` forces
+`staticProjection` (`nativeRenderTransition.ts`), so during a maximize the plain
+branches are exactly the ones on screen, and a shared clip there would put the
+clip a propagation *behind* its own path - the inversion, in the other direction.
+Note too that capturing a plain number rather than `frame` changes nothing:
+anything captured in a worklet closure travels on the closure channel.
+
+Shared-value props are free here. The Skia container restarts one mapper over
+every shared value in the tree and it fires once per frame, so a clip that only
+changes when `frame` changes adds no repaint that the sibling path was not
+already causing. Identity also stabilises, which *reduces* memo pressure.
+
+**What no channel work can fix is geometry deciding what exists.** Mount and
+unmount happen on the React commit, full stop. A layer that filters panes by
+`height > 0`, or sizes a tick array from `pane.height`, will add and remove nodes
+a frame before the canvas geometry follows. Those counts have to be keyed on
+something a pane toggle does not change - the plot height - and the per-item
+`visible`/`opacity` derived values do the hiding.
 
 ## Gesture rebuilds on native
 

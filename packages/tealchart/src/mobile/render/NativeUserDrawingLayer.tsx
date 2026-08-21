@@ -1,4 +1,5 @@
 import type { SkPath } from '@shopify/react-native-skia';
+import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawing, UserDrawingAnchor, UserDrawingRenderEntry } from '../../drawings';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
@@ -401,7 +402,7 @@ export function NativeUserDrawingLayerImpl({
   draftAnchors: readonly UserDrawingAnchor[];
   entries: readonly UserDrawingRenderEntry[];
   frame: NativeChartFrame;
-  plotPrimitiveClip: NativePrimitiveClip;
+  plotPrimitiveClip: SharedValue<NativePrimitiveClip>;
   sharedViewport: NativeViewportSharedValues;
 }) {
   return (

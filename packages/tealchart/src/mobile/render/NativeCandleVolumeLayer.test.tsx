@@ -143,7 +143,8 @@ describe('NativeCandleVolumeLayer', () => {
     });
 
     expect(clipGroups).toHaveLength(1);
-    expect(clipGroups[0]?.props.clip).toEqual({
+    // The live branch clips through a shared value, matching its paths.
+    expect(clipGroups[0]?.props.clip.value).toEqual({
       x: frame.contentLeft,
       y: frame.mainPane.top,
       width: frame.priceAxisRight - frame.contentLeft,
@@ -269,5 +270,40 @@ describe('NativeCandleVolumeLayer', () => {
 
     expect(scrunched.bodyHeight).toBeGreaterThan(normal.bodyHeight);
     expect(scrunched.bodyY).not.toBe(normal.bodyY);
+  });
+
+  // The bug this shape exists for: a plain-prop clip lands on the React commit
+  // while a derived path lands a propagation later, so a pane whose height just
+  // changed paints clipped to the new geometry and drawn at the old one. Each
+  // branch has to keep its clip on whichever channel its own paths use.
+  it('keeps the clip on the same channel as the paths it clips', () => {
+    const layerProps = { frame, options, sharedViewport, visibleBars: bars, volumeHeight: 80 };
+
+    const live = NativeCandleVolumeLayerImpl({ ...layerProps, staticProjection: null });
+    const liveClip = collectElementsByType(live, Group).find((element) => element.props.clip)?.props.clip;
+
+    expect(liveClip).toHaveProperty('value');
+    expect(liveClip.value).toEqual(expect.objectContaining({ x: expect.any(Number) }));
+
+    const projected = NativeCandleVolumeLayerImpl({
+      ...layerProps,
+      staticProjection: createNativeChartProjection({
+        frame,
+        paneRanges: { main: { yMin: 63000, yMax: 64000 } },
+        viewport: { startTime: 0, endTime: 60_000 },
+      }),
+    });
+    const projectedClip = collectElementsByType(projected, Group).find((element) => element.props.clip)?.props.clip;
+
+    expect(projectedClip).not.toHaveProperty('value');
+    expect(projectedClip).toEqual(expect.objectContaining({ x: expect.any(Number) }));
+
+    // Assert the paths too, or converting a path back to useMemo would leave
+    // the clip stranded on the other channel and this test would not notice.
+    const livePath = collectElementsByType(renderFunctionChildren(live), SkiaPath)[0]?.props.path;
+    const projectedPath = collectElementsByType(renderFunctionChildren(projected), SkiaPath)[0]?.props.path;
+
+    expect(livePath).toHaveProperty('value');
+    expect(projectedPath).not.toHaveProperty('value');
   });
 });
