@@ -3,11 +3,11 @@ import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 
 import { describe, expect, it } from 'vitest';
 
-import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { createNativeChartFrameFromPanes, getNativePaneAtY } from '../render/nativeChartFrame';
 import {
   beginNativeCrosshairDrag,
   hideNativeCrosshair,
-  isNativeCrosshairPointInMainPane,
+  isNativeCrosshairPointInPlot,
   showNativeCrosshair,
   toggleNativeCrosshair,
   updateNativeCrosshairDrag,
@@ -30,6 +30,59 @@ function createCrosshair(): NativeCrosshairSharedValues {
 const frame = createNativeChartFrameFromPanes({
   dimensions: { width: 220, height: 180, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
   panes: [{ id: 'main', type: 'main', top: 36, height: 104, yMin: 62_000, yMax: 64_000 }],
+});
+
+const multiPaneFrame = createNativeChartFrameFromPanes({
+  dimensions: { width: 220, height: 220, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
+  panes: [
+    { id: 'main', type: 'main', top: 36, height: 84, yMin: 62_000, yMax: 64_000 },
+    { id: 'pane_1', type: 'indicator', top: 120, height: 60, yMin: -1, yMax: 1 },
+  ],
+});
+
+describe('native crosshair across panes', () => {
+  it('activates over a secondary pane, not just the price pane', () => {
+    const crosshair = createCrosshair();
+
+    expect(showNativeCrosshair(crosshair, multiPaneFrame, 90, 150)).toBe(true);
+    expect(crosshair.y.value).toBe(150);
+  });
+
+  it('drags down through a secondary pane instead of stopping at the price pane', () => {
+    const crosshair = createCrosshair();
+    showNativeCrosshair(crosshair, multiPaneFrame, 90, 60);
+    beginNativeCrosshairDrag(crosshair);
+
+    updateNativeCrosshairDrag(crosshair, multiPaneFrame, 0, 90);
+
+    expect(crosshair.y.value).toBe(150);
+  });
+
+  it('stops at the time axis', () => {
+    const crosshair = createCrosshair();
+    showNativeCrosshair(crosshair, multiPaneFrame, 90, 60);
+    beginNativeCrosshairDrag(crosshair);
+
+    updateNativeCrosshairDrag(crosshair, multiPaneFrame, 0, 500);
+
+    expect(crosshair.y.value).toBe(multiPaneFrame.timeAxisTop);
+  });
+
+  it('reads the maximised pane at the seam, not the pane collapsed underneath it', () => {
+    const maximized = createNativeChartFrameFromPanes({
+      dimensions: { width: 220, height: 220, margins: { top: 0, right: 50, bottom: 40, left: 20 } },
+      panes: [
+        { id: 'main', type: 'main', top: 36, height: 0, yMin: 62_000, yMax: 64_000 },
+        { id: 'pane_1', type: 'indicator', top: 36, height: 144, yMin: -1, yMax: 1 },
+      ],
+    });
+
+    // Both panes contain y=36; only the height filter decides which wins, and
+    // the collapsed one winning is what put main-pane readouts over a
+    // maximised indicator.
+    expect(getNativePaneAtY(maximized, 36)?.id).toBe('pane_1');
+    expect(isNativeCrosshairPointInPlot(maximized, 90, 100)).toBe(true);
+  });
 });
 
 describe('native crosshair state', () => {
@@ -67,10 +120,10 @@ describe('native crosshair state', () => {
   });
 
   it('keeps crosshair taps out of the full price-axis label lane', () => {
-    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft - 1, 60)).toBe(true);
-    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft, 60)).toBe(false);
-    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisLeft + 1, 60)).toBe(false);
-    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisHitLeft, 60)).toBe(false);
-    expect(isNativeCrosshairPointInMainPane(frame, frame.priceAxisHitLeft - 1, 60)).toBe(true);
+    expect(isNativeCrosshairPointInPlot(frame, frame.priceAxisLeft - 1, 60)).toBe(true);
+    expect(isNativeCrosshairPointInPlot(frame, frame.priceAxisLeft, 60)).toBe(false);
+    expect(isNativeCrosshairPointInPlot(frame, frame.priceAxisLeft + 1, 60)).toBe(false);
+    expect(isNativeCrosshairPointInPlot(frame, frame.priceAxisHitLeft, 60)).toBe(false);
+    expect(isNativeCrosshairPointInPlot(frame, frame.priceAxisHitLeft - 1, 60)).toBe(true);
   });
 });
