@@ -81,7 +81,11 @@ export function resolveNativeIndicatorPaneAxisSlot({
     // A short pane often admits only its two end ticks — for a 0-100 oscillator
     // those sit exactly on pane.top and pane.bottom, so culling the edges leaves
     // the axis blank. Keep them and clamp the baseline.
-    visible: slot.visible && y >= pane.top - 0.5 && y <= pane.bottom + 0.5,
+    // A collapsed pane has top === bottom, so the range check alone passes and
+    // the label clamps to top + 10 - i.e. into the pane below. Unreachable while
+    // the layer still filters panes by height, but that filter is what has to go
+    // for a maximize to stop changing the tree; this is what makes that safe.
+    visible: pane.height > 0 && span > 0 && slot.visible && y >= pane.top - 0.5 && y <= pane.bottom + 0.5,
     y,
   };
 }
