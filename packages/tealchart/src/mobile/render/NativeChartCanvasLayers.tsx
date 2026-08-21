@@ -15,6 +15,8 @@ import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
+import { memo } from 'react';
+
 import { Group, Skia } from '@shopify/react-native-skia';
 
 import { NativeCandleVolumeLayer } from './NativeCandleVolumeLayer';
@@ -67,7 +69,7 @@ export interface NativeChartCanvasLayersProps {
   volumeHeight: number;
 }
 
-export function NativeChartCanvasLayers({
+export function NativeChartCanvasLayersImpl({
   axisFont,
   backgroundColor,
   bracketDragState,
@@ -222,3 +224,8 @@ export function NativeChartCanvasLayers({
     </>
   );
 }
+
+// Memoised: the chart owner re-renders on every unrelated UI state change, and
+// reconciling this subtree each time was the cost behind the laggy transitions.
+export const NativeChartCanvasLayers = memo(NativeChartCanvasLayersImpl);
+NativeChartCanvasLayers.displayName = 'NativeChartCanvasLayers';

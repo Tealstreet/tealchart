@@ -9,7 +9,7 @@ import {
   getNativeLiveCandleGeometry,
   getNativeLiveCandlesPath,
   getNativeLiveVolumeGeometry,
-  NativeCandleVolumeLayer,
+  NativeCandleVolumeLayerImpl,
 } from './NativeCandleVolumeLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { createNativeChartProjection } from './nativeProjection';
@@ -112,7 +112,7 @@ describe('NativeCandleVolumeLayer', () => {
   }
 
   it('emits wick, body, and volume primitives for visible candles', () => {
-    const layer = NativeCandleVolumeLayer({
+    const layer = NativeCandleVolumeLayerImpl({
       frame,
       options,
       sharedViewport,
@@ -184,7 +184,7 @@ describe('NativeCandleVolumeLayer', () => {
     }));
     const wideViewport = { ...sharedViewport, endTime: shared(400_000) };
     const rendered = renderFunctionChildren(
-      NativeCandleVolumeLayer({
+      NativeCandleVolumeLayerImpl({
         frame,
         options,
         sharedViewport: wideViewport,
@@ -206,7 +206,7 @@ describe('NativeCandleVolumeLayer', () => {
       viewport: { startTime: 0, endTime: 60_000 },
     });
     const rendered = renderFunctionChildren(
-      NativeCandleVolumeLayer({
+      NativeCandleVolumeLayerImpl({
         frame,
         options,
         sharedViewport,
