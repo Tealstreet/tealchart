@@ -85,12 +85,12 @@ describe('NativeChartCanvasLayers', () => {
         activeObjectId: shared(''),
         activePrice: shared(0),
       },
-      plotPrimitiveClip: {
+      plotPrimitiveClip: shared({
         x: frame.contentLeft,
         y: frame.mainPane.top,
         width: frame.contentWidth,
         height: frame.mainPane.height,
-      },
+      }),
       pricePrecision: 0.1,
       nowMs: shared(0),
       resolvedPriceAxisTags: shared([]),

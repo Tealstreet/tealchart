@@ -179,7 +179,9 @@ describe('useNativeSkiaRenderModel', () => {
     expect(model.leftToolRailLayout?.items.length).toBeGreaterThan(0);
     expect(model.visibleBars.map((bar) => bar.time)).toEqual([0, 900, 1800]);
     expect(model.volumeHeight).toBe(82.4);
-    expect(model.plotPrimitiveClip).toEqual({
+    // A shared value now: it has to reach the canvas on the same channel as the
+    // drawings it clips, or the two land a propagation apart.
+    expect(model.plotPrimitiveClip.value).toEqual({
       x: frame.contentLeft,
       y: frame.mainPane.top,
       width: frame.priceAxisRight - frame.contentLeft,
@@ -260,7 +262,7 @@ describe('useNativeSkiaRenderModel', () => {
     expect(model.leftToolRailLayout).toBeNull();
     expect(model.tradeLineGeometries).toEqual([]);
     expect(model.visibleBars).toEqual([]);
-    expect(model.plotPrimitiveClip).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    expect(model.plotPrimitiveClip.value).toEqual({ x: 0, y: 0, width: 0, height: 0 });
     expect(model.volumeHeight).toBe(0);
   });
 
