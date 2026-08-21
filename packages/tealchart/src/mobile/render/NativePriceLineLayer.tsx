@@ -36,7 +36,7 @@ import {
   NativePriceAxisTagBox,
   NativePriceAxisTagStaticText,
 } from './NativePriceAxisTag';
-import { getNativePriceAxisTagFloor, sharedPriceToNativeY } from './nativeSharedViewport';
+import { getNativePriceAxisTagFloor, isNativeMainPaneVisible, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
 
 function priceLineDash(lineStyle: PriceLine['lineStyle']): number[] | null {
@@ -47,7 +47,7 @@ function priceLineDash(lineStyle: PriceLine['lineStyle']): number[] | null {
 
 function isNativePriceLineYVisible(value: number, frame: NativeChartFrame): boolean {
   'worklet';
-  return value >= frame.mainPane.top && value <= frame.mainPane.bottom;
+  return isNativeMainPaneVisible(frame) && value >= frame.mainPane.top && value <= frame.mainPane.bottom;
 }
 
 function resolveNativePriceLineAxisTagCenterY(
@@ -141,7 +141,12 @@ export function AnimatedPriceLine({
     isNativePriceLineYVisible(y.value, frame) && !bracketSuppressed.value ? 1 : 0,
   );
   const shouldRenderAxisTag = line.showAxisTag === true || !line.renderLineOnCanvas;
-  const tagOpacity = useDerivedValue(() => (shouldRenderAxisTag && !bracketSuppressed.value ? 1 : 0));
+  // Pane visibility only, never the point test: a tag whose price has scrolled
+  // off the pane is deliberately clamped and still drawn. A collapsed pane has
+  // nothing to clamp into.
+  const tagOpacity = useDerivedValue(() =>
+    shouldRenderAxisTag && isNativeMainPaneVisible(frame) && !bracketSuppressed.value ? 1 : 0,
+  );
 
   if (staticProjection) {
     const staticY = staticProjection.priceToY(line.price);
@@ -159,7 +164,7 @@ export function AnimatedPriceLine({
             {dash && <DashPathEffect intervals={dash} />}
           </SkiaLine>
         </Group>
-        {shouldRenderAxisTag ? (
+        {shouldRenderAxisTag && isNativeMainPaneVisible(frame) ? (
           <Group opacity={1}>
             <NativePriceAxisTagBox
               x={axisTag.x}

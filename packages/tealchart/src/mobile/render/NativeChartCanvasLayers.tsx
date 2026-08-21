@@ -216,6 +216,7 @@ export function NativeChartCanvasLayersImpl({
             frame={frame}
             hasContextMenu={hasContextMenu}
             options={options}
+            paneRangeOverrides={paneRangeOverrides}
             pricePrecision={pricePrecision}
             sharedViewport={sharedViewport}
           />

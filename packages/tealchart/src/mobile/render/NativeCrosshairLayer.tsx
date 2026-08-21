@@ -1,6 +1,8 @@
+import type { SharedValue } from 'react-native-reanimated';
 import type { RenderOptions } from '../../types';
 import type { NativeCrosshairSharedValues } from '../interaction/nativeCrosshair';
 import type { NativeChartFrame } from './nativeChartFrame';
+import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { memo } from 'react';
@@ -10,6 +12,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 import {
   NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
+  isNativeCrosshairOverMainPane,
   nativeCrosshairXToTime,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
@@ -36,6 +39,7 @@ export interface NativeCrosshairLayerProps {
   frame: NativeChartFrame;
   hasContextMenu: boolean;
   options: RenderOptions;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
 }
@@ -46,18 +50,32 @@ export function NativeCrosshairLayerImpl({
   frame,
   hasContextMenu,
   options,
+  paneRangeOverrides,
   pricePrecision,
   sharedViewport,
 }: NativeCrosshairLayerProps) {
   const color = options.crosshairColor ?? '#888888';
   const textColor = options.backgroundColor ?? '#131722';
   const opacity = useDerivedValue(() => (crosshair.visible.value ? 1 : 0));
+  // Through every pane, not just the main one - the panes tile contiguously
+  // down to the time axis, so that whole span is the plot.
   const verticalStart = useDerivedValue(() => ({ x: crosshair.x.value, y: frame.mainPane.top }));
-  const verticalEnd = useDerivedValue(() => ({ x: crosshair.x.value, y: frame.mainPane.bottom }));
+  const verticalEnd = useDerivedValue(() => ({ x: crosshair.x.value, y: frame.timeAxisTop }));
   const horizontalStart = useDerivedValue(() => ({ x: frame.contentLeft, y: crosshair.y.value }));
   const priceText = useDerivedValue(() =>
-    resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision),
+    resolveNativeCrosshairPriceLabelText(
+      frame,
+      sharedViewport,
+      crosshair.y.value,
+      pricePrecision,
+      paneRangeOverrides,
+    ),
   );
+  // The button opens order actions at a price, which only the price pane has.
+  const contextMenuVisible = useDerivedValue(
+    () => hasContextMenu && isNativeCrosshairOverMainPane(frame, crosshair.y.value),
+  );
+  const contextMenuOpacity = useDerivedValue(() => (contextMenuVisible.value ? 1 : 0));
   const priceLabel = useDerivedValue(() =>
     resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceText.value),
   );
@@ -65,7 +83,7 @@ export function NativeCrosshairLayerImpl({
   const priceLabelWidth = useDerivedValue(() => priceLabel.value.width);
   const priceTextX = useDerivedValue(() => priceLabel.value.textX);
   const horizontalEnd = useDerivedValue(() => ({
-    x: hasContextMenu
+    x: contextMenuVisible.value
       ? Math.max(
           frame.contentLeft,
           resolveNativeCrosshairContextMenuButtonLayout(frame, crosshair.y.value, pricePrecision, priceText.value)
@@ -120,7 +138,7 @@ export function NativeCrosshairLayerImpl({
         <DashPathEffect intervals={NATIVE_CROSSHAIR_DASH} />
       </SkiaLine>
       {hasContextMenu ? (
-        <>
+        <Group opacity={contextMenuOpacity}>
           <RoundedRect
             x={contextButtonX}
             y={contextButtonY}
@@ -133,7 +151,7 @@ export function NativeCrosshairLayerImpl({
           />
           <SkiaLine p1={plusHorizontalStart} p2={plusHorizontalEnd} color={color} strokeWidth={1.4} />
           <SkiaLine p1={plusVerticalStart} p2={plusVerticalEnd} color={color} strokeWidth={1.4} />
-        </>
+        </Group>
       ) : null}
       <RoundedRect
         x={priceLabelX}

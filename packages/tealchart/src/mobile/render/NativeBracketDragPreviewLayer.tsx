@@ -17,7 +17,7 @@ import {
 import { createNativeAxisLaneTagLayout, PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
 import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativePriceAxisTag';
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
-import { getNativePriceAxisTagFloor, sharedPriceToNativeY } from './nativeSharedViewport';
+import { getNativePriceAxisTagFloor, isNativeMainPaneVisible, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
 import { PARTIAL_BRACKET_PERCENTS, resolvePartialBracketMarkers } from '../../interaction/partialBrackets';
 
@@ -141,7 +141,7 @@ export function resolveNativePartialSurfaceTops({
 
 function isNativeBracketPreviewYVisible(value: number, frame: NativeChartFrame): boolean {
   'worklet';
-  return value >= frame.mainPane.top && value <= frame.mainPane.bottom;
+  return isNativeMainPaneVisible(frame) && value >= frame.mainPane.top && value <= frame.mainPane.bottom;
 }
 
 export function NativePartialMarker({
