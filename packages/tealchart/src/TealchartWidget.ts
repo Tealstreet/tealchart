@@ -455,16 +455,19 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartApi.setOnStudyCreate(async (request) => {
         if (!this._tealScriptManager) return false;
         try {
-          // For now, assume 'name' is the Tealscript code for built-in indicators
-          // In the future, we can have a registry of built-in scripts
-          await this._tealScriptManager.addScript(request.studyId, request.name, request.inputs);
+          // `name` carries either Tealscript source or a built-in id, and the
+          // registry has resolved ids for a while - only this call site still
+          // assumed source, so ids compiled as literal code and plotted nothing.
+          // The native host already resolves them; this is that same lookup.
           const definition = this._getIndicatorForStudyRequest(request.name);
+          const code = definition?.code || request.name;
+          await this._tealScriptManager.addScript(request.studyId, code, request.inputs);
           this._indicatorConfigMap.set(request.studyId, {
             id: request.studyId,
             name: request.displayName,
             category: definition?.category ?? 'other',
             overlay: request.forceOverlay,
-            code: request.name,
+            code,
             yAxisRange: definition?.yAxisRange,
           });
           // The single place a Tealscript study claims a pane. Callers that go

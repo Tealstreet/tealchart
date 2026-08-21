@@ -4,7 +4,7 @@ import type { NativeChartProjection } from './nativeProjection';
 
 import { getNativeCandidateTimeWindow } from './nativeTimeWindow';
 
-const MIN_CANDLE_WIDTH = 2;
+const MIN_CANDLE_WIDTH = 1;
 const MAX_CANDLE_WIDTH = 10;
 
 export interface NativeVisibleCandleGeometry {

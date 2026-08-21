@@ -480,7 +480,7 @@ export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   volumeHeight: 0.2,
   devicePixelRatio: 1,
   candleSpacing: 2,
-  minCandleWidth: 3,
+  minCandleWidth: 1.5,
   maxCandleWidth: 30,
 };
 

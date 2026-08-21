@@ -11,6 +11,7 @@ import type {
   UserDrawingEditDrag,
   UserDrawingInputPoint,
   UserDrawingMeasure,
+  UserDrawingObjectTreeDispatchAction,
   UserDrawingPanePosition,
   UserDrawingRecentToolByCategory,
   UserDrawingSelectedActionSurfaceCommand,
@@ -41,6 +42,7 @@ import {
   hitTestUserDrawings,
   isUserDrawingLayoutStateEqual,
   redoUserDrawingCommand,
+  resolveUserDrawingObjectTreeDispatchActionCommands,
   undoUserDrawingCommand,
 } from '../../drawings';
 
@@ -59,6 +61,8 @@ interface NativeUserDrawingEditDragSession {
 export interface NativeUserDrawingRuntimeInput {
   initialUserDrawingState?: UserDrawingState | null;
   onUserDrawingCommand?: UserDrawingCommandEventListener;
+  /** Host opens the object tree panel; the runtime owns no chrome of its own. */
+  onUserDrawingObjectTreeOpen?: () => void;
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
 }
 
@@ -72,6 +76,7 @@ export interface NativeUserDrawingRuntime {
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ) => boolean;
   dispatchNativeUserDrawingCommand: (command: UserDrawingCommand) => boolean;
+  dispatchNativeUserDrawingObjectTreeAction: (action: UserDrawingObjectTreeDispatchAction) => boolean;
   dispatchNativeUserDrawingSelectedAction: (command: UserDrawingSelectedActionSurfaceCommand) => boolean;
   endNativeUserDrawingEditDrag: () => void;
   handleNativeUserDrawingInput: (point: UserDrawingInputPoint) => boolean;
@@ -324,6 +329,7 @@ export function resolveNativeUserDrawingExternalState(
 export function useNativeUserDrawingRuntime({
   initialUserDrawingState,
   onUserDrawingCommand,
+  onUserDrawingObjectTreeOpen,
   onUserDrawingStateChange,
 }: NativeUserDrawingRuntimeInput): NativeUserDrawingRuntime {
   const [userDrawingState, setUserDrawingState] = useState(() =>
@@ -627,11 +633,30 @@ export function useNativeUserDrawingRuntime({
             meta: createNativeUserDrawingNoAffectedToolbarCommandMetadata(),
           });
         }
+        case 'openObjectTree': {
+          if (!onUserDrawingObjectTreeOpen) return false;
+          onUserDrawingObjectTreeOpen();
+          return true;
+        }
         case 'openProperties':
-        case 'openObjectTree':
         case 'setDuplicateEditDrag':
           return false;
       }
+    },
+    [createNativeUserDrawingId, dispatchNativeUserDrawingCommand, onUserDrawingObjectTreeOpen],
+  );
+
+  const dispatchNativeUserDrawingObjectTreeAction = useCallback(
+    (action: UserDrawingObjectTreeDispatchAction) => {
+      const commands = resolveUserDrawingObjectTreeDispatchActionCommands(stateRef.current, action, {
+        createId: createNativeUserDrawingId,
+        now: () => Date.now(),
+      });
+      let changed = false;
+      for (const command of commands) {
+        changed = dispatchNativeUserDrawingCommand(command) || changed;
+      }
+      return changed;
     },
     [createNativeUserDrawingId, dispatchNativeUserDrawingCommand],
   );
@@ -726,6 +751,7 @@ export function useNativeUserDrawingRuntime({
     beginNativeUserDrawingEditDragAtPoint,
     canBeginNativeUserDrawingEditDragAtPoint,
     dispatchNativeUserDrawingCommand,
+    dispatchNativeUserDrawingObjectTreeAction,
     dispatchNativeUserDrawingSelectedAction,
     endNativeUserDrawingEditDrag,
     handleNativeUserDrawingInput,

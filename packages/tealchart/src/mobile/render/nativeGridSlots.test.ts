@@ -13,18 +13,45 @@ function visiblePrices(priceMin: number, priceMax: number, priceHeight: number):
 }
 
 describe('native price grid spacing', () => {
-  // The ladder steps by up to 2.5x and the old acceptance window was 2x wide,
-  // so a step could clear it - and the downward fallback then answered with the
-  // coarsest spacing going, leaving one label on the axis.
-  it('fills the axis on ranges that fall between two ladder steps', () => {
-    // spacing 20 overshoots at 16 labels, spacing 50 is the finest that fits.
-    expect(getNativePriceGridSpacing(104_352.5, 104_647.5, 380)).toBe(50);
-    expect(visiblePrices(104_352.5, 104_647.5, 380).length).toBe(5);
+  // 14.75 gaps over 380px is a 25.8px pitch, comfortably past the 24px minimum.
+  // Counting markers instead rejected it at 16, because the phase put one marker
+  // off the bottom of the axis.
+  it('fills the axis to the pitch limit rather than the marker count', () => {
+    expect(getNativePriceGridSpacing(104_352.5, 104_647.5, 380)).toBe(20);
+    expect(visiblePrices(104_352.5, 104_647.5, 380).length).toBe(15);
+  });
+
+  // The bug this file exists for: dragging the chart vertically holds the range
+  // fixed and slides only the phase, so spacing must not move at all.
+  it('holds spacing fixed while a vertical pan slides the grid phase', () => {
+    const priceHeight = 380;
+
+    // G (gaps) lands in (14, 15.83] for each, which is exactly where the old
+    // marker count could tip past 15 and drop the axis to the next rung.
+    for (const [base, range] of [
+      [104_500, 295],
+      [63_400, 2_900],
+      [3.27, 0.29],
+      [0.0312, 0.0029],
+    ]) {
+      const spacing = getNativePriceGridSpacing(base, base + range, priceHeight);
+      const counts = new Set<number>();
+
+      for (let step = 0; step < 40; step += 1) {
+        const offset = (spacing * step) / 40;
+        expect(getNativePriceGridSpacing(base + offset, base + offset + range, priceHeight)).toBe(spacing);
+        counts.add(visiblePrices(base + offset, base + offset + range, priceHeight).length);
+      }
+
+      expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+    }
   });
 
   it('never returns a near-empty axis across a sweep of price magnitudes', () => {
     const priceHeight = 380;
-    const maxLabels = Math.floor(priceHeight / 24);
+    // A grid straddling both edges shows one marker more than it has gaps, and
+    // slot visibility carries a 1% tolerance on top.
+    const maxLabels = Math.floor(priceHeight / 24 + 0.02) + 1;
 
     for (const mid of [0.0312, 0.87, 3.27, 47.2, 487.5, 3120, 63_400, 104_500]) {
       for (let fraction = 0.002; fraction <= 0.6; fraction *= 1.09) {

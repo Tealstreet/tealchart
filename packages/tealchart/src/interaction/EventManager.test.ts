@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clearChartStoreCache } from '../state/chartState';
 import { EventManager } from './EventManager';
+import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../viewport/timeRangeConstraints';
 
 function createContainer(): HTMLElement {
   const container = document.createElement('div');
@@ -984,7 +985,7 @@ describe('EventManager drawing drag routing', () => {
     });
 
     const container = createContainer();
-    let viewport = { startTime: 99_601, endTime: 100_000, priceMin: 0, priceMax: 100 };
+    let viewport = { startTime: 99_201, endTime: 100_000, priceMin: 0, priceMax: 100 };
     const onViewportChange = vi.fn((nextViewport: typeof viewport) => {
       viewport = nextViewport;
     });
@@ -1015,11 +1016,15 @@ describe('EventManager drawing drag routing', () => {
     container.dispatchEvent(event);
     rafCallbacks.shift()?.(0);
 
+    // Plot is width 16 less the 8px price axis, one bar per minimum bar width,
+    // 100ms per bar, anchored to the right edge. The start sits just inside the
+    // cap so one wheel step overshoots it and still pans left into more history.
+    const maxRange = Math.floor((16 - 8) / DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX) * 100;
+    const clamped = { startTime: 100_000 - maxRange, endTime: 100_000, priceMin: 0, priceMax: 100 };
+
     expect(onViewportChange).toHaveBeenCalledOnce();
-    expect(onViewportChange).toHaveBeenCalledWith({ startTime: 99_600, endTime: 100_000, priceMin: 0, priceMax: 100 });
-    expect(onRequestMoreBars).toHaveBeenCalledWith('left', {
-      viewport: { startTime: 99_600, endTime: 100_000, priceMin: 0, priceMax: 100 },
-    });
+    expect(onViewportChange).toHaveBeenCalledWith(clamped);
+    expect(onRequestMoreBars).toHaveBeenCalledWith('left', { viewport: clamped });
 
     manager.dispose();
   });
