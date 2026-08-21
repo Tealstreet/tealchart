@@ -105,7 +105,7 @@ export interface NativeChartGestureRuntimeInput {
   pricePrecision: number;
   priceScaleActive: SharedValue<boolean>;
   overlayActionTargets?: readonly NativeOverlayActionHitTarget[];
-  resetButtonVisible?: boolean;
+  resetViewVisible?: SharedValue<boolean>;
   selectedDrawingActionTargets?: readonly NativeSelectedDrawingActionHitTarget[];
   priceScaleGestureState: NativePriceScaleGestureState;
   sharedViewport: NativeViewportSharedValues;
@@ -193,7 +193,7 @@ export function useNativeChartGestureRuntime({
   pricePrecision,
   priceScaleActive,
   overlayActionTargets = [],
-  resetButtonVisible = false,
+  resetViewVisible,
   selectedDrawingActionTargets = [],
   priceScaleGestureState,
   sharedViewport,
@@ -233,6 +233,7 @@ export function useNativeChartGestureRuntime({
   const resetTapStartY = useSharedValue(0);
   const resetTapStartedOnButton = useSharedValue(false);
   const resetTapBlockedByContextMenuButton = useSharedValue(false);
+  const resetTapMaxTravel = useSharedValue(0);
   const drawingEditDragActive = useSharedValue(false);
   const handleDrawingSelectionTap = useCallback(
     (x: number, y: number, claim: () => void) => {
@@ -243,11 +244,18 @@ export function useNativeChartGestureRuntime({
   const resetTapGestureState = useMemo(
     () => ({
       blockedByContextMenuButton: resetTapBlockedByContextMenuButton,
+      maxTravel: resetTapMaxTravel,
       startX: resetTapStartX,
       startY: resetTapStartY,
       startedOnButton: resetTapStartedOnButton,
     }),
-    [resetTapBlockedByContextMenuButton, resetTapStartX, resetTapStartY, resetTapStartedOnButton],
+    [
+      resetTapBlockedByContextMenuButton,
+      resetTapMaxTravel,
+      resetTapStartX,
+      resetTapStartY,
+      resetTapStartedOnButton,
+    ],
   );
   const dataFrame = hasDataViewport ? frame : null;
   const chartInteractionFrame = drawingInputEnabled ? null : dataFrame;
@@ -265,6 +273,7 @@ export function useNativeChartGestureRuntime({
       paneRangeOverrides,
       commitPanViewport: stableCommitPanViewport,
       controlZones,
+      resetViewVisible,
       crosshair,
       frame: chartInteractionFrame,
       orderDragZones,
@@ -288,6 +297,7 @@ export function useNativeChartGestureRuntime({
     paneDividerBands,
     stableCommitPanViewport,
     controlZones,
+    resetViewVisible,
     crosshair,
     tradeLabelHeight,
     tradeLineActionZones,
@@ -304,6 +314,7 @@ export function useNativeChartGestureRuntime({
       chartInteractionEnabled: !drawingInputEnabled,
       commitTradeLineAction: stableCommitTradeLineAction,
       controlZones,
+      resetViewVisible,
       crosshair,
       drawingPlacementEnabled: drawingInputEnabled,
       drawingSelectionEnabled,
@@ -322,6 +333,7 @@ export function useNativeChartGestureRuntime({
   }, [
     bracketDragActive,
     controlZones,
+    resetViewVisible,
     crosshair,
     dataFrame,
     drawingInputEnabled,
@@ -342,6 +354,7 @@ export function useNativeChartGestureRuntime({
   const crosshairPanGesture = useMemo<GestureType>(() => {
     return createNativeCrosshairPanGesture({
       controlZones,
+      resetViewVisible,
       crosshair,
       frame: crosshairInteractionFrame,
       hasContextMenu,
@@ -354,6 +367,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     controlZones,
+    resetViewVisible,
     crosshairInteractionFrame,
     crosshair,
     hasContextMenu,
@@ -368,6 +382,7 @@ export function useNativeChartGestureRuntime({
   const crosshairLongPressGesture = useMemo<GestureType>(() => {
     return createNativeCrosshairLongPressGesture({
       controlZones,
+      resetViewVisible,
       crosshair,
       frame: crosshairInteractionFrame,
       hasContextMenu,
@@ -380,6 +395,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     controlZones,
+    resetViewVisible,
     crosshairInteractionFrame,
     crosshair,
     hasContextMenu,
@@ -395,6 +411,7 @@ export function useNativeChartGestureRuntime({
     return createNativeOrderDragGesture({
       commitOrderMove: stableCommitOrderMove,
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       orderDragState,
       orderDragZones,
@@ -406,6 +423,7 @@ export function useNativeChartGestureRuntime({
   }, [
     chartInteractionFrame,
     controlZones,
+    resetViewVisible,
     orderDragState,
     orderDragZones,
     sharedViewport,
@@ -424,6 +442,7 @@ export function useNativeChartGestureRuntime({
       chartAxisPinchGestureState,
       commitPanViewport: stableCommitPanViewport,
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       orderDragState,
       orderDragZones,
@@ -442,6 +461,7 @@ export function useNativeChartGestureRuntime({
     chartAxisPinchGestureState,
     chartInteractionFrame,
     controlZones,
+    resetViewVisible,
     orderDragState,
     orderDragZones,
     panActive,
@@ -463,6 +483,7 @@ export function useNativeChartGestureRuntime({
       clearNativeBracketDrag: stableClearNativeBracketDrag,
       commitBracketMove: stableCommitBracketMove,
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       sharedViewport,
       tradeLabelHeight,
@@ -473,6 +494,7 @@ export function useNativeChartGestureRuntime({
     bracketDragInteractionState,
     chartInteractionFrame,
     controlZones,
+    resetViewVisible,
     sharedViewport,
     stableClearNativeBracketDrag,
     stableCommitBracketMove,
@@ -509,6 +531,7 @@ export function useNativeChartGestureRuntime({
   const drawingEditDragGesture = useMemo<GestureType>(() => {
     return createNativeUserDrawingEditDragGesture({
       controlZones,
+      resetViewVisible,
       dragActive: drawingEditDragActive,
       dragZones: drawingEditDragZonesShared,
       enabled: drawingSelectionEnabled,
@@ -519,6 +542,7 @@ export function useNativeChartGestureRuntime({
     });
   }, [
     controlZones,
+    resetViewVisible,
     dataFrame,
     drawingEditDragActive,
     drawingEditDragZonesShared,
@@ -538,13 +562,13 @@ export function useNativeChartGestureRuntime({
   const resetViewTapGesture = useMemo<GestureType>(() => {
     return createNativeResetViewTapGesture({
       controlZones,
+      resetViewVisible,
       crosshair,
       frame: chartInteractionFrame,
       hasContextMenu,
       onResetViewTap: stableOnResetViewTap,
       pricePrecision,
       resetTapGestureState,
-      resetButtonVisible,
       sharedViewport,
     });
   }, [
@@ -553,8 +577,8 @@ export function useNativeChartGestureRuntime({
     crosshair,
     hasContextMenu,
     pricePrecision,
-    resetButtonVisible,
     resetTapGestureState,
+    resetViewVisible,
     sharedViewport,
     stableOnResetViewTap,
   ]);
@@ -562,6 +586,7 @@ export function useNativeChartGestureRuntime({
   const priceAxisResetTapGesture = useMemo<GestureType>(() => {
     return createNativePriceAxisResetTapGesture({
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       onResetView: stableOnPriceAxisResetTap,
     });
@@ -570,6 +595,7 @@ export function useNativeChartGestureRuntime({
   const paneMaximizeTapGesture = useMemo<GestureType>(() => {
     return createNativePaneMaximizeTapGesture({
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       onTogglePaneMaximize: stableOnTogglePaneMaximize,
     });
@@ -581,6 +607,7 @@ export function useNativeChartGestureRuntime({
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       commitPanViewport: stableCommitPanViewport,
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       onIndicatorPaneScale: stableOnIndicatorPaneScale,
       paneRangeOverrides,
@@ -591,6 +618,7 @@ export function useNativeChartGestureRuntime({
   }, [
     chartInteractionFrame,
     controlZones,
+    resetViewVisible,
     paneRangeOverrides,
     priceScaleActive,
     priceScaleGestureState,
@@ -607,6 +635,7 @@ export function useNativeChartGestureRuntime({
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       commitPanViewport: stableCommitPanViewport,
       controlZones,
+      resetViewVisible,
       frame: chartInteractionFrame,
       sharedViewport,
       timeScaleActive,
@@ -615,6 +644,7 @@ export function useNativeChartGestureRuntime({
   }, [
     chartInteractionFrame,
     controlZones,
+    resetViewVisible,
     sharedViewport,
     stableBeginNativeViewportInteraction,
     stableCancelNativeViewportInteraction,

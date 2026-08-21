@@ -1,19 +1,30 @@
+import type { SharedValue } from 'react-native-reanimated';
 import type { NativeResetViewButtonLayout } from '../interaction/nativeResetViewButton';
 
 import React from 'react';
 
 import { StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import { NATIVE_RESET_VIEW_BUTTON_SIZE } from '../interaction/nativeResetViewButton';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
 
+const NATIVE_RESET_VIEW_FADE_MS = 120;
+
 export interface NativeResetViewButtonOverlayProps {
   layout: NativeResetViewButtonLayout;
+  visible: SharedValue<boolean>;
 }
 
-export function NativeResetViewButtonOverlayImpl({ layout }: NativeResetViewButtonOverlayProps) {
+export function NativeResetViewButtonOverlayImpl({ layout, visible }: NativeResetViewButtonOverlayProps) {
+  // Mounted for as long as there is a chart, so revealing it costs a UI-thread
+  // opacity change rather than a React render of the whole chart.
+  const fadeStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(visible.value ? 1 : 0, { duration: NATIVE_RESET_VIEW_FADE_MS }),
+  }));
+
   return (
-    <View pointerEvents="none" style={styles.overlay}>
+    <Animated.View pointerEvents="none" style={[styles.overlay, fadeStyle]}>
       <View
         style={[
           styles.hitArea,
@@ -30,7 +41,7 @@ export function NativeResetViewButtonOverlayImpl({ layout }: NativeResetViewButt
           <NativeDrawingIcon name="refresh" size={16} color="#d1d4dc" strokeWidth={2} />
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

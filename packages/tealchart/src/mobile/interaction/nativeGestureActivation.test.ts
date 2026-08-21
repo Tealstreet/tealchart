@@ -24,7 +24,11 @@ import {
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
-import { NATIVE_RESET_VIEW_HIT_SIZE, resolveNativeResetViewButtonLayout } from './nativeResetViewButton';
+import {
+  NATIVE_RESET_VIEW_HIT_SIZE,
+  resolveNativeResetViewButtonLayout,
+  resolveNativeResetViewRevealTopY,
+} from './nativeResetViewButton';
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
 import {
   createNativeLeftToolRailToggleTapGesture,
@@ -145,6 +149,7 @@ function createCrosshair(visible = false) {
 function resetTapState() {
   return {
     blockedByContextMenuButton: shared(false),
+    maxTravel: shared(0),
     startX: shared(0),
     startY: shared(0),
     startedOnButton: shared(false),
@@ -450,16 +455,18 @@ describe('native gesture activation', () => {
       frame,
       onResetViewTap: () => {},
       resetTapGestureState: resetTapState(),
-      resetButtonVisible: false,
+      resetViewVisible: shared(false),
     }) as any;
     const visibleResetTapGesture = createNativeResetViewTapGesture({
       frame,
       onResetViewTap: visibleReset,
       resetTapGestureState: resetTapState(),
-      resetButtonVisible: true,
+      resetViewVisible: shared(true),
     }) as any;
 
-    expect(hiddenResetTapGesture.config.maxDistance).toBe(NATIVE_TAP_MAX_DISTANCE);
+    // Visibility is a shared value now, so `maxDistance` cannot branch on it and
+    // the travel a reveal tap is allowed is enforced in the handlers instead.
+    expect(hiddenResetTapGesture.config.maxDistance).toBe(NATIVE_RESET_VIEW_HIT_SIZE / 2);
     expect(visibleResetTapGesture.config.maxDistance).toBe(NATIVE_RESET_VIEW_HIT_SIZE / 2);
 
     visibleResetTapGesture.handlers.onTouchesDown({
@@ -576,7 +583,7 @@ describe('native gesture activation', () => {
       hasContextMenu: true,
       onResetViewTap,
       resetTapGestureState: resetTapState(),
-      resetButtonVisible: true,
+      resetViewVisible: shared(true),
     }) as any;
 
     resetTapGesture.handlers.onTouchesDown({
@@ -595,7 +602,7 @@ describe('native gesture activation', () => {
       frame,
       onResetViewTap,
       resetTapGestureState: resetTapState(),
-      resetButtonVisible: true,
+      resetViewVisible: shared(true),
     }) as any;
 
     resetTapGesture.handlers.onTouchesDown({
@@ -607,23 +614,71 @@ describe('native gesture activation', () => {
     expect(onResetViewTap).not.toHaveBeenCalled();
   });
 
-  it('still resets when the button reserves its own control zone', () => {
+  it('yields the visible reset button to its own gesture and keeps the pan off it', () => {
+    const layout = resolveNativeResetViewButtonLayout(frame);
+    const resetViewVisible = shared(false);
+    const panActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const panGesture = createNativeChartPanGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      chartPanGestureState: {
+        active: panActive,
+        indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeTimePerPixel: shared(0),
+        activePricePerPixel: shared(0),
+      },
+      commitPanViewport: () => {},
+      crosshair: createCrosshair(false),
+      frame,
+      orderDragZones: shared([]),
+      panActive,
+      resetViewVisible,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+    }) as any;
+
+    // Hidden, the button reserves nothing and the strip pans as usual.
+    const hidden = mockStateManager();
+    panGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: layout.centerX, y: layout.centerY }],
+        allTouches: [{ x: layout.centerX, y: layout.centerY }],
+      },
+      hidden,
+    );
+    expect(hidden.failed).toBe(false);
+
+    // Visible, its circle is reserved even though no control zone publishes it.
+    resetViewVisible.value = true;
+    const visible = mockStateManager();
+    panGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: layout.centerX, y: layout.centerY }],
+        allTouches: [{ x: layout.centerX, y: layout.centerY }],
+      },
+      visible,
+    );
+    expect(visible.failed).toBe(true);
+  });
+
+  it('resets from its own button without reserving a control zone for it', () => {
     const layout = resolveNativeResetViewButtonLayout(frame);
     const onResetViewTap = vi.fn();
+    // The button's circle is resolved from the frame at touch time rather than
+    // published as a zone, so the gesture that owns it cannot block itself.
     const resetTapGesture = createNativeResetViewTapGesture({
-      controlZones: [
-        {
-          owner: 'resetView',
-          x1: layout.centerX - layout.hitRadius,
-          x2: layout.centerX + layout.hitRadius,
-          y1: layout.centerY - layout.hitRadius,
-          y2: layout.centerY + layout.hitRadius,
-        },
-      ],
       frame,
       onResetViewTap,
       resetTapGestureState: resetTapState(),
-      resetButtonVisible: true,
+      resetViewVisible: shared(true),
     }) as any;
 
     resetTapGesture.handlers.onTouchesDown({
@@ -633,6 +688,29 @@ describe('native gesture activation', () => {
     resetTapGesture.handlers.onEnd({ x: layout.centerX, y: layout.centerY }, true);
 
     expect(onResetViewTap).toHaveBeenCalledTimes(1);
+  });
+
+  it('reveals nothing when the tap wandered and came back', () => {
+    const onResetViewTap = vi.fn();
+    const revealY = resolveNativeResetViewRevealTopY(frame) + 4;
+    const resetTapGesture = createNativeResetViewTapGesture({
+      frame,
+      onResetViewTap,
+      resetTapGestureState: resetTapState(),
+      resetViewVisible: shared(false),
+    }) as any;
+
+    resetTapGesture.handlers.onTouchesDown({
+      changedTouches: [{ x: 100, y: revealY }],
+      allTouches: [{ x: 100, y: revealY }],
+    });
+    resetTapGesture.handlers.onTouchesMove({
+      changedTouches: [{ x: 140, y: revealY }],
+      allTouches: [{ x: 140, y: revealY }],
+    });
+    resetTapGesture.handlers.onEnd({ x: 100, y: revealY }, true);
+
+    expect(onResetViewTap).not.toHaveBeenCalled();
   });
 
   it('commits left tool rail toggle taps through the chart gesture layer', () => {
