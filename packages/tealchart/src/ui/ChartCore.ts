@@ -83,6 +83,7 @@ import {
   ChartMargins,
   ChartPane,
   ContextMenuItem,
+  ContextMenuRenderContext,
   DEFAULT_MARGINS,
   ExecutionLineRenderData,
   OemsActionResult,
@@ -149,6 +150,12 @@ export interface ChartCoreOptions {
   onPositionReverse?: (positionId: string) => Awaitable<OemsActionResult>;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
+  /**
+   * Renders the whole menu instead of a list of items. Given one, the chart
+   * places and dismisses it exactly as it would its own menu and draws nothing
+   * inside it.
+   */
+  renderContextMenu?: (context: ContextMenuRenderContext) => HTMLElement | null;
   /** Mouse down callback */
   onMouseDown?: () => void;
   /** Mouse up callback */
@@ -407,6 +414,7 @@ export class ChartCore {
   private contextMenuCloseTimer: ReturnType<typeof setTimeout> | null = null;
   // + button drawn on crosshair canvas — hit-test bounds for click detection
   private _plusButtonBounds: { x: number; y: number; r: number } | null = null;
+  private contextMenuResizeObserver: ResizeObserver | null = null;
   // Bound handler for + button click — stored so it can be removed on dispose
   private plusButtonClickHandler: (e: MouseEvent) => void;
 
@@ -787,7 +795,7 @@ export class ChartCore {
 
     // Click listener for canvas-drawn + button (stored for cleanup in dispose)
     this.plusButtonClickHandler = (e: MouseEvent) => {
-      if (!this._plusButtonBounds || !this.options.onContextMenu) return;
+      if (!this._plusButtonBounds || !this.hasContextMenu()) return;
       const rect = this.chartContainer.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -1596,6 +1604,17 @@ export class ChartCore {
     this.options.onContextMenu = callback;
   }
 
+  setContextMenuRenderer(renderer: (context: ContextMenuRenderContext) => HTMLElement | null): void {
+    this.options.renderContextMenu = renderer;
+    // The "+" is drawn only when a menu exists, so a renderer registered after
+    // init has to repaint to appear at all.
+    this.scheduleRender();
+  }
+
+  private hasContextMenu(): boolean {
+    return !!this.options.onContextMenu || !!this.options.renderContextMenu;
+  }
+
   private handleContextMenu(
     screenX: number,
     screenY: number,
@@ -1607,32 +1626,55 @@ export class ChartCore {
       this.viewport && this.userDrawingState?.activeTool === 'select'
         ? this.options.onUserDrawingContextMenu?.({ x: screenX, y: screenY }, this.getUserDrawingSpaces(this.viewport))
         : undefined;
-    const items =
-      (drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? [];
+    // Only the "+" button. Right-click and long-press arrive here too, and a
+    // host that renders a quick-order widget for the button has not asked to
+    // replace those. A drawing's own menu still wins over both.
+    const custom =
+      placement !== 'crosshairButton' || (drawingItems && drawingItems.length > 0)
+        ? null
+        : (this.options.renderContextMenu?.({
+            anchorX: screenX,
+            anchorY: screenY,
+            close: () => this.closeContextMenu(),
+            price,
+            unixTime: time,
+          }) ?? null);
+    const items = custom
+      ? []
+      : ((drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? []);
     this.closeContextMenu();
-    if (items.length === 0) return;
+    if (!custom && items.length === 0) return;
 
     // Create menu
     this.contextMenu = div({
-      style: {
-        position: 'fixed',
-        left: `${screenX}px`,
-        top: `${screenY}px`,
-        backgroundColor: 'var(--bg, #1e222d)',
-        border: '1px solid var(--border, #363a45)',
-        borderRadius: '4px',
-        padding: '4px 0',
-        zIndex: '1000',
-        minWidth: '150px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-      },
+      style: custom
+        ? { position: 'fixed', left: `${screenX}px`, top: `${screenY}px`, zIndex: '1000' }
+        : {
+            position: 'fixed',
+            left: `${screenX}px`,
+            top: `${screenY}px`,
+            backgroundColor: 'var(--bg, #1e222d)',
+            border: '1px solid var(--border, #363a45)',
+            borderRadius: '4px',
+            padding: '4px 0',
+            zIndex: '1000',
+            minWidth: '150px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          },
     });
     // Portaled to document.body, so it can't inherit the widget root's theme vars.
     applyChromeThemeVars(this.contextMenu, this.options.renderOptions);
     this.contextMenu.addEventListener('mousedown', (event) => event.stopPropagation());
     this.contextMenu.addEventListener('mouseup', (event) => event.stopPropagation());
-    this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
-    this.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
+    if (custom) {
+      // Nothing above a host's own box is ours to swallow: React delegates at
+      // its root container, and a click that never reaches it is a dead button.
+      // Outside-click dismissal reads `contains`, not propagation, so it holds.
+      this.contextMenu.appendChild(custom);
+    } else {
+      this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
+      this.contextMenu.addEventListener('contextmenu', (event) => event.stopPropagation());
+    }
 
     for (const item of items) {
       const menuItem = div({
@@ -1663,6 +1705,12 @@ export class ChartCore {
 
     document.body.appendChild(this.contextMenu);
     this.positionContextMenu(screenX, screenY, placement);
+    // Host content is commonly mounted a tick later - a React root rendering
+    // into the element we just returned measures zero until it does.
+    if (custom && typeof ResizeObserver !== 'undefined') {
+      this.contextMenuResizeObserver = new ResizeObserver(() => this.positionContextMenu(screenX, screenY, placement));
+      this.contextMenuResizeObserver.observe(this.contextMenu);
+    }
 
     // Close on click outside
     this.contextMenuCloseHandler = (e: MouseEvent) => {
@@ -1702,6 +1750,8 @@ export class ChartCore {
       document.removeEventListener('click', this.contextMenuCloseHandler);
       this.contextMenuCloseHandler = null;
     }
+    this.contextMenuResizeObserver?.disconnect();
+    this.contextMenuResizeObserver = null;
     this.contextMenu?.remove();
     this.contextMenu = null;
   }
@@ -2380,7 +2430,7 @@ export class ChartCore {
 
     // Draw horizontal crosshair line across chart area
     // Stop short of the + context menu button (18px wide + 2px offset + 2px gap)
-    const hasContextMenu = !!this.options.onContextMenu;
+    const hasContextMenu = this.hasContextMenu();
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
       const rightStop = hasContextMenu ? width - this.margins.right - 22 : width - this.margins.right;
       ctx.beginPath();

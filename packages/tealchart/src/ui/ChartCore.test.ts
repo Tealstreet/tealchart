@@ -2066,3 +2066,106 @@ describe('ChartCore action state provenance', () => {
     core.dispose();
   });
 });
+
+describe('ChartCore host-rendered context menu', () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  // The "+" is where a host asks for its own widget. Right-click and long-press
+  // reach the same handler and have not been given away.
+  it('renders the host element for the + button and the item list everywhere else', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const itemClick = vi.fn();
+    const onContextMenu = vi.fn(() => [{ position: 'top' as const, text: 'Fallback action', click: itemClick }]);
+    const renderContextMenu = vi.fn(() => {
+      const el = document.createElement('div');
+      el.textContent = 'Quick order';
+      return el;
+    });
+    const core = new ChartCore({ container, width: 800, height: 600, onContextMenu, renderContextMenu });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    const testCore = core as unknown as {
+      handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+    };
+
+    testCore.handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    expect(renderContextMenu).toHaveBeenCalledWith(
+      expect.objectContaining({ anchorX: 100, anchorY: 100, price: 10, unixTime: 20 }),
+    );
+    expect(onContextMenu).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain('Quick order');
+
+    testCore.handleContextMenu(120, 120, 11, 21);
+
+    expect(onContextMenu).toHaveBeenCalledWith(21, 11);
+    expect(document.body.textContent).toContain('Fallback action');
+    expect(document.body.textContent).not.toContain('Quick order');
+
+    core.dispose();
+  });
+
+  it('falls back to the item list when the host declines to render', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onContextMenu = vi.fn(() => [{ position: 'top' as const, text: 'Fallback action', click: vi.fn() }]);
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu,
+      renderContextMenu: () => null,
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    (
+      core as unknown as {
+        handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+      }
+    ).handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    expect(onContextMenu).toHaveBeenCalledWith(20, 10);
+    expect(document.body.textContent).toContain('Fallback action');
+
+    core.dispose();
+  });
+
+  it('closes what it rendered when the host asks it to', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    let close: (() => void) | null = null;
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderContextMenu: (context) => {
+        close = context.close;
+        const el = document.createElement('div');
+        el.textContent = 'Quick order';
+        return el;
+      },
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    (
+      core as unknown as {
+        handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+      }
+    ).handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    expect(document.body.textContent).toContain('Quick order');
+
+    close?.();
+
+    expect(document.body.textContent).not.toContain('Quick order');
+
+    core.dispose();
+  });
+});

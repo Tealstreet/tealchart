@@ -662,6 +662,7 @@ export type {
   ISubscription,
   ContextMenuItem,
   ContextMenuCallback,
+  ContextMenuRenderContext,
   ITimeScaleApi,
   // Order/Position line types
   ExecutionDirection,
