@@ -15,6 +15,8 @@ const NATIVE_CONTEXT_MENU_MARGIN = 8;
 const NATIVE_CONTEXT_MENU_ANCHOR_GAP = 12;
 const NATIVE_CONTEXT_MENU_TEXT_CHARACTER_WIDTH = 8;
 const NATIVE_CONTEXT_MENU_TEXT_HORIZONTAL_PADDING = 28;
+const NATIVE_HOST_CONTENT_FALLBACK_WIDTH = 220;
+const NATIVE_HOST_CONTENT_FALLBACK_HEIGHT = 120;
 
 export interface NativeCrosshairContextMenuState {
   anchorX: number;
@@ -30,10 +32,17 @@ export interface NativeContextMenuOverlayLayout {
   width: number;
 }
 
+export interface NativeHostContentPlacement {
+  left: number;
+  top: number;
+}
+
 export interface NativeCrosshairContextMenuOverlayProps {
   backgroundColor: string;
   dimensions: { width: number; height: number };
+  hostContentSize?: { width: number; height: number } | null;
   menu: NativeCrosshairContextMenuState;
+  onHostContentLayout?: (size: { width: number; height: number }) => void;
   onClose: () => void;
   renderOptions: RenderOptions;
   textColor: string;
@@ -74,6 +83,39 @@ export function resolveNativeContextMenuOverlayLayout({
   return { left, top, width };
 }
 
+export function resolveNativeHostContentPlacement({
+  anchorX,
+  anchorY,
+  contentHeight,
+  contentWidth,
+  dimensions,
+}: {
+  anchorX: number;
+  anchorY: number;
+  contentHeight?: number;
+  contentWidth?: number;
+  dimensions: { width: number; height: number };
+}): NativeHostContentPlacement {
+  const width = Math.min(
+    contentWidth ?? NATIVE_HOST_CONTENT_FALLBACK_WIDTH,
+    Math.max(0, dimensions.width - NATIVE_CONTEXT_MENU_MARGIN * 2),
+  );
+  const height = Math.min(
+    contentHeight ?? NATIVE_HOST_CONTENT_FALLBACK_HEIGHT,
+    Math.max(0, dimensions.height - NATIVE_CONTEXT_MENU_MARGIN * 2),
+  );
+  const left = Math.min(
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, anchorX - width - NATIVE_CONTEXT_MENU_ANCHOR_GAP),
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, dimensions.width - width - NATIVE_CONTEXT_MENU_MARGIN),
+  );
+  const top = Math.min(
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, anchorY - height / 2),
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, dimensions.height - height - NATIVE_CONTEXT_MENU_MARGIN),
+  );
+
+  return { left, top };
+}
+
 function resolveNativeContextMenuBackgroundColor(backgroundColor: string): string {
   const hex = backgroundColor.trim();
   const match = /^#?([0-9a-f]{6})$/i.exec(hex);
@@ -89,7 +131,9 @@ function resolveNativeContextMenuBackgroundColor(backgroundColor: string): strin
 export function NativeCrosshairContextMenuOverlayImpl({
   backgroundColor,
   dimensions,
+  hostContentSize,
   menu,
+  onHostContentLayout,
   onClose,
   renderOptions,
   textColor,
@@ -106,13 +150,13 @@ export function NativeCrosshairContextMenuOverlayImpl({
   const menuBackgroundColor = resolveNativeContextMenuBackgroundColor(backgroundColor);
 
   const contentPlacement = menu.content
-    ? {
-        right: Math.max(
-          NATIVE_CONTEXT_MENU_MARGIN,
-          dimensions.width - menu.anchorX + NATIVE_CONTEXT_MENU_ANCHOR_GAP,
-        ),
-        top: layout.top,
-      }
+    ? resolveNativeHostContentPlacement({
+        anchorX: menu.anchorX,
+        anchorY: menu.anchorY,
+        contentHeight: hostContentSize?.height,
+        contentWidth: hostContentSize?.width,
+        dimensions,
+      })
     : null;
 
   const stopPropagation = (event: GestureResponderEvent) => {
@@ -123,9 +167,8 @@ export function NativeCrosshairContextMenuOverlayImpl({
     <Pressable pointerEvents="auto" style={styles.overlay} onPress={onClose}>
       <View
         style={
-          // Host content owns everything inside the box, chrome included, and
-          // is anchored by its right edge because its width is its own: the
-          // left edge cannot be computed before a width we do not know.
+          // Host content owns everything inside the box, chrome included.
+          // The wrapper measures it once and then clamps that box in-chart.
           contentPlacement
             ? [styles.hostContent, contentPlacement]
             : [
@@ -133,6 +176,14 @@ export function NativeCrosshairContextMenuOverlayImpl({
                 { backgroundColor: menuBackgroundColor, borderColor },
                 { left: layout.left, top: layout.top, width: layout.width },
               ]
+        }
+        onLayout={
+          menu.content
+            ? (event) => {
+                const { height, width } = event.nativeEvent.layout;
+                onHostContentLayout?.({ height, width });
+              }
+            : undefined
         }
         onStartShouldSetResponder={() => true}
       >
@@ -177,7 +228,24 @@ export function NativeCrosshairContextMenuOverlayImpl({
   );
 }
 
-export const NativeCrosshairContextMenuOverlay = React.memo(NativeCrosshairContextMenuOverlayImpl);
+function NativeCrosshairContextMenuOverlayWithMeasurement({
+  ...props
+}: Omit<NativeCrosshairContextMenuOverlayProps, 'hostContentSize' | 'onHostContentLayout'>) {
+  const [hostContentSize, setHostContentSize] = React.useState<{ width: number; height: number } | null>(null);
+
+  return (
+    <NativeCrosshairContextMenuOverlayImpl
+      {...props}
+      hostContentSize={hostContentSize}
+      onHostContentLayout={(next) => {
+        setHostContentSize((current) =>
+          current?.height === next.height && current.width === next.width ? current : next,
+        );
+      }}
+    />
+  );
+}
+export const NativeCrosshairContextMenuOverlay = React.memo(NativeCrosshairContextMenuOverlayWithMeasurement);
 NativeCrosshairContextMenuOverlay.displayName = 'NativeCrosshairContextMenuOverlay';
 
 const styles = StyleSheet.create({
