@@ -78,6 +78,32 @@ export function resolveLeftHistoryBackfillContinuationHint({
   return withRequiredStartTime(targetHint, requiredStartTime);
 }
 
+/**
+ * A load resolves the viewport from the saved view scale, which is stored as a
+ * bar count - so a chart the user had zoomed out past `INITIAL_BAR_COUNT` bars
+ * comes back showing a range no loaded bar covers, and the chart draws empty
+ * space to the left of its own history.
+ *
+ * Backfill was only ever asked for by a gesture, which is why touching the
+ * chart appeared to fix it. This says the same thing from the data's side.
+ */
+export function resolveViewportHistoryBackfillHint({
+  earliestBarTime,
+  hasMoreHistoricalData,
+  viewport,
+}: {
+  earliestBarTime: number | undefined;
+  hasMoreHistoricalData: boolean;
+  viewport: Viewport | null | undefined;
+}): HistoryBackfillRequestHint | null {
+  if (!hasMoreHistoricalData) return null;
+  if (!finiteNumber(earliestBarTime)) return null;
+  if (!finiteNumber(viewport?.startTime)) return null;
+  if (viewport.startTime >= earliestBarTime) return null;
+
+  return { requiredStartTime: viewport.startTime, viewport };
+}
+
 export function resolveLeftHistoryBackfillRequest({
   defaultCount = DEFAULT_HISTORY_BACKFILL_BAR_COUNT,
   earliestBarTime,

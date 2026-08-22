@@ -8,6 +8,7 @@ import {
   mergeLeftHistoryBackfillRequestHints,
   resolveLeftHistoryBackfillContinuationHint,
   resolveLeftHistoryBackfillRequest,
+  resolveViewportHistoryBackfillHint,
 } from './historyBackfill';
 
 const intervalMs = 60_000;
@@ -145,5 +146,76 @@ describe('history backfill request sizing', () => {
     ).toMatchObject({
       requiredStartTime: queuedStartTime,
     });
+  });
+});
+
+describe('viewport history coverage', () => {
+  // The view scale is stored as a bar count, so a chart zoomed out past the
+  // initial page comes back showing a range no loaded bar covers. Nothing asked
+  // for the rest, because only a gesture ever asked.
+  it('asks for the history the restored viewport shows and the bars do not cover', () => {
+    expect(
+      resolveViewportHistoryBackfillHint({
+        earliestBarTime,
+        hasMoreHistoricalData: true,
+        viewport: viewport(earliestBarTime - 500 * intervalMs),
+      }),
+    ).toMatchObject({ requiredStartTime: earliestBarTime - 500 * intervalMs });
+  });
+
+  it('asks for nothing when the bars already reach the start of the viewport', () => {
+    expect(
+      resolveViewportHistoryBackfillHint({
+        earliestBarTime,
+        hasMoreHistoricalData: true,
+        viewport: viewport(earliestBarTime),
+      }),
+    ).toBeNull();
+  });
+
+  it('asks for nothing once the feed has said there is no more history', () => {
+    expect(
+      resolveViewportHistoryBackfillHint({
+        earliestBarTime,
+        hasMoreHistoricalData: false,
+        viewport: viewport(earliestBarTime - 500 * intervalMs),
+      }),
+    ).toBeNull();
+  });
+
+  it('asks for nothing before any bars have arrived', () => {
+    expect(
+      resolveViewportHistoryBackfillHint({
+        earliestBarTime: undefined,
+        hasMoreHistoricalData: true,
+        viewport: viewport(earliestBarTime - 500 * intervalMs),
+      }),
+    ).toBeNull();
+  });
+
+  // The hint has to survive the paging loop, which compares against
+  // `requiredStartTime`, not against the viewport it came from.
+  it('carries a required start time the continuation can page towards', () => {
+    const hint = resolveViewportHistoryBackfillHint({
+      earliestBarTime,
+      hasMoreHistoricalData: true,
+      viewport: viewport(earliestBarTime - 500 * intervalMs),
+    });
+
+    expect(
+      resolveLeftHistoryBackfillContinuationHint({
+        activeHint: hint ?? undefined,
+        currentEarliestBarTime: earliestBarTime - 300 * intervalMs,
+        previousEarliestBarTime: earliestBarTime,
+      }),
+    ).toMatchObject({ requiredStartTime: earliestBarTime - 500 * intervalMs });
+
+    expect(
+      resolveLeftHistoryBackfillContinuationHint({
+        activeHint: hint ?? undefined,
+        currentEarliestBarTime: earliestBarTime - 500 * intervalMs,
+        previousEarliestBarTime: earliestBarTime - 300 * intervalMs,
+      }),
+    ).toBeNull();
   });
 });
