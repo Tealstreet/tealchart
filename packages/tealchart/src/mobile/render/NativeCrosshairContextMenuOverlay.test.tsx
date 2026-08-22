@@ -1,12 +1,14 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import React from 'react';
+
 import { Pressable, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
   NativeCrosshairContextMenuOverlayImpl,
   resolveNativeContextMenuOverlayLayout,
+  resolveNativeHostContentPlacement,
 } from './NativeCrosshairContextMenuOverlay';
 
 interface TestElementProps {
@@ -104,8 +106,27 @@ describe('NativeCrosshairContextMenuOverlay', () => {
 });
 
 describe('NativeCrosshairContextMenuOverlay host content', () => {
-  // Anchored by its right edge: the left edge of host content cannot be
-  // computed before a width the chart does not know.
+  it('clamps measured host content inside the native chart viewport', () => {
+    expect(
+      resolveNativeHostContentPlacement({
+        anchorX: 380,
+        anchorY: 470,
+        contentHeight: 118,
+        contentWidth: 228,
+        dimensions: { width: 390, height: 480 },
+      }),
+    ).toEqual({ left: 140, top: 354 });
+    expect(
+      resolveNativeHostContentPlacement({
+        anchorX: 30,
+        anchorY: 20,
+        contentHeight: 118,
+        contentWidth: 228,
+        dimensions: { width: 390, height: 480 },
+      }),
+    ).toEqual({ left: 8, top: 8 });
+  });
+
   it('renders host content in place of the item list, grown leftward from the anchor', () => {
     const overlay = NativeCrosshairContextMenuOverlayImpl({
       backgroundColor: '#131722',
@@ -124,9 +145,10 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
     const style = flattenStyle(views[0].props.style);
     const texts = collectElementsByType(overlay, Text);
 
-    expect(style.right).toBe(102);
+    expect(style.left).toBe(68);
+    expect(style.top).toBe(40);
     expect(style.width).toBeUndefined();
-    expect(style.left).toBeUndefined();
+    expect(style.right).toBeUndefined();
     expect(texts.map((text) => text.props.children)).toContain('Quick order');
   });
 });
