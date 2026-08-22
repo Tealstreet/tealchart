@@ -568,6 +568,21 @@ export interface ContextMenuItem {
 export type ContextMenuCallback = (unixTime: number, price: number) => ContextMenuItem[];
 
 /**
+ * Where the chart opened its context menu, and how to close it again.
+ *
+ * A host that renders its own widget there gets the anchor in the same space
+ * the chart placed the menu in - page coordinates on web, chart coordinates on
+ * native - and owns everything inside it.
+ */
+export interface ContextMenuRenderContext {
+  unixTime: number;
+  price: number;
+  anchorX: number;
+  anchorY: number;
+  close: () => void;
+}
+
+/**
  * Time scale API (subset of TradingView's ITimeScaleApi)
  */
 export interface ITimeScaleApi {

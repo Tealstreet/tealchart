@@ -125,6 +125,7 @@ import {
   Bar,
   ChartOverrides,
   ContextMenuCallback,
+  ContextMenuRenderContext,
   ContextMenuItem,
   DatafeedBar,
   DEFAULT_RENDER_OPTIONS,
@@ -238,6 +239,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   // Context menu
   private _contextMenuCallback: ContextMenuCallback | null = null;
+  private _contextMenuRenderer: ((context: ContextMenuRenderContext) => HTMLElement | null) | null = null;
   private _userDrawingObjectTreePanel: UserDrawingObjectTreePanel | null = null;
   private _userDrawingPropertiesPanel: UserDrawingPropertiesPanel | null = null;
   private _userDrawingPropertiesPanelDrawingId: string | undefined;
@@ -1297,6 +1299,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       onPositionClose: (positionId) => this._chartApi.triggerPositionClose(positionId),
       onPositionReverse: (positionId) => this._chartApi.triggerPositionReverse(positionId),
       onContextMenu: this._contextMenuCallback || undefined,
+      renderContextMenu: this._contextMenuRenderer || undefined,
       onMouseDown: () => {
         this._eventEmitter.emit('mouse_down');
       },
@@ -3887,6 +3890,16 @@ export class TealchartWidget implements ITealchartWebWidget {
   // ============================================================================
   // Context Menu
   // ============================================================================
+
+  /**
+   * Register a renderer for the whole menu, in place of a list of items.
+   * Applies to the "+" button only; the chart places and dismisses what it
+   * returns and draws nothing inside it.
+   */
+  renderContextMenu(renderer: (context: ContextMenuRenderContext) => HTMLElement | null): void {
+    this._contextMenuRenderer = renderer;
+    this._ui?.setContextMenuRenderer(renderer);
+  }
 
   /**
    * Register context menu callback
