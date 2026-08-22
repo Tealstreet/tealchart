@@ -290,6 +290,41 @@ TP/SL is merged into `brackets` even when the line has none
 which is deliberate — see `3c84ee37` — because the echo may arrive as its own
 order line and never as a bracket on the parent.
 
+### What owns an object
+
+An action owns its object **only while its callback is in the air**. Once the
+venue has answered, the action is merely waiting for a snapshot to echo the new
+state, and that wait must never cost the user their next gesture: a second drag
+supersedes it (`superseded`), and an object that has left the snapshot by then
+is dropped (`abandoned`) rather than held to the timeout. Both are restricted to
+`awaitingConfirmation` — a callback still in flight owns its object outright, so
+a host that clears and rebuilds its lines in one pass cannot cancel it.
+
+**A `confirmsRemoved` action keeps its object either way** — cancel, close and
+reverse. It is confirmed by the line leaving the feed, so there is no echo to
+give up waiting for, and letting a second click through would submit the same
+cancel twice.
+
+That distinction is the whole reason the gates differ. On web, the drag gates
+read `isAwaitingCallback` and the click gates read `isPending` in
+`PriceLineManager` — cancel, close, reverse, and the click half of the
+TP/SL hit rect, which shares one rect with a drag and so is gated separately
+inside `dragend`. Gating a drag on `isPending` is the bug this replaced: a
+confirmation that never matched left the line refusing every later drag for
+thirty seconds.
+
+Native only shares the drag-zone gate (`tradeLineLayout`) and the dim. Its click
+path reads action state off the **raw** snapshot, where it is never set, so that
+gate is dead code and `startAction` is the only guard that actually holds — and
+`startNativeBracketMoveAction` has no gate at all. Do not read
+`shouldClear*DragForSnapshot`'s `isPending` as one of these: there it means the
+optimistic state now owns the line, which is when the preview may retire.
+
+**Start actions from the raw lines**, never the action-applied ones. Built from
+a line that already carries an unsettled action, a new action inherits that
+action's guess as a field it must also see echoed — and `confirmState` compares
+every field it was given, so the replacement could never confirm either.
+
 **The adapter module is shared.** `interaction/oemsLineState.ts` is used by both
 `ChartCore` and the native runtime. It was duplicated once, drifted, and the
 drift was invisible because the tests passed `{}` where the render data actually
@@ -305,7 +340,10 @@ appearing or disappearing never costs you the adapter — glyde's
 `bindOrderLineCallbacks` is the reference shape.
 
 A host that destroys its adapter is telling the chart the order is gone. The
-chart believes it, because that is the contract.
+chart believes it, because that is the contract. The orphaned action is now
+dropped by the same snapshot pass that retires the line, so what a host pays for
+breaking this is the churn itself — a remove and a create — and no longer a
+replacement line that refuses to be dragged.
 
 ### Drag state on native: `active` vs `activeObjectId`
 
