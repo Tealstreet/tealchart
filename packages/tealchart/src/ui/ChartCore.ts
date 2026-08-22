@@ -1159,7 +1159,12 @@ export class ChartCore {
   }
 
   private handleOrderMove(orderId: string, newPrice: number): void {
-    const order = this.orderLines.find((line) => this.getOrderObjectId(line) === orderId);
+    // Raw, never the action-applied array: an action's optimistic state must
+    // describe what the venue is expected to report back. Reading a line that
+    // already carries an unsettled action folds that action's guess into the
+    // new one, and `confirmState` compares every field it was given - so the
+    // replacement could never confirm either.
+    const order = this.rawOrderLines.find((line) => this.getOrderObjectId(line) === orderId);
     const originalState = order ? this.getOrderLineState(order) : { price: newPrice, visible: true };
     const result = this.oemsActions.startAction({
       objectType: 'order',
@@ -1176,7 +1181,7 @@ export class ChartCore {
   }
 
   private handleOrderCancel(orderId: string): void {
-    const order = this.orderLines.find((line) => this.getOrderObjectId(line) === orderId);
+    const order = this.rawOrderLines.find((line) => this.getOrderObjectId(line) === orderId);
     const originalState = order ? this.getOrderLineState(order) : { visible: true };
     const result = this.oemsActions.startAction({
       objectType: 'order',
@@ -1191,7 +1196,7 @@ export class ChartCore {
   }
 
   private handlePositionClose(positionId: string): void {
-    const position = this.positionLines.find((line) => this.getPositionObjectId(line) === positionId);
+    const position = this.rawPositionLines.find((line) => this.getPositionObjectId(line) === positionId);
     const originalState = position ? this.getPositionLineState(position) : { visible: true };
     const result = this.oemsActions.startAction({
       objectType: 'position',
@@ -1206,7 +1211,7 @@ export class ChartCore {
   }
 
   private handlePositionReverse(positionId: string): void {
-    const position = this.positionLines.find((line) => this.getPositionObjectId(line) === positionId);
+    const position = this.rawPositionLines.find((line) => this.getPositionObjectId(line) === positionId);
     const originalState = position ? this.getPositionLineState(position) : { visible: true };
     const result = this.oemsActions.startAction({
       objectType: 'position',
@@ -1281,7 +1286,7 @@ export class ChartCore {
       // venue's id and looked them up under the adapter's, so nothing on this
       // line ever rendered as pending. See CLAUDE.md "Line identity (OEMS)".
       const objectId = bound.lineId;
-      const line = this.orderLines.find((candidate) => this.getOrderObjectId(candidate) === objectId);
+      const line = this.rawOrderLines.find((candidate) => this.getOrderObjectId(candidate) === objectId);
       return {
         objectType: 'order',
         objectId,
@@ -1291,7 +1296,7 @@ export class ChartCore {
 
     if (bound.type === 'position') {
       const objectId = bound.lineId;
-      const line = this.positionLines.find((candidate) => this.getPositionObjectId(candidate) === objectId);
+      const line = this.rawPositionLines.find((candidate) => this.getPositionObjectId(candidate) === objectId);
       return {
         objectType: 'position',
         objectId,

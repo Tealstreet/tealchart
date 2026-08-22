@@ -650,7 +650,7 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
       objectType === 'order' &&
       isOrderLineRenderData(line) &&
       line.editable &&
-      !line.actionState?.isPending &&
+      !line.actionState?.isAwaitingCallback &&
       line.callbacks?.onMove &&
       hasDraggableLabelBody
         ? {

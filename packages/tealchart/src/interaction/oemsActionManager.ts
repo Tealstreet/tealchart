@@ -69,7 +69,12 @@ export interface OemsActionObjectStatus<TState extends OemsActionState = OemsAct
 
 export interface OemsActionSettlement<TState extends OemsActionState = OemsActionState> {
   action: OemsAction<TState>;
-  status: 'confirmed' | 'failed' | 'timedOut';
+  /**
+   * `superseded` is a second action taking the object while the first was only
+   * waiting for the venue's echo; `abandoned` is the object leaving the chart
+   * before that echo arrived. Neither says anything went wrong.
+   */
+  status: 'confirmed' | 'failed' | 'timedOut' | 'superseded' | 'abandoned';
   error?: unknown;
 }
 
@@ -165,14 +170,24 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
 
   startAction(args: OemsActionStartArgs<TState>): OemsActionStartResult<TState> {
     const objectKey = getObjectKey(args.objectType, args.objectId);
-    if (this.actionsByObject.has(objectKey)) {
+    const existing = this.actionsByObject.get(objectKey);
+    // Only a round trip still in the air owns the object. Once the venue has
+    // answered we are merely waiting for a snapshot to echo the new state, and
+    // that wait must never cost the user their next drag - an echo that never
+    // matches would otherwise hold the object for the whole timeout.
+    //
+    // A removal is the exception and holds the object outright: it is confirmed
+    // by the line leaving the feed, so there is no echo to give up waiting for,
+    // and letting a second click through would submit the same cancel twice.
+    if (existing && (existing.phase === 'awaitingCallback' || existing.confirmsRemoved)) {
       return {
         accepted: false,
         completedSynchronously: false,
-        action: this.actionsByObject.get(objectKey) ?? null,
+        action: existing,
         reason: 'conflicting-action',
       };
     }
+    if (existing) this.settleAction(existing, 'superseded');
 
     let callbackResult: Awaitable<OemsActionResult>;
     try {
@@ -263,6 +278,24 @@ export class OemsActionManager<TState extends OemsActionState = OemsActionState>
     if (!this.stateEquals(action.optimisticState, confirmedState)) return false;
 
     this.settleAction(action, 'confirmed');
+    return true;
+  }
+
+  /**
+   * The object left the chart before its confirmation arrived - a host that
+   * retires an adapter on an amend rather than re-pointing it, a symbol change,
+   * a line cleared and rebuilt. There is nothing left to confirm against, so
+   * the action is dropped rather than held to the timeout.
+   *
+   * Restricted to `awaitingConfirmation`: a callback still in flight owns the
+   * object, and a host that clears and re-adds its lines in one pass must not
+   * be able to cancel it.
+   */
+  abandon(objectType: OemsActionObjectType, objectId: string): boolean {
+    const action = this.getAction(objectType, objectId);
+    if (!action || action.phase !== 'awaitingConfirmation') return false;
+
+    this.settleAction(action, 'abandoned');
     return true;
   }
 

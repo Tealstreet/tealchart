@@ -130,9 +130,16 @@ export function confirmOemsOrderLineSnapshots(
     manager.confirmState('order', getOemsOrderObjectId(line), getOemsOrderLineState(line));
   }
 
+  // An object that left the snapshot can never be confirmed against it. A
+  // removal-confirming action reads that departure as its confirmation; every
+  // other kind is dropped, because holding it to the timeout latches the line's
+  // pending state onto an object the chart no longer draws.
   for (const action of manager.getActions()) {
-    if (action.objectType === 'order' && action.confirmsRemoved && !seen.has(action.objectId)) {
+    if (action.objectType !== 'order' || seen.has(action.objectId)) continue;
+    if (action.confirmsRemoved) {
       manager.confirmRemoved('order', action.objectId);
+    } else {
+      manager.abandon('order', action.objectId);
     }
   }
 }
@@ -146,9 +153,16 @@ export function confirmOemsPositionLineSnapshots(
     manager.confirmState('position', getOemsPositionObjectId(line), getOemsPositionLineState(line));
   }
 
+  // An object that left the snapshot can never be confirmed against it. A
+  // removal-confirming action reads that departure as its confirmation; every
+  // other kind is dropped, because holding it to the timeout latches the line's
+  // pending state onto an object the chart no longer draws.
   for (const action of manager.getActions()) {
-    if (action.objectType === 'position' && action.confirmsRemoved && !seen.has(action.objectId)) {
+    if (action.objectType !== 'position' || seen.has(action.objectId)) continue;
+    if (action.confirmsRemoved) {
       manager.confirmRemoved('position', action.objectId);
+    } else {
+      manager.abandon('position', action.objectId);
     }
   }
 }
