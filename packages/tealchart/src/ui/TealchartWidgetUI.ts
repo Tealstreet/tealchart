@@ -28,6 +28,7 @@ import type {
   Awaitable,
   Bar,
   ContextMenuItem,
+  ContextMenuRenderContext,
   ExecutionLineRenderData,
   OemsActionResult,
   OrderLineRenderData,
@@ -155,6 +156,7 @@ export interface TealchartWidgetUIOptions {
   onPositionReverse?: (positionId: string) => Awaitable<OemsActionResult>;
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
+  renderContextMenu?: (context: ContextMenuRenderContext) => HTMLElement | null;
   /** Mouse down callback */
   onMouseDown?: () => void;
   /** Mouse up callback */
@@ -567,6 +569,7 @@ export class TealchartWidgetUI {
       onPositionClose: this.options.onPositionClose,
       onPositionReverse: this.options.onPositionReverse,
       onContextMenu: this.options.onContextMenu,
+      renderContextMenu: this.options.renderContextMenu,
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,
       onCrossHairMoved: this.options.onCrossHairMoved,
@@ -987,6 +990,10 @@ export class TealchartWidgetUI {
    */
   setContextMenuCallback(callback: (unixTime: number, price: number) => ContextMenuItem[]): void {
     this.chartCore?.setContextMenuCallback(callback);
+  }
+
+  setContextMenuRenderer(renderer: (context: ContextMenuRenderContext) => HTMLElement | null): void {
+    this.chartCore?.setContextMenuRenderer(renderer);
   }
 
   /**
