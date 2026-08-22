@@ -2009,3 +2009,60 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 });
+
+describe('ChartCore action state provenance', () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  // An action describes what the venue is expected to report back, so it has to
+  // be built from the raw line. Built from the action-applied one, a second
+  // gesture inherits the first's unconfirmed guess as a field it must also see
+  // echoed - and could never confirm either.
+  it('builds a new action from the raw line, not from an unconfirmed one', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({ container, width: 800, height: 600 });
+    const onSLMoveEnd = vi.fn(() => Promise.resolve());
+    const onTPMoveEnd = vi.fn(() => Promise.resolve());
+
+    core.setBars(makeBars(5));
+    core.setPositionLines([makePositionLine({ brackets: {}, callbacks: { onSLMoveEnd, onTPMoveEnd } })]);
+
+    const bound = {
+      lineId: 'position-1',
+      positionId: 'position-1',
+      type: 'position',
+      price: 50010,
+      originalY: 0,
+      adjustedY: 0,
+      width: 0,
+      height: 0,
+      color: '#2196F3',
+      label: { primaryText: '50,010' },
+      lineStyle: 'solid',
+      callbacks: { onSLMoveEnd, onTPMoveEnd },
+    } as PriceLineLabelBounds;
+    const privateCore = core as unknown as {
+      handleBracketMoveEnd(type: 'tp' | 'sl', bound: PriceLineLabelBounds, price: number): void;
+      oemsActions: { getAction(type: string, id: string): { optimisticState: Record<string, unknown> } | null };
+    };
+
+    privateCore.handleBracketMoveEnd('sl', bound, 49900);
+    await Promise.resolve();
+    await Promise.resolve();
+    privateCore.handleBracketMoveEnd('tp', bound, 50500);
+
+    const optimisticState = privateCore.oemsActions.getAction('position', 'position-1')?.optimisticState;
+    expect(optimisticState?.takeProfit).toBe(50500);
+    expect(optimisticState?.stopLoss).toBeUndefined();
+
+    core.dispose();
+  });
+});

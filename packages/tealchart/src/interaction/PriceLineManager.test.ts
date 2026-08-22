@@ -323,3 +323,133 @@ describe('PriceLineManager TP/SL dragging', () => {
     stage.destroy();
   });
 });
+
+describe('PriceLineManager order dragging', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.unstubAllGlobals();
+  });
+
+  function draggableOrderBound(actionState: PriceLineLabelBounds['actionState']): PriceLineLabelBounds {
+    return { ...makeOrderBound(100), draggable: true, actionState };
+  }
+
+  function dragHandle(manager: PriceLineManager): Konva.Rect {
+    const group = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+    const handles = (group?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) ??
+      []) as Konva.Rect[];
+    return handles[0];
+  }
+
+  function withManager(run: (manager: PriceLineManager) => void): void {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+
+    run(manager);
+
+    manager.dispose();
+    stage.destroy();
+  }
+
+  // The bug this covers: an amend the venue never echoed back in the shape the
+  // action expected left the line pending, and pending refused every later drag
+  // until the action timed out thirty seconds on.
+  it('still lets the user drag a line that is only waiting for the venue to echo', () => {
+    withManager((manager) => {
+      manager.update([
+        draggableOrderBound({
+          kind: 'orderMove',
+          isPending: true,
+          isAwaitingCallback: false,
+          isAwaitingConfirmation: true,
+        }),
+      ]);
+
+      dragHandle(manager).fire('dragstart');
+
+      expect(manager.isDragging()).toBe(true);
+    });
+  });
+
+  it('refuses a drag while the round trip is still in the air', () => {
+    withManager((manager) => {
+      manager.update([
+        draggableOrderBound({
+          kind: 'orderMove',
+          isPending: true,
+          isAwaitingCallback: true,
+          isAwaitingConfirmation: false,
+        }),
+      ]);
+
+      dragHandle(manager).fire('dragstart');
+
+      expect(manager.isDragging()).toBe(false);
+    });
+  });
+});
+
+describe('PriceLineManager TP/SL gating while an action is unconfirmed', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.unstubAllGlobals();
+  });
+
+  // The TP button is one hit rect serving two gestures, and they do not share a
+  // rule: a drag supersedes an action the venue has already answered, a click
+  // would submit that same action a second time.
+  it('lets the button be dragged but not clicked while awaiting confirmation', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+    const onTPClick = vi.fn();
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+      onTPClick,
+    });
+
+    manager.update([
+      {
+        ...makePositionBound(100),
+        actionState: {
+          kind: 'positionTpMove',
+          isPending: true,
+          isAwaitingCallback: false,
+          isAwaitingConfirmation: true,
+        },
+      },
+    ]);
+
+    const group = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('position-1');
+    const buttons = (group?.find((node: Konva.Node) => node instanceof Konva.Rect && node.draggable()) ??
+      []) as Konva.Rect[];
+    expect(buttons.length).toBeGreaterThan(0);
+
+    buttons[0].fire('dragstart');
+    expect(manager.isDragging()).toBe(true);
+
+    buttons[0].fire('dragend');
+    expect(onTPClick).not.toHaveBeenCalled();
+
+    manager.dispose();
+    stage.destroy();
+  });
+});

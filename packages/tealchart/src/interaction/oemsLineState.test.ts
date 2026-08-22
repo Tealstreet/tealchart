@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { OemsActionManager } from './oemsActionManager';
 import {
   applyOemsBracketActionState,
+  confirmOemsOrderLineSnapshots,
   applyOemsOrderActionState,
   applyOemsPositionActionState,
   getOemsOrderObjectId,
@@ -108,5 +109,68 @@ describe('applyOems*ActionState with no existing brackets', () => {
 
   it('clears actionState on a line with nothing in flight', () => {
     expect(applyOemsOrderActionState(orderLine(), pendingManager()).actionState).toBeUndefined();
+  });
+});
+
+describe('confirmOemsOrderLineSnapshots', () => {
+  const startMove = (manager: OemsActionManager<OemsTradingLineState>, callback: () => Promise<void>) =>
+    manager.startAction({
+      objectType: 'order',
+      objectId: 'order-1',
+      kind: 'orderMove',
+      originalState: { price: 100, visible: true },
+      optimisticState: { price: 101, visible: true },
+      callback,
+    });
+
+  // A host that retires the adapter on an amend instead of re-pointing it takes
+  // the object away from under the action. Held to the timeout, the line it was
+  // replaced by inherited nothing but the pending state stayed on the books.
+  it('abandons a move whose line left the snapshot', async () => {
+    const settled: string[] = [];
+    const manager = new OemsActionManager<OemsTradingLineState>({
+      onSettle: (settlement) => settled.push(settlement.status),
+    });
+    startMove(manager, () => Promise.resolve());
+    await Promise.resolve();
+    await Promise.resolve();
+
+    confirmOemsOrderLineSnapshots(manager, []);
+
+    expect(settled).toEqual(['abandoned']);
+    expect(manager.getAction('order', 'order-1')).toBeNull();
+  });
+
+  it('still reads a departure as confirmation for a cancel', async () => {
+    const settled: string[] = [];
+    const manager = new OemsActionManager<OemsTradingLineState>({
+      onSettle: (settlement) => settled.push(settlement.status),
+    });
+    manager.startAction({
+      objectType: 'order',
+      objectId: 'order-1',
+      kind: 'orderCancel',
+      originalState: { price: 100, visible: true },
+      optimisticState: { price: 100, visible: true },
+      confirmsRemoved: true,
+      callback: () => Promise.resolve(),
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    confirmOemsOrderLineSnapshots(manager, []);
+
+    expect(settled).toEqual(['confirmed']);
+  });
+
+  // A host is free to clear its lines and re-add them in one pass; that must not
+  // cancel a round trip that is still in the air.
+  it('leaves a move whose callback has not resolved alone', () => {
+    const manager = new OemsActionManager<OemsTradingLineState>();
+    startMove(manager, () => new Promise<never>(() => {}));
+
+    confirmOemsOrderLineSnapshots(manager, []);
+
+    expect(manager.getAction('order', 'order-1')).not.toBeNull();
   });
 });
