@@ -573,6 +573,18 @@ describe('imperative chart API contract', () => {
     expect(buildConfig.compilerOptions?.stripInternal).toBe(true);
   });
 
+  // Both platforms restore the viewport from a view scale measured in bars, so
+  // both can come back showing a range their loaded page does not cover. Web is
+  // covered end to end in TealchartWidget.test.ts; this pins the native half,
+  // which lives inside an effect no unit test can drive.
+  it('asks for the history a restored native viewport shows', () => {
+    const runtimeSource = readSource('mobile/interaction/useNativeViewportRuntime.ts');
+
+    expect(runtimeSource).toContain('resolveViewportHistoryBackfillHint({');
+    expect(runtimeSource).toContain('viewport: pendingDataLoadViewport,');
+    expect(runtimeSource).toContain("if (hint) onRequestMoreBars?.('left', hint);");
+  });
+
   it('renders native trading lines from adapter snapshots', () => {
     const runtimeSource = readSource('mobile/interaction/useNativeOemsLineRuntime.ts');
     const layerSource = readSource('mobile/render/NativeChartTradeLinesLayer.tsx');
