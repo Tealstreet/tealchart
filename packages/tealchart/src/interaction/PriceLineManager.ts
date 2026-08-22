@@ -850,9 +850,13 @@ export class PriceLineManager {
 
       let dragStartY = 0;
 
+      // Only a round trip still in the air blocks a drag. Blocking on the whole
+      // pending window meant a confirmation that never matched - a host that
+      // retires the adapter on an amend, a venue that echoes a different shape -
+      // left the line un-draggable until the action timed out.
       dragRect.on('mousedown touchstart', () => {
         const currentBound = this.getCurrentBound(group, bound);
-        if (currentBound.actionState?.isPending) return;
+        if (currentBound.actionState?.isAwaitingCallback) return;
         if (!this.activeDrag) {
           dragRect.startDrag();
         }
@@ -860,7 +864,7 @@ export class PriceLineManager {
 
       dragRect.on('dragstart', () => {
         const currentBound = this.getCurrentBound(group, bound);
-        if (currentBound.actionState?.isPending) {
+        if (currentBound.actionState?.isAwaitingCallback) {
           this.dragCancelled = true;
           dragRect.stopDrag();
           return;
@@ -1087,7 +1091,7 @@ export class PriceLineManager {
 
           hitRect.on('mousedown touchstart', () => {
             const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isPending) return;
+            if (currentBound.actionState?.isAwaitingCallback) return;
             if (!this.activeDrag) {
               hitRect.startDrag();
             }
@@ -1095,7 +1099,7 @@ export class PriceLineManager {
 
           hitRect.on('dragstart', () => {
             const currentBound = this.getCurrentBound(group, bound);
-            if (currentBound.actionState?.isPending) {
+            if (currentBound.actionState?.isAwaitingCallback) {
               this.dragCancelled = true;
               hitRect.stopDrag();
               return;
@@ -1189,7 +1193,10 @@ export class PriceLineManager {
                 this.options.onSLDragEnd?.(currentBound, price, partialPercent);
               }
               this.options.onTPSLDragEnd?.();
-            } else if (!this.dragCancelled) {
+            } else if (!this.dragCancelled && !currentBound.actionState?.isPending) {
+              // The click shares this hit rect with the drag, but not its rule:
+              // a drag supersedes an unconfirmed action, a click would simply
+              // submit the same one twice.
               if (buttonType === 'tp') {
                 this.options.onTPClick?.(currentBound);
               } else {
@@ -1232,6 +1239,9 @@ export class PriceLineManager {
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
             const currentBound = this.getCurrentBound(group, bound);
+            // Unlike a drag, a cancel or close has nothing to supersede: the
+            // action sits unconfirmed until the line leaves the feed, and a
+            // second click would submit the same cancel again.
             if (currentBound.actionState?.isPending) return;
             if (button.type === 'cancel') {
               this.options.onOrderCancel?.(currentBound.lineId);

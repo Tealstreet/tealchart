@@ -126,7 +126,7 @@ export function AnimatedTradeLine({
     label: { backgroundColor: line.bodyBackgroundColor, textColor: line.bodyTextColor },
     color,
   });
-  const pendingOpacity = line.actionState?.isPending ? 0.55 : 1;
+  const pendingOpacity = line.actionState?.isAwaitingCallback ? 0.55 : 1;
   const groupOpacity = useDerivedValue(() => (isNativeYInMainPane(rawY.value, frame) ? pendingOpacity : 0));
   // While this line is being dragged its tag is drawn by the floating overlay
   // above every other tag, so the in-place one stands down rather than drawing
