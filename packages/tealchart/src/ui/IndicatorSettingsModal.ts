@@ -76,7 +76,7 @@ const contentStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   groupTitle: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -93,34 +93,34 @@ const contentStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   label: {
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     flex: '1',
   } as Partial<CSSStyleDeclaration>,
 
   tooltip: {
-    color: 'var(--text3, #5d606b)',
+    color: 'var(--tc-text3, #5d606b)',
     fontSize: '10px',
     marginTop: '2px',
   } as Partial<CSSStyleDeclaration>,
 
   input: {
-    backgroundColor: 'var(--bg, #131722)',
-    border: '1px solid var(--border, #363a45)',
+    backgroundColor: 'var(--tc-bg, #131722)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
     padding: '6px 10px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     width: '120px',
     outline: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   select: {
-    backgroundColor: 'var(--bg, #131722)',
-    border: '1px solid var(--border, #363a45)',
+    backgroundColor: 'var(--tc-bg, #131722)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
     padding: '6px 10px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     width: '140px',
     outline: 'none',
@@ -142,9 +142,9 @@ const contentStyles = {
     width: '60px',
     height: '28px',
     padding: '2px',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
-    backgroundColor: 'var(--bg, #131722)',
+    backgroundColor: 'var(--tc-bg, #131722)',
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
 
@@ -154,7 +154,7 @@ const contentStyles = {
     alignItems: 'center',
     gap: '12px',
     padding: '10px 0',
-    borderBottom: '1px solid var(--border, #363a45)',
+    borderBottom: '1px solid var(--tc-border, #363a45)',
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
 
@@ -170,7 +170,7 @@ const contentStyles = {
 
   plotName: {
     flex: '1',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '13px',
   } as Partial<CSSStyleDeclaration>,
 
@@ -179,9 +179,9 @@ const contentStyles = {
     alignItems: 'center',
     gap: '8px',
     padding: '6px 10px',
-    backgroundColor: 'var(--bg, #131722)',
+    backgroundColor: 'var(--tc-bg, #131722)',
     borderRadius: '4px',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
 
@@ -195,9 +195,9 @@ const contentStyles = {
   // Style popover
   popover: {
     position: 'absolute',
-    backgroundColor: 'var(--modal-bg, #1e222d)',
+    backgroundColor: 'var(--tc-modal-bg, #1e222d)',
     borderRadius: '8px',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
     padding: '16px',
     zIndex: '10002',
@@ -221,7 +221,7 @@ const contentStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   controlLabel: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
     width: '60px',
     flexShrink: '0',
@@ -238,20 +238,20 @@ const contentStyles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'var(--bg, #131722)',
-    border: '1px solid var(--border, #363a45)',
+    backgroundColor: 'var(--tc-bg, #131722)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
   } as Partial<CSSStyleDeclaration>,
 
   optionButtonActive: {
-    backgroundColor: 'var(--text2, #787b86)',
-    borderColor: 'var(--text2, #787b86)',
+    backgroundColor: 'var(--tc-text2, #787b86)',
+    borderColor: 'var(--tc-text2, #787b86)',
   } as Partial<CSSStyleDeclaration>,
 
   emptyState: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '12px',
   } as Partial<CSSStyleDeclaration>,
 };
@@ -283,8 +283,8 @@ export class IndicatorSettingsModal extends Modal {
       closeOnEscape: true,
       position: 'absolute',
       align: 'center',
-      modalBackground: 'var(--modal-bg, #1e222d)',
-      border: '1px solid var(--border, #363a45)',
+      modalBackground: 'var(--tc-modal-bg, #1e222d)',
+      border: '1px solid var(--tc-border, #363a45)',
       maxHeight: 'min(80vh, calc(100% - 40px))',
       tabs: [
         { id: 'inputs', label: options.translations?.inputs || 'Inputs' },
