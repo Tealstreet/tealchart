@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { SkImage } from '@shopify/react-native-skia';
 import type { LayoutRectangle } from 'react-native';
 import type { PlotOutput, WorkerError } from '@tealstreet/tealscript';
@@ -27,6 +28,7 @@ import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadInt
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
   ContextMenuCallback,
+  ContextMenuRenderContext,
   IBasicDataFeed,
   PriceLine,
   RenderOptions,
@@ -192,6 +194,13 @@ export interface SkiaTealchartProps {
   userDrawingState?: UserDrawingState;
   onIndicatorsClick?: () => void;
   onContextMenu?: ContextMenuCallback;
+  /**
+   * Renders the whole menu instead of a list of items. Given one, the chart
+   * places and dismisses it exactly as it would its own menu and draws nothing
+   * inside it. What it returns is captured at the tap and held until the menu
+   * closes, so anything live inside it has to subscribe for itself.
+   */
+  renderContextMenu?: (context: ContextMenuRenderContext) => ReactNode;
   onViewportChange?: (viewport: Viewport) => void;
   onIntervalChange?: (interval: string) => void;
   onSymbolClick?: () => void;
@@ -219,6 +228,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingState,
     onIndicatorsClick,
     onContextMenu,
+    renderContextMenu,
     onViewportChange,
     onIntervalChange,
     onSymbolClick,
@@ -966,21 +976,32 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // handler and the "+" menu never opens.
   const [imperativeContextMenu, setImperativeContextMenu] = useState<ContextMenuCallback | null>(null);
   const activeContextMenu = imperativeContextMenu ?? onContextMenu ?? null;
-  const hasNativeContextMenu = Boolean(activeContextMenu);
+  const hasNativeContextMenu = Boolean(activeContextMenu) || Boolean(renderContextMenu);
   const closeNativeContextMenu = useCallback(() => {
     setNativeContextMenu(null);
     crosshair.visible.value = false;
   }, [crosshair]);
   const handleNativeContextMenuTap = useCallback(
     (time: number, price: number, anchorX: number, anchorY: number) => {
+      const content = renderContextMenu?.({
+        anchorX,
+        anchorY,
+        close: closeNativeContextMenu,
+        price,
+        unixTime: time,
+      });
+      if (content) {
+        setNativeContextMenu({ anchorX, anchorY, content, items: [] });
+        return;
+      }
       const items = activeContextMenu?.(time, price) ?? [];
       setNativeContextMenu(items.length > 0 ? { anchorX, anchorY, items } : null);
     },
-    [activeContextMenu],
+    [activeContextMenu, closeNativeContextMenu, renderContextMenu],
   );
   useEffect(() => {
-    if (!activeContextMenu) setNativeContextMenu(null);
-  }, [activeContextMenu]);
+    if (!activeContextMenu && !renderContextMenu) setNativeContextMenu(null);
+  }, [activeContextMenu, renderContextMenu]);
   const clearNativeResetViewButtonTimer = useCallback(() => {
     if (nativeResetViewButtonTimerRef.current) {
       clearTimeout(nativeResetViewButtonTimerRef.current);

@@ -577,6 +577,16 @@ describe('imperative chart API contract', () => {
   // both can come back showing a range their loaded page does not cover. Web is
   // covered end to end in TealchartWidget.test.ts; this pins the native half,
   // which lives inside an effect no unit test can drive.
+  // The "+" can open host content instead of a list, and the native half lives
+  // inside a callback no unit test can drive. Web is covered in ChartCore.test.
+  it('lets the host render the native + menu itself', () => {
+    const source = readSource('SkiaTealchart.tsx');
+
+    expect(source).toContain('const content = renderContextMenu?.({');
+    expect(source).toContain('setNativeContextMenu({ anchorX, anchorY, content, items: [] });');
+    expect(source).toContain('Boolean(activeContextMenu) || Boolean(renderContextMenu)');
+  });
+
   it('asks for the history a restored native viewport shows', () => {
     const runtimeSource = readSource('mobile/interaction/useNativeViewportRuntime.ts');
 

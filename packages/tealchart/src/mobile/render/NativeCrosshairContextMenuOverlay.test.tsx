@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
+import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -99,5 +100,33 @@ describe('NativeCrosshairContextMenuOverlay', () => {
     expect(close).toHaveBeenCalledTimes(1);
     expect(pressables[2].props.disabled).toBe(true);
     expect(pressables[2].props.accessibilityState).toEqual({ disabled: true });
+  });
+});
+
+describe('NativeCrosshairContextMenuOverlay host content', () => {
+  // Anchored by its right edge: the left edge of host content cannot be
+  // computed before a width the chart does not know.
+  it('renders host content in place of the item list, grown leftward from the anchor', () => {
+    const overlay = NativeCrosshairContextMenuOverlayImpl({
+      backgroundColor: '#131722',
+      dimensions: { width: 390, height: 480 },
+      menu: {
+        anchorX: 300,
+        anchorY: 100,
+        content: React.createElement(Text, null, 'Quick order'),
+        items: [],
+      },
+      onClose: vi.fn(),
+      renderOptions: { gridColor: '#363a45' },
+      textColor: '#d1d4dc',
+    });
+    const views = collectElementsByType(overlay, View);
+    const style = flattenStyle(views[0].props.style);
+    const texts = collectElementsByType(overlay, Text);
+
+    expect(style.right).toBe(102);
+    expect(style.width).toBeUndefined();
+    expect(style.left).toBeUndefined();
+    expect(texts.map((text) => text.props.children)).toContain('Quick order');
   });
 });

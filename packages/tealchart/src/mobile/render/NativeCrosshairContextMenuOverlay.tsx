@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { GestureResponderEvent } from 'react-native';
 import type { ContextMenuItem, RenderOptions } from '../../types';
 
@@ -19,6 +20,8 @@ export interface NativeCrosshairContextMenuState {
   anchorX: number;
   anchorY: number;
   items: ContextMenuItem[];
+  /** Set instead of `items` when the host renders the menu itself. */
+  content?: ReactNode;
 }
 
 export interface NativeContextMenuOverlayLayout {
@@ -102,6 +105,16 @@ export function NativeCrosshairContextMenuOverlayImpl({
   const disabledColor = '#787b86';
   const menuBackgroundColor = resolveNativeContextMenuBackgroundColor(backgroundColor);
 
+  const contentPlacement = menu.content
+    ? {
+        right: Math.max(
+          NATIVE_CONTEXT_MENU_MARGIN,
+          dimensions.width - menu.anchorX + NATIVE_CONTEXT_MENU_ANCHOR_GAP,
+        ),
+        top: layout.top,
+      }
+    : null;
+
   const stopPropagation = (event: GestureResponderEvent) => {
     event.stopPropagation?.();
   };
@@ -109,18 +122,22 @@ export function NativeCrosshairContextMenuOverlayImpl({
   return (
     <Pressable pointerEvents="auto" style={styles.overlay} onPress={onClose}>
       <View
-        style={[
-          styles.menu,
-          {
-            backgroundColor: menuBackgroundColor,
-            borderColor,
-            left: layout.left,
-            top: layout.top,
-            width: layout.width,
-          },
-        ]}
+        style={
+          // Host content owns everything inside the box, chrome included, and
+          // is anchored by its right edge because its width is its own: the
+          // left edge cannot be computed before a width we do not know.
+          contentPlacement
+            ? [styles.hostContent, contentPlacement]
+            : [
+                styles.menu,
+                { backgroundColor: menuBackgroundColor, borderColor },
+                { left: layout.left, top: layout.top, width: layout.width },
+              ]
+        }
         onStartShouldSetResponder={() => true}
       >
+        {menu.content}
+
         {menu.items.map((item, index) => {
           const enabled = item.enabled !== false;
           return (
@@ -179,6 +196,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
+  },
+  hostContent: {
+    position: 'absolute',
   },
   item: {
     borderRadius: 4,
