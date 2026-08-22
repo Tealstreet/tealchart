@@ -2140,13 +2140,13 @@ describe('ChartCore host-rendered context menu', () => {
 
   it('closes what it rendered when the host asks it to', async () => {
     const { ChartCore } = await import('./ChartCore');
-    let close: (() => void) | null = null;
+    const closeRef: { current: (() => void) | null } = { current: null };
     const core = new ChartCore({
       container,
       width: 800,
       height: 600,
       renderContextMenu: (context) => {
-        close = context.close;
+        closeRef.current = context.close;
         const el = document.createElement('div');
         el.textContent = 'Quick order';
         return el;
@@ -2162,7 +2162,7 @@ describe('ChartCore host-rendered context menu', () => {
 
     expect(document.body.textContent).toContain('Quick order');
 
-    close?.();
+    closeRef.current?.();
 
     expect(document.body.textContent).not.toContain('Quick order');
 
