@@ -4698,3 +4698,78 @@ describe('TealchartWidget', () => {
     });
   });
 });
+
+// The view scale is stored as a bar count, so a chart the user had zoomed out
+// past the initial page comes back showing a range no loaded bar covers. Only a
+// gesture ever asked for the rest, which is why touching the chart fixed it.
+describe('TealchartWidget viewport history coverage', () => {
+  beforeEach(() => {
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return null;
+    });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    document.body.innerHTML = '';
+  });
+
+  it('asks for the history a restored viewport shows and the loaded page does not cover', () => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed, makeBars(300));
+
+    expect(datafeed._getBarsCalls).toHaveLength(1);
+
+    // A symbol switch keeps how far the user was zoomed out, so the same span
+    // is restored over a page that cannot fill it.
+    widget.setSymbol('ETHUSDT');
+    datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+    datafeed._getBarsCb?.(makeBars(40), {});
+
+    const backfill = datafeed._getBarsCalls.filter((call) => call.periodParams.firstDataRequest === false);
+    expect(backfill).toHaveLength(1);
+    // `countBack` floors at the default page size, so it says nothing on its
+    // own. What matters is that the window reaches back past the page we have
+    // to where the restored viewport starts - 300 bars of zoom over a 40 bar
+    // page, so roughly 260 bars before the earliest one loaded.
+    const earliestLoadedSeconds = makeBars(40)[0].time / 1000;
+    expect(backfill[0].periodParams.to).toBeLessThan(earliestLoadedSeconds);
+    expect(backfill[0].periodParams.from).toBeLessThan(earliestLoadedSeconds - 260 * 60);
+
+    widget.remove();
+  });
+
+  // A newly listed market cannot reach the start of the viewport however many
+  // times it is asked, so the empty response has to end it.
+  it('stops asking once the feed says there is no more history', () => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed, makeBars(300));
+
+    widget.setSymbol('ETHUSDT');
+    datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+    datafeed._getBarsCb?.(makeBars(40), {});
+    datafeed._getBarsCb?.([], {});
+
+    expect(datafeed._getBarsCalls.filter((call) => call.periodParams.firstDataRequest === false)).toHaveLength(1);
+
+    widget.remove();
+  });
+
+  it('asks for nothing when the loaded page already covers the viewport', () => {
+    const datafeed = createMockDatafeed();
+    const widget = createWidget(datafeed);
+    completeInit(datafeed, makeBars(40));
+
+    widget.setSymbol('ETHUSDT');
+    datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+    datafeed._getBarsCb?.(makeBars(300), {});
+
+    expect(datafeed._getBarsCalls.filter((call) => call.periodParams.firstDataRequest === false)).toHaveLength(0);
+
+    widget.remove();
+  });
+});

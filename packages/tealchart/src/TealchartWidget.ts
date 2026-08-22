@@ -68,6 +68,7 @@ import {
   mergeLeftHistoryBackfillRequestHints,
   resolveLeftHistoryBackfillContinuationHint,
   resolveLeftHistoryBackfillRequest,
+  resolveViewportHistoryBackfillHint,
 } from './core/historyBackfill';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import {
@@ -715,7 +716,13 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     // Increment request ID to cancel any in-flight requests
     const requestId = ++this._loadBarsRequestId;
+    // A fresh page is a fresh paging state. Leaving these behind stranded the
+    // backfill below: a request in flight from the last page never clears its
+    // own flag once its response is discarded as stale, and a market that had
+    // run out of history keeps saying so for the market that replaced it.
     this._clearQueuedLeftHistoryBackfill();
+    this._isLoadingMoreBars = false;
+    this._hasMoreHistoricalData = true;
     this._isLoadingBars = true;
     this._scheduler.markDirty(DIRTY.CROSSHAIR); // Re-render to show faded/loading state
 
@@ -779,6 +786,12 @@ export class TealchartWidget implements ITealchartWebWidget {
         // Clean up old widget DOM now that we have bars to paint.
         // Old DOM stayed visible to prevent blank flash during widget recreation.
         this._ui?.cleanupStaleSiblings?.();
+
+        // Last, so the subscription is live and `_isLoadingBars` is already
+        // down: the page we just loaded is a fixed bar count, but the viewport
+        // came back from a view scale measured in bars, and a chart zoomed out
+        // past that count shows a range none of its own bars cover.
+        this._requestHistoryForViewport();
       },
       (error) => {
         // Check if this request is still valid
@@ -792,6 +805,23 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._setReady();
       },
     );
+  }
+
+  /**
+   * Backfill was only ever asked for by a gesture, so a chart that came back
+   * showing more than it had loaded stayed empty on the left until the user
+   * touched it. The paging loop already knows how to reach a required start
+   * time; it just had to be told the viewport needs one.
+   */
+  private _requestHistoryForViewport(): void {
+    const hint = resolveViewportHistoryBackfillHint({
+      earliestBarTime: this._bars[0]?.time,
+      hasMoreHistoricalData: this._hasMoreHistoricalData,
+      viewport: this._viewport,
+    });
+    if (!hint) return;
+
+    this._loadMoreBars('left', hint);
   }
 
   private _subscribeToBars(): void {
@@ -4029,6 +4059,9 @@ export class TealchartWidget implements ITealchartWebWidget {
       if (this._chartStore) {
         this._chartStore.settings.setKey('viewport', settings.viewport);
       }
+      // A saved layout carries absolute times rather than a bar count, so it can
+      // outrun the loaded page by even more than a restored view scale does.
+      this._requestHistoryForViewport();
     }
 
     // Re-render to reflect the loaded layout
