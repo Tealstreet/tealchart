@@ -240,6 +240,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   // Context menu
   private _contextMenuCallback: ContextMenuCallback | null = null;
   private _contextMenuRenderer: ((context: ContextMenuRenderContext) => HTMLElement | null) | null = null;
+  private _contextMenuCloseHandler: (() => void) | null = null;
   private _userDrawingObjectTreePanel: UserDrawingObjectTreePanel | null = null;
   private _userDrawingPropertiesPanel: UserDrawingPropertiesPanel | null = null;
   private _userDrawingPropertiesPanelDrawingId: string | undefined;
@@ -1300,6 +1301,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       onPositionReverse: (positionId) => this._chartApi.triggerPositionReverse(positionId),
       onContextMenu: this._contextMenuCallback || undefined,
       renderContextMenu: this._contextMenuRenderer || undefined,
+      onContextMenuClose: this._contextMenuCloseHandler || undefined,
       onMouseDown: () => {
         this._eventEmitter.emit('mouse_down');
       },
@@ -3899,6 +3901,12 @@ export class TealchartWidget implements ITealchartWebWidget {
   renderContextMenu(renderer: (context: ContextMenuRenderContext) => HTMLElement | null): void {
     this._contextMenuRenderer = renderer;
     this._ui?.setContextMenuRenderer(renderer);
+  }
+
+  /** Called when anything but the host dismisses a host-rendered menu. */
+  onContextMenuClose(handler: () => void): void {
+    this._contextMenuCloseHandler = handler;
+    this._ui?.setContextMenuCloseHandler(handler);
   }
 
   /**
