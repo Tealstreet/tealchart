@@ -201,6 +201,8 @@ export interface SkiaTealchartProps {
    * closes, so anything live inside it has to subscribe for itself.
    */
   renderContextMenu?: (context: ContextMenuRenderContext) => ReactNode;
+  /** Called when anything but the host dismisses a host-rendered menu. */
+  onContextMenuClose?: () => void;
   onViewportChange?: (viewport: Viewport) => void;
   onIntervalChange?: (interval: string) => void;
   onSymbolClick?: () => void;
@@ -229,6 +231,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onIndicatorsClick,
     onContextMenu,
     renderContextMenu,
+    onContextMenuClose,
     onViewportChange,
     onIntervalChange,
     onSymbolClick,
@@ -978,9 +981,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const activeContextMenu = imperativeContextMenu ?? onContextMenu ?? null;
   const hasNativeContextMenu = Boolean(activeContextMenu) || Boolean(renderContextMenu);
   const closeNativeContextMenu = useCallback(() => {
-    setNativeContextMenu(null);
+    setNativeContextMenu((current) => {
+      if (current?.content) onContextMenuClose?.();
+      return null;
+    });
     crosshair.visible.value = false;
-  }, [crosshair]);
+  }, [crosshair, onContextMenuClose]);
   const handleNativeContextMenuTap = useCallback(
     (time: number, price: number, anchorX: number, anchorY: number) => {
       const content = renderContextMenu?.({

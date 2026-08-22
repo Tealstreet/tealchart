@@ -157,6 +157,7 @@ export interface TealchartWidgetUIOptions {
   /** Context menu callback */
   onContextMenu?: (unixTime: number, price: number) => ContextMenuItem[];
   renderContextMenu?: (context: ContextMenuRenderContext) => HTMLElement | null;
+  onContextMenuClose?: () => void;
   /** Mouse down callback */
   onMouseDown?: () => void;
   /** Mouse up callback */
@@ -570,6 +571,7 @@ export class TealchartWidgetUI {
       onPositionReverse: this.options.onPositionReverse,
       onContextMenu: this.options.onContextMenu,
       renderContextMenu: this.options.renderContextMenu,
+      onContextMenuClose: this.options.onContextMenuClose,
       onMouseDown: this.options.onMouseDown,
       onMouseUp: this.options.onMouseUp,
       onCrossHairMoved: this.options.onCrossHairMoved,
@@ -994,6 +996,10 @@ export class TealchartWidgetUI {
 
   setContextMenuRenderer(renderer: (context: ContextMenuRenderContext) => HTMLElement | null): void {
     this.chartCore?.setContextMenuRenderer(renderer);
+  }
+
+  setContextMenuCloseHandler(handler: () => void): void {
+    this.chartCore?.setContextMenuCloseHandler(handler);
   }
 
   /**

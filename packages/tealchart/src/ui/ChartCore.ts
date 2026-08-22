@@ -156,6 +156,12 @@ export interface ChartCoreOptions {
    * inside it.
    */
   renderContextMenu?: (context: ContextMenuRenderContext) => HTMLElement | null;
+  /**
+   * Fired when a host-rendered menu is dismissed by anything other than the
+   * host itself - an outside click, a new menu, teardown. Without it a host has
+   * no way to know its content stopped being on screen, and keeps it alive.
+   */
+  onContextMenuClose?: () => void;
   /** Mouse down callback */
   onMouseDown?: () => void;
   /** Mouse up callback */
@@ -415,6 +421,7 @@ export class ChartCore {
   // + button drawn on crosshair canvas — hit-test bounds for click detection
   private _plusButtonBounds: { x: number; y: number; r: number } | null = null;
   private contextMenuResizeObserver: ResizeObserver | null = null;
+  private contextMenuIsCustom = false;
   // Bound handler for + button click — stored so it can be removed on dispose
   private plusButtonClickHandler: (e: MouseEvent) => void;
 
@@ -1604,6 +1611,10 @@ export class ChartCore {
     this.options.onContextMenu = callback;
   }
 
+  setContextMenuCloseHandler(handler: () => void): void {
+    this.options.onContextMenuClose = handler;
+  }
+
   setContextMenuRenderer(renderer: (context: ContextMenuRenderContext) => HTMLElement | null): void {
     this.options.renderContextMenu = renderer;
     // The "+" is drawn only when a menu exists, so a renderer registered after
@@ -1670,6 +1681,7 @@ export class ChartCore {
       // Nothing above a host's own box is ours to swallow: React delegates at
       // its root container, and a click that never reaches it is a dead button.
       // Outside-click dismissal reads `contains`, not propagation, so it holds.
+      this.contextMenuIsCustom = true;
       this.contextMenu.appendChild(custom);
     } else {
       this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
@@ -1742,6 +1754,8 @@ export class ChartCore {
   }
 
   private closeContextMenu(): void {
+    const hadCustomMenu = this.contextMenuIsCustom;
+    this.contextMenuIsCustom = false;
     if (this.contextMenuCloseTimer) {
       clearTimeout(this.contextMenuCloseTimer);
       this.contextMenuCloseTimer = null;
@@ -1754,6 +1768,7 @@ export class ChartCore {
     this.contextMenuResizeObserver = null;
     this.contextMenu?.remove();
     this.contextMenu = null;
+    if (hadCustomMenu) this.options.onContextMenuClose?.();
   }
 
   // ============================================================================
