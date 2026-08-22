@@ -12,7 +12,10 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 import { runOnJS } from 'react-native-worklets';
 
-import { resolveHistoryBackfillRequiredStartTime } from '../../core/historyBackfill';
+import {
+  resolveHistoryBackfillRequiredStartTime,
+  resolveViewportHistoryBackfillHint,
+} from '../../core/historyBackfill';
 import { TealchartRenderer } from '../../TealchartRenderer';
 import { captureViewScale, intervalToMs, restoreViewport, withDefaultPricePadding } from '../../viewport/viewScale';
 import { createNativeChartProjection } from '../render/nativeProjection';
@@ -424,7 +427,25 @@ export function useNativeViewportRuntime({
     setSettledViewport(pendingDataLoadViewport);
     requestNativeRenderViewportSync(pendingDataLoadViewport);
     onViewportChange?.(pendingDataLoadViewport);
-  }, [bars, dataKey, loadedBarsInterval, onViewportChange, pendingDataLoadViewport, requestNativeRenderViewportSync]);
+
+    // The view scale is a bar count, so a chart zoomed out past the page the
+    // load returned comes back showing a range none of its bars cover. Only a
+    // pan ever asked for the rest. The host re-checks whether any is left.
+    const hint = resolveViewportHistoryBackfillHint({
+      earliestBarTime: bars[0]?.time,
+      hasMoreHistoricalData: true,
+      viewport: pendingDataLoadViewport,
+    });
+    if (hint) onRequestMoreBars?.('left', hint);
+  }, [
+    bars,
+    dataKey,
+    loadedBarsInterval,
+    onRequestMoreBars,
+    onViewportChange,
+    pendingDataLoadViewport,
+    requestNativeRenderViewportSync,
+  ]);
 
   useEffect(() => {
     if (!barsMatchRequestedData || isLoading || bars.length === 0 || Object.is(loadedBarsRef.current, bars)) return;
@@ -604,11 +625,21 @@ export function useNativeViewportRuntime({
       syncNativeSharedViewportIfChanged(panStartViewport, viewportToApply);
       resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
       onViewportChange?.(viewportToApply);
+
+      // A saved layout carries absolute times, so it can outrun the loaded page
+      // by more than a restored view scale does.
+      const hint = resolveViewportHistoryBackfillHint({
+        earliestBarTime: autoScaleBars[0]?.time,
+        hasMoreHistoricalData: true,
+        viewport: viewportToApply,
+      });
+      if (hint) onRequestMoreBars?.('left', hint);
       return true;
     },
     [
       autoScaleBars,
       autoViewport,
+      onRequestMoreBars,
       onViewportChange,
       panActive,
       panStartViewport,
