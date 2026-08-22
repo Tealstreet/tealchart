@@ -74,20 +74,20 @@ export function resolveChromeThemeVars(
 
   return {
     // Primary / secondary / tertiary text form a brightness ladder from one color.
-    '--text': text,
-    '--text2': withAlpha(text, 0.75),
-    '--text3': withAlpha(text, 0.55),
-    '--bg': bg,
-    '--border': border,
-    '--accent': accent,
-    '--accent-bg': withAlpha(accent, 0.16),
-    '--active-bg': overlay(0.12),
-    '--hover-bg': overlay(0.06),
-    '--tooltip-bg': elevated(0.14),
-    '--modal-bg': elevated(0.06),
-    '--input-bg': elevated(0.1),
-    '--buy-color': buy,
-    '--sell-color': sell,
+    '--tc-text': text,
+    '--tc-text2': withAlpha(text, 0.75),
+    '--tc-text3': withAlpha(text, 0.55),
+    '--tc-bg': bg,
+    '--tc-border': border,
+    '--tc-accent': accent,
+    '--tc-accent-bg': withAlpha(accent, 0.16),
+    '--tc-active-bg': overlay(0.12),
+    '--tc-hover-bg': overlay(0.06),
+    '--tc-tooltip-bg': elevated(0.14),
+    '--tc-modal-bg': elevated(0.06),
+    '--tc-input-bg': elevated(0.1),
+    '--tc-buy-color': buy,
+    '--tc-sell-color': sell,
   };
 }
 

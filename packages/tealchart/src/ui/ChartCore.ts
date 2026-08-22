@@ -1664,8 +1664,8 @@ export class ChartCore {
             position: 'fixed',
             left: `${screenX}px`,
             top: `${screenY}px`,
-            backgroundColor: 'var(--bg, #1e222d)',
-            border: '1px solid var(--border, #363a45)',
+            backgroundColor: 'var(--tc-bg, #1e222d)',
+            border: '1px solid var(--tc-border, #363a45)',
             borderRadius: '4px',
             padding: '4px 0',
             zIndex: '1000',
@@ -1693,7 +1693,7 @@ export class ChartCore {
         style: {
           padding: '8px 12px',
           fontSize: '12px',
-          color: 'var(--text, #d1d4dc)',
+          color: 'var(--tc-text, #d1d4dc)',
           cursor: item.enabled === false ? 'default' : 'pointer',
           opacity: item.enabled === false ? '0.5' : '1',
         },
@@ -1706,7 +1706,7 @@ export class ChartCore {
         },
         onMouseEnter: (e) => {
           if (item.enabled === false) return;
-          (e.target as HTMLElement).style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
+          (e.target as HTMLElement).style.backgroundColor = 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))';
         },
         onMouseLeave: (e) => {
           (e.target as HTMLElement).style.backgroundColor = 'transparent';

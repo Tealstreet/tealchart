@@ -133,7 +133,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontWeight: '500',
     whiteSpace: 'nowrap',
   } as Partial<CSSStyleDeclaration>,
@@ -142,7 +142,7 @@ const styles = {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
-    backgroundColor: 'var(--buy-color, #0ECB81)',
+    backgroundColor: 'var(--tc-buy-color, #0ECB81)',
     marginLeft: '4px',
   } as Partial<CSSStyleDeclaration>,
 
@@ -159,12 +159,12 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   ohlcLabel: {
-    color: 'var(--text3, #5d606b)',
+    color: 'var(--tc-text3, #5d606b)',
     fontSize: '11px',
   } as Partial<CSSStyleDeclaration>,
 
   ohlcValue: {
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontFamily: 'monospace',
     fontSize: '11px',
   } as Partial<CSSStyleDeclaration>,
@@ -175,7 +175,7 @@ const styles = {
     gap: '4px',
     padding: '2px 0',
     cursor: 'pointer',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
   } as Partial<CSSStyleDeclaration>,
 
@@ -185,7 +185,7 @@ const styles = {
     gap: '6px',
     padding: '3px 0',
     fontSize: '11px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorName: {
@@ -197,7 +197,7 @@ const styles = {
     alignItems: 'center',
     gap: '4px',
     marginLeft: '6px',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
   } as Partial<CSSStyleDeclaration>,
 
@@ -214,7 +214,7 @@ const styles = {
     border: 'none',
     padding: '2px',
     cursor: 'pointer',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -334,7 +334,7 @@ export class ChartLegend extends Component<ChartLegendState> {
       this.ohlcElements.closeText.nodeValue = this.formatPrice(bar.close);
     }
     if (this.ohlcElements.close) {
-      const closeColor = isUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
+      const closeColor = isUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)';
       if (this.ohlcElements.close.style.color !== closeColor) {
         this.ohlcElements.close.style.color = closeColor;
       }
@@ -344,7 +344,7 @@ export class ChartLegend extends Component<ChartLegendState> {
       const changePercent = (change / prevBar.close) * 100;
       const changeUp = change >= 0;
       this.ohlcElements.changeText.nodeValue = `${changeUp ? '+' : ''}${safeToFixed(change, 1)} (${safeToFixed(changePercent, 2)}%)`;
-      const changeColor = changeUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
+      const changeColor = changeUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)';
       if (this.ohlcElements.change.style.color !== changeColor) {
         this.ohlcElements.change.style.color = changeColor;
       }
@@ -471,15 +471,15 @@ export class ChartLegend extends Component<ChartLegendState> {
     // Symbol info
     const symbolSection = div({ style: styles.symbolInfo });
     symbolSection.appendChild(span({ text: this.options.symbol }));
-    symbolSection.appendChild(span({ text: '·', style: { color: 'var(--text3, #5d606b)' } }));
+    symbolSection.appendChild(span({ text: '·', style: { color: 'var(--tc-text3, #5d606b)' } }));
     symbolSection.appendChild(span({ text: this.formatInterval(this.options.interval) }));
 
     if (this.options.exchangeName) {
-      symbolSection.appendChild(span({ text: '·', style: { color: 'var(--text3, #5d606b)' } }));
+      symbolSection.appendChild(span({ text: '·', style: { color: 'var(--tc-text3, #5d606b)' } }));
       symbolSection.appendChild(
         span({
           text: this.options.exchangeName,
-          style: { color: 'var(--text2, #787b86)' },
+          style: { color: 'var(--tc-text2, #787b86)' },
         }),
       );
     }
@@ -539,7 +539,7 @@ export class ChartLegend extends Component<ChartLegendState> {
           style: {
             fontFamily: 'monospace',
             fontSize: '11px',
-            color: changeUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)',
+            color: changeUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)',
           },
         });
         const changeText = document.createTextNode(
@@ -567,7 +567,7 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     const valueStyle: Partial<CSSStyleDeclaration> = { ...styles.ohlcValue };
     if (isUp !== undefined) {
-      valueStyle.color = isUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
+      valueStyle.color = isUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)';
     }
     item.appendChild(span({ text: value, style: valueStyle }));
 
@@ -588,7 +588,7 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     const valueStyle: Partial<CSSStyleDeclaration> = { ...styles.ohlcValue };
     if (isUp !== undefined) {
-      valueStyle.color = isUp ? 'var(--buy-color, #0ECB81)' : 'var(--sell-color, #F6465D)';
+      valueStyle.color = isUp ? 'var(--tc-buy-color, #0ECB81)' : 'var(--tc-sell-color, #F6465D)';
     }
     const valueEl = span({ style: valueStyle });
     const textNode = document.createTextNode(value);
@@ -685,10 +685,10 @@ export class ChartLegend extends Component<ChartLegendState> {
 
     // Use direct event listeners instead of props to ensure correct element targeting
     btn.addEventListener('mouseenter', () => {
-      btn.style.color = 'var(--text, #d1d4dc)';
+      btn.style.color = 'var(--tc-text, #d1d4dc)';
     });
     btn.addEventListener('mouseleave', () => {
-      btn.style.color = 'var(--text2, #787b86)';
+      btn.style.color = 'var(--tc-text2, #787b86)';
     });
 
     btn.appendChild(icon);
