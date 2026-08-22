@@ -2114,6 +2114,44 @@ describe('ChartCore host-rendered context menu', () => {
     core.dispose();
   });
 
+  // Without it the host has no idea its content left the screen, and keeps it
+  // mounted - subscriptions and all - against a node nobody can see.
+  it('tells the host when anything else dismisses what it rendered', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const onContextMenuClose = vi.fn();
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenuClose,
+      renderContextMenu: () => {
+        const el = document.createElement('div');
+        el.textContent = 'Quick order';
+        return el;
+      },
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    const testCore = core as unknown as {
+      handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+      closeContextMenu(): void;
+    };
+    testCore.handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    expect(onContextMenuClose).not.toHaveBeenCalled();
+
+    testCore.closeContextMenu();
+
+    expect(onContextMenuClose).toHaveBeenCalledTimes(1);
+
+    // Only for content it was actually showing.
+    testCore.closeContextMenu();
+
+    expect(onContextMenuClose).toHaveBeenCalledTimes(1);
+
+    core.dispose();
+  });
+
   it('falls back to the item list when the host declines to render', async () => {
     const { ChartCore } = await import('./ChartCore');
     const onContextMenu = vi.fn(() => [{ position: 'top' as const, text: 'Fallback action', click: vi.fn() }]);
