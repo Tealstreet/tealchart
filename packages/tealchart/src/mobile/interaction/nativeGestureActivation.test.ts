@@ -21,7 +21,6 @@ import {
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
 } from './nativeCrosshairGestures';
-import { deferNativeCanvasTapToPaneMaximize } from './nativeChartGestures';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
@@ -32,6 +31,7 @@ import {
 } from './nativeResetViewButton';
 import { createNativeSelectedDrawingActionTapGesture } from './nativeSelectedDrawingActionGestures';
 import {
+  createNativeCanvasTapGesture,
   createNativeLeftToolRailToggleTapGesture,
   createNativePaneMaximizeTapGesture,
   createNativePriceAxisResetTapGesture,
@@ -189,12 +189,43 @@ function paneMaximizeInput(overrides: Record<string, unknown> = {}) {
     bracketDragActive: shared(false),
     chartInteractionEnabled: true,
     crosshair: createCrosshair(false),
+    drawingCrosshairFallbackSuppressedUntilMs: shared(0),
+    paneMaximizeCrosshairSnapshotActive: shared(false),
+    paneMaximizeCrosshairSnapshotVisible: shared(false),
+    paneMaximizeCrosshairSnapshotX: shared(0),
+    paneMaximizeCrosshairSnapshotY: shared(0),
     drawingTapEnabled: false,
     frame: multiPaneFrame,
     hasContextMenu: false,
     onTogglePaneMaximize: () => {},
     orderDragZones: shared([]),
     pricePrecision: 2,
+    sharedViewport: sharedViewport(viewportValue),
+    tradeLabelHeight: 18,
+    tradeLineActionZones: shared([]),
+    tradeLineRows: shared([]),
+    ...overrides,
+  } as never;
+}
+
+function canvasTapInput(overrides: Record<string, unknown> = {}) {
+  return {
+    bracketDragActive: shared(false),
+    chartInteractionEnabled: true,
+    commitTradeLineAction: () => {},
+    controlZones: [],
+    crosshair: createCrosshair(false),
+    drawingCrosshairFallbackSuppressedUntilMs: shared(0),
+    drawingPlacementEnabled: false,
+    drawingSelectionEnabled: false,
+    frame: multiPaneFrame,
+    hasContextMenu: false,
+    onContextMenuTap: () => {},
+    onDrawingPlacementTap: () => {},
+    onDrawingSelectionTap: () => {},
+    orderDragZones: shared([]),
+    pricePrecision: 2,
+    resetViewVisible: shared(false),
     sharedViewport: sharedViewport(viewportValue),
     tradeLabelHeight: 18,
     tradeLineActionZones: shared([]),
@@ -538,15 +569,31 @@ describe('native gesture activation', () => {
 
   it('maximizes the pane a double tap lands in when there is more than one', () => {
     const onTogglePaneMaximize = vi.fn();
-    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ onTogglePaneMaximize })) as any;
+    const crosshair = createCrosshair(true);
+    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ crosshair, onTogglePaneMaximize })) as any;
 
     expect(gesture.config.numberOfTaps).toBe(2);
 
+    const manager = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }], allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }] },
+      manager,
+    );
+    expect(manager.failed).toBe(false);
+
     gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 60 }, true);
     expect(onTogglePaneMaximize).toHaveBeenCalledWith('main');
+    expect(crosshair.visible.value).toBe(true);
 
+    gesture.handlers.onFinalize({}, true);
+    crosshair.visible.value = false;
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }], allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }] },
+      mockStateManager(),
+    );
     gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 150 }, true);
     expect(onTogglePaneMaximize).toHaveBeenLastCalledWith('pane_1');
+    expect(crosshair.visible.value).toBe(false);
   });
 
   it('leaves pane-maximize double taps outside the plot alone', () => {
@@ -1471,20 +1518,6 @@ describe('native gesture activation', () => {
 });
 
 describe('canvas tap vs pane maximize double tap', () => {
-  function tap() {
-    return createNativePaneMaximizeTapGesture(paneMaximizeInput()) as any;
-  }
-
-  function canvasTap() {
-    return {
-      config: {} as Record<string, unknown>,
-      requireExternalGestureToFail(...gestures: unknown[]) {
-        this.config.requireToFail = [...((this.config.requireToFail as unknown[]) ?? []), ...gestures];
-        return this;
-      },
-    } as any;
-  }
-
   it('stands down where the single tap owns an action, so the double tap cannot eat it', () => {
     const zone = {
       objectType: 'order' as const,
@@ -1498,8 +1531,8 @@ describe('canvas tap vs pane maximize double tap', () => {
       paneMaximizeInput({ tradeLineActionZones: shared([zone]) }),
     ) as any;
 
-    // On a cancel button: recognising here would cancel the canvas tap that is
-    // waiting on this gesture, and the order would never be cancelled.
+    // On a cancel button: double-tap maximize must stand down so chrome keeps
+    // the tap sequence.
     const onButton = mockStateManager();
     gesture.handlers.onTouchesDown(
       { changedTouches: [{ x: 95, y: 78 }], allTouches: [{ x: 95, y: 78 }] },
@@ -1519,8 +1552,9 @@ describe('canvas tap vs pane maximize double tap', () => {
 
   it('stays armed in the default drawing-select state', () => {
     // `drawingSelectionEnabled` is true out of the box, so the resolver answers
-    // `drawingThenCrosshair` for the whole plot. Treating that as owned would
-    // disarm the double tap everywhere.
+    // `drawingThenCrosshair` for the whole plot. That path can claim a drawing
+    // tap or schedule a delayed crosshair fallback; pane maximize still stays
+    // available and suppresses the fallback if its double tap wins.
     const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ drawingTapEnabled: true })) as any;
     const manager = mockStateManager();
 
@@ -1530,6 +1564,22 @@ describe('canvas tap vs pane maximize double tap', () => {
     );
 
     expect(manager.failed).toBe(false);
+  });
+
+  it('resets pane-maximize crosshair snapshots after failed tap sequences', () => {
+    const paneMaximizeCrosshairSnapshotActive = shared(false);
+    const gesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({ paneMaximizeCrosshairSnapshotActive }),
+    ) as any;
+
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
+      mockStateManager(),
+    );
+    expect(paneMaximizeCrosshairSnapshotActive.value).toBe(true);
+
+    gesture.handlers.onFinalize({}, false);
+    expect(paneMaximizeCrosshairSnapshotActive.value).toBe(false);
   });
 
   it('stands down on the crosshair context-menu button', () => {
@@ -1549,34 +1599,140 @@ describe('canvas tap vs pane maximize double tap', () => {
     expect(manager.failed).toBe(true);
   });
 
-  it('makes the canvas tap wait out the double tap when a second pane exists', () => {
-    const canvasTapGesture = canvasTap();
-    const paneMaximizeTapGesture = tap();
+  it('leaves the canvas tap immediate when a second pane exists', () => {
+    const canvasTapGesture = createNativeCanvasTapGesture(canvasTapInput()) as any;
 
-    deferNativeCanvasTapToPaneMaximize(canvasTapGesture, paneMaximizeTapGesture, 2);
-
-    expect(canvasTapGesture.config.requireToFail).toEqual([paneMaximizeTapGesture]);
-  });
-
-  it('leaves the canvas tap immediate when there is nothing to double tap', () => {
-    const canvasTapGesture = { config: {} as Record<string, unknown>, requireExternalGestureToFail() {
-      throw new Error('should not wait on a gesture that disables itself');
-    } } as any;
-
-    expect(deferNativeCanvasTapToPaneMaximize(canvasTapGesture, tap(), 1)).toBe(canvasTapGesture);
     expect(canvasTapGesture.config.requireToFail).toBeUndefined();
   });
 
-  it('appends, which is why the caller must hand it a freshly built gesture', () => {
-    // Pinning gesture-handler's behaviour, not endorsing it: applying the
-    // relation twice grows the list, so a memoised gesture would collect one
-    // entry per render. The runtime applies it inside the memo that builds it.
-    const canvasTapGesture = canvasTap();
-    const paneMaximizeTapGesture = tap();
+  it('falls through from drawing selection to crosshair when no drawing claims the tap', async () => {
+    const crosshair = createCrosshair(false);
+    const canvasGesture = createNativeCanvasTapGesture(
+      canvasTapInput({
+        crosshair,
+        drawingSelectionEnabled: true,
+        onDrawingSelectionTap: () => {},
+      }),
+    ) as any;
 
-    deferNativeCanvasTapToPaneMaximize(canvasTapGesture, paneMaximizeTapGesture, 2);
-    deferNativeCanvasTapToPaneMaximize(canvasTapGesture, paneMaximizeTapGesture, 2);
+    canvasGesture.handlers.onEnd({ x: 150, y: 100 }, true);
 
-    expect((canvasTapGesture.config.requireToFail as unknown[]).length).toBe(2);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(crosshair.visible.value).toBe(true);
+  });
+
+  it('suppresses drawing fallback when pane maximize resolves after the canvas tap', async () => {
+    const crosshair = createCrosshair(false);
+    const drawingCrosshairFallbackSuppressedUntilMs = shared(0);
+    const paneMaximizeCrosshairSnapshotActive = shared(false);
+    const paneMaximizeCrosshairSnapshotVisible = shared(false);
+    const paneMaximizeCrosshairSnapshotX = shared(0);
+    const paneMaximizeCrosshairSnapshotY = shared(0);
+    const canvasGesture = createNativeCanvasTapGesture(
+      canvasTapInput({
+        crosshair,
+        drawingCrosshairFallbackSuppressedUntilMs,
+        drawingSelectionEnabled: true,
+        onDrawingSelectionTap: () => {},
+      }),
+    ) as any;
+    const paneGesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({
+        crosshair,
+        drawingCrosshairFallbackSuppressedUntilMs,
+        paneMaximizeCrosshairSnapshotActive,
+        paneMaximizeCrosshairSnapshotVisible,
+        paneMaximizeCrosshairSnapshotX,
+        paneMaximizeCrosshairSnapshotY,
+        drawingTapEnabled: true,
+      }),
+    ) as any;
+
+    paneGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
+      mockStateManager(),
+    );
+    canvasGesture.handlers.onEnd({ x: 150, y: 100 }, true);
+    paneGesture.handlers.onEnd({ x: 150, y: 100 }, true);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(crosshair.visible.value).toBe(false);
+  });
+
+  it('restores the pre-tap crosshair state when first-tap drawing fallback already ran', async () => {
+    const crosshair = createCrosshair(false);
+    const drawingCrosshairFallbackSuppressedUntilMs = shared(0);
+    const paneMaximizeCrosshairSnapshotActive = shared(false);
+    const paneMaximizeCrosshairSnapshotVisible = shared(false);
+    const paneMaximizeCrosshairSnapshotX = shared(0);
+    const paneMaximizeCrosshairSnapshotY = shared(0);
+    const canvasGesture = createNativeCanvasTapGesture(
+      canvasTapInput({
+        crosshair,
+        drawingCrosshairFallbackSuppressedUntilMs,
+        drawingSelectionEnabled: true,
+        onDrawingSelectionTap: () => {},
+      }),
+    ) as any;
+    const paneGesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({
+        crosshair,
+        drawingCrosshairFallbackSuppressedUntilMs,
+        paneMaximizeCrosshairSnapshotActive,
+        paneMaximizeCrosshairSnapshotVisible,
+        paneMaximizeCrosshairSnapshotX,
+        paneMaximizeCrosshairSnapshotY,
+        drawingTapEnabled: true,
+      }),
+    ) as any;
+
+    paneGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
+      mockStateManager(),
+    );
+    canvasGesture.handlers.onEnd({ x: 150, y: 100 }, true);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(crosshair.visible.value).toBe(true);
+
+    paneGesture.handlers.onEnd({ x: 150, y: 100 }, true);
+    expect(crosshair.visible.value).toBe(false);
+  });
+
+  it('suppresses drawing fallback when pane maximize resolves before the canvas tap', async () => {
+    const crosshair = createCrosshair(false);
+    const drawingCrosshairFallbackSuppressedUntilMs = shared(0);
+    const paneMaximizeCrosshairSnapshotActive = shared(false);
+    const paneMaximizeCrosshairSnapshotVisible = shared(false);
+    const paneMaximizeCrosshairSnapshotX = shared(0);
+    const paneMaximizeCrosshairSnapshotY = shared(0);
+    const canvasGesture = createNativeCanvasTapGesture(
+      canvasTapInput({
+        crosshair,
+        drawingCrosshairFallbackSuppressedUntilMs,
+        drawingSelectionEnabled: true,
+        onDrawingSelectionTap: () => {},
+      }),
+    ) as any;
+    const paneGesture = createNativePaneMaximizeTapGesture(
+      paneMaximizeInput({
+        crosshair,
+        drawingCrosshairFallbackSuppressedUntilMs,
+        paneMaximizeCrosshairSnapshotActive,
+        paneMaximizeCrosshairSnapshotVisible,
+        paneMaximizeCrosshairSnapshotX,
+        paneMaximizeCrosshairSnapshotY,
+        drawingTapEnabled: true,
+      }),
+    ) as any;
+
+    paneGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
+      mockStateManager(),
+    );
+    paneGesture.handlers.onEnd({ x: 150, y: 100 }, true);
+    canvasGesture.handlers.onEnd({ x: 150, y: 100 }, true);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(crosshair.visible.value).toBe(false);
   });
 });

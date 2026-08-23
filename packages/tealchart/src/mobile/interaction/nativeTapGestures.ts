@@ -19,7 +19,7 @@ import { runOnJS } from 'react-native-worklets';
 import { getNativePaneAtY } from '../render/nativeChartFrame';
 import { isNativeLeftToolRailToggleTap } from '../utils/leftToolRailLayout';
 import { resolveNativeCanvasTap } from './nativeCanvasTapResolver';
-import { toggleNativeCrosshair } from './nativeCrosshair';
+import { hideNativeCrosshair, toggleNativeCrosshair } from './nativeCrosshair';
 import {
   isNativeCrosshairContextMenuButtonTap,
   nativeCrosshairXToTime,
@@ -47,6 +47,7 @@ export interface NativeCanvasTapGestureInput {
   ) => void;
   controlZones: readonly NativeGestureControlZone[];
   crosshair: NativeCrosshairSharedValues;
+  drawingCrosshairFallbackSuppressedUntilMs: SharedValue<number>;
   resetViewVisible?: SharedValue<boolean>;
   drawingPlacementEnabled: boolean;
   drawingSelectionEnabled: boolean;
@@ -79,6 +80,7 @@ export function createNativeCanvasTapGesture({
   controlZones,
   resetViewVisible,
   crosshair,
+  drawingCrosshairFallbackSuppressedUntilMs,
   drawingPlacementEnabled,
   drawingSelectionEnabled,
   frame,
@@ -115,6 +117,7 @@ export function createNativeCanvasTapGesture({
     });
     setTimeout(() => {
       if (claimed) return;
+      if (Date.now() <= drawingCrosshairFallbackSuppressedUntilMs.value) return;
       toggleCrosshairAt(x, y);
     }, 0);
   };
@@ -234,6 +237,11 @@ export interface NativePaneMaximizeTapGestureInput {
   bracketDragActive: SharedValue<boolean>;
   chartInteractionEnabled: boolean;
   crosshair: NativeCrosshairSharedValues;
+  drawingCrosshairFallbackSuppressedUntilMs: SharedValue<number>;
+  paneMaximizeCrosshairSnapshotActive: SharedValue<boolean>;
+  paneMaximizeCrosshairSnapshotVisible: SharedValue<boolean>;
+  paneMaximizeCrosshairSnapshotX: SharedValue<number>;
+  paneMaximizeCrosshairSnapshotY: SharedValue<number>;
   drawingTapEnabled: boolean;
   hasContextMenu: boolean;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
@@ -260,6 +268,11 @@ export function createNativePaneMaximizeTapGesture({
   chartInteractionEnabled,
   controlZones = [],
   crosshair,
+  drawingCrosshairFallbackSuppressedUntilMs,
+  paneMaximizeCrosshairSnapshotActive,
+  paneMaximizeCrosshairSnapshotVisible,
+  paneMaximizeCrosshairSnapshotX,
+  paneMaximizeCrosshairSnapshotY,
   drawingTapEnabled,
   hasContextMenu,
   orderDragZones,
@@ -277,13 +290,10 @@ export function createNativePaneMaximizeTapGesture({
   return Gesture.Tap()
     .numberOfTaps(2)
     .maxDistance(NATIVE_TAP_MAX_DISTANCE)
-    // Armed only where the canvas tap would toggle the crosshair, which is the
-    // one outcome the two contend over. Anywhere the single tap owns an action
-    // - a cancel button, the context-menu button, a drawing - this stands down
-    // at touch-down, so that tap neither waits on this gesture nor gets
-    // cancelled by it. Deciding in onEnd would be too late: recognition is what
-    // cancels the canvas tap, and an impatient double tap on a cancel button
-    // would maximise the pane instead of cancelling the order.
+    // Armed only where the canvas tap would toggle the crosshair. Anywhere the
+    // single tap owns an action - a cancel button, the context-menu button, a
+    // drawing - this stands down at touch-down so an impatient double tap on
+    // chrome cannot maximize the pane instead of activating that chrome.
     .onTouchesDown((event, stateManager: GestureStateManager) => {
       const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
       if (!touch) {
@@ -310,13 +320,19 @@ export function createNativePaneMaximizeTapGesture({
           tradeLineRows: tradeLineRows.value,
         },
       );
-      // `drawingThenCrosshair` counts as contended too: it means "offer this to
-      // the drawings, and toggle the crosshair if none of them wants it". That
-      // hit test runs on the JS thread, so the worklet cannot tell the two
-      // apart - and the crosshair half is the same conflict. It is also the
-      // default state, since the select tool is active out of the box, so
-      // treating it as owned would disarm the double tap everywhere.
-      if (outcome.kind !== 'crosshair' && outcome.kind !== 'drawingThenCrosshair') stateManager.fail();
+      // `drawingThenCrosshair` still arms the double tap. If pane maximize wins,
+      // onEnd below briefly suppresses that JS-thread fallback so it cannot
+      // repaint the crosshair after the pane has been maximized.
+      if (outcome.kind !== 'crosshair' && outcome.kind !== 'drawingThenCrosshair') {
+        stateManager.fail();
+        return;
+      }
+      if (!paneMaximizeCrosshairSnapshotActive.value) {
+        paneMaximizeCrosshairSnapshotActive.value = true;
+        paneMaximizeCrosshairSnapshotVisible.value = crosshair.visible.value;
+        paneMaximizeCrosshairSnapshotX.value = crosshair.x.value;
+        paneMaximizeCrosshairSnapshotY.value = crosshair.y.value;
+      }
     })
     .onEnd((event, success) => {
       if (!success) return;
@@ -324,7 +340,20 @@ export function createNativePaneMaximizeTapGesture({
       if (event.x < frame.contentLeft || event.x >= frame.priceAxisHitLeft) return;
       const pane = getNativePaneAtY(frame, event.y);
       if (!pane) return;
+      drawingCrosshairFallbackSuppressedUntilMs.value = Date.now() + 120;
+      if (paneMaximizeCrosshairSnapshotActive.value) {
+        if (paneMaximizeCrosshairSnapshotVisible.value) {
+          crosshair.visible.value = true;
+          crosshair.x.value = paneMaximizeCrosshairSnapshotX.value;
+          crosshair.y.value = paneMaximizeCrosshairSnapshotY.value;
+        } else {
+          hideNativeCrosshair(crosshair);
+        }
+      }
       runOnJS(onTogglePaneMaximize)(pane.id);
+    })
+    .onFinalize(() => {
+      paneMaximizeCrosshairSnapshotActive.value = false;
     });
 }
 
@@ -433,4 +462,3 @@ export function createNativeResetViewTapGesture({
       runOnJS(onResetViewTap)(event.x, event.y);
     });
 }
-
