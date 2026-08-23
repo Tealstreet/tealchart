@@ -147,6 +147,18 @@ describe('resolveNativeCanvasTap', () => {
     expect(outcome).toEqual({ kind: 'tradeLineSelect', objectType: 'order', objectId: 'order-1' });
   });
 
+  it('selects a trade line from the visible connector outside the label body', () => {
+    const rowY = CENTER_Y - 12;
+    const outcome = resolveNativeCanvasTap(
+      { x: 28, y: rowY },
+      context({
+        orderDragZones: [{ objectId: 'order-1', price: priceAt(rowY), x1: 20, x2: 170 }],
+        tradeLineRows: [{ objectType: 'order', objectId: 'order-1', price: priceAt(rowY), x1: 20, x2: 170 }],
+      }),
+    );
+    expect(outcome).toEqual({ kind: 'tradeLineSelect', objectType: 'order', objectId: 'order-1' });
+  });
+
   it('offers the tap to drawings before the crosshair, and never both', () => {
     const outcome = resolveNativeCanvasTap(EMPTY_PLOT, context({ drawingTapEnabled: true }));
     expect(outcome.kind).toBe('drawingThenCrosshair');

@@ -325,6 +325,19 @@ export function canBeginNativeChartPan({
 }): boolean {
   'worklet';
   if (
+    findNativeTradeLineRow({
+      rows,
+      x,
+      y,
+      sharedViewport,
+      frame,
+      tradeLabelHeight,
+    })
+  ) {
+    return false;
+  }
+
+  if (
     findNativeTradeLineActionZone({
       zones: actionZones,
       rows,

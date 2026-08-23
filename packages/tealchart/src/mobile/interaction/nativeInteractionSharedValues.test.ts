@@ -28,6 +28,9 @@ describe('native interaction shared values', () => {
         objectType: 'order',
         objectId: 'order-1',
         price: 100,
+        leftLineStartX: 10,
+        priceLabelX: 90,
+        priceLabelWidth: 50,
         dragZone: { objectId: 'order-1', price: 100, x1: 10, x2: 80 },
         actionZones: [
           {
@@ -50,6 +53,9 @@ describe('native interaction shared values', () => {
         objectType: 'position',
         objectId: 'position-1',
         price: 110,
+        leftLineStartX: 12,
+        priceLabelX: 92,
+        priceLabelWidth: 50,
         actionZones: [],
       },
     ] as NativeTradeLineGeometry[];
@@ -61,12 +67,41 @@ describe('native interaction shared values', () => {
       geometries,
     });
 
-    expect(orderDragZones.value).toEqual([{ objectId: 'order-1', price: 100, x1: 10, x2: 80 }]);
+    expect(orderDragZones.value).toEqual([{ objectId: 'order-1', price: 100, x1: 10, x2: 140 }]);
     expect(actionZones.value).toHaveLength(1);
     expect(rows.value).toEqual([
-      { objectType: 'order', objectId: 'order-1', price: 100 },
-      { objectType: 'position', objectId: 'position-1', price: 110 },
+      { objectType: 'order', objectId: 'order-1', price: 100, x1: 10, x2: 140 },
+      { objectType: 'position', objectId: 'position-1', price: 110, x1: 12, x2: 142 },
     ]);
+  });
+
+  it('refreshes row hit boxes when layout x bounds change without a price change', () => {
+    const orderDragZones = shared<NativeOrderDragZone[]>([]);
+    const actionZones = shared<NativeTradeLineActionZone[]>([]);
+    const rows = shared<NativeTradeLineRow[]>([]);
+    const baseGeometry = {
+      objectType: 'order',
+      objectId: 'order-1',
+      price: 100,
+      leftLineStartX: 10,
+      priceLabelX: 90,
+      priceLabelWidth: 50,
+      dragZone: { objectId: 'order-1', price: 100, x1: 40, x2: 80 },
+      actionZones: [],
+    } as NativeTradeLineGeometry;
+
+    syncNativeTradeLineInteractionGeometry({ orderDragZones, actionZones, rows, geometries: [baseGeometry] });
+    const firstRows = rows.value;
+
+    syncNativeTradeLineInteractionGeometry({
+      orderDragZones,
+      actionZones,
+      rows,
+      geometries: [{ ...baseGeometry, leftLineStartX: 24, priceLabelX: 104 }],
+    });
+
+    expect(rows.value).not.toBe(firstRows);
+    expect(rows.value).toEqual([{ objectType: 'order', objectId: 'order-1', price: 100, x1: 24, x2: 154 }]);
   });
 
   it('refreshes action zones when bracket preview metadata changes', () => {
