@@ -1,7 +1,14 @@
 import type { TimeframeOption } from '../../state/chartState';
 import type { ResolutionString } from '../../types';
 
-export type NativeTopBarActionType = 'symbol' | 'timeframe' | 'indicators' | 'layout' | 'undo' | 'redo';
+export type NativeTopBarActionType =
+  | 'symbol'
+  | 'timeframe'
+  | 'timeframeMenu'
+  | 'indicators'
+  | 'layout'
+  | 'undo'
+  | 'redo';
 
 export interface NativeTopBarActionCommand {
   type: NativeTopBarActionType;
@@ -43,7 +50,9 @@ export interface NativeTopBarHitRectGeometry {
 }
 
 export interface NativeTopBarLayout {
+  width: number;
   height: number;
+  interval: ResolutionString;
   symbol: NativeTopBarTextGeometry;
   symbolChevron: NativeTopBarTextGeometry | null;
   symbolHitRect: NativeTopBarHitRectGeometry | null;
@@ -68,6 +77,7 @@ export interface NativeTopBarLayoutInput {
   indicatorsEnabled?: boolean;
   layoutName?: string | null;
   layoutSelectorEnabled?: boolean;
+  timeframeMenuEnabled?: boolean;
   undoEnabled?: boolean;
   redoEnabled?: boolean;
 }
@@ -91,6 +101,7 @@ const BUTTON_HEIGHT = 28;
 const BUTTON_PADDING_X = 6;
 const MIN_TIMEFRAME_BUTTON_WIDTH = 30;
 const ACTION_BUTTON_WIDTH = 24;
+const TIMEFRAME_MENU_WIDTH = 26;
 const DIVIDER_HEIGHT = 18;
 const SYMBOL_CHEVRON = 'v';
 const SYMBOL_CHEVRON_GAP = 5;
@@ -126,9 +137,40 @@ function pushDivider(dividers: NativeTopBarDividerGeometry[], x: number, height:
   });
 }
 
-function sumButtonWidths(widths: readonly number[]): number {
-  if (widths.length === 0) return 0;
-  return widths.reduce((total, width) => total + width, 0) + BUTTON_GAP * (widths.length - 1);
+function fitTimeframeCandidatesBeforeMenu(
+  candidates: readonly NativeTopBarTimeframeCandidate[],
+  visibleLaneWidth: number,
+  activeInterval: ResolutionString,
+): NativeTopBarTimeframeCandidate[] {
+  const availableWidth = Math.max(
+    MIN_TIMEFRAME_BUTTON_WIDTH,
+    visibleLaneWidth - TIMEFRAME_MENU_WIDTH - BUTTON_GAP - HORIZONTAL_PADDING,
+  );
+  const selected: NativeTopBarTimeframeCandidate[] = [];
+  let usedWidth = 0;
+
+  for (const candidate of candidates) {
+    const nextWidth = selected.length === 0 ? candidate.width : usedWidth + BUTTON_GAP + candidate.width;
+    if (selected.length > 0 && nextWidth > availableWidth) break;
+    selected.push(candidate);
+    usedWidth = nextWidth;
+  }
+
+  const activeCandidate = candidates.find((candidate) => candidate.timeframe.value === activeInterval);
+  if (!activeCandidate || selected.some((candidate) => candidate.timeframe.value === activeInterval)) {
+    return selected.length > 0 ? selected : candidates.slice(0, 1);
+  }
+
+  while (selected.length > 0) {
+    const nextWidth = selected.length === 0 ? activeCandidate.width : usedWidth + BUTTON_GAP + activeCandidate.width;
+    if (nextWidth <= availableWidth) break;
+    const removed = selected.pop();
+    if (!removed) break;
+    usedWidth -= removed.width + (selected.length > 0 ? BUTTON_GAP : 0);
+  }
+
+  selected.push(activeCandidate);
+  return selected;
 }
 
 export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): NativeTopBarLayout {
@@ -169,18 +211,18 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
         }
       : null;
 
-  const timeframeCandidates = input.timeframes.map((timeframe): NativeTopBarTimeframeCandidate => ({
-    timeframe,
-    width: Math.max(
-      MIN_TIMEFRAME_BUTTON_WIDTH,
-      Math.ceil(input.textWidth(timeframe.shortLabel)) + BUTTON_PADDING_X * 2,
-    ),
-  }));
+  const allTimeframeCandidates = input.timeframes.map(
+    (timeframe): NativeTopBarTimeframeCandidate => ({
+      timeframe,
+      width: Math.max(
+        MIN_TIMEFRAME_BUTTON_WIDTH,
+        Math.ceil(input.textWidth(timeframe.shortLabel)) + BUTTON_PADDING_X * 2,
+      ),
+    }),
+  );
   const scrollAreaX =
     (symbolHitRect ? symbolHitRect.x + symbolHitRect.width : HORIZONTAL_PADDING) +
     (symbolChevron ? GROUP_GAP : HORIZONTAL_PADDING);
-  const timeframeWidth = sumButtonWidths(timeframeCandidates.map((candidate) => candidate.width));
-
   const rawLayoutLabel = input.layoutName?.trim() || LAYOUT_LABEL;
   const resolvedLayoutWidth = input.layoutSelectorEnabled
     ? Math.min(
@@ -199,6 +241,9 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
   const rightControlsWidth =
     indicatorsWidth + GROUP_GAP + actionButtonsWidth + (resolvedLayoutWidth > 0 ? GROUP_GAP + resolvedLayoutWidth : 0);
   const visibleLaneWidth = Math.max(0, input.width - scrollAreaX);
+  const timeframeCandidates = input.timeframeMenuEnabled
+    ? fitTimeframeCandidatesBeforeMenu(allTimeframeCandidates, visibleLaneWidth, input.interval)
+    : allTimeframeCandidates;
 
   let x = 0;
   for (const candidate of timeframeCandidates) {
@@ -225,6 +270,23 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
   }
   if (timeframeCandidates.length > 0) {
     x -= BUTTON_GAP;
+  }
+
+  if (input.timeframeMenuEnabled) {
+    if (x > 0) x += BUTTON_GAP;
+    buttons.push({
+      type: 'timeframeMenu',
+      text: '',
+      enabled: true,
+      x,
+      y: buttonY,
+      width: TIMEFRAME_MENU_WIDTH,
+      height: BUTTON_HEIGHT,
+      textX: x,
+      textY,
+      textColor: input.mutedTextColor,
+    });
+    x += TIMEFRAME_MENU_WIDTH;
   }
 
   const spacerBeforeRightControls = Math.max(
@@ -299,7 +361,9 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
   buttons.sort((a, b) => a.x - b.x);
 
   return {
+    width: input.width,
     height,
+    interval: input.interval,
     symbol,
     symbolChevron,
     symbolHitRect,

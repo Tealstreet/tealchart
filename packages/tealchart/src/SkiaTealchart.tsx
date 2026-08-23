@@ -136,7 +136,7 @@ import {
   getNativePositionObjectId as getPositionObjectId,
 } from './mobile/utils/tradeLineLayout';
 import { applyChartOverridesToRenderOptions } from './overrides';
-import { getChartStore } from './state/chartState';
+import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
 import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
@@ -364,10 +364,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => new Set<ResolutionString>(uiPreferences.favoriteTimeframeValues),
     [uiPreferences.favoriteTimeframeValues],
   );
+  const nativeTopBarMenuTimeframes = useMemo(
+    () => filterTimeframesBySupportedResolutions(supportedResolutions, AVAILABLE_TIMEFRAMES),
+    [supportedResolutions],
+  );
   const [nativeOpenDrawingCategoryId, setNativeOpenDrawingCategoryId] = useState<string | null>(null);
   const toggleLeftToolRailCollapsed = useCallback(() => {
     chartStore.uiPreferences.setKey('leftToolRailCollapsed', !chartStore.uiPreferences.get().leftToolRailCollapsed);
   }, [chartStore]);
+  const toggleNativeFavoriteTimeframe = useCallback(
+    (timeframe: ResolutionString) => {
+      const current = new Set(chartStore.uiPreferences.get().favoriteTimeframeValues);
+      if (current.has(timeframe)) {
+        current.delete(timeframe);
+      } else {
+        current.add(timeframe);
+      }
+      const nextFavorites = AVAILABLE_TIMEFRAMES.map((option) => option.value).filter((value) => current.has(value));
+      chartStore.uiPreferences.setKey('favoriteTimeframeValues', nextFavorites);
+    },
+    [chartStore],
+  );
   const dismissNativeOpenDrawingCategory = useCallback(() => {
     setNativeOpenDrawingCategoryId(null);
   }, []);
@@ -2011,9 +2028,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       {topBarLayout && (
         <NativeTopBarOverlay
           backgroundColor={backgroundColor}
+          favoriteTimeframeValues={uiPreferences.favoriteTimeframeValues}
           gridColor={gridColor}
+          menuTimeframes={nativeTopBarMenuTimeframes}
           mutedTextColor={nativeMutedTextColor}
           onAction={handleNativeTopBarAction}
+          onFavoriteTimeframeToggle={toggleNativeFavoriteTimeframe}
           textColor={textColor}
           topBarLayout={topBarLayout}
         />

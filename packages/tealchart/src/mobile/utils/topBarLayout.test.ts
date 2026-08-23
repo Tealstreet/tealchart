@@ -9,7 +9,7 @@ const mobileTimeframes = AVAILABLE_TIMEFRAMES.filter((timeframe) =>
 );
 const mobileVisibleValues = new Set(['1', '5', '15', '30', '60']);
 
-function createLayout(width = 390, layoutSelectorEnabled = false) {
+function createLayout(width = 390, layoutSelectorEnabled = false, options: { timeframeMenuEnabled?: boolean } = {}) {
   return createNativeTopBarLayout({
     width,
     height: 36,
@@ -25,6 +25,7 @@ function createLayout(width = 390, layoutSelectorEnabled = false) {
     indicatorsEnabled: true,
     layoutName: 'Default Layout',
     layoutSelectorEnabled,
+    timeframeMenuEnabled: options.timeframeMenuEnabled ?? true,
     undoEnabled: true,
     redoEnabled: true,
   });
@@ -46,6 +47,9 @@ describe('native top bar layout', () => {
     expect(layout.buttons.map((button) => button.type)).toContain('timeframe');
     expect(layout.buttons.find((button) => button.interval === '15')?.backgroundColor).toBe('#24312b');
     expect(layout.buttons.find((button) => button.type === 'indicators')?.text).toBe('Indicators');
+    expect(layout.buttons.find((button) => button.type === 'timeframeMenu')).toEqual(
+      expect.objectContaining({ enabled: true }),
+    );
     expect(layout.buttons.map((button) => button.type)).toContain('undo');
     expect(layout.buttons.map((button) => button.type)).toContain('redo');
 
@@ -66,13 +70,48 @@ describe('native top bar layout', () => {
     expect(layout.buttons.every((button) => button.x + button.width <= layout.scrollContentWidth)).toBe(true);
   });
 
-  it('keeps every native timeframe in the scrollable lane on compact widths', () => {
-    const layout = createLayout(270);
+  it('keeps every native timeframe in the scrollable lane when the overflow menu is disabled', () => {
+    const layout = createLayout(270, false, { timeframeMenuEnabled: false });
     const timeframeButtons = layout.buttons.filter((button) => button.type === 'timeframe');
 
     expect(timeframeButtons.map((button) => button.interval)).toEqual(['1', '5', '15', '30', '60']);
     expect(timeframeButtons.map((button) => button.interval)).toContain('15');
     expect(layout.scrollContentWidth).toBeGreaterThan(270 - layout.scrollAreaX);
+  });
+
+  it('keeps the timeframe menu reachable before overflow content on compact widths', () => {
+    const layout = createLayout(270);
+    const timeframeButtons = layout.buttons.filter((button) => button.type === 'timeframe');
+    const menuButton = layout.buttons.find((button) => button.type === 'timeframeMenu');
+    const visibleLaneWidth = 270 - layout.scrollAreaX;
+
+    expect(timeframeButtons.map((button) => button.interval)).toEqual(['1', '5', '15', '30']);
+    expect(menuButton).toEqual(expect.objectContaining({ enabled: true }));
+    expect(menuButton!.x + menuButton!.width).toBeLessThanOrEqual(visibleLaneWidth);
+  });
+
+  it('keeps the active favorite visible when compact fitting trims later intervals', () => {
+    const layout = createNativeTopBarLayout({
+      width: 270,
+      height: 36,
+      symbol: 'BTC-USD',
+      interval: '240',
+      timeframes: AVAILABLE_TIMEFRAMES.filter((timeframe) =>
+        ['1', '3', '5', '15', '30', '60', '120', '240'].includes(timeframe.value),
+      ),
+      textWidth,
+      titleTextWidth: textWidth,
+      textColor: '#f0f3fa',
+      mutedTextColor: '#8a8f98',
+      activeTextColor: '#12c48b',
+      activeBackgroundColor: '#24312b',
+      indicatorsEnabled: true,
+      timeframeMenuEnabled: true,
+    });
+    const timeframeButtons = layout.buttons.filter((button) => button.type === 'timeframe');
+
+    expect(timeframeButtons.map((button) => button.interval)).toContain('240');
+    expect(layout.buttons.find((button) => button.interval === '240')?.backgroundColor).toBe('#24312b');
   });
 
   it('adds a compact layout selector button without overlapping other controls', () => {
@@ -107,12 +146,19 @@ describe('native top bar layout', () => {
   it('exports deterministic button commands for native overlay controls', () => {
     const layout = createLayout();
     const activeButton = layout.buttons.find((button) => button.interval === '15');
+    const menuButton = layout.buttons.find((button) => button.type === 'timeframeMenu');
 
     expect(activeButton).toBeDefined();
     expect(activeButton).toEqual(
       expect.objectContaining({
         type: 'timeframe',
         interval: '15',
+        enabled: true,
+      }),
+    );
+    expect(menuButton).toEqual(
+      expect.objectContaining({
+        type: 'timeframeMenu',
         enabled: true,
       }),
     );
