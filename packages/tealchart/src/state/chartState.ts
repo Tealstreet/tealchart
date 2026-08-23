@@ -106,7 +106,7 @@ export interface ChartSettings {
 }
 
 export const DEFAULT_CHART_SETTINGS: ChartSettings = {
-  interval: '1h' as ResolutionString,
+  interval: '60' as ResolutionString,
   symbol: 'BTCUSDT',
   showVolume: true,
   volumeHeight: 0.2,
@@ -138,13 +138,27 @@ const DEFAULT_CURRENT_LAYOUT: CurrentLayoutState = {
 // Chart UI Preferences
 // ============================================================================
 
+const DEFAULT_CHART_UI_FAVORITE_TIMEFRAME_VALUES = [
+  '1',
+  '3',
+  '5',
+  '15',
+  '30',
+  '60',
+  '120',
+  '240',
+] as ResolutionString[];
+
 export interface ChartUiPreferences {
   /** Whether the left drawing tool rail is collapsed to its toggle affordance. */
   leftToolRailCollapsed: boolean;
+  /** Timeframes pinned into the compact toolbar selector. */
+  favoriteTimeframeValues: ResolutionString[];
 }
 
 export const DEFAULT_CHART_UI_PREFERENCES: ChartUiPreferences = {
   leftToolRailCollapsed: false,
+  favoriteTimeframeValues: DEFAULT_CHART_UI_FAVORITE_TIMEFRAME_VALUES,
 };
 
 // ============================================================================
@@ -236,9 +250,20 @@ function normalizeChartUiPreferences(
 ): ChartUiPreferences {
   if (value == null || typeof value !== 'object') return { ...defaults };
   const input = value as Partial<ChartUiPreferences>;
+  const favoriteTimeframeValues = Array.isArray(input.favoriteTimeframeValues)
+    ? Array.from(
+        new Set(
+          input.favoriteTimeframeValues.filter(
+            (timeframe): timeframe is ResolutionString => typeof timeframe === 'string',
+          ),
+        ),
+      )
+    : defaults.favoriteTimeframeValues;
+
   return {
     leftToolRailCollapsed:
       typeof input.leftToolRailCollapsed === 'boolean' ? input.leftToolRailCollapsed : defaults.leftToolRailCollapsed,
+    favoriteTimeframeValues,
   };
 }
 
@@ -626,20 +651,26 @@ export function createIntervalMsAtom(chartKey: string) {
  */
 export function resolutionToMs(resolution: ResolutionString): number {
   const num = parseInt(resolution, 10) || 1;
-  const unit = resolution.replace(/[0-9]/g, '').toUpperCase();
+  const unit = resolution.replace(/[0-9]/g, '');
 
   switch (unit) {
+    case 's':
     case 'S':
       return num * 1000;
     case '': // Minutes (no suffix) - TradingView standard
-    case 'M':
+    case 'm': // Lenient fallback for host timeframe strings such as "1m".
       return num * 60 * 1000;
+    case 'h':
     case 'H':
       return num * 60 * 60 * 1000;
+    case 'd':
     case 'D':
       return num * 24 * 60 * 60 * 1000;
+    case 'w':
     case 'W':
       return num * 7 * 24 * 60 * 60 * 1000;
+    case 'M':
+      return num * 30 * 24 * 60 * 60 * 1000;
     default:
       return num * 60 * 1000; // Default to minutes for unknown suffixes
   }
@@ -653,19 +684,67 @@ export interface TimeframeOption {
   value: ResolutionString;
   label: string;
   shortLabel: string;
+  group: TimeframeGroup;
+  defaultFavorite?: boolean;
 }
 
-export const AVAILABLE_TIMEFRAMES: TimeframeOption[] = [
-  { value: '1' as ResolutionString, label: '1 minute', shortLabel: '1m' },
-  { value: '3' as ResolutionString, label: '3 minutes', shortLabel: '3m' },
-  { value: '5' as ResolutionString, label: '5 minutes', shortLabel: '5m' },
-  { value: '15' as ResolutionString, label: '15 minutes', shortLabel: '15m' },
-  { value: '30' as ResolutionString, label: '30 minutes', shortLabel: '30m' },
-  { value: '60' as ResolutionString, label: '1 hour', shortLabel: '1h' },
-  { value: '240' as ResolutionString, label: '4 hours', shortLabel: '4h' },
-  { value: '1D' as ResolutionString, label: '1 day', shortLabel: '1D' },
-  { value: '1W' as ResolutionString, label: '1 week', shortLabel: '1W' },
+export type TimeframeGroup = 'seconds' | 'minutes' | 'hours' | 'days';
+
+export interface TimeframeGroupDefinition {
+  value: TimeframeGroup;
+  label: string;
+}
+
+export const TIMEFRAME_GROUPS: TimeframeGroupDefinition[] = [
+  { value: 'seconds', label: 'Seconds' },
+  { value: 'minutes', label: 'Minutes' },
+  { value: 'hours', label: 'Hours' },
+  { value: 'days', label: 'Days' },
 ];
+
+export const AVAILABLE_TIMEFRAMES: TimeframeOption[] = [
+  { value: '1S' as ResolutionString, label: '1 second', shortLabel: '1s', group: 'seconds' },
+  { value: '5S' as ResolutionString, label: '5 seconds', shortLabel: '5s', group: 'seconds' },
+  { value: '15S' as ResolutionString, label: '15 seconds', shortLabel: '15s', group: 'seconds' },
+  { value: '30S' as ResolutionString, label: '30 seconds', shortLabel: '30s', group: 'seconds' },
+  { value: '1' as ResolutionString, label: '1 minute', shortLabel: '1m', group: 'minutes', defaultFavorite: true },
+  { value: '3' as ResolutionString, label: '3 minutes', shortLabel: '3m', group: 'minutes', defaultFavorite: true },
+  { value: '5' as ResolutionString, label: '5 minutes', shortLabel: '5m', group: 'minutes', defaultFavorite: true },
+  { value: '15' as ResolutionString, label: '15 minutes', shortLabel: '15m', group: 'minutes', defaultFavorite: true },
+  { value: '30' as ResolutionString, label: '30 minutes', shortLabel: '30m', group: 'minutes', defaultFavorite: true },
+  { value: '60' as ResolutionString, label: '1 hour', shortLabel: '1h', group: 'hours', defaultFavorite: true },
+  { value: '120' as ResolutionString, label: '2 hours', shortLabel: '2h', group: 'hours', defaultFavorite: true },
+  { value: '240' as ResolutionString, label: '4 hours', shortLabel: '4h', group: 'hours', defaultFavorite: true },
+  { value: '360' as ResolutionString, label: '6 hours', shortLabel: '6h', group: 'hours' },
+  { value: '480' as ResolutionString, label: '8 hours', shortLabel: '8h', group: 'hours' },
+  { value: '720' as ResolutionString, label: '12 hours', shortLabel: '12h', group: 'hours' },
+  { value: '1D' as ResolutionString, label: '1 day', shortLabel: '1D', group: 'days' },
+  { value: '3D' as ResolutionString, label: '3 days', shortLabel: '3D', group: 'days' },
+  { value: '1W' as ResolutionString, label: '1 week', shortLabel: '1W', group: 'days' },
+  { value: '1M' as ResolutionString, label: '1 month', shortLabel: '1M', group: 'days' },
+];
+
+export const DEFAULT_FAVORITE_TIMEFRAME_VALUES = AVAILABLE_TIMEFRAMES.filter(
+  (timeframe) => timeframe.defaultFavorite,
+).map((timeframe) => timeframe.value);
+
+export function filterTimeframesBySupportedResolutions(
+  supportedResolutions: readonly ResolutionString[] | readonly string[] | null | undefined,
+  timeframes: readonly TimeframeOption[] = AVAILABLE_TIMEFRAMES,
+): TimeframeOption[] {
+  if (!supportedResolutions || supportedResolutions.length === 0) return [...timeframes];
+  const supported = new Set(supportedResolutions);
+  const filtered = timeframes.filter((timeframe) => supported.has(timeframe.value));
+  return filtered.length > 0 ? filtered : [...timeframes];
+}
+
+export function getDefaultFavoriteTimeframeValues(
+  supportedResolutions?: readonly ResolutionString[] | readonly string[] | null,
+): ResolutionString[] {
+  const supported = filterTimeframesBySupportedResolutions(supportedResolutions);
+  const favorites = supported.filter((timeframe) => timeframe.defaultFavorite).map((timeframe) => timeframe.value);
+  return favorites.length > 0 ? favorites : supported.map((timeframe) => timeframe.value);
+}
 
 /**
  * Get display label for a resolution

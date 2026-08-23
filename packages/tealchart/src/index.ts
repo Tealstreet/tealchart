@@ -37,9 +37,19 @@ export {
   getDecimalPlacesFromPrecision,
   formatPriceWithPrecision,
   AVAILABLE_TIMEFRAMES,
+  DEFAULT_FAVORITE_TIMEFRAME_VALUES,
+  TIMEFRAME_GROUPS,
+  filterTimeframesBySupportedResolutions,
+  getDefaultFavoriteTimeframeValues,
   DEFAULT_CHART_SETTINGS,
 } from './state/chartState';
-export type { ChartSettings, TimeframeOption, IndicatorInstance } from './state/chartState';
+export type {
+  ChartSettings,
+  TimeframeGroup,
+  TimeframeGroupDefinition,
+  TimeframeOption,
+  IndicatorInstance,
+} from './state/chartState';
 
 // Indicator CRUD actions
 export {

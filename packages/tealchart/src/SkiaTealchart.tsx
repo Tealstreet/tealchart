@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
 import type { SkImage } from '@shopify/react-native-skia';
-import type { LayoutRectangle } from 'react-native';
 import type { PlotOutput, WorkerError } from '@tealstreet/tealscript';
+import type { ReactNode } from 'react';
+import type { LayoutRectangle } from 'react-native';
 import type {
   UserDrawingCommandEventListener,
   UserDrawingSelectedActionSurfaceCommand,
@@ -10,6 +10,7 @@ import type {
   UserDrawingTool,
 } from './drawings';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
+import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
 import type {
   NativeLegendActionCommand,
   NativeLegendActionHitTarget,
@@ -19,11 +20,10 @@ import type {
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
-import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
+import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
-import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
 import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
@@ -36,6 +36,8 @@ import type {
   ResolutionString,
   Viewport,
 } from './types';
+import type { PaneMaximizeState } from './utils/paneMaximize';
+import type { ITealchartWidget, SaveChartErrorInfo } from './widgetContract';
 
 import React, {
   forwardRef,
@@ -48,12 +50,10 @@ import React, {
   useState,
 } from 'react';
 
-import { Canvas, Image as SkiaImage, Skia, useCanvasRef } from '@shopify/react-native-skia';
-
-import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
+import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
 import { StyleSheet, View } from 'react-native';
-import { useSharedValue } from 'react-native-reanimated';
 import { GestureDetector } from 'react-native-gesture-handler';
+import { useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
 import {
@@ -61,6 +61,7 @@ import {
   resolveUserDrawingRenderEntriesFromSlices,
   resolveUserDrawingSelectionActionAnchorFromDrawings,
 } from './drawings';
+import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
 import {
@@ -76,25 +77,23 @@ import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeS
 import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
 import { useNativeTopBarActionRuntime } from './mobile/interaction/useNativeTopBarActionRuntime';
 import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserDrawingRuntime';
-import { NativeUserDrawingObjectTreePanel } from './mobile/render/NativeUserDrawingObjectTreePanel';
 import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
 import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
-import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
-import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
-import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
-
 import {
   NativeChartSettingsButton,
   NativeChartSettingsOverlay,
   resolveNativeChartSettingsActionTargets,
 } from './mobile/render/NativeChartSettingsOverlay';
+import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
+import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
+import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
 import { resolveSettledNativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
@@ -105,6 +104,7 @@ import {
 } from './mobile/render/nativeRenderTransition';
 import { NativeResetViewButtonOverlay } from './mobile/render/NativeResetViewButtonOverlay';
 import { NativeTopBarOverlay } from './mobile/render/NativeTopBarOverlay';
+import { NativeUserDrawingObjectTreePanel } from './mobile/render/NativeUserDrawingObjectTreePanel';
 import {
   NativeUserDrawingSelectionActionOverlay,
   resolveNativeSelectedDrawingActionHitTargets,
@@ -122,6 +122,11 @@ import {
 import { useNativeTealchartCoreRuntime } from './mobile/useNativeTealchartCoreRuntime';
 import { resolveNativeLeftToolRailToggleHitRect } from './mobile/utils/leftToolRailLayout';
 import {
+  applyNativePaneHeightOverrides,
+  createNativePaneLayoutSignature,
+  nativePaneHeightsMatchRatios,
+} from './mobile/utils/nativePaneLayoutOverrides';
+import {
   createNativeUserDrawingCoordinateSpaces,
   resolveNativeUserDrawingInputPoint,
   resolveNativeUserDrawingSelectionPoint,
@@ -130,22 +135,15 @@ import {
   getNativeOrderObjectId as getOrderObjectId,
   getNativePositionObjectId as getPositionObjectId,
 } from './mobile/utils/tradeLineLayout';
-import {
-  applyNativePaneHeightOverrides,
-  createNativePaneLayoutSignature,
-  nativePaneHeightsMatchRatios,
-} from './mobile/utils/nativePaneLayoutOverrides';
-import { EventEmitter } from './events/EventEmitter';
 import { applyChartOverridesToRenderOptions } from './overrides';
 import { getChartStore } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
-import { IDLE_PANE_MAXIMIZE_STATE, type PaneMaximizeState, togglePaneMaximize } from './utils/paneMaximize';
+import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
 
 const STATIC_TOP_BAR_HEIGHT = 36;
 const TRADE_LABEL_HEIGHT = 18;
 const VOLUME_HEIGHT_RATIO = 0.15;
-const MOBILE_TOP_BAR_TIMEFRAME_VALUES = new Set<ResolutionString>(['1', '5', '15', '30', '60']);
 const NATIVE_CHART_UI_DEFAULTS = { leftToolRailCollapsed: true };
 const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>['anchors'] = [];
 const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
@@ -362,6 +360,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     });
   }, [chartStore]);
   const leftToolRailCollapsed = uiPreferences.leftToolRailCollapsed;
+  const nativeTopBarTimeframeValues = useMemo(
+    () => new Set<ResolutionString>(uiPreferences.favoriteTimeframeValues),
+    [uiPreferences.favoriteTimeframeValues],
+  );
   const [nativeOpenDrawingCategoryId, setNativeOpenDrawingCategoryId] = useState<string | null>(null);
   const toggleLeftToolRailCollapsed = useCallback(() => {
     chartStore.uiPreferences.setKey('leftToolRailCollapsed', !chartStore.uiPreferences.get().leftToolRailCollapsed);
@@ -672,9 +674,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const captured: NativePaneSnapshot[] = [];
       for (const pane of currentFrame.panes) {
         if (pane.height <= 0) continue;
-        const image = canvas.makeImageSnapshot(
-          Skia.XYWHRect(0, pane.top, currentFrame.dimensions.width, pane.height),
-        );
+        const image = canvas.makeImageSnapshot(Skia.XYWHRect(0, pane.top, currentFrame.dimensions.width, pane.height));
         if (!image) continue;
         captured.push({ height: pane.height, image, paneId: pane.id, top: pane.top });
       }
@@ -1150,8 +1150,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         volumeHeight: settings.volumeHeight,
       });
       const restoreViewport =
-        settings.viewport &&
-        shouldRestoreNativeLayoutViewport({ layoutSymbol: settings.symbol, symbol: nextSymbol });
+        settings.viewport && shouldRestoreNativeLayoutViewport({ layoutSymbol: settings.symbol, symbol: nextSymbol });
       if (restoreViewport) {
         applyNativeViewport(settings.viewport, {
           // The store has not applied the layout's own auto-scale yet, so the
@@ -1466,10 +1465,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const handleNativeOverlayAction = useCallback(
     (command: unknown) => {
-      const overlayCommand = command as
-        | NativeChartSettingsActionCommand
-        | NativeLegendActionCommand
-        | null;
+      const overlayCommand = command as NativeChartSettingsActionCommand | NativeLegendActionCommand | null;
       if (!overlayCommand) return;
       if (!('indicatorId' in overlayCommand) || typeof overlayCommand.indicatorId !== 'string') return;
       if (overlayCommand.type === 'toggleIndicator') {
@@ -1533,7 +1529,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     supportedResolutions,
     symbol,
     topBarInterval: nativeDisplayedInterval,
-    topBarDefaultVisibleValues: MOBILE_TOP_BAR_TIMEFRAME_VALUES,
+    topBarDefaultVisibleValues: nativeTopBarTimeframeValues,
     topBarHeight: STATIC_TOP_BAR_HEIGHT,
     tradeLabelHeight: TRADE_LABEL_HEIGHT,
     userDrawingActiveTool: nativeUserDrawingState.activeTool,
@@ -1744,10 +1740,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeUserDrawingSelectionActionOverlayModel,
     topBarLayout,
   ]);
-  const nativeOverlayActionTargets = useMemo(
-    () => [],
-    [],
-  );
+  const nativeOverlayActionTargets = useMemo(() => [], []);
   // Same outcome as the reset button, different input. The button also hides
   // itself on use; do that here too so a reveal from an earlier tap does not
   // linger over an already-reset chart.
@@ -2003,10 +1996,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           />
         ) : null}
       </Canvas>
-      <Canvas
-        style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]}
-        pointerEvents="none"
-      >
+      <Canvas style={[styles.snapshotLayer, !resizeSnapshotVisible && styles.hiddenSnapshotLayer]} pointerEvents="none">
         {resizeSnapshot ? (
           <SkiaImage
             fit="fill"

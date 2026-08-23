@@ -1,20 +1,27 @@
 import type { TealchartKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
-
-import { afterEach, describe, it, expect } from 'vitest';
-import {
-  resolutionToMs,
-  getResolutionLabel,
-  getDecimalPlacesFromPrecision,
-  formatPriceWithPrecision,
-  clearChartStoreCache,
-  DEFAULT_CHART_UI_PREFERENCES,
-  DEFAULT_CHART_SETTINGS,
-  AVAILABLE_TIMEFRAMES,
-  getChartStore,
-} from './chartState';
 import type { ResolutionString } from '../types';
 
-function createMemoryStorage(initial: Record<string, string> = {}): TealchartKeyValueStorage & { values: Map<string, string> } {
+import { afterEach, describe, expect, it } from 'vitest';
+
+import {
+  AVAILABLE_TIMEFRAMES,
+  clearChartStoreCache,
+  DEFAULT_CHART_SETTINGS,
+  DEFAULT_CHART_UI_PREFERENCES,
+  DEFAULT_FAVORITE_TIMEFRAME_VALUES,
+  filterTimeframesBySupportedResolutions,
+  formatPriceWithPrecision,
+  getChartStore,
+  getDecimalPlacesFromPrecision,
+  getDefaultFavoriteTimeframeValues,
+  getResolutionLabel,
+  resolutionToMs,
+  TIMEFRAME_GROUPS,
+} from './chartState';
+
+function createMemoryStorage(
+  initial: Record<string, string> = {},
+): TealchartKeyValueStorage & { values: Map<string, string> } {
   const values = new Map(Object.entries(initial));
   return {
     values,
@@ -42,9 +49,9 @@ describe('chartState', () => {
       expect(resolutionToMs('60' as ResolutionString)).toBe(60 * 60 * 1000);
     });
 
-    it('converts minute resolutions with M suffix', () => {
-      expect(resolutionToMs('1M' as ResolutionString)).toBe(60 * 1000);
-      expect(resolutionToMs('5M' as ResolutionString)).toBe(5 * 60 * 1000);
+    it('converts lowercase minute suffixes from host timeframe strings', () => {
+      expect(resolutionToMs('1m' as ResolutionString)).toBe(60 * 1000);
+      expect(resolutionToMs('5m' as ResolutionString)).toBe(5 * 60 * 1000);
     });
 
     it('converts hourly resolutions', () => {
@@ -61,6 +68,10 @@ describe('chartState', () => {
     it('converts weekly resolutions', () => {
       expect(resolutionToMs('1W' as ResolutionString)).toBe(7 * 24 * 60 * 60 * 1000);
       expect(resolutionToMs('W' as ResolutionString)).toBe(7 * 24 * 60 * 60 * 1000);
+    });
+
+    it('converts monthly resolutions', () => {
+      expect(resolutionToMs('1M' as ResolutionString)).toBe(30 * 24 * 60 * 60 * 1000);
     });
 
     it('converts second resolutions', () => {
@@ -84,9 +95,11 @@ describe('chartState', () => {
       expect(getResolutionLabel('5' as ResolutionString)).toBe('5m');
       expect(getResolutionLabel('15' as ResolutionString)).toBe('15m');
       expect(getResolutionLabel('60' as ResolutionString)).toBe('1h');
+      expect(getResolutionLabel('120' as ResolutionString)).toBe('2h');
       expect(getResolutionLabel('240' as ResolutionString)).toBe('4h');
       expect(getResolutionLabel('1D' as ResolutionString)).toBe('1D');
       expect(getResolutionLabel('1W' as ResolutionString)).toBe('1W');
+      expect(getResolutionLabel('1M' as ResolutionString)).toBe('1M');
     });
 
     it('returns raw resolution for unknown values', () => {
@@ -145,7 +158,7 @@ describe('chartState', () => {
 
   describe('DEFAULT_CHART_SETTINGS', () => {
     it('has expected default values', () => {
-      expect(DEFAULT_CHART_SETTINGS.interval).toBe('1h');
+      expect(DEFAULT_CHART_SETTINGS.interval).toBe('60');
       expect(DEFAULT_CHART_SETTINGS.symbol).toBe('BTCUSDT');
       expect(DEFAULT_CHART_SETTINGS.showVolume).toBe(true);
       expect(DEFAULT_CHART_SETTINGS.volumeHeight).toBe(0.2);
@@ -156,22 +169,53 @@ describe('chartState', () => {
   });
 
   describe('AVAILABLE_TIMEFRAMES', () => {
-    it('includes common timeframes', () => {
+    it('matches the TradingView-compatible exchange resolution ladder', () => {
       const values = AVAILABLE_TIMEFRAMES.map((tf) => tf.value);
-      expect(values).toContain('1');
-      expect(values).toContain('5');
-      expect(values).toContain('15');
-      expect(values).toContain('60');
-      expect(values).toContain('240');
-      expect(values).toContain('1D');
-      expect(values).toContain('1W');
+      expect(values).toEqual([
+        '1S',
+        '5S',
+        '15S',
+        '30S',
+        '1',
+        '3',
+        '5',
+        '15',
+        '30',
+        '60',
+        '120',
+        '240',
+        '360',
+        '480',
+        '720',
+        '1D',
+        '3D',
+        '1W',
+        '1M',
+      ]);
     });
 
     it('has matching labels for each timeframe', () => {
       for (const tf of AVAILABLE_TIMEFRAMES) {
         expect(tf.label).toBeTruthy();
         expect(tf.shortLabel).toBeTruthy();
+        expect(TIMEFRAME_GROUPS.map((group) => group.value)).toContain(tf.group);
       }
+    });
+
+    it('marks TradingView-style top-bar favorites', () => {
+      expect(DEFAULT_FAVORITE_TIMEFRAME_VALUES).toEqual(['1', '3', '5', '15', '30', '60', '120', '240']);
+    });
+
+    it('filters by supported resolutions with a full-list fallback', () => {
+      expect(filterTimeframesBySupportedResolutions(['1', '60']).map((tf) => tf.value)).toEqual(['1', '60']);
+      expect(filterTimeframesBySupportedResolutions(['999']).map((tf) => tf.value)).toEqual(
+        AVAILABLE_TIMEFRAMES.map((tf) => tf.value),
+      );
+    });
+
+    it('derives supported default favorites and falls back to all supported values', () => {
+      expect(getDefaultFavoriteTimeframeValues(['1', '60', '1D'])).toEqual(['1', '60']);
+      expect(getDefaultFavoriteTimeframeValues(['1D', '1W'])).toEqual(['1D', '1W']);
     });
   });
 
@@ -188,7 +232,10 @@ describe('chartState', () => {
         defaultUiPreferences: { leftToolRailCollapsed: true },
       });
 
-      expect(chartStore.uiPreferences.get()).toEqual({ leftToolRailCollapsed: true });
+      expect(chartStore.uiPreferences.get()).toEqual({
+        ...DEFAULT_CHART_UI_PREFERENCES,
+        leftToolRailCollapsed: true,
+      });
     });
 
     it('persists sidebar preferences through the supplied key/value storage', () => {
@@ -201,6 +248,7 @@ describe('chartState', () => {
       clearChartStoreCache();
 
       expect(getChartStore('ui-persisted', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
+        ...DEFAULT_CHART_UI_PREFERENCES,
         leftToolRailCollapsed: true,
       });
     });
@@ -215,13 +263,16 @@ describe('chartState', () => {
       );
 
       expect(getChartStore('ui-late-storage', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
+        ...DEFAULT_CHART_UI_PREFERENCES,
         leftToolRailCollapsed: true,
       });
     });
 
     it('lets stored sidebar preferences override platform defaults', () => {
       const storage = createMemoryStorage({
-        'tealstreet:tealchart:ui-native-stored-default:ui-preferences': JSON.stringify({ leftToolRailCollapsed: false }),
+        'tealstreet:tealchart:ui-native-stored-default:ui-preferences': JSON.stringify({
+          leftToolRailCollapsed: false,
+        }),
       });
 
       expect(
@@ -229,7 +280,7 @@ describe('chartState', () => {
           uiPreferencesStorage: storage,
           defaultUiPreferences: { leftToolRailCollapsed: true },
         }).uiPreferences.get(),
-      ).toEqual({ leftToolRailCollapsed: false });
+      ).toEqual({ ...DEFAULT_CHART_UI_PREFERENCES, leftToolRailCollapsed: false });
     });
 
     it('does not let late storage overwrite sidebar preferences changed before storage was bound', () => {
@@ -243,10 +294,11 @@ describe('chartState', () => {
       chartStore.uiPreferences.setKey('leftToolRailCollapsed', true);
 
       expect(getChartStore('ui-late-local-change', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
+        ...DEFAULT_CHART_UI_PREFERENCES,
         leftToolRailCollapsed: true,
       });
       expect(storage.values.get('tealstreet:tealchart:ui-late-local-change:ui-preferences')).toBe(
-        JSON.stringify({ leftToolRailCollapsed: true }),
+        JSON.stringify({ ...DEFAULT_CHART_UI_PREFERENCES, leftToolRailCollapsed: true }),
       );
     });
 
@@ -265,8 +317,23 @@ describe('chartState', () => {
 
       await Promise.resolve();
 
-      expect(chartStore.uiPreferences.get()).toEqual({ leftToolRailCollapsed: true });
+      expect(chartStore.uiPreferences.get()).toEqual({ ...DEFAULT_CHART_UI_PREFERENCES, leftToolRailCollapsed: true });
       expect(writes).toEqual([]);
+    });
+
+    it('persists favorite timeframes in chart UI preferences', () => {
+      const storage = createMemoryStorage();
+      getChartStore('ui-timeframe-favorites', { uiPreferencesStorage: storage }).uiPreferences.setKey(
+        'favoriteTimeframeValues',
+        ['15', '60', '1D'] as ResolutionString[],
+      );
+
+      clearChartStoreCache();
+
+      expect(getChartStore('ui-timeframe-favorites', { uiPreferencesStorage: storage }).uiPreferences.get()).toEqual({
+        leftToolRailCollapsed: false,
+        favoriteTimeframeValues: ['15', '60', '1D'],
+      });
     });
   });
 });

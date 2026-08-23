@@ -169,4 +169,26 @@ describe('native top bar layout', () => {
     expect(timeframes[0]?.value).toBe('240');
     expect(timeframes.map((timeframe) => timeframe.value)).toContain('1');
   });
+
+  it('filters compact native favorites by supported resolutions without showing every supported resolution', () => {
+    const timeframes = createNativeTopBarTimeframes({
+      timeframes: AVAILABLE_TIMEFRAMES,
+      interval: '60',
+      supportedResolutions: ['1', '60', '120', '360'],
+      defaultVisibleValues: new Set(['1', '3', '5', '60', '120']),
+    });
+
+    expect(timeframes.map((timeframe) => timeframe.value)).toEqual(['1', '60', '120']);
+  });
+
+  it('keeps the active supported interval visible when it is outside native favorites', () => {
+    const timeframes = createNativeTopBarTimeframes({
+      timeframes: AVAILABLE_TIMEFRAMES,
+      interval: '360',
+      supportedResolutions: ['1', '60', '120', '360'],
+      defaultVisibleValues: new Set(['1', '60', '120']),
+    });
+
+    expect(timeframes.map((timeframe) => timeframe.value)).toEqual(['360', '1', '60', '120']);
+  });
 });
