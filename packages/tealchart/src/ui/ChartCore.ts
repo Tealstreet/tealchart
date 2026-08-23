@@ -101,7 +101,7 @@ import {
   Viewport,
 } from '../types';
 import { dedupeBarsByTime } from '../utils/dedupeBars';
-import { safeToFixed } from '../utils/safeNumber';
+import { safeNum, safeToFixed } from '../utils/safeNumber';
 import { tradingLineToBracketLines } from '../utils/tradeLineBrackets';
 import { resolveOrderTradeLineLabel, resolvePositionTradeLineLabel } from '../utils/tradeLineLabel';
 import { applyAutoScale, intervalToMs } from '../viewport/viewScale';
@@ -2488,7 +2488,7 @@ export class ChartCore {
         this.getUnifiedLayout(),
         this.options.renderOptions?.pricePrecision,
       );
-      const priceText = safeToFixed(value, decimals, 'crosshairPrice');
+      const priceText = getNumberFormatter(decimals).format(safeNum(value, 0, 'crosshairPrice'));
       const font = this.renderer.getFont();
       ctx.font = `11px ${font}`;
       const measuredPriceLabelWidth = ctx.measureText(priceText).width + 10;
