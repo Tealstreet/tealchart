@@ -44,6 +44,13 @@ import type { ActiveIndicator } from './ChartLegend';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
 import {
+  LOADING_DOT_COUNT,
+  LOADING_DOT_MAX_OPACITY,
+  LOADING_DOT_MIN_OPACITY,
+  LOADING_DOT_PERIOD_MS,
+  LOADING_DOT_STAGGER_MS,
+} from '../constants';
+import {
   anchorToScreenPoint,
   getUserDrawingTextAnnotationPoint,
   getUserDrawingToolbarStateKey,
@@ -57,13 +64,6 @@ import {
   resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
-import {
-  LOADING_DOT_COUNT,
-  LOADING_DOT_MAX_OPACITY,
-  LOADING_DOT_MIN_OPACITY,
-  LOADING_DOT_PERIOD_MS,
-  LOADING_DOT_STAGGER_MS,
-} from '../constants';
 import { getChartStore } from '../state/chartState';
 import { DEFAULT_MARGINS, TIME_AXIS_HEIGHT } from '../types';
 import { ChartCore } from './ChartCore';
@@ -414,6 +414,7 @@ export class TealchartWidgetUI {
         onUserDrawingPropertiesOpen: options.onUserDrawingPropertiesOpen,
         onUserDrawingObjectTreeOpen: options.onUserDrawingObjectTreeOpen,
         onUserDrawingTextEditOpen: options.onUserDrawingTextEditOpen,
+        renderOptions: options.renderOptions,
         drawingOverlayParent: this.overlayRoot,
         layoutCallbacks: options.layoutCallbacks,
       });
@@ -1028,6 +1029,7 @@ export class TealchartWidgetUI {
   setRenderOptions(options: Partial<RenderOptions>): void {
     this.options.renderOptions = { ...this.options.renderOptions, ...options };
     applyChromeThemeVars(this.rootEl, this.options.renderOptions);
+    this.topBar?.setRenderOptions(this.options.renderOptions);
     this.chartCore?.setRenderOptions(options);
   }
 
