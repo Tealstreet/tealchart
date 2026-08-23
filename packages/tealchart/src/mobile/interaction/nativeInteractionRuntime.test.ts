@@ -80,12 +80,12 @@ describe('native interaction runtime', () => {
 
     begin(runtime, 'priceScale');
 
-    expect(runtime.updatePriceScale({ deltaY: 100, sensitivity: 0.01, anchorPrice: 150 })).toBe(true);
+    expect(runtime.updatePriceScale({ deltaY: 50, sensitivity: 0.01, anchorPrice: 150 })).toBe(true);
     const live = runtime.getRenderViewport();
 
     expect(live.startTime).toBe(viewport.startTime);
     expect(live.endTime).toBe(viewport.endTime);
-    expect(live.priceMax - live.priceMin).toBeCloseTo(100 * Math.exp(1));
+    expect(live.priceMax - live.priceMin).toBeCloseTo(200);
     expect(runtime.commit('priceScale')).toEqual(live);
   });
 
@@ -261,7 +261,7 @@ describe('native viewport transform helpers', () => {
 
   it('scales prices around an explicit anchor', () => {
     const next = scaleViewportPrices(viewport, {
-      deltaY: Math.log(2) / 0.01,
+      deltaY: 50,
       sensitivity: 0.01,
       anchorPrice: 125,
     });
@@ -270,13 +270,25 @@ describe('native viewport transform helpers', () => {
     expect(next.priceMax).toBeCloseTo(275);
   });
 
-  it('rejects non-finite price scale outputs before returning a viewport', () => {
-    expect(() =>
-      scaleViewportPrices(viewport, {
-        deltaY: 1_000,
-        sensitivity: 1_000,
-      }),
-    ).toThrow('non-finite range');
+  it('keeps repeated price scale drag deltas linear in visual density', () => {
+    const first = scaleViewportPrices(viewport, { deltaY: -50, sensitivity: 0.01 });
+    const second = scaleViewportPrices(viewport, { deltaY: -100, sensitivity: 0.01 });
+
+    const startDensity = 1 / (viewport.priceMax - viewport.priceMin);
+    const firstDensity = 1 / (first.priceMax - first.priceMin);
+    const secondDensity = 1 / (second.priceMax - second.priceMin);
+
+    expect(firstDensity - startDensity).toBeCloseTo(startDensity * 0.5);
+    expect(secondDensity - firstDensity).toBeCloseTo(startDensity * 0.5);
+  });
+
+  it('clamps price scale to a finite range before returning a viewport', () => {
+    const next = scaleViewportPrices(viewport, {
+      deltaY: 1_000,
+      sensitivity: 1_000,
+    });
+
+    expect(next.priceMax - next.priceMin).toBeCloseTo(1_000);
   });
 
   it('scales time around an explicit anchor', () => {
