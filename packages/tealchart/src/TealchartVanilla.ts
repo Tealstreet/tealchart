@@ -8,9 +8,9 @@ import { WebCanvasContext } from './rendering';
 import { getChartStore } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
 import { DEFAULT_MARGINS, DEFAULT_RENDER_OPTIONS } from './types';
-import { dedupeBarsByTime } from './utils/dedupeBars';
 import { ChartTopBar } from './ui/ChartTopBar';
 import { IndicatorsModal } from './ui/IndicatorsModal';
+import { dedupeBarsByTime } from './utils/dedupeBars';
 
 /**
  * TealchartVanilla - Framework-agnostic chart components
@@ -245,6 +245,7 @@ export class SimpleChart {
           this._onIntervalChange?.(interval);
         },
         onIndicatorsClick: () => this._indicatorsModal?.toggle(),
+        renderOptions: this._renderOptions,
       });
       this._rootEl.appendChild(this._topBar.getElement());
     }

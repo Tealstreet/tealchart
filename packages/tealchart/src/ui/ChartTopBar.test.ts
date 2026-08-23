@@ -62,6 +62,7 @@ describe('ChartTopBar drawing toolbar', () => {
       window.localStorage.clear();
     }
     clearChartStoreCache();
+    vi.restoreAllMocks();
   });
 
   it('dispatches symbol clicks only when a symbol callback is wired', () => {
@@ -140,6 +141,114 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(onIntervalChange).toHaveBeenLastCalledWith('360');
     expect(topBar.getElement().textContent).toContain('6h');
     expect(document.querySelector<HTMLElement>('[role="menu"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
+  it('applies resolved chrome theme vars to the portaled interval dropdown', () => {
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-timeframe-dropdown-theme',
+      symbol: 'BTCUSDT',
+      renderOptions: {
+        backgroundColor: '#0b0d10',
+        textColor: '#eef2f8',
+        gridColor: 'rgba(255, 255, 255, 0.11)',
+        chromeTheme: {
+          menuBackgroundColor: '#10141c',
+        },
+      },
+    });
+    topBar.mount(document.body);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    const dropdown = document.querySelector<HTMLElement>('[role="menu"]');
+
+    expect(dropdown).not.toBeNull();
+    expect(dropdown?.style.getPropertyValue('--tc-canvas-bg')).toBe('#0b0d10');
+    expect(dropdown?.style.getPropertyValue('--tc-menu-bg')).toBe('#10141c');
+    expect(dropdown?.style.getPropertyValue('--tc-text')).toBe('#eef2f8');
+
+    topBar.setRenderOptions({
+      backgroundColor: '#050608',
+      textColor: '#f8fafc',
+      gridColor: 'rgba(255, 255, 255, 0.08)',
+    });
+
+    expect(dropdown?.style.getPropertyValue('--tc-canvas-bg')).toBe('#050608');
+    expect(dropdown?.style.getPropertyValue('--tc-menu-bg')).toBe('#050608');
+    expect(dropdown?.style.getPropertyValue('--tc-text')).toBe('#f8fafc');
+
+    topBar.unmount();
+  });
+
+  it('selects supported custom intervals through the same interval path', () => {
+    const onIntervalChange = vi.fn();
+    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('4h');
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-custom-timeframe',
+      symbol: 'BTCUSDT',
+      onIntervalChange,
+    });
+    topBar.mount(document.body);
+    topBar.setSupportedResolutions(['1', '60', '240']);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    const addCustom = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((button) =>
+      button.textContent?.includes('Add custom interval...'),
+    );
+    addCustom?.click();
+
+    expect(prompt).toHaveBeenCalledWith('Custom interval', '60');
+    expect(onIntervalChange).toHaveBeenLastCalledWith('240');
+    expect(topBar.getElement().textContent).toContain('4h');
+    expect(document.querySelector<HTMLElement>('[role="menu"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
+  it('keeps uppercase custom month intervals distinct from minutes', () => {
+    const onIntervalChange = vi.fn();
+    vi.spyOn(window, 'prompt').mockReturnValue('1M');
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-custom-timeframe-month',
+      symbol: 'BTCUSDT',
+      onIntervalChange,
+    });
+    topBar.mount(document.body);
+    topBar.setSupportedResolutions(['1', '1M']);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    const addCustom = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((button) =>
+      button.textContent?.includes('Add custom interval...'),
+    );
+    addCustom?.click();
+
+    expect(onIntervalChange).toHaveBeenLastCalledWith('1M');
+
+    topBar.unmount();
+  });
+
+  it('rejects custom intervals unsupported by the active datafeed', () => {
+    const onIntervalChange = vi.fn();
+    vi.spyOn(window, 'prompt').mockReturnValue('4h');
+    const alert = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-custom-timeframe-unsupported',
+      symbol: 'BTCUSDT',
+      onIntervalChange,
+    });
+    topBar.mount(document.body);
+    topBar.setSupportedResolutions(['1', '60']);
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    const addCustom = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((button) =>
+      button.textContent?.includes('Add custom interval...'),
+    );
+    addCustom?.click();
+
+    expect(alert).toHaveBeenCalledWith('4 hours is not supported for this market.');
+    expect(onIntervalChange).not.toHaveBeenCalled();
+    expect(document.querySelector<HTMLElement>('[role="menu"]')).not.toBeNull();
 
     topBar.unmount();
   });

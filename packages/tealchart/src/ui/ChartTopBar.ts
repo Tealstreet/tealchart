@@ -14,7 +14,7 @@ import type {
 } from '../drawings';
 import type { ChartChromeMetrics } from '../layout/chartGeometry';
 import type { ChartStore, TimeframeOption } from '../state/chartState';
-import type { ResolutionString } from '../types';
+import type { RenderOptions, ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
 
@@ -48,12 +48,14 @@ import {
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import {
+  AVAILABLE_TIMEFRAMES,
   filterTimeframesBySupportedResolutions,
   getChartStore,
   getDefaultFavoriteTimeframeValues,
   TIMEFRAME_GROUPS,
 } from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
+import { applyChromeThemeVars } from './chromeTheme';
 import { Component } from './Component';
 import { renderDrawingIcon } from './dom';
 import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
@@ -158,6 +160,8 @@ export interface ChartTopBarOptions extends ComponentOptions {
   onUserDrawingTextEditOpen?: (drawingId: string) => void;
   /** CSS variables for theming */
   cssVars?: Record<string, string>;
+  /** Render options used to derive shared chart chrome CSS variables */
+  renderOptions?: Partial<RenderOptions>;
   /** Optional overlay root for drawing rail/flyout DOM. Falls back to the top bar parent. */
   drawingOverlayParent?: HTMLElement;
 }
@@ -344,9 +348,8 @@ const styles = {
     color: 'var(--tc-text, #d1d4dc)',
     fontSize: '13px',
     textAlign: 'left',
-    cursor: 'default',
+    cursor: 'pointer',
     boxSizing: 'border-box',
-    opacity: '0.78',
   } as Partial<CSSStyleDeclaration>,
 
   timeframeDropdownAddIcon: {
@@ -876,10 +879,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     Object.assign(this.el.style, styles.container);
     this.applyContainerLayout();
 
-    // Apply CSS vars if provided
-    if (options.cssVars) {
-      this.setCssVars(options.cssVars);
-    }
+    this.applyThemeVars();
   }
 
   // ============================================================================
@@ -2213,16 +2213,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       style: styles.timeframeDropdown,
       attributes: { role: 'menu' },
     });
-    if (this.options.cssVars) {
-      for (const [name, value] of Object.entries(this.options.cssVars)) {
-        dropdown.style.setProperty(name, value);
-      }
-    }
+    this.applyThemeVars(dropdown);
 
     const addCustomItem = this.createElement('button', {
       style: styles.timeframeDropdownAdd,
-      attributes: { type: 'button', disabled: 'true' },
+      attributes: { type: 'button' },
     });
+    addCustomItem.addEventListener('click', () => this.handleAddCustomInterval());
     addCustomItem.appendChild(
       this.createElement('span', {
         style: styles.timeframeDropdownAddIcon,
@@ -2339,6 +2336,50 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.options.onIntervalChange?.(interval);
   }
 
+  private handleAddCustomInterval(): void {
+    const raw = window.prompt?.('Custom interval', this.state.interval);
+    const interval = this.normalizeCustomInterval(raw);
+    if (!interval) return;
+
+    if (this.supportedResolutions?.length && !this.supportedResolutions.includes(interval)) {
+      window.alert?.(`${this.getIntervalLabel(interval)} is not supported for this market.`);
+      return;
+    }
+
+    this.addFavoriteTimeframeValue(interval);
+    this.handleTimeframeClick(interval);
+  }
+
+  private normalizeCustomInterval(raw: string | null | undefined): ResolutionString | null {
+    const normalized = String(raw ?? '')
+      .trim()
+      .replace(/\s+/g, '');
+    if (!normalized) return null;
+
+    const match = normalized.match(/^(\d+)([sSmMhHdDwWM]?)$/);
+    if (!match) return null;
+
+    const count = Number.parseInt(match[1] ?? '', 10);
+    if (!Number.isFinite(count) || count <= 0) return null;
+
+    const unit = match[2] ?? '';
+    if (unit === '' || unit === 'm') return String(count) as ResolutionString;
+    if (unit === 'h' || unit === 'H') return String(count * 60) as ResolutionString;
+    if (unit === 'M') return `${count}M` as ResolutionString;
+    return `${count}${unit.toUpperCase()}` as ResolutionString;
+  }
+
+  private getIntervalLabel(interval: ResolutionString): string {
+    const option = AVAILABLE_TIMEFRAMES.find((timeframe) => timeframe.value === interval);
+    return option?.label ?? interval;
+  }
+
+  private addFavoriteTimeframeValue(value: ResolutionString): void {
+    const current = this.chartStore.uiPreferences.get().favoriteTimeframeValues;
+    if (current.includes(value)) return;
+    this.chartStore.uiPreferences.setKey('favoriteTimeframeValues', [...current, value]);
+  }
+
   // ============================================================================
   // Public API
   // ============================================================================
@@ -2367,6 +2408,22 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
     if (newBtn) {
       Object.assign(newBtn.style, styles.timeframeButtonActive);
+    }
+  }
+
+  setRenderOptions(renderOptions: Partial<RenderOptions> | undefined): void {
+    this.options.renderOptions = renderOptions;
+    this.applyThemeVars();
+    if (this.intervalDropdownEl) {
+      this.applyThemeVars(this.intervalDropdownEl);
+    }
+  }
+
+  private applyThemeVars(target: HTMLElement = this.el): void {
+    applyChromeThemeVars(target, this.options.renderOptions);
+    if (!this.options.cssVars) return;
+    for (const [name, value] of Object.entries(this.options.cssVars)) {
+      target.style.setProperty(name, value);
     }
   }
 
@@ -2440,6 +2497,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
    * Update CSS variables
    */
   updateCssVars(vars: Record<string, string>): void {
-    this.setCssVars(vars);
+    this.options.cssVars = vars;
+    this.applyThemeVars();
+    if (this.intervalDropdownEl) {
+      this.applyThemeVars(this.intervalDropdownEl);
+    }
   }
 }
