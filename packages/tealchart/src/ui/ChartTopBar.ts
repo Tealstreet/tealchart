@@ -193,8 +193,8 @@ const styles = {
     // right border and the top bar's bottom border meet in a top-left "L".
     marginLeft: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     padding: '0 8px',
-    backgroundColor: 'var(--bg, #131722)',
-    borderBottom: '1px solid var(--border, #2a2e39)',
+    backgroundColor: 'var(--tc-bg, #131722)',
+    borderBottom: '1px solid var(--tc-border, #2a2e39)',
     fontSize: '12px',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     gap: '12px',
@@ -206,7 +206,7 @@ const styles = {
 
   symbol: {
     fontWeight: '600',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '13px',
     flexShrink: '0',
     whiteSpace: 'nowrap',
@@ -238,12 +238,12 @@ const styles = {
     marginLeft: '5px',
     borderLeft: '4px solid transparent',
     borderRight: '4px solid transparent',
-    borderTop: '5px solid var(--text2, #787b86)',
+    borderTop: '5px solid var(--tc-text2, #787b86)',
     pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   exchange: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
     marginLeft: '4px',
   } as Partial<CSSStyleDeclaration>,
@@ -251,7 +251,7 @@ const styles = {
   divider: {
     width: '1px',
     height: '16px',
-    backgroundColor: 'var(--border, #363a45)',
+    backgroundColor: 'var(--tc-border, #363a45)',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -267,7 +267,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     fontSize: '12px',
     fontWeight: '500',
@@ -275,12 +275,12 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   timeframeButtonActive: {
-    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.2))',
-    color: 'var(--accent, #2962ff)',
+    backgroundColor: 'var(--tc-accent-bg, rgba(41, 98, 255, 0.2))',
+    color: 'var(--tc-accent, #2962ff)',
   } as Partial<CSSStyleDeclaration>,
 
   timeframeButtonHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorsButton: {
@@ -291,7 +291,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     fontSize: '12px',
     fontWeight: '500',
@@ -301,8 +301,8 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   indicatorsButtonHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
-    color: 'var(--text, #d1d4dc)',
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))',
+    color: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorsIcon: {
@@ -323,8 +323,8 @@ const styles = {
     alignItems: 'center',
     padding: '4px 0',
     boxSizing: 'border-box',
-    borderRight: '1px solid var(--border, #2a2e39)',
-    backgroundColor: 'var(--bg, #131722)',
+    borderRight: '1px solid var(--tc-border, #2a2e39)',
+    backgroundColor: 'var(--tc-bg, #131722)',
     zIndex: '7',
     pointerEvents: 'auto',
     overflow: 'visible',
@@ -363,7 +363,7 @@ const styles = {
   drawingRailToggleDivider: {
     width: '28px',
     height: '1px',
-    backgroundColor: 'var(--border, #2a2e39)',
+    backgroundColor: 'var(--tc-border, #2a2e39)',
     margin: '4px 0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -376,12 +376,12 @@ const styles = {
     justifyContent: 'center',
     width: `${DRAWING_RAIL_COLLAPSE_TAB_WIDTH}px`,
     height: '38px',
-    border: '1px solid var(--border, #2a2e39)',
+    border: '1px solid var(--tc-border, #2a2e39)',
     borderLeft: 'none',
     borderTopRightRadius: '10px',
     borderBottomRightRadius: '10px',
-    backgroundColor: 'var(--text, #d1d4dc)',
-    color: 'var(--bg, #131722)',
+    backgroundColor: 'var(--tc-text, #d1d4dc)',
+    color: 'var(--tc-bg, #131722)',
     cursor: 'pointer',
     padding: '0',
     boxShadow: '0 1px 2px rgba(0, 0, 0, 0.18)',
@@ -398,7 +398,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #b2b5be)',
+    color: 'var(--tc-text2, #b2b5be)',
     cursor: 'pointer',
     fontSize: '14px',
     fontWeight: '600',
@@ -430,7 +430,7 @@ const styles = {
     height: '0',
     borderTop: '3px solid transparent',
     borderBottom: '3px solid transparent',
-    borderLeft: '4px solid var(--text2, #787b86)',
+    borderLeft: '4px solid var(--tc-text2, #787b86)',
     pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
@@ -439,8 +439,8 @@ const styles = {
     display: 'none',
     padding: '3px 8px',
     borderRadius: '4px',
-    backgroundColor: 'var(--tooltip-bg, #363a45)',
-    color: 'var(--text, #d1d4dc)',
+    backgroundColor: 'var(--tc-tooltip-bg, #363a45)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     fontWeight: '500',
     lineHeight: '1.4',
@@ -462,15 +462,15 @@ const styles = {
     overflowY: 'auto',
     padding: '10px',
     boxSizing: 'border-box',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '6px',
-    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    backgroundColor: 'var(--tc-bg, rgba(19, 23, 34, 0.98))',
     boxShadow: '0 12px 32px rgba(0, 0, 0, 0.32)',
     zIndex: '2',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolFlyoutTitle: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
     fontWeight: '600',
     letterSpacing: '0',
@@ -492,7 +492,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     fontSize: '13px',
     lineHeight: '26px',
@@ -510,7 +510,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     cursor: 'pointer',
     fontSize: '13px',
     padding: '4px 8px',
@@ -518,7 +518,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolFlyoutIcon: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '13px',
     fontWeight: '600',
     textAlign: 'center',
@@ -546,13 +546,13 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     opacity: '0.5',
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolFlyoutStarActive: {
-    color: 'var(--accent, #f5c518)',
+    color: 'var(--tc-accent, #f5c518)',
     opacity: '1',
   } as Partial<CSSStyleDeclaration>,
 
@@ -564,8 +564,8 @@ const styles = {
     gap: '2px',
     padding: '3px 4px',
     borderRadius: '8px',
-    backgroundColor: 'var(--bg, #1e222d)',
-    border: '1px solid var(--border, #2a2e39)',
+    backgroundColor: 'var(--tc-bg, #1e222d)',
+    border: '1px solid var(--tc-border, #2a2e39)',
     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
   } as Partial<CSSStyleDeclaration>,
 
@@ -575,7 +575,7 @@ const styles = {
     justifyContent: 'center',
     width: '16px',
     alignSelf: 'stretch',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'grab',
     fontSize: '12px',
     userSelect: 'none',
@@ -590,7 +590,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     cursor: 'pointer',
   } as Partial<CSSStyleDeclaration>,
 
@@ -604,9 +604,9 @@ const styles = {
     width: `${SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH}px`,
     boxSizing: 'border-box',
     padding: '4px',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '6px',
-    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    backgroundColor: 'var(--tc-bg, rgba(19, 23, 34, 0.98))',
     boxShadow: '0 10px 28px rgba(0, 0, 0, 0.32)',
     zIndex: '8',
     pointerEvents: 'auto',
@@ -619,7 +619,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   selectedActionSurfaceGroupSeparated: {
-    borderLeft: '1px solid var(--border, #363a45)',
+    borderLeft: '1px solid var(--tc-border, #363a45)',
     paddingLeft: '3px',
   } as Partial<CSSStyleDeclaration>,
 
@@ -632,9 +632,9 @@ const styles = {
     alignItems: 'center',
     gap: '3px',
     padding: '6px',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '6px',
-    backgroundColor: 'var(--bg, rgba(19, 23, 34, 0.98))',
+    backgroundColor: 'var(--tc-bg, rgba(19, 23, 34, 0.98))',
     boxShadow: '0 12px 30px rgba(0, 0, 0, 0.34)',
     zIndex: '9',
     pointerEvents: 'auto',
@@ -655,7 +655,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   drawingToolCategoryLabel: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '10px',
     fontWeight: '600',
     letterSpacing: '0',
@@ -670,7 +670,7 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     fontSize: '13px',
     fontWeight: '600',
@@ -681,25 +681,25 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonActive: {
-    backgroundColor: 'var(--active-bg, rgba(255, 255, 255, 0.12))',
-    color: 'var(--text, #d1d4dc)',
+    backgroundColor: 'var(--tc-active-bg, rgba(255, 255, 255, 0.12))',
+    color: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   // TradingView-style persistent toggle (e.g. magnet on): filled light glyph on dark.
   drawingButtonToggleActive: {
-    backgroundColor: 'var(--text, #d1d4dc)',
-    color: 'var(--bg, #131722)',
+    backgroundColor: 'var(--tc-text, #d1d4dc)',
+    color: 'var(--tc-bg, #131722)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
-    color: 'var(--text, #d1d4dc)',
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))',
+    color: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingSwatch: {
     width: '18px',
     height: '18px',
-    border: '1px solid var(--border, #363a45)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
     padding: '0',
   } as Partial<CSSStyleDeclaration>,
@@ -897,7 +897,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     });
     this.indicatorsBtn.addEventListener('mouseleave', () => {
       this.indicatorsBtn!.style.backgroundColor = 'transparent';
-      this.indicatorsBtn!.style.color = 'var(--text2, #787b86)';
+      this.indicatorsBtn!.style.color = 'var(--tc-text2, #787b86)';
     });
 
     const iconSpan = this.createElement('span', {
@@ -1163,7 +1163,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     btn.addEventListener('mouseleave', () => {
       if (!active) {
         btn.style.backgroundColor = 'transparent';
-        btn.style.color = 'var(--text2, #b2b5be)';
+        btn.style.color = 'var(--tc-text2, #b2b5be)';
       }
       this.hideRailTooltip();
     });
@@ -1221,7 +1221,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       btn.addEventListener('mouseleave', () => {
         if (!isActive) {
           btn.style.backgroundColor = 'transparent';
-          btn.style.color = 'var(--text, #d1d4dc)';
+          btn.style.color = 'var(--tc-text, #d1d4dc)';
         }
       });
       bar.appendChild(btn);
@@ -1464,7 +1464,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           style: {
             ...styles.drawingButton,
             backgroundColor: this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent',
-            color: this.selectedActionPopoverGroupId === group.id ? 'var(--accent, #5b8cff)' : 'var(--text2, #787b86)',
+            color: this.selectedActionPopoverGroupId === group.id ? 'var(--tc-accent, #5b8cff)' : 'var(--tc-text2, #787b86)',
           },
           textContent: group.presentation.triggerIcon ?? '⋯',
           attributes: {
@@ -1483,7 +1483,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           trigger.style.backgroundColor =
             this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent';
           trigger.style.color =
-            this.selectedActionPopoverGroupId === group.id ? 'var(--accent, #5b8cff)' : 'var(--text2, #787b86)';
+            this.selectedActionPopoverGroupId === group.id ? 'var(--tc-accent, #5b8cff)' : 'var(--tc-text2, #787b86)';
         });
         groupEl.appendChild(trigger);
 
@@ -1576,8 +1576,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       btn.addEventListener('mouseenter', () => Object.assign(btn.style, styles.drawingButtonHover));
       btn.addEventListener('mouseleave', () => {
         btn.style.backgroundColor =
-          item.swatchColor ?? (item.selected ? 'var(--accent-bg, rgba(41, 98, 255, 0.2))' : 'transparent');
-        btn.style.color = item.selected ? 'var(--accent, #2962ff)' : 'var(--text2, #787b86)';
+          item.swatchColor ?? (item.selected ? 'var(--tc-accent-bg, rgba(41, 98, 255, 0.2))' : 'transparent');
+        btn.style.color = item.selected ? 'var(--tc-accent, #2962ff)' : 'var(--tc-text2, #787b86)';
       });
     }
     return btn;
@@ -1723,7 +1723,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       categoryButton.addEventListener('mouseleave', () => {
         if (!category.tools.includes(activeTool)) {
           categoryButton.style.backgroundColor = 'transparent';
-          categoryButton.style.color = 'var(--text2, #b2b5be)';
+          categoryButton.style.color = 'var(--tc-text2, #b2b5be)';
         }
       });
       this.setDrawingIconContent(
@@ -1864,7 +1864,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         btn.addEventListener('mouseleave', () => {
           if (!isActive) {
             btn.style.backgroundColor = 'transparent';
-            btn.style.color = 'var(--text, #d1d4dc)';
+            btn.style.color = 'var(--tc-text, #d1d4dc)';
           }
         });
         row.appendChild(btn);
@@ -1980,7 +1980,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         });
         btn.addEventListener('mouseleave', () => {
           btn.style.backgroundColor = 'transparent';
-          btn.style.color = 'var(--text2, #b2b5be)';
+          btn.style.color = 'var(--tc-text2, #b2b5be)';
         });
       }
       group.appendChild(btn);
@@ -2008,7 +2008,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     if (previousBtn) {
       previousBtn.style.backgroundColor = 'transparent';
-      previousBtn.style.color = 'var(--text2, #787b86)';
+      previousBtn.style.color = 'var(--tc-text2, #787b86)';
     }
     if (newBtn) {
       Object.assign(newBtn.style, styles.timeframeButtonActive);
@@ -2038,7 +2038,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
     if (previousBtn) {
       previousBtn.style.backgroundColor = 'transparent';
-      previousBtn.style.color = 'var(--text2, #787b86)';
+      previousBtn.style.color = 'var(--tc-text2, #787b86)';
     }
     if (newBtn) {
       Object.assign(newBtn.style, styles.timeframeButtonActive);

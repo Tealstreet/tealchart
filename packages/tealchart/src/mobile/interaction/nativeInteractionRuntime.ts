@@ -158,12 +158,13 @@ export function scaleViewportPrices(viewport: Viewport, transform: NativePriceSc
   assertFiniteNumber(transform.sensitivity ?? DEFAULT_SCALE_SENSITIVITY, 'price scale sensitivity');
   if (transform.anchorPrice !== undefined) assertFiniteNumber(transform.anchorPrice, 'price scale anchorPrice');
   const sensitivity = transform.sensitivity ?? DEFAULT_SCALE_SENSITIVITY;
-  const scale = Math.exp(transform.deltaY * sensitivity);
-  if (!Number.isFinite(scale)) {
+  const rawVisualScale = 1 - transform.deltaY * sensitivity;
+  const visualScale = Math.max(0.1, Math.min(10, rawVisualScale));
+  if (!Number.isFinite(visualScale)) {
     throw new Error('NativeInteractionRuntime price scale transform produced a non-finite range');
   }
   const range = viewport.priceMax - viewport.priceMin;
-  const nextRange = Math.max(Number.EPSILON, range * scale);
+  const nextRange = Math.max(Number.EPSILON, range / visualScale);
   if (!Number.isFinite(nextRange)) {
     throw new Error('NativeInteractionRuntime price scale transform produced a non-finite range');
   }

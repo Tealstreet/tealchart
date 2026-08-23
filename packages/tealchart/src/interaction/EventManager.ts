@@ -1707,15 +1707,16 @@ export class EventManager {
     // Scale the zoom factor so smaller panes feel the same as larger ones
     // A 10% drag on a small pane should zoom the same as 10% drag on large pane
     const heightScale = fullChartHeight / paneHeight;
-    // Clamp zoom factor to prevent extreme zoom on fast drags (0.1x to 10x)
-    const rawZoomFactor = 1 + dy * 0.005 * heightScale;
-    const zoomFactor = Math.max(0.1, Math.min(10, rawZoomFactor));
+    // Make the drag linear in visual scale (pixels per price), not in price range.
+    // Range-linear zoom gets increasingly twitchy when the axis is already zoomed in.
+    const rawVisualScale = 1 - dy * 0.005 * heightScale;
+    const visualScale = Math.max(0.1, Math.min(10, rawVisualScale));
 
     const { yMin: startPriceMin, yMax: startPriceMax } = this.state.dragStartPaneYRange;
     const range = startPriceMax - startPriceMin;
     const center = (startPriceMax + startPriceMin) / 2;
 
-    const newRange = range * zoomFactor;
+    const newRange = range / visualScale;
     const newPriceMin = center - newRange / 2;
     const newPriceMax = center + newRange / 2;
 

@@ -1029,7 +1029,7 @@ export class TealchartRenderer {
       }
     } else {
       // No chart label - draw line all the way to price axis label
-      const priceAxisLabelX = options.width - bound.width;
+      const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
       ctx.beginPath();
       ctx.moveTo(lineStartX, lineY);
       ctx.lineTo(priceAxisLabelX, lineY);
@@ -1102,7 +1102,7 @@ export class TealchartRenderer {
 
       // Draw line from right side of chart label to price axis label
       const chartLabelRightX = currentX;
-      const priceAxisLabelX = options.width - bound.width;
+      const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
       if (chartLabelRightX < priceAxisLabelX) {
         ctx.save();
         ctx.strokeStyle = color;
@@ -1122,7 +1122,7 @@ export class TealchartRenderer {
     }
 
     // Draw price axis label with connector if needed
-    const priceAxisLabelX = options.width - bound.width;
+    const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Draw connector line if label is offset from price line
@@ -1554,7 +1554,7 @@ export class TealchartRenderer {
     const labelHeight = 16;
 
     // Position label in the price axis area
-    const labelX = options.width - margins.right + 2;
+    const labelX = options.width - labelWidth - PRICE_AXIS_RIGHT_PADDING;
     const labelY = lineY - labelHeight / 2;
 
     // Clamp label to visible area
@@ -5185,7 +5185,7 @@ export class TealchartRenderer {
           ctx.stroke();
         }
       } else {
-        const priceAxisLabelX = options.width - bound.width;
+        const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
         ctx.beginPath();
         ctx.moveTo(lineStartX, lineY);
         ctx.lineTo(priceAxisLabelX, lineY);
@@ -5259,7 +5259,7 @@ export class TealchartRenderer {
 
       // Line to price axis label
       const chartLabelRightX = currentX;
-      const priceAxisLabelX = options.width - bound.width;
+      const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
       if (chartLabelRightX < priceAxisLabelX) {
         ctx.save();
         ctx.strokeStyle = color;
@@ -5278,7 +5278,7 @@ export class TealchartRenderer {
     if (!drawLabels) return;
 
     // Price axis label
-    const priceAxisLabelX = options.width - bound.width;
+    const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Connector

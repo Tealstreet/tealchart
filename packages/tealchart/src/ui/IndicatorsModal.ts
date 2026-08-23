@@ -52,7 +52,7 @@ const CATEGORY_KEYS: Record<BuiltinIndicator['category'], string> = {
 const contentStyles = {
   searchContainer: {
     padding: '8px',
-    borderBottom: '1px solid var(--border, #363a45)',
+    borderBottom: '1px solid var(--tc-border, #363a45)',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -65,17 +65,17 @@ const contentStyles = {
     left: '8px',
     top: '50%',
     transform: 'translateY(-50%)',
-    color: 'var(--text3, #5d606b)',
+    color: 'var(--tc-text3, #5d606b)',
     pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   searchInput: {
     width: '100%',
     padding: '6px 8px 6px 28px',
-    backgroundColor: 'var(--input-bg, #2a2e39)',
-    border: '1px solid var(--border, #363a45)',
+    backgroundColor: 'var(--tc-input-bg, #2a2e39)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '3px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '12px',
     outline: 'none',
     boxSizing: 'border-box',
@@ -85,7 +85,7 @@ const contentStyles = {
     padding: '8px 12px 4px',
     fontSize: '10px',
     fontWeight: '600',
-    color: 'var(--text3, #5d606b)',
+    color: 'var(--tc-text3, #5d606b)',
     textTransform: 'uppercase',
     letterSpacing: '0.3px',
   } as Partial<CSSStyleDeclaration>,
@@ -93,23 +93,23 @@ const contentStyles = {
   listItem: {
     padding: '6px 12px',
     cursor: 'pointer',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontSize: '13px',
     transition: 'background-color 0.1s',
   } as Partial<CSSStyleDeclaration>,
 
   listItemActive: {
-    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.15))',
+    backgroundColor: 'var(--tc-accent-bg, rgba(41, 98, 255, 0.15))',
   } as Partial<CSSStyleDeclaration>,
 
   listItemHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.08))',
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.08))',
   } as Partial<CSSStyleDeclaration>,
 
   emptyState: {
     padding: '16px 12px',
     textAlign: 'center',
-    color: 'var(--text3, #5d606b)',
+    color: 'var(--tc-text3, #5d606b)',
     fontSize: '12px',
   } as Partial<CSSStyleDeclaration>,
 };
@@ -134,7 +134,7 @@ export class IndicatorsModal extends Modal {
       align: 'top',
       paddingTop: '40px',
       borderRadius: '4px',
-      border: '1px solid var(--border, #363a45)',
+      border: '1px solid var(--tc-border, #363a45)',
       showCloseButton: true,
       closeOnOverlayClick: true,
       closeOnEscape: true,

@@ -58,7 +58,7 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     padding: '2px 0',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorName: {
@@ -66,7 +66,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   indicatorInputs: {
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorActions: {
@@ -82,7 +82,7 @@ const styles = {
     border: 'none',
     padding: '2px',
     cursor: 'pointer',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -281,10 +281,10 @@ export class IndicatorPaneLegend extends Component<IndicatorPaneLegendState> {
 
     // Use direct event listeners instead of props to ensure correct element targeting
     btn.addEventListener('mouseenter', () => {
-      btn.style.color = 'var(--text, #d1d4dc)';
+      btn.style.color = 'var(--tc-text, #d1d4dc)';
     });
     btn.addEventListener('mouseleave', () => {
-      btn.style.color = 'var(--text2, #787b86)';
+      btn.style.color = 'var(--tc-text2, #787b86)';
     });
 
     btn.appendChild(icon);

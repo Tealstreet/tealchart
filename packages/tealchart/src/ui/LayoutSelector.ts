@@ -45,7 +45,7 @@ const selectorStyles = {
     border: 'none',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     fontSize: '12px',
     fontWeight: '500',
@@ -62,7 +62,7 @@ const selectorStyles = {
     marginLeft: '5px',
     borderLeft: '4px solid transparent',
     borderRight: '4px solid transparent',
-    borderTop: '5px solid var(--text2, #787b86)',
+    borderTop: '5px solid var(--tc-text2, #787b86)',
     pointerEvents: 'none',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
@@ -74,7 +74,7 @@ const selectorStyles = {
     padding: '8px 12px',
     cursor: 'pointer',
     fontSize: '13px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     transition: 'background-color 0.1s',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -82,8 +82,8 @@ const selectorStyles = {
   } as Partial<CSSStyleDeclaration>,
 
   listItemActive: {
-    backgroundColor: 'var(--accent-bg, rgba(41, 98, 255, 0.15))',
-    color: 'var(--accent, #2962ff)',
+    backgroundColor: 'var(--tc-accent-bg, rgba(41, 98, 255, 0.15))',
+    color: 'var(--tc-accent, #2962ff)',
   } as Partial<CSSStyleDeclaration>,
 
   listItemName: {
@@ -105,7 +105,7 @@ const selectorStyles = {
   iconButton: {
     background: 'transparent',
     border: 'none',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     padding: '2px 4px',
     display: 'flex',
@@ -118,7 +118,7 @@ const selectorStyles = {
 
   actionsContainer: {
     padding: '4px 0',
-    borderTop: '1px solid var(--border, #363a45)',
+    borderTop: '1px solid var(--tc-border, #363a45)',
   } as Partial<CSSStyleDeclaration>,
 
   actionItem: {
@@ -128,7 +128,7 @@ const selectorStyles = {
     padding: '8px 12px',
     cursor: 'pointer',
     fontSize: '13px',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     transition: 'background-color 0.1s, color 0.1s',
     whiteSpace: 'nowrap',
     border: 'none',
@@ -140,7 +140,7 @@ const selectorStyles = {
   emptyState: {
     padding: '20px 12px',
     fontSize: '12px',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     textAlign: 'center',
   } as Partial<CSSStyleDeclaration>,
 };
@@ -266,11 +266,11 @@ class LayoutModal extends Modal {
       }
     });
     renameBtn.addEventListener('mouseenter', () => {
-      renameBtn.style.color = 'var(--text, #d1d4dc)';
+      renameBtn.style.color = 'var(--tc-text, #d1d4dc)';
       renameBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
     });
     renameBtn.addEventListener('mouseleave', () => {
-      renameBtn.style.color = 'var(--text2, #787b86)';
+      renameBtn.style.color = 'var(--tc-text2, #787b86)';
       renameBtn.style.backgroundColor = 'transparent';
     });
     actionsEl.appendChild(renameBtn);
@@ -292,7 +292,7 @@ class LayoutModal extends Modal {
       deleteBtn.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
     });
     deleteBtn.addEventListener('mouseleave', () => {
-      deleteBtn.style.color = 'var(--text2, #787b86)';
+      deleteBtn.style.color = 'var(--tc-text2, #787b86)';
       deleteBtn.style.backgroundColor = 'transparent';
     });
     actionsEl.appendChild(deleteBtn);
@@ -301,11 +301,11 @@ class LayoutModal extends Modal {
 
     // Hover: show actions
     item.addEventListener('mouseenter', () => {
-      if (!isActive) item.style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
+      if (!isActive) item.style.backgroundColor = 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))';
       actionsEl.style.opacity = '1';
     });
     item.addEventListener('mouseleave', () => {
-      item.style.backgroundColor = isActive ? 'var(--accent-bg, rgba(41, 98, 255, 0.15))' : 'transparent';
+      item.style.backgroundColor = isActive ? 'var(--tc-accent-bg, rgba(41, 98, 255, 0.15))' : 'transparent';
       actionsEl.style.opacity = '0';
     });
 
@@ -325,12 +325,12 @@ class LayoutModal extends Modal {
 
     btn.addEventListener('click', onClick);
     btn.addEventListener('mouseenter', () => {
-      btn.style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
-      btn.style.color = 'var(--text, #d1d4dc)';
+      btn.style.backgroundColor = 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))';
+      btn.style.color = 'var(--tc-text, #d1d4dc)';
     });
     btn.addEventListener('mouseleave', () => {
       btn.style.backgroundColor = 'transparent';
-      btn.style.color = 'var(--text2, #787b86)';
+      btn.style.color = 'var(--tc-text2, #787b86)';
     });
 
     return btn;
@@ -363,12 +363,12 @@ export class LayoutSelector {
     this.buttonEl.appendChild(chevron);
 
     this.buttonEl.addEventListener('mouseenter', () => {
-      this.buttonEl.style.backgroundColor = 'var(--hover-bg, rgba(255, 255, 255, 0.05))';
-      this.buttonEl.style.color = 'var(--text, #d1d4dc)';
+      this.buttonEl.style.backgroundColor = 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))';
+      this.buttonEl.style.color = 'var(--tc-text, #d1d4dc)';
     });
     this.buttonEl.addEventListener('mouseleave', () => {
       this.buttonEl.style.backgroundColor = 'transparent';
-      this.buttonEl.style.color = 'var(--text2, #787b86)';
+      this.buttonEl.style.color = 'var(--tc-text2, #787b86)';
     });
 
     // Create modal
