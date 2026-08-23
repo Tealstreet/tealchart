@@ -475,6 +475,29 @@ describe('PriceLineManager order dragging', () => {
       expect(firstGroup!.getZIndex()).toBeGreaterThan(secondGroup!.getZIndex());
     });
   });
+
+  it('hovers the nearest overlapping trade line instead of the topmost hit rect', () => {
+    withManager((manager) => {
+      manager.update([
+        { ...draggableOrderBound(undefined), lineId: 'top-order', price: 100, originalY: 100, adjustedY: 100 },
+        { ...draggableOrderBound(undefined), lineId: 'middle-order', price: 112, originalY: 112, adjustedY: 112 },
+        { ...draggableOrderBound(undefined), lineId: 'bottom-order', price: 124, originalY: 124, adjustedY: 124 },
+      ]);
+
+      const topGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('top-order');
+      const middleGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('middle-order');
+      const bottomGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('bottom-order');
+
+      expect(topGroup).toBeDefined();
+      expect(middleGroup).toBeDefined();
+      expect(bottomGroup).toBeDefined();
+
+      expect(manager.updateHoverAt(300, 113)).toBe(true);
+
+      expect(middleGroup!.getZIndex()).toBeGreaterThan(topGroup!.getZIndex());
+      expect(middleGroup!.getZIndex()).toBeGreaterThan(bottomGroup!.getZIndex());
+    });
+  });
 });
 
 describe('PriceLineManager TP/SL gating while an action is unconfirmed', () => {
