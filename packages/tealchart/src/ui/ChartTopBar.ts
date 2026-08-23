@@ -382,8 +382,8 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   timeframeDropdownItemActive: {
-    backgroundColor: 'var(--tc-text, #d1d4dc)',
-    color: 'var(--tc-canvas-bg, #131722)',
+    backgroundColor: 'var(--tc-active-bg, rgba(255, 255, 255, 0.12))',
+    color: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   timeframeFavoriteButton: {

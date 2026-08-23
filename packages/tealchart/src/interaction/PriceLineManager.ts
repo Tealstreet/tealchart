@@ -22,6 +22,8 @@ import { resolveTradingLineRowHitRect } from './tradingLineHitGeometry';
 // Types
 // ============================================================================
 
+export type PriceLineHoverHitKind = 'interactive' | 'passive' | null;
+
 export interface PriceLineManagerOptions {
   /** Konva layer to render on */
   layer: Konva.Layer;
@@ -366,7 +368,7 @@ export class PriceLineManager {
     this.selectLine(null);
   }
 
-  updateHoverAt(x: number, y: number): boolean {
+  updateHoverAt(x: number, y: number): PriceLineHoverHitKind {
     const hoveredLineId = this.findTradingLineAtPoint(x, y);
     let changed = false;
 
@@ -386,12 +388,7 @@ export class PriceLineManager {
       this.applyFloatingLineOrder();
     }
 
-    if (hoveredLineId) {
-      this.options.onCursorChange?.('pointer');
-      return true;
-    }
-
-    return false;
+    return hoveredLineId ? 'passive' : null;
   }
 
   clearHover(): void {
@@ -807,15 +804,19 @@ export class PriceLineManager {
     return node.getStage()?.getPointerPosition() ?? null;
   }
 
-  private bindLineSelectAndHover(node: Konva.Node, lineId: string): void {
-    node.on('mousedown touchstart', () => {
-      this.selectLine(lineId);
-    });
+  private bindLineSelectAndHover(node: Konva.Node, lineId: string, options?: { passive?: boolean }): void {
+    if (!options?.passive) {
+      node.on('mousedown touchstart', () => {
+        this.selectLine(lineId);
+      });
+    }
     node.on('mouseenter', () => {
-      this.options.onCursorChange?.('pointer');
+      if (!options?.passive) {
+        this.options.onCursorChange?.('pointer');
+      }
     });
     node.on('mouseleave', () => {
-      if (!this.activeDrag) {
+      if (!this.activeDrag && !options?.passive) {
         this.options.onCursorChange?.('crosshair');
       }
     });
@@ -1036,8 +1037,8 @@ export class PriceLineManager {
         fill: 'rgba(0, 0, 0, 0.01)',
         listening: true,
       });
-      lineHitRect.setAttr('tealchartCursor', 'pointer');
-      this.bindLineSelectAndHover(lineHitRect, bound.lineId);
+      lineHitRect.setAttr('tealchartPassiveCrosshairHit', true);
+      this.bindLineSelectAndHover(lineHitRect, bound.lineId, { passive: true });
       group.add(lineHitRect);
     }
 

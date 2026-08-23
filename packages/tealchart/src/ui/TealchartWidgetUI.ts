@@ -517,8 +517,10 @@ export class TealchartWidgetUI {
         justifyContent: 'center',
         cursor: 'pointer',
         zIndex: '4',
-        color: 'var(--tealchart-chrome-text, #b2b5be)',
-        background: 'var(--tealchart-chrome-bg, transparent)',
+        color: 'var(--tc-text2, var(--tealchart-chrome-text, #b2b5be))',
+        background: 'var(--tc-canvas-bg, var(--tealchart-chrome-bg, #131722))',
+        borderTop: '1px solid var(--tc-border, rgba(255, 255, 255, 0.08))',
+        borderLeft: '1px solid var(--tc-border, rgba(255, 255, 255, 0.08))',
       },
     });
     button.setAttribute('data-tealchart-chart-settings-button', 'true');
