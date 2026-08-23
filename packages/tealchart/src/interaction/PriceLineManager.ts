@@ -117,6 +117,21 @@ interface CountdownTextNodeRef {
   targetTime: number;
 }
 
+interface TradingLineChartLabelLayout {
+  chartLabelWidth: number;
+  chartLabelX: number;
+  segmentsWidth: number;
+  lineStartX: number;
+  useNarrowText: boolean;
+  inlineButtons: ReturnType<typeof splitTradeLineButtonsForDisplay>['inlineButtons'];
+  tpslButtons: ReturnType<typeof splitTradeLineButtonsForDisplay>['tpslButtons'];
+  orderedButtons: ReturnType<typeof splitTradeLineButtonsForDisplay>['orderedButtons'];
+  hasInlineButtons: boolean;
+  tpslGap: number;
+  rightLineStartX: number;
+  rightLineEndX: number;
+}
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -349,6 +364,40 @@ export class PriceLineManager {
 
   clearSelectedLine(): void {
     this.selectLine(null);
+  }
+
+  updateHoverAt(x: number, y: number): boolean {
+    const hoveredLineId = this.findTradingLineAtPoint(x, y);
+    let changed = false;
+
+    for (const lineId of [...this.hoveredLineIds]) {
+      if (lineId !== hoveredLineId) {
+        this.hoveredLineIds.delete(lineId);
+        changed = true;
+      }
+    }
+
+    if (hoveredLineId && !this.hoveredLineIds.has(hoveredLineId)) {
+      this.hoveredLineIds.add(hoveredLineId);
+      changed = true;
+    }
+
+    if (changed) {
+      this.applyFloatingLineOrder();
+    }
+
+    if (hoveredLineId) {
+      this.options.onCursorChange?.('pointer');
+      return true;
+    }
+
+    return false;
+  }
+
+  clearHover(): void {
+    if (this.hoveredLineIds.size === 0) return;
+    this.hoveredLineIds.clear();
+    this.applyFloatingLineOrder();
   }
 
   /**
@@ -646,15 +695,97 @@ export class PriceLineManager {
     }
   }
 
-  private setHoveredLine(lineId: string, hovered: boolean): void {
-    const hadLine = this.hoveredLineIds.has(lineId);
-    if (hovered === hadLine) return;
-    if (hovered) {
-      this.hoveredLineIds.add(lineId);
-    } else {
-      this.hoveredLineIds.delete(lineId);
+  private findTradingLineAtPoint(x: number, y: number): string | null {
+    let nearest: { distance: number; lineId: string } | null = null;
+
+    for (const bound of this.labelBounds) {
+      if ((bound.type !== 'order' && bound.type !== 'position') || !bound.chartLabel?.segments.length) continue;
+      const lineY = this.cachedLineGroups.get(bound.lineId)?.getAttr('lineY') ?? this.options.priceToY(bound.price);
+      const priceAxisLabelX = this.options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+      const { chartLabelWidth, chartLabelX, lineStartX, rightLineEndX } = this.resolveTradingLineChartLabelLayout(
+        bound,
+        priceAxisLabelX,
+      );
+      const rowHitRect = resolveTradingLineRowHitRect({
+        chartLabelWidth,
+        chartLabelX,
+        interactionKind: 'mouseHover',
+        labelHeight: LABEL_HEIGHT,
+        lineStartX,
+        lineY,
+        rightLineEndX,
+      });
+
+      if (
+        x < rowHitRect.x ||
+        x > rowHitRect.x + rowHitRect.width ||
+        y < rowHitRect.y ||
+        y > rowHitRect.y + rowHitRect.height
+      ) {
+        continue;
+      }
+
+      const distance = Math.abs(y - lineY);
+      if (!nearest || distance < nearest.distance) {
+        nearest = { distance, lineId: bound.lineId };
+      }
     }
-    this.applyFloatingLineOrder();
+
+    return nearest?.lineId ?? null;
+  }
+
+  private resolveTradingLineChartLabelLayout(
+    bound: PriceLineLabelBounds,
+    priceAxisLabelX: number,
+  ): TradingLineChartLabelLayout {
+    const { width, margins } = this.options;
+    const fontFamily = this.getTextFontFamily();
+    const chartLabel = bound.chartLabel;
+    let chartLabelWidth = 0;
+    let segmentsWidth = 0;
+    const lineStartX = getTradingLineMinX(this.options);
+    let chartLabelX = lineStartX;
+    const useNarrowText = width < 400;
+    const buttons = chartLabel?.buttons || [];
+    const { inlineButtons, tpslButtons, orderedButtons } = splitTradeLineButtonsForDisplay(buttons);
+    const hasInlineButtons = inlineButtons.length > 0;
+    const tpslGap = tpslButtons.length > 0 ? 6 : 0;
+
+    if (chartLabel && chartLabel.segments.length > 0) {
+      for (const segment of chartLabel.segments) {
+        const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
+        segmentsWidth += getSegmentWidth(text, fontFamily);
+      }
+      chartLabelWidth = segmentsWidth + tpslGap;
+      for (const button of orderedButtons) {
+        chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
+      }
+
+      const lineLength = bound.lineLength ?? 100;
+      const lineLengthUnit = bound.lineLengthUnit ?? 'percentage';
+      const maxLabelX = width - margins.right - chartLabelWidth;
+      const minLabelX = lineStartX;
+      chartLabelX =
+        lineLengthUnit === 'pixel'
+          ? maxLabelX - Math.max(0, lineLength)
+          : minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
+      chartLabelX = Math.max(minLabelX, Math.min(maxLabelX, chartLabelX));
+    }
+
+    return {
+      chartLabelWidth,
+      chartLabelX,
+      segmentsWidth,
+      lineStartX,
+      useNarrowText,
+      inlineButtons,
+      tpslButtons,
+      orderedButtons,
+      hasInlineButtons,
+      tpslGap,
+      rightLineStartX: chartLabelX + chartLabelWidth + 2,
+      rightLineEndX: priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING,
+    };
   }
 
   private applyFloatingLineOrder(): void {
@@ -678,11 +809,9 @@ export class PriceLineManager {
       this.selectLine(lineId);
     });
     node.on('mouseenter', () => {
-      this.setHoveredLine(lineId, true);
       this.options.onCursorChange?.('pointer');
     });
     node.on('mouseleave', () => {
-      this.setHoveredLine(lineId, false);
       if (!this.activeDrag) {
         this.options.onCursorChange?.('crosshair');
       }
@@ -841,42 +970,22 @@ export class PriceLineManager {
     priceAxisLabelY: number,
     lineDash: number[],
   ): void {
-    const { width, margins, yToPrice } = this.options;
+    const { yToPrice } = this.options;
     const fontFamily = this.getTextFontFamily();
     const chartLabel = bound.chartLabel;
     const isDraggable = bound.draggable ?? false;
-
-    // Calculate chart label dimensions
-    let chartLabelWidth = 0;
-    let segmentsWidth = 0;
-    const lineStartX = getTradingLineMinX(this.options);
-    let chartLabelX = lineStartX;
-    const useNarrowText = width < 400;
-    const buttons = chartLabel?.buttons || [];
-    const { inlineButtons, tpslButtons, orderedButtons } = splitTradeLineButtonsForDisplay(buttons);
-    const hasInlineButtons = inlineButtons.length > 0;
-    const tpslGap = tpslButtons.length > 0 ? 6 : 0;
-
-    if (chartLabel && chartLabel.segments.length > 0) {
-      for (const segment of chartLabel.segments) {
-        const text = useNarrowText && segment.textShort ? segment.textShort : segment.text;
-        segmentsWidth += getSegmentWidth(text, fontFamily);
-      }
-      chartLabelWidth = segmentsWidth + tpslGap;
-      for (const button of orderedButtons) {
-        chartLabelWidth += button.type === 'tp' || button.type === 'sl' ? 24 : 16;
-      }
-
-      const lineLength = bound.lineLength ?? 100;
-      const lineLengthUnit = bound.lineLengthUnit ?? 'percentage';
-      const maxLabelX = width - margins.right - chartLabelWidth;
-      const minLabelX = lineStartX;
-      chartLabelX =
-        lineLengthUnit === 'pixel'
-          ? maxLabelX - Math.max(0, lineLength)
-          : minLabelX + ((maxLabelX - minLabelX) * (100 - lineLength)) / 100;
-      chartLabelX = Math.max(minLabelX, Math.min(maxLabelX, chartLabelX));
-    }
+    const {
+      chartLabelWidth,
+      chartLabelX,
+      segmentsWidth,
+      lineStartX,
+      useNarrowText,
+      orderedButtons,
+      hasInlineButtons,
+      tpslGap,
+      rightLineStartX,
+      rightLineEndX,
+    } = this.resolveTradingLineChartLabelLayout(bound, priceAxisLabelX);
 
     // Left line segment
     if (chartLabel && chartLabel.segments.length > 0 && bound.extendLeft !== false) {
@@ -893,8 +1002,6 @@ export class PriceLineManager {
     }
 
     // Right line segment (from end of full chart label to price axis)
-    let rightLineStartX = chartLabelX + chartLabelWidth + 2;
-    let rightLineEndX = priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING;
     if (chartLabel && chartLabel.segments.length > 0) {
       if (rightLineEndX > rightLineStartX) {
         group.add(

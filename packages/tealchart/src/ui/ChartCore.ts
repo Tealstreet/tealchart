@@ -719,6 +719,8 @@ export class ChartCore {
         // The + button is canvas-drawn, so it has no element to take the press
         // and this is what keeps a click on it from starting a pan.
         if (this.isOverCrosshairPlusButton(x, y)) return true;
+        if (this.priceLineManager?.updateHoverAt(x, y)) return true;
+        this.priceLineManager?.clearHover();
         return this.isOverKonvaInteractiveElement(x, y);
       },
       isOverCrosshairChrome: (x, y) => this.isOverCrosshairPlusButton(x, y),
