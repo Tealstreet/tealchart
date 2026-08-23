@@ -49,6 +49,8 @@ describe('chrome theme resolver', () => {
     expect(vars['--tc-canvas-bg']).toBe('#101418');
     expect(vars['--tc-menu-bg']).toBe('#151924');
     expect(vars['--tc-bg']).toBe('#101418');
+    expect(vars['--tealchart-chrome-bg']).toBe('#101418');
+    expect(vars['--tealchart-chrome-text']).toBe(vars['--tc-text2']);
     expect(vars['--bg']).toBe('#101418');
     expect(vars['--modal-bg']).toBe(vars['--tc-modal-bg']);
   });

@@ -115,6 +115,13 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(dropdown?.textContent).toContain('Minutes');
     expect(dropdown?.textContent).toContain('Hours');
 
+    const activeItem = Array.from(document.querySelectorAll<HTMLElement>('[role="menuitemradio"]')).find(
+      (item) => item.getAttribute('aria-checked') === 'true',
+    );
+    expect(activeItem).not.toBeNull();
+    expect(activeItem?.style.backgroundColor).toBe('var(--tc-active-bg, rgba(255, 255, 255, 0.12))');
+    expect(activeItem?.style.color).toBe('var(--tc-text, #d1d4dc)');
+
     const sixHourItem = Array.from(document.querySelectorAll<HTMLElement>('[role="menuitemradio"]')).find((item) =>
       item.textContent?.includes('6 hours'),
     );

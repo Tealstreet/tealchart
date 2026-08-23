@@ -511,7 +511,7 @@ describe('PriceLineManager order dragging', () => {
       expect(middleGroup).toBeDefined();
       expect(bottomGroup).toBeDefined();
 
-      expect(manager.updateHoverAt(300, 113)).toBe(true);
+      expect(manager.updateHoverAt(300, 113)).toBe('passive');
 
       expect(middleGroup!.getZIndex()).toBeGreaterThan(topGroup!.getZIndex());
       expect(middleGroup!.getZIndex()).toBeGreaterThan(bottomGroup!.getZIndex());

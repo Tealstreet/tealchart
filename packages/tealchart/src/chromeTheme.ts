@@ -104,6 +104,8 @@ export function resolveChromeThemeVars(
     '--tc-sell-color': theme.sellColor,
     '--tc-warning': theme.warningColor,
     '--tc-bg': theme.canvasBackgroundColor,
+    '--tealchart-chrome-bg': theme.canvasBackgroundColor,
+    '--tealchart-chrome-text': theme.mutedTextColor,
     '--bg': theme.canvasBackgroundColor,
     '--modal-bg': theme.modalBackgroundColor,
     '--input-bg': theme.inputBackgroundColor,

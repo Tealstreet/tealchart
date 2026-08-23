@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import type { UserDrawingState } from '../drawings';
 import type { PaneLayout } from '../types';
 
@@ -279,6 +281,8 @@ describe('TealchartWidgetUI legend layout', () => {
     // intersection rather than half a price-axis in from the edge.
     expect(gear!.style.width).toBe(`${DEFAULT_MARGINS.bottom}px`);
     expect(gear!.style.height).toBe(`${DEFAULT_MARGINS.bottom}px`);
+    expect(gear!.style.background).toBe('var(--tc-canvas-bg, var(--tealchart-chrome-bg, #131722))');
+    expect(gear!.style.borderTop).toBe('1px solid var(--tc-border, rgba(255, 255, 255, 0.08))');
     expect(gear!.querySelector('svg')).not.toBeNull();
 
   });

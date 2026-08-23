@@ -719,8 +719,10 @@ export class ChartCore {
         // The + button is canvas-drawn, so it has no element to take the press
         // and this is what keeps a click on it from starting a pan.
         if (this.isOverCrosshairPlusButton(x, y)) return true;
-        if (this.priceLineManager?.updateHoverAt(x, y)) return true;
-        this.priceLineManager?.clearHover();
+        const priceLineHit = this.priceLineManager?.updateHoverAt(x, y) ?? null;
+        if (!priceLineHit) {
+          this.priceLineManager?.clearHover();
+        }
         return this.isOverKonvaInteractiveElement(x, y);
       },
       isOverCrosshairChrome: (x, y) => this.isOverCrosshairPlusButton(x, y),
@@ -1136,13 +1138,13 @@ export class ChartCore {
   private isOverKonvaInteractiveElement(x: number, y: number): boolean {
     if (!this.stage) return false;
     const hit = this.stage.getIntersection({ x, y });
-    return hit !== null && hit.listening();
+    return hit !== null && hit.listening() && !this.isPassiveCrosshairHit(hit);
   }
 
   private getKonvaCursorAt(x: number, y: number): string | null {
     if (!this.stage) return null;
     const hit = this.stage.getIntersection({ x, y });
-    if (hit === null || !hit.listening()) return null;
+    if (hit === null || !hit.listening() || this.isPassiveCrosshairHit(hit)) return null;
 
     let node: Konva.Node | null = hit;
     while (node && node !== this.stage) {
@@ -1152,6 +1154,15 @@ export class ChartCore {
       node = node.getParent();
     }
     return null;
+  }
+
+  private isPassiveCrosshairHit(hit: Konva.Node): boolean {
+    let node: Konva.Node | null = hit;
+    while (node && node !== this.stage) {
+      if (node.getAttr('tealchartPassiveCrosshairHit') === true) return true;
+      node = node.getParent();
+    }
+    return false;
   }
 
   /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */
