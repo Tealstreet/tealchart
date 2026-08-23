@@ -91,6 +91,7 @@ import {
   PaneLayout,
   PositionData,
   PositionLineRenderData,
+  PRICE_AXIS_RIGHT_PADDING,
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
@@ -2434,6 +2435,39 @@ export class ChartCore {
     // Check if cursor is in chart area (horizontally)
     if (x < this.margins.left || x > width - this.margins.right) return;
 
+    let priceLabel:
+      | {
+          text: string;
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        }
+      | null = null;
+    if (y >= this.margins.top && y <= height - this.margins.bottom) {
+      // The pane under the cursor, not always the price pane: an indicator pane
+      // carries its own scale, and RSI or MACD read as nonsense at market
+      // precision.
+      const { value, decimals } = this.renderer.publicYToPaneValueWithLayout(
+        y,
+        this.viewport,
+        this.getUnifiedLayout(),
+        this.options.renderOptions?.pricePrecision,
+      );
+      const priceText = safeToFixed(value, decimals, 'crosshairPrice');
+      const font = this.renderer.getFont();
+      ctx.font = `11px ${font}`;
+      const priceLabelWidth = ctx.measureText(priceText).width + 10;
+      const priceLabelHeight = 18;
+      priceLabel = {
+        text: priceText,
+        x: width - priceLabelWidth - PRICE_AXIS_RIGHT_PADDING,
+        y: y - priceLabelHeight / 2,
+        width: priceLabelWidth,
+        height: priceLabelHeight,
+      };
+    }
+
     // Draw vertical crosshair line
     ctx.strokeStyle = crosshairColor;
     ctx.lineWidth = 1;
@@ -2447,7 +2481,7 @@ export class ChartCore {
     // Stop short of the + context menu button (18px wide + 2px offset + 2px gap)
     const hasContextMenu = this.hasContextMenu();
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
-      const rightStop = hasContextMenu ? width - this.margins.right - 22 : width - this.margins.right;
+      const rightStop = hasContextMenu && priceLabel ? priceLabel.x - 22 : width - this.margins.right;
       ctx.beginPath();
       ctx.moveTo(this.margins.left, y);
       ctx.lineTo(rightStop, y);
@@ -2456,8 +2490,8 @@ export class ChartCore {
     ctx.setLineDash([]);
 
     // Draw + button circle on the crosshair line
-    if (hasContextMenu && y >= this.margins.top && y <= height - this.margins.bottom) {
-      const btnX = width - this.margins.right - 11; // center of 18px circle, 2px from axis
+    if (hasContextMenu && priceLabel) {
+      const btnX = priceLabel.x - 11; // center of 18px circle, 2px left of the price label
       const btnY = y;
       const btnR = 9; // 18px diameter / 2
 
@@ -2519,34 +2553,18 @@ export class ChartCore {
     ctx.fillText(timeLabel, x, timeLabelY + timeLabelHeight / 2);
 
     // Draw price label on right Y-axis (replaces HTML crosshair label)
-    if (y >= this.margins.top && y <= height - this.margins.bottom) {
-      // The pane under the cursor, not always the price pane: an indicator pane
-      // carries its own scale, and RSI or MACD read as nonsense at market
-      // precision.
-      const { value, decimals } = this.renderer.publicYToPaneValueWithLayout(
-        y,
-        this.viewport,
-        this.getUnifiedLayout(),
-        this.options.renderOptions?.pricePrecision,
-      );
-      const priceText = safeToFixed(value, decimals, 'crosshairPrice');
-      ctx.font = `11px ${font}`;
-      const priceLabelWidth = ctx.measureText(priceText).width + 10;
-      const priceLabelHeight = 18;
-      const priceLabelX = width - this.margins.right;
-      const priceLabelY = y - priceLabelHeight / 2;
-
+    if (priceLabel) {
       // Background
       ctx.fillStyle = crosshairColor;
       ctx.beginPath();
-      ctx.roundRect(priceLabelX, priceLabelY, priceLabelWidth, priceLabelHeight, 2);
+      ctx.roundRect(priceLabel.x, priceLabel.y, priceLabel.width, priceLabel.height, 2);
       ctx.fill();
 
       // Text
       ctx.fillStyle = this.options.renderOptions?.backgroundColor || '#131722';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(priceText, priceLabelX + priceLabelWidth / 2, y);
+      ctx.fillText(priceLabel.text, priceLabel.x + priceLabel.width / 2, y);
     }
 
     // Draw jailbreak indicator tooltips
