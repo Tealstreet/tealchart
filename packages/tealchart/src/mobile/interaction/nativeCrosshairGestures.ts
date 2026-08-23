@@ -1,4 +1,3 @@
-import type { LegacyGestureStateManager as GestureStateManager } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
@@ -204,7 +203,7 @@ export function createNativeCrosshairPanGesture({
   if (!frame) return Gesture.Pan().enabled(false);
   return Gesture.Pan()
     .minDistance(2)
-    .onTouchesDown((event, stateManager: GestureStateManager) => {
+    .onTouchesDown((event, stateManager) => {
       if (!crosshair.visible.value || !isNativeCrosshairSingleTouch(event)) {
         stateManager.fail();
         return;

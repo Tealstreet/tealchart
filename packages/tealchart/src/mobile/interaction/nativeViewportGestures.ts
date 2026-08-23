@@ -1,4 +1,3 @@
-import type { LegacyGestureStateManager as GestureStateManager } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
@@ -187,7 +186,7 @@ export function createNativeChartPanGesture({
 
   return Gesture.Pan()
     .minDistance(2)
-    .onTouchesDown((event, stateManager: GestureStateManager) => {
+    .onTouchesDown((event, stateManager) => {
       if (panActive.value) return;
       if (crosshair?.visible.value) {
         stateManager.fail();
@@ -357,7 +356,7 @@ export function createNativeChartAxisPinchGesture({
   if (!frame) return Gesture.Manual().enabled(false);
 
   return Gesture.Manual()
-    .onTouchesDown((event, stateManager: GestureStateManager) => {
+    .onTouchesDown((event, stateManager) => {
       if (pinchActive.value) return;
       if (
         bracketDragActive.value ||
@@ -416,7 +415,7 @@ export function createNativeChartAxisPinchGesture({
         frame,
       );
     })
-    .onTouchesUp((event, stateManager: GestureStateManager) => {
+    .onTouchesUp((event, stateManager) => {
       if (!pinchActive.value) return;
       if ((event.numberOfTouches ?? event.allTouches.length) >= 2 && event.allTouches.length >= 2) return;
       const nextViewport = getNativeViewportGestureCommit(pinchActive, sharedViewport);
@@ -425,7 +424,7 @@ export function createNativeChartAxisPinchGesture({
       }
       stateManager.end();
     })
-    .onTouchesCancelled((_event, stateManager: GestureStateManager) => {
+    .onTouchesCancelled((_event, stateManager) => {
       if (pinchActive.value) stateManager.fail();
     })
     .onFinalize((_event, success) => {
@@ -479,7 +478,7 @@ export function createNativePriceScaleGesture({
 
   return Gesture.Pan()
     .minDistance(2)
-    .onTouchesDown((event, stateManager: GestureStateManager) => {
+    .onTouchesDown((event, stateManager) => {
       if (priceScaleActive.value) return;
       if (!isNativeInitialSingleTouch(event)) {
         stateManager.fail();
@@ -590,7 +589,7 @@ export function createNativeTimeScaleGesture({
 
   return Gesture.Pan()
     .minDistance(2)
-    .onTouchesDown((event, stateManager: GestureStateManager) => {
+    .onTouchesDown((event, stateManager) => {
       if (timeScaleActive.value) return;
       if (!isNativeInitialSingleTouch(event)) {
         stateManager.fail();

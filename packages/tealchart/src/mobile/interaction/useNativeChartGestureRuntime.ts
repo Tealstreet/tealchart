@@ -1,4 +1,4 @@
-import type { GestureType, LegacySimultaneousGesture } from 'react-native-gesture-handler';
+import type { GestureType } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativePaneDividerBand, NativePaneHeight } from './nativePaneDivider';
@@ -29,7 +29,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useSharedValue } from 'react-native-reanimated';
 
-import { createNativeChartGesture } from './nativeChartGestures';
+import { createNativeChartGesture, type NativeChartGesture } from './nativeChartGestures';
 import {
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
@@ -117,7 +117,7 @@ export interface NativeChartGestureRuntimeInput {
 }
 
 export interface NativeChartGestureRuntime {
-  nativeChartGesture: LegacySimultaneousGesture;
+  nativeChartGesture: NativeChartGesture;
 }
 
 export function resolveNativeCrosshairInteractionFrame({
