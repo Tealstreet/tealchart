@@ -78,13 +78,13 @@ const styles = {
     left: '0',
     right: '0',
     bottom: '0',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'var(--tc-backdrop, rgba(0, 0, 0, 0.6))',
     display: 'flex',
     zIndex: '10000',
   } as Partial<CSSStyleDeclaration>,
 
   modal: {
-    backgroundColor: 'var(--tc-modal-bg, #1e222d)',
+    backgroundColor: 'var(--tc-modal-bg, var(--tc-canvas-bg, #1e222d))',
     borderRadius: '8px',
     boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
     display: 'flex',

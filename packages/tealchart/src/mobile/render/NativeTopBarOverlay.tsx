@@ -16,9 +16,11 @@ interface TimeframeMenuMeasurer {
 }
 
 export interface NativeTopBarOverlayProps {
+  activeBackgroundColor?: string;
   backgroundColor: string;
   gridColor: string;
   favoriteTimeframeValues?: readonly ResolutionString[];
+  menuBackgroundColor?: string;
   menuTimeframes?: readonly TimeframeOption[];
   mutedTextColor: string;
   onAction: (action: NativeTopBarActionCommand) => void;
@@ -45,9 +47,11 @@ function accessibilityLabelForButton(button: NativeTopBarButtonGeometry): string
 }
 
 export function NativeTopBarOverlayImpl({
+  activeBackgroundColor,
   backgroundColor,
   favoriteTimeframeValues = [],
   gridColor,
+  menuBackgroundColor,
   menuTimeframes = [],
   mutedTextColor,
   onAction,
@@ -260,7 +264,7 @@ export function NativeTopBarOverlayImpl({
       </View>
       <NativeAnchoredFloatingSurface
         anchor={timeframeMenuAnchor}
-        backgroundColor={backgroundColor}
+        backgroundColor={menuBackgroundColor ?? backgroundColor}
         borderColor={gridColor}
         fallbackLeft={fallbackMenuLeft}
         fallbackTop={fallbackMenuTop}
@@ -287,7 +291,7 @@ export function NativeTopBarOverlayImpl({
                         style={[
                           styles.timeframeMenuRow,
                           {
-                            backgroundColor: active ? gridColor : 'transparent',
+                            backgroundColor: active ? (activeBackgroundColor ?? gridColor) : 'transparent',
                           },
                         ]}
                       >

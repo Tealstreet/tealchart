@@ -51,6 +51,31 @@ export interface ViewScaleState {
 }
 
 // Rendering options
+export interface ChartChromeThemeOptions {
+  accentBackgroundColor: string;
+  accentColor: string;
+  activeBackgroundColor: string;
+  backdropColor: string;
+  borderColor: string;
+  buyColor: string;
+  canvasBackgroundColor: string;
+  hoverBackgroundColor: string;
+  inputBackgroundColor: string;
+  leftToolRailBackgroundColor: string;
+  menuBackgroundColor: string;
+  modalBackgroundColor: string;
+  mutedTextColor: string;
+  popoverBackgroundColor: string;
+  sellColor: string;
+  tertiaryTextColor: string;
+  textColor: string;
+  tooltipBackgroundColor: string;
+  topBarBackgroundColor: string;
+  warningColor: string;
+}
+
+export type ChartChromeThemeOverrides = Partial<ChartChromeThemeOptions>;
+
 export interface RenderOptions {
   width: number;
   height: number;
@@ -71,6 +96,8 @@ export interface RenderOptions {
   chartLabelMinX?: number;
   pricePrecision?: number; // Market price precision (e.g., 0.00001 for 5 decimal places)
   fontFamily?: string; // Font family for all chart text. Defaults to 'sans-serif' for canvas rendering.
+  /** Optional chrome surface overrides. Defaults are derived from the canvas render colors. */
+  chromeTheme?: ChartChromeThemeOverrides;
   // Metadata for jailbreak indicators
   exchange?: string;
   symbol?: string;

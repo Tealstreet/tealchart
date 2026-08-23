@@ -3166,6 +3166,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._userDrawingPropertiesPanel = null;
         this._userDrawingPropertiesPanelDrawingId = undefined;
       },
+      renderOptions: this._renderOptions,
     });
   }
 

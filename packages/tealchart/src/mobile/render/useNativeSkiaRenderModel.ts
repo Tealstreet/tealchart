@@ -1,6 +1,7 @@
 import type { Skia } from '@shopify/react-native-skia';
 import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingCommandAvailability, UserDrawingRecentToolByCategory, UserDrawingTool } from '../../drawings';
+import type { ChartChromeTheme } from '../../chromeTheme';
 import type {
   Bar,
   OrderLineRenderData,
@@ -23,11 +24,11 @@ import { useMemo } from 'react';
 
 import { useDerivedValue } from 'react-native-reanimated';
 
+import { resolveChartChromeTheme } from '../../chromeTheme';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions } from '../../state/chartState';
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
 import { createNativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import { createNativeBracketPriceLines } from '../utils/nativeBracketPriceLines';
-import { getNativeMutedTextColor, NATIVE_TOP_BAR_ACTIVE_BACKGROUND_COLOR } from '../utils/nativeColor';
 import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import { createNativePriceAxisTagSources } from '../utils/priceAxisTagSources';
 import { createNativeTopBarLayout, createNativeTopBarTimeframes } from '../utils/topBarLayout';
@@ -78,6 +79,7 @@ export interface NativeSkiaRenderModelInput {
 export interface NativeSkiaRenderModel {
   axisFont: ReturnType<typeof Skia.Font>;
   backgroundColor: string;
+  chromeTheme: ChartChromeTheme;
   gridColor: string;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
   nativeMutedTextColor: string;
@@ -126,7 +128,8 @@ export function useNativeSkiaRenderModel({
   const titleFont = useMemo(() => createNativeSkiaFont(13), []);
   const axisFont = useMemo(() => createNativeSkiaAxisFont(11), []);
   const priceTickSize = useMemo(() => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision), [pricePrecision]);
-  const nativeMutedTextColor = useMemo(() => getNativeMutedTextColor(options.textColor), [options.textColor]);
+  const chromeTheme = useMemo(() => resolveChartChromeTheme(options), [options]);
+  const nativeMutedTextColor = chromeTheme.mutedTextColor;
   const selectedTopBarInterval = topBarInterval ?? interval;
   const nativeTopBarMenuTimeframes = useMemo(
     () => filterTimeframesBySupportedResolutions(supportedResolutions, AVAILABLE_TIMEFRAMES),
@@ -154,7 +157,7 @@ export function useNativeSkiaRenderModel({
             textColor: options.textColor,
             mutedTextColor: nativeMutedTextColor,
             activeTextColor: options.upColor,
-            activeBackgroundColor: NATIVE_TOP_BAR_ACTIVE_BACKGROUND_COLOR,
+            activeBackgroundColor: chromeTheme.activeBackgroundColor,
             indicatorsEnabled,
             layoutName,
             layoutSelectorEnabled,
@@ -170,6 +173,7 @@ export function useNativeSkiaRenderModel({
       nativeMutedTextColor,
       nativeTopBarMenuTimeframes.length,
       nativeTopBarTimeframes,
+      chromeTheme.activeBackgroundColor,
       indicatorsEnabled,
       options.textColor,
       options.upColor,
@@ -324,6 +328,7 @@ export function useNativeSkiaRenderModel({
   return {
     axisFont,
     backgroundColor,
+    chromeTheme,
     gridColor,
     leftToolRailLayout,
     nativeMutedTextColor,

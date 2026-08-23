@@ -200,7 +200,7 @@ const styles = {
     // right border and the top bar's bottom border meet in a top-left "L".
     marginLeft: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     padding: '0 8px',
-    backgroundColor: 'var(--tc-bg, #131722)',
+    backgroundColor: 'var(--tc-topbar-bg, var(--tc-canvas-bg, #131722))',
     borderBottom: '1px solid var(--tc-border, #2a2e39)',
     fontSize: '12px',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -317,7 +317,7 @@ const styles = {
     width: '260px',
     maxHeight: 'min(640px, calc(100vh - 16px))',
     overflowY: 'auto',
-    backgroundColor: 'var(--tc-menu-bg, var(--tc-bg, #131722))',
+    backgroundColor: 'var(--tc-menu-bg, var(--tc-canvas-bg, #131722))',
     border: '1px solid var(--tc-border, #2a2e39)',
     borderRadius: '4px',
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
@@ -383,7 +383,7 @@ const styles = {
 
   timeframeDropdownItemActive: {
     backgroundColor: 'var(--tc-text, #d1d4dc)',
-    color: 'var(--tc-bg, #131722)',
+    color: 'var(--tc-canvas-bg, #131722)',
   } as Partial<CSSStyleDeclaration>,
 
   timeframeFavoriteButton: {
@@ -442,7 +442,7 @@ const styles = {
     padding: '4px 0',
     boxSizing: 'border-box',
     borderRight: '1px solid var(--tc-border, #2a2e39)',
-    backgroundColor: 'var(--tc-bg, #131722)',
+    backgroundColor: 'var(--tc-left-rail-bg, var(--tc-canvas-bg, #131722))',
     zIndex: '7',
     pointerEvents: 'auto',
     overflow: 'visible',
@@ -499,7 +499,7 @@ const styles = {
     borderTopRightRadius: '10px',
     borderBottomRightRadius: '10px',
     backgroundColor: 'var(--tc-text, #d1d4dc)',
-    color: 'var(--tc-bg, #131722)',
+    color: 'var(--tc-canvas-bg, #131722)',
     cursor: 'pointer',
     padding: '0',
     boxShadow: '0 1px 2px rgba(0, 0, 0, 0.18)',
@@ -580,7 +580,7 @@ const styles = {
     boxSizing: 'border-box',
     border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '6px',
-    backgroundColor: 'var(--tc-bg, rgba(19, 23, 34, 0.98))',
+    backgroundColor: 'var(--tc-popover-bg, var(--tc-canvas-bg, rgba(19, 23, 34, 0.98)))',
     boxShadow: '0 12px 32px rgba(0, 0, 0, 0.32)',
     zIndex: '2',
   } as Partial<CSSStyleDeclaration>,
@@ -680,7 +680,7 @@ const styles = {
     gap: '2px',
     padding: '3px 4px',
     borderRadius: '8px',
-    backgroundColor: 'var(--tc-bg, #1e222d)',
+    backgroundColor: 'var(--tc-popover-bg, var(--tc-canvas-bg, #1e222d))',
     border: '1px solid var(--tc-border, #2a2e39)',
     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
   } as Partial<CSSStyleDeclaration>,
@@ -722,7 +722,7 @@ const styles = {
     padding: '4px',
     border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '6px',
-    backgroundColor: 'var(--tc-bg, rgba(19, 23, 34, 0.98))',
+    backgroundColor: 'var(--tc-popover-bg, var(--tc-canvas-bg, rgba(19, 23, 34, 0.98)))',
     boxShadow: '0 10px 28px rgba(0, 0, 0, 0.32)',
     zIndex: '8',
     pointerEvents: 'auto',
@@ -750,7 +750,7 @@ const styles = {
     padding: '6px',
     border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '6px',
-    backgroundColor: 'var(--tc-bg, rgba(19, 23, 34, 0.98))',
+    backgroundColor: 'var(--tc-popover-bg, var(--tc-canvas-bg, rgba(19, 23, 34, 0.98)))',
     boxShadow: '0 12px 30px rgba(0, 0, 0, 0.34)',
     zIndex: '9',
     pointerEvents: 'auto',
@@ -804,7 +804,7 @@ const styles = {
   // TradingView-style persistent toggle (e.g. magnet on): filled light glyph on dark.
   drawingButtonToggleActive: {
     backgroundColor: 'var(--tc-text, #d1d4dc)',
-    color: 'var(--tc-bg, #131722)',
+    color: 'var(--tc-canvas-bg, #131722)',
   } as Partial<CSSStyleDeclaration>,
 
   drawingButtonHover: {
@@ -2203,6 +2203,11 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       style: styles.timeframeDropdown,
       attributes: { role: 'menu' },
     });
+    if (this.options.cssVars) {
+      for (const [name, value] of Object.entries(this.options.cssVars)) {
+        dropdown.style.setProperty(name, value);
+      }
+    }
 
     const addCustomItem = this.createElement('button', {
       style: styles.timeframeDropdownAdd,

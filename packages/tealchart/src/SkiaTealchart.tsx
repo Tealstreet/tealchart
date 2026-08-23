@@ -1545,6 +1545,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const {
     axisFont,
     backgroundColor,
+    chromeTheme,
     gridColor,
     leftToolRailLayout,
     nativeMutedTextColor,
@@ -1662,19 +1663,19 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () =>
       frame
         ? resolveNativeSelectedDrawingActionOverlayModel({
-            activeBackgroundColor: gridColor,
+            activeBackgroundColor: chromeTheme.activeBackgroundColor,
             activeTextColor: options.upColor,
             anchor: nativeUserDrawingSelectionActionAnchor,
-            backgroundColor,
+            backgroundColor: chromeTheme.popoverBackgroundColor,
             bottomInset: 8,
-            gridColor,
+            gridColor: chromeTheme.borderColor,
             leftInset: nativeSelectionActionLeftInset,
-            mutedTextColor: nativeMutedTextColor,
+            mutedTextColor: chromeTheme.mutedTextColor,
             onAction: handleNativeSelectedDrawingAction,
             onPopoverGroupChange: setNativeSelectedActionPopoverGroupId,
             openPopoverGroupId: nativeSelectedActionPopoverGroupId,
             rightInset: 8,
-            textColor,
+            textColor: chromeTheme.textColor,
             topInset: nativeSelectionActionTopInset,
             userDrawingDefaultStylesByKind: nativeUserDrawingDefaultStylesByKind,
             userDrawingDraft: nativeUserDrawingDraft,
@@ -1686,11 +1687,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           })
         : null,
     [
-      backgroundColor,
+      chromeTheme.activeBackgroundColor,
+      chromeTheme.borderColor,
+      chromeTheme.mutedTextColor,
+      chromeTheme.popoverBackgroundColor,
+      chromeTheme.textColor,
       frame,
-      gridColor,
       handleNativeSelectedDrawingAction,
-      nativeMutedTextColor,
       nativeSelectedActionPopoverGroupId,
       nativeSelectionActionLeftInset,
       nativeSelectionActionTopInset,
@@ -1701,7 +1704,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       nativeUserDrawingSelectionActionAnchor,
       nativeUserDrawingTextEdit,
       options.upColor,
-      textColor,
     ],
   );
   // Hidden for the drag, so its buttons stop taking taps and stop suppressing
@@ -2069,14 +2071,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       </Canvas>
       {topBarLayout && (
         <NativeTopBarOverlay
-          backgroundColor={backgroundColor}
+          activeBackgroundColor={chromeTheme.activeBackgroundColor}
+          backgroundColor={chromeTheme.topBarBackgroundColor}
           favoriteTimeframeValues={uiPreferences.favoriteTimeframeValues}
-          gridColor={gridColor}
+          gridColor={chromeTheme.borderColor}
+          menuBackgroundColor={chromeTheme.menuBackgroundColor}
           menuTimeframes={nativeTopBarMenuTimeframes}
-          mutedTextColor={nativeMutedTextColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
           onAction={handleNativeTopBarAction}
           onFavoriteTimeframeToggle={toggleNativeFavoriteTimeframe}
-          textColor={textColor}
+          textColor={chromeTheme.textColor}
           topBarLayout={topBarLayout}
         />
       )}
@@ -2111,34 +2115,34 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       )}
       {leftToolRailLayout && (
         <NativeLeftToolRailOverlay
-          backgroundColor={backgroundColor}
-          gridColor={gridColor}
+          backgroundColor={chromeTheme.leftToolRailBackgroundColor}
+          gridColor={chromeTheme.borderColor}
           leftToolRailLayout={leftToolRailLayout}
-          mutedTextColor={nativeMutedTextColor}
-          activeBackgroundColor={gridColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
+          activeBackgroundColor={chromeTheme.activeBackgroundColor}
           activeTextColor={options.upColor}
           openCategoryId={nativeOpenDrawingCategoryId}
           onCategoryOpenChange={setNativeOpenDrawingCategoryId}
           onToolSelect={handleNativeUserDrawingToolSelect}
           onToggleCollapsed={toggleLeftToolRailCollapsed}
-          toggleBackgroundColor={textColor}
+          toggleBackgroundColor={chromeTheme.textColor}
         />
       )}
       {frame && nativeUserDrawingSelectionActionAnchor && !nativeUserDrawingEditDragActive && (
         <NativeUserDrawingSelectionActionOverlay
-          activeBackgroundColor={gridColor}
+          activeBackgroundColor={chromeTheme.activeBackgroundColor}
           activeTextColor={options.upColor}
           anchor={nativeUserDrawingSelectionActionAnchor}
-          backgroundColor={backgroundColor}
+          backgroundColor={chromeTheme.popoverBackgroundColor}
           bottomInset={8}
-          gridColor={gridColor}
+          gridColor={chromeTheme.borderColor}
           leftInset={nativeSelectionActionLeftInset}
-          mutedTextColor={nativeMutedTextColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
           onAction={handleNativeSelectedDrawingAction}
           onPopoverGroupChange={setNativeSelectedActionPopoverGroupId}
           openPopoverGroupId={nativeSelectedActionPopoverGroupId}
           rightInset={8}
-          textColor={textColor}
+          textColor={chromeTheme.textColor}
           topInset={nativeSelectionActionTopInset}
           userDrawingDefaultStylesByKind={nativeUserDrawingDefaultStylesByKind}
           userDrawingDraft={nativeUserDrawingDraft}
@@ -2163,43 +2167,43 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         />
       ) : null}
       <NativeChartSettingsButton
-        backgroundColor={backgroundColor}
+        backgroundColor={chromeTheme.canvasBackgroundColor}
         axisHeight={frame?.dimensions.margins.bottom ?? 0}
         onLayoutRectChange={handleNativeChartSettingsButtonLayout}
         onPress={() => setNativeChartSettingsOpen(true)}
-        textColor={nativeMutedTextColor}
+        textColor={chromeTheme.mutedTextColor}
       />
       {nativeChartSettingsOpen ? (
         <NativeChartSettingsOverlay
-          activeBackgroundColor={gridColor}
-          backgroundColor={backgroundColor}
+          activeBackgroundColor={chromeTheme.activeBackgroundColor}
+          backgroundColor={chromeTheme.modalBackgroundColor}
           context={nativeChartSettingsContext}
-          gridColor={gridColor}
-          mutedTextColor={nativeMutedTextColor}
+          gridColor={chromeTheme.borderColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
           onClose={() => setNativeChartSettingsOpen(false)}
-          textColor={textColor}
+          textColor={chromeTheme.textColor}
         />
       ) : null}
       {nativeIndicatorsOpen ? (
         <NativeIndicatorsOverlay
-          activeBackgroundColor={gridColor}
-          backgroundColor={backgroundColor}
-          gridColor={gridColor}
-          mutedTextColor={nativeMutedTextColor}
+          activeBackgroundColor={chromeTheme.activeBackgroundColor}
+          backgroundColor={chromeTheme.modalBackgroundColor}
+          gridColor={chromeTheme.borderColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
           onClose={() => setNativeIndicatorsOpen(false)}
           onSelect={handleNativeIndicatorSelect}
-          textColor={textColor}
+          textColor={chromeTheme.textColor}
         />
       ) : null}
       {nativeLayoutSelectorOpen ? (
         <NativeLayoutSelectorOverlay
-          backgroundColor={backgroundColor}
+          backgroundColor={chromeTheme.modalBackgroundColor}
           currentLayout={nativeCurrentLayout}
           errorText={nativeLayoutSelectorError}
-          gridColor={gridColor}
+          gridColor={chromeTheme.borderColor}
           layouts={nativeLayoutSelectorLayouts}
           loading={nativeLayoutSelectorLoading}
-          mutedTextColor={nativeMutedTextColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
           onClose={() => setNativeLayoutSelectorOpen(false)}
           onDelete={handleNativeLayoutSelectorDelete}
           onLoad={handleNativeLayoutSelectorLoad}
@@ -2208,18 +2212,18 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           onSave={handleNativeLayoutSelectorSave}
           onSaveAs={handleNativeLayoutSelectorSaveAs}
           saveStatus={nativeSaveStatus}
-          textColor={textColor}
+          textColor={chromeTheme.textColor}
         />
       ) : null}
       {nativeObjectTreeOpen ? (
         <NativeUserDrawingObjectTreePanel
-          backgroundColor={backgroundColor}
-          gridColor={gridColor}
+          backgroundColor={chromeTheme.modalBackgroundColor}
+          gridColor={chromeTheme.borderColor}
           model={nativeObjectTreeModel}
-          mutedTextColor={nativeMutedTextColor}
+          mutedTextColor={chromeTheme.mutedTextColor}
           onClose={() => setNativeObjectTreeOpen(false)}
           onDispatch={dispatchNativeUserDrawingObjectTreeAction}
-          textColor={textColor}
+          textColor={chromeTheme.textColor}
         />
       ) : null}
     </View>

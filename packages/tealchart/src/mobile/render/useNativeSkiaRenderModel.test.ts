@@ -179,6 +179,16 @@ describe('useNativeSkiaRenderModel', () => {
     expect(model.topBarLayout?.buttons.find((button) => button.type === 'timeframeMenu')).toEqual(
       expect.objectContaining({ enabled: true }),
     );
+    expect(model.chromeTheme).toEqual(
+      expect.objectContaining({
+        canvasBackgroundColor: '#101418',
+        topBarBackgroundColor: '#101418',
+        menuBackgroundColor: '#101418',
+        modalBackgroundColor: '#101418',
+        borderColor: '#222831',
+        textColor: '#f0f3fa',
+      }),
+    );
     expect(model.leftToolRailLayout?.items.length).toBeGreaterThan(0);
     expect(model.visibleBars.map((bar) => bar.time)).toEqual([0, 900, 1800]);
     expect(model.volumeHeight).toBe(82.4);
