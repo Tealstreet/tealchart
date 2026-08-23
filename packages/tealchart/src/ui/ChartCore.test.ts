@@ -1863,12 +1863,17 @@ describe('ChartCore viewport management', () => {
 
     eventManager.callbacks.onCrossHairMoved?.(729, 120);
     eventManager.callbacks.onCrosshairRender?.();
+    const plusButtonBounds = (core as unknown as { _plusButtonBounds: { x: number; y: number; r: number } | null })
+      ._plusButtonBounds;
+    expect(plusButtonBounds).not.toBeNull();
+    eventManager.callbacks.onCrossHairMoved?.(plusButtonBounds!.x, 120);
+    eventManager.callbacks.onCrosshairRender?.();
     expect(chartContainer.style.cursor).toBe('pointer');
 
     eventManager.isDragging = true;
     eventManager.activeCursor = 'grabbing';
     eventManager.callbacks.onCursorChange?.('grabbing');
-    eventManager.callbacks.onCrossHairMoved?.(729, 140);
+    eventManager.callbacks.onCrossHairMoved?.(plusButtonBounds!.x, 140);
     eventManager.callbacks.onCrosshairRender?.();
     expect(chartContainer.style.cursor).toBe('grabbing');
 
