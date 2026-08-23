@@ -27,7 +27,7 @@ describe('trading line hit geometry', () => {
         lineY: 100,
         rightLineEndX: 500,
       }),
-    ).toEqual({ x: 80, y: 82, width: 420, height: 27 });
+    ).toEqual({ x: 80, y: 71, width: 420, height: 38 });
   });
 
   it('does not produce negative width when the label is collapsed against the axis', () => {
