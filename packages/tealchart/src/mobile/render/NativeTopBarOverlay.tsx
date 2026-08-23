@@ -1,30 +1,18 @@
 import type { TimeframeOption } from '../../state/chartState';
 import type { ResolutionString } from '../../types';
 import type { NativeTopBarActionCommand, NativeTopBarButtonGeometry, NativeTopBarLayout } from '../utils/topBarLayout';
+import type { NativeFloatingAnchor } from './NativeFloatingOverlay';
 
 import React from 'react';
 
-import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { TIMEFRAME_GROUPS } from '../../state/chartState';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
-
-interface TimeframeMenuAnchor {
-  height: number;
-  width: number;
-  x: number;
-  y: number;
-}
+import { NativeAnchoredFloatingSurface } from './NativeFloatingOverlay';
 
 interface TimeframeMenuMeasurer {
   measureInWindow: (callback: (x: number, y: number, width: number, height: number) => void) => void;
-}
-
-function getWindowDimensionsFallback(topBarWidth: number): { height: number; width: number } {
-  const measured = (
-    Dimensions as { get?: (dimension: 'window') => { height: number; width: number } } | undefined
-  )?.get?.('window');
-  return measured ?? { height: 844, width: topBarWidth };
 }
 
 export interface NativeTopBarOverlayProps {
@@ -68,7 +56,7 @@ export function NativeTopBarOverlayImpl({
   topBarLayout,
 }: NativeTopBarOverlayProps) {
   const [timeframeMenuOpen, setTimeframeMenuOpen] = React.useState(false);
-  const [timeframeMenuAnchor, setTimeframeMenuAnchor] = React.useState<TimeframeMenuAnchor | null>(null);
+  const [timeframeMenuAnchor, setTimeframeMenuAnchor] = React.useState<NativeFloatingAnchor | null>(null);
   const timeframeMenuButtonRef = React.useRef<TimeframeMenuMeasurer | null>(null);
   const favoriteTimeframeSet = React.useMemo(() => new Set(favoriteTimeframeValues), [favoriteTimeframeValues]);
   const groupedMenuTimeframes = React.useMemo(
@@ -79,15 +67,10 @@ export function NativeTopBarOverlayImpl({
       })).filter((entry) => entry.timeframes.length > 0),
     [menuTimeframes],
   );
-  const windowDimensions = getWindowDimensionsFallback(topBarLayout.width);
-  const menuWidth = Math.min(292, Math.max(228, windowDimensions.width - 16));
-  const fallbackMenuLeft = Math.max(8, Math.min(topBarLayout.scrollAreaX, Math.max(8, topBarLayout.width - menuWidth)));
-  const anchorMenuLeft = timeframeMenuAnchor
-    ? timeframeMenuAnchor.x + timeframeMenuAnchor.width - menuWidth
-    : fallbackMenuLeft;
-  const menuLeft = Math.max(8, Math.min(anchorMenuLeft, windowDimensions.width - menuWidth - 8));
-  const menuTop = Math.max(8, (timeframeMenuAnchor?.y ?? 0) + (timeframeMenuAnchor?.height ?? topBarLayout.height) + 4);
-  const menuMaxHeight = Math.min(420, Math.max(180, windowDimensions.height - menuTop - 8));
+  const menuPreferredWidth = 292;
+  const menuMinWidth = 228;
+  const fallbackMenuLeft = Math.max(8, topBarLayout.width - menuPreferredWidth - 8);
+  const fallbackMenuTop = topBarLayout.height + 4;
   const handleButtonPress = React.useCallback(
     (button: NativeTopBarButtonGeometry) => {
       if (button.type === 'timeframeMenu') {
@@ -275,29 +258,23 @@ export function NativeTopBarOverlayImpl({
           </View>
         </ScrollView>
       </View>
-      {timeframeMenuOpen ? (
-        <Modal animationType="none" transparent visible onRequestClose={() => setTimeframeMenuOpen(false)}>
-          <Pressable
-            accessibilityLabel="Close timeframe selector"
-            accessibilityRole="button"
-            onPress={() => setTimeframeMenuOpen(false)}
-            style={styles.timeframeMenuBackdrop}
-          />
-          <View
-            pointerEvents="auto"
-            style={[
-              styles.timeframeMenu,
-              {
-                backgroundColor,
-                borderColor: gridColor,
-                left: menuLeft,
-                maxHeight: menuMaxHeight,
-                top: menuTop,
-                width: menuWidth,
-              },
-            ]}
-          >
-            <ScrollView bounces={false} showsVerticalScrollIndicator={false} style={{ maxHeight: menuMaxHeight }}>
+      <NativeAnchoredFloatingSurface
+        anchor={timeframeMenuAnchor}
+        backgroundColor={backgroundColor}
+        borderColor={gridColor}
+        fallbackLeft={fallbackMenuLeft}
+        fallbackTop={fallbackMenuTop}
+        fallbackViewportWidth={topBarLayout.width}
+        maxHeight={420}
+        minHeight={180}
+        minWidth={menuMinWidth}
+        onRequestClose={() => setTimeframeMenuOpen(false)}
+        preferredWidth={menuPreferredWidth}
+        style={styles.timeframeMenu}
+        visible={timeframeMenuOpen}
+      >
+        {({ maxHeight }) => (
+          <ScrollView bounces={false} showsVerticalScrollIndicator={false} style={{ maxHeight }}>
               {groupedMenuTimeframes.map(({ group, timeframes }) => (
                 <View key={group.value}>
                   <Text style={[styles.timeframeMenuGroupLabel, { color: mutedTextColor }]}>{group.label}</Text>
@@ -355,9 +332,8 @@ export function NativeTopBarOverlayImpl({
                 </View>
               ))}
             </ScrollView>
-          </View>
-        </Modal>
-      ) : null}
+        )}
+      </NativeAnchoredFloatingSurface>
     </View>
   );
 }
@@ -433,18 +409,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 24,
   },
-  timeframeMenuBackdrop: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
   timeframeMenu: {
-    borderRadius: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-    position: 'absolute',
+    elevation: 12,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
   },
   timeframeMenuGroupLabel: {
     fontSize: 11,
