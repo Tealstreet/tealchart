@@ -3,14 +3,17 @@ import type {
   UserDrawingPropertiesSurfaceCommand,
   UserDrawingPropertiesSurfaceControl,
 } from '../drawings';
+import type { RenderOptions } from '../types';
 
 import { Component } from './Component';
+import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, span } from './dom';
 
 export interface UserDrawingPropertiesPanelOptions {
   surface: UserDrawingPropertiesSurface;
   onDispatch: (command: UserDrawingPropertiesSurfaceCommand) => boolean;
   onClose?: () => void;
+  renderOptions?: Partial<RenderOptions>;
 }
 
 interface UserDrawingPropertiesPanelState {
@@ -27,11 +30,11 @@ const styles = {
     maxHeight: 'min(620px, calc(100vh - 72px))',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'rgba(17, 19, 26, 0.96)',
-    border: '1px solid rgba(120, 123, 134, 0.28)',
+    backgroundColor: 'var(--tc-popover-bg, rgba(17, 19, 26, 0.96))',
+    border: '1px solid var(--tc-border, rgba(120, 123, 134, 0.28))',
     borderRadius: '6px',
     boxShadow: '0 16px 44px rgba(0, 0, 0, 0.42)',
-    color: '#d1d4dc',
+    color: 'var(--tc-text, #d1d4dc)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '12px',
     overflow: 'hidden',
@@ -43,8 +46,8 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 10px 0 12px',
-    borderBottom: '1px solid rgba(120, 123, 134, 0.18)',
-    backgroundColor: 'rgba(30, 34, 45, 0.86)',
+    borderBottom: '1px solid var(--tc-border, rgba(120, 123, 134, 0.18))',
+    backgroundColor: 'var(--tc-menu-bg, rgba(30, 34, 45, 0.86))',
   } as Partial<CSSStyleDeclaration>,
   title: {
     minWidth: '0',
@@ -60,7 +63,7 @@ const styles = {
     border: '0',
     borderRadius: '4px',
     backgroundColor: 'transparent',
-    color: '#9ca3af',
+    color: 'var(--tc-text2, #9ca3af)',
     cursor: 'pointer',
     fontSize: '18px',
     lineHeight: '28px',
@@ -71,16 +74,16 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
   empty: {
     padding: '28px 12px',
-    color: '#787b86',
+    color: 'var(--tc-text2, #787b86)',
     textAlign: 'center',
   } as Partial<CSSStyleDeclaration>,
   group: {
     padding: '6px 0 10px',
-    borderBottom: '1px solid rgba(120, 123, 134, 0.14)',
+    borderBottom: '1px solid var(--tc-border, rgba(120, 123, 134, 0.14))',
   } as Partial<CSSStyleDeclaration>,
   groupLabel: {
     padding: '0 2px 8px',
-    color: '#787b86',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
     fontWeight: '600',
     letterSpacing: '0',
@@ -95,16 +98,16 @@ const styles = {
     minWidth: '32px',
     height: '30px',
     padding: '0 9px',
-    border: '1px solid rgba(120, 123, 134, 0.22)',
+    border: '1px solid var(--tc-border, rgba(120, 123, 134, 0.22))',
     borderRadius: '4px',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    color: '#d1d4dc',
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.03))',
+    color: 'var(--tc-text, #d1d4dc)',
     cursor: 'pointer',
     fontSize: '12px',
   } as Partial<CSSStyleDeclaration>,
   controlButtonSelected: {
-    borderColor: 'rgba(41, 98, 255, 0.72)',
-    backgroundColor: 'rgba(41, 98, 255, 0.2)',
+    borderColor: 'var(--tc-accent, rgba(41, 98, 255, 0.72))',
+    backgroundColor: 'var(--tc-accent-bg, rgba(41, 98, 255, 0.2))',
   } as Partial<CSSStyleDeclaration>,
   controlButtonDisabled: {
     opacity: '0.38',
@@ -129,6 +132,7 @@ export class UserDrawingPropertiesPanel extends Component<UserDrawingPropertiesP
     this.el.setAttribute('role', 'dialog');
     this.el.setAttribute('aria-label', 'Drawing properties');
     this.el.setAttribute('data-tealchart-user-drawing-properties-panel', 'true');
+    applyChromeThemeVars(this.el, options.renderOptions);
     this.el.addEventListener('mousedown', (event) => event.stopPropagation());
     this.el.addEventListener('mouseup', (event) => event.stopPropagation());
     this.el.addEventListener('click', (event) => event.stopPropagation());

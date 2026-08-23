@@ -1677,7 +1677,7 @@ export class ChartCore {
             position: 'fixed',
             left: `${screenX}px`,
             top: `${screenY}px`,
-            backgroundColor: 'var(--tc-bg, #1e222d)',
+            backgroundColor: 'var(--tc-menu-bg, var(--tc-canvas-bg, #1e222d))',
             border: '1px solid var(--tc-border, #363a45)',
             borderRadius: '4px',
             padding: '4px 0',
