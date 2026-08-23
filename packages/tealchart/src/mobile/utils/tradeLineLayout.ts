@@ -710,8 +710,8 @@ export function createNativeOrderDragZones(geometries: readonly NativeTradeLineG
           {
             objectId: geometry.dragZone.objectId,
             price: geometry.dragZone.price,
-            x1: geometry.leftLineStartX,
-            x2: geometry.priceLabelX + geometry.priceLabelWidth,
+            x1: geometry.dragZone.x1,
+            x2: geometry.dragZone.x2,
           },
         ]
       : [],

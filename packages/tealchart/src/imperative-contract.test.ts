@@ -582,8 +582,10 @@ describe('imperative chart API contract', () => {
   it('lets the host render the native + menu itself', () => {
     const source = readSource('SkiaTealchart.tsx');
 
-    expect(source).toContain('const content = renderContextMenu?.({');
-    expect(source).toContain('setNativeContextMenu({ anchorX, anchorY, content, items: [] });');
+    expect(source).toContain('const hostMenu = resolveNativeContextMenuRenderResult(');
+    expect(source).toContain('renderContextMenu?.({');
+    expect(source).toContain('content: hostMenu.content,');
+    expect(source).toContain('items: [],');
     expect(source).toContain('Boolean(activeContextMenu) || Boolean(renderContextMenu)');
   });
 
@@ -620,8 +622,11 @@ describe('imperative chart API contract', () => {
     expect(runtimeSource).not.toMatch(/useMemo(<[^>]*>)?\([\s\S]{0,240}applyNativeOrderActionState/);
     expect(runtimeSource).toContain('applyNativeOrderActionState,');
     expect(runtimeSource).toContain('applyNativePositionActionState,');
-    expect(layerSource).toContain('{lineSnapshot.orderLines.map((line) => {');
-    expect(layerSource).toContain('{lineSnapshot.positionLines.map((line) => {');
+    expect(layerSource).toContain('{tradeLineGeometries.map((geometry) => {');
+    expect(layerSource).toContain('lineSnapshot.orderLines.find((candidate) => getOrderObjectId(candidate) === geometry.objectId)');
+    expect(layerSource).toContain(
+      'lineSnapshot.positionLines.find((candidate) => getPositionObjectId(candidate) === geometry.objectId)',
+    );
     expect(layerSource).not.toMatch(/priceLines,\s+orderLines,\s+positionLines,/);
     expect(layerSource).not.toContain('onPriceChange={onOrderMove}');
     expect(layerSource).not.toContain('onCancel={onOrderCancel}');

@@ -36,6 +36,7 @@ import {
   findNativeBracketDragZone,
   findNativeOrderDragZone,
   findNativeTradeLineActionZone,
+  findNativeTradeLineRow,
 } from './nativeTradeLineHitTest';
 
 interface NativeGestureTouchEvent {
@@ -122,6 +123,19 @@ export function createNativeOrderDragGesture({
         frame,
         tradeLabelHeight,
       });
+      if (!zone && onSelectTradeLine) {
+        const row = findNativeTradeLineRow({
+          rows: tradeLineRows.value,
+          x: point.x,
+          y: point.y,
+          sharedViewport,
+          frame,
+          tradeLabelHeight,
+        });
+        if (row) {
+          runOnJS(onSelectTradeLine)(row.objectType, row.objectId);
+        }
+      }
       if (!zone) {
         stateManager.fail();
       }

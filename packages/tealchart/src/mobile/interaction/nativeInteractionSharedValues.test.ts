@@ -67,7 +67,7 @@ describe('native interaction shared values', () => {
       geometries,
     });
 
-    expect(orderDragZones.value).toEqual([{ objectId: 'order-1', price: 100, x1: 10, x2: 140 }]);
+    expect(orderDragZones.value).toEqual([{ objectId: 'order-1', price: 100, x1: 10, x2: 80 }]);
     expect(actionZones.value).toHaveLength(1);
     expect(rows.value).toEqual([
       { objectType: 'order', objectId: 'order-1', price: 100, x1: 10, x2: 140 },
