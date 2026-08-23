@@ -29,7 +29,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useSharedValue } from 'react-native-reanimated';
 
-import { createNativeChartGesture, deferNativeCanvasTapToPaneMaximize } from './nativeChartGestures';
+import { createNativeChartGesture } from './nativeChartGestures';
 import {
   createNativeCrosshairLongPressGesture,
   createNativeCrosshairPanGesture,
@@ -234,6 +234,11 @@ export function useNativeChartGestureRuntime({
   const resetTapStartedOnButton = useSharedValue(false);
   const resetTapBlockedByContextMenuButton = useSharedValue(false);
   const resetTapMaxTravel = useSharedValue(0);
+  const drawingCrosshairFallbackSuppressedUntilMs = useSharedValue(0);
+  const paneMaximizeCrosshairSnapshotActive = useSharedValue(false);
+  const paneMaximizeCrosshairSnapshotVisible = useSharedValue(false);
+  const paneMaximizeCrosshairSnapshotX = useSharedValue(0);
+  const paneMaximizeCrosshairSnapshotY = useSharedValue(0);
   const drawingEditDragActive = useSharedValue(false);
   const handleDrawingSelectionTap = useCallback(
     (x: number, y: number, claim: () => void) => {
@@ -314,6 +319,11 @@ export function useNativeChartGestureRuntime({
       chartInteractionEnabled: !drawingInputEnabled,
       controlZones,
       crosshair,
+      drawingCrosshairFallbackSuppressedUntilMs,
+      paneMaximizeCrosshairSnapshotActive,
+      paneMaximizeCrosshairSnapshotVisible,
+      paneMaximizeCrosshairSnapshotX,
+      paneMaximizeCrosshairSnapshotY,
       drawingTapEnabled: drawingInputEnabled || drawingSelectionEnabled,
       frame: chartInteractionFrame,
       hasContextMenu,
@@ -331,6 +341,11 @@ export function useNativeChartGestureRuntime({
     chartInteractionFrame,
     controlZones,
     crosshair,
+    drawingCrosshairFallbackSuppressedUntilMs,
+    paneMaximizeCrosshairSnapshotActive,
+    paneMaximizeCrosshairSnapshotVisible,
+    paneMaximizeCrosshairSnapshotX,
+    paneMaximizeCrosshairSnapshotY,
     drawingInputEnabled,
     drawingSelectionEnabled,
     hasContextMenu,
@@ -344,15 +359,15 @@ export function useNativeChartGestureRuntime({
     tradeLineRows,
   ]);
 
-  const chartPaneCount = chartInteractionFrame?.panes.length ?? 0;
   const canvasTapGesture = useMemo<GestureType>(() => {
-    const gesture = createNativeCanvasTapGesture({
+    return createNativeCanvasTapGesture({
       bracketDragActive,
       chartInteractionEnabled: !drawingInputEnabled,
       commitTradeLineAction: stableCommitTradeLineAction,
       controlZones,
       resetViewVisible,
       crosshair,
+      drawingCrosshairFallbackSuppressedUntilMs,
       drawingPlacementEnabled: drawingInputEnabled,
       drawingSelectionEnabled,
       frame: dataFrame,
@@ -367,14 +382,12 @@ export function useNativeChartGestureRuntime({
       tradeLineActionZones,
       tradeLineRows,
     });
-    return deferNativeCanvasTapToPaneMaximize(gesture, paneMaximizeTapGesture, chartPaneCount);
   }, [
     bracketDragActive,
-    chartPaneCount,
     controlZones,
-    paneMaximizeTapGesture,
     resetViewVisible,
     crosshair,
+    drawingCrosshairFallbackSuppressedUntilMs,
     dataFrame,
     drawingInputEnabled,
     drawingSelectionEnabled,
