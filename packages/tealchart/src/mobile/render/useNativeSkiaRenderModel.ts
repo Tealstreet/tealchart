@@ -54,7 +54,7 @@ export interface NativeSkiaRenderModelInput {
   layoutName?: string | null;
   layoutSelectorEnabled?: boolean;
   marginsBottom: number;
-  onIndicatorsClick?: () => void;
+  indicatorsEnabled?: boolean;
   options: RenderOptions;
   priceAxisTagHeight: number;
   priceLines?: PriceLine[];
@@ -95,12 +95,12 @@ export function useNativeSkiaRenderModel({
   bars,
   frame,
   interval,
+  indicatorsEnabled,
   leftToolRailCollapsed,
   layoutName,
   layoutSelectorEnabled,
   lineSnapshot,
   marginsBottom,
-  onIndicatorsClick,
   options,
   priceAxisTagHeight,
   priceLines,
@@ -152,7 +152,7 @@ export function useNativeSkiaRenderModel({
             mutedTextColor: nativeMutedTextColor,
             activeTextColor: options.upColor,
             activeBackgroundColor: NATIVE_TOP_BAR_ACTIVE_BACKGROUND_COLOR,
-            indicatorsEnabled: Boolean(onIndicatorsClick),
+            indicatorsEnabled,
             layoutName,
             layoutSelectorEnabled,
             timeframeMenuEnabled: nativeTopBarMenuTimeframes.length > 1,
@@ -167,7 +167,7 @@ export function useNativeSkiaRenderModel({
       nativeMutedTextColor,
       nativeTopBarMenuTimeframes.length,
       nativeTopBarTimeframes,
-      onIndicatorsClick,
+      indicatorsEnabled,
       options.textColor,
       options.upColor,
       showTopBar,
