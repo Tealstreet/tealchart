@@ -3,6 +3,7 @@
  * Designed to be compatible with existing TradingView datafeed infrastructure
  */
 
+import type { ReactNode } from 'react';
 import type { WorkerError } from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEvent,
@@ -582,6 +583,17 @@ export interface ContextMenuRenderContext {
   viewportWidth?: number;
   viewportHeight?: number;
   close: () => void;
+}
+
+/**
+ * Native hosts can return this from renderContextMenu when the menu content has
+ * a known first-frame size. The native overlay uses the hint before layout
+ * measurement so custom menus do not jump after the first render.
+ */
+export interface NativeContextMenuRenderResult {
+  content: ReactNode;
+  width?: number;
+  height?: number;
 }
 
 /**

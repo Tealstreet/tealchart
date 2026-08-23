@@ -151,4 +151,27 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
     expect(style.right).toBeUndefined();
     expect(texts.map((text) => text.props.children)).toContain('Quick order');
   });
+
+  it('uses host content size hints before native layout measurement arrives', () => {
+    const overlay = NativeCrosshairContextMenuOverlayImpl({
+      backgroundColor: '#131722',
+      dimensions: { width: 390, height: 480 },
+      menu: {
+        anchorX: 300,
+        anchorY: 100,
+        content: React.createElement(Text, null, 'Quick order'),
+        contentHeight: 64,
+        contentWidth: 258,
+        items: [],
+      },
+      onClose: vi.fn(),
+      renderOptions: { gridColor: '#363a45' },
+      textColor: '#d1d4dc',
+    });
+    const views = collectElementsByType(overlay, View);
+    const style = flattenStyle(views[0].props.style);
+
+    expect(style.left).toBe(30);
+    expect(style.top).toBe(68);
+  });
 });
