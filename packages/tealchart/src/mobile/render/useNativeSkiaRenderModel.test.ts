@@ -147,7 +147,7 @@ describe('useNativeSkiaRenderModel', () => {
         positionLines: [positionLine],
       },
       marginsBottom: 32,
-      onIndicatorsClick: () => undefined,
+      indicatorsEnabled: true,
       options: {
         ...DEFAULT_RENDER_OPTIONS,
         backgroundColor: '#101418',

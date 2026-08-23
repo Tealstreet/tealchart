@@ -19,6 +19,7 @@ import type {
 } from './mobile/render/NativeChartLegendOverlay';
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
@@ -88,6 +89,7 @@ import {
 } from './mobile/render/NativeChartSettingsOverlay';
 import { NativeCrosshairContextMenuOverlay } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import { NativeDrawingCategoryDismissOverlay } from './mobile/render/NativeDrawingCategoryDismissOverlay';
+import { NativeIndicatorsOverlay } from './mobile/render/NativeIndicatorsOverlay';
 import { NativeLayoutSelectorOverlay } from './mobile/render/NativeLayoutSelectorOverlay';
 import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
@@ -235,7 +237,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     showTopBar = true,
     supportedResolutions,
     userDrawingState,
-    onIndicatorsClick,
     onContextMenu,
     renderContextMenu,
     onContextMenuClose,
@@ -335,6 +336,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const [nativeShowVolume, setNativeShowVolume] = useState(() => chartStore.settings.get().showVolume);
   const [nativeChartSettingsOpen, setNativeChartSettingsOpen] = useState(false);
+  const [nativeIndicatorsOpen, setNativeIndicatorsOpen] = useState(false);
   useEffect(() => {
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
     setNativeChartProperties(chartStore.settings.get().chartProperties);
@@ -1467,10 +1469,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chartApi,
     onLayoutClick: nativeLayoutSelectorEnabled ? openNativeLayoutSelector : undefined,
     onSymbolClick,
-    onIndicatorsClick,
+    onIndicatorsClick: () => setNativeIndicatorsOpen(true),
     redoUserDrawingCommand: redoNativeUserDrawingCommand,
     undoUserDrawingCommand: undoNativeUserDrawingCommand,
   });
+  const handleNativeIndicatorSelect = useCallback(
+    (indicator: BuiltinIndicator) => {
+      void chartApi.createStudy(indicator.id, indicator.overlay, false, {}, {}, { displayName: indicator.name });
+    },
+    [chartApi],
+  );
   const handleNativeTopBarAction = useCallback(
     (action: Parameters<typeof commitNativeTopBarRuntimeAction>[0]) => {
       if (action.type === 'timeframe' && action.interval) {
@@ -1531,12 +1539,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     bars: nativeRenderBars,
     frame,
     interval: nativeRenderInterval,
+    indicatorsEnabled: true,
     layoutName: nativeCurrentLayout.layoutName,
     layoutSelectorEnabled: nativeLayoutSelectorEnabled,
     leftToolRailCollapsed,
     lineSnapshot,
     marginsBottom: margins.bottom,
-    onIndicatorsClick,
     options,
     priceAxisTagHeight: PRICE_AXIS_TAG_HEIGHT,
     priceLines: nativeRenderPriceLines,
@@ -2138,6 +2146,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           textColor={textColor}
         />
       ) : null}
+      {nativeIndicatorsOpen ? (
+        <NativeIndicatorsOverlay
+          activeBackgroundColor={gridColor}
+          backgroundColor={backgroundColor}
+          gridColor={gridColor}
+          mutedTextColor={nativeMutedTextColor}
+          onClose={() => setNativeIndicatorsOpen(false)}
+          onSelect={handleNativeIndicatorSelect}
+          textColor={textColor}
+        />
+      ) : null}
       {nativeLayoutSelectorOpen ? (
         <NativeLayoutSelectorOverlay
           backgroundColor={backgroundColor}
@@ -2185,10 +2204,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   liveChartLayer: {
-    ...StyleSheet.absoluteFillObject,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   snapshotLayer: {
-    ...StyleSheet.absoluteFillObject,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   hiddenSnapshotLayer: {
     opacity: 0,

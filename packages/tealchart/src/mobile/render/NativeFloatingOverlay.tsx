@@ -90,6 +90,36 @@ export interface NativeAnchoredFloatingSurfaceProps {
   visible: boolean;
 }
 
+export interface NativeFloatingOverlayProps {
+  backdropColor?: string;
+  children: ReactNode;
+  onRequestClose: () => void;
+  visible: boolean;
+}
+
+export function NativeFloatingOverlay({
+  backdropColor = 'transparent',
+  children,
+  onRequestClose,
+  visible,
+}: NativeFloatingOverlayProps) {
+  if (!visible) return null;
+
+  return (
+    <Modal animationType="none" transparent visible onRequestClose={onRequestClose}>
+      <View pointerEvents="box-none" style={styles.root}>
+        <Pressable
+          accessibilityLabel="Close floating chart overlay"
+          accessibilityRole="button"
+          onPress={onRequestClose}
+          style={[styles.backdrop, { backgroundColor: backdropColor }]}
+        />
+        {children}
+      </View>
+    </Modal>
+  );
+}
+
 export function NativeAnchoredFloatingSurface({
   anchor,
   backgroundColor,
@@ -128,34 +158,43 @@ export function NativeAnchoredFloatingSurface({
 
   return (
     <Modal animationType="none" transparent visible onRequestClose={onRequestClose}>
-      <Pressable
-        accessibilityLabel="Close floating chart overlay"
-        accessibilityRole="button"
-        onPress={onRequestClose}
-        style={styles.backdrop}
-      />
-      <View
-        pointerEvents="auto"
-        style={[
-          styles.surface,
-          {
-            backgroundColor,
-            borderColor,
-            left: position.left,
-            maxHeight: position.maxHeight,
-            top: position.top,
-            width: position.width,
-          },
-          style,
-        ]}
-      >
-        {typeof children === 'function' ? children(position) : children}
+      <View pointerEvents="box-none" style={styles.root}>
+        <Pressable
+          accessibilityLabel="Close floating chart overlay"
+          accessibilityRole="button"
+          onPress={onRequestClose}
+          style={styles.backdrop}
+        />
+        <View
+          pointerEvents="auto"
+          style={[
+            styles.surface,
+            {
+              backgroundColor,
+              borderColor,
+              left: position.left,
+              maxHeight: position.maxHeight,
+              top: position.top,
+              width: position.width,
+            },
+            style,
+          ]}
+        >
+          {typeof children === 'function' ? children(position) : children}
+        </View>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   backdrop: {
     bottom: 0,
     left: 0,
