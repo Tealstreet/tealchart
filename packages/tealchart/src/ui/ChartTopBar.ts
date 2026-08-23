@@ -302,9 +302,12 @@ const styles = {
     backgroundColor: 'transparent',
     color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
-    fontSize: '16px',
-    lineHeight: '1',
     transition: 'background-color 0.15s, color 0.15s',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownTriggerIcon: {
+    pointerEvents: 'none',
+    transition: 'transform 0.15s ease',
   } as Partial<CSSStyleDeclaration>,
 
   timeframeDropdownTriggerOpen: {
@@ -999,10 +1002,17 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         ...styles.timeframeDropdownTrigger,
         ...(this.state.intervalDropdownOpen ? styles.timeframeDropdownTriggerOpen : {}),
       },
-      textContent: '⌃',
     });
     dropdownBtn.type = 'button';
     dropdownBtn.setAttribute('aria-label', 'Select interval');
+    dropdownBtn.setAttribute('aria-expanded', String(this.state.intervalDropdownOpen));
+    const dropdownIcon = renderDrawingIcon('chevronDown', { size: 13, strokeWidth: 2.1 });
+    if (dropdownIcon) {
+      Object.assign(dropdownIcon.style, styles.timeframeDropdownTriggerIcon, {
+        transform: this.state.intervalDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+      });
+      dropdownBtn.appendChild(dropdownIcon);
+    }
     dropdownBtn.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
