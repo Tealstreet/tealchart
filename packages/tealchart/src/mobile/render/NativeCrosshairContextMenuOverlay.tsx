@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { GestureResponderEvent } from 'react-native';
+import type { GestureResponderEvent, LayoutChangeEvent } from 'react-native';
 import type { ContextMenuItem, RenderOptions } from '../../types';
 
 import React from 'react';
@@ -30,11 +30,18 @@ export interface NativeContextMenuOverlayLayout {
   width: number;
 }
 
+export interface NativeContextMenuHostContentSize {
+  width: number;
+  height: number;
+}
+
 export interface NativeCrosshairContextMenuOverlayProps {
   backgroundColor: string;
   dimensions: { width: number; height: number };
+  hostContentSize?: NativeContextMenuHostContentSize | null;
   menu: NativeCrosshairContextMenuState;
   onClose: () => void;
+  onHostContentLayout?: (event: LayoutChangeEvent) => void;
   renderOptions: RenderOptions;
   textColor: string;
 }
@@ -74,6 +81,36 @@ export function resolveNativeContextMenuOverlayLayout({
   return { left, top, width };
 }
 
+export function resolveNativeContextMenuHostContentLayout({
+  anchorX,
+  anchorY,
+  contentSize,
+  dimensions,
+}: {
+  anchorX: number;
+  anchorY: number;
+  contentSize: NativeContextMenuHostContentSize;
+  dimensions: { width: number; height: number };
+}): { left: number; maxHeight: number; maxWidth: number; top: number } {
+  const width = Math.min(contentSize.width, Math.max(0, dimensions.width - NATIVE_CONTEXT_MENU_MARGIN * 2));
+  const height = Math.min(contentSize.height, Math.max(0, dimensions.height - NATIVE_CONTEXT_MENU_MARGIN * 2));
+  const left = Math.min(
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, anchorX - width - NATIVE_CONTEXT_MENU_ANCHOR_GAP),
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, dimensions.width - width - NATIVE_CONTEXT_MENU_MARGIN),
+  );
+  const top = Math.min(
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, anchorY + NATIVE_CONTEXT_MENU_MARGIN),
+    Math.max(NATIVE_CONTEXT_MENU_MARGIN, dimensions.height - height - NATIVE_CONTEXT_MENU_MARGIN),
+  );
+
+  return {
+    left,
+    maxHeight: height,
+    maxWidth: width,
+    top,
+  };
+}
+
 function resolveNativeContextMenuBackgroundColor(backgroundColor: string): string {
   const hex = backgroundColor.trim();
   const match = /^#?([0-9a-f]{6})$/i.exec(hex);
@@ -89,8 +126,10 @@ function resolveNativeContextMenuBackgroundColor(backgroundColor: string): strin
 export function NativeCrosshairContextMenuOverlayImpl({
   backgroundColor,
   dimensions,
+  hostContentSize,
   menu,
   onClose,
+  onHostContentLayout,
   renderOptions,
   textColor,
 }: NativeCrosshairContextMenuOverlayProps) {
@@ -106,13 +145,21 @@ export function NativeCrosshairContextMenuOverlayImpl({
   const menuBackgroundColor = resolveNativeContextMenuBackgroundColor(backgroundColor);
 
   const contentPlacement = menu.content
-    ? {
-        right: Math.max(
-          NATIVE_CONTEXT_MENU_MARGIN,
-          dimensions.width - menu.anchorX + NATIVE_CONTEXT_MENU_ANCHOR_GAP,
-        ),
-        top: layout.top,
-      }
+    ? hostContentSize
+      ? resolveNativeContextMenuHostContentLayout({
+          anchorX: menu.anchorX,
+          anchorY: menu.anchorY,
+          contentSize: hostContentSize,
+          dimensions,
+        })
+      : {
+          opacity: 0,
+          right: Math.max(
+            NATIVE_CONTEXT_MENU_MARGIN,
+            dimensions.width - menu.anchorX + NATIVE_CONTEXT_MENU_ANCHOR_GAP,
+          ),
+          top: layout.top,
+        }
     : null;
 
   const stopPropagation = (event: GestureResponderEvent) => {
@@ -134,6 +181,7 @@ export function NativeCrosshairContextMenuOverlayImpl({
                 { left: layout.left, top: layout.top, width: layout.width },
               ]
         }
+        onLayout={menu.content ? onHostContentLayout : undefined}
         onStartShouldSetResponder={() => true}
       >
         {menu.content}
@@ -177,7 +225,28 @@ export function NativeCrosshairContextMenuOverlayImpl({
   );
 }
 
-export const NativeCrosshairContextMenuOverlay = React.memo(NativeCrosshairContextMenuOverlayImpl);
+function NativeCrosshairContextMenuOverlayComponent(
+  props: Omit<NativeCrosshairContextMenuOverlayProps, 'hostContentSize' | 'onHostContentLayout'>,
+) {
+  const [hostContentSize, setHostContentSize] = React.useState<NativeContextMenuHostContentSize | null>(null);
+  const onHostContentLayout = React.useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setHostContentSize((current) => {
+      if (current?.width === width && current.height === height) return current;
+      return { width, height };
+    });
+  }, []);
+
+  return (
+    <NativeCrosshairContextMenuOverlayImpl
+      {...props}
+      hostContentSize={hostContentSize}
+      onHostContentLayout={onHostContentLayout}
+    />
+  );
+}
+
+export const NativeCrosshairContextMenuOverlay = React.memo(NativeCrosshairContextMenuOverlayComponent);
 NativeCrosshairContextMenuOverlay.displayName = 'NativeCrosshairContextMenuOverlay';
 
 const styles = StyleSheet.create({
