@@ -58,6 +58,7 @@ describe('UserDrawingPropertiesPanel', () => {
     expect([
       'min(620px, calc(100vh - 72px))',
       'min(620px, -72px + 100vh)',
+      'min(620px * , * calc(100vh - 72px))',
     ]).toContain(element?.style.maxHeight);
     expect(element?.style.overflow).toBe('hidden');
 
