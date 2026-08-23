@@ -2336,9 +2336,22 @@ export class ChartCore {
       // Collision cache hit — geometry unchanged, but label content may have changed.
       // Refresh content fields in-place from current line data. O(n) with Map lookup.
       const lineMap = new Map(allPriceLines.map((l) => [l.id, l]));
+      const computedPanes = this.renderer.computePanesLayout(layout, this.options.height);
+      const mainPane = computedPanes.find((pane) => pane.type === 'main');
+      if (mainPane) {
+        mainPane.yMin = vp.priceMin;
+        mainPane.yMax = vp.priceMax;
+      }
       for (const b of this.labelBoundsCache) {
         const line = lineMap.get(b.lineId);
         if (line) {
+          const targetPaneId = line.targetPaneId || 'main';
+          const targetPane = computedPanes.find((pane) => pane.id === targetPaneId) || mainPane;
+          const collisionOffset = this.collisionOffsetCache.get(b.lineId) ?? b.adjustedY - b.originalY;
+          if (targetPane) {
+            b.originalY = this.renderer.valueToY(line.price, targetPane);
+            b.adjustedY = b.originalY + collisionOffset;
+          }
           b.price = line.price;
           b.label = line.label;
           b.chartLabel = line.chartLabel;
