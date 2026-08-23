@@ -16,6 +16,7 @@ import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
+import { resolveTradingLineRowHitRect } from './tradingLineHitGeometry';
 
 // ============================================================================
 // Types
@@ -908,13 +909,19 @@ export class PriceLineManager {
     }
 
     if (chartLabel && chartLabel.segments.length > 0) {
-      const lineHitRectX = Math.min(lineStartX, chartLabelX);
-      const lineHitRectRight = Math.max(rightLineEndX, chartLabelX + chartLabelWidth);
+      const rowHitRect = resolveTradingLineRowHitRect({
+        chartLabelWidth,
+        chartLabelX,
+        labelHeight: LABEL_HEIGHT,
+        lineStartX,
+        lineY,
+        rightLineEndX,
+      });
       const lineHitRect = new Konva.Rect({
-        x: lineHitRectX,
-        y: lineY - 6,
-        width: Math.max(0, lineHitRectRight - lineHitRectX),
-        height: 12,
+        x: rowHitRect.x,
+        y: rowHitRect.y,
+        width: rowHitRect.width,
+        height: rowHitRect.height,
         fill: 'rgba(0, 0, 0, 0.01)',
         listening: true,
       });
