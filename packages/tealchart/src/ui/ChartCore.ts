@@ -437,6 +437,7 @@ export class ChartCore {
   private contextMenuCloseTimer: ReturnType<typeof setTimeout> | null = null;
   // + button drawn on crosshair canvas — hit-test bounds for click detection
   private _plusButtonBounds: CrosshairPlusButtonBounds | null = null;
+  private crosshairPriceLabelMaxWidth = 0;
   private contextMenuResizeObserver: ResizeObserver | null = null;
   private contextMenuIsCustom = false;
   // Bound handler for + button click — stored so it can be removed on dispose
@@ -1180,15 +1181,6 @@ export class ChartCore {
     const dx = x - bounds.x;
     const dy = y - bounds.y;
     return dx * dx + dy * dy <= bounds.r * bounds.r;
-  }
-
-  private getStableCrosshairPlusButtonX(ctx: CanvasRenderingContext2D, decimals: number): number {
-    const decimalPlaces = Math.max(0, decimals);
-    const capacityText = decimalPlaces === 0 ? '999,999' : `999,999.${'9'.repeat(decimalPlaces)}`;
-    const capacityLabelWidth = ctx.measureText(capacityText).width + 10;
-    const capacityLabelX = this.options.width - capacityLabelWidth - PRICE_AXIS_RIGHT_PADDING;
-    const priceAxisLeft = this.options.width - this.margins.right;
-    return Math.min(priceAxisLeft, capacityLabelX) - CROSSHAIR_PLUS_BUTTON_RIGHT_OFFSET;
   }
 
   private isOverUnlockedUserDrawing(x: number, y: number): boolean {
@@ -2480,12 +2472,12 @@ export class ChartCore {
 
     let priceLabel: {
       text: string;
+      textX: number;
       x: number;
       y: number;
       width: number;
       height: number;
     } | null = null;
-    let priceLabelDecimals = this.options.renderOptions?.pricePrecision ?? 2;
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
       // The pane under the cursor, not always the price pane: an indicator pane
       // carries its own scale, and RSI or MACD read as nonsense at market
@@ -2496,14 +2488,17 @@ export class ChartCore {
         this.getUnifiedLayout(),
         this.options.renderOptions?.pricePrecision,
       );
-      priceLabelDecimals = decimals;
       const priceText = safeToFixed(value, decimals, 'crosshairPrice');
       const font = this.renderer.getFont();
       ctx.font = `11px ${font}`;
-      const priceLabelWidth = ctx.measureText(priceText).width + 10;
+      const measuredPriceLabelWidth = ctx.measureText(priceText).width + 10;
+      this.crosshairPriceLabelMaxWidth = Math.max(this.crosshairPriceLabelMaxWidth, measuredPriceLabelWidth);
+      const priceLabelWidth = this.crosshairPriceLabelMaxWidth;
+      const priceLabelRight = width - PRICE_AXIS_RIGHT_PADDING;
       priceLabel = {
         text: priceText,
-        x: width - priceLabelWidth - PRICE_AXIS_RIGHT_PADDING,
+        textX: priceLabelRight - 5,
+        x: priceLabelRight - priceLabelWidth,
         y: y - CROSSHAIR_PRICE_LABEL_HEIGHT / 2,
         width: priceLabelWidth,
         height: CROSSHAIR_PRICE_LABEL_HEIGHT,
@@ -2513,7 +2508,7 @@ export class ChartCore {
     const crosshairButton =
       hasContextMenu && priceLabel
         ? {
-            x: this.getStableCrosshairPlusButtonX(ctx, priceLabelDecimals),
+            x: priceLabel.x - CROSSHAIR_PLUS_BUTTON_RIGHT_OFFSET,
             y,
             r: CROSSHAIR_PLUS_BUTTON_RADIUS,
           }
@@ -2620,9 +2615,9 @@ export class ChartCore {
 
       // Text
       ctx.fillStyle = this.options.renderOptions?.backgroundColor || '#131722';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      ctx.fillText(priceLabel.text, priceLabel.x + priceLabel.width / 2, y);
+      ctx.fillText(priceLabel.text, priceLabel.textX, y);
     }
 
     // Draw jailbreak indicator tooltips

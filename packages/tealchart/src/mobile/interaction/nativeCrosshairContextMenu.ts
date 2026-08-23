@@ -54,12 +54,13 @@ export function resolveNativeCrosshairPriceLabelLayout(
   frame: NativeChartFrame,
   pricePrecision: number,
   labelText = getNativeCrosshairPriceLabelCapacityText(pricePrecision),
+  minWidth = 0,
 ): NativeCrosshairPriceLabelLayout {
   'worklet';
   const laneRight = frame.dimensions.width - NATIVE_PRICE_AXIS_LANE_RIGHT_INSET;
   const measuredWidth =
     Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH) + NATIVE_PRICE_AXIS_TAG_PADDING_X * 2;
-  const width = Math.max(0, Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, measuredWidth));
+  const width = Math.max(0, Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, measuredWidth, minWidth));
   const x = laneRight - width;
 
   return {
@@ -143,13 +144,13 @@ export function resolveNativeCrosshairContextMenuButtonLayout(
   frame: NativeChartFrame,
   crosshairY: number,
   pricePrecision = 2,
-  _priceLabelText?: string,
+  priceLabelText?: string,
+  minPriceLabelWidth = 0,
 ): NativeCrosshairContextMenuButtonLayout {
   'worklet';
-  const capacityPriceLabel = resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision);
-  const stableAnchorX = Math.min(frame.priceAxisLeft, capacityPriceLabel.x);
+  const priceLabel = resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceLabelText, minPriceLabelWidth);
   return {
-    centerX: stableAnchorX - NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RIGHT_OFFSET,
+    centerX: priceLabel.x - NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RIGHT_OFFSET,
     centerY: Math.min(Math.max(crosshairY, frame.mainPane.top), frame.mainPane.bottom),
     radius: NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
     hitRadius: NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_HIT_RADIUS,
@@ -160,6 +161,7 @@ export function isNativeCrosshairContextMenuButtonTap({
   frame,
   crosshairY,
   pricePrecision,
+  priceLabelMinWidth = 0,
   sharedViewport,
   x,
   y,
@@ -167,6 +169,7 @@ export function isNativeCrosshairContextMenuButtonTap({
   frame: NativeChartFrame;
   crosshairY: number;
   pricePrecision?: number;
+  priceLabelMinWidth?: number;
   sharedViewport?: NativeViewportSharedValues;
   x: number;
   y: number;
@@ -178,7 +181,13 @@ export function isNativeCrosshairContextMenuButtonTap({
   const priceLabelText = sharedViewport
     ? resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshairY, pricePrecision ?? 2)
     : undefined;
-  const layout = resolveNativeCrosshairContextMenuButtonLayout(frame, crosshairY, pricePrecision, priceLabelText);
+  const layout = resolveNativeCrosshairContextMenuButtonLayout(
+    frame,
+    crosshairY,
+    pricePrecision,
+    priceLabelText,
+    priceLabelMinWidth,
+  );
   const dx = x - layout.centerX;
   const dy = y - layout.centerY;
   return dx * dx + dy * dy <= layout.hitRadius * layout.hitRadius;

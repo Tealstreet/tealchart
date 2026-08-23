@@ -11,8 +11,8 @@ import { DashPathEffect, Group, RoundedRect, Skia, Line as SkiaLine } from '@sho
 import { useDerivedValue } from 'react-native-reanimated';
 
 import {
-  NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
   isNativeCrosshairOverMainPane,
+  NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
   nativeCrosshairXToTime,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
@@ -63,22 +63,25 @@ export function NativeCrosshairLayerImpl({
   const verticalEnd = useDerivedValue(() => ({ x: crosshair.x.value, y: frame.timeAxisTop }));
   const horizontalStart = useDerivedValue(() => ({ x: frame.contentLeft, y: crosshair.y.value }));
   const priceText = useDerivedValue(() =>
-    resolveNativeCrosshairPriceLabelText(
-      frame,
-      sharedViewport,
-      crosshair.y.value,
-      pricePrecision,
-      paneRangeOverrides,
-    ),
+    resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision, paneRangeOverrides),
   );
   // The button opens order actions at a price, which only the price pane has.
   const contextMenuVisible = useDerivedValue(
     () => hasContextMenu && isNativeCrosshairOverMainPane(frame, crosshair.y.value),
   );
   const contextMenuOpacity = useDerivedValue(() => (contextMenuVisible.value ? 1 : 0));
-  const priceLabel = useDerivedValue(() =>
-    resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceText.value),
-  );
+  const priceLabel = useDerivedValue(() => {
+    const nextLabel = resolveNativeCrosshairPriceLabelLayout(
+      frame,
+      pricePrecision,
+      priceText.value,
+      crosshair.priceLabelMaxWidth?.value ?? 0,
+    );
+    if (crosshair.priceLabelMaxWidth && nextLabel.width > crosshair.priceLabelMaxWidth.value) {
+      crosshair.priceLabelMaxWidth.value = nextLabel.width;
+    }
+    return nextLabel;
+  });
   const priceLabelX = useDerivedValue(() => priceLabel.value.x);
   const priceLabelWidth = useDerivedValue(() => priceLabel.value.width);
   const priceTextX = useDerivedValue(() => priceLabel.value.textX);
@@ -86,8 +89,13 @@ export function NativeCrosshairLayerImpl({
     x: contextMenuVisible.value
       ? Math.max(
           frame.contentLeft,
-          resolveNativeCrosshairContextMenuButtonLayout(frame, crosshair.y.value, pricePrecision, priceText.value)
-            .centerX -
+          resolveNativeCrosshairContextMenuButtonLayout(
+            frame,
+            crosshair.y.value,
+            pricePrecision,
+            priceText.value,
+            crosshair.priceLabelMaxWidth?.value ?? 0,
+          ).centerX -
             NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS -
             NATIVE_CROSSHAIR_BUTTON_LINE_GAP,
         )
@@ -107,7 +115,13 @@ export function NativeCrosshairLayerImpl({
     return formatNativeTimeAxisLabelWorklet(nativeCrosshairXToTime(crosshair.x.value, sharedViewport, frame), timeStep);
   });
   const contextButtonLayout = useDerivedValue(() =>
-    resolveNativeCrosshairContextMenuButtonLayout(frame, crosshair.y.value, pricePrecision, priceText.value),
+    resolveNativeCrosshairContextMenuButtonLayout(
+      frame,
+      crosshair.y.value,
+      pricePrecision,
+      priceText.value,
+      crosshair.priceLabelMaxWidth?.value ?? 0,
+    ),
   );
   const contextButtonX = useDerivedValue(() => contextButtonLayout.value.centerX - contextButtonLayout.value.radius);
   const contextButtonY = useDerivedValue(() => contextButtonLayout.value.centerY - contextButtonLayout.value.radius);

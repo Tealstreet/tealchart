@@ -44,7 +44,7 @@ describe('native crosshair context menu geometry', () => {
     const priceLabel = resolveNativeCrosshairPriceLabelLayout(frame, 2);
 
     expect(resolveNativeCrosshairContextMenuButtonLayout(frame, 80, 2)).toEqual({
-      centerX: Math.min(frame.priceAxisLeft, priceLabel.x) - 11,
+      centerX: priceLabel.x - 11,
       centerY: 80,
       radius: NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
       hitRadius: NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_HIT_RADIUS,
@@ -56,26 +56,41 @@ describe('native crosshair context menu geometry', () => {
     const button = resolveNativeCrosshairContextMenuButtonLayout(widePriceAxisFrame, 180, 1);
 
     expect(priceLabel.x).toBeGreaterThan(widePriceAxisFrame.priceAxisLeft);
-    expect(button.centerX).toBe(widePriceAxisFrame.priceAxisLeft - 11);
+    expect(button.centerX).toBe(priceLabel.x - 11);
   });
 
-  it('sizes crosshair price labels from displayed text without moving the button', () => {
+  it('keeps text flush right while a remembered label width prevents button jitter', () => {
     const capacityLabel = resolveNativeCrosshairPriceLabelLayout(widePriceAxisFrame, 0.0001);
     const displayedLabel = resolveNativeCrosshairPriceLabelLayout(widePriceAxisFrame, 0.0001, '2.1033');
-    const displayedButton = resolveNativeCrosshairContextMenuButtonLayout(widePriceAxisFrame, 180, 0.0001, '2.1033');
-    const capacityButton = resolveNativeCrosshairContextMenuButtonLayout(widePriceAxisFrame, 180, 0.0001);
+    const rememberedLabel = resolveNativeCrosshairPriceLabelLayout(
+      widePriceAxisFrame,
+      0.0001,
+      '2.1033',
+      capacityLabel.width,
+    );
+    const rememberedButton = resolveNativeCrosshairContextMenuButtonLayout(
+      widePriceAxisFrame,
+      180,
+      0.0001,
+      '2.1033',
+      capacityLabel.width,
+    );
     const viewport = sharedViewport({ startTime: 1_000, endTime: 2_000, priceMin: 1.9, priceMax: 2.3 });
 
     expect(displayedLabel.width).toBeLessThan(capacityLabel.width);
     expect(displayedLabel.x).toBeGreaterThan(capacityLabel.x);
-    expect(displayedButton.centerX).toBe(capacityButton.centerX);
+    expect(rememberedLabel.width).toBe(capacityLabel.width);
+    expect(rememberedLabel.x).toBe(capacityLabel.x);
+    expect(rememberedLabel.textX).toBe(displayedLabel.textX);
+    expect(rememberedButton.centerX).toBe(capacityLabel.x - 11);
     expect(
       isNativeCrosshairContextMenuButtonTap({
         frame: widePriceAxisFrame,
         crosshairY: 158,
         pricePrecision: 0.0001,
+        priceLabelMinWidth: capacityLabel.width,
         sharedViewport: viewport,
-        x: displayedButton.centerX,
+        x: rememberedButton.centerX,
         y: 180,
       }),
     ).toBe(true);
@@ -89,7 +104,7 @@ describe('native crosshair context menu geometry', () => {
     expect(label.x).toBeLessThan(frame.priceAxisLeft);
     expect(label.x + label.width).toBe(right);
     expect(label.textX + Math.ceil('63,777.000000'.length * 6.8)).toBe(right - 6);
-    expect(button.centerX).toBe(resolveNativeCrosshairPriceLabelLayout(frame, 0.000001).x - 11);
+    expect(button.centerX).toBe(label.x - 11);
   });
 
   it('hit-tests the generous mobile plus button target', () => {

@@ -1,3 +1,5 @@
+import type { SharedValue } from 'react-native-reanimated';
+import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
 import type {
@@ -15,20 +17,17 @@ import type {
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
 import type { NativePaneDividerBand, NativePaneDividerTarget } from './nativePaneDivider';
-import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type {
   NativeChartAxisPinchGestureState,
   NativeChartPanGestureState,
-  NativePriceAutoScaleSharedValues,
   NativeIndicatorPaneScaleTarget,
+  NativePriceAutoScaleSharedValues,
   NativePriceScaleGestureState,
   NativeTimeScaleGestureState,
   NativeViewportGestureMetrics,
 } from './nativeViewportGestureState';
 
 import { useMemo } from 'react';
-
-import type { SharedValue } from 'react-native-reanimated';
 
 import { useSharedValue } from 'react-native-reanimated';
 
@@ -125,6 +124,7 @@ export function useNativeSkiaInteractionRuntime({
   const crosshairY = useSharedValue(0);
   const crosshairDragOriginX = useSharedValue(0);
   const crosshairDragOriginY = useSharedValue(0);
+  const crosshairPriceLabelMaxWidth = useSharedValue(0);
 
   const sharedViewport = useMemo<NativeViewportSharedValues>(
     () => ({
@@ -167,8 +167,9 @@ export function useNativeSkiaInteractionRuntime({
       y: crosshairY,
       dragOriginX: crosshairDragOriginX,
       dragOriginY: crosshairDragOriginY,
+      priceLabelMaxWidth: crosshairPriceLabelMaxWidth,
     }),
-    [crosshairDragOriginX, crosshairDragOriginY, crosshairVisible, crosshairX, crosshairY],
+    [crosshairDragOriginX, crosshairDragOriginY, crosshairPriceLabelMaxWidth, crosshairVisible, crosshairX, crosshairY],
   );
   const orderDragState = useMemo<NativeOrderDragInteractionState>(
     () => ({

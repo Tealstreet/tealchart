@@ -1,7 +1,6 @@
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
-import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import type {
   NativeOrderDragZone,
   NativeTradeLineActionType,
@@ -9,11 +8,16 @@ import type {
   NativeTradeLineObjectType,
   NativeTradeLineRow,
 } from '../utils/tradeLineLayout';
+import type { NativeGestureControlZone } from './nativeGestureControlZones';
 
 import { isNativeCrosshairContextMenuButtonTap } from './nativeCrosshairContextMenu';
 import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
-import { canBeginNativeChartPan, findNativeTradeLineActionZone, findNativeTradeLineRow } from './nativeTradeLineHitTest';
+import {
+  canBeginNativeChartPan,
+  findNativeTradeLineActionZone,
+  findNativeTradeLineRow,
+} from './nativeTradeLineHitTest';
 
 /**
  * The single owner of a canvas tap.
@@ -80,6 +84,7 @@ export interface NativeCanvasTapContext {
   hasContextMenu: boolean;
   orderDragZones: readonly NativeOrderDragZone[];
   pricePrecision: number;
+  priceLabelMinWidth?: number;
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
   tradeLineActionZones: readonly NativeTradeLineActionZone[];
@@ -142,6 +147,7 @@ export function resolveNativeCanvasTap(
       frame: ctx.frame,
       crosshairY: ctx.crosshairY,
       pricePrecision: ctx.pricePrecision,
+      priceLabelMinWidth: ctx.priceLabelMinWidth ?? 0,
       sharedViewport: ctx.sharedViewport,
       x: point.x,
       y: point.y,
