@@ -91,7 +91,7 @@ export function resolveNativeContextMenuHostContentLayout({
   anchorY: number;
   contentSize: NativeContextMenuHostContentSize;
   dimensions: { width: number; height: number };
-}): { left: number; maxHeight: number; maxWidth: number; top: number } {
+}): { left: number; maxHeight: number; top: number; width: number } {
   const width = Math.min(contentSize.width, Math.max(0, dimensions.width - NATIVE_CONTEXT_MENU_MARGIN * 2));
   const height = Math.min(contentSize.height, Math.max(0, dimensions.height - NATIVE_CONTEXT_MENU_MARGIN * 2));
   const left = Math.min(
@@ -106,8 +106,8 @@ export function resolveNativeContextMenuHostContentLayout({
   return {
     left,
     maxHeight: height,
-    maxWidth: width,
     top,
+    width,
   };
 }
 
