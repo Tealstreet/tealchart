@@ -9,6 +9,7 @@ import type { ContextMenuItem, RenderOptions } from '../types';
 
 import { applyChromeThemeVars } from './chromeTheme';
 import { div, span } from './dom';
+import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
 
 // ============================================================================
 // Types
@@ -168,7 +169,7 @@ export class ContextMenu {
       menu.appendChild(menuItem);
     }
 
-    document.body.appendChild(menu);
+    mountWebFloatingElement(menu);
     return menu;
   }
 
@@ -211,35 +212,12 @@ export class ContextMenu {
   // ============================================================================
 
   private positionMenu(): void {
-    const { x, y } = this.options;
-    const rect = this.el.getBoundingClientRect();
-
-    // Adjust position to fit in viewport
-    let adjustedX = x;
-    let adjustedY = y;
-
-    // Right edge
-    if (x + rect.width > window.innerWidth - 10) {
-      adjustedX = window.innerWidth - rect.width - 10;
-    }
-
-    // Bottom edge
-    if (y + rect.height > window.innerHeight - 10) {
-      adjustedY = window.innerHeight - rect.height - 10;
-    }
-
-    // Left edge
-    if (adjustedX < 10) {
-      adjustedX = 10;
-    }
-
-    // Top edge
-    if (adjustedY < 10) {
-      adjustedY = 10;
-    }
-
-    this.el.style.left = `${adjustedX}px`;
-    this.el.style.top = `${adjustedY}px`;
+    positionFixedFloatingElement(this.el, {
+      desiredLeft: this.options.x,
+      desiredTop: this.options.y,
+      fallbackWidth: 160,
+      margin: 10,
+    });
   }
 
   // ============================================================================

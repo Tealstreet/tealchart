@@ -56,6 +56,7 @@ import {
 import { TIME_AXIS_HEIGHT } from '../types';
 import { Component } from './Component';
 import { renderDrawingIcon } from './dom';
+import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
 import { LayoutSelector } from './LayoutSelector';
 
 /**
@@ -2278,7 +2279,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       }
     }
 
-    document.body.appendChild(dropdown);
+    mountWebFloatingElement(dropdown);
     this.intervalDropdownEl = dropdown;
     this.positionIntervalDropdown(anchorEl, dropdown);
 
@@ -2294,18 +2295,16 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   private positionIntervalDropdown(anchorEl: HTMLElement, dropdown: HTMLElement): void {
     const anchorRect = anchorEl.getBoundingClientRect();
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
     const dropdownWidth = dropdown.offsetWidth || 260;
-    const margin = 8;
-    const left = Math.min(Math.max(anchorRect.left, margin), Math.max(margin, viewportWidth - dropdownWidth - margin));
+    const dropdownHeight = dropdown.offsetHeight || 0;
 
-    dropdown.style.left = `${left}px`;
-    dropdown.style.top = `${anchorRect.bottom + 4}px`;
-
-    const dropdownHeight = Math.min(dropdown.offsetHeight, viewportHeight - margin * 2);
-    const maxTop = viewportHeight - dropdownHeight - margin;
-    dropdown.style.top = `${Math.max(margin, Math.min(anchorRect.bottom + 4, maxTop))}px`;
+    positionFixedFloatingElement(dropdown, {
+      desiredLeft: anchorRect.left,
+      desiredTop: anchorRect.bottom + 4,
+      fallbackWidth: dropdownWidth,
+      fallbackHeight: dropdownHeight,
+      margin: 8,
+    });
   }
 
   // ============================================================================
