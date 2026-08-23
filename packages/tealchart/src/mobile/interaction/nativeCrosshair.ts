@@ -9,6 +9,7 @@ export interface NativeCrosshairSharedValues {
   y: SharedValue<number>;
   dragOriginX: SharedValue<number>;
   dragOriginY: SharedValue<number>;
+  priceLabelMaxWidth?: SharedValue<number>;
 }
 
 function getNativeCrosshairMaxX(frame: NativeChartFrame): number {

@@ -27,13 +27,13 @@ import {
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
 import { isNativeGestureControlPoint, isNativeReservedControlPoint } from './nativeGestureControlZones';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import {
   isNativeResetViewButtonTap,
   isNativeResetViewTapWithinTolerance,
   NATIVE_RESET_VIEW_HIT_SIZE,
   resolveNativeResetViewButtonLayout,
 } from './nativeResetViewButton';
-import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { canBeginNativePriceScaleGesture, getNativePriceScaleHitGeometry } from './nativeViewportGestureState';
 
 export interface NativeCanvasTapGestureInput {
@@ -144,6 +144,7 @@ export function createNativeCanvasTapGesture({
           hasContextMenu,
           orderDragZones: orderDragZones.value,
           pricePrecision,
+          priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
           sharedViewport,
           tradeLabelHeight,
           tradeLineActionZones: tradeLineActionZones.value,
@@ -170,6 +171,7 @@ export function createNativeCanvasTapGesture({
           crosshair.y.value,
           pricePrecision,
           resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision),
+          crosshair.priceLabelMaxWidth?.value ?? 0,
         );
         runOnJS(onContextMenuTap)(time, price, layout.centerX, layout.centerY);
         return;
@@ -297,74 +299,77 @@ export function createNativePaneMaximizeTapGesture({
 }: NativePaneMaximizeTapGestureInput) {
   if (!frame || frame.panes.length <= 1) return Gesture.Tap().enabled(false);
 
-  return Gesture.Tap()
-    .numberOfTaps(2)
-    .maxDistance(NATIVE_TAP_MAX_DISTANCE)
-    // Armed only where the canvas tap would toggle the crosshair. Anywhere the
-    // single tap owns an action - a cancel button, the context-menu button, a
-    // drawing - this stands down at touch-down so an impatient double tap on
-    // chrome cannot maximize the pane instead of activating that chrome.
-    .onTouchesDown((event, stateManager) => {
-      const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
-      if (!touch) {
-        stateManager.fail();
-        return;
-      }
-      const outcome = resolveNativeCanvasTap(
-        { x: touch.x, y: touch.y },
-        {
-          bracketDragActive: bracketDragActive.value,
-          chartInteractionEnabled,
-          controlZones,
-          resetViewVisible,
-          crosshairVisible: crosshair.visible.value,
-          crosshairY: crosshair.y.value,
-          drawingTapEnabled,
-          frame,
-          hasContextMenu,
-          orderDragZones: orderDragZones.value,
-          pricePrecision,
-          sharedViewport,
-          tradeLabelHeight,
-          tradeLineActionZones: tradeLineActionZones.value,
-          tradeLineRows: tradeLineRows.value,
-        },
-      );
-      // `drawingThenCrosshair` still arms the double tap. If pane maximize wins,
-      // onEnd below briefly suppresses that JS-thread fallback so it cannot
-      // repaint the crosshair after the pane has been maximized.
-      if (outcome.kind !== 'crosshair' && outcome.kind !== 'drawingThenCrosshair') {
-        stateManager.fail();
-        return;
-      }
-      if (!paneMaximizeCrosshairSnapshotActive.value) {
-        paneMaximizeCrosshairSnapshotActive.value = true;
-        paneMaximizeCrosshairSnapshotVisible.value = crosshair.visible.value;
-        paneMaximizeCrosshairSnapshotX.value = crosshair.x.value;
-        paneMaximizeCrosshairSnapshotY.value = crosshair.y.value;
-      }
-    })
-    .onEnd((event, success) => {
-      if (!success) return;
-      if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: event.x, y: event.y })) return;
-      if (event.x < frame.contentLeft || event.x >= frame.priceAxisHitLeft) return;
-      const pane = getNativePaneAtY(frame, event.y);
-      if (!pane) return;
-      drawingCrosshairFallbackSuppressedUntilMs.value = Date.now() + 120;
-      if (paneMaximizeCrosshairSnapshotActive.value) {
-        if (paneMaximizeCrosshairSnapshotVisible.value) {
-          crosshair.visible.value = true;
-          crosshair.x.value = paneMaximizeCrosshairSnapshotX.value;
-          crosshair.y.value = paneMaximizeCrosshairSnapshotY.value;
-        } else {
-          hideNativeCrosshair(crosshair);
+  return (
+    Gesture.Tap()
+      .numberOfTaps(2)
+      .maxDistance(NATIVE_TAP_MAX_DISTANCE)
+      // Armed only where the canvas tap would toggle the crosshair. Anywhere the
+      // single tap owns an action - a cancel button, the context-menu button, a
+      // drawing - this stands down at touch-down so an impatient double tap on
+      // chrome cannot maximize the pane instead of activating that chrome.
+      .onTouchesDown((event, stateManager) => {
+        const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
+        if (!touch) {
+          stateManager.fail();
+          return;
         }
-      }
-      runOnJS(onTogglePaneMaximize)(pane.id);
-    })
-    .onFinalize(() => {
-      paneMaximizeCrosshairSnapshotActive.value = false;
-    });
+        const outcome = resolveNativeCanvasTap(
+          { x: touch.x, y: touch.y },
+          {
+            bracketDragActive: bracketDragActive.value,
+            chartInteractionEnabled,
+            controlZones,
+            resetViewVisible,
+            crosshairVisible: crosshair.visible.value,
+            crosshairY: crosshair.y.value,
+            drawingTapEnabled,
+            frame,
+            hasContextMenu,
+            orderDragZones: orderDragZones.value,
+            pricePrecision,
+            priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
+            sharedViewport,
+            tradeLabelHeight,
+            tradeLineActionZones: tradeLineActionZones.value,
+            tradeLineRows: tradeLineRows.value,
+          },
+        );
+        // `drawingThenCrosshair` still arms the double tap. If pane maximize wins,
+        // onEnd below briefly suppresses that JS-thread fallback so it cannot
+        // repaint the crosshair after the pane has been maximized.
+        if (outcome.kind !== 'crosshair' && outcome.kind !== 'drawingThenCrosshair') {
+          stateManager.fail();
+          return;
+        }
+        if (!paneMaximizeCrosshairSnapshotActive.value) {
+          paneMaximizeCrosshairSnapshotActive.value = true;
+          paneMaximizeCrosshairSnapshotVisible.value = crosshair.visible.value;
+          paneMaximizeCrosshairSnapshotX.value = crosshair.x.value;
+          paneMaximizeCrosshairSnapshotY.value = crosshair.y.value;
+        }
+      })
+      .onEnd((event, success) => {
+        if (!success) return;
+        if (isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: event.x, y: event.y })) return;
+        if (event.x < frame.contentLeft || event.x >= frame.priceAxisHitLeft) return;
+        const pane = getNativePaneAtY(frame, event.y);
+        if (!pane) return;
+        drawingCrosshairFallbackSuppressedUntilMs.value = Date.now() + 120;
+        if (paneMaximizeCrosshairSnapshotActive.value) {
+          if (paneMaximizeCrosshairSnapshotVisible.value) {
+            crosshair.visible.value = true;
+            crosshair.x.value = paneMaximizeCrosshairSnapshotX.value;
+            crosshair.y.value = paneMaximizeCrosshairSnapshotY.value;
+          } else {
+            hideNativeCrosshair(crosshair);
+          }
+        }
+        runOnJS(onTogglePaneMaximize)(pane.id);
+      })
+      .onFinalize(() => {
+        paneMaximizeCrosshairSnapshotActive.value = false;
+      })
+  );
 }
 
 export interface NativeResetViewTapGestureState {
@@ -399,76 +404,79 @@ export function createNativeResetViewTapGesture({
   sharedViewport,
 }: NativeResetViewTapGestureInput) {
   if (!frame) return Gesture.Tap().enabled(false);
-  return Gesture.Tap()
-    // Visibility is a shared value, and `maxDistance` is gesture config that
-    // cannot read one, so the permissive bound is always in force and the
-    // travel a hidden button demands is enforced in the handlers instead.
-    .maxDistance(NATIVE_RESET_VIEW_HIT_SIZE / 2)
-    .onTouchesDown((event) => {
-      const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
-      resetTapGestureState.maxTravel.value = 0;
-      if (!touch) {
-        resetTapGestureState.blockedByContextMenuButton.value = false;
-        resetTapGestureState.startedOnButton.value = false;
-        return;
-      }
-      resetTapGestureState.startX.value = touch.x;
-      resetTapGestureState.startY.value = touch.y;
-      const buttonVisible = resetViewVisible?.value === true;
-      // The button's own circle is resolved from the frame by the gestures that
-      // must yield to it, so this gesture only has to check foreign zones.
-      if (isNativeGestureControlPoint(controlZones, touch.x, touch.y)) {
-        resetTapGestureState.blockedByContextMenuButton.value = true;
-        resetTapGestureState.startedOnButton.value = false;
-        return;
-      }
-      resetTapGestureState.blockedByContextMenuButton.value = Boolean(
-        hasContextMenu &&
-        crosshair?.visible.value &&
-        isNativeCrosshairContextMenuButtonTap({
-          frame,
-          crosshairY: crosshair.y.value,
-          pricePrecision,
-          sharedViewport,
-          x: touch.x,
-          y: touch.y,
-        }),
-      );
-      resetTapGestureState.startedOnButton.value =
-        !resetTapGestureState.blockedByContextMenuButton.value &&
-        buttonVisible &&
-        isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), touch.x, touch.y);
-    })
-    // `maxDistance` used to enforce this continuously. It measures travel, not
-    // displacement, so without it a flick that returns to where it started
-    // would read as a tap and reveal the button.
-    .onTouchesMove((event) => {
-      const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
-      if (!touch) return;
-      const dx = touch.x - resetTapGestureState.startX.value;
-      const dy = touch.y - resetTapGestureState.startY.value;
-      resetTapGestureState.maxTravel.value = Math.max(
-        resetTapGestureState.maxTravel.value,
-        Math.sqrt(dx * dx + dy * dy),
-      );
-    })
-    .onEnd((event, success) => {
-      if (!success) return;
-      if (resetTapGestureState.blockedByContextMenuButton.value) return;
-      if (resetTapGestureState.startedOnButton.value) {
-        if (!isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), event.x, event.y)) return;
-      } else if (
-        resetTapGestureState.maxTravel.value > NATIVE_TAP_MAX_DISTANCE ||
-        !isNativeResetViewTapWithinTolerance(
-          resetTapGestureState.startX.value,
-          resetTapGestureState.startY.value,
-          event.x,
-          event.y,
-          NATIVE_TAP_MAX_DISTANCE,
-        )
-      ) {
-        return;
-      }
-      runOnJS(onResetViewTap)(event.x, event.y);
-    });
+  return (
+    Gesture.Tap()
+      // Visibility is a shared value, and `maxDistance` is gesture config that
+      // cannot read one, so the permissive bound is always in force and the
+      // travel a hidden button demands is enforced in the handlers instead.
+      .maxDistance(NATIVE_RESET_VIEW_HIT_SIZE / 2)
+      .onTouchesDown((event) => {
+        const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
+        resetTapGestureState.maxTravel.value = 0;
+        if (!touch) {
+          resetTapGestureState.blockedByContextMenuButton.value = false;
+          resetTapGestureState.startedOnButton.value = false;
+          return;
+        }
+        resetTapGestureState.startX.value = touch.x;
+        resetTapGestureState.startY.value = touch.y;
+        const buttonVisible = resetViewVisible?.value === true;
+        // The button's own circle is resolved from the frame by the gestures that
+        // must yield to it, so this gesture only has to check foreign zones.
+        if (isNativeGestureControlPoint(controlZones, touch.x, touch.y)) {
+          resetTapGestureState.blockedByContextMenuButton.value = true;
+          resetTapGestureState.startedOnButton.value = false;
+          return;
+        }
+        resetTapGestureState.blockedByContextMenuButton.value = Boolean(
+          hasContextMenu &&
+          crosshair?.visible.value &&
+          isNativeCrosshairContextMenuButtonTap({
+            frame,
+            crosshairY: crosshair.y.value,
+            pricePrecision,
+            priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
+            sharedViewport,
+            x: touch.x,
+            y: touch.y,
+          }),
+        );
+        resetTapGestureState.startedOnButton.value =
+          !resetTapGestureState.blockedByContextMenuButton.value &&
+          buttonVisible &&
+          isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), touch.x, touch.y);
+      })
+      // `maxDistance` used to enforce this continuously. It measures travel, not
+      // displacement, so without it a flick that returns to where it started
+      // would read as a tap and reveal the button.
+      .onTouchesMove((event) => {
+        const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
+        if (!touch) return;
+        const dx = touch.x - resetTapGestureState.startX.value;
+        const dy = touch.y - resetTapGestureState.startY.value;
+        resetTapGestureState.maxTravel.value = Math.max(
+          resetTapGestureState.maxTravel.value,
+          Math.sqrt(dx * dx + dy * dy),
+        );
+      })
+      .onEnd((event, success) => {
+        if (!success) return;
+        if (resetTapGestureState.blockedByContextMenuButton.value) return;
+        if (resetTapGestureState.startedOnButton.value) {
+          if (!isNativeResetViewButtonTap(resolveNativeResetViewButtonLayout(frame), event.x, event.y)) return;
+        } else if (
+          resetTapGestureState.maxTravel.value > NATIVE_TAP_MAX_DISTANCE ||
+          !isNativeResetViewTapWithinTolerance(
+            resetTapGestureState.startX.value,
+            resetTapGestureState.startY.value,
+            event.x,
+            event.y,
+            NATIVE_TAP_MAX_DISTANCE,
+          )
+        ) {
+          return;
+        }
+        runOnJS(onResetViewTap)(event.x, event.y);
+      })
+  );
 }

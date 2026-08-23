@@ -4,7 +4,10 @@ import type { RenderOptions } from '../../types';
 import { matchFont, RoundedRect } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
-import { resolveNativeCrosshairContextMenuButtonLayout } from '../interaction/nativeCrosshairContextMenu';
+import {
+  resolveNativeCrosshairContextMenuButtonLayout,
+  resolveNativeCrosshairPriceLabelLayout,
+} from '../interaction/nativeCrosshairContextMenu';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeCrosshairLayerImpl } from './NativeCrosshairLayer';
 
@@ -54,7 +57,7 @@ const sharedViewport = {
   priceMax: shared(64000),
 };
 
-function renderCrosshair(hasContextMenu = false) {
+function renderCrosshair(hasContextMenu = false, rememberedPriceLabelWidth = 0) {
   return NativeCrosshairLayerImpl({
     axisFont: matchFont({ fontSize: 11 }),
     crosshair: {
@@ -63,6 +66,7 @@ function renderCrosshair(hasContextMenu = false) {
       y: shared(180),
       dragOriginX: shared(200),
       dragOriginY: shared(180),
+      priceLabelMaxWidth: shared(rememberedPriceLabelWidth),
     },
     frame,
     hasContextMenu,
@@ -98,10 +102,18 @@ describe('NativeCrosshairLayer price axis tag', () => {
     expect(valueOf<number>(boxes[0].props.height)).toBe(valueOf<number>(boxes[1].props.height));
   });
 
-  it('keeps the context menu button pinned while price tag width changes', () => {
-    const short = resolveNativeCrosshairContextMenuButtonLayout(frame, 180, 0.1, '1.0');
-    const long = resolveNativeCrosshairContextMenuButtonLayout(frame, 180, 0.1, '123,456.7890');
+  it('honors remembered price tag width without moving text off the right edge', () => {
+    const boxes = collectElementsByType(renderCrosshair(false, 120), RoundedRect);
+    const priceBox = boxes[0];
 
-    expect(long.centerX).toBe(short.centerX);
+    expect(valueOf<number>(priceBox.props.width)).toBe(120);
+  });
+
+  it('keeps the context menu button pinned to a remembered price tag width', () => {
+    const long = resolveNativeCrosshairPriceLabelLayout(frame, 0.1, '123,456.7890');
+    const short = resolveNativeCrosshairContextMenuButtonLayout(frame, 180, 0.1, '1.0', long.width);
+    const longButton = resolveNativeCrosshairContextMenuButtonLayout(frame, 180, 0.1, '123,456.7890', long.width);
+
+    expect(longButton.centerX).toBe(short.centerX);
   });
 });

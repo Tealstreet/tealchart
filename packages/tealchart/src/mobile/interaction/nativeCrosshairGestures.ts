@@ -6,17 +6,10 @@ import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
 
 import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS } from 'react-native-worklets';
 
 import { beginNativeCrosshairDrag, toggleNativeCrosshair, updateNativeCrosshairDrag } from './nativeCrosshair';
-import {
-  isNativeCrosshairContextMenuButtonTap,
-  nativeCrosshairXToTime,
-  nativeCrosshairYToPrice,
-  resolveNativeCrosshairContextMenuButtonLayout,
-  resolveNativeCrosshairPriceLabelText,
-} from './nativeCrosshairContextMenu';
-import { isNativeGestureControlPoint, isNativeReservedControlPoint } from './nativeGestureControlZones';
+import { isNativeCrosshairContextMenuButtonTap } from './nativeCrosshairContextMenu';
+import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
@@ -111,6 +104,7 @@ function toggleNativeCrosshairAtPoint({
       frame,
       crosshairY: crosshair.y.value,
       pricePrecision,
+      priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
       sharedViewport,
       x: point.x,
       y: point.y,
@@ -150,8 +144,6 @@ export interface NativeCrosshairGestureInput {
   tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
 }
-
-
 export function createNativeCrosshairLongPressGesture({
   controlZones = [],
   resetViewVisible,
@@ -216,6 +208,7 @@ export function createNativeCrosshairPanGesture({
             frame,
             crosshairY: crosshair.y.value,
             pricePrecision,
+            priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
             sharedViewport,
             x: point.x,
             y: point.y,
@@ -241,13 +234,4 @@ export function createNativeCrosshairPanGesture({
     .onUpdate((event) => {
       updateNativeCrosshairDrag(crosshair, frame, event.translationX, event.translationY);
     });
-}
-
-export interface NativeCrosshairContextMenuTapGestureInput {
-  crosshair: NativeCrosshairSharedValues;
-  frame: NativeChartFrame | null;
-  hasContextMenu: boolean;
-  onContextMenuTap: (time: number, price: number, anchorX: number, anchorY: number) => void;
-  pricePrecision?: number;
-  sharedViewport: NativeViewportSharedValues;
 }
