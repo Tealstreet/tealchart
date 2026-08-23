@@ -58,7 +58,9 @@ describe('ChartTopBar drawing toolbar', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    window.localStorage.clear();
+    if (typeof window.localStorage.clear === 'function') {
+      window.localStorage.clear();
+    }
     clearChartStoreCache();
   });
 
@@ -141,7 +143,6 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(topBar.getElement().textContent).not.toContain('2h');
 
     topBar.unmount();
-    clearChartStoreCache();
 
     const reopenedTopBar = new ChartTopBar({
       chartKey: 'topbar-timeframe-favorites',
@@ -420,7 +421,9 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(expandButton?.style.right).toBe('-14px');
 
     topBar.unmount();
-    clearChartStoreCache();
+    if (typeof window.localStorage.clear === 'function') {
+      clearChartStoreCache();
+    }
     document.body.innerHTML = '';
 
     const restoredTopBar = new ChartTopBar({
