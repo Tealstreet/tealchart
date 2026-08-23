@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { NativeDrawingIcon } from './NativeDrawingIcon';
+import { NativeFloatingOverlay } from './NativeFloatingOverlay';
 
 export interface NativeLayoutSelectorOverlayProps {
   backgroundColor: string;
@@ -81,13 +82,13 @@ export function NativeLayoutSelectorOverlayViewImpl({
   };
 
   return (
-    <View pointerEvents="auto" style={styles.root}>
-      <Pressable
-        accessibilityLabel="Close chart layouts"
-        accessibilityRole="button"
-        onPress={onClose}
-        style={styles.backdrop}
-      />
+    <NativeFloatingOverlay
+      backdropAccessibilityLabel="Close chart layouts"
+      backdropColor="rgba(0,0,0,0.18)"
+      contentContainerStyle={styles.root}
+      onRequestClose={onClose}
+      visible
+    >
       <View
         style={[
           styles.surface,
@@ -239,7 +240,7 @@ export function NativeLayoutSelectorOverlayViewImpl({
           ) : null}
         </ScrollView>
       </View>
-    </View>
+    </NativeFloatingOverlay>
   );
 }
 
@@ -276,10 +277,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     padding: 12,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.18)',
   },
   closeText: {
     fontSize: 20,
@@ -377,10 +374,14 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
   },
   root: {
-    ...StyleSheet.absoluteFillObject,
+    bottom: 0,
     justifyContent: 'flex-start',
+    left: 0,
     paddingHorizontal: 12,
     paddingTop: 42,
+    position: 'absolute',
+    right: 0,
+    top: 0,
     zIndex: 40,
   },
   rowActionText: {

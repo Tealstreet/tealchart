@@ -91,15 +91,19 @@ export interface NativeAnchoredFloatingSurfaceProps {
 }
 
 export interface NativeFloatingOverlayProps {
+  backdropAccessibilityLabel?: string;
   backdropColor?: string;
   children: ReactNode;
+  contentContainerStyle?: StyleProp<ViewStyle>;
   onRequestClose: () => void;
   visible: boolean;
 }
 
 export function NativeFloatingOverlay({
+  backdropAccessibilityLabel = 'Close floating chart overlay',
   backdropColor = 'transparent',
   children,
+  contentContainerStyle,
   onRequestClose,
   visible,
 }: NativeFloatingOverlayProps) {
@@ -109,12 +113,18 @@ export function NativeFloatingOverlay({
     <Modal animationType="none" transparent visible onRequestClose={onRequestClose}>
       <View pointerEvents="box-none" style={styles.root}>
         <Pressable
-          accessibilityLabel="Close floating chart overlay"
+          accessibilityLabel={backdropAccessibilityLabel}
           accessibilityRole="button"
           onPress={onRequestClose}
           style={[styles.backdrop, { backgroundColor: backdropColor }]}
         />
-        {children}
+        {contentContainerStyle ? (
+          <View pointerEvents="box-none" style={contentContainerStyle}>
+            {children}
+          </View>
+        ) : (
+          children
+        )}
       </View>
     </Modal>
   );

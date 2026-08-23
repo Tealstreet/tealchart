@@ -15,6 +15,7 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { NativeDrawingIcon } from './NativeDrawingIcon';
+import { NativeFloatingOverlay } from './NativeFloatingOverlay';
 
 import { getChartSettingsControlsForTab, getPopulatedChartSettingsTabs } from '../../settings/chartSettingsControls';
 
@@ -30,22 +31,14 @@ export interface NativeChartSettingsOverlayProps {
 
 const styles = StyleSheet.create({
   root: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 80,
-  },
-  scrim: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   sheet: {
     borderRadius: 10,
@@ -134,9 +127,13 @@ export function NativeChartSettingsOverlayViewImpl({
     );
   };
 
-  return (
-    <View style={styles.root}>
-      <Pressable accessibilityLabel="Dismiss chart settings" onPress={onClose} style={styles.scrim} />
+  return NativeFloatingOverlay({
+    backdropAccessibilityLabel: 'Dismiss chart settings',
+    backdropColor: 'rgba(0, 0, 0, 0.6)',
+    contentContainerStyle: styles.root,
+    onRequestClose: onClose,
+    visible: true,
+    children: (
       <View style={[styles.sheet, { backgroundColor, borderColor: gridColor }]}>
         <View style={[styles.header, { borderBottomColor: gridColor }]}>
           <Text style={[styles.title, { color: textColor }]}>Chart settings</Text>
@@ -170,8 +167,8 @@ export function NativeChartSettingsOverlayViewImpl({
           )}
         </ScrollView>
       </View>
-    </View>
-  );
+    ),
+  });
 }
 
 export function NativeChartSettingsOverlayImpl(props: NativeChartSettingsOverlayProps) {
