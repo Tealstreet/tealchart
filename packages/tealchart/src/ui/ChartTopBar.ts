@@ -1,9 +1,9 @@
 import type {
   UpdateUserDrawingOptions,
+  UserDrawingCommandAvailability,
   UserDrawingFavoriteToolbarPosition,
   UserDrawingIconName,
   UserDrawingMagnetMode,
-  UserDrawingCommandAvailability,
   UserDrawingSelectionActionAnchor,
   UserDrawingState,
   UserDrawingStyle,
@@ -12,24 +12,24 @@ import type {
   UserDrawingTrendLineExtend,
   UserDrawingZOrderAction,
 } from '../drawings';
-import type { ChartStore } from '../state/chartState';
+import type { ChartChromeMetrics } from '../layout/chartGeometry';
+import type { ChartStore, TimeframeOption } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type { ComponentOptions } from './Component';
 import type { LayoutSelectorCallbacks } from './LayoutSelector';
-import type { ChartChromeMetrics } from '../layout/chartGeometry';
 
 import {
   getUserDrawingAllDrawingsUpdateOptions,
+  getUserDrawingFavoriteTools,
   getUserDrawingToolCategoryDescriptorForTool,
   getUserDrawingToolDescriptor,
-  getUserDrawingFavoriteTools,
   isUserDrawingGlobalToolbarAction,
   isUserDrawingRailToolbarAction,
   isUserDrawingToolbarActionEnabled,
   isUserDrawingToolFavorite,
   resolveDrawingSelectedActionIconName,
-  resolveDrawingToolIconName,
   resolveDrawingToolbarActionIconName,
+  resolveDrawingToolIconName,
   resolveUserDrawingActionSurfacePosition,
   resolveUserDrawingSelectedActionSurface,
   resolveUserDrawingToolCategoryButtonTool,
@@ -47,7 +47,12 @@ import {
   resolveLeftToolRailMetrics,
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
-import { AVAILABLE_TIMEFRAMES, getChartStore } from '../state/chartState';
+import {
+  filterTimeframesBySupportedResolutions,
+  getChartStore,
+  getDefaultFavoriteTimeframeValues,
+  TIMEFRAME_GROUPS,
+} from '../state/chartState';
 import { TIME_AXIS_HEIGHT } from '../types';
 import { Component } from './Component';
 import { renderDrawingIcon } from './dom';
@@ -159,6 +164,7 @@ export interface ChartTopBarOptions extends ComponentOptions {
 interface ChartTopBarState {
   interval: ResolutionString;
   hoveredTimeframe: string | null;
+  intervalDropdownOpen: boolean;
   indicatorsHovered: boolean;
 }
 
@@ -281,6 +287,117 @@ const styles = {
 
   timeframeButtonHover: {
     backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownTrigger: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    padding: '0',
+    border: 'none',
+    borderRadius: '4px',
+    backgroundColor: 'transparent',
+    color: 'var(--tc-text2, #787b86)',
+    cursor: 'pointer',
+    fontSize: '16px',
+    lineHeight: '1',
+    transition: 'background-color 0.15s, color 0.15s',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownTriggerOpen: {
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))',
+    color: 'var(--tc-text, #d1d4dc)',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdown: {
+    position: 'fixed',
+    width: '260px',
+    maxHeight: 'min(640px, calc(100vh - 16px))',
+    overflowY: 'auto',
+    backgroundColor: 'var(--tc-menu-bg, var(--tc-bg, #131722))',
+    border: '1px solid var(--tc-border, #2a2e39)',
+    borderRadius: '4px',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+    zIndex: '1000',
+    padding: '6px 0',
+    boxSizing: 'border-box',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    color: 'var(--tc-text, #d1d4dc)',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownAdd: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    width: '100%',
+    height: '42px',
+    padding: '0 16px',
+    border: 'none',
+    borderBottom: '1px solid var(--tc-border, #2a2e39)',
+    backgroundColor: 'transparent',
+    color: 'var(--tc-text, #d1d4dc)',
+    fontSize: '13px',
+    textAlign: 'left',
+    cursor: 'default',
+    boxSizing: 'border-box',
+    opacity: '0.78',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownAddIcon: {
+    fontSize: '24px',
+    lineHeight: '1',
+    color: 'var(--tc-text, #d1d4dc)',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownGroupLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: '30px',
+    padding: '0 16px',
+    color: 'var(--tc-text2, #787b86)',
+    fontSize: '11px',
+    textTransform: 'uppercase',
+    letterSpacing: '1px',
+    boxSizing: 'border-box',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownItem: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 32px',
+    alignItems: 'center',
+    width: '100%',
+    height: '36px',
+    padding: '0 12px 0 16px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: 'var(--tc-text, #d1d4dc)',
+    fontSize: '13px',
+    textAlign: 'left',
+    cursor: 'pointer',
+    boxSizing: 'border-box',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeDropdownItemActive: {
+    backgroundColor: 'var(--tc-text, #d1d4dc)',
+    color: 'var(--tc-bg, #131722)',
+  } as Partial<CSSStyleDeclaration>,
+
+  timeframeFavoriteButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: 'var(--tc-warning, #ff9800)',
+    cursor: 'pointer',
+    fontSize: '16px',
+    lineHeight: '1',
+    padding: '0',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorsButton: {
@@ -456,9 +573,7 @@ const styles = {
     left: `${WEB_CHART_CHROME_METRICS.leftToolRailWidth}px`,
     display: 'none',
     minWidth: '240px',
-    maxHeight: `calc(100vh - ${
-      TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING
-    }px)`,
+    maxHeight: `calc(100vh - ${TIME_AXIS_HEIGHT + LEFT_TOOL_RAIL_VERTICAL_PADDING}px)`,
     overflowY: 'auto',
     padding: '10px',
     boxSizing: 'border-box',
@@ -729,6 +844,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   private drawingRailTooltipEl: HTMLElement | null = null;
   private drawingFavoritesBarEl: HTMLElement | null = null;
   private drawingFavoritesBarCleanup: Array<() => void> = [];
+  private intervalDropdownEl: HTMLElement | null = null;
+  private intervalDropdownOutsideHandler: ((event: PointerEvent) => void) | null = null;
   private uiPreferencesUnsubscribe: (() => void) | null = null;
   private pinnedDrawingToolCategoryId: string | null = null;
   private recentDrawingToolsByCategory: Record<string, UserDrawingTool | undefined> = {};
@@ -739,8 +856,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
 
   constructor(options: ChartTopBarOptions) {
     super('div', {
-      interval: '1h' as ResolutionString,
+      interval: '60' as ResolutionString,
       hoveredTimeframe: null,
+      intervalDropdownOpen: false,
       indicatorsHovered: false,
     });
 
@@ -781,6 +899,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.uiPreferencesUnsubscribe = null;
     this.removeDrawingToolRail();
     this.removeDrawingFavoritesBar();
+    this.removeIntervalDropdown();
     this.removeSelectedActionSurface();
     this.layoutSelector?.dispose();
     this.layoutSelector = null;
@@ -794,6 +913,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     this.el.innerHTML = '';
     this.removeDrawingToolRail();
     this.removeDrawingFavoritesBar();
+    this.removeIntervalDropdown();
     this.removeSelectedActionSurface();
     this.timeframeButtons.clear();
     this.applyContainerLayout();
@@ -842,15 +962,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     // Timeframe selector
     const tfGroup = this.createElement('div', { style: styles.timeframeGroup });
 
-    // Filter timeframes by supported resolutions (if set by datafeed)
-    const filteredTimeframes =
-      this.supportedResolutions && this.supportedResolutions.length > 0
-        ? AVAILABLE_TIMEFRAMES.filter((tf) => this.supportedResolutions!.includes(tf.value))
-        : AVAILABLE_TIMEFRAMES;
-    // Fall back to full list if filtering removes everything
-    const timeframes = filteredTimeframes.length > 0 ? filteredTimeframes : AVAILABLE_TIMEFRAMES;
+    const timeframes = this.getSupportedTimeframes();
+    const toolbarTimeframes = this.getToolbarTimeframes(timeframes);
 
-    for (const tf of timeframes) {
+    for (const tf of toolbarTimeframes) {
       const isActive = this.state.interval === tf.value;
 
       const btn = this.createElement('button', {
@@ -878,7 +993,36 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       this.timeframeButtons.set(tf.value, btn);
     }
 
+    const dropdownBtn = this.createElement('button', {
+      style: {
+        ...styles.timeframeDropdownTrigger,
+        ...(this.state.intervalDropdownOpen ? styles.timeframeDropdownTriggerOpen : {}),
+      },
+      textContent: '⌃',
+    });
+    dropdownBtn.type = 'button';
+    dropdownBtn.setAttribute('aria-label', 'Select interval');
+    dropdownBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.toggleIntervalDropdown();
+    });
+    dropdownBtn.addEventListener('mouseenter', () => {
+      Object.assign(dropdownBtn.style, styles.timeframeDropdownTriggerOpen);
+    });
+    dropdownBtn.addEventListener('mouseleave', () => {
+      if (!this.state.intervalDropdownOpen) {
+        dropdownBtn.style.backgroundColor = 'transparent';
+        dropdownBtn.style.color = 'var(--tc-text2, #787b86)';
+      }
+    });
+    tfGroup.appendChild(dropdownBtn);
+
     this.el.appendChild(tfGroup);
+
+    if (this.state.intervalDropdownOpen) {
+      this.renderIntervalDropdown(dropdownBtn, timeframes);
+    }
 
     // Divider
     this.el.appendChild(this.createElement('div', { style: styles.divider }));
@@ -1037,7 +1181,13 @@ export class ChartTopBar extends Component<ChartTopBarState> {
       ? isUserDrawingToolbarActionEnabled(state, 'zoomIn', this.options.userDrawingCommandAvailability)
       : false;
     toggles.appendChild(
-      this.createDrawingRailToggleButton('zoomIn', 'Zoom in', false, () => this.options.onUserDrawingZoomIn?.(), zoomEnabled),
+      this.createDrawingRailToggleButton(
+        'zoomIn',
+        'Zoom in',
+        false,
+        () => this.options.onUserDrawingZoomIn?.(),
+        zoomEnabled,
+      ),
     );
 
     // Magnet + draw-mode + lock + hide + link form one TradingView-style utility group.
@@ -1090,7 +1240,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         allLocked ? 'lock' : 'unlock',
         allLocked ? 'Unlock all drawings' : 'Lock all drawings',
         allLocked,
-        () => this.options.onUserDrawingLockedChange?.(someUnlocked, someUnlocked ? allOptions : allOptionsIncludingLocked),
+        () =>
+          this.options.onUserDrawingLockedChange?.(someUnlocked, someUnlocked ? allOptions : allOptionsIncludingLocked),
         hasDrawings,
       ),
     );
@@ -1106,11 +1257,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     );
 
     toggles.appendChild(
-      this.createDrawingRailToggleButton(
-        'link',
-        'Objects tree',
-        false,
-        () => this.options.onUserDrawingObjectTreeOpen?.(),
+      this.createDrawingRailToggleButton('link', 'Objects tree', false, () =>
+        this.options.onUserDrawingObjectTreeOpen?.(),
       ),
     );
 
@@ -1422,11 +1570,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         height: activePopoverHeight,
       },
       inset: {
-        left: computeLeftToolRailAvoidanceInset(
-          railMetrics,
-          viewport.width,
-          SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH,
-        ),
+        left: computeLeftToolRailAvoidanceInset(railMetrics, viewport.width, SELECTED_ACTION_SURFACE_ESTIMATED_WIDTH),
         right: 8,
         top: WEB_CHART_CHROME_METRICS.topBarHeight + 6,
         bottom: 8,
@@ -1464,7 +1608,8 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           style: {
             ...styles.drawingButton,
             backgroundColor: this.selectedActionPopoverGroupId === group.id ? 'rgba(41, 98, 255, 0.18)' : 'transparent',
-            color: this.selectedActionPopoverGroupId === group.id ? 'var(--tc-accent, #5b8cff)' : 'var(--tc-text2, #787b86)',
+            color:
+              this.selectedActionPopoverGroupId === group.id ? 'var(--tc-accent, #5b8cff)' : 'var(--tc-text2, #787b86)',
           },
           textContent: group.presentation.triggerIcon ?? '⋯',
           attributes: {
@@ -1563,7 +1708,12 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         ...(item.selected !== undefined ? { 'aria-pressed': item.selected ? 'true' : 'false' } : {}),
       },
     });
-    this.setDrawingIconContent(btn, resolveDrawingSelectedActionIconName(item.command, item.swatchColor), item.icon, 18);
+    this.setDrawingIconContent(
+      btn,
+      resolveDrawingSelectedActionIconName(item.command, item.swatchColor),
+      item.icon,
+      18,
+    );
     btn.disabled = !item.enabled;
     if (item.enabled) {
       btn.addEventListener('click', () => {
@@ -1587,12 +1737,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
    * Populate an element with a tool/action icon: the shared SVG when authored,
    * otherwise the descriptor's glyph fallback.
    */
-  private setDrawingIconContent(
-    el: HTMLElement,
-    iconName: string | undefined,
-    glyph: string,
-    size: number,
-  ): void {
+  private setDrawingIconContent(el: HTMLElement, iconName: string | undefined, glyph: string, size: number): void {
     el.textContent = '';
     const iconEl = iconName ? renderDrawingIcon(iconName, { size }) : null;
     if (iconEl) {
@@ -1770,8 +1915,7 @@ export class ChartTopBar extends Component<ChartTopBarState> {
         const railHeight = railRect.height || Math.max(160, window.innerHeight - TIME_AXIS_HEIGHT);
         const rawFlyoutTop = Math.max(0, buttonRect.top - railRect.top);
         const remainingHeight = Math.max(0, railHeight - rawFlyoutTop);
-        const flyoutTop =
-          remainingHeight > 0 && remainingHeight < 160 ? Math.max(0, railHeight - 160) : rawFlyoutTop;
+        const flyoutTop = remainingHeight > 0 && remainingHeight < 160 ? Math.max(0, railHeight - 160) : rawFlyoutTop;
         const flyoutHeight = Math.max(120, railHeight - flyoutTop);
         flyout.style.top = `${flyoutTop}px`;
         flyout.style.maxHeight = `${flyoutHeight}px`;
@@ -1878,7 +2022,9 @@ export class ChartTopBar extends Component<ChartTopBarState> {
           attributes: {
             type: 'button',
             title: isFavorite ? 'Remove from favorites' : 'Add to favorites',
-            'aria-label': isFavorite ? `Remove ${descriptor.label} from favorites` : `Add ${descriptor.label} to favorites`,
+            'aria-label': isFavorite
+              ? `Remove ${descriptor.label} from favorites`
+              : `Add ${descriptor.label} to favorites`,
             'aria-pressed': isFavorite ? 'true' : 'false',
           },
         });
@@ -1990,29 +2136,190 @@ export class ChartTopBar extends Component<ChartTopBarState> {
   }
 
   // ============================================================================
+  // Timeframe Selector
+  // ============================================================================
+
+  private getSupportedTimeframes(): TimeframeOption[] {
+    return filterTimeframesBySupportedResolutions(this.supportedResolutions);
+  }
+
+  private getFavoriteTimeframeValues(timeframes: readonly TimeframeOption[]): ResolutionString[] {
+    const supportedValues = new Set(timeframes.map((timeframe) => timeframe.value));
+    const storedFavorites = this.chartStore.uiPreferences
+      .get()
+      .favoriteTimeframeValues.filter((timeframe) => supportedValues.has(timeframe));
+    const favoriteValues =
+      storedFavorites.length > 0 ? storedFavorites : getDefaultFavoriteTimeframeValues(this.supportedResolutions);
+
+    if (supportedValues.has(this.state.interval) && !favoriteValues.includes(this.state.interval)) {
+      return [...favoriteValues, this.state.interval];
+    }
+
+    return favoriteValues;
+  }
+
+  private getToolbarTimeframes(timeframes: readonly TimeframeOption[]): TimeframeOption[] {
+    const timeframesByValue = new Map(timeframes.map((timeframe) => [timeframe.value, timeframe]));
+    return this.getFavoriteTimeframeValues(timeframes)
+      .map((value) => timeframesByValue.get(value))
+      .filter((timeframe): timeframe is TimeframeOption => timeframe != null);
+  }
+
+  private toggleFavoriteTimeframe(value: ResolutionString, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const current = this.chartStore.uiPreferences.get().favoriteTimeframeValues;
+    const next = current.includes(value) ? current.filter((timeframe) => timeframe !== value) : [...current, value];
+    this.chartStore.uiPreferences.setKey('favoriteTimeframeValues', next);
+  }
+
+  private toggleIntervalDropdown(): void {
+    this.setState({ intervalDropdownOpen: !this.state.intervalDropdownOpen });
+  }
+
+  private closeIntervalDropdown(options: { render?: boolean } = {}): void {
+    if (!this.state.intervalDropdownOpen) return;
+    this.state.intervalDropdownOpen = false;
+    this.removeIntervalDropdown();
+    if (options.render !== false) this.render();
+  }
+
+  private removeIntervalDropdown(options: { keepOutsideHandler?: boolean } = {}): void {
+    this.intervalDropdownEl?.remove();
+    this.intervalDropdownEl = null;
+
+    if (!options.keepOutsideHandler && this.intervalDropdownOutsideHandler) {
+      document.removeEventListener('pointerdown', this.intervalDropdownOutsideHandler, true);
+      this.intervalDropdownOutsideHandler = null;
+    }
+  }
+
+  private renderIntervalDropdown(anchorEl: HTMLElement, timeframes: readonly TimeframeOption[]): void {
+    this.removeIntervalDropdown({ keepOutsideHandler: true });
+
+    const dropdown = this.createElement('div', {
+      style: styles.timeframeDropdown,
+      attributes: { role: 'menu' },
+    });
+
+    const addCustomItem = this.createElement('button', {
+      style: styles.timeframeDropdownAdd,
+      attributes: { type: 'button', disabled: 'true' },
+    });
+    addCustomItem.appendChild(
+      this.createElement('span', {
+        style: styles.timeframeDropdownAddIcon,
+        textContent: '+',
+      }),
+    );
+    addCustomItem.appendChild(
+      this.createElement('span', {
+        textContent: 'Add custom interval...',
+      }),
+    );
+    dropdown.appendChild(addCustomItem);
+
+    const favoriteValues = this.chartStore.uiPreferences.get().favoriteTimeframeValues;
+
+    for (const group of TIMEFRAME_GROUPS) {
+      const groupTimeframes = timeframes.filter((timeframe) => timeframe.group === group.value);
+      if (groupTimeframes.length === 0) continue;
+
+      dropdown.appendChild(
+        this.createElement('div', {
+          style: styles.timeframeDropdownGroupLabel,
+          textContent: group.label,
+        }),
+      );
+
+      for (const timeframe of groupTimeframes) {
+        const isActive = timeframe.value === this.state.interval;
+        const isFavorite = favoriteValues.includes(timeframe.value);
+        const item = this.createElement('div', {
+          style: {
+            ...styles.timeframeDropdownItem,
+            ...(isActive ? styles.timeframeDropdownItemActive : {}),
+          },
+          attributes: { role: 'menuitemradio', 'aria-checked': String(isActive), tabindex: '0' },
+        });
+        item.addEventListener('click', () => this.handleTimeframeClick(timeframe.value));
+        item.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          this.handleTimeframeClick(timeframe.value);
+        });
+        item.addEventListener('mouseenter', () => {
+          if (!isActive) item.style.backgroundColor = 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))';
+        });
+        item.addEventListener('mouseleave', () => {
+          if (!isActive) item.style.backgroundColor = 'transparent';
+        });
+        item.appendChild(
+          this.createElement('span', {
+            textContent: timeframe.label,
+          }),
+        );
+
+        const favoriteButton = this.createElement('button', {
+          style: {
+            ...styles.timeframeFavoriteButton,
+            opacity: isFavorite ? '1' : '0.45',
+          },
+          textContent: isFavorite ? '★' : '☆',
+          attributes: {
+            type: 'button',
+            'aria-label': `${isFavorite ? 'Remove' : 'Add'} ${timeframe.label} favorite`,
+          },
+        });
+        favoriteButton.addEventListener('click', (event) => this.toggleFavoriteTimeframe(timeframe.value, event));
+        item.appendChild(favoriteButton);
+        dropdown.appendChild(item);
+      }
+    }
+
+    document.body.appendChild(dropdown);
+    this.intervalDropdownEl = dropdown;
+    this.positionIntervalDropdown(anchorEl, dropdown);
+
+    if (!this.intervalDropdownOutsideHandler) {
+      this.intervalDropdownOutsideHandler = (event: PointerEvent) => {
+        const target = event.target as Node | null;
+        if (!target || this.el.contains(target) || dropdown.contains(target)) return;
+        this.closeIntervalDropdown();
+      };
+      document.addEventListener('pointerdown', this.intervalDropdownOutsideHandler, true);
+    }
+  }
+
+  private positionIntervalDropdown(anchorEl: HTMLElement, dropdown: HTMLElement): void {
+    const anchorRect = anchorEl.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const dropdownWidth = dropdown.offsetWidth || 260;
+    const margin = 8;
+    const left = Math.min(Math.max(anchorRect.left, margin), Math.max(margin, viewportWidth - dropdownWidth - margin));
+
+    dropdown.style.left = `${left}px`;
+    dropdown.style.top = `${anchorRect.bottom + 4}px`;
+
+    const dropdownHeight = Math.min(dropdown.offsetHeight, viewportHeight - margin * 2);
+    const maxTop = viewportHeight - dropdownHeight - margin;
+    dropdown.style.top = `${Math.max(margin, Math.min(anchorRect.bottom + 4, maxTop))}px`;
+  }
+
+  // ============================================================================
   // Event Handlers
   // ============================================================================
 
   private handleTimeframeClick(interval: ResolutionString): void {
-    const previousInterval = this.state.interval;
-
     // Update store
     this.chartStore.settings.setKey('interval', interval);
 
-    // Update local state (don't use setState to avoid re-render)
     this.state.interval = interval;
-
-    // Update button styles directly
-    const previousBtn = this.timeframeButtons.get(previousInterval);
-    const newBtn = this.timeframeButtons.get(interval);
-
-    if (previousBtn) {
-      previousBtn.style.backgroundColor = 'transparent';
-      previousBtn.style.color = 'var(--tc-text2, #787b86)';
-    }
-    if (newBtn) {
-      Object.assign(newBtn.style, styles.timeframeButtonActive);
-    }
+    this.state.intervalDropdownOpen = false;
+    this.removeIntervalDropdown();
+    this.render();
 
     // Notify parent
     this.options.onIntervalChange?.(interval);
@@ -2031,6 +2338,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     }
     const previousInterval = this.state.interval;
     this.state.interval = interval;
+    if (!this.timeframeButtons.has(interval)) {
+      this.render();
+      return;
+    }
 
     // Update button styles directly (no full re-render needed)
     const previousBtn = this.timeframeButtons.get(previousInterval);
@@ -2073,7 +2384,10 @@ export class ChartTopBar extends Component<ChartTopBarState> {
     if (options.render !== false) this.render();
   }
 
-  setUserDrawingCommandAvailability(availability: UserDrawingCommandAvailability, options: { render?: boolean } = {}): void {
+  setUserDrawingCommandAvailability(
+    availability: UserDrawingCommandAvailability,
+    options: { render?: boolean } = {},
+  ): void {
     this.options.userDrawingCommandAvailability = availability;
     if (options.render !== false) this.render();
   }

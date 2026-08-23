@@ -169,15 +169,13 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
         }
       : null;
 
-  const timeframeCandidates = input.timeframes.map(
-    (timeframe): NativeTopBarTimeframeCandidate => ({
-      timeframe,
-      width: Math.max(
-        MIN_TIMEFRAME_BUTTON_WIDTH,
-        Math.ceil(input.textWidth(timeframe.shortLabel)) + BUTTON_PADDING_X * 2,
-      ),
-    }),
-  );
+  const timeframeCandidates = input.timeframes.map((timeframe): NativeTopBarTimeframeCandidate => ({
+    timeframe,
+    width: Math.max(
+      MIN_TIMEFRAME_BUTTON_WIDTH,
+      Math.ceil(input.textWidth(timeframe.shortLabel)) + BUTTON_PADDING_X * 2,
+    ),
+  }));
   const scrollAreaX =
     (symbolHitRect ? symbolHitRect.x + symbolHitRect.width : HORIZONTAL_PADDING) +
     (symbolChevron ? GROUP_GAP : HORIZONTAL_PADDING);
@@ -313,19 +311,22 @@ export function createNativeTopBarLayout(input: NativeTopBarLayoutInput): Native
 }
 
 export function createNativeTopBarTimeframes(input: NativeTopBarTimeframesInput): TimeframeOption[] {
-  const selectedValues =
+  const supportedValues =
     input.supportedResolutions && input.supportedResolutions.length > 0
       ? new Set<ResolutionString>(input.supportedResolutions)
-      : input.defaultVisibleValues;
-  const selectedTimeframes = input.timeframes.filter((timeframe) => selectedValues.has(timeframe.value));
+      : new Set(input.timeframes.map((timeframe) => timeframe.value));
+  const selectedTimeframes = input.timeframes.filter(
+    (timeframe) => input.defaultVisibleValues.has(timeframe.value) && supportedValues.has(timeframe.value),
+  );
   const fallbackTimeframes =
     selectedTimeframes.length > 0
       ? selectedTimeframes
-      : input.timeframes.filter((timeframe) => input.defaultVisibleValues.has(timeframe.value));
+      : input.timeframes.filter((timeframe) => supportedValues.has(timeframe.value));
   const activeTimeframe = input.timeframes.find((timeframe) => timeframe.value === input.interval) ?? {
     value: input.interval,
     label: input.interval,
     shortLabel: input.interval,
+    group: 'minutes',
   };
 
   if (fallbackTimeframes.some((timeframe) => timeframe.value === activeTimeframe.value)) {

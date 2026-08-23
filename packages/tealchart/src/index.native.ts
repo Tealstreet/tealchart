@@ -22,13 +22,23 @@ export {
 
 export {
   AVAILABLE_TIMEFRAMES,
+  DEFAULT_FAVORITE_TIMEFRAME_VALUES,
   DEFAULT_CHART_SETTINGS,
+  TIMEFRAME_GROUPS,
+  filterTimeframesBySupportedResolutions,
   formatPriceWithPrecision,
   getDecimalPlacesFromPrecision,
+  getDefaultFavoriteTimeframeValues,
   getResolutionLabel,
   resolutionToMs,
 } from './state/chartState';
-export type { ChartSettings, IndicatorInstance, TimeframeOption } from './state/chartState';
+export type {
+  ChartSettings,
+  IndicatorInstance,
+  TimeframeGroup,
+  TimeframeGroupDefinition,
+  TimeframeOption,
+} from './state/chartState';
 export {
   BUILTIN_CHART_THEMES,
   DARK_CHART_THEME,

@@ -91,6 +91,69 @@ describe('ChartTopBar drawing toolbar', () => {
     inertTopBar.unmount();
   });
 
+  it('renders pinned TradingView intervals and selects from the grouped dropdown', () => {
+    const onIntervalChange = vi.fn();
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-timeframe-dropdown',
+      symbol: 'BTCUSDT',
+      onIntervalChange,
+    });
+    topBar.mount(document.body);
+    topBar.setSupportedResolutions(['1', '3', '5', '15', '30', '60', '120', '240', '360', '1D']);
+
+    expect(topBar.getElement().textContent).toContain('1m');
+    expect(topBar.getElement().textContent).toContain('2h');
+    expect(topBar.getElement().textContent).not.toContain('6h');
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    const dropdown = document.querySelector<HTMLElement>('[role="menu"]');
+
+    expect(dropdown).not.toBeNull();
+    expect(dropdown?.textContent).toContain('Add custom interval...');
+    expect(dropdown?.textContent).toContain('Minutes');
+    expect(dropdown?.textContent).toContain('Hours');
+
+    const sixHourItem = Array.from(document.querySelectorAll<HTMLElement>('[role="menuitemradio"]')).find((item) =>
+      item.textContent?.includes('6 hours'),
+    );
+    expect(sixHourItem).not.toBeNull();
+    sixHourItem?.click();
+
+    expect(onIntervalChange).toHaveBeenLastCalledWith('360');
+    expect(topBar.getElement().textContent).toContain('6h');
+    expect(document.querySelector<HTMLElement>('[role="menu"]')).toBeNull();
+
+    topBar.unmount();
+  });
+
+  it('persists interval favorites in chart UI preferences', () => {
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-timeframe-favorites',
+      symbol: 'BTCUSDT',
+    });
+    topBar.mount(document.body);
+
+    expect(topBar.getElement().textContent).toContain('2h');
+
+    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    document.querySelector<HTMLButtonElement>('button[aria-label="Remove 2 hours favorite"]')?.click();
+
+    expect(topBar.getElement().textContent).not.toContain('2h');
+
+    topBar.unmount();
+    clearChartStoreCache();
+
+    const reopenedTopBar = new ChartTopBar({
+      chartKey: 'topbar-timeframe-favorites',
+      symbol: 'BTCUSDT',
+    });
+    reopenedTopBar.mount(document.body);
+
+    expect(reopenedTopBar.getElement().textContent).not.toContain('2h');
+
+    reopenedTopBar.unmount();
+  });
+
   it('renders drawing tools from shared descriptors and dispatches tool changes', () => {
     const onTool = vi.fn();
     const topBar = new ChartTopBar({
@@ -224,9 +287,7 @@ describe('ChartTopBar drawing toolbar', () => {
     topBar.mount(document.body);
 
     for (const { tool, label, categoryLabel } of auditedPlacementToolbarTools) {
-      const category = document.querySelector<HTMLButtonElement>(
-        `button[aria-label="${categoryLabel} drawing tools"]`,
-      );
+      const category = document.querySelector<HTMLButtonElement>(`button[aria-label="${categoryLabel} drawing tools"]`);
       expect(category, categoryLabel).not.toBeNull();
       document.querySelector<HTMLButtonElement>(`button[aria-label="${categoryLabel} menu"]`)?.click();
 
@@ -293,9 +354,9 @@ describe('ChartTopBar drawing toolbar', () => {
 
     topBar.setUserDrawingState({ ...baseDrawingState, activeTool: 'rectangle' });
     expect(
-      document.querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')?.getAttribute(
-        'aria-expanded',
-      ),
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Lines drawing tools"]')
+        ?.getAttribute('aria-expanded'),
     ).toBe('false');
 
     topBar.unmount();
@@ -369,9 +430,9 @@ describe('ChartTopBar drawing toolbar', () => {
     });
     restoredTopBar.mount(document.body);
 
-    expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.getAttribute('aria-expanded')).toBe(
-      'false',
-    );
+    expect(
+      document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.getAttribute('aria-expanded'),
+    ).toBe('false');
     expect(document.querySelector<HTMLElement>('[aria-label="Drawing tool categories"]')?.style.transform).toBe(
       'translateX(-50px)',
     );
@@ -483,7 +544,9 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(bar).not.toBeNull();
     const handle = bar?.querySelector<HTMLElement>('[aria-label="Drag favorites toolbar"]');
     expect(handle).not.toBeNull();
-    const tools = Array.from(bar?.querySelectorAll('button[aria-label]') ?? []).map((b) => b.getAttribute('aria-label'));
+    const tools = Array.from(bar?.querySelectorAll('button[aria-label]') ?? []).map((b) =>
+      b.getAttribute('aria-label'),
+    );
     expect(tools).toEqual(['Trend line', 'Horizontal line']);
 
     bar?.querySelector<HTMLButtonElement>('button[aria-label="Trend line"]')?.click();
@@ -649,8 +712,12 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Open drawing object tree"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Copy selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate selected drawing"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Duplicate while dragging selected drawing"]')?.click();
-    document.querySelector<HTMLButtonElement>('button[aria-label="Set as default style for this drawing type"]')?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Duplicate while dragging selected drawing"]')
+      ?.click();
+    document
+      .querySelector<HTMLButtonElement>('button[aria-label="Set as default style for this drawing type"]')
+      ?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Delete selected drawing"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Bring selected drawing forward"]')?.click();
     document.querySelector<HTMLButtonElement>('button[aria-label="Send selected drawing backward"]')?.click();
@@ -753,9 +820,9 @@ describe('ChartTopBar drawing toolbar', () => {
     document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.click();
     expect(onMeasureModeChange).toHaveBeenCalledWith(false);
     expect(
-      document.querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')?.getAttribute(
-        'aria-pressed',
-      ),
+      document
+        .querySelector<HTMLButtonElement>('button[aria-label="Measure date and price range"]')
+        ?.getAttribute('aria-pressed'),
     ).toBe('true');
     document.querySelector<HTMLButtonElement>('button[aria-label="Edit drawing text"]')?.click();
     expect(onTextEdit).toHaveBeenCalledWith('label');
