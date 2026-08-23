@@ -22,6 +22,7 @@ import {
   findNativeOrderDragZoneIndex,
   findNativeTradeLineActionZone,
   findNativeTradeLineActionZoneIndex,
+  findNativeTradeLineRow,
   isNativePriceAxisTagSourceSuppressedByBracketDrag,
   resolveNativePriceAxisTagCenters,
 } from './nativeTradeLineHitTest';
@@ -320,6 +321,35 @@ describe('native trade-line hit testing', () => {
         tradeLabelHeight: 18,
       }),
     ).toBe(true);
+  });
+
+  it('hits trade-line rows across the visible line span when label bounds are absent', () => {
+    const rows: NativeTradeLineRow[] = [
+      { objectType: 'order', objectId: 'order-1', price: 50 },
+    ];
+
+    expect(
+      findNativeTradeLineRow({
+        rows,
+        x: 80,
+        y: 50,
+        sharedViewport,
+        frame,
+        tradeLabelHeight: 18,
+      }),
+    ).toEqual({ objectType: 'order', objectId: 'order-1', price: 50 });
+    expect(
+      canBeginNativeChartPan({
+        actionZones: [],
+        orderDragZones: [],
+        rows,
+        x: 80,
+        y: 50,
+        sharedViewport,
+        frame,
+        tradeLabelHeight: 18,
+      }),
+    ).toBe(false);
   });
 
   it('keeps OEMS hit zones on true chart-space trade-line centers', () => {

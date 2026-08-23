@@ -246,13 +246,14 @@ export function findNativeTradeLineRowIndex({
   'worklet';
   for (let index = rows.length - 1; index >= 0; index -= 1) {
     const row = rows[index];
-    if (row.x1 === undefined || row.x2 === undefined) continue;
+    const x1 = row.x1 ?? frame.contentLeft;
+    const x2 = row.x2 ?? frame.priceAxisHitLeft;
     const priceY = sharedPriceToNativeLineY(row.price, sharedViewport, frame);
     if (!isNativeYInMainPane(priceY, frame)) continue;
     const zoneTop = priceY - tradeLabelHeight / 2;
     if (
-      x >= row.x1 &&
-      x <= row.x2 &&
+      x >= x1 &&
+      x <= x2 &&
       y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
       y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
     ) {
