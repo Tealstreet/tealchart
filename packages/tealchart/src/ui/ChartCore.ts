@@ -29,6 +29,7 @@ import type {
   PaneDividerInfo,
 } from '../interaction/EventManager';
 import type { OemsActionKind } from '../interaction/oemsActionManager';
+import type { OemsTradingLineState } from '../interaction/oemsLineState';
 import type { CanvasContext } from '../rendering/CanvasContext';
 import type { DirtyFlags } from '../rendering/RenderScheduler';
 import type { PlotStyleOverride } from '../state/chartState';
@@ -55,12 +56,6 @@ import {
 import { EventManager } from '../interaction/EventManager';
 import { OemsActionManager } from '../interaction/oemsActionManager';
 import {
-  PARTIAL_BRACKET_MARKER_INTERVAL,
-  PARTIAL_BRACKET_PERCENTS,
-  PARTIAL_BRACKET_ZONE_HALF_WIDTH,
-  resolvePartialBracketMarkers,
-} from '../interaction/partialBrackets';
-import {
   applyOemsOrderActionState,
   applyOemsPositionActionState,
   confirmOemsOrderLineSnapshots,
@@ -69,8 +64,13 @@ import {
   getOemsOrderObjectId,
   getOemsPositionLineState,
   getOemsPositionObjectId,
-  type OemsTradingLineState,
 } from '../interaction/oemsLineState';
+import {
+  PARTIAL_BRACKET_MARKER_INTERVAL,
+  PARTIAL_BRACKET_PERCENTS,
+  PARTIAL_BRACKET_ZONE_HALF_WIDTH,
+  resolvePartialBracketMarkers,
+} from '../interaction/partialBrackets';
 import { PriceLineManager } from '../interaction/PriceLineManager';
 import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
@@ -410,6 +410,11 @@ interface CrosshairPlusButtonBounds {
   x: number;
   y: number;
 }
+
+const CROSSHAIR_PRICE_LABEL_HEIGHT = 18;
+const CROSSHAIR_PLUS_BUTTON_RADIUS = 9;
+const CROSSHAIR_PLUS_BUTTON_RIGHT_OFFSET = 11;
+const CROSSHAIR_PLUS_BUTTON_LINE_GAP = 4;
 
 // ============================================================================
 // ChartCore Class
@@ -960,7 +965,6 @@ export class ChartCore {
     return applyOemsPositionActionState(line, this.oemsActions);
   }
 
-
   /**
    * Set execution markers
    * Reference equality check - skip if same array
@@ -1166,15 +1170,7 @@ export class ChartCore {
   }
 
   /** True when hovering a grabbable (unlocked) drawing in select mode — for the cursor. */
-  /**
-   * The + button, which is drawn ON the crosshair line at the cursor's own y -
-   * so the pointer is inside it whenever it is in that strip at all.
-   *
-   * It suppresses input like any other click target, but it must never suppress
-   * the crosshair: doing so hid the crosshair, hiding cleared these bounds, and
-   * with no bounds the next move brought both back - a flip per mousemove, and
-   * a click landing on nothing about half the time.
-   */
+  /** The + button is click chrome, but not crosshair-suppressing chrome. */
   private isOverCrosshairPlusButton(x: number, y: number): boolean {
     const bounds = this._plusButtonBounds;
     if (!bounds) return false;
@@ -1184,6 +1180,15 @@ export class ChartCore {
     const dx = x - bounds.x;
     const dy = y - bounds.y;
     return dx * dx + dy * dy <= bounds.r * bounds.r;
+  }
+
+  private getStableCrosshairPlusButtonX(ctx: CanvasRenderingContext2D, decimals: number): number {
+    const decimalPlaces = Math.max(0, decimals);
+    const capacityText = decimalPlaces === 0 ? '999,999' : `999,999.${'9'.repeat(decimalPlaces)}`;
+    const capacityLabelWidth = ctx.measureText(capacityText).width + 10;
+    const capacityLabelX = this.options.width - capacityLabelWidth - PRICE_AXIS_RIGHT_PADDING;
+    const priceAxisLeft = this.options.width - this.margins.right;
+    return Math.min(priceAxisLeft, capacityLabelX) - CROSSHAIR_PLUS_BUTTON_RIGHT_OFFSET;
   }
 
   private isOverUnlockedUserDrawing(x: number, y: number): boolean {
@@ -2473,15 +2478,14 @@ export class ChartCore {
     // Check if cursor is in chart area (horizontally)
     if (x < this.margins.left || x > width - this.margins.right) return;
 
-    let priceLabel:
-      | {
-          text: string;
-          x: number;
-          y: number;
-          width: number;
-          height: number;
-        }
-      | null = null;
+    let priceLabel: {
+      text: string;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    } | null = null;
+    let priceLabelDecimals = this.options.renderOptions?.pricePrecision ?? 2;
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
       // The pane under the cursor, not always the price pane: an indicator pane
       // carries its own scale, and RSI or MACD read as nonsense at market
@@ -2492,19 +2496,28 @@ export class ChartCore {
         this.getUnifiedLayout(),
         this.options.renderOptions?.pricePrecision,
       );
+      priceLabelDecimals = decimals;
       const priceText = safeToFixed(value, decimals, 'crosshairPrice');
       const font = this.renderer.getFont();
       ctx.font = `11px ${font}`;
       const priceLabelWidth = ctx.measureText(priceText).width + 10;
-      const priceLabelHeight = 18;
       priceLabel = {
         text: priceText,
         x: width - priceLabelWidth - PRICE_AXIS_RIGHT_PADDING,
-        y: y - priceLabelHeight / 2,
+        y: y - CROSSHAIR_PRICE_LABEL_HEIGHT / 2,
         width: priceLabelWidth,
-        height: priceLabelHeight,
+        height: CROSSHAIR_PRICE_LABEL_HEIGHT,
       };
     }
+    const hasContextMenu = this.hasContextMenu();
+    const crosshairButton =
+      hasContextMenu && priceLabel
+        ? {
+            x: this.getStableCrosshairPlusButtonX(ctx, priceLabelDecimals),
+            y,
+            r: CROSSHAIR_PLUS_BUTTON_RADIUS,
+          }
+        : null;
 
     // Draw vertical crosshair line
     ctx.strokeStyle = crosshairColor;
@@ -2517,9 +2530,10 @@ export class ChartCore {
 
     // Draw horizontal crosshair line across chart area
     // Stop short of the + context menu button (18px wide + 2px offset + 2px gap)
-    const hasContextMenu = this.hasContextMenu();
     if (y >= this.margins.top && y <= height - this.margins.bottom) {
-      const rightStop = hasContextMenu && priceLabel ? priceLabel.x - 22 : width - this.margins.right;
+      const rightStop = crosshairButton
+        ? crosshairButton.x - crosshairButton.r - CROSSHAIR_PLUS_BUTTON_LINE_GAP
+        : width - this.margins.right;
       ctx.beginPath();
       ctx.moveTo(this.margins.left, y);
       ctx.lineTo(rightStop, y);
@@ -2528,10 +2542,10 @@ export class ChartCore {
     ctx.setLineDash([]);
 
     // Draw + button circle on the crosshair line
-    if (hasContextMenu && priceLabel) {
-      const btnX = priceLabel.x - 11; // center of 18px circle, 2px left of the price label
-      const btnY = y;
-      const btnR = 9; // 18px diameter / 2
+    if (crosshairButton && priceLabel) {
+      const btnX = crosshairButton.x;
+      const btnY = crosshairButton.y;
+      const btnR = crosshairButton.r;
 
       // Store a forgiving hit target from the circular button through the price
       // label. The circle stays visually compact, but users moving toward the

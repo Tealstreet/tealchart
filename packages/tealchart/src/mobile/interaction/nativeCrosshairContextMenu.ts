@@ -4,18 +4,18 @@ import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 
 import { getNativePaneAtY } from '../render/nativeChartFrame';
-import { NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING, getNativePriceGridSlot } from '../render/nativeGridSlots';
+import { getNativePriceGridSlot, NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING } from '../render/nativeGridSlots';
 import { resolveNativePaneRange } from '../render/nativePaneRangeOverride';
-import {
-  NATIVE_PRICE_AXIS_LANE_RIGHT_INSET,
-  NATIVE_PRICE_AXIS_TAG_MIN_WIDTH,
-  NATIVE_PRICE_AXIS_TAG_PADDING_X,
-} from '../utils/nativePriceAxisLane';
 import {
   formatNativeIndicatorAxisTickWorklet,
   formatNativeTradeLinePriceWorklet,
   getNativeTradeLinePriceDecimalsWorklet,
 } from '../render/nativePriceFormat';
+import {
+  NATIVE_PRICE_AXIS_LANE_RIGHT_INSET,
+  NATIVE_PRICE_AXIS_TAG_MIN_WIDTH,
+  NATIVE_PRICE_AXIS_TAG_PADDING_X,
+} from '../utils/nativePriceAxisLane';
 
 export const NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS = 9;
 export const NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_HIT_RADIUS = 24;
@@ -65,7 +65,10 @@ export function resolveNativeCrosshairPriceLabelLayout(
   return {
     x,
     width,
-    textX: laneRight - NATIVE_PRICE_AXIS_TAG_PADDING_X - Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH),
+    textX:
+      laneRight -
+      NATIVE_PRICE_AXIS_TAG_PADDING_X -
+      Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH),
   };
 }
 
@@ -140,12 +143,13 @@ export function resolveNativeCrosshairContextMenuButtonLayout(
   frame: NativeChartFrame,
   crosshairY: number,
   pricePrecision = 2,
-  priceLabelText?: string,
+  _priceLabelText?: string,
 ): NativeCrosshairContextMenuButtonLayout {
   'worklet';
-  const priceLabel = resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceLabelText);
+  const capacityPriceLabel = resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision);
+  const stableAnchorX = Math.min(frame.priceAxisLeft, capacityPriceLabel.x);
   return {
-    centerX: priceLabel.x - NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RIGHT_OFFSET,
+    centerX: stableAnchorX - NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RIGHT_OFFSET,
     centerY: Math.min(Math.max(crosshairY, frame.mainPane.top), frame.mainPane.bottom),
     radius: NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
     hitRadius: NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_HIT_RADIUS,
