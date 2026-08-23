@@ -1884,6 +1884,34 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('keeps the crosshair + button x stable while price label text changes width', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+      renderOptions: { pricePrecision: 0 },
+    });
+
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 1, priceMax: 900000 });
+
+    const eventManager = eventManagerInstances[0];
+    eventManager.callbacks.onCrossHairMoved?.(700, 120);
+    eventManager.callbacks.onCrosshairRender?.();
+    const highPriceBounds = (core as unknown as { _plusButtonBounds: { x: number } | null })._plusButtonBounds;
+
+    eventManager.callbacks.onCrossHairMoved?.(700, 520);
+    eventManager.callbacks.onCrosshairRender?.();
+    const lowPriceBounds = (core as unknown as { _plusButtonBounds: { x: number } | null })._plusButtonBounds;
+
+    expect(highPriceBounds).not.toBeNull();
+    expect(lowPriceBounds).not.toBeNull();
+    expect(lowPriceBounds?.x).toBe(highPriceBounds?.x);
+
+    core.dispose();
+  });
+
   it('does not let hover processing override the active price-axis cursor', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({

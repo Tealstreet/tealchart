@@ -98,13 +98,10 @@ describe('NativeCrosshairLayer price axis tag', () => {
     expect(valueOf<number>(boxes[0].props.height)).toBe(valueOf<number>(boxes[1].props.height));
   });
 
-  // The "+" button is positioned from the price label's measured width, so any
-  // change to how that width is derived moves the button and its tap target.
-  // Unifying the crosshair onto the full-lane layout would do exactly that.
-  it('moves the context menu button with the price tag width', () => {
+  it('keeps the context menu button pinned while price tag width changes', () => {
     const short = resolveNativeCrosshairContextMenuButtonLayout(frame, 180, 0.1, '1.0');
     const long = resolveNativeCrosshairContextMenuButtonLayout(frame, 180, 0.1, '123,456.7890');
 
-    expect(long.centerX).toBeLessThan(short.centerX);
+    expect(long.centerX).toBe(short.centerX);
   });
 });
