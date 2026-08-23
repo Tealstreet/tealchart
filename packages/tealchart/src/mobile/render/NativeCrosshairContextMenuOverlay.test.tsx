@@ -1,13 +1,14 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import React from 'react';
+
 import { Pressable, Text, View } from 'react-native';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
   NativeCrosshairContextMenuOverlayImpl,
-  resolveNativeContextMenuHostContentLayout,
   resolveNativeContextMenuOverlayLayout,
+  resolveNativeHostContentPlacement,
 } from './NativeCrosshairContextMenuOverlay';
 
 interface TestElementProps {
@@ -105,7 +106,28 @@ describe('NativeCrosshairContextMenuOverlay', () => {
 });
 
 describe('NativeCrosshairContextMenuOverlay host content', () => {
-  it('hides host content while its native layout has not been measured', () => {
+  it('clamps measured host content inside the native chart viewport', () => {
+    expect(
+      resolveNativeHostContentPlacement({
+        anchorX: 380,
+        anchorY: 470,
+        contentHeight: 118,
+        contentWidth: 228,
+        dimensions: { width: 390, height: 480 },
+      }),
+    ).toEqual({ left: 140, top: 354 });
+    expect(
+      resolveNativeHostContentPlacement({
+        anchorX: 30,
+        anchorY: 20,
+        contentHeight: 118,
+        contentWidth: 228,
+        dimensions: { width: 390, height: 480 },
+      }),
+    ).toEqual({ left: 8, top: 8 });
+  });
+
+  it('renders host content in place of the item list, grown leftward from the anchor', () => {
     const overlay = NativeCrosshairContextMenuOverlayImpl({
       backgroundColor: '#131722',
       dimensions: { width: 390, height: 480 },
@@ -123,56 +145,10 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
     const style = flattenStyle(views[0].props.style);
     const texts = collectElementsByType(overlay, Text);
 
-    expect(style.right).toBe(102);
-    expect(style.opacity).toBe(0);
+    expect(style.left).toBe(60);
+    expect(style.top).toBe(67);
     expect(style.width).toBeUndefined();
-    expect(style.left).toBeUndefined();
-    expect(texts.map((text) => text.props.children)).toContain('Quick order');
-  });
-
-  it('clamps measured host content inside the native chart viewport', () => {
-    expect(
-      resolveNativeContextMenuHostContentLayout({
-        anchorX: 375,
-        anchorY: 430,
-        contentSize: { width: 268, height: 86 },
-        dimensions: { width: 390, height: 480 },
-      }),
-    ).toEqual({ left: 95, maxHeight: 86, top: 386, width: 268 });
-
-    const overlay = NativeCrosshairContextMenuOverlayImpl({
-      backgroundColor: '#131722',
-      dimensions: { width: 390, height: 480 },
-      hostContentSize: { width: 268, height: 86 },
-      menu: {
-        anchorX: 375,
-        anchorY: 430,
-        content: React.createElement(Text, null, 'Quick order'),
-        items: [],
-      },
-      onClose: vi.fn(),
-      renderOptions: { gridColor: '#363a45' },
-      textColor: '#d1d4dc',
-    });
-    const views = collectElementsByType(overlay, View);
-    const style = flattenStyle(views[0].props.style);
-
-    expect(style.left).toBe(95);
-    expect(style.maxHeight).toBe(86);
-    expect(style.top).toBe(386);
-    expect(style.width).toBe(268);
     expect(style.right).toBeUndefined();
-    expect(style.opacity).toBeUndefined();
-  });
-
-  it('caps oversized measured host content to the native chart viewport', () => {
-    expect(
-      resolveNativeContextMenuHostContentLayout({
-        anchorX: 120,
-        anchorY: 40,
-        contentSize: { width: 480, height: 700 },
-        dimensions: { width: 390, height: 480 },
-      }),
-    ).toEqual({ left: 8, maxHeight: 464, top: 8, width: 374 });
+    expect(texts.map((text) => text.props.children)).toContain('Quick order');
   });
 });

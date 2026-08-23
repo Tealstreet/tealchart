@@ -84,7 +84,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   modal: {
-    backgroundColor: 'var(--modal-bg, #1e222d)',
+    backgroundColor: 'var(--tc-modal-bg, #1e222d)',
     borderRadius: '8px',
     boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
     display: 'flex',
@@ -98,7 +98,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '12px 16px',
-    borderBottom: '1px solid var(--border, #363a45)',
+    borderBottom: '1px solid var(--tc-border, #363a45)',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -106,14 +106,14 @@ const styles = {
     margin: '0',
     fontSize: '14px',
     fontWeight: '600',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     fontFamily: 'inherit',
   } as Partial<CSSStyleDeclaration>,
 
   closeButton: {
     background: 'transparent',
     border: 'none',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     cursor: 'pointer',
     padding: '4px',
     display: 'flex',
@@ -125,7 +125,7 @@ const styles = {
 
   tabs: {
     display: 'flex',
-    borderBottom: '1px solid var(--border, #363a45)',
+    borderBottom: '1px solid var(--tc-border, #363a45)',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -134,7 +134,7 @@ const styles = {
     background: 'none',
     border: 'none',
     borderBottom: '2px solid transparent',
-    color: 'var(--text2, #787b86)',
+    color: 'var(--tc-text2, #787b86)',
     fontSize: '13px',
     fontWeight: '500',
     cursor: 'pointer',
@@ -142,8 +142,8 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   tabActive: {
-    color: 'var(--text, #d1d4dc)',
-    borderBottomColor: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
+    borderBottomColor: 'var(--tc-text, #d1d4dc)',
   } as Partial<CSSStyleDeclaration>,
 
   content: {
@@ -158,7 +158,7 @@ const styles = {
     justifyContent: 'flex-end',
     gap: '8px',
     padding: '12px 16px',
-    borderTop: '1px solid var(--border, #363a45)',
+    borderTop: '1px solid var(--tc-border, #363a45)',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -174,12 +174,12 @@ const styles = {
 
   cancelButton: {
     backgroundColor: 'transparent',
-    border: '1px solid var(--border, #363a45)',
-    color: 'var(--text2, #787b86)',
+    border: '1px solid var(--tc-border, #363a45)',
+    color: 'var(--tc-text2, #787b86)',
   } as Partial<CSSStyleDeclaration>,
 
   applyButton: {
-    backgroundColor: 'var(--buy-color, #0ECB81)',
+    backgroundColor: 'var(--tc-buy-color, #0ECB81)',
     color: '#fff',
   } as Partial<CSSStyleDeclaration>,
 };
@@ -285,10 +285,10 @@ export class Modal extends Component<ModalState> {
         </svg>`,
         onClick: () => this.close(),
         onMouseEnter: (e) => {
-          (e.currentTarget as HTMLElement).style.color = 'var(--text, #d1d4dc)';
+          (e.currentTarget as HTMLElement).style.color = 'var(--tc-text, #d1d4dc)';
         },
         onMouseLeave: (e) => {
-          (e.currentTarget as HTMLElement).style.color = 'var(--text2, #787b86)';
+          (e.currentTarget as HTMLElement).style.color = 'var(--tc-text2, #787b86)';
         },
       });
       this.headerEl.appendChild(closeBtn);

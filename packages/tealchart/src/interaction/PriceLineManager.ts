@@ -918,6 +918,10 @@ export class PriceLineManager {
         dragRect.y(dragStartY);
 
         if (!this.dragCancelled && Math.abs(finalY - lineY) > 1) {
+          // Dragging translates the whole group for smooth motion. The next
+          // data-driven update must rebuild against the final price geometry
+          // instead of reusing that temporary group transform.
+          this.needsFullRebuild = true;
           this.options.onOrderMove?.(currentBound.lineId, finalPrice);
         } else {
           activeDrag.group.y(activeDrag.originalGroupY ?? 0);

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import type { EventManagerCallbacks } from './EventManager';
+import type { Viewport } from '../types';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -1066,6 +1067,50 @@ describe('EventManager drawing drag routing', () => {
     expect(onViewportChange).toHaveBeenCalledOnce();
     expect(onViewportChange).toHaveBeenCalledWith(clamped);
     expect(onRequestMoreBars).toHaveBeenCalledWith('left', { viewport: clamped });
+
+    manager.dispose();
+  });
+
+  it('scales web price-axis drags linearly in visual price density', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRaf = () => {
+      while (rafCallbacks.length > 0) {
+        rafCallbacks.shift()?.(0);
+      }
+    };
+
+    const container = createContainer();
+    const nextViewports: Viewport[] = [];
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getViewport: () => ({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 }),
+        getPaneAtY: () => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 556 }),
+        onViewportChange: (nextViewport) => {
+          nextViewports.push(nextViewport);
+        },
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 780, clientY: 100 }));
+    flushRaf();
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, button: 0, clientX: 780, clientY: 50 }));
+    flushRaf();
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, button: 0, clientX: 780, clientY: 0 }));
+    flushRaf();
+
+    expect(nextViewports).toHaveLength(2);
+
+    const startDensity = 556 / 100;
+    const firstDensity = 556 / (nextViewports[0].priceMax - nextViewports[0].priceMin);
+    const secondDensity = 556 / (nextViewports[1].priceMax - nextViewports[1].priceMin);
+
+    expect(firstDensity - startDensity).toBeCloseTo(startDensity * 0.25);
+    expect(secondDensity - firstDensity).toBeCloseTo(startDensity * 0.25);
 
     manager.dispose();
   });

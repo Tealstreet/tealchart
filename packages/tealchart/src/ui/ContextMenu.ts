@@ -34,8 +34,8 @@ export interface ContextMenuOptions {
 const styles = {
   menu: {
     position: 'fixed',
-    backgroundColor: 'var(--bg, #1e222d)',
-    border: '1px solid var(--border, #363a45)',
+    backgroundColor: 'var(--tc-bg, #1e222d)',
+    border: '1px solid var(--tc-border, #363a45)',
     borderRadius: '4px',
     padding: '4px 0',
     minWidth: '160px',
@@ -49,7 +49,7 @@ const styles = {
 
   menuItem: {
     padding: '8px 12px',
-    color: 'var(--text, #d1d4dc)',
+    color: 'var(--tc-text, #d1d4dc)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -58,7 +58,7 @@ const styles = {
   } as Partial<CSSStyleDeclaration>,
 
   menuItemHover: {
-    backgroundColor: 'var(--hover-bg, rgba(255, 255, 255, 0.05))',
+    backgroundColor: 'var(--tc-hover-bg, rgba(255, 255, 255, 0.05))',
   } as Partial<CSSStyleDeclaration>,
 
   menuItemDisabled: {
@@ -68,7 +68,7 @@ const styles = {
 
   divider: {
     height: '1px',
-    backgroundColor: 'var(--border, #363a45)',
+    backgroundColor: 'var(--tc-border, #363a45)',
     margin: '4px 0',
   } as Partial<CSSStyleDeclaration>,
 
@@ -90,14 +90,14 @@ const styles = {
 
   shortcut: {
     marginLeft: '16px',
-    color: 'var(--text3, #787b86)',
+    color: 'var(--tc-text3, #787b86)',
     fontSize: '11px',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,
 
   submenuArrow: {
     marginLeft: 'auto',
-    color: 'var(--text3, #787b86)',
+    color: 'var(--tc-text3, #787b86)',
     fontSize: '10px',
     flexShrink: '0',
   } as Partial<CSSStyleDeclaration>,

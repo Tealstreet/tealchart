@@ -9,6 +9,7 @@ import { PriceLineManager } from './PriceLineManager';
 
 interface PriceLineManagerProbe {
   cachedLineGroups: Map<string, Konva.Group>;
+  needsFullRebuild?: boolean;
   dispose: () => void;
 }
 
@@ -341,7 +342,10 @@ describe('PriceLineManager order dragging', () => {
     return handles[0];
   }
 
-  function withManager(run: (manager: PriceLineManager) => void): void {
+  function withManager(
+    run: (manager: PriceLineManager) => void,
+    options: Partial<ConstructorParameters<typeof PriceLineManager>[0]> = {},
+  ): void {
     stubCanvasContext();
     const container = createContainer();
     const stage = new Konva.Stage({ container, width: 800, height: 600 });
@@ -354,6 +358,7 @@ describe('PriceLineManager order dragging', () => {
       margins: { top: 0, right: 80, bottom: 0, left: 0 },
       priceToY: (price) => price,
       yToPrice: (y) => y,
+      ...options,
     });
 
     run(manager);
@@ -397,6 +402,37 @@ describe('PriceLineManager order dragging', () => {
 
       expect(manager.isDragging()).toBe(false);
     });
+  });
+
+  it('rebuilds after a moved order drag instead of reusing the translated drag group', () => {
+    const onOrderMove = vi.fn();
+
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+
+        const handle = dragHandle(manager);
+        const firstGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+        expect(firstGroup).toBeDefined();
+
+        handle.fire('dragstart');
+        handle.y(handle.y() + 24);
+        handle.fire('dragmove');
+        handle.fire('dragend');
+
+        expect(onOrderMove).toHaveBeenCalledWith('order-1', 124);
+        expect((manager as unknown as PriceLineManagerProbe).needsFullRebuild).toBe(true);
+
+        manager.update([{ ...draggableOrderBound(undefined), price: 124, originalY: 124, adjustedY: 124 }]);
+
+        const rebuiltGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+        expect(rebuiltGroup).toBeDefined();
+        expect(rebuiltGroup).not.toBe(firstGroup);
+        expect(rebuiltGroup?.y()).toBe(0);
+        expect(rebuiltGroup?.getAttr('lineY')).toBe(124);
+      },
+      { onOrderMove },
+    );
   });
 });
 
