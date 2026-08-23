@@ -777,6 +777,7 @@ export class ChartCore {
       },
       onMouseDown: () => this.options.onMouseDown?.(),
       onMouseUp: () => this.options.onMouseUp?.(),
+      onChartSurfaceClick: () => this.priceLineManager?.clearSelectedLine(),
       onContextMenu: (x, y, price, time) => this.handleContextMenu(x, y, price, time),
       onRender: () => this.scheduleRender(),
       onCrosshairRender: () => {

@@ -331,6 +331,30 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
+  it('clears selected trade-line visibility only on unclaimed chart-surface clicks', () => {
+    const container = createContainer();
+    const onChartSurfaceClick = vi.fn();
+    let overInteractive = true;
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        isOverInteractiveElement: () => overInteractive,
+        onChartSurfaceClick,
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 100, clientY: 100 }));
+    expect(onChartSurfaceClick).not.toHaveBeenCalled();
+
+    overInteractive = false;
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 120, clientY: 120 }));
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, button: 0, clientX: 120, clientY: 120 }));
+    expect(onChartSurfaceClick).toHaveBeenCalledTimes(1);
+
+    manager.dispose();
+  });
+
   // Chrome the crosshair draws follows the cursor, so standing down for it hides
   // the crosshair, which takes the chrome away, which brings both back next move
   // - a flip per mousemove. It stays interactive, so a press on it cannot start

@@ -272,6 +272,8 @@ export class PriceLineManager {
     originalX?: number;
     originalGroupY?: number;
     originalAbsoluteY?: number;
+    originalPointerX?: number;
+    originalPointerY?: number;
     originalPrice: number;
     startCenterX?: number;
     partialEnabled?: boolean;
@@ -289,6 +291,8 @@ export class PriceLineManager {
   private cachedLineGroups: Map<string, Konva.Group> = new Map();
   private lastLabelBoundsSignature: string = '';
   private needsFullRebuild: boolean = true;
+  private selectedLineId: string | null = null;
+  private hoveredLineIds: Set<string> = new Set();
 
   constructor(options: PriceLineManagerOptions) {
     this.layer = options.layer;
@@ -331,6 +335,19 @@ export class PriceLineManager {
       // Fast path: only update positions via priceToY transform
       this.updatePositions();
     }
+    this.pruneFloatingLineIds();
+    this.applyFloatingLineOrder();
+  }
+
+  selectLine(lineId: string | null): void {
+    if (this.selectedLineId === lineId) return;
+    this.selectedLineId = lineId;
+    this.pruneFloatingLineIds();
+    this.applyFloatingLineOrder();
+  }
+
+  clearSelectedLine(): void {
+    this.selectLine(null);
   }
 
   /**
@@ -417,6 +434,7 @@ export class PriceLineManager {
 
     // Update crosshair
     this.updateCrosshair();
+    this.applyFloatingLineOrder();
 
     this.layer.batchDraw();
   }
@@ -610,8 +628,64 @@ export class PriceLineManager {
 
     // Render crosshair vertical line
     this.updateCrosshair();
+    this.pruneFloatingLineIds();
+    this.applyFloatingLineOrder();
 
     this.layer.batchDraw();
+  }
+
+  private pruneFloatingLineIds(): void {
+    if (this.selectedLineId && !this.cachedLineGroups.has(this.selectedLineId)) {
+      this.selectedLineId = null;
+    }
+    for (const lineId of this.hoveredLineIds) {
+      if (!this.cachedLineGroups.has(lineId)) {
+        this.hoveredLineIds.delete(lineId);
+      }
+    }
+  }
+
+  private setHoveredLine(lineId: string, hovered: boolean): void {
+    const hadLine = this.hoveredLineIds.has(lineId);
+    if (hovered === hadLine) return;
+    if (hovered) {
+      this.hoveredLineIds.add(lineId);
+    } else {
+      this.hoveredLineIds.delete(lineId);
+    }
+    this.applyFloatingLineOrder();
+  }
+
+  private applyFloatingLineOrder(): void {
+    if (this.selectedLineId) {
+      this.cachedLineGroups.get(this.selectedLineId)?.moveToTop();
+    }
+    for (const lineId of this.hoveredLineIds) {
+      this.cachedLineGroups.get(lineId)?.moveToTop();
+    }
+    this.crosshairVertical?.moveToTop();
+    this.crosshairHorizontal?.moveToTop();
+    this.layer.batchDraw();
+  }
+
+  private getStagePointerPosition(node: Konva.Node): { x: number; y: number } | null {
+    return node.getStage()?.getPointerPosition() ?? null;
+  }
+
+  private bindLineSelectAndHover(node: Konva.Node, lineId: string): void {
+    node.on('mousedown touchstart', () => {
+      this.selectLine(lineId);
+    });
+    node.on('mouseenter', () => {
+      this.setHoveredLine(lineId, true);
+      this.options.onCursorChange?.('pointer');
+    });
+    node.on('mouseleave', () => {
+      this.setHoveredLine(lineId, false);
+      if (!this.activeDrag) {
+        this.options.onCursorChange?.('crosshair');
+      }
+    });
   }
 
   private renderPriceLine(bound: PriceLineLabelBounds): void {
@@ -818,9 +892,9 @@ export class PriceLineManager {
     }
 
     // Right line segment (from end of full chart label to price axis)
+    let rightLineStartX = chartLabelX + chartLabelWidth + 2;
+    let rightLineEndX = priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING;
     if (chartLabel && chartLabel.segments.length > 0) {
-      const rightLineStartX = chartLabelX + chartLabelWidth + 2;
-      const rightLineEndX = priceAxisLabelX - PRICE_AXIS_RIGHT_PADDING;
       if (rightLineEndX > rightLineStartX) {
         group.add(
           new Konva.Line({
@@ -831,6 +905,22 @@ export class PriceLineManager {
           }),
         );
       }
+    }
+
+    if (chartLabel && chartLabel.segments.length > 0) {
+      const lineHitRectX = Math.min(lineStartX, chartLabelX);
+      const lineHitRectRight = Math.max(rightLineEndX, chartLabelX + chartLabelWidth);
+      const lineHitRect = new Konva.Rect({
+        x: lineHitRectX,
+        y: lineY - 6,
+        width: Math.max(0, lineHitRectRight - lineHitRectX),
+        height: 12,
+        fill: 'rgba(0, 0, 0, 0.01)',
+        listening: true,
+      });
+      lineHitRect.setAttr('tealchartCursor', 'pointer');
+      this.bindLineSelectAndHover(lineHitRect, bound.lineId);
+      group.add(lineHitRect);
     }
 
     // Invisible drag handle for segments
@@ -858,6 +948,7 @@ export class PriceLineManager {
       dragRect.on('mousedown touchstart', () => {
         const currentBound = this.getCurrentBound(group, bound);
         if (currentBound.actionState?.isAwaitingCallback) return;
+        this.selectLine(currentBound.lineId);
         if (!this.activeDrag) {
           dragRect.startDrag();
         }
@@ -871,6 +962,7 @@ export class PriceLineManager {
           return;
         }
         dragStartY = dragRect.y();
+        const startPointer = this.getStagePointerPosition(dragRect);
         this.activeDrag = {
           node: dragRect,
           group,
@@ -879,6 +971,7 @@ export class PriceLineManager {
           originalY: lineY,
           originalGroupY: group.y(),
           originalAbsoluteY: dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2,
+          originalPointerY: startPointer?.y,
           originalPrice: currentBound.price,
         };
         this.dragCancelled = false;
@@ -892,7 +985,10 @@ export class PriceLineManager {
         if (!activeDrag || activeDrag.type !== 'order' || activeDrag.node !== dragRect || !activeDrag.group) return;
 
         const currentAbsoluteY = dragRect.getAbsolutePosition().y + TOUCH_TARGET_HEIGHT / 2;
-        const deltaY = currentAbsoluteY - (activeDrag.originalAbsoluteY ?? activeDrag.originalY);
+        const currentPointerY = this.getStagePointerPosition(dragRect)?.y;
+        const dragCurrentY = currentPointerY ?? currentAbsoluteY;
+        const dragStartYValue = activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? activeDrag.originalY;
+        const deltaY = dragCurrentY - dragStartYValue;
         activeDrag.group.y((activeDrag.originalGroupY ?? 0) + deltaY);
         const movingY = activeDrag.originalY + deltaY;
         activeDrag.group.setAttr('lineY', movingY);
@@ -936,12 +1032,7 @@ export class PriceLineManager {
         this.options.onCursorChange?.('crosshair');
       });
 
-      dragRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-      dragRect.on('mouseleave', () => {
-        if (!this.activeDrag) {
-          this.options.onCursorChange?.('crosshair');
-        }
-      });
+      this.bindLineSelectAndHover(dragRect, bound.lineId);
 
       group.add(dragRect);
     }
@@ -1097,6 +1188,7 @@ export class PriceLineManager {
           hitRect.on('mousedown touchstart', () => {
             const currentBound = this.getCurrentBound(group, bound);
             if (currentBound.actionState?.isAwaitingCallback) return;
+            this.selectLine(currentBound.lineId);
             if (!this.activeDrag) {
               hitRect.startDrag();
             }
@@ -1110,6 +1202,7 @@ export class PriceLineManager {
               return;
             }
             const startPosition = hitRect.getAbsolutePosition();
+            const startPointer = this.getStagePointerPosition(hitRect);
             this.activeDrag = {
               node: hitRect,
               type: 'tpsl',
@@ -1120,6 +1213,8 @@ export class PriceLineManager {
               originalY,
               originalPrice: currentBound.price,
               originalAbsoluteY: startPosition.y + LABEL_HEIGHT / 2,
+              originalPointerX: startPointer?.x,
+              originalPointerY: startPointer?.y,
               startCenterX: startPosition.x + buttonWidth / 2,
               partialEnabled: currentBound.partialEnabled ?? false,
               onCancel: () => {
@@ -1135,8 +1230,9 @@ export class PriceLineManager {
             if (!activeDrag || activeDrag.type !== 'tpsl' || activeDrag.node !== hitRect) return;
 
             const currentPosition = hitRect.getAbsolutePosition();
-            const currentCenterX = currentPosition.x + buttonWidth / 2;
-            const currentCenterY = currentPosition.y + LABEL_HEIGHT / 2;
+            const currentPointer = this.getStagePointerPosition(hitRect);
+            const currentCenterX = currentPointer?.x ?? currentPosition.x + buttonWidth / 2;
+            const currentCenterY = currentPointer?.y ?? currentPosition.y + LABEL_HEIGHT / 2;
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
@@ -1175,12 +1271,13 @@ export class PriceLineManager {
             }
 
             const currentPosition = hitRect.getAbsolutePosition();
-            const currentCenterX = currentPosition.x + buttonWidth / 2;
-            const currentCenterY = currentPosition.y + LABEL_HEIGHT / 2;
-            const deltaX = Math.abs(currentCenterX - (activeDrag.startCenterX ?? startCenterX));
-            const deltaY = Math.abs(
-              currentCenterY - (activeDrag.originalAbsoluteY ?? activeDrag.originalY + LABEL_HEIGHT / 2),
-            );
+            const currentPointer = this.getStagePointerPosition(hitRect);
+            const currentCenterX = currentPointer?.x ?? currentPosition.x + buttonWidth / 2;
+            const currentCenterY = currentPointer?.y ?? currentPosition.y + LABEL_HEIGHT / 2;
+            const dragStartX = activeDrag.originalPointerX ?? activeDrag.startCenterX ?? startCenterX;
+            const dragStartY = activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? activeDrag.originalY + LABEL_HEIGHT / 2;
+            const deltaX = Math.abs(currentCenterX - dragStartX);
+            const deltaY = Math.abs(currentCenterY - dragStartY);
             const price = yToPrice(currentCenterY);
             const currentBound = this.getCurrentBound(group, bound);
             const partialPercent = activeDrag.partialEnabled
@@ -1214,12 +1311,7 @@ export class PriceLineManager {
             this.options.onCursorChange?.('crosshair');
           });
 
-          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          hitRect.on('mouseleave', () => {
-            if (!this.activeDrag) {
-              this.options.onCursorChange?.('crosshair');
-            }
-          });
+          this.bindLineSelectAndHover(hitRect, bound.lineId);
 
           buttonGroup.add(hitRect);
           refs.buttonIcons.push(undefined);
@@ -1244,6 +1336,7 @@ export class PriceLineManager {
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
             const currentBound = this.getCurrentBound(group, bound);
+            this.selectLine(currentBound.lineId);
             // Unlike a drag, a cancel or close has nothing to supersede: the
             // action sits unconfirmed until the line leaves the feed, and a
             // second click would submit the same cancel again.
@@ -1255,8 +1348,7 @@ export class PriceLineManager {
             }
             this.options.onCursorChange?.('crosshair');
           });
-          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
+          this.bindLineSelectAndHover(hitRect, bound.lineId);
           buttonGroup.add(hitRect);
         } else if (button.type === 'reverse') {
           const icons = createReverseIcon(currentX, lineY, buttonWidth, button.iconColor);
@@ -1277,12 +1369,12 @@ export class PriceLineManager {
           hitRect.on('mousedown touchstart', (e) => {
             e.cancelBubble = true;
             const currentBound = this.getCurrentBound(group, bound);
+            this.selectLine(currentBound.lineId);
             if (currentBound.actionState?.isPending) return;
             this.options.onPositionReverse?.(currentBound.lineId);
             this.options.onCursorChange?.('crosshair');
           });
-          hitRect.on('mouseenter', () => this.options.onCursorChange?.('pointer'));
-          hitRect.on('mouseleave', () => this.options.onCursorChange?.('crosshair'));
+          this.bindLineSelectAndHover(hitRect, bound.lineId);
           buttonGroup.add(hitRect);
         } else {
           refs.buttonTexts.push(undefined);

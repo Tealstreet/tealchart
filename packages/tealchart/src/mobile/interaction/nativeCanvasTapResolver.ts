@@ -13,7 +13,7 @@ import type {
 import { isNativeCrosshairContextMenuButtonTap } from './nativeCrosshairContextMenu';
 import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
-import { canBeginNativeChartPan, findNativeTradeLineActionZone } from './nativeTradeLineHitTest';
+import { canBeginNativeChartPan, findNativeTradeLineActionZone, findNativeTradeLineRow } from './nativeTradeLineHitTest';
 
 /**
  * The single owner of a canvas tap.
@@ -44,6 +44,11 @@ export type NativeCanvasTapOutcome =
       objectType: NativeTradeLineObjectType;
       objectId: string;
       actionType: NativeTradeLineActionType;
+    }
+  | {
+      kind: 'tradeLineSelect';
+      objectType: NativeTradeLineObjectType;
+      objectId: string;
     }
   | { kind: 'crosshairContextMenu' }
   /**
@@ -148,6 +153,24 @@ export function resolveNativeCanvasTap(
   // The reveal strip is not a control zone; it is a frame-relative affordance
   // the crosshair has always yielded to.
   if (isNativeResetViewRevealTap(ctx.frame, point.x, point.y)) return { kind: 'none' };
+
+  if (ctx.chartInteractionEnabled) {
+    const tradeLineRow = findNativeTradeLineRow({
+      rows: ctx.tradeLineRows,
+      x: point.x,
+      y: point.y,
+      sharedViewport: ctx.sharedViewport,
+      frame: ctx.frame,
+      tradeLabelHeight: ctx.tradeLabelHeight,
+    });
+    if (tradeLineRow) {
+      return {
+        kind: 'tradeLineSelect',
+        objectType: tradeLineRow.objectType,
+        objectId: tradeLineRow.objectId,
+      };
+    }
+  }
 
   if (ctx.drawingTapEnabled) return { kind: 'drawingThenCrosshair' };
   if (!ctx.chartInteractionEnabled) return { kind: 'none' };
