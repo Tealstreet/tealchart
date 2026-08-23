@@ -70,7 +70,11 @@ import {
   resolveNativeResetViewButtonLayout,
   resolveNativeResetViewTapTarget,
 } from './mobile/interaction/nativeResetViewButton';
-import { findNativeOrderDragZone, findNativeTradeLineActionZone } from './mobile/interaction/nativeTradeLineHitTest';
+import {
+  findNativeOrderDragZone,
+  findNativeTradeLineActionZone,
+  findNativeTradeLineRow,
+} from './mobile/interaction/nativeTradeLineHitTest';
 import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nativeUserDrawingEditDragZones';
 import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
 import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
@@ -1619,6 +1623,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         }) ||
         findNativeOrderDragZone({
           zones: orderDragZones.value,
+          rows: tradeLineRows.value,
+          x,
+          y,
+          sharedViewport,
+          frame,
+          tradeLabelHeight: TRADE_LABEL_HEIGHT,
+        }) ||
+        findNativeTradeLineRow({
           rows: tradeLineRows.value,
           x,
           y,
