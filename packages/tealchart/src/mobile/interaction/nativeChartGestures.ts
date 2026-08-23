@@ -1,4 +1,4 @@
-import type { GestureType, SimultaneousGesture } from 'react-native-gesture-handler';
+import type { GestureType, LegacySimultaneousGesture } from 'react-native-gesture-handler';
 
 import { Gesture } from 'react-native-gesture-handler';
 
@@ -38,7 +38,7 @@ export function createNativeChartGesture({
   resetViewTapGesture,
   selectedDrawingActionTapGesture,
   timeScaleGesture,
-}: NativeChartGestureInput): SimultaneousGesture {
+}: NativeChartGestureInput): LegacySimultaneousGesture {
   // Canvas taps are owned by canvasTapGesture, which resolves the point once
   // and dispatches a single outcome. The gestures listed alongside it are drags,
   // pinches and chrome - none of them competes for a plain tap on the plot.

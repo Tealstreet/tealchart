@@ -50,7 +50,11 @@ NativeResetViewButtonOverlay.displayName = 'NativeResetViewButtonOverlay';
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
     zIndex: 30,
   },
   hitArea: {

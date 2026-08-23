@@ -1,4 +1,4 @@
-import type { GestureType, SimultaneousGesture } from 'react-native-gesture-handler';
+import type { GestureType, LegacySimultaneousGesture } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativePaneDividerBand, NativePaneHeight } from './nativePaneDivider';
@@ -117,7 +117,7 @@ export interface NativeChartGestureRuntimeInput {
 }
 
 export interface NativeChartGestureRuntime {
-  nativeChartGesture: SimultaneousGesture;
+  nativeChartGesture: LegacySimultaneousGesture;
 }
 
 export function resolveNativeCrosshairInteractionFrame({

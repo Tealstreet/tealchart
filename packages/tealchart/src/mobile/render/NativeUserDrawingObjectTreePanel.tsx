@@ -15,6 +15,7 @@ import {
   USER_DRAWING_OBJECT_TREE_RENDERED_ROW_ACTIONS,
 } from '../../drawings';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
+import { NativeFloatingOverlay } from './NativeFloatingOverlay';
 
 export interface NativeUserDrawingObjectTreePanelProps {
   backgroundColor: string;
@@ -111,13 +112,13 @@ export function NativeUserDrawingObjectTreePanelView({
   const sections = resolveNativeUserDrawingObjectTreeSections(model);
 
   return (
-    <View pointerEvents="auto" style={styles.root}>
-      <Pressable
-        accessibilityLabel="Close drawing object tree"
-        accessibilityRole="button"
-        onPress={onClose}
-        style={styles.backdrop}
-      />
+    <NativeFloatingOverlay
+      backdropAccessibilityLabel="Close drawing object tree"
+      backdropColor="rgba(0,0,0,0.18)"
+      contentContainerStyle={styles.root}
+      onRequestClose={onClose}
+      visible
+    >
       <View style={[styles.surface, { backgroundColor, borderColor: gridColor }]}>
         <View style={[styles.header, { borderBottomColor: gridColor }]}>
           <Text style={[styles.title, { color: textColor }]}>{`Drawings (${model.drawingCount})`}</Text>
@@ -234,7 +235,7 @@ export function NativeUserDrawingObjectTreePanelView({
           </ScrollView>
         )}
       </View>
-    </View>
+    </NativeFloatingOverlay>
   );
 }
 
@@ -273,10 +274,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     paddingVertical: 6,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.18)',
   },
   empty: {
     fontSize: 12,
@@ -317,10 +314,14 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   root: {
-    ...StyleSheet.absoluteFillObject,
+    bottom: 0,
     justifyContent: 'flex-start',
+    left: 0,
     paddingHorizontal: 12,
     paddingTop: 42,
+    position: 'absolute',
+    right: 0,
+    top: 0,
     zIndex: 40,
   },
   row: {

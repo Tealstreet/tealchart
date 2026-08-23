@@ -1,5 +1,5 @@
 import type { SharedValue } from 'react-native-reanimated';
-import type { GestureStateManager } from 'react-native-gesture-handler';
+import type { LegacyGestureStateManager as GestureStateManager } from 'react-native-gesture-handler';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type {
