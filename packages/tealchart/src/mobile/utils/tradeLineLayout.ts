@@ -704,7 +704,18 @@ export function buildNativeTradeLineGeometries(
 }
 
 export function createNativeOrderDragZones(geometries: readonly NativeTradeLineGeometry[]): NativeOrderDragZone[] {
-  return geometries.flatMap((geometry) => (geometry.dragZone ? [geometry.dragZone] : []));
+  return geometries.flatMap((geometry) =>
+    geometry.dragZone
+      ? [
+          {
+            objectId: geometry.dragZone.objectId,
+            price: geometry.dragZone.price,
+            x1: geometry.leftLineStartX,
+            x2: geometry.priceLabelX + geometry.priceLabelWidth,
+          },
+        ]
+      : [],
+  );
 }
 
 export function createNativeTradeLineRows(geometries: readonly NativeTradeLineGeometry[]): NativeTradeLineRow[] {
@@ -712,7 +723,7 @@ export function createNativeTradeLineRows(geometries: readonly NativeTradeLineGe
     objectType: geometry.objectType,
     objectId: geometry.objectId,
     price: geometry.price,
-    x1: geometry.labelX,
+    x1: geometry.leftLineStartX,
     x2: geometry.priceLabelX + geometry.priceLabelWidth,
   }));
 }

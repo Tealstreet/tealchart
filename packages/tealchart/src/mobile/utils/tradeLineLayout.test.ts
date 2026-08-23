@@ -647,8 +647,8 @@ describe('native trade line layout', () => {
     );
 
     expect(createNativeTradeLineRows(geometries)).toEqual([
-      { objectId: 'order-a', objectType: 'order', price: 100 },
-      { objectId: 'position-b', objectType: 'position', price: 101 },
+      { objectId: 'order-a', objectType: 'order', price: 100, x1: 54, x2: 384 },
+      { objectId: 'position-b', objectType: 'position', price: 101, x1: 54, x2: 384 },
     ]);
   });
 });

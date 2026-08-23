@@ -50,7 +50,14 @@ function areNativeTradeLineRowsEqual(left: readonly NativeTradeLineRow[], right:
   if (left.length !== right.length) return false;
   return left.every((row, index) => {
     const other = right[index];
-    return other && row.objectType === other.objectType && row.objectId === other.objectId && row.price === other.price;
+    return (
+      other &&
+      row.objectType === other.objectType &&
+      row.objectId === other.objectId &&
+      row.price === other.price &&
+      row.x1 === other.x1 &&
+      row.x2 === other.x2
+    );
   });
 }
 
