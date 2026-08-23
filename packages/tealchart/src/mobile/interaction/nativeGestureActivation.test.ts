@@ -1448,6 +1448,42 @@ describe('native gesture activation', () => {
     expect(commitOrderMove).toHaveBeenCalledWith('order-1', expect.any(Number));
   });
 
+  it('selects row-only order touches without starting an order move', () => {
+    const viewport = sharedViewport(viewportValue);
+    const centerY = 88;
+    const price =
+      viewportValue.priceMax -
+      ((centerY - frame.mainPane.top) / frame.mainPane.height) * (viewportValue.priceMax - viewportValue.priceMin);
+    const tradeLineRows = shared([{ objectType: 'order' as const, objectId: 'order-1', price, x1: 20, x2: 220 }]);
+    const orderDragZones = shared([{ objectId: 'order-1', price, x1: 40, x2: 120 }]);
+    const tradeLineActionZones = shared([]);
+    const commitOrderMove = vi.fn();
+    const onSelectTradeLine = vi.fn();
+    const orderDragState = createOrderDragState();
+    const orderDragGesture = createNativeOrderDragGesture({
+      commitOrderMove,
+      frame,
+      onSelectTradeLine,
+      orderDragState,
+      orderDragZones,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones,
+      tradeLineRows,
+    }) as any;
+
+    const rowOnly = mockStateManager();
+    orderDragGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 180, y: centerY }], allTouches: [{ x: 180, y: centerY }] },
+      rowOnly,
+    );
+
+    expect(onSelectTradeLine).toHaveBeenCalledWith('order', 'order-1');
+    expect(rowOnly.failed).toBe(true);
+    expect(orderDragState.active.value).toBe(false);
+    expect(commitOrderMove).not.toHaveBeenCalled();
+  });
+
   it('does not clear bracket drag state from a TP or SL tap without pan begin', () => {
     const viewport = sharedViewport(viewportValue);
     const centerY = 88;

@@ -167,4 +167,66 @@ describe('NativeChartTradeLinesLayer', () => {
     expect(rendered[2].props.dragState).toBeUndefined();
     expect(rendered[3].props.dragState).toBe(bracketDragState);
   });
+
+  it('draws trade lines in promoted geometry order', () => {
+    const axisFont = matchFont({ fontSize: 11 });
+    const textFont = matchFont({ fontSize: 11 });
+    const smallFont = matchFont({ fontSize: 10 });
+    const orderDragState: NativeOrderDragSharedValues = {
+      activeObjectId: shared(''),
+      activePrice: shared(0),
+    };
+    const bracketDragState: NativeBracketDragSharedValues = {
+      activeObjectId: shared(''),
+      activeObjectType: shared(''),
+      activeBracketType: shared(''),
+      activePrice: shared(0),
+      activeEntryPrice: shared(0),
+      activeDragStartX: shared(0),
+      activeDragCurrentX: shared(0),
+      activeDragStartY: shared(0),
+      activeDragCurrentY: shared(0),
+      activePositionNotional: shared(0),
+      activePositionIsLong: shared(true),
+      activePartialPercent: shared(100),
+      activePartialEnabled: shared(false),
+      activeColor: shared(''),
+    };
+    const orderLine = { id: 'generated-order', orderId: 'exchange-order', price: 63500 } as OrderLineRenderData;
+    const positionLine = {
+      id: 'generated-position',
+      positionId: 'position-btc',
+      price: 63777,
+    } as PositionLineRenderData;
+
+    const layer = NativeChartTradeLinesLayerImpl({
+      axisFont,
+      bracketDragState,
+      extraPriceLines: [],
+      frame,
+      getOrderObjectId: (line) => line.orderId ?? line.id,
+      getPositionObjectId: (line) => line.positionId ?? line.id,
+      lineSnapshot: {
+        orderLines: [orderLine],
+        positionLines: [positionLine],
+      },
+      nowMs: shared(0),
+      orderDragState,
+      pricePrecision: 0.1,
+      resolvedPriceAxisTags: shared([]),
+      sharedViewport,
+      smallFont,
+      textFont,
+      tradeLabelHeight: 18,
+      tradeLineGeometries: [createGeometry('position', 'position-btc'), createGeometry('order', 'exchange-order')],
+    });
+    const rendered: ReactElement[] = [];
+    walkElements(layer, (element) => {
+      if (element.type === AnimatedTradeLine) {
+        rendered.push(element);
+      }
+    });
+
+    expect(rendered.map((element) => element.props.geometry.objectId)).toEqual(['position-btc', 'exchange-order']);
+  });
 });

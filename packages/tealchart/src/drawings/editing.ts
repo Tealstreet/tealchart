@@ -205,7 +205,6 @@ function moveDrawing(drawing: UserDrawing, delta: AnchorDelta, space: DrawingCoo
     case 'parallelChannel':
     case 'flatTopBottom':
     case 'projection':
-    case 'sector':
     case 'longPosition':
     case 'shortPosition':
     case 'barsPattern':

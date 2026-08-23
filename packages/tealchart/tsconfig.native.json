@@ -18,5 +18,5 @@
     "src/events/**/*.ts",
     "src/debug/**/*.ts"
   ],
-  "exclude": ["**/node_modules", "**/.*/*", "dist"]
+  "exclude": ["**/node_modules", "**/.*/*", "dist", "src/mobile/**/*.test.ts", "src/mobile/**/*.test.tsx"]
 }

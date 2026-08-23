@@ -7,7 +7,7 @@ import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
 import { TealchartRenderer } from './TealchartRenderer';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
-import { TIME_AXIS_HEIGHT } from './types';
+import { PRICE_AXIS_RIGHT_PADDING, TIME_AXIS_HEIGHT } from './types';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -687,10 +687,11 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const trackY = renderer.publicPriceToY(120, viewport);
+      const labelWidth = '120'.length * 7 + 8;
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
-      expect(roundRect).toHaveBeenCalledWith(opts.width - opts.margins.right + 2, trackY - 8, expect.any(Number), 16, 2);
+      expect(roundRect).toHaveBeenCalledWith(opts.width - labelWidth - PRICE_AXIS_RIGHT_PADDING, trackY - 8, labelWidth, 16, 2);
       expect(fillText).toHaveBeenCalledWith('120', expect.any(Number), trackY);
       expect(ctx.strokeStyle).toBe('#333333');
     });

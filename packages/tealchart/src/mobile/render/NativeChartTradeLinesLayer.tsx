@@ -73,40 +73,34 @@ export function NativeChartTradeLinesLayerImpl({
         />
       ))}
 
-      {lineSnapshot.orderLines.map((line) => {
-        const objectId = getOrderObjectId(line);
-        const geometry = tradeLineGeometries.find(
-          (candidate) => candidate.objectType === 'order' && candidate.objectId === objectId,
-        );
-        if (!geometry) return null;
-        return (
-          <AnimatedTradeLine
-            key={`order-${objectId}`}
-            axisFont={axisFont}
-            dragState={orderDragState}
-            frame={frame}
-            geometry={geometry}
-            line={line}
-            pricePrecision={pricePrecision}
-            resolvedPriceAxisTags={resolvedPriceAxisTags}
-            sharedViewport={sharedViewport}
-            smallFont={smallFont}
-            staticProjection={staticProjection}
-            textFont={textFont}
-            tradeLabelHeight={tradeLabelHeight}
-          />
-        );
-      })}
+      {tradeLineGeometries.map((geometry) => {
+        if (geometry.objectType === 'order') {
+          const line = lineSnapshot.orderLines.find((candidate) => getOrderObjectId(candidate) === geometry.objectId);
+          if (!line) return null;
+          return (
+            <AnimatedTradeLine
+              key={`order-${geometry.objectId}`}
+              axisFont={axisFont}
+              dragState={orderDragState}
+              frame={frame}
+              geometry={geometry}
+              line={line}
+              pricePrecision={pricePrecision}
+              resolvedPriceAxisTags={resolvedPriceAxisTags}
+              sharedViewport={sharedViewport}
+              smallFont={smallFont}
+              staticProjection={staticProjection}
+              textFont={textFont}
+              tradeLabelHeight={tradeLabelHeight}
+            />
+          );
+        }
 
-      {lineSnapshot.positionLines.map((line) => {
-        const objectId = getPositionObjectId(line);
-        const geometry = tradeLineGeometries.find(
-          (candidate) => candidate.objectType === 'position' && candidate.objectId === objectId,
-        );
-        if (!geometry) return null;
+        const line = lineSnapshot.positionLines.find((candidate) => getPositionObjectId(candidate) === geometry.objectId);
+        if (!line) return null;
         return (
           <AnimatedTradeLine
-            key={`position-${objectId}`}
+            key={`position-${geometry.objectId}`}
             axisFont={axisFont}
             frame={frame}
             geometry={geometry}
