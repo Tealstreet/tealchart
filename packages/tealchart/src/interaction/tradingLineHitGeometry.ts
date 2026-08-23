@@ -15,6 +15,8 @@ export interface TradingLineRowHitRect {
   y: number;
 }
 
+const MOUSE_POINTER_TIP_VERTICAL_BIAS = 20;
+
 export function resolveTradingLineRowHitRect({
   chartLabelWidth,
   chartLabelX,
@@ -26,7 +28,7 @@ export function resolveTradingLineRowHitRect({
 }: TradingLineRowHitRectInput): TradingLineRowHitRect {
   const x = Math.min(lineStartX, chartLabelX);
   const right = Math.max(rightLineEndX, chartLabelX + chartLabelWidth);
-  const topBias = interactionKind === 'mouseHover' ? labelHeight / 2 : 0;
+  const topBias = interactionKind === 'mouseHover' ? MOUSE_POINTER_TIP_VERTICAL_BIAS : 0;
   return {
     x,
     y: lineY - labelHeight / 2 - topBias,
