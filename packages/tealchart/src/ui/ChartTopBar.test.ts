@@ -107,10 +107,19 @@ describe('ChartTopBar drawing toolbar', () => {
     expect(topBar.getElement().textContent).toContain('2h');
     expect(topBar.getElement().textContent).not.toContain('6h');
 
-    document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]')?.click();
+    const intervalButton = document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]');
+    expect(intervalButton?.getAttribute('aria-expanded')).toBe('false');
+    const closedIcon = intervalButton?.querySelector('svg');
+    expect(closedIcon?.getAttribute('width')).toBe('13');
+    expect(closedIcon?.style.transform).toBe('rotate(0deg)');
+
+    intervalButton?.click();
     const dropdown = document.querySelector<HTMLElement>('[role="menu"]');
 
     expect(dropdown).not.toBeNull();
+    const openIntervalButton = document.querySelector<HTMLButtonElement>('button[aria-label="Select interval"]');
+    expect(openIntervalButton?.getAttribute('aria-expanded')).toBe('true');
+    expect(openIntervalButton?.querySelector('svg')?.style.transform).toBe('rotate(180deg)');
     expect(dropdown?.textContent).toContain('Add custom interval...');
     expect(dropdown?.textContent).toContain('Minutes');
     expect(dropdown?.textContent).toContain('Hours');

@@ -6,6 +6,7 @@ import type { NativeFloatingAnchor } from './NativeFloatingOverlay';
 import React from 'react';
 
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { TIMEFRAME_GROUPS } from '../../state/chartState';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
@@ -62,6 +63,10 @@ export function NativeTopBarOverlayImpl({
   const [timeframeMenuOpen, setTimeframeMenuOpen] = React.useState(false);
   const [timeframeMenuAnchor, setTimeframeMenuAnchor] = React.useState<NativeFloatingAnchor | null>(null);
   const timeframeMenuButtonRef = React.useRef<TimeframeMenuMeasurer | null>(null);
+  const timeframeMenuProgress = useSharedValue(0);
+  const timeframeMenuIconStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${timeframeMenuProgress.value * 180}deg` }],
+  }));
   const favoriteTimeframeSet = React.useMemo(() => new Set(favoriteTimeframeValues), [favoriteTimeframeValues]);
   const groupedMenuTimeframes = React.useMemo(
     () =>
@@ -75,6 +80,13 @@ export function NativeTopBarOverlayImpl({
   const menuMinWidth = 228;
   const fallbackMenuLeft = Math.max(8, topBarLayout.width - menuPreferredWidth - 8);
   const fallbackMenuTop = topBarLayout.height + 4;
+  React.useEffect(() => {
+    timeframeMenuProgress.value = withTiming(timeframeMenuOpen ? 1 : 0, {
+      duration: 150,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [timeframeMenuOpen, timeframeMenuProgress]);
+
   const handleButtonPress = React.useCallback(
     (button: NativeTopBarButtonGeometry) => {
       if (button.type === 'timeframeMenu') {
@@ -230,14 +242,18 @@ export function NativeTopBarOverlayImpl({
                     },
                   ]}
                 >
-                  {icon && (
+                  {icon && button.type === 'timeframeMenu' ? (
+                    <Animated.View pointerEvents="none" style={timeframeMenuIconStyle}>
+                      <NativeDrawingIcon name={icon} size={12} color={button.textColor} strokeWidth={2.2} />
+                    </Animated.View>
+                  ) : icon ? (
                     <NativeDrawingIcon
                       name={icon}
                       size={button.type === 'indicators' ? 18 : 19}
                       color={button.textColor}
                       strokeWidth={button.type === 'indicators' ? 1.7 : 1.9}
                     />
-                  )}
+                  ) : null}
                   {button.type !== 'undo' && button.type !== 'redo' && button.type !== 'timeframeMenu' && (
                     <Text
                       numberOfLines={1}
