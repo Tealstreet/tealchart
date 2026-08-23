@@ -24,6 +24,8 @@ export interface NativeCrosshairContextMenuState {
   items: ContextMenuItem[];
   /** Set instead of `items` when the host renders the menu itself. */
   content?: ReactNode;
+  contentHeight?: number;
+  contentWidth?: number;
 }
 
 export interface NativeContextMenuOverlayLayout {
@@ -153,8 +155,8 @@ export function NativeCrosshairContextMenuOverlayImpl({
     ? resolveNativeHostContentPlacement({
         anchorX: menu.anchorX,
         anchorY: menu.anchorY,
-        contentHeight: hostContentSize?.height,
-        contentWidth: hostContentSize?.width,
+        contentHeight: hostContentSize?.height ?? menu.contentHeight,
+        contentWidth: hostContentSize?.width ?? menu.contentWidth,
         dimensions,
       })
     : null;

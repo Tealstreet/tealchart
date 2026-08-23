@@ -663,6 +663,7 @@ export type {
   ContextMenuItem,
   ContextMenuCallback,
   ContextMenuRenderContext,
+  NativeContextMenuRenderResult,
   ITimeScaleApi,
   // Order/Position line types
   ExecutionDirection,

@@ -30,6 +30,7 @@ import type {
   ContextMenuCallback,
   ContextMenuRenderContext,
   IBasicDataFeed,
+  NativeContextMenuRenderResult,
   PriceLine,
   RenderOptions,
   ResolutionString,
@@ -200,7 +201,7 @@ export interface SkiaTealchartProps {
    * inside it. What it returns is captured at the tap and held until the menu
    * closes, so anything live inside it has to subscribe for itself.
    */
-  renderContextMenu?: (context: ContextMenuRenderContext) => ReactNode;
+  renderContextMenu?: (context: ContextMenuRenderContext) => ReactNode | NativeContextMenuRenderResult;
   /** Called when anything but the host dismisses a host-rendered menu. */
   onContextMenuClose?: () => void;
   onViewportChange?: (viewport: Viewport) => void;
@@ -211,6 +212,14 @@ export interface SkiaTealchartProps {
   onUserDrawingCommand?: UserDrawingCommandEventListener;
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   resizeFreeze?: boolean;
+}
+
+function resolveNativeContextMenuRenderResult(
+  value: ReactNode | NativeContextMenuRenderResult | null | undefined,
+): NativeContextMenuRenderResult | null {
+  if (!value) return null;
+  if (typeof value === 'object' && 'content' in value) return value as NativeContextMenuRenderResult;
+  return { content: value };
 }
 
 export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>(function SkiaTealchart(
@@ -991,17 +1000,26 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, [crosshair, onContextMenuClose]);
   const handleNativeContextMenuTap = useCallback(
     (time: number, price: number, anchorX: number, anchorY: number) => {
-      const content = renderContextMenu?.({
-        anchorX,
-        anchorY,
-        close: closeNativeContextMenu,
-        price,
-        unixTime: time,
-        viewportHeight: contextMenuViewportHeight,
-        viewportWidth: contextMenuViewportWidth,
-      });
-      if (content) {
-        setNativeContextMenu({ anchorX, anchorY, content, items: [] });
+      const hostMenu = resolveNativeContextMenuRenderResult(
+        renderContextMenu?.({
+          anchorX,
+          anchorY,
+          close: closeNativeContextMenu,
+          price,
+          unixTime: time,
+          viewportHeight: contextMenuViewportHeight,
+          viewportWidth: contextMenuViewportWidth,
+        }),
+      );
+      if (hostMenu) {
+        setNativeContextMenu({
+          anchorX,
+          anchorY,
+          content: hostMenu.content,
+          contentHeight: hostMenu.height,
+          contentWidth: hostMenu.width,
+          items: [],
+        });
         return;
       }
       const items = activeContextMenu?.(time, price) ?? [];
