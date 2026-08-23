@@ -4,10 +4,28 @@ import type { NativeTopBarActionCommand, NativeTopBarButtonGeometry, NativeTopBa
 
 import React from 'react';
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { TIMEFRAME_GROUPS } from '../../state/chartState';
 import { NativeDrawingIcon } from './NativeDrawingIcon';
+
+interface TimeframeMenuAnchor {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+}
+
+interface TimeframeMenuMeasurer {
+  measureInWindow: (callback: (x: number, y: number, width: number, height: number) => void) => void;
+}
+
+function getWindowDimensionsFallback(topBarWidth: number): { height: number; width: number } {
+  const measured = (
+    Dimensions as { get?: (dimension: 'window') => { height: number; width: number } } | undefined
+  )?.get?.('window');
+  return measured ?? { height: 844, width: topBarWidth };
+}
 
 export interface NativeTopBarOverlayProps {
   backgroundColor: string;
@@ -50,6 +68,8 @@ export function NativeTopBarOverlayImpl({
   topBarLayout,
 }: NativeTopBarOverlayProps) {
   const [timeframeMenuOpen, setTimeframeMenuOpen] = React.useState(false);
+  const [timeframeMenuAnchor, setTimeframeMenuAnchor] = React.useState<TimeframeMenuAnchor | null>(null);
+  const timeframeMenuButtonRef = React.useRef<TimeframeMenuMeasurer | null>(null);
   const favoriteTimeframeSet = React.useMemo(() => new Set(favoriteTimeframeValues), [favoriteTimeframeValues]);
   const groupedMenuTimeframes = React.useMemo(
     () =>
@@ -59,17 +79,37 @@ export function NativeTopBarOverlayImpl({
       })).filter((entry) => entry.timeframes.length > 0),
     [menuTimeframes],
   );
-  const menuLeft = Math.max(8, Math.min(topBarLayout.scrollAreaX, Math.max(8, topBarLayout.width - 292)));
-  const menuWidth = Math.min(292, Math.max(228, topBarLayout.width - menuLeft - 8));
+  const windowDimensions = getWindowDimensionsFallback(topBarLayout.width);
+  const menuWidth = Math.min(292, Math.max(228, windowDimensions.width - 16));
+  const fallbackMenuLeft = Math.max(8, Math.min(topBarLayout.scrollAreaX, Math.max(8, topBarLayout.width - menuWidth)));
+  const anchorMenuLeft = timeframeMenuAnchor
+    ? timeframeMenuAnchor.x + timeframeMenuAnchor.width - menuWidth
+    : fallbackMenuLeft;
+  const menuLeft = Math.max(8, Math.min(anchorMenuLeft, windowDimensions.width - menuWidth - 8));
+  const menuTop = Math.max(8, (timeframeMenuAnchor?.y ?? 0) + (timeframeMenuAnchor?.height ?? topBarLayout.height) + 4);
+  const menuMaxHeight = Math.min(420, Math.max(180, windowDimensions.height - menuTop - 8));
   const handleButtonPress = React.useCallback(
     (button: NativeTopBarButtonGeometry) => {
       if (button.type === 'timeframeMenu') {
-        setTimeframeMenuOpen((open) => !open);
+        if (timeframeMenuOpen) {
+          setTimeframeMenuOpen(false);
+          return;
+        }
+        const buttonRef = timeframeMenuButtonRef.current;
+        if (buttonRef && typeof buttonRef.measureInWindow === 'function') {
+          buttonRef.measureInWindow((x, y, width, height) => {
+            setTimeframeMenuAnchor({ x, y, width, height });
+            setTimeframeMenuOpen(true);
+          });
+          return;
+        }
+        setTimeframeMenuAnchor(null);
+        setTimeframeMenuOpen(true);
         return;
       }
       onAction(button);
     },
-    [onAction],
+    [onAction, timeframeMenuOpen],
   );
   const handleMenuTimeframePress = React.useCallback(
     (timeframe: TimeframeOption) => {
@@ -179,6 +219,13 @@ export function NativeTopBarOverlayImpl({
               return (
                 <Pressable
                   key={`native-top-bar-button-${button.type}-${button.interval ?? button.text}-${button.x}`}
+                  ref={
+                    button.type === 'timeframeMenu'
+                      ? (node) => {
+                          timeframeMenuButtonRef.current = node as TimeframeMenuMeasurer | null;
+                        }
+                      : undefined
+                  }
                   accessibilityLabel={accessibilityLabelForButton(button)}
                   accessibilityRole="button"
                   disabled={!button.enabled}
@@ -229,17 +276,12 @@ export function NativeTopBarOverlayImpl({
         </ScrollView>
       </View>
       {timeframeMenuOpen ? (
-        <>
+        <Modal animationType="none" transparent visible onRequestClose={() => setTimeframeMenuOpen(false)}>
           <Pressable
             accessibilityLabel="Close timeframe selector"
             accessibilityRole="button"
             onPress={() => setTimeframeMenuOpen(false)}
-            style={[
-              styles.timeframeMenuBackdrop,
-              {
-                top: topBarLayout.height,
-              },
-            ]}
+            style={styles.timeframeMenuBackdrop}
           />
           <View
             pointerEvents="auto"
@@ -249,12 +291,13 @@ export function NativeTopBarOverlayImpl({
                 backgroundColor,
                 borderColor: gridColor,
                 left: menuLeft,
-                top: topBarLayout.height + 4,
+                maxHeight: menuMaxHeight,
+                top: menuTop,
                 width: menuWidth,
               },
             ]}
           >
-            <ScrollView bounces={false} showsVerticalScrollIndicator={false} style={styles.timeframeMenuScroll}>
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false} style={{ maxHeight: menuMaxHeight }}>
               {groupedMenuTimeframes.map(({ group, timeframes }) => (
                 <View key={group.value}>
                   <Text style={[styles.timeframeMenuGroupLabel, { color: mutedTextColor }]}>{group.label}</Text>
@@ -313,7 +356,7 @@ export function NativeTopBarOverlayImpl({
               ))}
             </ScrollView>
           </View>
-        </>
+        </Modal>
       ) : null}
     </View>
   );
@@ -395,11 +438,11 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
     right: 0,
+    top: 0,
   },
   timeframeMenu: {
     borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
-    maxHeight: 420,
     overflow: 'hidden',
     position: 'absolute',
   },
@@ -426,8 +469,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     minHeight: 38,
-  },
-  timeframeMenuScroll: {
-    maxHeight: 420,
   },
 });
