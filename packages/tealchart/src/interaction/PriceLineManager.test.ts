@@ -476,6 +476,25 @@ describe('PriceLineManager order dragging', () => {
     });
   });
 
+  it('keeps the active dragged trade line above overlapping trade lines', () => {
+    withManager((manager) => {
+      manager.update([
+        { ...draggableOrderBound(undefined), lineId: 'order-1' },
+        { ...draggableOrderBound(undefined), lineId: 'order-2' },
+      ]);
+
+      const firstGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+      const secondGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-2');
+      const handle = dragHandle(manager);
+
+      expect(firstGroup).toBeDefined();
+      expect(secondGroup).toBeDefined();
+      handle.fire('dragstart');
+
+      expect(firstGroup!.getZIndex()).toBeGreaterThan(secondGroup!.getZIndex());
+    });
+  });
+
   it('hovers the nearest overlapping trade line instead of the topmost hit rect', () => {
     withManager((manager) => {
       manager.update([

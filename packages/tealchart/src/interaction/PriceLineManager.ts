@@ -795,6 +795,9 @@ export class PriceLineManager {
     for (const lineId of this.hoveredLineIds) {
       this.cachedLineGroups.get(lineId)?.moveToTop();
     }
+    if (this.activeDrag?.lineId) {
+      this.cachedLineGroups.get(this.activeDrag.lineId)?.moveToTop();
+    }
     this.crosshairVertical?.moveToTop();
     this.crosshairHorizontal?.moveToTop();
     this.layer.batchDraw();
@@ -1090,6 +1093,8 @@ export class PriceLineManager {
           originalPrice: currentBound.price,
         };
         this.dragCancelled = false;
+        this.selectLine(currentBound.lineId);
+        this.applyFloatingLineOrder();
         this.options.onCursorChange?.('grabbing');
       });
 
@@ -1110,6 +1115,7 @@ export class PriceLineManager {
         dragRect.y(dragStartY);
         const currentBound = this.getCurrentBound(activeDrag.group, bound);
         this.options.onOrderMoving?.(currentBound.lineId, yToPrice(movingY));
+        this.applyFloatingLineOrder();
         this.layer.batchDraw();
       });
 
