@@ -64,7 +64,7 @@ vi.mock('../interaction/EventManager', () => ({
  * Stub canvas.getContext('2d') so ChartCore can construct in jsdom.
  * Returns a minimal mock that satisfies WebCanvasContext → TealchartRenderer.
  */
-function stubCanvasContext(): void {
+function stubCanvasContext(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   const mockCtx = {
     canvas: { width: 800, height: 600 },
     font: '',
@@ -101,10 +101,12 @@ function stubCanvasContext(): void {
     scale: () => {},
     translate: () => {},
     rotate: () => {},
+    ...overrides,
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLCanvasElement.prototype.getContext = (() => mockCtx) as any;
+  return mockCtx;
 }
 
 function makeBars(count: number, startTime = 1_000_000, interval = 60_000, basePrice = 50_000): Bar[] {
@@ -1908,6 +1910,29 @@ describe('ChartCore viewport management', () => {
     expect(highPriceBounds).not.toBeNull();
     expect(lowPriceBounds).not.toBeNull();
     expect(lowPriceBounds?.x).toBe(highPriceBounds?.x);
+
+    core.dispose();
+  });
+
+  it('renders the crosshair price-axis label with grouped thousands', async () => {
+    const fillText = vi.fn();
+    stubCanvasContext({ fillText });
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+      renderOptions: { pricePrecision: 0.1 },
+    });
+
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 69000, priceMax: 73000 });
+
+    const eventManager = eventManagerInstances[0];
+    eventManager.callbacks.onCrossHairMoved?.(700, 250);
+    eventManager.callbacks.onCrosshairRender?.();
+
+    expect(fillText.mock.calls.some((call) => String(call[0]).match(/^\d{2},\d{3}\.\d$/))).toBe(true);
 
     core.dispose();
   });
