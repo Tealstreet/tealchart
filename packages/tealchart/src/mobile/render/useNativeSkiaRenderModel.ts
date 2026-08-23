@@ -20,9 +20,10 @@ import type { NativeChartProjection } from './nativeProjection';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
 import { useMemo } from 'react';
+
 import { useDerivedValue } from 'react-native-reanimated';
 
-import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
+import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions } from '../../state/chartState';
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
 import { createNativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import { createNativeBracketPriceLines } from '../utils/nativeBracketPriceLines';
@@ -124,14 +125,18 @@ export function useNativeSkiaRenderModel({
   const priceTickSize = useMemo(() => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision), [pricePrecision]);
   const nativeMutedTextColor = useMemo(() => getNativeMutedTextColor(options.textColor), [options.textColor]);
   const selectedTopBarInterval = topBarInterval ?? interval;
+  const nativeTopBarMenuTimeframes = useMemo(
+    () => filterTimeframesBySupportedResolutions(supportedResolutions, AVAILABLE_TIMEFRAMES),
+    [supportedResolutions],
+  );
   const nativeTopBarTimeframes = useMemo(() => {
     return createNativeTopBarTimeframes({
-      timeframes: AVAILABLE_TIMEFRAMES,
+      timeframes: nativeTopBarMenuTimeframes,
       interval: selectedTopBarInterval,
       supportedResolutions,
       defaultVisibleValues: topBarDefaultVisibleValues,
     });
-  }, [selectedTopBarInterval, supportedResolutions, topBarDefaultVisibleValues]);
+  }, [nativeTopBarMenuTimeframes, selectedTopBarInterval, supportedResolutions, topBarDefaultVisibleValues]);
   const topBarLayout = useMemo(
     () =>
       showTopBar && frame
@@ -150,6 +155,7 @@ export function useNativeSkiaRenderModel({
             indicatorsEnabled: Boolean(onIndicatorsClick),
             layoutName,
             layoutSelectorEnabled,
+            timeframeMenuEnabled: nativeTopBarMenuTimeframes.length > 1,
             undoEnabled: userDrawingCommandAvailability?.canUndo === true,
             redoEnabled: userDrawingCommandAvailability?.canRedo === true,
           })
@@ -159,6 +165,7 @@ export function useNativeSkiaRenderModel({
       layoutName,
       layoutSelectorEnabled,
       nativeMutedTextColor,
+      nativeTopBarMenuTimeframes.length,
       nativeTopBarTimeframes,
       onIndicatorsClick,
       options.textColor,

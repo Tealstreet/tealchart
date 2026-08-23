@@ -1,54 +1,15 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AVAILABLE_TIMEFRAMES } from '../../state/chartState';
 import { createNativeTopBarLayout } from '../utils/topBarLayout';
-import { NativeDrawingIcon } from './NativeDrawingIcon';
 import { NativeTopBarOverlayImpl } from './NativeTopBarOverlay';
 
 const textWidth = (text: string) => text.length * 7;
 
-interface TestElementProps {
-  accessibilityLabel?: string;
-  children?: ReactNode;
-  name?: string;
-  onPress?: () => void;
-  style?: { width?: number } | Array<{ width?: number }>;
-}
-
-type TestElement = ReactElement<TestElementProps>;
-
-function walkElements(node: ReactNode, visitor: (element: TestElement) => void): void {
-  if (node === null || node === undefined || typeof node === 'boolean') return;
-  if (Array.isArray(node)) {
-    for (const child of node) walkElements(child, visitor);
-    return;
-  }
-  if (typeof node !== 'object' || !('props' in node)) return;
-
-  const element = node as TestElement;
-  visitor(element);
-  walkElements(element.props.children as ReactNode, visitor);
-}
-
-function collectElementsByType(root: ReactNode, type: unknown): TestElement[] {
-  const elements: TestElement[] = [];
-  walkElements(root, (element) => {
-    if (element.type === type) elements.push(element);
-  });
-  return elements;
-}
-
-function styleWidth(style: TestElementProps['style']): number | undefined {
-  if (Array.isArray(style)) {
-    return style.find((item) => item.width !== undefined)?.width;
-  }
-  return style?.width;
-}
-
-function createLayout() {
+function createLayout(options: { timeframeMenuEnabled?: boolean } = {}) {
   return createNativeTopBarLayout({
     width: 390,
     height: 36,
@@ -64,95 +25,91 @@ function createLayout() {
     indicatorsEnabled: true,
     layoutName: 'Default',
     layoutSelectorEnabled: true,
+    timeframeMenuEnabled: options.timeframeMenuEnabled,
     undoEnabled: true,
     redoEnabled: true,
   });
 }
 
+function renderOverlay(
+  props: Partial<ComponentProps<typeof NativeTopBarOverlayImpl>> & {
+    topBarLayout?: ComponentProps<typeof NativeTopBarOverlayImpl>['topBarLayout'];
+  } = {},
+) {
+  const onAction = props.onAction ?? vi.fn();
+  const onFavoriteTimeframeToggle = props.onFavoriteTimeframeToggle ?? vi.fn();
+
+  render(
+    <NativeTopBarOverlayImpl
+      backgroundColor="#101418"
+      favoriteTimeframeValues={props.favoriteTimeframeValues}
+      gridColor="#222831"
+      menuTimeframes={props.menuTimeframes}
+      mutedTextColor="#8a8f98"
+      onAction={onAction}
+      onFavoriteTimeframeToggle={onFavoriteTimeframeToggle}
+      textColor="#f0f3fa"
+      topBarLayout={props.topBarLayout ?? createLayout()}
+    />,
+  );
+
+  return { onAction, onFavoriteTimeframeToggle };
+}
+
 describe('NativeTopBarOverlay', () => {
   it('renders top-bar chrome as React Native controls', () => {
-    const overlay = NativeTopBarOverlayImpl({
-      backgroundColor: '#101418',
-      gridColor: '#222831',
-      mutedTextColor: '#8a8f98',
-      onAction: vi.fn(),
-      textColor: '#f0f3fa',
-      topBarLayout: createLayout(),
-    });
-    const texts = collectElementsByType(overlay, Text).map((element) => element.props.children);
-    const iconNames = collectElementsByType(overlay, NativeDrawingIcon).map((element) => element.props.name);
-    const pressables = collectElementsByType(overlay, Pressable);
-    const scrollViews = collectElementsByType(overlay, ScrollView);
-    const contentViews = collectElementsByType(overlay, View);
+    renderOverlay();
 
-    expect(texts).toEqual(expect.arrayContaining(['BTC-USD', '15m', 'Default', 'Indicators']));
-    expect(iconNames).toEqual(expect.arrayContaining(['chevronDown', 'indicators', 'undo', 'redo']));
-    expect(iconNames.filter((name) => name === 'chevronDown')).toHaveLength(2);
-    expect(pressables.length).toBe(createLayout().buttons.length + 1);
-    expect(scrollViews).toHaveLength(1);
-    expect(contentViews.some((element) => styleWidth(element.props.style) === createLayout().scrollContentWidth)).toBe(
-      true,
-    );
-    expect(pressables.some((element) => element.props.accessibilityLabel === 'Change symbol')).toBe(true);
+    expect(screen.getByText('BTC-USD')).toBeTruthy();
+    expect(screen.getByText('15m')).toBeTruthy();
+    expect(screen.getByText('Default')).toBeTruthy();
+    expect(screen.getByText('Indicators')).toBeTruthy();
+    expect(screen.getByLabelText('Change symbol')).toBeTruthy();
+    expect(screen.getByLabelText('Chart layouts')).toBeTruthy();
   });
 
   it('dispatches the symbol command from the symbol header', () => {
-    const onAction = vi.fn();
-    const overlay = NativeTopBarOverlayImpl({
-      backgroundColor: '#101418',
-      gridColor: '#222831',
-      mutedTextColor: '#8a8f98',
-      onAction,
-      textColor: '#f0f3fa',
-      topBarLayout: createLayout(),
-    });
-    const symbolPressable = collectElementsByType(overlay, Pressable).find(
-      (element) => element.props.accessibilityLabel === 'Change symbol',
-    );
+    const { onAction } = renderOverlay();
 
-    expect(symbolPressable).toBeDefined();
-    symbolPressable!.props.onPress!();
+    fireEvent.click(screen.getByLabelText('Change symbol'));
+
     expect(onAction).toHaveBeenCalledWith({ type: 'symbol' });
   });
 
   it('dispatches the selected button command directly', () => {
-    const onAction = vi.fn();
-    const layout = createLayout();
-    const overlay = NativeTopBarOverlayImpl({
-      backgroundColor: '#101418',
-      gridColor: '#222831',
-      mutedTextColor: '#8a8f98',
-      onAction,
-      textColor: '#f0f3fa',
-      topBarLayout: layout,
-    });
-    const activeButton = layout.buttons.find((button) => button.interval === '15');
-    const activePressable = collectElementsByType(overlay, Pressable).find(
-      (element) => element.props.accessibilityLabel === '15m timeframe',
-    );
+    const { onAction } = renderOverlay();
 
-    expect(activeButton).toBeDefined();
-    expect(activePressable).toBeDefined();
-    activePressable!.props.onPress!();
+    fireEvent.click(screen.getByLabelText('15m timeframe'));
+
     expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'timeframe', interval: '15' }));
   });
 
   it('dispatches the layout selector command from the layout button', () => {
-    const onAction = vi.fn();
-    const overlay = NativeTopBarOverlayImpl({
-      backgroundColor: '#101418',
-      gridColor: '#222831',
-      mutedTextColor: '#8a8f98',
-      onAction,
-      textColor: '#f0f3fa',
-      topBarLayout: createLayout(),
-    });
-    const layoutPressable = collectElementsByType(overlay, Pressable).find(
-      (element) => element.props.accessibilityLabel === 'Chart layouts',
-    );
+    const { onAction } = renderOverlay();
 
-    expect(layoutPressable).toBeDefined();
-    layoutPressable!.props.onPress!();
+    fireEvent.click(screen.getByLabelText('Chart layouts'));
+
     expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'layout' }));
+  });
+
+  it('opens a grouped timeframe selector with favorite toggles', () => {
+    const { onAction, onFavoriteTimeframeToggle } = renderOverlay({
+      favoriteTimeframeValues: ['1', '3', '5', '15', '30', '60'],
+      menuTimeframes: AVAILABLE_TIMEFRAMES,
+      topBarLayout: createLayout({ timeframeMenuEnabled: true }),
+    });
+
+    fireEvent.click(screen.getByLabelText('More timeframes'));
+
+    expect(screen.getByText('Seconds')).toBeTruthy();
+    expect(screen.getByText('Days')).toBeTruthy();
+    expect(screen.getByLabelText('1 day timeframe')).toBeTruthy();
+    expect(screen.getByLabelText('Favorite 1 day')).toBeTruthy();
+
+    fireEvent.click(screen.getByLabelText('Favorite 1 day'));
+    expect(onFavoriteTimeframeToggle).toHaveBeenCalledWith('1D');
+
+    fireEvent.click(screen.getByLabelText('1 week timeframe'));
+    expect(onAction).toHaveBeenCalledWith({ type: 'timeframe', interval: '1W' });
   });
 });

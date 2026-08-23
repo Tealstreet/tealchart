@@ -176,6 +176,9 @@ describe('useNativeSkiaRenderModel', () => {
     expect(model.topBarLayout?.buttons.map((button) => button.text)).toEqual(
       expect.arrayContaining(['1m', '5m', '15m', '30m']),
     );
+    expect(model.topBarLayout?.buttons.find((button) => button.type === 'timeframeMenu')).toEqual(
+      expect.objectContaining({ enabled: true }),
+    );
     expect(model.leftToolRailLayout?.items.length).toBeGreaterThan(0);
     expect(model.visibleBars.map((bar) => bar.time)).toEqual([0, 900, 1800]);
     expect(model.volumeHeight).toBe(82.4);
