@@ -13,7 +13,7 @@ import type { NativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines';
 import type { NativePriceAxisTagSource } from '../utils/priceAxisTagSources';
 import type { NativeTopBarLayout } from '../utils/topBarLayout';
-import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
+import type { NativeSelectedTradeLine, NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
@@ -35,6 +35,7 @@ import {
   buildNativeTradeLineGeometries,
   getNativeOrderObjectId,
   getNativePositionObjectId,
+  promoteNativeSelectedTradeLineGeometry,
 } from '../utils/tradeLineLayout';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './nativePriceFormat';
 import { createNativeSkiaAxisFont, createNativeSkiaFont, measureNativeSkiaTextWidth } from './nativeSkiaText';
@@ -60,6 +61,7 @@ export interface NativeSkiaRenderModelInput {
   priceLines?: PriceLine[];
   pricePrecision: number;
   projection: NativeChartProjection | null;
+  selectedTradeLine?: NativeSelectedTradeLine | null;
   showTopBar: boolean;
   supportedResolutions?: ResolutionString[];
   symbol: string;
@@ -106,6 +108,7 @@ export function useNativeSkiaRenderModel({
   priceLines,
   pricePrecision,
   projection,
+  selectedTradeLine,
   showTopBar,
   supportedResolutions,
   symbol,
@@ -203,8 +206,8 @@ export function useNativeSkiaRenderModel({
     ],
   );
   const tradeLineGeometries = useMemo(
-    () =>
-      projection
+    () => {
+      const geometries = projection
         ? buildNativeTradeLineGeometries(lineSnapshot.orderLines, lineSnapshot.positionLines, {
             dimensions: projection.frame.dimensions,
             priceLabelLane: createNativePriceAxisLane(projection.frame),
@@ -216,7 +219,9 @@ export function useNativeSkiaRenderModel({
             positiveColor: options.upColor,
             negativeColor: options.downColor,
           })
-        : [],
+        : [];
+      return promoteNativeSelectedTradeLineGeometry(geometries, selectedTradeLine);
+    },
     [
       axisFont,
       lineSnapshot.orderLines,
@@ -226,6 +231,7 @@ export function useNativeSkiaRenderModel({
       options.upColor,
       pricePrecision,
       projection,
+      selectedTradeLine,
       smallFont,
       textFont,
     ],
@@ -296,6 +302,7 @@ export function useNativeSkiaRenderModel({
         orderLines: lineSnapshot.orderLines,
         positionLines: lineSnapshot.positionLines,
         priceLineTagHeight: priceAxisTagHeight,
+        selectedTradeLine,
         tradeLineTagHeight: tradeLabelHeight + 2,
       }),
     [
@@ -305,6 +312,7 @@ export function useNativeSkiaRenderModel({
       lineSnapshot.orderLines,
       lineSnapshot.positionLines,
       priceAxisTagHeight,
+      selectedTradeLine,
       tradeLabelHeight,
     ],
   );

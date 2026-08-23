@@ -62,6 +62,7 @@ function getLiveNativePricePerPixel(sharedViewport: NativeViewportSharedValues, 
 
 export interface NativeOrderDragGestureInput {
   commitOrderMove: (objectId: string, nextPrice: number) => void;
+  onSelectTradeLine?: (objectType: NativeTradeLineObjectType, objectId: string) => void;
   controlZones?: readonly NativeGestureControlZone[];
   resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
@@ -75,6 +76,7 @@ export interface NativeOrderDragGestureInput {
 
 export function createNativeOrderDragGesture({
   commitOrderMove,
+  onSelectTradeLine,
   controlZones = [],
   resetViewVisible,
   frame,
@@ -135,6 +137,9 @@ export function createNativeOrderDragGesture({
         tradeLabelHeight,
       });
       if (!zone) return;
+      if (onSelectTradeLine) {
+        runOnJS(onSelectTradeLine)('order', zone.objectId);
+      }
       beginNativeOrderDragState(orderDragState, zone, getLiveNativePricePerPixel(sharedViewport, frame));
     })
     .onUpdate((event) => {
@@ -165,6 +170,7 @@ export interface NativeBracketDragGestureInput {
     price: number,
     partialPercent?: number,
   ) => void;
+  onSelectTradeLine?: (objectType: NativeTradeLineObjectType, objectId: string) => void;
   controlZones?: readonly NativeGestureControlZone[];
   resetViewVisible?: SharedValue<boolean>;
   frame: NativeChartFrame | null;
@@ -178,6 +184,7 @@ export function createNativeBracketDragGesture({
   bracketDragInteractionState,
   clearNativeBracketDrag,
   commitBracketMove,
+  onSelectTradeLine,
   controlZones = [],
   resetViewVisible,
   frame,
@@ -224,6 +231,9 @@ export function createNativeBracketDragGesture({
         tradeLabelHeight,
       });
       if (!zone) return;
+      if (onSelectTradeLine) {
+        runOnJS(onSelectTradeLine)(zone.objectType, zone.objectId);
+      }
       beginNativeBracketDragState(
         bracketDragInteractionState,
         zone,

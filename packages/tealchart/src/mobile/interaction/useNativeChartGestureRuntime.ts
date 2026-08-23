@@ -92,6 +92,8 @@ export interface NativeChartGestureRuntimeInput {
   onDrawingSelectionTap: (x: number, y: number, claimTap: () => void) => void;
   onLeftToolRailToggleTap: () => void;
   onContextMenuTap: Parameters<typeof createNativeCanvasTapGesture>[0]['onContextMenuTap'];
+  onSelectTradeLine: Parameters<typeof createNativeCanvasTapGesture>[0]['onSelectTradeLine'];
+  onClearTradeLineSelection: Parameters<typeof createNativeCanvasTapGesture>[0]['onClearTradeLineSelection'];
   onOverlayAction?: (command: unknown) => void;
   onSelectedDrawingAction: Parameters<typeof createNativeSelectedDrawingActionTapGesture>[0]['onAction'];
   onSelectedDrawingActionPopoverGroupChange: Parameters<
@@ -182,6 +184,8 @@ export function useNativeChartGestureRuntime({
   onDrawingSelectionTap,
   onLeftToolRailToggleTap,
   onContextMenuTap,
+  onSelectTradeLine,
+  onClearTradeLineSelection,
   onOverlayAction = () => undefined,
   onSelectedDrawingAction,
   onSelectedDrawingActionPopoverGroupChange,
@@ -375,6 +379,8 @@ export function useNativeChartGestureRuntime({
       onContextMenuTap: stableOnContextMenuTap,
       onDrawingPlacementTap: stableOnDrawingTap,
       onDrawingSelectionTap: stableOnDrawingSelectionTap,
+      onSelectTradeLine,
+      onClearTradeLineSelection,
       orderDragZones,
       pricePrecision,
       sharedViewport,
@@ -399,6 +405,8 @@ export function useNativeChartGestureRuntime({
     stableOnContextMenuTap,
     stableOnDrawingSelectionTap,
     stableOnDrawingTap,
+    onSelectTradeLine,
+    onClearTradeLineSelection,
     tradeLabelHeight,
     tradeLineActionZones,
     tradeLineRows,
@@ -463,6 +471,7 @@ export function useNativeChartGestureRuntime({
   const orderDragGesture = useMemo<GestureType>(() => {
     return createNativeOrderDragGesture({
       commitOrderMove: stableCommitOrderMove,
+      onSelectTradeLine,
       controlZones,
       resetViewVisible,
       frame: chartInteractionFrame,
@@ -479,6 +488,7 @@ export function useNativeChartGestureRuntime({
     resetViewVisible,
     orderDragState,
     orderDragZones,
+    onSelectTradeLine,
     sharedViewport,
     stableCommitOrderMove,
     tradeLabelHeight,
@@ -535,6 +545,7 @@ export function useNativeChartGestureRuntime({
       bracketDragInteractionState,
       clearNativeBracketDrag: stableClearNativeBracketDrag,
       commitBracketMove: stableCommitBracketMove,
+      onSelectTradeLine,
       controlZones,
       resetViewVisible,
       frame: chartInteractionFrame,
@@ -548,6 +559,7 @@ export function useNativeChartGestureRuntime({
     chartInteractionFrame,
     controlZones,
     resetViewVisible,
+    onSelectTradeLine,
     sharedViewport,
     stableClearNativeBracketDrag,
     stableCommitBracketMove,

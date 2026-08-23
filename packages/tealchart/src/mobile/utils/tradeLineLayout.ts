@@ -15,6 +15,11 @@ export type NativeTradeLineObjectType = 'order' | 'position';
 export type NativeTradeLineActionType = ChartLabelButton['type'];
 export type NativeTradeLineCornerStyle = 'all' | 'left' | 'right' | 'none';
 
+export interface NativeSelectedTradeLine {
+  objectType: NativeTradeLineObjectType;
+  objectId: string;
+}
+
 const ACTION_BUTTON_WIDTH = 16;
 const BRACKET_BUTTON_WIDTH = 26;
 const DEFAULT_CHARACTER_WIDTH = 6.8;
@@ -60,6 +65,8 @@ export interface NativeTradeLineRow {
   objectType: NativeTradeLineObjectType;
   objectId: string;
   price: number;
+  x1?: number;
+  x2?: number;
 }
 
 export interface NativeTradeLineSegmentGeometry extends ChartLabelSegment {
@@ -125,6 +132,30 @@ export interface NativeTradeLineGeometryInput {
   positiveColor: string;
   negativeColor: string;
   chartLabelMinX?: number;
+}
+
+export function isNativeSelectedTradeLineMatch(
+  selected: NativeSelectedTradeLine | null | undefined,
+  line: Pick<NativeTradeLineGeometry, 'objectType' | 'objectId'>,
+): boolean {
+  return selected?.objectType === line.objectType && selected.objectId === line.objectId;
+}
+
+export function promoteNativeSelectedTradeLineGeometry(
+  geometries: readonly NativeTradeLineGeometry[],
+  selected: NativeSelectedTradeLine | null | undefined,
+): NativeTradeLineGeometry[] {
+  if (!selected) return [...geometries];
+  const promoted: NativeTradeLineGeometry[] = [];
+  const rest: NativeTradeLineGeometry[] = [];
+  for (const geometry of geometries) {
+    if (isNativeSelectedTradeLineMatch(selected, geometry)) {
+      promoted.push(geometry);
+    } else {
+      rest.push(geometry);
+    }
+  }
+  return promoted.length > 0 ? [...rest, ...promoted] : [...geometries];
 }
 
 export interface NativeTradeLineLabelParts {
@@ -681,6 +712,8 @@ export function createNativeTradeLineRows(geometries: readonly NativeTradeLineGe
     objectType: geometry.objectType,
     objectId: geometry.objectId,
     price: geometry.price,
+    x1: geometry.labelX,
+    x2: geometry.priceLabelX + geometry.priceLabelWidth,
   }));
 }
 

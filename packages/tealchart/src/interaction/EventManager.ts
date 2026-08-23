@@ -46,6 +46,8 @@ export interface EventManagerCallbacks {
   onMouseUp?: () => void;
   /** Called on context menu (right-click or long-press) */
   onContextMenu?: (x: number, y: number, price: number, time: number) => void;
+  /** Called on an unclaimed chart-surface click/tap */
+  onChartSurfaceClick?: () => void;
   /** Called when render is needed */
   onRender?: () => void;
   /** Called when cursor should change */
@@ -1006,6 +1008,7 @@ export class EventManager {
           })
         : false;
     const handledDrawingInput = isDrawingInputHandled(drawingInputResult);
+    const clickHitState = wasClick ? this.resolveCrosshairHitState(mouseX, mouseY) : null;
 
     if (
       wasClick &&
@@ -1030,6 +1033,16 @@ export class EventManager {
     } else if (!wasClick) {
       this._lastClickTime = 0;
       this._lastClickPaneId = null;
+    }
+
+    if (
+      wasClick &&
+      !handledDrawingInput &&
+      e.button === 0 &&
+      clickHitState &&
+      clickHitState.shouldShowCrosshair
+    ) {
+      this.callbacks.onChartSurfaceClick?.();
     }
 
     if (this.state.isDragging) {
@@ -1573,12 +1586,16 @@ export class EventManager {
     }
 
     const dims = this.callbacks.getDimensions();
+    const tapHitState = this.resolveCrosshairHitState(x, y, dims);
 
     // Bottom zone tap - toggle reset button (handled by UI)
     if (y > dims.height - 150) {
       // This would toggle reset button visibility
       // Could emit an event for this
     } else {
+      if (tapHitState.shouldShowCrosshair) {
+        this.callbacks.onChartSurfaceClick?.();
+      }
       // Crosshair zone - toggle locked state
       if (this.touchCrosshairLocked) {
         this.touchCrosshairLocked = false;

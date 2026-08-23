@@ -434,6 +434,47 @@ describe('PriceLineManager order dragging', () => {
       { onOrderMove },
     );
   });
+
+  it('uses stage pointer deltas for order drags so parent translation cannot offset the price', () => {
+    const onOrderMove = vi.fn();
+
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+
+        const handle = dragHandle(manager);
+        const stage = handle.getStage();
+        const getPointerPosition = vi.spyOn(stage!, 'getPointerPosition');
+        getPointerPosition.mockReturnValue({ x: 120, y: 100 });
+
+        handle.fire('dragstart');
+        getPointerPosition.mockReturnValue({ x: 120, y: 124 });
+        handle.fire('dragmove');
+        handle.fire('dragend');
+
+        expect(onOrderMove).toHaveBeenCalledWith('order-1', 124);
+      },
+      { onOrderMove },
+    );
+  });
+
+  it('keeps a selected trade line above overlapping trade lines', () => {
+    withManager((manager) => {
+      manager.update([
+        { ...draggableOrderBound(undefined), lineId: 'order-1' },
+        { ...draggableOrderBound(undefined), lineId: 'order-2' },
+      ]);
+
+      const firstGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+      const secondGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-2');
+
+      expect(firstGroup).toBeDefined();
+      expect(secondGroup).toBeDefined();
+      manager.selectLine('order-1');
+
+      expect(firstGroup!.getZIndex()).toBeGreaterThan(secondGroup!.getZIndex());
+    });
+  });
 });
 
 describe('PriceLineManager TP/SL gating while an action is unconfirmed', () => {

@@ -136,6 +136,8 @@ import {
 import {
   getNativeOrderObjectId as getOrderObjectId,
   getNativePositionObjectId as getPositionObjectId,
+  type NativeSelectedTradeLine,
+  type NativeTradeLineObjectType,
 } from './mobile/utils/tradeLineLayout';
 import { applyChartOverridesToRenderOptions } from './overrides';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore } from './state/chartState';
@@ -668,6 +670,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // these instead of re-laying-out the chart every frame; committing the real
   // heights per frame is correct and unusably slow.
   const [nativePaneSnapshots, setNativePaneSnapshots] = useState<readonly NativePaneSnapshot[]>([]);
+  const [nativeSelectedTradeLine, setNativeSelectedTradeLine] = useState<NativeSelectedTradeLine | null>(null);
+  const handleNativeSelectTradeLine = useCallback((objectType: NativeTradeLineObjectType, objectId: string) => {
+    setNativeSelectedTradeLine({ objectType, objectId });
+  }, []);
+  const handleNativeClearTradeLineSelection = useCallback(() => {
+    setNativeSelectedTradeLine(null);
+  }, []);
   const nativePaneSnapshotsRef = useRef<readonly NativePaneSnapshot[]>([]);
   const replaceNativePaneSnapshots = useCallback((next: readonly NativePaneSnapshot[]) => {
     for (const snapshot of nativePaneSnapshotsRef.current) snapshot.image.dispose();
@@ -1518,6 +1527,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     orderDragState,
     pricePrecision: nativePricePrecision,
   });
+  useEffect(() => {
+    if (!nativeSelectedTradeLine) return;
+    const stillPresent =
+      nativeSelectedTradeLine.objectType === 'order'
+        ? lineSnapshot.orderLines.some((line) => getOrderObjectId(line) === nativeSelectedTradeLine.objectId)
+        : lineSnapshot.positionLines.some((line) => getPositionObjectId(line) === nativeSelectedTradeLine.objectId);
+    if (!stillPresent) {
+      setNativeSelectedTradeLine(null);
+    }
+  }, [lineSnapshot.orderLines, lineSnapshot.positionLines, nativeSelectedTradeLine]);
 
   const {
     axisFont,
@@ -1550,6 +1569,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     priceLines: nativeRenderPriceLines,
     pricePrecision: nativePricePrecision,
     projection: nativeRenderProjection,
+    selectedTradeLine: nativeSelectedTradeLine,
     showTopBar,
     supportedResolutions,
     symbol,
@@ -1881,6 +1901,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
     onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
     onContextMenuTap: handleNativeContextMenuTap,
+    onSelectTradeLine: handleNativeSelectTradeLine,
+    onClearTradeLineSelection: handleNativeClearTradeLineSelection,
     onOverlayAction: handleNativeOverlayAction,
     onSelectedDrawingAction: handleNativeSelectedDrawingAction,
     onSelectedDrawingActionPopoverGroupChange: setNativeSelectedActionPopoverGroupId,

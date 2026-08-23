@@ -136,14 +136,15 @@ describe('resolveNativeCanvasTap', () => {
   // A tap that lands on the line itself but misses the button belongs to that
   // line, so the crosshair must not swallow it.
   it('does not toggle the crosshair on a trade-line row', () => {
+    const rowY = CENTER_Y - 12;
     const outcome = resolveNativeCanvasTap(
-      { x: 60, y: CENTER_Y },
+      { x: 60, y: rowY },
       context({
-        orderDragZones: [{ objectId: 'order-1', price: priceAt(CENTER_Y), x1: 40, x2: 120 }],
-        tradeLineRows: [{ objectType: 'order', objectId: 'order-1', price: priceAt(CENTER_Y) }],
+        orderDragZones: [{ objectId: 'order-1', price: priceAt(rowY), x1: 40, x2: 120 }],
+        tradeLineRows: [{ objectType: 'order', objectId: 'order-1', price: priceAt(rowY), x1: 40, x2: 170 }],
       }),
     );
-    expect(outcome.kind).toBe('none');
+    expect(outcome).toEqual({ kind: 'tradeLineSelect', objectType: 'order', objectId: 'order-1' });
   });
 
   it('offers the tap to drawings before the crosshair, and never both', () => {
@@ -157,7 +158,7 @@ describe('resolveNativeCanvasTap', () => {
     const ctx = context({
       chartInteractionEnabled: false,
       tradeLineActionZones: [cancelZone()],
-      tradeLineRows: [{ objectType: 'order', objectId: 'order-1', price: priceAt(CENTER_Y) }],
+      tradeLineRows: [{ objectType: 'order', objectId: 'order-1', price: priceAt(CENTER_Y), x1: 40, x2: 170 }],
     });
     expect(resolveNativeCanvasTap(ON_CANCEL, ctx).kind).toBe('none');
     expect(resolveNativeCanvasTap(EMPTY_PLOT, ctx).kind).toBe('none');

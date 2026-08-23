@@ -3,12 +3,13 @@ import type {
   NativeBracketPriceLineRef,
   NativeRenderablePriceLine,
 } from './nativeBracketPriceLines';
-import type { NativeTradeLineObjectType } from './tradeLineLayout';
+import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './tradeLineLayout';
 
 import { getNativeOrderObjectId, getNativePositionObjectId } from './tradeLineLayout';
 
 export const DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT = 22;
 export const NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY = 90;
+export const NATIVE_SELECTED_TRADE_LINE_AXIS_TAG_PRIORITY = 95;
 
 export interface NativePriceAxisTagSource {
   sourceType: 'priceLine' | NativeTradeLineObjectType;
@@ -29,6 +30,7 @@ export interface NativePriceAxisTagSourcesInput {
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
   priceLineTagHeight?: number;
+  selectedTradeLine?: NativeSelectedTradeLine | null;
   tradeLineTagHeight: number;
 }
 
@@ -87,24 +89,26 @@ export function createNativePriceAxisTagSources(input: NativePriceAxisTagSources
   ];
   const orderLineSources = input.orderLines.map((line) => {
     const objectId = getNativeOrderObjectId(line);
+    const selected = input.selectedTradeLine?.objectType === 'order' && input.selectedTradeLine.objectId === objectId;
     return {
       sourceType: 'order' as const,
       tagId: getNativeTradeLineTagId('order', objectId),
       objectId,
       price: line.price,
       height: input.tradeLineTagHeight,
-      priority: NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY,
+      priority: selected ? NATIVE_SELECTED_TRADE_LINE_AXIS_TAG_PRIORITY : NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY,
     };
   });
   const positionLineSources = input.positionLines.map((line) => {
     const objectId = getNativePositionObjectId(line);
+    const selected = input.selectedTradeLine?.objectType === 'position' && input.selectedTradeLine.objectId === objectId;
     return {
       sourceType: 'position' as const,
       tagId: getNativeTradeLineTagId('position', objectId),
       objectId,
       price: line.price,
       height: input.tradeLineTagHeight,
-      priority: NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY,
+      priority: selected ? NATIVE_SELECTED_TRADE_LINE_AXIS_TAG_PRIORITY : NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY,
     };
   });
 

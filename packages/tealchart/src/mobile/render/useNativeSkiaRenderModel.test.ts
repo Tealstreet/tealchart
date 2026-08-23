@@ -220,6 +220,36 @@ describe('useNativeSkiaRenderModel', () => {
     ]);
   });
 
+  it('promotes the selected trade line to the top of the native draw order', () => {
+    const model = useNativeSkiaRenderModel({
+      bars,
+      frame,
+      interval: '15',
+      lineSnapshot: {
+        orderLines: [createOrderLine()],
+        positionLines: [createPositionLine()],
+      },
+      marginsBottom: 32,
+      options: DEFAULT_RENDER_OPTIONS,
+      priceAxisTagHeight: 22,
+      pricePrecision: 0.1,
+      projection,
+      selectedTradeLine: { objectType: 'order', objectId: 'adapter-order' },
+      showTopBar: true,
+      symbol: 'BTC-USD',
+      topBarDefaultVisibleValues: new Set(['1', '5', '15', '30', '60']),
+      topBarHeight: 36,
+      tradeLabelHeight: 18,
+      volumeHeightRatio: 0.2,
+    });
+
+    expect(model.tradeLineGeometries.map((geometry) => `${geometry.objectType}:${geometry.objectId}`)).toEqual([
+      'position:adapter-position',
+      'order:adapter-order',
+    ]);
+    expect(model.priceAxisTagSources.find((source) => source.tagId === 'order:adapter-order')?.priority).toBe(95);
+  });
+
   it('formats native last-trade axis labels from decimal-count precision', () => {
     const model = useNativeSkiaRenderModel({
       bars: [{ time: 0, open: 0.0684, high: 0.0688, low: 0.0682, close: 0.0686, volume: 100 }],

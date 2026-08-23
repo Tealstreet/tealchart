@@ -228,6 +228,46 @@ export function findNativeTradeLineActionZone(
   return index >= 0 ? args.zones[index] : null;
 }
 
+export function findNativeTradeLineRowIndex({
+  rows,
+  x,
+  y,
+  sharedViewport,
+  frame,
+  tradeLabelHeight,
+}: {
+  rows: readonly NativeTradeLineRow[];
+  x: number;
+  y: number;
+  sharedViewport: NativeViewportSharedValues;
+  frame: NativeChartFrame;
+  tradeLabelHeight: number;
+}): number {
+  'worklet';
+  for (let index = rows.length - 1; index >= 0; index -= 1) {
+    const row = rows[index];
+    if (row.x1 === undefined || row.x2 === undefined) continue;
+    const priceY = sharedPriceToNativeLineY(row.price, sharedViewport, frame);
+    if (!isNativeYInMainPane(priceY, frame)) continue;
+    const zoneTop = priceY - tradeLabelHeight / 2;
+    if (
+      x >= row.x1 &&
+      x <= row.x2 &&
+      y >= zoneTop - NATIVE_TRADE_LABEL_HIT_SLOP &&
+      y <= zoneTop + tradeLabelHeight + NATIVE_TRADE_LABEL_HIT_SLOP
+    ) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+export function findNativeTradeLineRow(args: Parameters<typeof findNativeTradeLineRowIndex>[0]): NativeTradeLineRow | null {
+  'worklet';
+  const index = findNativeTradeLineRowIndex(args);
+  return index >= 0 ? args.rows[index] : null;
+}
+
 export function isNativeBracketActionType(
   actionType: NativeTradeLineActionType,
 ): actionType is NativeTradeLineBracketType {

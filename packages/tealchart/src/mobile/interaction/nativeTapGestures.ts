@@ -56,6 +56,8 @@ export interface NativeCanvasTapGestureInput {
   onDrawingPlacementTap: (x: number, y: number) => void;
   /** Calls `claim` when it takes the tap; otherwise the crosshair gets it. */
   onDrawingSelectionTap: (x: number, y: number, claim: () => void) => void;
+  onSelectTradeLine: (objectType: NativeTradeLineObjectType, objectId: string) => void;
+  onClearTradeLineSelection: () => void;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
@@ -87,6 +89,8 @@ export function createNativeCanvasTapGesture({
   onContextMenuTap,
   onDrawingPlacementTap,
   onDrawingSelectionTap,
+  onSelectTradeLine,
+  onClearTradeLineSelection,
   orderDragZones,
   pricePrecision,
   sharedViewport,
@@ -117,6 +121,7 @@ export function createNativeCanvasTapGesture({
     setTimeout(() => {
       if (claimed) return;
       if (Date.now() <= drawingCrosshairFallbackSuppressedUntilMs.value) return;
+      onClearTradeLineSelection();
       toggleCrosshairAt(x, y);
     }, 0);
   };
@@ -148,7 +153,12 @@ export function createNativeCanvasTapGesture({
 
       if (outcome.kind === 'none') return;
       if (outcome.kind === 'tradeLineAction') {
+        runOnJS(onSelectTradeLine)(outcome.objectType, outcome.objectId);
         runOnJS(commitTradeLineAction)(outcome.objectType, outcome.objectId, outcome.actionType);
+        return;
+      }
+      if (outcome.kind === 'tradeLineSelect') {
+        runOnJS(onSelectTradeLine)(outcome.objectType, outcome.objectId);
         return;
       }
       if (outcome.kind === 'crosshairContextMenu') {
@@ -168,6 +178,7 @@ export function createNativeCanvasTapGesture({
         runOnJS(offerToDrawings)(event.x, event.y);
         return;
       }
+      runOnJS(onClearTradeLineSelection)();
       runOnJS(toggleCrosshairAt)(event.x, event.y);
     });
 }
