@@ -1,4 +1,3 @@
-import type { LegacyGestureStateManager as GestureStateManager } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
@@ -294,7 +293,7 @@ export function createNativePaneMaximizeTapGesture({
     // single tap owns an action - a cancel button, the context-menu button, a
     // drawing - this stands down at touch-down so an impatient double tap on
     // chrome cannot maximize the pane instead of activating that chrome.
-    .onTouchesDown((event, stateManager: GestureStateManager) => {
+    .onTouchesDown((event, stateManager) => {
       const touch = event.changedTouches?.[0] ?? event.allTouches?.[0];
       if (!touch) {
         stateManager.fail();
