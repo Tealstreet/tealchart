@@ -151,6 +151,8 @@ export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
 
 type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
+const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
+
 // Cached number formatters by decimal places
 const numberFormatterCache = new Map<number, Intl.NumberFormat>();
 
@@ -945,18 +947,18 @@ export class TealchartRenderer {
     // Draw text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+    const labelTextX = labelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (secondaryText) {
       // Two lines of text with minimal padding
-      ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelY + 7);
-      ctx.fillText(secondaryText, labelX + bound.width / 2, labelY + 19);
+      ctx.fillText(bound.label.primaryText, labelTextX, labelY + 7);
+      ctx.fillText(secondaryText, labelTextX, labelY + 19);
     } else {
-      // Single line centered
-      ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
+      ctx.fillText(bound.label.primaryText, labelTextX, labelCenterY);
     }
   }
 
@@ -1156,14 +1158,15 @@ export class TealchartRenderer {
     const textColor = bound.label.textColor || '#ffffff';
     ctx.fillStyle = textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
+    const priceAxisTextX = priceAxisLabelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (bound.label.secondaryText) {
-      ctx.fillText(bound.label.primaryText, priceAxisLabelX + bound.width / 2, priceAxisLabelY + 7);
-      ctx.fillText(bound.label.secondaryText, priceAxisLabelX + bound.width / 2, priceAxisLabelY + 19);
+      ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);
+      ctx.fillText(bound.label.secondaryText, priceAxisTextX, priceAxisLabelY + 19);
     } else {
-      ctx.fillText(bound.label.primaryText, priceAxisLabelX + bound.width / 2, labelCenterY);
+      ctx.fillText(bound.label.primaryText, priceAxisTextX, labelCenterY);
     }
   }
 
@@ -5074,16 +5077,17 @@ export class TealchartRenderer {
     // Label text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
+    const labelTextX = labelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (secondaryText) {
-      ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelY + 7);
-      ctx.fillText(secondaryText, labelX + bound.width / 2, labelY + 19);
+      ctx.fillText(bound.label.primaryText, labelTextX, labelY + 7);
+      ctx.fillText(secondaryText, labelTextX, labelY + 19);
     } else {
-      ctx.fillText(bound.label.primaryText, labelX + bound.width / 2, labelCenterY);
+      ctx.fillText(bound.label.primaryText, labelTextX, labelCenterY);
     }
   }
 
@@ -5309,14 +5313,15 @@ export class TealchartRenderer {
 
     ctx.fillStyle = bound.label.textColor || '#ffffff';
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
+    const priceAxisTextX = priceAxisLabelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (bound.label.secondaryText) {
-      ctx.fillText(bound.label.primaryText, priceAxisLabelX + bound.width / 2, priceAxisLabelY + 7);
-      ctx.fillText(bound.label.secondaryText, priceAxisLabelX + bound.width / 2, priceAxisLabelY + 19);
+      ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);
+      ctx.fillText(bound.label.secondaryText, priceAxisTextX, priceAxisLabelY + 19);
     } else {
-      ctx.fillText(bound.label.primaryText, priceAxisLabelX + bound.width / 2, labelCenterY);
+      ctx.fillText(bound.label.primaryText, priceAxisTextX, labelCenterY);
     }
   }
 

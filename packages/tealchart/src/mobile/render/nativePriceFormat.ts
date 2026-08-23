@@ -6,7 +6,8 @@ export function clampNativePriceDecimalsWorklet(decimals: number): number {
 
 export function normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision: number): number {
   'worklet';
-  if (!Number.isFinite(pricePrecision) || pricePrecision < 0) return 0.01;
+  if (!Number.isFinite(pricePrecision)) return Number.NaN;
+  if (pricePrecision < 0) return 0.01;
   if (pricePrecision > 0 && pricePrecision < 1) return pricePrecision;
   // Built from a decimal literal rather than 10 ** -n. The result is read back
   // with toString() to count decimals, and exponentiation is not specified to a
@@ -98,6 +99,9 @@ export function formatNativePriceAxisTickWithPrecisionWorklet(
   pricePrecision: number,
 ): string {
   'worklet';
+  if (!Number.isFinite(pricePrecision)) {
+    return formatNativePriceAxisTickWorklet(price, spacing);
+  }
   return formatNativePriceWithDecimalsWorklet(
     price,
     Math.max(

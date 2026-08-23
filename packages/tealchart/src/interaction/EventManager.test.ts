@@ -1071,7 +1071,7 @@ describe('EventManager drawing drag routing', () => {
     manager.dispose();
   });
 
-  it('scales web price-axis drags linearly in visual price density', () => {
+  it('scales web price-axis drags smoothly in visual price density', () => {
     const rafCallbacks: FrameRequestCallback[] = [];
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       rafCallbacks.push(callback);
@@ -1109,8 +1109,47 @@ describe('EventManager drawing drag routing', () => {
     const firstDensity = 556 / (nextViewports[0].priceMax - nextViewports[0].priceMin);
     const secondDensity = 556 / (nextViewports[1].priceMax - nextViewports[1].priceMin);
 
-    expect(firstDensity - startDensity).toBeCloseTo(startDensity * 0.25);
-    expect(secondDensity - firstDensity).toBeCloseTo(startDensity * 0.25);
+    expect(firstDensity / startDensity).toBeCloseTo(Math.exp(0.25));
+    expect(secondDensity / firstDensity).toBeCloseTo(Math.exp(0.25));
+
+    manager.dispose();
+  });
+
+  it('anchors web price-axis drags to the clicked price', () => {
+    const rafCallbacks: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback);
+      return rafCallbacks.length;
+    });
+    const flushRaf = () => {
+      while (rafCallbacks.length > 0) {
+        rafCallbacks.shift()?.(0);
+      }
+    };
+
+    const container = createContainer();
+    const nextViewports: Viewport[] = [];
+    const manager = new EventManager(
+      container,
+      createCallbacks({
+        getPriceFromY: () => 80,
+        getPaneAtY: () => ({ paneId: 'main', yMin: 0, yMax: 100, paneHeight: 556 }),
+        onViewportChange: (nextViewport) => {
+          nextViewports.push(nextViewport);
+        },
+      }),
+    );
+
+    container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0, clientX: 780, clientY: 100 }));
+    flushRaf();
+    window.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, button: 0, clientX: 780, clientY: 50 }));
+    flushRaf();
+
+    expect(nextViewports).toHaveLength(1);
+    const next = nextViewports[0];
+    const originalAnchorRatio = (80 - 0) / 100;
+    const nextAnchorRatio = (80 - next.priceMin) / (next.priceMax - next.priceMin);
+    expect(nextAnchorRatio).toBeCloseTo(originalAnchorRatio);
 
     manager.dispose();
   });

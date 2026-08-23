@@ -233,7 +233,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     theme = 'Dark',
     margins: marginsProp,
     priceLines,
-    pricePrecision = 2,
+    pricePrecision,
     showTopBar = true,
     supportedResolutions,
     userDrawingState,
@@ -443,7 +443,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativeDisplayedInterval(interval);
   }, [interval]);
   const nativePricePrecision = useMemo(
-    () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision),
+    () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision ?? Number.NaN),
     [pricePrecision],
   );
   // Pane heights the user set by dragging a divider. Chart-owned, exactly as web

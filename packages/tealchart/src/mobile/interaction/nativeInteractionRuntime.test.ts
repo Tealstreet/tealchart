@@ -85,7 +85,7 @@ describe('native interaction runtime', () => {
 
     expect(live.startTime).toBe(viewport.startTime);
     expect(live.endTime).toBe(viewport.endTime);
-    expect(live.priceMax - live.priceMin).toBeCloseTo(200);
+    expect(live.priceMax - live.priceMin).toBeCloseTo(164.8721);
     expect(runtime.commit('priceScale')).toEqual(live);
   });
 
@@ -266,11 +266,11 @@ describe('native viewport transform helpers', () => {
       anchorPrice: 125,
     });
 
-    expect(next.priceMin).toBeCloseTo(75);
-    expect(next.priceMax).toBeCloseTo(275);
+    expect(next.priceMin).toBeCloseTo(83.7819);
+    expect(next.priceMax).toBeCloseTo(248.654);
   });
 
-  it('keeps repeated price scale drag deltas linear in visual density', () => {
+  it('keeps repeated price scale drag deltas smooth in visual density', () => {
     const first = scaleViewportPrices(viewport, { deltaY: -50, sensitivity: 0.01 });
     const second = scaleViewportPrices(viewport, { deltaY: -100, sensitivity: 0.01 });
 
@@ -278,8 +278,8 @@ describe('native viewport transform helpers', () => {
     const firstDensity = 1 / (first.priceMax - first.priceMin);
     const secondDensity = 1 / (second.priceMax - second.priceMin);
 
-    expect(firstDensity - startDensity).toBeCloseTo(startDensity * 0.5);
-    expect(secondDensity - firstDensity).toBeCloseTo(startDensity * 0.5);
+    expect(firstDensity / startDensity).toBeCloseTo(Math.exp(0.5));
+    expect(secondDensity / firstDensity).toBeCloseTo(Math.exp(0.5));
   });
 
   it('clamps price scale to a finite range before returning a viewport', () => {
@@ -288,7 +288,7 @@ describe('native viewport transform helpers', () => {
       sensitivity: 1_000,
     });
 
-    expect(next.priceMax - next.priceMin).toBeCloseTo(1_000);
+    expect(next.priceMax - next.priceMin).toBeCloseTo(2_000);
   });
 
   it('scales time around an explicit anchor', () => {

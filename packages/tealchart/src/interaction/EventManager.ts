@@ -12,6 +12,7 @@
 import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from '../core/historyBackfill';
 import type { Viewport } from '../types';
 
+import { scaleViewportPricesFromAxisDrag } from '../viewport/priceScaleTransform';
 import { clampViewportTimeRange } from '../viewport/timeRangeConstraints';
 
 // ============================================================================
@@ -217,6 +218,7 @@ export interface InteractionState {
   draggedPaneId: string | null;
   dragStartPaneYRange: { yMin: number; yMax: number } | null;
   dragStartPaneHeight: number;
+  dragStartAnchorPrice: number | null;
   isOverPriceAxis: boolean;
   isOverPaneDivider: boolean;
   isOverInteractive: boolean;
@@ -270,6 +272,7 @@ export class EventManager {
     draggedPaneId: null,
     dragStartPaneYRange: null,
     dragStartPaneHeight: 0,
+    dragStartAnchorPrice: null,
     isOverPriceAxis: false,
     isOverPaneDivider: false,
     isOverInteractive: false,
@@ -637,6 +640,10 @@ export class EventManager {
         this.state.draggedPaneId = pane.paneId;
         this.state.dragStartPaneYRange = { yMin: pane.yMin, yMax: pane.yMax };
         this.state.dragStartPaneHeight = pane.paneHeight;
+        this.state.dragStartAnchorPrice =
+          isOverPriceAxis && pane.paneId === 'main'
+            ? (this.callbacks.getPriceFromY?.(y) ?? (pane.yMin + pane.yMax) / 2)
+            : (pane.yMin + pane.yMax) / 2;
       }
     }
 
@@ -943,6 +950,7 @@ export class EventManager {
     this.state.draggedPaneId = null;
     this.state.dragStartPaneYRange = null;
     this.state.dragStartPaneHeight = 0;
+    this.state.dragStartAnchorPrice = null;
     this.state.draggedDivider = null;
     this._pendingMouseDrawingDragOptions = undefined;
     this._pendingMouseDrawingDragStartOptions = undefined;
@@ -1049,6 +1057,7 @@ export class EventManager {
     this.state.draggedPaneId = null;
     this.state.dragStartPaneYRange = null;
     this.state.dragStartPaneHeight = 0;
+    this.state.dragStartAnchorPrice = null;
     this.state.draggedDivider = null;
     this._pendingMouseDrawingDragOptions = undefined;
     this._pendingMouseDrawingDragStartOptions = undefined;
@@ -1099,6 +1108,7 @@ export class EventManager {
     this.state.draggedPaneId = null;
     this.state.dragStartPaneYRange = null;
     this.state.dragStartPaneHeight = 0;
+    this.state.dragStartAnchorPrice = null;
     this.state.draggedDivider = null;
     this._pendingMouseDrawingDragOptions = undefined;
     this._pendingMouseDrawingDragStartOptions = undefined;
@@ -1312,6 +1322,10 @@ export class EventManager {
           this.state.draggedPaneId = pane.paneId;
           this.state.dragStartPaneYRange = { yMin: pane.yMin, yMax: pane.yMax };
           this.state.dragStartPaneHeight = pane.paneHeight;
+          this.state.dragStartAnchorPrice =
+            isOverPriceAxis && pane.paneId === 'main'
+              ? (this.callbacks.getPriceFromY?.(y) ?? (pane.yMin + pane.yMax) / 2)
+              : (pane.yMin + pane.yMax) / 2;
           if (isOverPriceAxis && !drawingDragStarted) {
             this.touchYPanUnlocked = true; // Allow Y-axis zooming immediately for price axis drag
           }
@@ -1506,6 +1520,7 @@ export class EventManager {
       this.state.draggedPaneId = null;
       this.state.dragStartPaneYRange = null;
       this.state.dragStartPaneHeight = 0;
+      this.state.dragStartAnchorPrice = null;
       this.state.draggedDivider = null;
     }
 
@@ -1700,25 +1715,21 @@ export class EventManager {
   private handlePriceAxisZoom(dy: number): void {
     if (!this.state.dragStartViewport || !this.state.dragStartPaneYRange || !this.state.draggedPaneId) return;
 
-    const dims = this.callbacks.getDimensions();
-    const fullChartHeight = dims.height - dims.timeAxisHeight - dims.topMargin;
-    const paneHeight = this.state.dragStartPaneHeight || fullChartHeight;
-
-    // Scale the zoom factor so smaller panes feel the same as larger ones
-    // A 10% drag on a small pane should zoom the same as 10% drag on large pane
-    const heightScale = fullChartHeight / paneHeight;
-    // Make the drag linear in visual scale (pixels per price), not in price range.
-    // Range-linear zoom gets increasingly twitchy when the axis is already zoomed in.
-    const rawVisualScale = 1 - dy * 0.005 * heightScale;
-    const visualScale = Math.max(0.1, Math.min(10, rawVisualScale));
-
     const { yMin: startPriceMin, yMax: startPriceMax } = this.state.dragStartPaneYRange;
-    const range = startPriceMax - startPriceMin;
-    const center = (startPriceMax + startPriceMin) / 2;
-
-    const newRange = range / visualScale;
-    const newPriceMin = center - newRange / 2;
-    const newPriceMax = center + newRange / 2;
+    const scaledViewport = scaleViewportPricesFromAxisDrag(
+      {
+        startTime: this.state.dragStartViewport.startTime,
+        endTime: this.state.dragStartViewport.endTime,
+        priceMin: startPriceMin,
+        priceMax: startPriceMax,
+      },
+      {
+        deltaY: dy,
+        anchorPrice: this.state.dragStartAnchorPrice ?? (startPriceMin + startPriceMax) / 2,
+      },
+    );
+    const newPriceMin = scaledViewport.priceMin;
+    const newPriceMax = scaledViewport.priceMax;
 
     // Use internal callback during drag to avoid triggering external callbacks
     const updateViewport = this.callbacks.onViewportChangeInternal ?? this.callbacks.onViewportChange;

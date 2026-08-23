@@ -94,6 +94,7 @@ export interface CrosshairState {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
+const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
 const DRAG_THRESHOLD = 5;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
@@ -699,30 +700,30 @@ export class PriceLineManager {
     if (secondaryText) {
       // Two-line label
       const primaryTextNode = new Konva.Text({
-        x,
+        x: x + PRICE_AXIS_LABEL_TEXT_PADDING_X,
         y: y + 1,
-        width: bound.width,
+        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'right',
         verticalAlign: 'middle',
         listening: false,
       });
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
       const secondaryTextNode = new Konva.Text({
-        x,
+        x: x + PRICE_AXIS_LABEL_TEXT_PADDING_X,
         y: y + bound.height / 2 - 1,
-        width: bound.width,
+        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: secondaryText,
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'right',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -737,15 +738,15 @@ export class PriceLineManager {
       }
     } else {
       const primaryTextNode = new Konva.Text({
-        x,
+        x: x + PRICE_AXIS_LABEL_TEXT_PADDING_X,
         y,
-        width: bound.width,
+        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height,
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'right',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1341,30 +1342,30 @@ export class PriceLineManager {
     if (secondaryText) {
       const fontFamily = this.getTextFontFamily();
       const primaryTextNode = new Konva.Text({
-        x: priceAxisLabelX,
+        x: priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X,
         y: priceAxisLabelY + 1,
-        width: bound.width,
+        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'right',
         verticalAlign: 'middle',
         listening: false,
       });
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
       const tradingSecondaryTextNode = new Konva.Text({
-        x: priceAxisLabelX,
+        x: priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X,
         y: priceAxisLabelY + bound.height / 2 - 1,
-        width: bound.width,
+        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: secondaryText,
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'right',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1380,15 +1381,15 @@ export class PriceLineManager {
     } else {
       const fontFamily = this.getTextFontFamily();
       const primaryTextNode = new Konva.Text({
-        x: priceAxisLabelX,
+        x: priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X,
         y: priceAxisLabelY,
-        width: bound.width,
+        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height,
         text: bound.label.primaryText,
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'right',
         verticalAlign: 'middle',
         listening: false,
       });
