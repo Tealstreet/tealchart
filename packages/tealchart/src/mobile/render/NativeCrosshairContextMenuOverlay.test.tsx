@@ -145,8 +145,8 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
     const style = flattenStyle(views[0].props.style);
     const texts = collectElementsByType(overlay, Text);
 
-    expect(style.left).toBe(68);
-    expect(style.top).toBe(40);
+    expect(style.left).toBe(60);
+    expect(style.top).toBe(67);
     expect(style.width).toBeUndefined();
     expect(style.right).toBeUndefined();
     expect(texts.map((text) => text.props.children)).toContain('Quick order');
