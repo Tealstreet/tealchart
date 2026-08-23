@@ -912,6 +912,7 @@ export class PriceLineManager {
       const rowHitRect = resolveTradingLineRowHitRect({
         chartLabelWidth,
         chartLabelX,
+        interactionKind: 'mouseHover',
         labelHeight: LABEL_HEIGHT,
         lineStartX,
         lineY,

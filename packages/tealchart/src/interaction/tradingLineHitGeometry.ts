@@ -1,6 +1,7 @@
 export interface TradingLineRowHitRectInput {
   chartLabelWidth: number;
   chartLabelX: number;
+  interactionKind?: 'mouseHover' | 'touch';
   labelHeight: number;
   lineStartX: number;
   lineY: number;
@@ -17,6 +18,7 @@ export interface TradingLineRowHitRect {
 export function resolveTradingLineRowHitRect({
   chartLabelWidth,
   chartLabelX,
+  interactionKind = 'touch',
   labelHeight,
   lineStartX,
   lineY,
@@ -24,11 +26,11 @@ export function resolveTradingLineRowHitRect({
 }: TradingLineRowHitRectInput): TradingLineRowHitRect {
   const x = Math.min(lineStartX, chartLabelX);
   const right = Math.max(rightLineEndX, chartLabelX + chartLabelWidth);
+  const topBias = interactionKind === 'mouseHover' ? labelHeight / 2 : 0;
   return {
     x,
-    y: lineY - labelHeight / 2,
+    y: lineY - labelHeight / 2 - topBias,
     width: Math.max(0, right - x),
-    height: labelHeight,
+    height: labelHeight + topBias,
   };
 }
-

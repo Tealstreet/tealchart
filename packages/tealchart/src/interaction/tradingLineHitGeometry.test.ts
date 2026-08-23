@@ -16,6 +16,20 @@ describe('trading line hit geometry', () => {
     ).toEqual({ x: 80, y: 91, width: 420, height: 18 });
   });
 
+  it('biases mouse hover rows toward the cursor tip instead of the cursor body', () => {
+    expect(
+      resolveTradingLineRowHitRect({
+        chartLabelWidth: 120,
+        chartLabelX: 240,
+        interactionKind: 'mouseHover',
+        labelHeight: 18,
+        lineStartX: 80,
+        lineY: 100,
+        rightLineEndX: 500,
+      }),
+    ).toEqual({ x: 80, y: 82, width: 420, height: 27 });
+  });
+
   it('does not produce negative width when the label is collapsed against the axis', () => {
     expect(
       resolveTradingLineRowHitRect({
@@ -29,4 +43,3 @@ describe('trading line hit geometry', () => {
     ).toEqual({ x: 300, y: 91, width: 0, height: 18 });
   });
 });
-
