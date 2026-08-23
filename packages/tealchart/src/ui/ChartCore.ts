@@ -107,6 +107,7 @@ import { resolveOrderTradeLineLabel, resolvePositionTradeLineLabel } from '../ut
 import { applyAutoScale, intervalToMs } from '../viewport/viewScale';
 import { applyChromeThemeVars } from './chromeTheme';
 import { button, div, icons } from './dom';
+import { mountWebFloatingElement, positionFixedFloatingElement } from './FloatingLayer';
 
 // ============================================================================
 // Types
@@ -1724,7 +1725,7 @@ export class ChartCore {
       this.contextMenu.appendChild(menuItem);
     }
 
-    document.body.appendChild(this.contextMenu);
+    mountWebFloatingElement(this.contextMenu);
     this.positionContextMenu(screenX, screenY, placement);
     // Host content is commonly mounted a tick later - a React root rendering
     // into the element we just returned measures zero until it does.
@@ -1751,15 +1752,17 @@ export class ChartCore {
     const rect = this.contextMenu.getBoundingClientRect();
     const menuWidth = rect.width || 150;
     const menuHeight = rect.height || this.contextMenu.offsetHeight || 0;
-    const margin = 8;
     const gap = 6;
     const desiredLeft = placement === 'crosshairButton' ? screenX - menuWidth - gap : screenX;
     const desiredTop = placement === 'crosshairButton' ? screenY + gap : screenY;
-    const maxLeft = Math.max(margin, window.innerWidth - menuWidth - margin);
-    const maxTop = Math.max(margin, window.innerHeight - menuHeight - margin);
 
-    this.contextMenu.style.left = `${Math.min(Math.max(desiredLeft, margin), maxLeft)}px`;
-    this.contextMenu.style.top = `${Math.min(Math.max(desiredTop, margin), maxTop)}px`;
+    positionFixedFloatingElement(this.contextMenu, {
+      desiredLeft,
+      desiredTop,
+      fallbackWidth: menuWidth,
+      fallbackHeight: menuHeight,
+      margin: 8,
+    });
   }
 
   private closeContextMenu(): void {
