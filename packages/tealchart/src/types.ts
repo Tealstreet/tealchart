@@ -579,6 +579,8 @@ export interface ContextMenuRenderContext {
   price: number;
   anchorX: number;
   anchorY: number;
+  viewportWidth?: number;
+  viewportHeight?: number;
   close: () => void;
 }
 

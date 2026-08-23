@@ -980,6 +980,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [imperativeContextMenu, setImperativeContextMenu] = useState<ContextMenuCallback | null>(null);
   const activeContextMenu = imperativeContextMenu ?? onContextMenu ?? null;
   const hasNativeContextMenu = Boolean(activeContextMenu) || Boolean(renderContextMenu);
+  const contextMenuViewportWidth = frame?.dimensions.width;
+  const contextMenuViewportHeight = frame?.dimensions.height;
   const closeNativeContextMenu = useCallback(() => {
     setNativeContextMenu((current) => {
       if (current?.content) onContextMenuClose?.();
@@ -995,6 +997,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         close: closeNativeContextMenu,
         price,
         unixTime: time,
+        viewportHeight: contextMenuViewportHeight,
+        viewportWidth: contextMenuViewportWidth,
       });
       if (content) {
         setNativeContextMenu({ anchorX, anchorY, content, items: [] });
@@ -1003,7 +1007,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       const items = activeContextMenu?.(time, price) ?? [];
       setNativeContextMenu(items.length > 0 ? { anchorX, anchorY, items } : null);
     },
-    [activeContextMenu, closeNativeContextMenu, renderContextMenu],
+    [activeContextMenu, closeNativeContextMenu, contextMenuViewportHeight, contextMenuViewportWidth, renderContextMenu],
   );
   useEffect(() => {
     if (!activeContextMenu && !renderContextMenu) setNativeContextMenu(null);

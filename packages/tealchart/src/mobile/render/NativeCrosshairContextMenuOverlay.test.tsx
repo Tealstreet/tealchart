@@ -138,7 +138,7 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
         contentSize: { width: 268, height: 86 },
         dimensions: { width: 390, height: 480 },
       }),
-    ).toEqual({ left: 95, maxHeight: 86, maxWidth: 268, top: 386 });
+    ).toEqual({ left: 95, maxHeight: 86, top: 386, width: 268 });
 
     const overlay = NativeCrosshairContextMenuOverlayImpl({
       backgroundColor: '#131722',
@@ -159,8 +159,8 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
 
     expect(style.left).toBe(95);
     expect(style.maxHeight).toBe(86);
-    expect(style.maxWidth).toBe(268);
     expect(style.top).toBe(386);
+    expect(style.width).toBe(268);
     expect(style.right).toBeUndefined();
     expect(style.opacity).toBeUndefined();
   });
@@ -173,6 +173,6 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
         contentSize: { width: 480, height: 700 },
         dimensions: { width: 390, height: 480 },
       }),
-    ).toEqual({ left: 8, maxHeight: 464, maxWidth: 374, top: 8 });
+    ).toEqual({ left: 8, maxHeight: 464, top: 8, width: 374 });
   });
 });
