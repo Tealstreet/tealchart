@@ -18,6 +18,7 @@ describe('native price format worklets', () => {
   });
 
   it('normalizes decimal-count precision inputs to tick-size precision', () => {
+    expect(normalizeNativePricePrecisionToTickSizeWorklet(Number.NaN)).toBeNaN();
     expect(normalizeNativePricePrecisionToTickSizeWorklet(0)).toBe(1);
     expect(normalizeNativePricePrecisionToTickSizeWorklet(2)).toBe(0.01);
     expect(normalizeNativePricePrecisionToTickSizeWorklet(6)).toBe(0.000001);
@@ -44,5 +45,6 @@ describe('native price format worklets', () => {
     expect(formatNativePriceAxisTickWithPrecisionWorklet(0.07, 0.01, 0.000001)).toBe('0.070000');
     expect(formatNativePriceAxisTickWithPrecisionWorklet(0.07, 0.01, 0.0001)).toBe('0.0700');
     expect(formatNativePriceAxisTickWithPrecisionWorklet(63777, 500, 0.1)).toBe('63,777.0');
+    expect(formatNativePriceAxisTickWithPrecisionWorklet(63777, 500, Number.NaN)).toBe('63,777');
   });
 });

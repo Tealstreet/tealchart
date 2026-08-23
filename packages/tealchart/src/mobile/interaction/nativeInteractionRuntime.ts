@@ -1,4 +1,7 @@
 import type { Viewport } from '../../types';
+import type { PriceScaleTransform } from '../../viewport/priceScaleTransform';
+
+import { scaleViewportPricesFromAxisDrag } from '../../viewport/priceScaleTransform';
 
 export type NativeInteractionOwner =
   | 'chartPan'
@@ -48,11 +51,7 @@ export interface NativeChartAxisPinchTransform {
   focalPriceRatio: number;
 }
 
-export interface NativePriceScaleTransform {
-  deltaY: number;
-  sensitivity?: number;
-  anchorPrice?: number;
-}
+export type NativePriceScaleTransform = PriceScaleTransform;
 
 export interface NativeTimeScaleTransform {
   deltaX: number;
@@ -157,25 +156,10 @@ export function scaleViewportPrices(viewport: Viewport, transform: NativePriceSc
   assertFiniteNumber(transform.deltaY, 'price scale deltaY');
   assertFiniteNumber(transform.sensitivity ?? DEFAULT_SCALE_SENSITIVITY, 'price scale sensitivity');
   if (transform.anchorPrice !== undefined) assertFiniteNumber(transform.anchorPrice, 'price scale anchorPrice');
-  const sensitivity = transform.sensitivity ?? DEFAULT_SCALE_SENSITIVITY;
-  const rawVisualScale = 1 - transform.deltaY * sensitivity;
-  const visualScale = Math.max(0.1, Math.min(10, rawVisualScale));
-  if (!Number.isFinite(visualScale)) {
+  const nextViewport = scaleViewportPricesFromAxisDrag(viewport, transform);
+  if (!Number.isFinite(nextViewport.priceMax - nextViewport.priceMin)) {
     throw new Error('NativeInteractionRuntime price scale transform produced a non-finite range');
   }
-  const range = viewport.priceMax - viewport.priceMin;
-  const nextRange = Math.max(Number.EPSILON, range / visualScale);
-  if (!Number.isFinite(nextRange)) {
-    throw new Error('NativeInteractionRuntime price scale transform produced a non-finite range');
-  }
-  const anchorPrice = transform.anchorPrice ?? (viewport.priceMin + viewport.priceMax) / 2;
-  const anchorRatio = (anchorPrice - viewport.priceMin) / range;
-
-  const nextViewport = {
-    ...viewport,
-    priceMin: anchorPrice - nextRange * anchorRatio,
-    priceMax: anchorPrice + nextRange * (1 - anchorRatio),
-  };
   assertValidViewport(nextViewport);
   return nextViewport;
 }

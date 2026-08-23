@@ -50,7 +50,8 @@ function isBracketCoveredByOrderLine(
   orderLines: readonly OrderLineRenderData[],
   priceTolerance: number,
 ): boolean {
-  return orderLines.some((order) => Math.abs(order.price - bracketPrice) <= priceTolerance);
+  const safePriceTolerance = Number.isFinite(priceTolerance) ? priceTolerance : 0;
+  return orderLines.some((order) => Math.abs(order.price - bracketPrice) <= safePriceTolerance);
 }
 
 export function createNativeBracketPriceLines({

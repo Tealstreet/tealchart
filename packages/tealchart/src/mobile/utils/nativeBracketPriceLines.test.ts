@@ -100,6 +100,12 @@ describe('native bracket price lines', () => {
       expect(build([{ id: 'real', price: 90.4 } as OrderLineRenderData])).toEqual(['adapter-id-tp']);
     });
 
+    it('dedupes exact covered brackets while price precision is still unknown', () => {
+      expect(build([{ id: 'pending-precision', price: 90 } as OrderLineRenderData], Number.NaN)).toEqual([
+        'adapter-id-tp',
+      ]);
+    });
+
     it('keeps both brackets when no order line covers them', () => {
       expect(build([{ id: 'entry', price: 100 } as OrderLineRenderData])).toEqual([
         'adapter-id-tp',
