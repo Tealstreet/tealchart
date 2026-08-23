@@ -400,6 +400,16 @@ function positionLineToPriceLine(
   };
 }
 
+interface CrosshairPlusButtonBounds {
+  hitBottom: number;
+  hitLeft: number;
+  hitRight: number;
+  hitTop: number;
+  r: number;
+  x: number;
+  y: number;
+}
+
 // ============================================================================
 // ChartCore Class
 // ============================================================================
@@ -420,7 +430,7 @@ export class ChartCore {
   private contextMenuCloseHandler: ((e: MouseEvent) => void) | null = null;
   private contextMenuCloseTimer: ReturnType<typeof setTimeout> | null = null;
   // + button drawn on crosshair canvas — hit-test bounds for click detection
-  private _plusButtonBounds: { x: number; y: number; r: number } | null = null;
+  private _plusButtonBounds: CrosshairPlusButtonBounds | null = null;
   private contextMenuResizeObserver: ResizeObserver | null = null;
   private contextMenuIsCustom = false;
   // Bound handler for + button click — stored so it can be removed on dispose
@@ -775,11 +785,8 @@ export class ChartCore {
         this.renderCrosshairOverlay();
         if (this.eventManager.getIsDragging()) return;
         // Pointer cursor over canvas-drawn + button
-        const b = this._plusButtonBounds;
-        if (b) {
-          const dx = this.crosshair.x - b.x;
-          const dy = this.crosshair.y - b.y;
-          const overPlus = dx * dx + dy * dy <= b.r * b.r;
+        if (this._plusButtonBounds) {
+          const overPlus = this.isOverCrosshairPlusButton(this.crosshair.x, this.crosshair.y);
           const wantCursor =
             overPlus || this.isOverUnlockedUserDrawing(this.crosshair.x, this.crosshair.y) ? 'pointer' : 'crosshair';
           if (this.cursor !== wantCursor) {
@@ -808,9 +815,7 @@ export class ChartCore {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const b = this._plusButtonBounds;
-      const dx = x - b.x;
-      const dy = y - b.y;
-      if (dx * dx + dy * dy <= b.r * b.r) {
+      if (this.isOverCrosshairPlusButton(x, y)) {
         e.stopPropagation();
         const price = this.renderer.publicYToPriceWithLayout(
           this.crosshair.y,
@@ -1158,6 +1163,9 @@ export class ChartCore {
   private isOverCrosshairPlusButton(x: number, y: number): boolean {
     const bounds = this._plusButtonBounds;
     if (!bounds) return false;
+    if (x >= bounds.hitLeft && x <= bounds.hitRight && y >= bounds.hitTop && y <= bounds.hitBottom) {
+      return true;
+    }
     const dx = x - bounds.x;
     const dy = y - bounds.y;
     return dx * dx + dy * dy <= bounds.r * bounds.r;
@@ -2508,15 +2516,21 @@ export class ChartCore {
       const btnY = y;
       const btnR = 9; // 18px diameter / 2
 
-      // Store bounds for hit-testing clicks
-      this._plusButtonBounds = { x: btnX, y: btnY, r: btnR };
+      // Store a forgiving hit target from the circular button through the price
+      // label. The circle stays visually compact, but users moving toward the
+      // right-axis label do not lose the affordance before they can click it.
+      this._plusButtonBounds = {
+        x: btnX,
+        y: btnY,
+        r: btnR,
+        hitLeft: btnX - btnR - 4,
+        hitRight: priceLabel.x + priceLabel.width,
+        hitTop: priceLabel.y - 4,
+        hitBottom: priceLabel.y + priceLabel.height + 4,
+      };
 
       // Check hover state
-      const hx = this.crosshair.x;
-      const hy = this.crosshair.y;
-      const dxH = hx - btnX;
-      const dyH = hy - btnY;
-      const isHovered = dxH * dxH + dyH * dyH <= btnR * btnR;
+      const isHovered = this.isOverCrosshairPlusButton(this.crosshair.x, this.crosshair.y);
 
       // Draw circle with optional hover fill
       if (isHovered) {

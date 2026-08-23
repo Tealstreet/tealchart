@@ -2119,6 +2119,44 @@ describe('ChartCore host-rendered context menu', () => {
     core.dispose();
   });
 
+  it('keeps the + button target active through the right-axis price label corridor', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderContextMenu: () => document.createElement('div'),
+    });
+    const testCore = core as unknown as {
+      _plusButtonBounds: {
+        hitBottom: number;
+        hitLeft: number;
+        hitRight: number;
+        hitTop: number;
+        r: number;
+        x: number;
+        y: number;
+      };
+      isOverCrosshairPlusButton(x: number, y: number): boolean;
+    };
+    testCore._plusButtonBounds = {
+      x: 100,
+      y: 50,
+      r: 9,
+      hitLeft: 87,
+      hitRight: 160,
+      hitTop: 37,
+      hitBottom: 63,
+    };
+
+    expect(testCore.isOverCrosshairPlusButton(100, 50)).toBe(true);
+    expect(testCore.isOverCrosshairPlusButton(150, 50)).toBe(true);
+    expect(testCore.isOverCrosshairPlusButton(150, 70)).toBe(false);
+    expect(testCore.isOverCrosshairPlusButton(170, 50)).toBe(false);
+
+    core.dispose();
+  });
+
   // Without it the host has no idea its content left the screen, and keeps it
   // mounted - subscriptions and all - against a node nobody can see.
   it('tells the host when anything else dismisses what it rendered', async () => {
