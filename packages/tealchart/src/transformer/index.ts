@@ -12,6 +12,7 @@ export type {
   TvChartContent,
   TvSource,
   TvSourceState,
+  TvStudyMetaInfo,
   TvPlot,
   TvPane,
   IndicatorMapping,
