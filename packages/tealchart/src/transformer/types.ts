@@ -69,6 +69,7 @@ export interface TvChartContent {
   _tealstreetVersion?: number;
   _tealstreetOriginalIndicators?: IndicatorInstance[];
   _tealstreetOriginalSettings?: Partial<ChartSettings>;
+  _tealstreetPreservedTradingViewStudies?: ChartSettings['preservedTradingViewStudies'];
 }
 
 /**
@@ -101,8 +102,21 @@ export interface TvSource {
   id: string;
   /** Source type: 'mainSeries', 'Study', study ID like 'STD;RSI' */
   type: string;
+  /** TradingView stores study identity here for real indicator sources. */
+  metaInfo?: TvStudyMetaInfo;
   /** Source state/configuration */
   state: TvSourceState;
+  /** Preserve TV fields this transformer does not model. */
+  [key: string]: unknown;
+}
+
+export interface TvStudyMetaInfo {
+  fullId?: string;
+  id?: string;
+  shortId?: string;
+  description?: string;
+  shortDescription?: string;
+  [key: string]: unknown;
 }
 
 /**
@@ -123,6 +137,8 @@ export interface TvSourceState {
   visible?: boolean;
   /** Main-series candle styling. Lives here in a layout, not in mainSourceProperties. */
   candleStyle?: Record<string, unknown>;
+  /** Preserve TV state fields this transformer does not model. */
+  [key: string]: unknown;
 }
 
 /**
@@ -135,6 +151,8 @@ export interface TvPlot {
   linewidth?: number;
   linestyle?: number; // 0 = solid, 1 = dotted, 2 = dashed
   visible?: boolean;
+  /** Preserve TV plot fields this transformer does not model. */
+  [key: string]: unknown;
 }
 
 /**
@@ -169,6 +187,8 @@ export interface IndicatorMapping {
   defaultInputs?: Record<string, unknown>;
   /** Whether this indicator is an overlay */
   isOverlay: boolean;
+  /** Higher values win when multiple custom indicators share one TV study id. */
+  tvImportPriority?: number;
 }
 
 /**

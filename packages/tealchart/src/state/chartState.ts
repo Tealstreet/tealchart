@@ -57,6 +57,37 @@ export interface IndicatorInstance {
   isVisible: boolean;
   /** For ordering */
   createdAt: number;
+  /**
+   * Raw TradingView study source captured when this indicator came from a TV
+   * layout. Tealchart renders the semantic fields above; this preserves TV-only
+   * metadata for lossless engine switching.
+   */
+  tradingViewStudy?: PreservedTradingViewStudySource;
+}
+
+export interface PreservedTradingViewStudySource {
+  /** TradingView study identifier, usually source.metaInfo.fullId. */
+  studyId: string;
+  /** Original TradingView source object. */
+  source: Record<string, unknown>;
+}
+
+export interface PreservedTradingViewStudy {
+  /** Original TradingView source id. */
+  id: string;
+  /** Original TradingView source object. */
+  source: Record<string, unknown>;
+  /** Pane placement from the imported layout. */
+  pane?: {
+    index: number;
+    height?: number;
+    mainSeriesPane?: boolean;
+    sourceIds: string[];
+  };
+  /** Semantic Tealchart indicator id when this raw source is also renderable. */
+  mappedIndicatorId?: string;
+  /** Whether Tealchart can render this source or is only preserving it. */
+  mappingStatus: 'mapped' | 'preserved';
 }
 
 // ============================================================================
@@ -101,6 +132,12 @@ export interface ChartSettings {
    * saving does not delete the ones Tealchart does not model.
    */
   preservedTvProperties?: PreservedTvProperties;
+  /**
+   * Raw TradingView study sources carried across engine switches. Tealchart may
+   * render a mapped semantic indicator for these, but export must keep the raw
+   * source available so TV-only fields and unsupported studies survive.
+   */
+  preservedTradingViewStudies?: PreservedTradingViewStudy[];
   /** Schema version for migrations */
   version: number;
 }
