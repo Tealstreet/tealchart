@@ -30,6 +30,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       length: 20,
     },
     isOverlay: true,
+    tvImportPriority: 100,
   },
 
   ema: {
@@ -42,6 +43,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       length: 20,
     },
     isOverlay: true,
+    tvImportPriority: 100,
   },
 
   wma: {
@@ -125,6 +127,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       slowLen: 20,
     },
     isOverlay: true,
+    tvImportPriority: 100,
   },
 
   'bb-filled': {
@@ -155,6 +158,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       length: 14,
     },
     isOverlay: false,
+    tvImportPriority: 100,
   },
 
   macd: {
@@ -173,6 +177,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       signalLen: 9,
     },
     isOverlay: false,
+    tvImportPriority: 100,
   },
 
   stochastic: {
@@ -308,6 +313,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       mult: 2.0,
     },
     isOverlay: true,
+    tvImportPriority: 100,
   },
 
   atr: {
@@ -335,6 +341,7 @@ export const INDICATOR_MAPPINGS: IndicatorMappingRegistry = {
       mult: 2.0,
     },
     isOverlay: true,
+    tvImportPriority: 100,
   },
 
   'donchian-channels': {
@@ -547,15 +554,18 @@ export function findMappingByCustomId(customId: string): IndicatorMapping | unde
  * Checks both primary tvStudyId and alternative IDs (tvAltIds)
  */
 export function findMappingByTvStudyId(tvStudyId: string): IndicatorMapping | undefined {
-  return Object.values(INDICATOR_MAPPINGS).find((mapping) => {
-    // Check primary ID
-    if (mapping.tvStudyId === tvStudyId) return true;
-    // Check alternative IDs
-    if (mapping.tvAltIds?.includes(tvStudyId)) return true;
-    // Check if the study ID starts with our mapping (for versioned IDs)
-    if (tvStudyId.startsWith(mapping.tvStudyId.split('@')[0])) return true;
-    return false;
-  });
+  const mappings = Object.values(INDICATOR_MAPPINGS);
+  const byPriority = (a: IndicatorMapping, b: IndicatorMapping) =>
+    (b.tvImportPriority ?? 0) - (a.tvImportPriority ?? 0);
+
+  const exact = mappings
+    .filter((mapping) => mapping.tvStudyId === tvStudyId || mapping.tvAltIds?.includes(tvStudyId))
+    .sort(byPriority)[0];
+  if (exact) return exact;
+
+  return mappings
+    .filter((mapping) => tvStudyId.startsWith(mapping.tvStudyId.split('@')[0]))
+    .sort(byPriority)[0];
 }
 
 /**

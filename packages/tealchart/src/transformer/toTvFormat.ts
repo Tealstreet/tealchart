@@ -5,7 +5,7 @@
  * for saving via the existing SaveLoadAdapter infrastructure.
  */
 
-import type { ChartSettings, IndicatorInstance } from '../state/chartState';
+import type { ChartSettings, IndicatorInstance, PreservedTradingViewStudy } from '../state/chartState';
 import type { TvChartContent, TvChartData, TvPane, TvSource, TvSourceState } from './types';
 
 import { serializeUserDrawingStateForLayout } from '../drawings';
@@ -46,6 +46,12 @@ export function toTvFormat(settings: ChartSettings, chartName: string): TvChartD
 function buildTvContent(settings: ChartSettings): TvChartContent {
   const sources: TvSource[] = [];
   const panes: TvPane[] = [];
+  const preservedStudies = settings.preservedTradingViewStudies ?? [];
+  const preservedByMappedIndicatorId = new Map(
+    preservedStudies
+      .filter((study) => study.mappedIndicatorId)
+      .map((study) => [study.mappedIndicatorId as string, study]),
+  );
 
   // Main series source. Saving rebuilds content from scratch, so anything an
   // imported layout carried has to be re-seeded here or it is silently deleted.
@@ -89,7 +95,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
   });
 
   for (const indicator of overlayIndicators) {
-    const source = indicatorToTvSource(indicator);
+    const source = indicatorToTvSource(indicator, preservedByMappedIndicatorId.get(indicator.id));
     if (source) {
       sources.push(source);
       mainPane.sources.push(source.id);
@@ -121,7 +127,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
   });
 
   for (const indicator of separateIndicators) {
-    const source = indicatorToTvSource(indicator);
+    const source = indicatorToTvSource(indicator, preservedByMappedIndicatorId.get(indicator.id));
     if (source) {
       sources.push(source);
       panes.push({
@@ -130,6 +136,21 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
       });
     }
   }
+
+  for (const study of getPreservedOnlyStudies(preservedStudies, settings.indicators)) {
+    const source = cloneRecord(study.source) as unknown as TvSource;
+    sources.push(source);
+    if (study.pane?.mainSeriesPane || study.pane?.index === 0) {
+      mainPane.sources.push(source.id);
+    } else {
+      panes.push({
+        sources: [source.id],
+        height: study.pane?.height ?? 0.15,
+      });
+    }
+  }
+
+  applyPreservedPanePlacement(panes, sources, preservedStudies);
 
   // Store Tealstreet metadata for round-trip preservation
   const content: TvChartContent = {
@@ -151,11 +172,11 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
       userDrawingState: serializeUserDrawingStateForLayout(settings.userDrawingState),
       chartProperties: settings.chartProperties,
       preservedTvProperties: settings.preservedTvProperties,
+      preservedTradingViewStudies: settings.preservedTradingViewStudies,
     },
-    // Preserve indicators that couldn't be mapped
-    _tealstreetOriginalIndicators: settings.indicators.filter((ind) => {
-      return !findMappingByCustomId(ind.builtinId);
-    }),
+    // Preserve exact Tealchart indicator identity for lossy TV projections.
+    _tealstreetOriginalIndicators: settings.indicators,
+    _tealstreetPreservedTradingViewStudies: preservedStudies,
   };
 
   return content;
@@ -169,7 +190,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
  * Transform a Custom Chart indicator instance to TV source
  * Returns null if indicator cannot be mapped
  */
-function indicatorToTvSource(indicator: IndicatorInstance): TvSource | null {
+function indicatorToTvSource(indicator: IndicatorInstance, preservedStudy?: PreservedTradingViewStudy): TvSource | null {
   const mapping = findMappingByCustomId(indicator.builtinId);
 
   if (!mapping) {
@@ -179,11 +200,23 @@ function indicatorToTvSource(indicator: IndicatorInstance): TvSource | null {
 
   // Map inputs from custom names to TV names
   const tvInputs = mapInputsToTv(indicator.builtinId, indicator.inputs);
+  const preservedSource = preservedStudy?.source ?? indicator.tradingViewStudy?.source;
+  const baseSource = preservedSource ? (cloneRecord(preservedSource) as unknown as TvSource) : undefined;
+  const studyId = indicator.tradingViewStudy?.studyId ?? mapping.tvStudyId;
+  const baseState = baseSource?.state ? cloneRecord(baseSource.state as Record<string, unknown>) : {};
 
   return {
+    ...(baseSource ?? {}),
     id: indicator.id,
-    type: mapping.tvStudyId,
+    type: baseSource?.type ?? 'Study',
+    metaInfo: {
+      ...(baseSource?.metaInfo ?? {}),
+      fullId: baseSource?.metaInfo?.fullId ?? studyId,
+      id: baseSource?.metaInfo?.id ?? studyId,
+      shortId: baseSource?.metaInfo?.shortId ?? studyId,
+    },
     state: {
+      ...baseState,
       inputs: tvInputs,
       visible: indicator.isVisible,
       // Preserve style overrides if present
@@ -197,6 +230,67 @@ function indicatorToTvSource(indicator: IndicatorInstance): TvSource | null {
       })),
     },
   };
+}
+
+function getPreservedOnlyStudies(
+  studies: PreservedTradingViewStudy[],
+  indicators: IndicatorInstance[],
+): PreservedTradingViewStudy[] {
+  const indicatorIds = new Set(indicators.map((indicator) => indicator.id));
+  return studies.filter(
+    (study) => study.mappingStatus === 'preserved' || !study.mappedIndicatorId || !indicatorIds.has(study.mappedIndicatorId),
+  );
+}
+
+function applyPreservedPanePlacement(
+  panes: TvPane[],
+  sources: TvSource[],
+  studies: PreservedTradingViewStudy[],
+): void {
+  const sourceIds = new Set(sources.map((source) => source.id));
+  const preservedSourceIds = new Set(studies.map((study) => study.id));
+  if (preservedSourceIds.size === 0) return;
+
+  for (const pane of panes) {
+    pane.sources = pane.sources.filter((sourceId) => !preservedSourceIds.has(sourceId));
+  }
+
+  const byPane = new Map<number, NonNullable<PreservedTradingViewStudy['pane']>>();
+  for (const study of studies) {
+    if (study.pane) {
+      byPane.set(study.pane.index, study.pane);
+    }
+  }
+
+  for (const [index, preservedPane] of Array.from(byPane.entries()).sort(([a], [b]) => a - b)) {
+    const paneSourceIds = preservedPane.sourceIds.filter((sourceId) => sourceIds.has(sourceId));
+    if (paneSourceIds.length === 0) continue;
+
+    while (panes.length <= index) {
+      panes.push({
+        sources: [],
+        height: 0.15,
+      });
+    }
+
+    let pane = panes[index];
+    if (!pane) {
+      pane = {
+        sources: [],
+        height: preservedPane.height,
+        mainSeriesPane: preservedPane.mainSeriesPane,
+      };
+      panes[index] = pane;
+    }
+
+    pane.sources = Array.from(new Set([...pane.sources, ...paneSourceIds]));
+    pane.height = preservedPane.height ?? pane.height;
+    pane.mainSeriesPane = preservedPane.mainSeriesPane ?? pane.mainSeriesPane;
+  }
+}
+
+function cloneRecord<T extends Record<string, unknown>>(value: T): T {
+  return structuredClone(value);
 }
 
 // ============================================================================
