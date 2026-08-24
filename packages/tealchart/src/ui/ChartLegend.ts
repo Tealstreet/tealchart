@@ -119,6 +119,7 @@ const styles = {
     // rail moves it. Matching the rail's own timing makes the two read as one
     // motion instead of the legend jumping after the rail has gone.
     transition: `left ${LEFT_TOOL_RAIL_ANIMATION_DURATION_MS}ms ${LEFT_TOOL_RAIL_ANIMATION_EASING}`,
+    pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   mainRow: {
@@ -127,6 +128,8 @@ const styles = {
     gap: '8px',
     marginBottom: '2px',
     whiteSpace: 'nowrap',
+    pointerEvents: 'none',
+    width: 'fit-content',
   } as Partial<CSSStyleDeclaration>,
 
   symbolInfo: {
@@ -177,6 +180,8 @@ const styles = {
     cursor: 'pointer',
     color: 'var(--tc-text2, #787b86)',
     fontSize: '11px',
+    pointerEvents: 'auto',
+    width: 'fit-content',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorRow: {
@@ -186,6 +191,8 @@ const styles = {
     padding: '3px 0',
     fontSize: '11px',
     color: 'var(--tc-text, #d1d4dc)',
+    pointerEvents: 'auto',
+    width: 'fit-content',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorName: {
@@ -219,6 +226,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '2px',
+    pointerEvents: 'auto',
   } as Partial<CSSStyleDeclaration>,
 };
 
@@ -395,6 +403,7 @@ export class ChartLegend extends Component<ChartLegendState> {
         style: {
           marginTop: '2px',
           display: this.state.isExpanded ? 'block' : 'none',
+          pointerEvents: 'none',
         },
       });
 
