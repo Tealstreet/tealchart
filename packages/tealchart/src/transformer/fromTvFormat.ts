@@ -255,7 +255,11 @@ function transformIndicators(
     for (const originalIndicator of tvContent._tealstreetOriginalIndicators) {
       const existingIndex = indicators.findIndex((i) => i.id === originalIndicator.id);
       if (existingIndex >= 0) {
-        indicators[existingIndex] = originalIndicator;
+        const currentIndicator = indicators[existingIndex];
+        indicators[existingIndex] =
+          currentIndicator.builtinId === originalIndicator.builtinId
+            ? currentIndicator
+            : restoreOriginalIndicatorIdentity(originalIndicator, currentIndicator);
       } else {
         indicators.push(originalIndicator);
       }
@@ -344,6 +348,20 @@ function getPaneSourceIds(pane: TvPane): string[] {
 
 function cloneRecord<T extends Record<string, unknown>>(value: T): T {
   return structuredClone(value);
+}
+
+function restoreOriginalIndicatorIdentity(
+  originalIndicator: IndicatorInstance,
+  currentIndicator: IndicatorInstance,
+): IndicatorInstance {
+  return {
+    ...currentIndicator,
+    ...originalIndicator,
+    inputs: currentIndicator.inputs,
+    styleOverrides: currentIndicator.styleOverrides ?? originalIndicator.styleOverrides,
+    isVisible: currentIndicator.isVisible,
+    tradingViewStudy: currentIndicator.tradingViewStudy ?? originalIndicator.tradingViewStudy,
+  };
 }
 
 // ============================================================================

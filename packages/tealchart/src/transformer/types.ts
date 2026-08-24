@@ -151,6 +151,8 @@ export interface TvPlot {
   linewidth?: number;
   linestyle?: number; // 0 = solid, 1 = dotted, 2 = dashed
   visible?: boolean;
+  /** Preserve TV plot fields this transformer does not model. */
+  [key: string]: unknown;
 }
 
 /**

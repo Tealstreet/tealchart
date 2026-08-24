@@ -70,9 +70,9 @@ describe('indicator engine interop preservation', () => {
         description: 'Moving Average',
       },
       state: {
-        inputs: { Length: 55 },
+        inputs: { Length: 55, customTvInput: 'preserved' },
         visible: true,
-        plots: [{ id: 'plot_0', type: 'line', color: '#ffaa00', linewidth: 3 }],
+        plots: [{ id: 'plot_0', type: 'line', color: '#ffaa00', linewidth: 3, trackPrice: true }],
         styles: { plot_0: { plottype: 0 } },
       },
       ownerSource: 'main',
@@ -102,7 +102,8 @@ describe('indicator engine interop preservation', () => {
 
     expect(exportedStudy.type).toBe('Study');
     expect(exportedStudy.metaInfo?.fullId).toBe('STD;SMA');
-    expect(exportedStudy.state.inputs).toEqual({ Length: 55 });
+    expect(exportedStudy.state.inputs).toEqual({ Length: 55, customTvInput: 'preserved' });
+    expect(exportedStudy.state.plots?.[0]).toMatchObject({ id: 'plot_0', trackPrice: true });
     expect(exportedStudy.state.styles).toEqual({ plot_0: { plottype: 0 } });
     expect(exportedStudy.ownerSource).toBe('main');
   });
@@ -173,7 +174,51 @@ describe('indicator engine interop preservation', () => {
     expect(getSource(exportedContent, 'bb_filled_1').metaInfo?.fullId).toBe('STD;Bollinger_Bands');
 
     const imported = fromTvFormat(tv);
-    expect(imported.data.indicators).toEqual([variantIndicator]);
+    expect(imported.data.indicators[0]).toMatchObject(variantIndicator);
+    expect(imported.data.indicators[0]?.tradingViewStudy?.studyId).toBe('STD;Bollinger_Bands');
+  });
+
+  it('keeps TradingView edits when loading a Tealchart-origin mapped indicator', () => {
+    const smaIndicator: IndicatorInstance = {
+      id: 'sma_1',
+      name: 'SMA',
+      builtinId: 'sma',
+      inputs: { length: 20 },
+      isVisible: true,
+      createdAt: 100,
+    };
+
+    const tv = toTvFormat(createSettings({ indicators: [smaIndicator] }), 'SMA');
+    const editedContent = JSON.parse(tv.content) as TvChartContent;
+    getSource(editedContent, 'sma_1').state.inputs = { Length: 55 };
+
+    const imported = fromTvFormat({ ...tv, content: JSON.stringify(editedContent) });
+    expect(imported.data.indicators[0]).toMatchObject({
+      id: 'sma_1',
+      builtinId: 'sma',
+      inputs: { length: 55 },
+    });
+  });
+
+  it('does not resurrect a deleted mapped TradingView study', () => {
+    const tvStudy: TvSource = {
+      id: 'sma_1',
+      type: 'Study',
+      metaInfo: {
+        fullId: 'STD;SMA',
+        id: 'STD;SMA',
+      },
+      state: {
+        inputs: { Length: 20 },
+        visible: true,
+      },
+    };
+
+    const imported = fromTvFormat(JSON.stringify(createTvContent([tvStudy])));
+    const exported = toTvFormat({ ...imported.data, indicators: [] }, 'Deleted mapped study');
+    const exportedContent = JSON.parse(exported.content) as TvChartContent;
+
+    expect(exportedContent.sources.some((source) => source.id === 'sma_1')).toBe(false);
   });
 
   it('imports duplicate TradingView study IDs as canonical TV-backed indicators', () => {
@@ -230,5 +275,6 @@ describe('indicator engine interop preservation', () => {
     const exportedContent = JSON.parse(exported.content) as TvChartContent;
 
     expect(exportedContent.panes.some((pane) => pane.sources.join('|') === 'rsi_1|tv_only_same_pane')).toBe(true);
+    expect(exportedContent.panes.every((pane) => pane.sources.length > 0)).toBe(true);
   });
 });
