@@ -51,6 +51,7 @@ const styles = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: '11px',
     userSelect: 'none',
+    pointerEvents: 'none',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorRow: {
@@ -59,6 +60,8 @@ const styles = {
     gap: '6px',
     padding: '2px 0',
     color: 'var(--tc-text, #d1d4dc)',
+    pointerEvents: 'auto',
+    width: 'fit-content',
   } as Partial<CSSStyleDeclaration>,
 
   indicatorName: {
@@ -87,6 +90,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '2px',
+    pointerEvents: 'auto',
   } as Partial<CSSStyleDeclaration>,
 };
 
