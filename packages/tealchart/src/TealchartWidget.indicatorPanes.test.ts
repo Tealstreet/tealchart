@@ -3,7 +3,7 @@ import type { ChartPane, ResolutionString, TealchartWidgetOptions } from './type
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getIndicatorById } from './indicators/builtinIndicators';
-import { clearChartStoreCache } from './state/chartState';
+import { clearChartStoreCache, DEFAULT_CHART_SETTINGS, type ChartSettings } from './state/chartState';
 import { TealchartWidget } from './TealchartWidget';
 
 const addIndicatorOptions: { onAddIndicator?: (indicator: unknown) => void } = {};
@@ -54,6 +54,7 @@ vi.mock('./GapDetectionManager', () => ({
 
 interface WidgetInternals {
   _paneManager: { getIndicatorPanes: () => ChartPane[] };
+  _handleLoadLayout: (settings: ChartSettings, warnings: string[], layoutId: string, layoutName: string) => void;
 }
 
 function createWidget(overrides: Partial<TealchartWidgetOptions> = {}): TealchartWidget {
@@ -139,6 +140,43 @@ describe('TealchartWidget indicator panes', () => {
 
     await vi.waitFor(() => expect(addedScripts).toHaveLength(1));
     expect(addedScripts[0].code).toBe(source);
+
+    widget.remove();
+  });
+
+  it('rehydrates loaded layout indicators into live scripts', async () => {
+    const widget = createWidget();
+    const momentum = getIndicatorById('momentum');
+    const bands = getIndicatorById('bollinger-bands');
+    expect(momentum?.code).toBeTruthy();
+    expect(bands?.code).toBeTruthy();
+
+    const settings: ChartSettings = {
+      ...DEFAULT_CHART_SETTINGS,
+      indicators: [
+        {
+          id: 'momentum_layout_1',
+          name: 'Momentum',
+          builtinId: 'momentum',
+          inputs: { length: 10 },
+          isVisible: true,
+          createdAt: 1,
+        },
+        {
+          id: 'bands_layout_1',
+          name: 'Bollinger Bands',
+          builtinId: 'bollinger-bands',
+          inputs: { length: 20, mult: 2 },
+          isVisible: true,
+          createdAt: 2,
+        },
+      ],
+    };
+
+    (widget as unknown as WidgetInternals)._handleLoadLayout(settings, [], 'layout-1', 'Default');
+
+    await vi.waitFor(() => expect(addedScripts).toHaveLength(2));
+    expect(addedScripts.map((script) => script.code)).toEqual([momentum?.code, bands?.code]);
 
     widget.remove();
   });

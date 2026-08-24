@@ -297,6 +297,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   private _indicatorStudyMap = new Map<string, string>();
   // Reverse map from study ID to indicator instance ID
   private _studyInstanceMap = new Map<string, string>();
+  private _indicatorRestoreGeneration = 0;
 
   // Pane management for non-overlay indicators
   private _paneManager: PaneManager;
@@ -1119,8 +1120,36 @@ export class TealchartWidget implements ITealchartWebWidget {
   private _restorePersistedIndicators(): void {
     if (!this._chartStore) return;
 
-    const indicators = this._chartStore.settings.get().indicators;
-    if (!indicators || indicators.length === 0) return;
+    this._replaceRuntimeIndicators(this._chartStore.settings.get().indicators);
+  }
+
+  private _clearRuntimeIndicators(): void {
+    for (const study of this._chartApi.getAllStudies()) {
+      this._chartApi.removeStudy(study.id);
+    }
+
+    for (const instanceId of this._jailbreakInstanceIds) {
+      this._jailbreakManager?.unregister(instanceId);
+    }
+    this._jailbreakInstanceIds.clear();
+
+    this._indicatorStudyMap.clear();
+    this._studyInstanceMap.clear();
+    this._indicatorConfigMap.clear();
+    this._indicatorDeclarationMap.clear();
+    this._paneManager.reset();
+    this._plots = [];
+    this._drawings = [];
+  }
+
+  private _replaceRuntimeIndicators(indicators: IndicatorInstance[] | undefined): void {
+    const restoreGeneration = ++this._indicatorRestoreGeneration;
+    this._clearRuntimeIndicators();
+
+    if (!indicators || indicators.length === 0) {
+      this._scheduler.markDirty(DIRTY.FULL);
+      return;
+    }
 
     for (const instance of indicators) {
       // Look up the built-in indicator by ID
@@ -1152,6 +1181,10 @@ export class TealchartWidget implements ITealchartWebWidget {
         .then((studyApi) => {
           if (studyApi) {
             const studyId = studyApi.getId();
+            if (this._disposed || restoreGeneration !== this._indicatorRestoreGeneration) {
+              this._chartApi.removeStudy(studyId);
+              return;
+            }
 
             // Track the mapping from instance ID to study ID
             this._indicatorStudyMap.set(instance.id, studyId);
@@ -1165,6 +1198,7 @@ export class TealchartWidget implements ITealchartWebWidget {
               this._chartApi.toggleStudyVisibility(studyId);
               this._tealScriptManager?.toggleScriptVisibility(studyId);
             }
+            this._scheduler.markDirty(DIRTY.FULL);
           }
         })
         .catch((error) => {
@@ -2319,6 +2353,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (options.newSymbol !== undefined) {
       this._symbol = options.newSymbol;
       this._ui?.setSymbol(options.newSymbol);
+      this._chartStore?.settings.setKey('symbol', options.newSymbol);
     }
 
     // A price axis the user scaled by hand belongs to the market it was scaled
@@ -3990,49 +4025,6 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartApi.setResolution(settings.interval);
     }
 
-    // Clear existing indicators
-    const existingStudies = this._chartApi.getAllStudies();
-    for (const study of existingStudies) {
-      this._handleRemoveIndicator(study.id);
-    }
-
-    // Add indicators from loaded settings
-    if (settings.indicators && settings.indicators.length > 0) {
-      for (const indicator of settings.indicators) {
-        const builtinIndicator = this._getIndicatorById(indicator.builtinId);
-        if (!builtinIndicator) {
-          this._logger?.warn(LogCategory.Indicators, `Unknown indicator: ${indicator.builtinId}`);
-          continue;
-        }
-
-        // Route jailbreak indicators to their own handler (they use BarsIndicator, not tealscript)
-        if (builtinIndicator.jailbreak) {
-          this._restoreJailbreakIndicator(indicator, builtinIndicator);
-          continue;
-        }
-
-        // Tealscript indicators: create study with saved inputs
-        this._chartApi
-          .createStudy(
-            builtinIndicator.code,
-            builtinIndicator.overlay,
-            false,
-            indicator.inputs,
-            {},
-            { displayName: indicator.name },
-          )
-          .then((studyApi) => {
-            if (studyApi) {
-              const studyId = studyApi.getId();
-              this._indicatorStudyMap.set(indicator.id, studyId);
-              this._studyInstanceMap.set(studyId, indicator.id);
-              this._indicatorConfigMap.set(studyId, builtinIndicator);
-              this._scheduler.markDirty(DIRTY.FULL);
-            }
-          });
-      }
-    }
-
     // Apply loaded settings to the in-memory store so auto-save can read them
     if (this._chartStore) {
       this._chartStore.settings.setKey('indicators', settings.indicators || []);
@@ -4047,6 +4039,8 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('symbol', settings.symbol || this._symbol);
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
+
+    this._replaceRuntimeIndicators(settings.indicators || []);
 
     // The store alone does not render. Volume is drawn from _renderOptions, so a
     // loaded layout has to reach it or the chart shows the previous layout's
