@@ -3,6 +3,7 @@ import type { Bar } from '../types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { getIndicatorById } from '../indicators/builtinIndicators';
 import { clearChartStoreCache } from '../state/chartState';
 import { MobileIndicatorManager } from './MobileIndicatorManager';
 
@@ -20,6 +21,27 @@ function makeBars(count: number): Bar[] {
 describe('MobileIndicatorManager custom Tealscript indicators', () => {
   afterEach(() => {
     clearChartStoreCache();
+  });
+
+  it('renders built-in Momentum and Bollinger Bands plots', () => {
+    const manager = new MobileIndicatorManager();
+    manager.setBars(makeBars(40));
+
+    const momentum = getIndicatorById('momentum');
+    const bollingerBands = getIndicatorById('bollinger-bands');
+    expect(momentum).toBeDefined();
+    expect(bollingerBands).toBeDefined();
+
+    const momentumId = manager.addIndicator(momentum!, { length: 10 });
+    const bollingerBandsId = manager.addIndicator(bollingerBands!, { length: 20, mult: 2 });
+
+    const plots = manager.getPlots();
+    const momentumPlots = plots.filter((plot) => plot.scriptId === momentumId);
+    const bollingerBandsPlots = plots.filter((plot) => plot.scriptId === bollingerBandsId);
+
+    expect(momentumPlots.some((plot) => plot.values.some((value) => typeof value === 'number'))).toBe(true);
+    expect(bollingerBandsPlots).toHaveLength(3);
+    expect(bollingerBandsPlots.every((plot) => plot.values.some((value) => typeof value === 'number'))).toBe(true);
   });
 
   it('adds caller-provided Tealscript and tags plots with the returned instance ID', () => {
