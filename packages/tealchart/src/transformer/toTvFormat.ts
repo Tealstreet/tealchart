@@ -6,7 +6,7 @@
  */
 
 import type { ChartSettings, IndicatorInstance, PreservedTradingViewStudy } from '../state/chartState';
-import type { TvChartContent, TvChartData, TvPane, TvSource, TvSourceState } from './types';
+import type { TvChartContent, TvChartData, TvPane, TvPlot, TvSource, TvSourceState } from './types';
 
 import { serializeUserDrawingStateForLayout } from '../drawings';
 import { writeTvChartProperties } from './chartProperties';
@@ -137,7 +137,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
     }
   }
 
-  for (const study of getPreservedOnlyStudies(preservedStudies, settings.indicators)) {
+  for (const study of getPreservedOnlyStudies(preservedStudies)) {
     const source = cloneRecord(study.source) as unknown as TvSource;
     sources.push(source);
     if (study.pane?.mainSeriesPane || study.pane?.index === 0) {
@@ -204,6 +204,9 @@ function indicatorToTvSource(indicator: IndicatorInstance, preservedStudy?: Pres
   const baseSource = preservedSource ? (cloneRecord(preservedSource) as unknown as TvSource) : undefined;
   const studyId = indicator.tradingViewStudy?.studyId ?? mapping.tvStudyId;
   const baseState = baseSource?.state ? cloneRecord(baseSource.state as Record<string, unknown>) : {};
+  const baseInputs = isRecord(baseState.inputs) ? baseState.inputs : {};
+  const basePlots = Array.isArray(baseState.plots) ? baseState.plots : undefined;
+  const plots = mergeTvPlots(basePlots, indicator.styleOverrides);
 
   return {
     ...(baseSource ?? {}),
@@ -217,29 +220,18 @@ function indicatorToTvSource(indicator: IndicatorInstance, preservedStudy?: Pres
     },
     state: {
       ...baseState,
-      inputs: tvInputs,
+      inputs: {
+        ...baseInputs,
+        ...tvInputs,
+      },
       visible: indicator.isVisible,
-      // Preserve style overrides if present
-      plots: indicator.styleOverrides?.map((override) => ({
-        id: override.plotId,
-        type: 'line',
-        color: override.color,
-        linewidth: override.linewidth,
-        linestyle: override.lineStyle ? LINE_STYLE_TO_TV[override.lineStyle] : undefined,
-        visible: true,
-      })),
+      ...(plots ? { plots } : {}),
     },
   };
 }
 
-function getPreservedOnlyStudies(
-  studies: PreservedTradingViewStudy[],
-  indicators: IndicatorInstance[],
-): PreservedTradingViewStudy[] {
-  const indicatorIds = new Set(indicators.map((indicator) => indicator.id));
-  return studies.filter(
-    (study) => study.mappingStatus === 'preserved' || !study.mappedIndicatorId || !indicatorIds.has(study.mappedIndicatorId),
-  );
+function getPreservedOnlyStudies(studies: PreservedTradingViewStudy[]): PreservedTradingViewStudy[] {
+  return studies.filter((study) => study.mappingStatus === 'preserved' || !study.mappedIndicatorId);
 }
 
 function applyPreservedPanePlacement(
@@ -287,10 +279,48 @@ function applyPreservedPanePlacement(
     pane.height = preservedPane.height ?? pane.height;
     pane.mainSeriesPane = preservedPane.mainSeriesPane ?? pane.mainSeriesPane;
   }
+
+  for (let i = panes.length - 1; i >= 0; i -= 1) {
+    if (panes[i]?.sources.length === 0) {
+      panes.splice(i, 1);
+    }
+  }
 }
 
 function cloneRecord<T extends Record<string, unknown>>(value: T): T {
   return structuredClone(value);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function mergeTvPlots(
+  basePlots: TvPlot[] | undefined,
+  styleOverrides: IndicatorInstance['styleOverrides'],
+): TvPlot[] | undefined {
+  if (!styleOverrides?.length) {
+    return basePlots;
+  }
+
+  const baseById = new Map<string, TvPlot>();
+  for (const plot of basePlots ?? []) {
+    if (typeof plot.id !== 'string') continue;
+    baseById.set(plot.id, plot);
+  }
+
+  return styleOverrides.map((override) => {
+    const basePlot: Partial<TvPlot> = baseById.get(override.plotId) ?? {};
+    return {
+      ...basePlot,
+      id: override.plotId,
+      type: basePlot.type ?? 'line',
+      color: override.color,
+      linewidth: override.linewidth,
+      linestyle: override.lineStyle ? LINE_STYLE_TO_TV[override.lineStyle] : basePlot.linestyle,
+      visible: basePlot.visible ?? true,
+    };
+  });
 }
 
 // ============================================================================
