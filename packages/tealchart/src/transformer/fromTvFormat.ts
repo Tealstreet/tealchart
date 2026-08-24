@@ -5,7 +5,7 @@
  * for loading layouts created by TradingView or Custom Chart.
  */
 
-import type { ChartSettings, IndicatorInstance } from '../state/chartState';
+import type { ChartSettings, IndicatorInstance, PreservedTradingViewStudy } from '../state/chartState';
 import type { ResolutionString } from '../types';
 import type { TransformResult, TvChartContent, TvChartData, TvPane, TvSource } from './types';
 
@@ -121,22 +121,27 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
   // Find volume pane height
   let volumeHeight = 0.2;
   const volumePane = tvContent.panes?.find((p) =>
-    p.sources.some((id) => tvContent.sources?.find((s) => s.id === id && s.type === 'Volume')),
+    getPaneSourceIds(p).some((id) => tvContent.sources?.find((s) => s.id === id && s.type === 'Volume')),
   );
   if (volumePane?.height) {
     volumeHeight = volumePane.height;
   }
 
+  // Use preserved settings if this is a round-trip
+  const originalSettings = tvContent._tealstreetOriginalSettings;
+
   // Transform indicators
-  const { indicators, warnings: indicatorWarnings, unmapped } = transformIndicators(tvContent, isTealchartOrigin);
+  const {
+    indicators,
+    warnings: indicatorWarnings,
+    unmapped,
+    preservedTradingViewStudies,
+  } = transformIndicators(tvContent, isTealchartOrigin, originalSettings?.preservedTradingViewStudies);
   warnings.push(...indicatorWarnings);
 
   if (unmapped.length > 0) {
     unmappedData.indicators = unmapped;
   }
-
-  // Use preserved settings if this is a round-trip
-  const originalSettings = tvContent._tealstreetOriginalSettings;
 
   const settings: ChartSettings = {
     symbol,
@@ -161,6 +166,7 @@ export function fromTvFormat(chartData: TvChartData | string): TransformResult<C
     preservedTvProperties:
       capturePreservedTvProperties(tvContent.chartProperties, mainSource?.state) ??
       sanitizePreservedTvProperties(originalSettings?.preservedTvProperties),
+    preservedTradingViewStudies,
     version: CHART_SETTINGS_VERSION,
   };
 
@@ -179,15 +185,21 @@ interface IndicatorTransformResult {
   indicators: IndicatorInstance[];
   warnings: string[];
   unmapped: TvSource[];
+  preservedTradingViewStudies?: PreservedTradingViewStudy[];
 }
 
 /**
  * Transform TV sources to Custom Chart indicators
  */
-function transformIndicators(tvContent: TvChartContent, isTealchartOrigin: boolean): IndicatorTransformResult {
+function transformIndicators(
+  tvContent: TvChartContent,
+  isTealchartOrigin: boolean,
+  originalPreservedStudies?: PreservedTradingViewStudy[],
+): IndicatorTransformResult {
   const indicators: IndicatorInstance[] = [];
   const warnings: string[] = [];
   const unmapped: TvSource[] = [];
+  const preservedTradingViewStudies: PreservedTradingViewStudy[] = [];
 
   // Get sources, excluding main series and volume
   const studySources =
@@ -201,21 +213,50 @@ function transformIndicators(tvContent: TvChartContent, isTealchartOrigin: boole
 
   for (const source of studySources) {
     const indicator = tvSourceToIndicator(source);
+    const pane = findSourcePane(tvContent, source.id);
 
     if (indicator) {
       indicators.push(indicator);
+      preservedTradingViewStudies.push({
+        id: source.id,
+        source: cloneRecord(source),
+        pane,
+        mappedIndicatorId: indicator.id,
+        mappingStatus: 'mapped',
+      });
     } else {
-      warnings.push(`Indicator "${source.type}" is not supported in custom chart`);
+      warnings.push(`Indicator "${getTvStudyId(source)}" is not supported in custom chart`);
       unmapped.push(source);
+      preservedTradingViewStudies.push({
+        id: source.id,
+        source: cloneRecord(source),
+        pane,
+        mappingStatus: 'preserved',
+      });
+    }
+  }
+
+  if (isTealchartOrigin) {
+    const existingIds = new Set(preservedTradingViewStudies.map((study) => study.id));
+    const originalStudies = [
+      ...(originalPreservedStudies ?? []),
+      ...(tvContent._tealstreetPreservedTradingViewStudies ?? []),
+    ];
+    for (const originalStudy of originalStudies) {
+      if (!existingIds.has(originalStudy.id)) {
+        preservedTradingViewStudies.push(originalStudy);
+        existingIds.add(originalStudy.id);
+      }
     }
   }
 
   // If this is a round-trip, restore any originally unmapped indicators
   if (isTealchartOrigin && tvContent._tealstreetOriginalIndicators) {
     for (const originalIndicator of tvContent._tealstreetOriginalIndicators) {
-      // Check if this indicator was already restored from TV sources
-      const alreadyRestored = indicators.some((i) => i.id === originalIndicator.id);
-      if (!alreadyRestored) {
+      const existingIndex = indicators.findIndex((i) => i.id === originalIndicator.id);
+      if (existingIndex >= 0) {
+        indicators[existingIndex] = originalIndicator;
+      } else {
         indicators.push(originalIndicator);
       }
     }
@@ -224,7 +265,12 @@ function transformIndicators(tvContent: TvChartContent, isTealchartOrigin: boole
   // Sort by createdAt to preserve original order
   indicators.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 
-  return { indicators, warnings, unmapped };
+  return {
+    indicators,
+    warnings,
+    unmapped,
+    preservedTradingViewStudies: preservedTradingViewStudies.length > 0 ? preservedTradingViewStudies : undefined,
+  };
 }
 
 /**
@@ -233,8 +279,7 @@ function transformIndicators(tvContent: TvChartContent, isTealchartOrigin: boole
  */
 function tvSourceToIndicator(source: TvSource): IndicatorInstance | null {
   // Get the actual study ID from metaInfo (TV stores it there, not in source.type)
-  const sourceAny = source as any;
-  const studyId = sourceAny.metaInfo?.fullId || sourceAny.metaInfo?.id || sourceAny.metaInfo?.shortId || source.type;
+  const studyId = getTvStudyId(source);
 
   const mapping = findMappingByTvStudyId(studyId);
 
@@ -263,7 +308,42 @@ function tvSourceToIndicator(source: TvSource): IndicatorInstance | null {
     styleOverrides: styleOverrides?.length ? styleOverrides : undefined,
     isVisible: source.state?.visible ?? true,
     createdAt: Date.now(),
+    tradingViewStudy: {
+      studyId,
+      source: cloneRecord(source),
+    },
   };
+}
+
+function getTvStudyId(source: TvSource): string {
+  return source.metaInfo?.fullId ?? source.metaInfo?.id ?? source.metaInfo?.shortId ?? source.type;
+}
+
+function findSourcePane(tvContent: TvChartContent, sourceId: string): PreservedTradingViewStudy['pane'] {
+  const panes = tvContent.panes ?? [];
+  for (let index = 0; index < panes.length; index += 1) {
+    const pane = panes[index];
+    if (!pane) continue;
+    if (getPaneSourceIds(pane).includes(sourceId)) {
+      return {
+        index,
+        height: pane.height,
+        mainSeriesPane: pane.mainSeriesPane,
+        sourceIds: getPaneSourceIds(pane),
+      };
+    }
+  }
+  return undefined;
+}
+
+function getPaneSourceIds(pane: TvPane): string[] {
+  return pane.sources
+    .map((source) => (typeof source === 'string' ? source : (source as { id?: unknown }).id))
+    .filter((id): id is string => typeof id === 'string');
+}
+
+function cloneRecord<T extends Record<string, unknown>>(value: T): T {
+  return structuredClone(value);
 }
 
 // ============================================================================
