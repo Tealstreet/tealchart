@@ -4,6 +4,8 @@ import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import {
   clampNativePriceAxisTickLabelY,
   clampNativeTimeAxisTickLabelX,
+  createNativeCenteredAxisTextX,
+  createNativeLeftAlignedAxisTextX,
   createNativePriceAxisTickLabelLayout,
   createNativePriceAxisTickTextLayout,
   createNativeRightAlignedAxisTextX,
@@ -94,6 +96,20 @@ describe('native axis tick layout', () => {
     expect(createNativeRightAlignedAxisTextX(right, 7, characterWidth, maxWidth)).toBe(right - 42);
     expect(createNativeRightAlignedAxisTextX(right, 5, characterWidth, maxWidth)).toBe(right - 30);
     expect(createNativeRightAlignedAxisTextX(right, 20, characterWidth, maxWidth)).toBe(right - 42);
+  });
+
+  it('centers main price-axis labels in the shared axis lane', () => {
+    const left = frame.priceAxisLeft + 4;
+    const characterWidth = 6;
+    const maxWidth = 42;
+
+    expect(createNativeCenteredAxisTextX(left, 7, characterWidth, maxWidth)).toBe(left);
+    expect(createNativeCenteredAxisTextX(left, 5, characterWidth, maxWidth)).toBe(left + 6);
+    expect(createNativeCenteredAxisTextX(left, 20, characterWidth, maxWidth)).toBe(left);
+  });
+
+  it('left-aligns secondary pane labels to the shared axis lane', () => {
+    expect(createNativeLeftAlignedAxisTextX(frame.priceAxisLeft + 4)).toBe(frame.priceAxisLeft + 4);
   });
 
   it('derives price-label slot capacity from the reserved axis lane', () => {

@@ -33,10 +33,8 @@ function slotsFor(pane: { yMin: number; yMax: number; top?: number; height?: num
   const frame = frameWith(pane);
   const indicator = frame.panes.find((entry) => entry.type === 'indicator')!;
   return resolveNativeIndicatorPaneAxisSlots({
-    characterWidth: 6,
     frame,
-    labelMaxWidth: 56,
-    labelRight: 398,
+    labelLeft: 346,
     maxCharacters: 9,
     pane: indicator,
   });
@@ -88,11 +86,11 @@ describe('NativeIndicatorPaneAxisLayer', () => {
     expect(labels.some((label) => label.includes('.'))).toBe(true);
   });
 
-  it('right-aligns labels against the axis edge', () => {
+  it('left-aligns labels to the shared axis lane edge', () => {
     const slots = slotsFor({ yMin: 0, yMax: 100 }).filter((slot) => slot.visible);
 
     for (const slot of slots) {
-      expect(slot.labelX + slot.labelText.length * 6).toBeLessThanOrEqual(398.001);
+      expect(slot.labelX).toBe(346);
     }
   });
 
@@ -110,11 +108,9 @@ describe('NativeIndicatorPaneAxisLayer', () => {
     const indicator = frame.panes.find((entry) => entry.type === 'indicator')!;
     const collapsed = { ...indicator, top: 400, bottom: 400, height: 0 };
     const slot = resolveNativeIndicatorPaneAxisSlot({
-      characterWidth: 6,
       frame,
       index: 0,
-      labelMaxWidth: 56,
-      labelRight: 398,
+      labelLeft: 346,
       maxCharacters: 9,
       pane: collapsed,
       range: { yMin: 0, yMax: 100 },

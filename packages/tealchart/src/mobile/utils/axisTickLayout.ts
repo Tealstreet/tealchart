@@ -97,6 +97,18 @@ export function createNativeRightAlignedAxisTextX(right: number, textLength: num
   return right - width;
 }
 
+export function createNativeCenteredAxisTextX(left: number, textLength: number, characterWidth: number, maxWidth: number): number {
+  'worklet';
+  if (characterWidth <= 0) return left;
+  const width = Math.min(Math.max(0, textLength) * characterWidth, maxWidth);
+  return left + Math.max(0, (maxWidth - width) / 2);
+}
+
+export function createNativeLeftAlignedAxisTextX(left: number): number {
+  'worklet';
+  return left;
+}
+
 export function getNativeAxisTextCharacterCapacity(maxWidth: number, characterWidth: number): number {
   if (characterWidth <= 0) return 1;
   return Math.max(1, Math.floor(Math.max(0, maxWidth) / characterWidth));
