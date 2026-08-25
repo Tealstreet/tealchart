@@ -53,6 +53,7 @@ import {
   resolveUserDrawingMagnetInputPoint,
   resolveUserDrawingPlacementConstraint,
 } from '../drawings';
+import { snapPriceToTick, snapTimeToInterval } from '../interaction/crosshairSnap';
 import { EventManager } from '../interaction/EventManager';
 import { OemsActionManager } from '../interaction/oemsActionManager';
 import {
@@ -72,7 +73,6 @@ import {
   resolvePartialBracketMarkers,
 } from '../interaction/partialBrackets';
 import { PriceLineManager } from '../interaction/PriceLineManager';
-import { snapPriceToTick, snapTimeToInterval } from '../interaction/crosshairSnap';
 import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -453,16 +453,14 @@ export class ChartCore {
 
   // Data refs
   private bars: Bar[] = [];
-  private jailbreakTooltipBarsCache:
-    | {
-        source: Bar[];
-        length: number;
-        firstTime: number | undefined;
-        lastTime: number | undefined;
-        lastClose: number | undefined;
-        barsInSeconds: Bar[];
-      }
-    | null = null;
+  private jailbreakTooltipBarsCache: {
+    source: Bar[];
+    length: number;
+    firstTime: number | undefined;
+    lastTime: number | undefined;
+    lastClose: number | undefined;
+    barsInSeconds: Bar[];
+  } | null = null;
   private viewport: Viewport | null = null;
   private priceLines: PriceLine[] = [];
   private rawOrderLines: OrderLineRenderData[] = [];
@@ -2533,11 +2531,14 @@ export class ChartCore {
       ctx.font = `11px ${font}`;
       const measuredPriceLabelWidth = ctx.measureText(priceText).width + 10;
       this.crosshairPriceLabelMaxWidth = Math.max(this.crosshairPriceLabelMaxWidth, measuredPriceLabelWidth);
-      const priceLabelWidth = this.crosshairPriceLabelMaxWidth;
+      const priceLabelWidth = Math.max(
+        this.crosshairPriceLabelMaxWidth,
+        ...this.labelBoundsCache.map((bound) => bound.width),
+      );
       const priceLabelRight = width - PRICE_AXIS_RIGHT_PADDING;
       priceLabel = {
         text: priceText,
-        textX: priceLabelRight - 5,
+        textX: priceLabelRight - priceLabelWidth / 2,
         x: priceLabelRight - priceLabelWidth,
         y: y - CROSSHAIR_PRICE_LABEL_HEIGHT / 2,
         width: priceLabelWidth,
@@ -2655,7 +2656,7 @@ export class ChartCore {
 
       // Text
       ctx.fillStyle = this.options.renderOptions?.backgroundColor || '#131722';
-      ctx.textAlign = 'right';
+      ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(priceLabel.text, priceLabel.textX, y);
     }

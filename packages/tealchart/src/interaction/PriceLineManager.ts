@@ -331,10 +331,7 @@ export class PriceLineManager {
   /**
    * Update the price line data
    */
-  update(
-    labelBounds: PriceLineLabelBounds[],
-    crosshair?: CrosshairState,
-  ): void {
+  update(labelBounds: PriceLineLabelBounds[], crosshair?: CrosshairState): void {
     // Check if we need a full rebuild or can do incremental update
     const newSignature = this.computeSignature(labelBounds);
     const structureChanged = newSignature !== this.lastLabelBoundsSignature;
@@ -837,7 +834,8 @@ export class PriceLineManager {
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Line dash pattern
-    const lineDash = bound.lineStyle === 'dashed' ? [4, 4] : bound.lineStyle === 'dotted' ? TRADE_LINE_DOTTED_DASH_PATTERN : [];
+    const lineDash =
+      bound.lineStyle === 'dashed' ? [4, 4] : bound.lineStyle === 'dotted' ? TRADE_LINE_DOTTED_DASH_PATTERN : [];
 
     // Create group for this price line
     const lineGroup = new Konva.Group({ opacity });
@@ -916,7 +914,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'right',
+        align: 'center',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -931,7 +929,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'right',
+        align: 'center',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -954,7 +952,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'right',
+        align: 'center',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1397,7 +1395,8 @@ export class PriceLineManager {
             const currentCenterX = currentPointer?.x ?? currentPosition.x + buttonWidth / 2;
             const currentCenterY = currentPointer?.y ?? currentPosition.y + LABEL_HEIGHT / 2;
             const dragStartX = activeDrag.originalPointerX ?? activeDrag.startCenterX ?? startCenterX;
-            const dragStartY = activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? activeDrag.originalY + LABEL_HEIGHT / 2;
+            const dragStartY =
+              activeDrag.originalPointerY ?? activeDrag.originalAbsoluteY ?? activeDrag.originalY + LABEL_HEIGHT / 2;
             const deltaX = Math.abs(currentCenterX - dragStartX);
             const deltaY = Math.abs(currentCenterY - dragStartY);
             const price = yToPrice(currentCenterY);
@@ -1438,9 +1437,10 @@ export class PriceLineManager {
           buttonGroup.add(hitRect);
           refs.buttonIcons.push(undefined);
         } else if (button.type === 'cancel' || button.type === 'close') {
-          const icons = button.icon === '✓'
-            ? createCheckIcon(currentX, lineY, buttonWidth, button.iconColor)
-            : createCloseIcon(currentX, lineY, buttonWidth, button.iconColor);
+          const icons =
+            button.icon === '✓'
+              ? createCheckIcon(currentX, lineY, buttonWidth, button.iconColor)
+              : createCloseIcon(currentX, lineY, buttonWidth, button.iconColor);
           icons.forEach((icon) => buttonGroup.add(icon));
           refs.buttonTexts.push(undefined);
           refs.buttonIcons.push(icons);
@@ -1564,7 +1564,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'right',
+        align: 'center',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1579,7 +1579,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'right',
+        align: 'center',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1603,7 +1603,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'right',
+        align: 'center',
         verticalAlign: 'middle',
         listening: false,
       });

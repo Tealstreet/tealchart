@@ -1,7 +1,7 @@
-import { getOemsOrderObjectId, getOemsPositionObjectId } from '../../interaction/oemsLineState';
-import type { ChartDimensions } from './coordinates';
 import type { ChartLabelButton, ChartLabelSegment, OrderLineRenderData, PositionLineRenderData } from '../../types';
+import type { ChartDimensions } from './coordinates';
 
+import { getOemsOrderObjectId, getOemsPositionObjectId } from '../../interaction/oemsLineState';
 import { computeTradingLineLabelMinX, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
 import {
   orderTradeLineButtonsForDisplay,
@@ -332,7 +332,11 @@ function getNativeTradeLineSegmentCorners(
   return 'none';
 }
 
-function getNativeTradeLineButtonCorners(index: number, buttonCount: number, segmentCount: number): NativeTradeLineCornerStyle {
+function getNativeTradeLineButtonCorners(
+  index: number,
+  buttonCount: number,
+  segmentCount: number,
+): NativeTradeLineCornerStyle {
   if (buttonCount === 0) return 'none';
   if (segmentCount === 0 && buttonCount === 1) return 'all';
   if (segmentCount === 0 && index === 0) return 'left';
@@ -365,7 +369,10 @@ function getNativeTradeLineButtonCornersForVisibleButtons(
   return 'none';
 }
 
-export function measureNativeTradeLinePriceLabelWidth(formattedPrice: string, textWidth = estimateNativeTradeLineTextWidth): number {
+export function measureNativeTradeLinePriceLabelWidth(
+  formattedPrice: string,
+  textWidth = estimateNativeTradeLineTextWidth,
+): number {
   return Math.max(
     DEFAULT_PRICE_LABEL_MIN_WIDTH,
     Math.ceil(textWidth(formattedPrice) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2),
@@ -378,7 +385,10 @@ export function getNativeTradeLinePriceLabelCapacityText(pricePrecision = DEFAUL
 
 export function getNativeTradeLinePriceLabelCharacterCapacity(priceLabelWidth: number, characterWidth: number): number {
   if (characterWidth <= 0) return 1;
-  return Math.max(1, Math.floor(Math.max(0, priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2) / characterWidth));
+  return Math.max(
+    1,
+    Math.floor(Math.max(0, priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2) / characterWidth),
+  );
 }
 
 export function getNativeTradeLineTextBaselineOffset(tradeLabelHeight: number): number {
@@ -431,7 +441,10 @@ function shouldInsertTradeLineButtonGap(
   return previousBracket !== nextBracket;
 }
 
-function getNativeTradeLineActionPrice(line: OrderLineRenderData | PositionLineRenderData, actionType: NativeTradeLineActionType): number {
+function getNativeTradeLineActionPrice(
+  line: OrderLineRenderData | PositionLineRenderData,
+  actionType: NativeTradeLineActionType,
+): number {
   if (actionType === 'tp') return line.brackets?.takeProfit ?? line.price;
   if (actionType === 'sl') return line.brackets?.stopLoss ?? line.price;
   return line.price;
@@ -489,9 +502,7 @@ function fitTradeLineButtons(
 
   return {
     visibleButtons: buttons.filter((_, index) => selectedIndexes.has(index)),
-    hiddenActionTypes: buttons
-      .filter((_, index) => !selectedIndexes.has(index))
-      .map((button) => button.type),
+    hiddenActionTypes: buttons.filter((_, index) => !selectedIndexes.has(index)).map((button) => button.type),
   };
 }
 
@@ -501,7 +512,8 @@ function measureTradeLineLabelContentWidth(
   textWidth: (text: string) => number,
 ): number {
   const segmentWidth = segments.reduce(
-    (width, segment) => width + Math.ceil(textWidth(segment.textShort ?? segment.text)) + SEGMENT_HORIZONTAL_PADDING * 2,
+    (width, segment) =>
+      width + Math.ceil(textWidth(segment.textShort ?? segment.text)) + SEGMENT_HORIZONTAL_PADDING * 2,
     0,
   );
   // Must account for the leading bracket gap too, or the label asks for 6px
@@ -543,16 +555,18 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   const { visibleButtons, hiddenActionTypes } = fitTradeLineButtons(buttons, availableWidth, hasSegmentCandidates);
   const buttonBlockWidth = measureTradeLineButtonBlockWidth(visibleButtons, hasSegmentCandidates);
   let remainingSegmentWidth = Math.max(0, availableWidth - buttonBlockWidth);
-  const segmentCandidates = segments.map((segment, sourceIndex) => {
-    const text = segment.textShort ?? segment.text;
-    return {
-      segment,
-      sourceIndex,
-      text,
-      minimumWidth: getMinimumNativeSegmentWidth(text, textWidth),
-      preferredWidth: Math.ceil(textWidth(text)) + SEGMENT_HORIZONTAL_PADDING * 2,
-    };
-  }).filter((candidate) => candidate.minimumWidth > 0);
+  const segmentCandidates = segments
+    .map((segment, sourceIndex) => {
+      const text = segment.textShort ?? segment.text;
+      return {
+        segment,
+        sourceIndex,
+        text,
+        minimumWidth: getMinimumNativeSegmentWidth(text, textWidth),
+        preferredWidth: Math.ceil(textWidth(text)) + SEGMENT_HORIZONTAL_PADDING * 2,
+      };
+    })
+    .filter((candidate) => candidate.minimumWidth > 0);
   let fittingSegmentCount = 0;
   let minimumSegmentWidth = 0;
   for (const candidate of segmentCandidates) {
@@ -567,49 +581,57 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     .map((candidate) => candidate.sourceIndex);
   let extraSegmentWidth = Math.max(0, remainingSegmentWidth - minimumSegmentWidth);
   const truncatedSegmentIndexes: number[] = [];
-  const segmentGeometry = fittingSegmentCandidates.map((candidate) => {
-    const preferredExtraWidth = Math.max(0, candidate.preferredWidth - candidate.minimumWidth);
-    const extraWidth = Math.min(preferredExtraWidth, extraSegmentWidth);
-    const targetWidth = candidate.minimumWidth + extraWidth;
-    extraSegmentWidth -= extraWidth;
-    if (targetWidth <= SEGMENT_HORIZONTAL_PADDING * 2) return null;
-    const displayText = fitNativeTradeLineText(candidate.text, targetWidth - SEGMENT_HORIZONTAL_PADDING * 2, textWidth);
-    if (!displayText) return null;
-    if (displayText !== candidate.text) truncatedSegmentIndexes.push(candidate.sourceIndex);
-    const geometry = {
-      ...candidate.segment,
-      text: candidate.text,
-      displayText,
-      x: currentX,
-      width: targetWidth,
-      textX: currentX + SEGMENT_HORIZONTAL_PADDING,
-    };
-    currentX += targetWidth;
-    remainingSegmentWidth -= targetWidth;
-    return geometry;
-  }).filter((segment): segment is Omit<NativeTradeLineSegmentGeometry, 'corners'> => Boolean(segment));
+  const segmentGeometry = fittingSegmentCandidates
+    .map((candidate) => {
+      const preferredExtraWidth = Math.max(0, candidate.preferredWidth - candidate.minimumWidth);
+      const extraWidth = Math.min(preferredExtraWidth, extraSegmentWidth);
+      const targetWidth = candidate.minimumWidth + extraWidth;
+      extraSegmentWidth -= extraWidth;
+      if (targetWidth <= SEGMENT_HORIZONTAL_PADDING * 2) return null;
+      const displayText = fitNativeTradeLineText(
+        candidate.text,
+        targetWidth - SEGMENT_HORIZONTAL_PADDING * 2,
+        textWidth,
+      );
+      if (!displayText) return null;
+      if (displayText !== candidate.text) truncatedSegmentIndexes.push(candidate.sourceIndex);
+      const geometry = {
+        ...candidate.segment,
+        text: candidate.text,
+        displayText,
+        x: currentX,
+        width: targetWidth,
+        textX: currentX + SEGMENT_HORIZONTAL_PADDING,
+      };
+      currentX += targetWidth;
+      remainingSegmentWidth -= targetWidth;
+      return geometry;
+    })
+    .filter((segment): segment is Omit<NativeTradeLineSegmentGeometry, 'corners'> => Boolean(segment));
   let previousButton: ChartLabelButton | null = null;
   let bracketConnector: NativeTradeLineBracketConnector | null = null;
-  const buttonGeometry = visibleButtons.map((button, index) => {
-    const gap = shouldInsertTradeLineButtonGap(previousButton, button, segmentGeometry.length > 0) ? BRACKET_GAP : 0;
-    const width = getTradeLineButtonWidth(button);
-    if (currentX + gap + width > layout.labelX + availableWidth) return null;
-    if (gap > 0) bracketConnector = { color: line.lineColor, x1: currentX, x2: currentX + gap };
-    currentX += gap;
-    const displayIcon = button.icon;
-    const iconWidth = Math.ceil(smallTextWidth(displayIcon));
-    const geometry = {
-      ...button,
-      displayIcon,
-      x: currentX,
-      width,
-      textX: Math.round(currentX + width / 2 - iconWidth / 2),
-      corners: getNativeTradeLineButtonCorners(index, visibleButtons.length, segmentGeometry.length),
-    };
-    currentX += width;
-    previousButton = button;
-    return geometry;
-  }).filter((button): button is NativeTradeLineButtonGeometry => Boolean(button));
+  const buttonGeometry = visibleButtons
+    .map((button, index) => {
+      const gap = shouldInsertTradeLineButtonGap(previousButton, button, segmentGeometry.length > 0) ? BRACKET_GAP : 0;
+      const width = getTradeLineButtonWidth(button);
+      if (currentX + gap + width > layout.labelX + availableWidth) return null;
+      if (gap > 0) bracketConnector = { color: line.lineColor, x1: currentX, x2: currentX + gap };
+      currentX += gap;
+      const displayIcon = button.icon;
+      const iconWidth = Math.ceil(smallTextWidth(displayIcon));
+      const geometry = {
+        ...button,
+        displayIcon,
+        x: currentX,
+        width,
+        textX: Math.round(currentX + width / 2 - iconWidth / 2),
+        corners: getNativeTradeLineButtonCorners(index, visibleButtons.length, segmentGeometry.length),
+      };
+      currentX += width;
+      previousButton = button;
+      return geometry;
+    })
+    .filter((button): button is NativeTradeLineButtonGeometry => Boolean(button));
   const visibleButtonCount = buttonGeometry.length;
   const buttonsDetachedFromSegments =
     segmentGeometry.length > 0 &&
@@ -617,7 +639,12 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
     shouldInsertTradeLineButtonGap(null, buttonGeometry[0], true);
   const segmentGeometryWithCorners: NativeTradeLineSegmentGeometry[] = segmentGeometry.map((segment, index) => ({
     ...segment,
-    corners: getNativeTradeLineSegmentCorners(index, segmentGeometry.length, visibleButtonCount, buttonsDetachedFromSegments),
+    corners: getNativeTradeLineSegmentCorners(
+      index,
+      segmentGeometry.length,
+      visibleButtonCount,
+      buttonsDetachedFromSegments,
+    ),
   }));
   const buttonGeometryWithCorners: NativeTradeLineButtonGeometry[] = buttonGeometry.map((button, index) => ({
     ...button,
@@ -647,19 +674,21 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   const renderedLabelWidth = Math.max(0, currentX - layout.labelX);
   const leftLineEndX = line.extendLeft === false ? layout.lineStartX : layout.labelX - LABEL_TO_LINE_GAP;
   const rightLineStartX = layout.labelX + renderedLabelWidth + LABEL_TO_LINE_GAP;
-  const priceLabelTextX = Math.round(
-    layout.priceLabelLeft +
-      layout.priceLabelWidth -
-      NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X -
-      Math.min(priceTextWidth(priceLabelText), Math.max(0, layout.priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2)),
+  const measuredPriceTextWidth = Math.min(
+    priceTextWidth(priceLabelText),
+    Math.max(0, layout.priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2),
   );
+  const priceLabelTextX = Math.round(layout.priceLabelLeft + (layout.priceLabelWidth - measuredPriceTextWidth) / 2);
 
   return {
     objectType,
     objectId,
     price: line.price,
     fitting: {
-      mode: hiddenActionTypes.length > 0 || hiddenSegmentIndexes.length > 0 || truncatedSegmentIndexes.length > 0 ? 'compact' : 'full',
+      mode:
+        hiddenActionTypes.length > 0 || hiddenSegmentIndexes.length > 0 || truncatedSegmentIndexes.length > 0
+          ? 'compact'
+          : 'full',
       hiddenActionTypes,
       hiddenSegmentIndexes,
       truncatedSegmentIndexes,
@@ -733,7 +762,9 @@ export function layoutNativeTradeLine(input: NativeTradeLineLayoutInput): Native
     input.chartLabelMinX ?? computeTradingLineLabelMinX(MOBILE_CHART_CHROME_METRICS, input.dimensions.margins),
   );
   const requestedPriceLabelWidth = input.priceLabelWidth ?? measureNativeTradeLinePriceLabelWidth(input.formattedPrice);
-  const priceLabelWidth = requestedPriceLabelWidth;
+  const priceLabelWidth = input.priceLabelLane
+    ? Math.max(requestedPriceLabelWidth, input.priceLabelLane.right - input.priceLabelLane.left)
+    : requestedPriceLabelWidth;
   const priceLabelLeft = input.priceLabelLane
     ? Math.round(input.priceLabelLane.right - priceLabelWidth)
     : Math.round(input.dimensions.width - priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
