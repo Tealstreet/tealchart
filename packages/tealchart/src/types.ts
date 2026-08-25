@@ -327,6 +327,8 @@ export interface PriceLineLabelBounds {
   floatingLabel?: boolean;
   /** Priority for conflict resolution - higher priority labels keep their position */
   priority?: number;
+  /** If true, lower priority labels de-overlap around this label's projected Y. */
+  fixed?: boolean;
   /** If true, line is drawn on canvas, only label in Konva (for high-speed lines) */
   renderLineOnCanvas?: boolean;
   /** Countdown target time (ms) - PriceLineLayer computes secondaryText from this */
