@@ -115,12 +115,31 @@ export interface TealchartPreparedRenderFrame extends TealchartRenderFrameInput 
   routedDrawings?: ReturnType<typeof routeTealScriptDrawings>;
 }
 
+interface ValueAxisLabelLayout {
+  commonLabelWidth: number;
+  paneLabelWidths: Map<string, number>;
+}
+
 export interface ValueAxisLabelRenderData {
   id: string;
   paneId: string;
   value: number;
   text: string;
   x: number;
+  labelX: number;
+  labelWidth: number;
+  textAlign: 'center' | 'left' | 'right';
+  y: number;
+  color: string;
+  fontSize: number;
+}
+
+interface MeasuredValueAxisLabel {
+  id: string;
+  paneId: string;
+  value: number;
+  text: string;
+  textWidth: number;
   y: number;
   color: string;
   fontSize: number;
@@ -224,6 +243,8 @@ export class TealchartRenderer {
   private options: RenderOptions;
   private margins: ChartMargins;
   private jailbreakManager: JailbreakIndicatorManager | null = null;
+  private valueAxisCommonLabelWidth = 0;
+  private valueAxisPaneLabelWidths = new Map<string, number>();
 
   constructor(ctx: CanvasContext, options: Partial<RenderOptions> = {}, margins: Partial<ChartMargins> = {}) {
     this.ctx = ctx;
@@ -3721,6 +3742,11 @@ export class TealchartRenderer {
       routedDrawings,
     } = frame;
     const paneIdFilter = passOptions?.paneIds ? new Set(passOptions.paneIds) : null;
+    const valueAxisLabelLayout = this.prepareValueAxisLabelLayout(
+      computedPanes,
+      labelBoundsByPane,
+      passOptions?.valueAxisOverscanPx,
+    );
 
     // Render each pane with its specific price lines and TealScript drawings
     for (const pane of computedPanes) {
@@ -3745,6 +3771,7 @@ export class TealchartRenderer {
         paneDrawings,
         passes,
         passOptions,
+        valueAxisLabelLayout,
       );
     }
 
@@ -3799,6 +3826,7 @@ export class TealchartRenderer {
     drawings?: DrawingOutput[],
     passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
     passOptions?: TealchartRenderPassOptions,
+    valueAxisLabelLayout?: ValueAxisLabelLayout,
   ): void {
     const { ctx, options } = this;
 
@@ -3825,6 +3853,7 @@ export class TealchartRenderer {
         drawings,
         passes,
         passOptions,
+        valueAxisLabelLayout,
       );
     } else {
       this.renderIndicatorPaneContent(
@@ -3838,6 +3867,7 @@ export class TealchartRenderer {
         drawings,
         passes,
         passOptions,
+        valueAxisLabelLayout,
       );
     }
 
@@ -3860,6 +3890,7 @@ export class TealchartRenderer {
     drawings?: DrawingOutput[],
     passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
     passOptions?: TealchartRenderPassOptions,
+    valueAxisLabelLayout?: ValueAxisLabelLayout,
   ): void {
     const { options } = this;
 
@@ -3935,7 +3966,7 @@ export class TealchartRenderer {
     }
 
     if (passes.has('main-axis')) {
-      this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx);
+      this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx, valueAxisLabelLayout);
     }
 
     if (labelBounds && labelBounds.length > 0) {
@@ -4185,6 +4216,7 @@ export class TealchartRenderer {
     drawings?: DrawingOutput[],
     passes: ReadonlySet<TealchartRenderPass> = new Set(TEALCHART_RENDER_PASSES),
     passOptions?: TealchartRenderPassOptions,
+    valueAxisLabelLayout?: ValueAxisLabelLayout,
   ): void {
     const { ctx, options } = this;
 
@@ -4237,7 +4269,7 @@ export class TealchartRenderer {
     }
 
     if (passes.has('indicator-axis')) {
-      this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx);
+      this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx, valueAxisLabelLayout);
     }
 
     if (passes.has('indicator-price-lines') && labelBounds && labelBounds.length > 0) {
@@ -4356,17 +4388,18 @@ export class TealchartRenderer {
     pane: ComputedPane,
     priceLineBounds?: PriceLineLabelBounds[],
     valueAxisOverscanPx = 0,
+    valueAxisLabelLayout?: ValueAxisLabelLayout,
   ): void {
     const { ctx } = this;
 
-    const labels = this.computePaneYAxisLabels(pane, priceLineBounds, valueAxisOverscanPx);
+    const labels = this.computePaneYAxisLabels(pane, priceLineBounds, valueAxisOverscanPx, valueAxisLabelLayout);
 
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
 
     for (const label of labels) {
       ctx.fillStyle = label.color;
+      ctx.textAlign = label.textAlign;
       ctx.fillText(label.text, label.x, label.y);
     }
   }
@@ -4378,14 +4411,57 @@ export class TealchartRenderer {
   ): ValueAxisLabelRenderData[] {
     const pane = frame.computedPanes.find((computedPane) => computedPane.id === paneId);
     if (!pane) return [];
-    return this.computePaneYAxisLabels(pane, frame.labelBoundsByPane.get(pane.id), valueAxisOverscanPx);
+    const valueAxisLabelLayout = this.prepareValueAxisLabelLayout(
+      frame.computedPanes,
+      frame.labelBoundsByPane,
+      valueAxisOverscanPx,
+    );
+    return this.computePaneYAxisLabels(
+      pane,
+      frame.labelBoundsByPane.get(pane.id),
+      valueAxisOverscanPx,
+      valueAxisLabelLayout,
+    );
   }
 
-  private computePaneYAxisLabels(
+  private prepareValueAxisLabelLayout(
+    computedPanes: ComputedPane[],
+    labelBoundsByPane: Map<string, PriceLineLabelBounds[]>,
+    valueAxisOverscanPx = 0,
+  ): ValueAxisLabelLayout {
+    const paneLabelWidths = new Map<string, number>();
+    let commonLabelWidth = this.valueAxisCommonLabelWidth;
+
+    for (const pane of computedPanes) {
+      const measuredLabels = this.measurePaneYAxisLabels(
+        pane,
+        labelBoundsByPane.get(pane.id),
+        valueAxisOverscanPx,
+      );
+      const measuredWidth =
+        measuredLabels.length > 0
+          ? Math.ceil(Math.max(...measuredLabels.map((label) => label.textWidth)))
+          : 0;
+      const paneLabelWidth = Math.max(this.valueAxisPaneLabelWidths.get(pane.id) ?? 0, measuredWidth);
+
+      this.valueAxisPaneLabelWidths.set(pane.id, paneLabelWidth);
+      paneLabelWidths.set(pane.id, paneLabelWidth);
+      commonLabelWidth = Math.max(commonLabelWidth, paneLabelWidth);
+    }
+
+    this.valueAxisCommonLabelWidth = commonLabelWidth;
+
+    return {
+      commonLabelWidth,
+      paneLabelWidths,
+    };
+  }
+
+  private measurePaneYAxisLabels(
     pane: ComputedPane,
     priceLineBounds?: PriceLineLabelBounds[],
     valueAxisOverscanPx = 0,
-  ): ValueAxisLabelRenderData[] {
+  ): MeasuredValueAxisLabel[] {
     const { options, margins } = this;
 
     if (pane.height <= 0) return [];
@@ -4406,8 +4482,8 @@ export class TealchartRenderer {
     }
     const formatter = getNumberFormatter(decimals);
 
-    const labels: ValueAxisLabelRenderData[] = [];
-    const labelRightEdge = options.width - 4;
+    const textFont = `11px ${this.font}`;
+    const measuredLabels: MeasuredValueAxisLabel[] = [];
     // For main pane, labels should stay below the transparent top bar (safe zone)
     const visibleTop = pane.type === 'main' ? margins.top : pane.top;
 
@@ -4427,19 +4503,68 @@ export class TealchartRenderer {
         if (wouldOverlap) continue;
       }
 
-      labels.push({
+      const text = formatter.format(value);
+      measuredLabels.push({
         id: `${pane.id}:value-axis:${value}`,
         paneId: pane.id,
         value,
-        text: formatter.format(value),
-        x: labelRightEdge,
+        text,
+        textWidth: getCachedTextWidth(this.ctx, text, textFont),
         y,
         color: options.textColor,
         fontSize: 11,
       });
     }
 
-    return labels;
+    return measuredLabels;
+  }
+
+  private computePaneYAxisLabels(
+    pane: ComputedPane,
+    priceLineBounds?: PriceLineLabelBounds[],
+    valueAxisOverscanPx = 0,
+    valueAxisLabelLayout?: ValueAxisLabelLayout,
+  ): ValueAxisLabelRenderData[] {
+    const { options } = this;
+    const measuredLabels = this.measurePaneYAxisLabels(pane, priceLineBounds, valueAxisOverscanPx);
+
+    if (measuredLabels.length === 0) return [];
+
+    let labelLayout = valueAxisLabelLayout;
+    if (!labelLayout) {
+      const measuredWidth = Math.ceil(Math.max(...measuredLabels.map((label) => label.textWidth)));
+      const paneLabelWidth = Math.max(this.valueAxisPaneLabelWidths.get(pane.id) ?? 0, measuredWidth);
+      this.valueAxisPaneLabelWidths.set(pane.id, paneLabelWidth);
+      this.valueAxisCommonLabelWidth = Math.max(this.valueAxisCommonLabelWidth, paneLabelWidth);
+      labelLayout = {
+        commonLabelWidth: this.valueAxisCommonLabelWidth,
+        paneLabelWidths: new Map([[pane.id, paneLabelWidth]]),
+      };
+    }
+
+    const commonLabelWidth = labelLayout.commonLabelWidth;
+    const paneLabelWidth = labelLayout.paneLabelWidths.get(pane.id) ?? commonLabelWidth;
+    const labelRightEdge = options.width - 4;
+    const commonLabelX = labelRightEdge - commonLabelWidth;
+    const isMainPane = pane.type === 'main';
+
+    return measuredLabels.map((label) => {
+      const labelWidth = isMainPane ? commonLabelWidth : paneLabelWidth;
+      const labelX = commonLabelX;
+      return {
+        id: label.id,
+        paneId: label.paneId,
+        value: label.value,
+        text: label.text,
+        x: isMainPane ? labelX + labelWidth / 2 : labelX,
+        labelX,
+        labelWidth,
+        textAlign: isMainPane ? 'center' : 'left',
+        y: label.y,
+        color: label.color,
+        fontSize: label.fontSize,
+      };
+    });
   }
 
   /**

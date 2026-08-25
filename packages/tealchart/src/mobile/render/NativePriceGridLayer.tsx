@@ -9,7 +9,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 import {
   clampNativePriceAxisTickLabelY,
-  createNativeRightAlignedAxisTextX,
+  createNativeCenteredAxisTextX,
   getNativeAxisTextCharacterCapacity,
 } from '../utils/axisTickLayout';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
@@ -58,7 +58,7 @@ export function resolveNativePriceGridSlotModel({
   frame,
   index,
   labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   priceMax,
   priceMin,
@@ -68,7 +68,7 @@ export function resolveNativePriceGridSlotModel({
   frame: NativeChartFrame;
   index: number;
   labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   priceMax: number;
   priceMin: number;
@@ -89,7 +89,7 @@ export function resolveNativePriceGridSlotModel({
 
   return {
     labelText,
-    labelX: createNativeRightAlignedAxisTextX(labelRight, labelText.length, characterWidth, labelMaxWidth),
+    labelX: createNativeCenteredAxisTextX(labelLeft, labelText.length, characterWidth, labelMaxWidth),
     labelY: clampNativePriceAxisTickLabelY(frame, y),
     lineEnd: { x: frame.priceAxisRight, y },
     lineStart: { x: frame.contentLeft, y },
@@ -105,7 +105,7 @@ function NativeAnimatedPriceGrid({
   gridColor,
   index,
   labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   pricePrecision,
   sharedViewport,
@@ -119,7 +119,7 @@ function NativeAnimatedPriceGrid({
   gridColor: string;
   index: number;
   labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
@@ -133,7 +133,7 @@ function NativeAnimatedPriceGrid({
       frame,
       index,
       labelMaxWidth,
-      labelRight,
+      labelLeft,
       maxCharacters,
       priceMax: sharedViewport.priceMax.value,
       priceMin: sharedViewport.priceMin.value,
@@ -161,7 +161,7 @@ function getNativeStaticPriceGridSlots({
   characterWidth,
   frame,
   labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   projection,
   pricePrecision,
@@ -170,7 +170,7 @@ function getNativeStaticPriceGridSlots({
   characterWidth: number;
   frame: NativeChartFrame;
   labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   projection: NativeChartProjection;
   pricePrecision: number;
@@ -191,7 +191,7 @@ function getNativeStaticPriceGridSlots({
 
     return {
       labelText,
-      labelX: createNativeRightAlignedAxisTextX(labelRight, labelText.length, characterWidth, labelMaxWidth),
+      labelX: createNativeCenteredAxisTextX(labelLeft, labelText.length, characterWidth, labelMaxWidth),
       labelY: clampNativePriceAxisTickLabelY(frame, y),
       lineEnd: { x: frame.priceAxisRight, y },
       lineStart: { x: frame.contentLeft, y },
@@ -225,8 +225,9 @@ export function NativePriceGridLayer({
   if (!showAxisLabels && !showGridLines) return null;
 
   const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
+  const labelLeft = frame.priceAxisLeft + 4;
   const labelRight = frame.priceAxisRight - 4;
-  const labelMaxWidth = Math.max(0, labelRight - (frame.priceAxisLeft + 4));
+  const labelMaxWidth = Math.max(0, labelRight - labelLeft);
   const maxCharacters = getNativeAxisTextCharacterCapacity(labelMaxWidth, characterWidth);
   const slotCount = getNativePriceGridSlotCount(frame.mainPane.height);
   const staticSlots = useMemo(
@@ -236,14 +237,14 @@ export function NativePriceGridLayer({
             characterWidth,
             frame,
             labelMaxWidth,
-            labelRight,
+            labelLeft,
             maxCharacters,
             pricePrecision,
             projection: staticProjection,
             slotCount,
           })
         : null,
-    [characterWidth, frame, labelMaxWidth, labelRight, maxCharacters, pricePrecision, staticProjection, slotCount],
+    [characterWidth, frame, labelLeft, labelMaxWidth, maxCharacters, pricePrecision, staticProjection, slotCount],
   );
 
   if (staticSlots) {
@@ -282,7 +283,7 @@ export function NativePriceGridLayer({
         characterWidth={characterWidth}
         frame={frame}
         labelMaxWidth={labelMaxWidth}
-        labelRight={labelRight}
+        labelLeft={labelLeft}
         maxCharacters={maxCharacters}
         pricePrecision={pricePrecision}
         sharedViewport={sharedViewport}
@@ -299,7 +300,7 @@ export function NativePriceGridLayer({
         frame={frame}
         gridColor={gridColor}
         labelMaxWidth={labelMaxWidth}
-        labelRight={labelRight}
+        labelLeft={labelLeft}
         maxCharacters={maxCharacters}
         pricePrecision={pricePrecision}
         sharedViewport={sharedViewport}
@@ -319,7 +320,7 @@ export function NativePriceGridLayer({
           gridColor={gridColor}
           index={index}
           labelMaxWidth={labelMaxWidth}
-          labelRight={labelRight}
+          labelLeft={labelLeft}
           maxCharacters={maxCharacters}
           pricePrecision={pricePrecision}
           sharedViewport={sharedViewport}
@@ -338,7 +339,7 @@ function NativePriceGridLinePath({
   frame,
   gridColor,
   labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   pricePrecision,
   sharedViewport,
@@ -348,7 +349,7 @@ function NativePriceGridLinePath({
   frame: NativeChartFrame;
   gridColor: string;
   labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
@@ -362,7 +363,7 @@ function NativePriceGridLinePath({
         frame,
         index,
         labelMaxWidth,
-        labelRight,
+        labelLeft,
         maxCharacters,
         priceMax: sharedViewport.priceMax.value,
         priceMin: sharedViewport.priceMin.value,
@@ -384,7 +385,7 @@ function NativePriceGridLabelGlyphs({
   characterWidth,
   frame,
   labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   pricePrecision,
   sharedViewport,
@@ -395,7 +396,7 @@ function NativePriceGridLabelGlyphs({
   characterWidth: number;
   frame: NativeChartFrame;
   labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
@@ -414,7 +415,7 @@ function NativePriceGridLabelGlyphs({
         frame,
         index,
         labelMaxWidth,
-        labelRight,
+        labelLeft,
         maxCharacters,
         priceMax: sharedViewport.priceMax.value,
         priceMin: sharedViewport.priceMin.value,

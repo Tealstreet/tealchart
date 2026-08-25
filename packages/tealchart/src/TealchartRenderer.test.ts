@@ -1,5 +1,14 @@
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { Bar, ComputedPane, ExecutionLineRenderData, PaneLayout, PriceLine, UnifiedPaneLayout, Viewport } from './types';
+import type {
+  Bar,
+  ComputedPane,
+  ExecutionLineRenderData,
+  PaneLayout,
+  PriceLine,
+  PriceLineLabelBounds,
+  UnifiedPaneLayout,
+  Viewport,
+} from './types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -3363,5 +3372,48 @@ describe('pane overlay geometry origin', () => {
 
     expect(overlay.map((p) => p.top)).toEqual(rendered.map((p) => p.top));
     expect(overlay.map((p) => p.bottom)).toEqual(rendered.map((p) => p.bottom));
+  });
+});
+
+describe('value axis label layout', () => {
+  it('uses one shared lane while centering main labels and left-aligning indicator labels', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.25,
+            yMin: -1_000_000,
+            yMax: 1_000_000,
+            fixedRange: true,
+          },
+        ],
+      },
+      400,
+    );
+    const frame = { computedPanes, labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>() } as any;
+
+    const mainLabels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'main');
+    const indicatorLabels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
+
+    expect(mainLabels.length).toBeGreaterThan(0);
+    expect(indicatorLabels.length).toBeGreaterThan(0);
+    expect(new Set(mainLabels.map((label) => label.labelWidth)).size).toBe(1);
+    expect(new Set(indicatorLabels.map((label) => label.labelWidth)).size).toBe(1);
+    expect(mainLabels[0]!.labelWidth).toBeGreaterThan(0);
+    expect(mainLabels[0]!.labelWidth).toBeGreaterThanOrEqual(indicatorLabels[0]!.labelWidth);
+    expect(mainLabels.every((label) => label.textAlign === 'center')).toBe(true);
+    expect(indicatorLabels.every((label) => label.textAlign === 'left')).toBe(true);
+    expect(indicatorLabels.every((label) => label.labelX === mainLabels[0]!.labelX)).toBe(true);
+    expect(mainLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
+    expect(indicatorLabels.every((label) => label.x === label.labelX)).toBe(true);
   });
 });
