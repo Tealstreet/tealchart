@@ -26,6 +26,8 @@ export interface LabelBounds {
   height: number;
   /** Priority for placement (higher = anchor, keeps exact position) */
   priority?: number;
+  /** Fixed labels keep their projected position; other labels de-overlap around them. */
+  fixed?: boolean;
 }
 
 // Memoization cache - keyed by hash of input positions
@@ -45,7 +47,12 @@ export function clearCollisionCache(): void {
  */
 function getCacheKey(labels: LabelBounds[]): string {
   // Include id (if present) so different sets of lines with same geometry produce different keys.
-  const segments = labels.map((l) => `${l.id || ''}:${Math.round(l.originalY * 10)}:${Math.round(l.height * 10)}`);
+  const segments = labels.map(
+    (l) => {
+      const originalYKey = l.fixed ? l.originalY : Math.round(l.originalY * 10);
+      return `${l.id || ''}:${originalYKey}:${Math.round(l.height * 10)}:${l.priority ?? 0}:${l.fixed ? 1 : 0}`;
+    },
+  );
   // Only sort when all labels have IDs — otherwise keep positional order
   // so index-based fallback in collision resolution stays consistent.
   if (labels.every((l) => l.id)) {
@@ -132,8 +139,10 @@ function stackCluster<T extends LabelBounds>(cluster: T[]): void {
     return;
   }
 
-  // Find anchor: highest priority, then lowest originalY as tiebreaker
+  // Find anchor: fixed labels first, then highest priority, then lowest originalY.
   const anchor = cluster.reduce((best, curr) => {
+    if (curr.fixed && !best.fixed) return curr;
+    if (best.fixed && !curr.fixed) return best;
     const bestPrio = best.priority ?? 0;
     const currPrio = curr.priority ?? 0;
     if (currPrio > bestPrio) return curr;
@@ -231,20 +240,34 @@ function enforceOrdering<T extends LabelBounds>(labels: T[]): void {
 
       // Inversion: prev should be above (lower adjustedY) but isn't
       if (prev.adjustedY > curr.adjustedY) {
-        // Swap their adjustedY values
-        const tmp = prev.adjustedY;
-        prev.adjustedY = curr.adjustedY;
-        curr.adjustedY = tmp;
-        fixed = true;
+        let moved = true;
+        if (prev.fixed && !curr.fixed) {
+          curr.adjustedY = prev.adjustedY + prev.height / 2 + curr.height / 2;
+        } else if (curr.fixed && !prev.fixed) {
+          prev.adjustedY = curr.adjustedY - curr.height / 2 - prev.height / 2;
+        } else if (!prev.fixed && !curr.fixed) {
+          const tmp = prev.adjustedY;
+          prev.adjustedY = curr.adjustedY;
+          curr.adjustedY = tmp;
+        } else {
+          moved = false;
+        }
+        fixed ||= moved;
       }
 
       // Also fix overlaps while maintaining order
       const prevBottom = prev.adjustedY + prev.height / 2;
       const currTop = curr.adjustedY - curr.height / 2;
       if (prevBottom > currTop + 0.1) {
-        // Push current down to be flush below prev
-        curr.adjustedY = prevBottom + curr.height / 2;
-        fixed = true;
+        let moved = true;
+        if (curr.fixed && !prev.fixed) {
+          prev.adjustedY = curr.adjustedY - curr.height / 2 - prev.height / 2;
+        } else if (!curr.fixed) {
+          curr.adjustedY = prevBottom + curr.height / 2;
+        } else {
+          moved = false;
+        }
+        fixed ||= moved;
       }
     }
 
@@ -343,9 +366,10 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
     return labels;
   }
 
-  // Phase 3: Place labels by priority, highest first
+  // Phase 3: Place labels by fixed status, then priority, highest first
   // Locked labels never move, lower priority labels adjust around them
   const byPriorityDesc = [...labels].sort((a, b) => {
+    if (a.fixed !== b.fixed) return a.fixed ? -1 : 1;
     const aPrio = a.priority ?? 0;
     const bPrio = b.priority ?? 0;
     if (bPrio !== aPrio) return bPrio - aPrio;
@@ -371,7 +395,7 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
       }
     }
 
-    if (hasOverlap) {
+    if (hasOverlap && !label.fixed) {
       // Try placing above or below the group
       const abovePos = minTop - label.height / 2;
       const belowPos = maxBottom + label.height / 2;

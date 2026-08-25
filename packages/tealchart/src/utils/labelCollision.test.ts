@@ -92,6 +92,19 @@ describe('resolveLabelCollisions', () => {
       assertNoOverlaps(labels);
     });
 
+    it('keeps fixed label in place while moving overlapping labels', () => {
+      const labels = [
+        { ...label(92, 24, 90), id: 'order-above' },
+        { ...label(100, 26, 100), id: 'last-trade', fixed: true },
+        { ...label(108, 24, 90), id: 'order-below' },
+      ];
+
+      resolveLabelCollisions(labels);
+
+      expect(labels[1].adjustedY).toBe(100);
+      assertNoOverlaps(labels);
+    });
+
     it('handles exactly touching labels (within margin)', () => {
       // height=20, label at 100 spans [90,110], label at 120 spans [110,130]
       // Touching at 110 — within the 2px margin, should cluster
@@ -181,6 +194,40 @@ describe('resolveLabelCollisions', () => {
       // Should still produce correct results after cache clear
       const labels2 = [label(100, 20), label(105, 20)];
       resolveLabelCollisions(labels2);
+      assertNoOverlaps(labels2);
+    });
+
+    it('does not reuse cache entries across fixed label state changes', () => {
+      const labels1 = [
+        { ...label(100, 20, 0), id: 'order' },
+        { ...label(105, 20, 0), id: 'last-trade' },
+      ];
+      resolveLabelCollisions(labels1);
+
+      const labels2 = [
+        { ...label(100, 20, 0), id: 'order' },
+        { ...label(105, 20, 100), id: 'last-trade', fixed: true },
+      ];
+      resolveLabelCollisions(labels2);
+
+      expect(labels2[1].adjustedY).toBe(105);
+      assertNoOverlaps(labels2);
+    });
+
+    it('does not reuse a stale fixed label position for sub-pixel moves', () => {
+      const labels1 = [
+        { ...label(100, 20, 0), id: 'order' },
+        { ...label(105, 20, 100), id: 'last-trade', fixed: true },
+      ];
+      resolveLabelCollisions(labels1);
+
+      const labels2 = [
+        { ...label(100, 20, 0), id: 'order' },
+        { ...label(105.04, 20, 100), id: 'last-trade', fixed: true },
+      ];
+      resolveLabelCollisions(labels2);
+
+      expect(labels2[1].adjustedY).toBe(105.04);
       assertNoOverlaps(labels2);
     });
   });
