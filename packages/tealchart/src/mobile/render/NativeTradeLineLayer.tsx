@@ -24,11 +24,7 @@ import {
 } from '../utils/tradeLineLayout';
 import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativePriceAxisTag';
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
-import {
-  getNativePriceAxisTagFloor,
-  isNativeYInMainPane,
-  sharedPriceToNativeY,
-} from './nativeSharedViewport';
+import { getNativePriceAxisTagFloor, isNativeYInMainPane, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth } from './nativeSkiaText';
 import { NativeStaticTradeLineLabelBody, NativeTradeLineLabelBody } from './NativeTradeLineLabelBody';
 
@@ -93,15 +89,15 @@ export function AnimatedTradeLine({
   );
   const priceTagTextBaselineOffset = getNativeTradeLinePriceTagTextBaselineOffset(tradeLabelHeight);
   const priceLabelY = useDerivedValue(() => axisTagCenterY.value - tradeLabelHeight / 2 - 1);
-  const priceTextY = useDerivedValue(() => axisTagCenterY.value - tradeLabelHeight / 2 - 1 + priceTagTextBaselineOffset);
+  const priceTextY = useDerivedValue(
+    () => axisTagCenterY.value - tradeLabelHeight / 2 - 1 + priceTagTextBaselineOffset,
+  );
   const priceLabelCharacterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
   const priceLabelRight = geometry.priceLabelX + geometry.priceLabelWidth;
   const priceLabelText = useDerivedValue(() => {
-    return (
-      dragState && dragState.activeObjectId.value === geometry.objectId
-        ? formatNativeTradeLinePriceWorklet(livePrice.value, pricePrecision)
-        : geometry.priceLabelText
-    );
+    return dragState && dragState.activeObjectId.value === geometry.objectId
+      ? formatNativeTradeLinePriceWorklet(livePrice.value, pricePrecision)
+      : geometry.priceLabelText;
   });
   const priceLabelWidth = useDerivedValue(() =>
     Math.max(
@@ -111,12 +107,15 @@ export function AnimatedTradeLine({
   );
   const priceLabelX = useDerivedValue(() => priceLabelRight - priceLabelWidth.value);
   const priceLabelTextX = useDerivedValue(
-    () => priceLabelRight - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X - priceLabelText.value.length * priceLabelCharacterWidth,
+    () => priceLabelX.value + (priceLabelWidth.value - priceLabelText.value.length * priceLabelCharacterWidth) / 2,
   );
   const leftLineStart = useDerivedValue(() => ({ x: geometry.leftLineStartX, y: lineY.value }));
   const leftLineEnd = useDerivedValue(() => ({ x: geometry.leftLineEndX, y: lineY.value }));
   const rightLineStart = useDerivedValue(() => ({ x: geometry.rightLineStartX, y: lineY.value }));
-  const rightLineEnd = useDerivedValue(() => ({ x: Math.min(geometry.rightLineEndX, priceLabelX.value - 2), y: lineY.value }));
+  const rightLineEnd = useDerivedValue(() => ({
+    x: Math.min(geometry.rightLineEndX, priceLabelX.value - 2),
+    y: lineY.value,
+  }));
   // A trading line's tag fills with its own colour, the same rule web applies.
   // These three tags were hardcoded dark with a coloured border, which is what
   // made native's order and position tags read differently from every other
@@ -143,7 +142,9 @@ export function AnimatedTradeLine({
     const staticPriceTextY = staticLabelY - 1 + priceTagTextBaselineOffset;
     const staticPriceLabelText = geometry.priceLabelText;
     const staticPriceLabelTextX =
-      priceLabelRight - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X - staticPriceLabelText.length * priceLabelCharacterWidth;
+      priceLabelRight -
+      NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X -
+      staticPriceLabelText.length * priceLabelCharacterWidth;
     const staticOpacity = isNativeYInMainPane(staticRawY, frame) ? pendingOpacity : 0;
     const staticLeftLineStart = { x: geometry.leftLineStartX, y: staticLineY };
     const staticLeftLineEnd = { x: geometry.leftLineEndX, y: staticLineY };
