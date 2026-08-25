@@ -465,7 +465,7 @@ export class EventManager {
   ): void {
     const { shouldShowCrosshair } = hitState;
     const wasVisible = this.crosshair.visible;
-    const point = this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y };
+    const point = shouldShowCrosshair ? (this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y }) : { x, y };
 
     this.crosshair.visible = shouldShowCrosshair;
     this.crosshair.x = point.x;
