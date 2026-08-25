@@ -1,14 +1,16 @@
+import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   buildNativeTradeLineGeometries,
   createNativeTradeLineRows,
   formatNativeTradeLinePrice,
+  getNativeTradeLineActionButtonWidth,
   getNativeTradeLinePriceDecimals,
   getNativeTradeLinePriceLabelCharacterCapacity,
   getNativeTradeLinePriceTagTextBaselineOffset,
   getNativeTradeLineTextBaselineOffset,
-  getNativeTradeLineActionButtonWidth,
   layoutNativeTradeLine,
   measureNativeTradeLineLabelWidth,
   measureNativeTradeLinePriceLabelWidth,
@@ -16,7 +18,6 @@ import {
   nativeTradeLineBorderStyle,
   nativeTradeLineDashArray,
 } from './tradeLineLayout';
-import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
 
 const dimensions = {
   height: 480,
@@ -215,12 +216,7 @@ describe('native trade line layout', () => {
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
     expect(geometry?.priceLabelTextX).toBeGreaterThanOrEqual(geometry?.priceLabelX ?? 0);
     expect(geometry?.priceLabelTextX).toBe(
-      Math.round(
-        (geometry?.priceLabelX ?? 0) +
-          (geometry?.priceLabelWidth ?? 0) -
-          NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X -
-          measureText('63,777.0'),
-      ),
+      Math.round((geometry?.priceLabelX ?? 0) + ((geometry?.priceLabelWidth ?? 0) - measureText('63,777.0')) / 2),
     );
     expect(geometry?.segments[0]?.displayText).toBe('Long');
     expect(geometry?.buttons.map((button) => button.type)).toEqual(['cancel', 'tp', 'sl']);
@@ -246,22 +242,30 @@ describe('native trade line layout', () => {
   });
 
   it('matches web extendLeft semantics for the left connector', () => {
-    const [withoutLeftConnector] = buildNativeTradeLineGeometries([createOrderLine({ extendLeft: false, lineLength: 50 })], [], {
-      dimensions,
-      pricePrecision: 0.1,
-      textWidth: measureText,
-      smallTextWidth: measureText,
-      positiveColor: '#12c48b',
-      negativeColor: '#ff4d67',
-    });
-    const [withLeftConnector] = buildNativeTradeLineGeometries([createOrderLine({ extendLeft: true, lineLength: 50 })], [], {
-      dimensions,
-      pricePrecision: 0.1,
-      textWidth: measureText,
-      smallTextWidth: measureText,
-      positiveColor: '#12c48b',
-      negativeColor: '#ff4d67',
-    });
+    const [withoutLeftConnector] = buildNativeTradeLineGeometries(
+      [createOrderLine({ extendLeft: false, lineLength: 50 })],
+      [],
+      {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      },
+    );
+    const [withLeftConnector] = buildNativeTradeLineGeometries(
+      [createOrderLine({ extendLeft: true, lineLength: 50 })],
+      [],
+      {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      },
+    );
 
     expect(withoutLeftConnector?.leftLineEndX).toBe(withoutLeftConnector?.leftLineStartX);
     expect(withoutLeftConnector?.rightLineEndX).toBeGreaterThan(withoutLeftConnector?.rightLineStartX ?? 0);
@@ -283,12 +287,7 @@ describe('native trade line layout', () => {
 
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', priceTextWidth));
     expect(geometry?.priceLabelTextX).toBe(
-      Math.round(
-        (geometry?.priceLabelX ?? 0) +
-          (geometry?.priceLabelWidth ?? 0) -
-          NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X -
-          priceTextWidth('63,777.0'),
-      ),
+      Math.round((geometry?.priceLabelX ?? 0) + ((geometry?.priceLabelWidth ?? 0) - priceTextWidth('63,777.0')) / 2),
     );
     expect(geometry?.buttons.map((button) => button.textX)).toEqual([
       Math.round((geometry?.buttons[0]?.x ?? 0) + 8 - measureText('×') / 2),
@@ -315,7 +314,7 @@ describe('native trade line layout', () => {
 
     expect(geometry?.priceLabelX).toBeGreaterThanOrEqual(priceLabelLane.left);
     expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBeLessThanOrEqual(priceLabelLane.right);
-    expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
+    expect(geometry?.priceLabelWidth).toBe(priceLabelLane.right - priceLabelLane.left);
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
   });
 
@@ -340,7 +339,7 @@ describe('native trade line layout', () => {
     expect(geometry?.priceLabelX).toBeLessThan(priceLabelLane.left);
     expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBe(priceLabelLane.right);
     expect(geometry?.priceLabelTextX).toBe(
-      Math.round(priceLabelLane.right - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X - measureText('63,777.000000')),
+      Math.round((geometry?.priceLabelX ?? 0) + ((geometry?.priceLabelWidth ?? 0) - measureText('63,777.000000')) / 2),
     );
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
   });
@@ -379,7 +378,10 @@ describe('native trade line layout', () => {
     );
 
     expect(geometry?.segments).toHaveLength(2);
-    expect(geometry?.segments.map((segment) => segment.text)).toEqual(['Very Long Buy Limit Label', '123456789.123456789']);
+    expect(geometry?.segments.map((segment) => segment.text)).toEqual([
+      'Very Long Buy Limit Label',
+      '123456789.123456789',
+    ]);
     expect(geometry?.segments.every((segment) => segment.displayText.length > 0)).toBe(true);
     expect(geometry?.segments.some((segment) => segment.displayText.endsWith('...'))).toBe(true);
     expect(geometry?.buttons.map((button) => button.type)).toEqual(['cancel', 'tp', 'sl']);
@@ -420,7 +422,9 @@ describe('native trade line layout', () => {
     expect(geometry?.fitting.hiddenActionTypes.length ?? 0).toBeGreaterThan(0);
     expect(geometry?.fitting.hiddenActionTypes).not.toContain('cancel');
     expect(geometry?.fitting.hiddenActionTypes.every((type) => type === 'tp' || type === 'sl')).toBe(true);
-    expect(geometry?.actionZones.map((zone) => zone.actionType)).toEqual(geometry?.buttons.map((button) => button.type));
+    expect(geometry?.actionZones.map((zone) => zone.actionType)).toEqual(
+      geometry?.buttons.map((button) => button.type),
+    );
     expect(geometry?.segments.length ?? 0).toBeLessThanOrEqual(2);
     expect(geometry?.fitting.hiddenSegmentIndexes.length ?? 0).toBeGreaterThan(0);
   });
@@ -499,19 +503,23 @@ describe('native trade line layout', () => {
   // case the gap was added for.
   it('widens the label for the gap instead of eating the segment text', () => {
     const render = (overrides: Partial<PositionLineRenderData>) => {
-      const [geometry] = buildNativeTradeLineGeometries([], [
-        createPositionLine({
-          positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
-          ...overrides,
-        }),
-      ], {
-        dimensions,
-        pricePrecision: 0.1,
-        textWidth: measureText,
-        smallTextWidth: measureText,
-        positiveColor: '#12c48b',
-        negativeColor: '#ff4d67',
-      });
+      const [geometry] = buildNativeTradeLineGeometries(
+        [],
+        [
+          createPositionLine({
+            positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+            ...overrides,
+          }),
+        ],
+        {
+          dimensions,
+          pricePrecision: 0.1,
+          textWidth: measureText,
+          smallTextWidth: measureText,
+          positiveColor: '#12c48b',
+          negativeColor: '#ff4d67',
+        },
+      );
       return geometry?.segments.map((segment) => segment.displayText ?? segment.text) ?? [];
     };
 
@@ -521,20 +529,24 @@ describe('native trade line layout', () => {
   // Standing off the segments means the two are separate pills, so each closes
   // its own edge instead of running square into the gap between them.
   it('rounds the seam it just opened between the segments and the brackets', () => {
-    const [geometry] = buildNativeTradeLineGeometries([], [
-      createPositionLine({
-        closeable: false,
-        reversible: false,
-        positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
-      }),
-    ], {
-      dimensions,
-      pricePrecision: 0.1,
-      textWidth: measureText,
-      smallTextWidth: measureText,
-      positiveColor: '#12c48b',
-      negativeColor: '#ff4d67',
-    });
+    const [geometry] = buildNativeTradeLineGeometries(
+      [],
+      [
+        createPositionLine({
+          closeable: false,
+          reversible: false,
+          positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+        }),
+      ],
+      {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      },
+    );
     const segments = geometry?.segments ?? [];
     const buttons = geometry?.buttons ?? [];
 
@@ -544,16 +556,18 @@ describe('native trade line layout', () => {
   });
 
   it('bridges the bracket gap so TP/SL is not a detached chip', () => {
-    const [geometry] = buildNativeTradeLineGeometries([], [
-      createPositionLine({ positionData: { entryPrice: 63600, isLong: true, notional: 2500 } }),
-    ], {
-      dimensions,
-      pricePrecision: 0.1,
-      textWidth: measureText,
-      smallTextWidth: measureText,
-      positiveColor: '#12c48b',
-      negativeColor: '#ff4d67',
-    });
+    const [geometry] = buildNativeTradeLineGeometries(
+      [],
+      [createPositionLine({ positionData: { entryPrice: 63600, isLong: true, notional: 2500 } })],
+      {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      },
+    );
 
     const closeButton = geometry?.buttons.find((button) => button.type === 'close');
     const takeProfitButton = geometry?.buttons.find((button) => button.type === 'tp');
@@ -564,41 +578,49 @@ describe('native trade line layout', () => {
   });
 
   it('leaves no bracket connector on a label without brackets', () => {
-    const [geometry] = buildNativeTradeLineGeometries([], [
-      createPositionLine({
-        brackets: null,
-        positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
-      }),
-    ], {
-      dimensions,
-      pricePrecision: 0.1,
-      textWidth: measureText,
-      smallTextWidth: measureText,
-      positiveColor: '#12c48b',
-      negativeColor: '#ff4d67',
-    });
+    const [geometry] = buildNativeTradeLineGeometries(
+      [],
+      [
+        createPositionLine({
+          brackets: null,
+          positionData: { entryPrice: 63600, isLong: true, notional: 2500 },
+        }),
+      ],
+      {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      },
+    );
 
     expect(geometry?.buttons.some((button) => button.type === 'tp')).toBe(false);
     expect(geometry?.bracketConnector).toBeNull();
   });
 
   it('builds stable position geometry with reverse, close, bracket actions, and no order drag zone', () => {
-    const [geometry] = buildNativeTradeLineGeometries([], [
-      createPositionLine({
-        positionData: {
-          entryPrice: 63600,
-          isLong: true,
-          notional: 2500,
-        },
-      }),
-    ], {
-      dimensions,
-      pricePrecision: 0.1,
-      textWidth: measureText,
-      smallTextWidth: measureText,
-      positiveColor: '#12c48b',
-      negativeColor: '#ff4d67',
-    });
+    const [geometry] = buildNativeTradeLineGeometries(
+      [],
+      [
+        createPositionLine({
+          positionData: {
+            entryPrice: 63600,
+            isLong: true,
+            notional: 2500,
+          },
+        }),
+      ],
+      {
+        dimensions,
+        pricePrecision: 0.1,
+        textWidth: measureText,
+        smallTextWidth: measureText,
+        positiveColor: '#12c48b',
+        negativeColor: '#ff4d67',
+      },
+    );
 
     expect(geometry?.objectType).toBe('position');
     expect(geometry?.objectId).toBe('adapter-position');
@@ -616,7 +638,9 @@ describe('native trade line layout', () => {
     expect(geometry?.buttons[2]?.corners).toBe('left');
     expect(geometry?.buttons[3]?.corners).toBe('right');
     const reverseButton = geometry?.buttons[0];
-    expect(reverseButton?.textX).toBe(Math.round((reverseButton?.x ?? 0) + (reverseButton?.width ?? 0) / 2 - measureText('⇄') / 2));
+    expect(reverseButton?.textX).toBe(
+      Math.round((reverseButton?.x ?? 0) + (reverseButton?.width ?? 0) / 2 - measureText('⇄') / 2),
+    );
     expect(geometry?.actionZones.map((zone) => zone.actionType)).toEqual(['reverse', 'close', 'tp', 'sl']);
     expect(geometry?.actionZones.map((zone) => zone.price)).toEqual([63777, 63777, 63777, 63777]);
     expect(geometry?.actionZones.map((zone) => zone.entryPrice)).toEqual([63600, 63600, 63600, 63600]);

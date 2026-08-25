@@ -8,6 +8,7 @@ import { DashPathEffect, Group, RoundedRect, Skia, Line as SkiaLine } from '@sho
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../../constants';
+import { PARTIAL_BRACKET_PERCENTS, resolvePartialBracketMarkers } from '../../interaction/partialBrackets';
 import { getNativeDarkLabelBackgroundColor, NATIVE_PRICE_AXIS_TAG_TEXT_COLOR } from '../utils/nativeColor';
 import { NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
@@ -19,7 +20,6 @@ import { NativePriceAxisTagAnimatedText, NativePriceAxisTagBox } from './NativeP
 import { formatNativeTradeLinePriceWorklet } from './nativePriceFormat';
 import { getNativePriceAxisTagFloor, isNativeMainPaneVisible, sharedPriceToNativeY } from './nativeSharedViewport';
 import { measureNativeSkiaAxisCharacterWidth, NativeAnimatedSkiaText } from './nativeSkiaText';
-import { PARTIAL_BRACKET_PERCENTS, resolvePartialBracketMarkers } from '../../interaction/partialBrackets';
 
 const PARTIAL_ZONE_HALF_WIDTH = 220;
 const PARTIAL_MARKER_INTERVAL = 55;
@@ -118,9 +118,7 @@ export function resolveNativePartialSurfaceTops({
   // Opposite side from the markers where it fits, otherwise stacked beyond
   // them. Both stay unclamped here on purpose: stacking off a clamped marker
   // and then clamping again collapses the two onto the same edge.
-  const labelFar = markersGoBelow
-    ? fingerY - PARTIAL_THUMB_CLEARANCE - labelHeight
-    : fingerY + PARTIAL_THUMB_CLEARANCE;
+  const labelFar = markersGoBelow ? fingerY - PARTIAL_THUMB_CLEARANCE - labelHeight : fingerY + PARTIAL_THUMB_CLEARANCE;
   const labelFarFits = markersGoBelow ? fitsAbove(labelFar) : fitsBelow(labelFar, labelHeight);
   const labelRaw = labelFarFits
     ? labelFar
@@ -184,9 +182,7 @@ export function NativePartialMarker({
   );
   const markerX = useDerivedValue(() => resolved.value.centerX - resolved.value.width / 2);
   const markerTextX = useDerivedValue(() => markerX.value + PARTIAL_MARKER_PADDING_X);
-  const isActive = useDerivedValue(
-    () => dragState.activePartialEnabled.value && resolved.value.isActive,
-  );
+  const isActive = useDerivedValue(() => dragState.activePartialEnabled.value && resolved.value.isActive);
   const markerBorderColor = useDerivedValue(() => (isActive.value ? activeColor.value : 'rgba(160, 166, 176, 0.45)'));
   const markerFill = useDerivedValue(() => (isActive.value ? activeColor.value : inactiveMarkerFill));
   const markerOpacity = useDerivedValue(() => {
@@ -291,7 +287,8 @@ export function AnimatedBracketDragPreview({
   // colour, or it reads as no line at all - which is how it looked outside
   // partial mode, where the zone gave no other clue where the price was.
   const lineColor = useDerivedValue(
-    () => dragState.activeLineColor.value || dragState.activeColor.value || DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
+    () =>
+      dragState.activeLineColor.value || dragState.activeColor.value || DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   );
   const labelBackgroundColor = getNativeDarkLabelBackgroundColor();
   const lineStart = useDerivedValue(() => ({ x: frame.contentLeft, y: y.value }));
@@ -303,9 +300,7 @@ export function AnimatedBracketDragPreview({
   // colour and the button that started the drag is still on screen, so the
   // prefix only bought width - the tag is the widest thing on the axis and it
   // pushed the price itself out of alignment with the tags above and below.
-  const tagText = useDerivedValue(() =>
-    formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision),
-  );
+  const tagText = useDerivedValue(() => formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision));
   const tagWidth = useDerivedValue(() =>
     Math.max(
       tagLayout.width,
@@ -314,9 +309,7 @@ export function AnimatedBracketDragPreview({
     ),
   );
   const tagX = useDerivedValue(() => tagRight - tagWidth.value);
-  const tagTextX = useDerivedValue(
-    () => tagRight - NATIVE_PRICE_AXIS_TAG_PADDING_X - tagText.value.length * axisCharacterWidth,
-  );
+  const tagTextX = useDerivedValue(() => tagX.value + (tagWidth.value - tagText.value.length * axisCharacterWidth) / 2);
   // Pinned to the drag price rather than de-overlapped against the other tags:
   // a dragged tag that drifts off the price it reports is worse than one that
   // overlaps a neighbour for the length of a drag. Still floor-clamped, so it
@@ -345,7 +338,9 @@ export function AnimatedBracketDragPreview({
     return isNativeBracketPreviewYVisible(y.value, frame) ? 1 : 0;
   });
   const entryY = useDerivedValue(() => sharedPriceToNativeY(dragState.activeEntryPrice.value, sharedViewport, frame));
-  const zoneTop = useDerivedValue(() => clampWorklet(Math.min(entryY.value, y.value), frame.mainPane.top, frame.mainPane.bottom));
+  const zoneTop = useDerivedValue(() =>
+    clampWorklet(Math.min(entryY.value, y.value), frame.mainPane.top, frame.mainPane.bottom),
+  );
   const zoneBottom = useDerivedValue(() =>
     clampWorklet(Math.max(entryY.value, y.value), frame.mainPane.top, frame.mainPane.bottom),
   );
@@ -400,19 +395,18 @@ export function AnimatedBracketDragPreview({
   );
   const markerTop = useDerivedValue(() => partialSurfaceTops.value.markerTop);
   const markerBaselineY = useDerivedValue(() => markerTop.value + 13);
-  const partialLabelText = useDerivedValue(
-    () =>
-      formatNativeBracketPartialPreviewLabel({
-        bracketType: dragState.activeBracketType.value,
-        entryPrice: dragState.activeEntryPrice.value,
-        isLong: dragState.activePositionIsLong.value,
-        notional: dragState.activePositionNotional.value,
-        partialPercent: dragState.activePartialPercent.value,
-        price: dragState.activePrice.value,
-      }),
+  const partialLabelText = useDerivedValue(() =>
+    formatNativeBracketPartialPreviewLabel({
+      bracketType: dragState.activeBracketType.value,
+      entryPrice: dragState.activeEntryPrice.value,
+      isLong: dragState.activePositionIsLong.value,
+      notional: dragState.activePositionNotional.value,
+      partialPercent: dragState.activePartialPercent.value,
+      price: dragState.activePrice.value,
+    }),
   );
-  const partialLabelWidth = useDerivedValue(() =>
-    Math.ceil(partialLabelText.value.length * axisCharacterWidth) + PARTIAL_MARKER_PADDING_X * 2,
+  const partialLabelWidth = useDerivedValue(
+    () => Math.ceil(partialLabelText.value.length * axisCharacterWidth) + PARTIAL_MARKER_PADDING_X * 2,
   );
   const partialLabelX = useDerivedValue(() =>
     clampWorklet(
@@ -434,15 +428,7 @@ export function AnimatedBracketDragPreview({
         <DashPathEffect intervals={[4, 4]} />
       </SkiaLine>
       <Group opacity={partialPreviewOpacity}>
-        <RoundedRect
-          x={armLeft}
-          y={zoneTop}
-          width={armWidth}
-          height={zoneHeight}
-          r={4}
-          color={color}
-          opacity={0.08}
-        />
+        <RoundedRect x={armLeft} y={zoneTop} width={armWidth} height={zoneHeight} r={4} color={color} opacity={0.08} />
         <RoundedRect
           x={armLeft}
           y={zoneTop}

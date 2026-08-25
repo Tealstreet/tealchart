@@ -1,5 +1,6 @@
 import type { DrawingOutput, PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
+import type { TimeAxisMarker } from './rendering/axisMarkers';
 import type { CanvasContext } from './rendering/CanvasContext';
 import type { PaneOffset } from './rendering/PaneManager';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
@@ -16,7 +17,6 @@ import {
   formatTimeAxisLabel,
   generatePriceMarkers as generateAxisPriceMarkers,
   generateTimeMarkers as generateAxisTimeMarkers,
-  type TimeAxisMarker,
 } from './rendering/axisMarkers';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
@@ -143,6 +143,27 @@ interface MeasuredValueAxisLabel {
   y: number;
   color: string;
   fontSize: number;
+}
+
+function normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
+  if (bounds.length <= 1) return bounds;
+  const width = Math.ceil(Math.max(...bounds.map((bound) => bound.width)));
+  if (!Number.isFinite(width) || width <= 0) return bounds;
+  return bounds.map((bound) => ({ ...bound, width }));
+}
+
+function normalizePriceLineLabelWidthsByPane(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
+  const widthsByPane = new Map<string, number>();
+  for (const bound of bounds) {
+    const paneId = bound.targetPaneId || 'main';
+    widthsByPane.set(paneId, Math.max(widthsByPane.get(paneId) ?? 0, bound.width));
+  }
+
+  return bounds.map((bound) => {
+    const paneId = bound.targetPaneId || 'main';
+    const width = Math.ceil(widthsByPane.get(paneId) ?? bound.width);
+    return Number.isFinite(width) && width > 0 ? { ...bound, width } : bound;
+  });
 }
 
 export const MAIN_VOLUME_OVERLAY_RATIO = 0.15;
@@ -861,17 +882,19 @@ export class TealchartRenderer {
       }
     }
 
-    return allBounds
-      .filter((b) => {
-        // Hide if line is completely outside visible area
-        return b.originalY >= visibleTop && b.originalY <= visibleBottom;
-      })
-      .map((b) => {
-        return {
-          ...b,
-          isOffScreen: false, // If we got here, it's on screen
-        };
-      });
+    return normalizePriceLineLabelWidths(
+      allBounds
+        .filter((b) => {
+          // Hide if line is completely outside visible area
+          return b.originalY >= visibleTop && b.originalY <= visibleBottom;
+        })
+        .map((b) => {
+          return {
+            ...b,
+            isOffScreen: false, // If we got here, it's on screen
+          };
+        }),
+    );
   }
 
   /**
@@ -969,11 +992,11 @@ export class TealchartRenderer {
     // Draw text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'right';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
-    const labelTextX = labelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const labelTextX = labelX + bound.width / 2;
 
     if (secondaryText) {
       // Two lines of text with minimal padding
@@ -1180,9 +1203,9 @@ export class TealchartRenderer {
     const textColor = bound.label.textColor || '#ffffff';
     ctx.fillStyle = textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'right';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const priceAxisTextX = priceAxisLabelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const priceAxisTextX = priceAxisLabelX + bound.width / 2;
 
     if (bound.label.secondaryText) {
       ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);
@@ -2133,9 +2156,7 @@ export class TealchartRenderer {
   }
 
   private plotStyleUsesStepLine(style: PlotStyle): boolean {
-    return style === 'stepline'
-      || style === 'steplinebr'
-      || style === 'stepline_diamond';
+    return style === 'stepline' || style === 'steplinebr' || style === 'stepline_diamond';
   }
 
   private renderStepLineDiamondMarkers(
@@ -2360,11 +2381,7 @@ export class TealchartRenderer {
     ctx.setLineDash([]);
   }
 
-  private getPerBarColor(
-    color: string | (string | null)[] | undefined,
-    barIndex: number,
-    fallback: string,
-  ): string {
+  private getPerBarColor(color: string | (string | null)[] | undefined, barIndex: number, fallback: string): string {
     if (Array.isArray(color)) {
       return color[barIndex] || fallback;
     }
@@ -2401,7 +2418,11 @@ export class TealchartRenderer {
     return Number.isFinite(plot.histbase);
   }
 
-  private getLatestRenderablePlotValue(plot: PlotOutput, bars: Bar[], viewport: Viewport): { index: number; value: number } | null {
+  private getLatestRenderablePlotValue(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+  ): { index: number; value: number } | null {
     const scanEnd = Math.min(bars.length, plot.values.length);
     for (let i = scanEnd - 1; i >= 0; i--) {
       const value = plot.values[i];
@@ -2456,11 +2477,21 @@ export class TealchartRenderer {
     );
   }
 
-  private renderPlotTrackPriceInComputedPane(plot: PlotOutput, bars: Bar[], viewport: Viewport, pane: ComputedPane): void {
+  private renderPlotTrackPriceInComputedPane(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    pane: ComputedPane,
+  ): void {
     this.renderPlotTrackPrice(plot, bars, viewport, pane.yMin, pane.yMax, (value) => this.valueToY(value, pane));
   }
 
-  private renderPlotTrackPriceInPaneOffset(plot: PlotOutput, bars: Bar[], viewport: Viewport, paneOffset: PaneOffset): void {
+  private renderPlotTrackPriceInPaneOffset(
+    plot: PlotOutput,
+    bars: Bar[],
+    viewport: Viewport,
+    paneOffset: PaneOffset,
+  ): void {
     this.renderPlotTrackPrice(plot, bars, viewport, paneOffset.yMin, paneOffset.yMax, (value) =>
       this.valueToPaneY(value, paneOffset),
     );
@@ -2572,12 +2603,8 @@ export class TealchartRenderer {
       bars,
       viewport,
       (value) => this.priceToY(value, viewport, priceHeight),
-      this.getAreaFillBaselineY(
-        plot,
-        fillFromTop,
-        margins.top,
-        priceHeight,
-        (value) => this.priceToY(value, viewport, priceHeight),
+      this.getAreaFillBaselineY(plot, fillFromTop, margins.top, priceHeight, (value) =>
+        this.priceToY(value, viewport, priceHeight),
       ),
       fillFromTop,
     );
@@ -2759,7 +2786,12 @@ export class TealchartRenderer {
 
     for (let i = 0; i < bars.length; i++) {
       const bar = bars[i];
-      if (!bar || !this.shouldRenderPlotBar(fill, bars, i) || bar.time < viewport.startTime || bar.time > viewport.endTime) {
+      if (
+        !bar ||
+        !this.shouldRenderPlotBar(fill, bars, i) ||
+        bar.time < viewport.startTime ||
+        bar.time > viewport.endTime
+      ) {
         previous = null;
         continue;
       }
@@ -2937,7 +2969,8 @@ export class TealchartRenderer {
       auto: 8,
     };
     const baseMarkerSize = sizeMap[size || 'small'] || 6;
-    const arrowMaxMagnitude = plot.type === 'plotarrow' ? this.getVisiblePlotArrowMaxMagnitude(plot, bars, viewport) : 0;
+    const arrowMaxMagnitude =
+      plot.type === 'plotarrow' ? this.getVisiblePlotArrowMaxMagnitude(plot, bars, viewport) : 0;
 
     for (let i = 0; i < bars.length && i < values.length; i++) {
       const bar = bars[i];
@@ -2965,12 +2998,7 @@ export class TealchartRenderer {
           : baseMarkerSize;
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
-      const effectiveLocation =
-        plot.type === 'plotarrow'
-          ? value > 0
-            ? 'belowbar'
-            : 'abovebar'
-          : location;
+      const effectiveLocation = plot.type === 'plotarrow' ? (value > 0 ? 'belowbar' : 'abovebar') : location;
 
       // Determine Y position based on location
       let y: number;
@@ -3010,7 +3038,7 @@ export class TealchartRenderer {
       }
 
       if (plot.text) {
-        ctx.fillStyle = Array.isArray(plot.textColor) && plot.textColor[i] ? plot.textColor[i] as string : textColor;
+        ctx.fillStyle = Array.isArray(plot.textColor) && plot.textColor[i] ? (plot.textColor[i] as string) : textColor;
         ctx.font = `${Math.max(10, markerSize * 1.5)}px sans-serif`;
         ctx.textAlign = 'center';
         this.drawPlotMarkerText(
@@ -3060,9 +3088,16 @@ export class TealchartRenderer {
     return maxMagnitude;
   }
 
-  private getPlotArrowMarkerSize(plot: PlotOutput, magnitude: number, maxMagnitude: number, fallbackSize: number): number {
+  private getPlotArrowMarkerSize(
+    plot: PlotOutput,
+    magnitude: number,
+    maxMagnitude: number,
+    fallbackSize: number,
+  ): number {
     const minHeight = Number.isFinite(plot.minHeight) ? Math.max(1, plot.minHeight!) : fallbackSize;
-    const maxHeight = Number.isFinite(plot.maxHeight) ? Math.max(minHeight, plot.maxHeight!) : Math.max(minHeight, fallbackSize);
+    const maxHeight = Number.isFinite(plot.maxHeight)
+      ? Math.max(minHeight, plot.maxHeight!)
+      : Math.max(minHeight, fallbackSize);
     if (maxMagnitude <= 0 || maxHeight === minHeight) return minHeight;
     return minHeight + (magnitude / maxMagnitude) * (maxHeight - minHeight);
   }
@@ -3145,13 +3180,7 @@ export class TealchartRenderer {
 
       case 'labelup':
         ctx.beginPath();
-        this.drawRoundedRectPath(
-          x - size * 0.7,
-          y - size * 0.45,
-          size * 1.4,
-          size * 0.9,
-          Math.max(2, size * 0.15)
-        );
+        this.drawRoundedRectPath(x - size * 0.7, y - size * 0.45, size * 1.4, size * 0.9, Math.max(2, size * 0.15));
         ctx.fill();
         ctx.beginPath();
         ctx.moveTo(x, y + size * 0.65);
@@ -3163,13 +3192,7 @@ export class TealchartRenderer {
 
       case 'labeldown':
         ctx.beginPath();
-        this.drawRoundedRectPath(
-          x - size * 0.7,
-          y - size * 0.45,
-          size * 1.4,
-          size * 0.9,
-          Math.max(2, size * 0.15)
-        );
+        this.drawRoundedRectPath(x - size * 0.7, y - size * 0.45, size * 1.4, size * 0.9, Math.max(2, size * 0.15));
         ctx.fill();
         ctx.beginPath();
         ctx.moveTo(x, y - size * 0.65);
@@ -3189,7 +3212,8 @@ export class TealchartRenderer {
 
   private drawRoundedRectPath(x: number, y: number, width: number, height: number, radius: number): void {
     const { ctx } = this;
-    const maybeRoundRect = (ctx as CanvasRenderingContext2D & { roundRect?: CanvasRenderingContext2D['roundRect'] }).roundRect;
+    const maybeRoundRect = (ctx as CanvasRenderingContext2D & { roundRect?: CanvasRenderingContext2D['roundRect'] })
+      .roundRect;
 
     if (typeof maybeRoundRect === 'function') {
       maybeRoundRect.call(ctx, x, y, width, height, radius);
@@ -3513,11 +3537,13 @@ export class TealchartRenderer {
     }
 
     // Filter to visible area within each line's target pane
-    return allBounds.filter((b) => {
-      const targetPaneId = b.targetPaneId || 'main';
-      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
-      return b.originalY >= targetPane.top && b.originalY <= targetPane.bottom;
-    });
+    return normalizePriceLineLabelWidthsByPane(
+      allBounds.filter((b) => {
+        const targetPaneId = b.targetPaneId || 'main';
+        const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
+        return b.originalY >= targetPane.top && b.originalY <= targetPane.bottom;
+      }),
+    );
   }
 
   /**
@@ -3714,7 +3740,8 @@ export class TealchartRenderer {
       }
     }
 
-    const routedDrawings = drawings && drawings.length > 0 ? routeTealScriptDrawings(drawings, computedPanes) : undefined;
+    const routedDrawings =
+      drawings && drawings.length > 0 ? routeTealScriptDrawings(drawings, computedPanes) : undefined;
 
     return {
       ...input,
@@ -3756,8 +3783,7 @@ export class TealchartRenderer {
       // and lines smear along the seam across the pane that was maximised.
       if (pane.height <= 0) continue;
       const paneLabelBounds = labelBoundsByPane.get(pane.id) || [];
-      const paneDrawings =
-        pane.type === 'main' ? routedDrawings?.main : routedDrawings?.byPaneId.get(pane.id);
+      const paneDrawings = pane.type === 'main' ? routedDrawings?.main : routedDrawings?.byPaneId.get(pane.id);
       this.renderPaneUnified(
         pane,
         bars,
@@ -3924,15 +3950,7 @@ export class TealchartRenderer {
     }
 
     if (passes.has('main-price-overlay-content')) {
-      this.renderOverlayIndicatorPlots(
-        plots,
-        indicatorPaneInfo,
-        bars,
-        viewport,
-        pane,
-        plotStyleOverrides,
-        'price',
-      );
+      this.renderOverlayIndicatorPlots(plots, indicatorPaneInfo, bars, viewport, pane, plotStyleOverrides, 'price');
     }
 
     if (passes.has('main-overlay-content')) {
@@ -3945,15 +3963,7 @@ export class TealchartRenderer {
       }
 
       // Draw overlay indicator plots (plots that share main pane Y-axis)
-      this.renderOverlayIndicatorPlots(
-        plots,
-        indicatorPaneInfo,
-        bars,
-        viewport,
-        pane,
-        plotStyleOverrides,
-        'time',
-      );
+      this.renderOverlayIndicatorPlots(plots, indicatorPaneInfo, bars, viewport, pane, plotStyleOverrides, 'time');
 
       if (executionLines && executionLines.length > 0) {
         this.drawExecutionMarkersInPane(executionLines, viewport, pane);
@@ -4240,27 +4250,11 @@ export class TealchartRenderer {
     }
 
     if (passes.has('indicator-price-content')) {
-      this.renderIndicatorPanePlots(
-        pane,
-        bars,
-        viewport,
-        plots,
-        indicatorPaneInfo,
-        plotStyleOverrides,
-        'price',
-      );
+      this.renderIndicatorPanePlots(pane, bars, viewport, plots, indicatorPaneInfo, plotStyleOverrides, 'price');
     }
 
     if (passes.has('indicator-content')) {
-      this.renderIndicatorPanePlots(
-        pane,
-        bars,
-        viewport,
-        plots,
-        indicatorPaneInfo,
-        plotStyleOverrides,
-        'time',
-      );
+      this.renderIndicatorPanePlots(pane, bars, viewport, plots, indicatorPaneInfo, plotStyleOverrides, 'time');
 
       if (drawings && drawings.length > 0) {
         const drawingPartition = partitionTealScriptDrawings(drawings);
@@ -4433,15 +4427,9 @@ export class TealchartRenderer {
     let commonLabelWidth = this.valueAxisCommonLabelWidth;
 
     for (const pane of computedPanes) {
-      const measuredLabels = this.measurePaneYAxisLabels(
-        pane,
-        labelBoundsByPane.get(pane.id),
-        valueAxisOverscanPx,
-      );
+      const measuredLabels = this.measurePaneYAxisLabels(pane, labelBoundsByPane.get(pane.id), valueAxisOverscanPx);
       const measuredWidth =
-        measuredLabels.length > 0
-          ? Math.ceil(Math.max(...measuredLabels.map((label) => label.textWidth)))
-          : 0;
+        measuredLabels.length > 0 ? Math.ceil(Math.max(...measuredLabels.map((label) => label.textWidth))) : 0;
       const paneLabelWidth = Math.max(this.valueAxisPaneLabelWidths.get(pane.id) ?? 0, measuredWidth);
 
       this.valueAxisPaneLabelWidths.set(pane.id, paneLabelWidth);
@@ -4617,7 +4605,8 @@ export class TealchartRenderer {
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
       const isUp = bar.close >= bar.open;
-      const color = this.resolveBarColorOverride(plots, barIndex, bars.length) ?? (isUp ? options.upColor : options.downColor);
+      const color =
+        this.resolveBarColorOverride(plots, barIndex, bars.length) ?? (isUp ? options.upColor : options.downColor);
 
       // Wick
       const highY = this.valueToY(bar.high, pane);
@@ -4644,12 +4633,7 @@ export class TealchartRenderer {
   /**
    * Draw volume overlay within the main pane (bottom portion)
    */
-  private drawVolumeInPane(
-    bars: Bar[],
-    viewport: Viewport,
-    pane: ComputedPane,
-    timeContentOverscanPx = 0,
-  ): void {
+  private drawVolumeInPane(bars: Bar[], viewport: Viewport, pane: ComputedPane, timeContentOverscanPx = 0): void {
     const { ctx, options, margins } = this;
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
@@ -4930,12 +4914,8 @@ export class TealchartRenderer {
         bars,
         viewport,
         (value) => this.valueToY(value, pane),
-        this.getAreaFillBaselineY(
-          plot,
-          style === 'areabr',
-          pane.top,
-          pane.height,
-          (value) => this.valueToY(value, pane),
+        this.getAreaFillBaselineY(plot, style === 'areabr', pane.top, pane.height, (value) =>
+          this.valueToY(value, pane),
         ),
         style === 'areabr',
       );
@@ -5114,7 +5094,9 @@ export class TealchartRenderer {
     }
 
     // Filter to visible area (labels with original Y in top bar should still render, just clamped)
-    return allBounds.filter((b) => b.originalY >= pane.top && b.originalY <= pane.bottom);
+    return normalizePriceLineLabelWidths(
+      allBounds.filter((b) => b.originalY >= pane.top && b.originalY <= pane.bottom),
+    );
   }
 
   /**
@@ -5214,11 +5196,11 @@ export class TealchartRenderer {
     // Label text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'right';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
-    const labelTextX = labelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const labelTextX = labelX + bound.width / 2;
 
     if (secondaryText) {
       ctx.fillText(bound.label.primaryText, labelTextX, labelY + 7);
@@ -5450,9 +5432,9 @@ export class TealchartRenderer {
 
     ctx.fillStyle = bound.label.textColor || '#ffffff';
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'right';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const priceAxisTextX = priceAxisLabelX + bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const priceAxisTextX = priceAxisLabelX + bound.width / 2;
 
     if (bound.label.secondaryText) {
       ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);
@@ -5680,12 +5662,8 @@ export class TealchartRenderer {
         bars,
         viewport,
         (value) => this.valueToPaneY(value, paneOffset),
-        this.getAreaFillBaselineY(
-          plot,
-          style === 'areabr',
-          paneOffset.top,
-          paneOffset.height,
-          (value) => this.valueToPaneY(value, paneOffset),
+        this.getAreaFillBaselineY(plot, style === 'areabr', paneOffset.top, paneOffset.height, (value) =>
+          this.valueToPaneY(value, paneOffset),
         ),
         style === 'areabr',
       );
