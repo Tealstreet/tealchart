@@ -72,6 +72,7 @@ import {
   resolvePartialBracketMarkers,
 } from '../interaction/partialBrackets';
 import { PriceLineManager } from '../interaction/PriceLineManager';
+import { snapPriceToTick, snapTimeToInterval } from '../interaction/crosshairSnap';
 import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from '../layout/chartGeometry';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
@@ -761,6 +762,10 @@ export class ChartCore {
         } else {
           this.options.onRequestMoreBars?.(dir, hint);
         }
+      },
+      snapCrosshairPoint: (x, y) => this.resolveSnappedCrosshairPoint(x, y),
+      onCrosshairMeasureReset: () => {
+        this.crosshairPriceLabelMaxWidth = 0;
       },
       onCrossHairMoved: (x, y, options) => {
         this.crosshair = { visible: true, x, y };
@@ -1854,6 +1859,23 @@ export class ChartCore {
     }
 
     return null;
+  }
+
+  private resolveSnappedCrosshairPoint(x: number, y: number): { x: number; y: number } {
+    const viewport = this.viewport ?? TealchartRenderer.calculateViewport(this.bars);
+    const layout = this.getUnifiedLayout();
+    const intervalMs = intervalToMs(this.options.interval ?? '60');
+    const snappedTime = snapTimeToInterval(this.renderer.publicXToTime(x, viewport), intervalMs);
+    const snappedX = this.renderer.publicTimeToX(snappedTime, viewport);
+    const pane = this.getPaneAtY(y);
+    if (pane?.paneId !== 'main') return { x: snappedX, y };
+
+    const pricePrecision = this.options.renderOptions?.pricePrecision;
+    const snappedPrice = snapPriceToTick(this.renderer.publicYToPriceWithLayout(y, viewport, layout), pricePrecision);
+    return {
+      x: snappedX,
+      y: this.renderer.publicPriceToYWithLayout(snappedPrice, viewport, layout),
+    };
   }
 
   private handleUserDrawingInput(

@@ -14,6 +14,10 @@ import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
   resolveNativeCrosshairPriceLabelText,
+  resolveNativeCrosshairSnappedPrice,
+  resolveNativeCrosshairSnappedTime,
+  resolveNativeCrosshairSnappedX,
+  resolveNativeCrosshairSnappedY,
 } from './nativeCrosshairContextMenu';
 
 function shared<T>(value: T): SharedValue<T> {
@@ -136,6 +140,27 @@ describe('native crosshair context menu geometry', () => {
     expect(nativeCrosshairXToTime((frame.contentLeft + frame.contentRight) / 2, viewport, frame)).toBe(1_500);
     expect(nativeCrosshairYToPrice(frame.mainPane.top, viewport, frame)).toBe(64_000);
     expect(nativeCrosshairYToPrice(frame.mainPane.bottom, viewport, frame)).toBe(62_000);
+  });
+
+  it('snaps main-pane crosshair price and y to the market tick', () => {
+    const viewport = sharedViewport({ startTime: 1_000, endTime: 2_000, priceMin: 62_000, priceMax: 64_000 });
+    const rawY = frame.mainPane.top + frame.mainPane.height * 0.31234;
+    const price = resolveNativeCrosshairSnappedPrice(frame, viewport, rawY, 0.5);
+    const snappedY = resolveNativeCrosshairSnappedY(frame, viewport, rawY, 0.5);
+
+    expect(price % 0.5).toBe(0);
+    expect(nativeCrosshairYToPrice(snappedY, viewport, frame)).toBe(price);
+    expect(resolveNativeCrosshairPriceLabelText(frame, viewport, rawY, 0.5)).toBe(price.toLocaleString('en-US'));
+  });
+
+  it('snaps crosshair time and x to the active interval', () => {
+    const viewport = sharedViewport({ startTime: 0, endTime: 10 * 60_000, priceMin: 62_000, priceMax: 64_000 });
+    const rawX = frame.contentLeft + frame.contentWidth * 0.36;
+    const time = resolveNativeCrosshairSnappedTime(frame, viewport, rawX, 60_000);
+    const snappedX = resolveNativeCrosshairSnappedX(frame, viewport, rawX, 60_000);
+
+    expect(time).toBe(4 * 60_000);
+    expect(nativeCrosshairXToTime(snappedX, viewport, frame)).toBe(time);
   });
 });
 

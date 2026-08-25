@@ -76,6 +76,7 @@ export interface NativeChartGestureRuntimeInput {
   frame: NativeChartFrame | null;
   hasContextMenu?: boolean;
   hasDataViewport: boolean;
+  intervalMs: number;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
   orderDragState: NativeOrderDragInteractionState;
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
@@ -168,6 +169,7 @@ export function useNativeChartGestureRuntime({
   frame,
   hasContextMenu = false,
   hasDataViewport,
+  intervalMs,
   leftToolRailLayout,
   orderDragState,
   orderDragZones,
@@ -376,6 +378,7 @@ export function useNativeChartGestureRuntime({
       drawingSelectionEnabled,
       frame: dataFrame,
       hasContextMenu,
+      intervalMs,
       onContextMenuTap: stableOnContextMenuTap,
       onDrawingPlacementTap: stableOnDrawingTap,
       onDrawingSelectionTap: stableOnDrawingSelectionTap,
@@ -398,6 +401,7 @@ export function useNativeChartGestureRuntime({
     drawingInputEnabled,
     drawingSelectionEnabled,
     hasContextMenu,
+    intervalMs,
     orderDragZones,
     pricePrecision,
     sharedViewport,

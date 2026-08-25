@@ -75,6 +75,7 @@ describe('NativeChartCanvasLayers', () => {
       gridColor: '#222831',
       hasDataViewport,
       hasContextMenu: false,
+      intervalMs: 60_000,
       indicatorPaneInfo: {},
       indicatorPlots: [],
       indicatorTotalBarCount: 0,

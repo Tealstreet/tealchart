@@ -8,7 +8,7 @@ import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import { Gesture } from 'react-native-gesture-handler';
 
 import { beginNativeCrosshairDrag, toggleNativeCrosshair, updateNativeCrosshairDrag } from './nativeCrosshair';
-import { isNativeCrosshairContextMenuButtonTap } from './nativeCrosshairContextMenu';
+import { isNativeCrosshairContextMenuButtonTap, resolveNativeCrosshairSnappedY } from './nativeCrosshairContextMenu';
 import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { isNativeResetViewRevealTap } from './nativeResetViewButton';
@@ -102,7 +102,7 @@ function toggleNativeCrosshairAtPoint({
     crosshair.visible.value &&
     isNativeCrosshairContextMenuButtonTap({
       frame,
-      crosshairY: crosshair.y.value,
+      crosshairY: resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision),
       pricePrecision,
       priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
       sharedViewport,
@@ -206,7 +206,7 @@ export function createNativeCrosshairPanGesture({
         (hasContextMenu &&
           isNativeCrosshairContextMenuButtonTap({
             frame,
-            crosshairY: crosshair.y.value,
+            crosshairY: resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision),
             pricePrecision,
             priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
             sharedViewport,

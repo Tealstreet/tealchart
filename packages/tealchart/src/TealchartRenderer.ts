@@ -3341,6 +3341,15 @@ export class TealchartRenderer {
   }
 
   /**
+   * Convert time to X coordinate.
+   * Used by interaction code that needs the same bar-center projection as candles.
+   */
+  publicTimeToX(time: number, viewport: Viewport): number {
+    const chartWidth = this.options.width - this.margins.left - this.margins.right;
+    return this.timeToX(time, viewport, chartWidth);
+  }
+
+  /**
    * Public accessor for formatCrosshairTime — used by ChartCore crosshair overlay
    */
   formatCrosshairTimePublic(time: number): string {
