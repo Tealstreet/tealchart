@@ -43,7 +43,11 @@ export interface NativeResolvedPriceAxisTag {
   fixed?: boolean;
 }
 
-export function fitNativePriceAxisTextToWidth(text: string, maxWidth: number, textWidth: (text: string) => number): string {
+export function fitNativePriceAxisTextToWidth(
+  text: string,
+  maxWidth: number,
+  textWidth: (text: string) => number,
+): string {
   if (maxWidth <= 0) return '';
   if (textWidth(text) <= maxWidth) return text;
 
@@ -72,7 +76,7 @@ export function createNativePriceAxisTagTextLayout(
 
   return {
     text: displayText,
-    x: x + width - paddingX - measuredTextWidth,
+    x: x + (width - measuredTextWidth) / 2,
   };
 }
 
@@ -128,12 +132,7 @@ export function getNativePriceAxisSecondaryTextBaselineOffset(tagHeight: number)
  * Web bounds every label this way already, in
  * `TealchartRenderer.calculatePriceLineLabelBounds`.
  */
-export function clampNativePriceAxisTagCenterY(
-  centerY: number,
-  height: number,
-  minY: number,
-  maxY: number,
-): number {
+export function clampNativePriceAxisTagCenterY(centerY: number, height: number, minY: number, maxY: number): number {
   'worklet';
   return Math.max(minY + height / 2, Math.min(maxY - height / 2, centerY));
 }
@@ -209,7 +208,8 @@ export function resolveNativePriceAxisTagStack(
       if (
         (candidate.fixed && !anchor.fixed) ||
         (candidate.fixed === anchor.fixed &&
-          (candidate.priority > anchor.priority || (candidate.priority === anchor.priority && candidate.centerY < anchor.centerY)))
+          (candidate.priority > anchor.priority ||
+            (candidate.priority === anchor.priority && candidate.centerY < anchor.centerY)))
       ) {
         anchorIndex = index;
       }
@@ -297,7 +297,8 @@ export function resolveNativePriceAxisTagStack(
   const bottomOverflow = last.centerY + last.height / 2 - maxY;
   if (bottomOverflow > 0) {
     for (let index = resolved.length - 1; index >= 0; index -= 1) {
-      if (index < resolved.length - 1 && !isNativePriceAxisTagPackedAgainst(resolved[index], resolved[index + 1], gap)) break;
+      if (index < resolved.length - 1 && !isNativePriceAxisTagPackedAgainst(resolved[index], resolved[index + 1], gap))
+        break;
       if (!resolved[index].fixed) resolved[index].centerY -= bottomOverflow;
     }
   }

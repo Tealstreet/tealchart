@@ -8,7 +8,7 @@ import { memo, useMemo } from 'react';
 import { Glyphs, Path as SkiaPath, Skia as SkiaApi } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import { createNativeRightAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
+import { createNativeLeftAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
 import {
   getNativePriceGridSlot,
@@ -32,11 +32,9 @@ export interface NativeIndicatorPaneAxisSlot {
 }
 
 interface NativeIndicatorPaneAxisSlotInput {
-  characterWidth: number;
   frame: NativeChartFrame;
   index: number;
-  labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   pane: NativePaneFrame;
   range: NativePaneRange;
@@ -51,11 +49,9 @@ interface NativeIndicatorPaneAxisSlotInput {
  * feed the live value from a shared value and the axis tracks the finger.
  */
 export function resolveNativeIndicatorPaneAxisSlot({
-  characterWidth,
   frame,
   index,
-  labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   pane,
   range,
@@ -82,7 +78,7 @@ export function resolveNativeIndicatorPaneAxisSlot({
 
   return {
     labelText,
-    labelX: createNativeRightAlignedAxisTextX(labelRight, labelText.length, characterWidth, labelMaxWidth),
+    labelX: createNativeLeftAlignedAxisTextX(labelLeft),
     labelY: Math.max(pane.top + 10, Math.min(pane.bottom - 2, y + 4)),
     lineEnd: { x: frame.priceAxisRight, y },
     lineStart: { x: frame.contentLeft, y },
@@ -132,8 +128,9 @@ export function NativeIndicatorPaneAxisLayerImpl({
   if (!showAxisLabels && !showGridLines) return null;
 
   const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
+  const labelLeft = frame.priceAxisLeft + 4;
   const labelRight = frame.priceAxisRight - 4;
-  const labelMaxWidth = Math.max(0, labelRight - (frame.priceAxisLeft + 4));
+  const labelMaxWidth = Math.max(0, labelRight - labelLeft);
   const maxCharacters = getNativeAxisTextCharacterCapacity(labelMaxWidth, characterWidth);
   const indicatorPanes = frame.panes.filter((pane) => pane.type === 'indicator');
   // getNativePriceGridSlotCount is not a worklet, so the bound is counted here
@@ -162,11 +159,9 @@ export function NativeIndicatorPaneAxisLayerImpl({
       {showAxisLabels ? (
         <NativeIndicatorPaneAxisLabelGlyphs
           axisFont={axisFont}
-          characterWidth={characterWidth}
           frame={frame}
           indicatorPanes={indicatorPanes}
-          labelMaxWidth={labelMaxWidth}
-          labelRight={labelRight}
+          labelLeft={labelLeft}
           maxCharacters={maxCharacters}
           paneRangeOverrides={paneRangeOverrides}
           slotCounts={slotCounts}
@@ -206,11 +201,9 @@ function NativeIndicatorPaneAxisGridPath({
       const count = slotCounts[paneIndex] ?? 0;
       for (let index = 0; index < count; index += 1) {
         const slot = resolveNativeIndicatorPaneAxisSlot({
-          characterWidth: 0,
           frame,
           index,
-          labelMaxWidth: 0,
-          labelRight: 0,
+          labelLeft: 0,
           maxCharacters: 0,
           pane,
           range,
@@ -230,22 +223,18 @@ function NativeIndicatorPaneAxisGridPath({
 /** Every indicator pane's axis labels as one Glyphs node. */
 function NativeIndicatorPaneAxisLabelGlyphs({
   axisFont,
-  characterWidth,
   frame,
   indicatorPanes,
-  labelMaxWidth,
-  labelRight,
+  labelLeft,
   maxCharacters,
   paneRangeOverrides,
   slotCounts,
   textColor,
 }: {
   axisFont: ReturnType<typeof Skia.Font>;
-  characterWidth: number;
   frame: NativeChartFrame;
   indicatorPanes: readonly NativePaneFrame[];
-  labelMaxWidth: number;
-  labelRight: number;
+  labelLeft: number;
   maxCharacters: number;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   slotCounts: readonly number[];
@@ -266,11 +255,9 @@ function NativeIndicatorPaneAxisLabelGlyphs({
       const count = slotCounts[paneIndex] ?? 0;
       for (let index = 0; index < count; index += 1) {
         const slot = resolveNativeIndicatorPaneAxisSlot({
-          characterWidth,
           frame,
           index,
-          labelMaxWidth,
-          labelRight,
+          labelLeft,
           maxCharacters,
           pane,
           range,

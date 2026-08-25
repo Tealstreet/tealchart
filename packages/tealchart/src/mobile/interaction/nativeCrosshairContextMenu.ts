@@ -13,6 +13,7 @@ import {
   getNativeTradeLinePriceDecimalsWorklet,
 } from '../render/nativePriceFormat';
 import {
+  NATIVE_PRICE_AXIS_LANE_LEFT_INSET,
   NATIVE_PRICE_AXIS_LANE_RIGHT_INSET,
   NATIVE_PRICE_AXIS_TAG_MIN_WIDTH,
   NATIVE_PRICE_AXIS_TAG_PADDING_X,
@@ -58,19 +59,19 @@ export function resolveNativeCrosshairPriceLabelLayout(
   minWidth = 0,
 ): NativeCrosshairPriceLabelLayout {
   'worklet';
+  const laneLeft = frame.priceAxisLeft + NATIVE_PRICE_AXIS_LANE_LEFT_INSET;
   const laneRight = frame.dimensions.width - NATIVE_PRICE_AXIS_LANE_RIGHT_INSET;
+  const laneWidth = Math.max(0, laneRight - laneLeft);
   const measuredWidth =
     Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH) + NATIVE_PRICE_AXIS_TAG_PADDING_X * 2;
-  const width = Math.max(0, Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, measuredWidth, minWidth));
+  const width = Math.max(0, Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, laneWidth, measuredWidth, minWidth));
   const x = laneRight - width;
+  const textWidth = Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH);
 
   return {
     x,
     width,
-    textX:
-      laneRight -
-      NATIVE_PRICE_AXIS_TAG_PADDING_X -
-      Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH),
+    textX: x + (width - textWidth) / 2,
   };
 }
 

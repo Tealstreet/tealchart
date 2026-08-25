@@ -90,13 +90,12 @@ describe('NativeCrosshairLayer price axis tag', () => {
     expect(valueOf<number>(priceBox.props.y) + valueOf<number>(priceBox.props.height) / 2).toBe(snappedY);
   });
 
-  it('sizes the price tag from its text, not the whole axis lane', () => {
+  it('uses the full price-axis lane width for the price tag', () => {
     const boxes = collectElementsByType(renderCrosshair(), RoundedRect);
     const priceBox = boxes[0];
-    const laneWidth = frame.dimensions.width - frame.priceAxisLeft;
+    const laneWidth = frame.dimensions.width - frame.priceAxisLeft - 6;
 
-    expect(valueOf<number>(priceBox.props.width)).toBeGreaterThan(0);
-    expect(valueOf<number>(priceBox.props.width)).toBeLessThan(laneWidth);
+    expect(valueOf<number>(priceBox.props.width)).toBe(laneWidth);
   });
 
   it('keeps the price and time tags the same height', () => {

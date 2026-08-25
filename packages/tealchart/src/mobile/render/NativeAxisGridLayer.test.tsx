@@ -67,8 +67,9 @@ const frame = createNativeChartFrameFromPanes({
 });
 
 const characterWidth = 7;
+const priceLabelLeft = frame.priceAxisLeft + 4;
 const priceLabelRight = frame.priceAxisRight - 4;
-const priceLabelMaxWidth = Math.max(0, priceLabelRight - (frame.priceAxisLeft + 4));
+const priceLabelMaxWidth = Math.max(0, priceLabelRight - priceLabelLeft);
 const priceMaxCharacters = getNativeAxisTextCharacterCapacity(priceLabelMaxWidth, characterWidth);
 const timeMaxCharacters = Math.min(8, getNativeAxisTextCharacterCapacity(frame.contentWidth, characterWidth));
 
@@ -80,7 +81,7 @@ describe('native axis grid layers', () => {
         frame,
         index,
         labelMaxWidth: priceLabelMaxWidth,
-        labelRight: priceLabelRight,
+        labelLeft: priceLabelLeft,
         maxCharacters: priceMaxCharacters,
         priceMax: 64000,
         priceMin: 63000,
@@ -90,6 +91,11 @@ describe('native axis grid layers', () => {
 
     expect(rows.map((row) => row.labelText)).toEqual(['63,000', '63,100', '63,200', '63,300']);
     expect(rows.every((row) => row.labelX >= frame.priceAxisLeft)).toBe(true);
+    expect(
+      rows.every(
+        (row) => row.labelX === priceLabelLeft + (priceLabelMaxWidth - row.labelText.length * characterWidth) / 2,
+      ),
+    ).toBe(true);
     expect(rows.every((row) => row.labelY >= frame.mainPane.top)).toBe(true);
     expect(rows.every((row) => row.lineStart.y === row.lineEnd.y)).toBe(true);
     expect(rows.every((row) => row.lineEnd.x === frame.priceAxisRight)).toBe(true);
@@ -101,7 +107,7 @@ describe('native axis grid layers', () => {
       frame,
       index: 0,
       labelMaxWidth: priceLabelMaxWidth,
-      labelRight: priceLabelRight,
+      labelLeft: priceLabelLeft,
       maxCharacters: 16,
       priceMax: 0.08,
       priceMin: 0.06,
@@ -270,7 +276,7 @@ describe('native axis grid layers', () => {
         frame,
         index,
         labelMaxWidth: priceLabelMaxWidth,
-        labelRight: priceLabelRight,
+        labelLeft: priceLabelLeft,
         maxCharacters: priceMaxCharacters,
         priceMax: 64_000,
         priceMin: 63_000,
@@ -283,7 +289,7 @@ describe('native axis grid layers', () => {
         frame,
         index,
         labelMaxWidth: 0,
-        labelRight: 0,
+        labelLeft: 0,
         maxCharacters: 0,
         priceMax: 64_000,
         priceMin: 63_000,
@@ -337,4 +343,3 @@ describe('native axis grid layers', () => {
     expect(Math.max(...ys)).toBeLessThanOrEqual(224 + 164);
   });
 });
-

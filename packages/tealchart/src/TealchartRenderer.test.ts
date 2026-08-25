@@ -1,12 +1,21 @@
 import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
-import type { Bar, ComputedPane, ExecutionLineRenderData, PaneLayout, PriceLine, UnifiedPaneLayout, Viewport } from './types';
+import type {
+  Bar,
+  ComputedPane,
+  ExecutionLineRenderData,
+  PaneLayout,
+  PriceLine,
+  PriceLineLabelBounds,
+  UnifiedPaneLayout,
+  Viewport,
+} from './types';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
-import { TealchartRenderer } from './TealchartRenderer';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
+import { TealchartRenderer } from './TealchartRenderer';
 import { PRICE_AXIS_RIGHT_PADDING, TIME_AXIS_HEIGHT } from './types';
 
 afterEach(() => {
@@ -503,7 +512,9 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const chartWidth = opts.width - opts.margins.left;
-      const expectedX = opts.margins.left + ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      const expectedX =
+        opts.margins.left +
+        ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
       expect(moveTo).toHaveBeenCalledWith(expectedX, expect.any(Number));
     });
 
@@ -537,7 +548,9 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const chartWidth = opts.width - opts.margins.left;
-      const expectedX = opts.margins.left + ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      const expectedX =
+        opts.margins.left +
+        ((bars[1]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
       expect(arc).toHaveBeenCalledWith(expectedX, expect.any(Number), expect.any(Number), 0, Math.PI * 2);
     });
 
@@ -571,7 +584,9 @@ describe('TealchartRenderer coordinate transforms', () => {
       const opts = renderer.getOptions();
       const chartWidth = opts.width - opts.margins.left;
       const hiddenX = opts.margins.left;
-      const firstVisibleX = opts.margins.left + ((bars[2]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      const firstVisibleX =
+        opts.margins.left +
+        ((bars[2]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
       expect(moveTo).not.toHaveBeenCalledWith(hiddenX, expect.any(Number));
       expect(moveTo).toHaveBeenCalledWith(firstVisibleX, expect.any(Number));
     });
@@ -691,7 +706,13 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
-      expect(roundRect).toHaveBeenCalledWith(opts.width - labelWidth - PRICE_AXIS_RIGHT_PADDING, trackY - 8, labelWidth, 16, 2);
+      expect(roundRect).toHaveBeenCalledWith(
+        opts.width - labelWidth - PRICE_AXIS_RIGHT_PADDING,
+        trackY - 8,
+        labelWidth,
+        16,
+        2,
+      );
       expect(fillText).toHaveBeenCalledWith('120', expect.any(Number), trackY);
       expect(ctx.strokeStyle).toBe('#333333');
     });
@@ -848,8 +869,20 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       (renderer as any).renderPlotInPane(plot, bars, viewport, pane);
 
-      expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(25, pane), expect.any(Number), 0, Math.PI * 2);
-      expect(arc).toHaveBeenCalledWith(expect.any(Number), renderer.valueToY(75, pane), expect.any(Number), 0, Math.PI * 2);
+      expect(arc).toHaveBeenCalledWith(
+        expect.any(Number),
+        renderer.valueToY(25, pane),
+        expect.any(Number),
+        0,
+        Math.PI * 2,
+      );
+      expect(arc).toHaveBeenCalledWith(
+        expect.any(Number),
+        renderer.valueToY(75, pane),
+        expect.any(Number),
+        0,
+        Math.PI * 2,
+      );
     });
 
     it('renders area fills in computed indicator panes', () => {
@@ -914,18 +947,24 @@ describe('TealchartRenderer coordinate transforms', () => {
       };
       const bridgedFill = vi.fn();
       const bridgedStroke = vi.fn();
-      const bridgedRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        fill: bridgedFill,
-        stroke: bridgedStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const bridgedRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          fill: bridgedFill,
+          stroke: bridgedStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
       const brokenFill = vi.fn();
       const brokenStroke = vi.fn();
-      const brokenRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        fill: brokenFill,
-        stroke: brokenStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const brokenRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          fill: brokenFill,
+          stroke: brokenStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
 
       (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'area' }, bars, viewport);
       (brokenRenderer as any).renderLinePlot({ ...basePlot, style: 'areabr' }, bars, viewport);
@@ -1052,10 +1091,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         linewidth: 1,
         style: 'stepline_diamond',
       };
-      const overrides = new Map([[
-        plot.id,
-        { color: '#FF9800', linewidth: 3 },
-      ]]);
+      const overrides = new Map([[plot.id, { color: '#FF9800', linewidth: 3 }]]);
 
       (renderer as any).renderPlotInPane(plot, bars, viewport, pane, overrides);
 
@@ -1129,15 +1165,21 @@ describe('TealchartRenderer coordinate transforms', () => {
         color: '#2196F3',
       };
       const bridgedStroke = vi.fn();
-      const bridgedRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: bridgedStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const bridgedRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: bridgedStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
       const linebrStroke = vi.fn();
-      const linebrRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: linebrStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const linebrRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: linebrStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
 
       (bridgedRenderer as any).renderPlotInPane({ ...basePlot, style: 'line' }, bars, viewport, pane);
       (linebrRenderer as any).renderPlotInPane({ ...basePlot, style: 'linebr' }, bars, viewport, pane);
@@ -1168,15 +1210,21 @@ describe('TealchartRenderer coordinate transforms', () => {
         color: '#2196F3',
       };
       const bridgedStroke = vi.fn();
-      const bridgedRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: bridgedStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const bridgedRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: bridgedStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
       const linebrStroke = vi.fn();
-      const linebrRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: linebrStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const linebrRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: linebrStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
 
       (bridgedRenderer as any).renderLinePlotInPane({ ...basePlot, style: 'line' }, bars, viewport, paneOffset);
       (linebrRenderer as any).renderLinePlotInPane({ ...basePlot, style: 'linebr' }, bars, viewport, paneOffset);
@@ -2090,15 +2138,21 @@ describe('TealchartRenderer coordinate transforms', () => {
         linewidth: 2,
       };
       const bridgedStroke = vi.fn();
-      const bridgedRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: bridgedStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const bridgedRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: bridgedStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
       const linebrStroke = vi.fn();
-      const linebrRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: linebrStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const linebrRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: linebrStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
 
       (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'line' }, bars, viewport);
       (linebrRenderer as any).renderLinePlot({ ...basePlot, style: 'linebr' }, bars, viewport);
@@ -2124,15 +2178,21 @@ describe('TealchartRenderer coordinate transforms', () => {
         linewidth: 2,
       };
       const bridgedStroke = vi.fn();
-      const bridgedRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: bridgedStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const bridgedRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: bridgedStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
       const steplinebrStroke = vi.fn();
-      const steplinebrRenderer = new TealchartRenderer({
-        ...createMockCtx(),
-        stroke: steplinebrStroke,
-      }, { width: 800, height: 600, showVolume: false });
+      const steplinebrRenderer = new TealchartRenderer(
+        {
+          ...createMockCtx(),
+          stroke: steplinebrStroke,
+        },
+        { width: 800, height: 600, showVolume: false },
+      );
 
       (bridgedRenderer as any).renderLinePlot({ ...basePlot, style: 'stepline' }, bars, viewport);
       (steplinebrRenderer as any).renderLinePlot({ ...basePlot, style: 'steplinebr' }, bars, viewport);
@@ -2388,7 +2448,7 @@ describe('TealchartRenderer coordinate transforms', () => {
           'fill:#4CAF5033',
           'arc:#E91E63',
           'fill:#E91E63',
-        ])
+        ]),
       );
     });
 
@@ -2729,9 +2789,78 @@ describe('TealchartRenderer coordinate transforms', () => {
       ];
       const precomputedBounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
 
-      renderer.renderWithLayout(bars, viewport, layout, priceLines, [], undefined, undefined, undefined, precomputedBounds);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        priceLines,
+        [],
+        undefined,
+        undefined,
+        undefined,
+        precomputedBounds,
+      );
 
       expect(calculateSpy).not.toHaveBeenCalled();
+    });
+
+    it('normalizes price line label widths within each pane', () => {
+      const ctx = createMockCtx();
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const viewport: Viewport = {
+        startTime: 0,
+        endTime: 1,
+        priceMin: 40_000,
+        priceMax: 60_000,
+      };
+      const layout: UnifiedPaneLayout = {
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.7, yMin: 0, yMax: 0, fixedRange: false },
+          { id: 'pane_1', type: 'indicator', heightRatio: 0.3, yMin: 0, yMax: 100, fixedRange: true },
+        ],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const priceLines: PriceLine[] = [
+        {
+          id: 'main-short',
+          price: 50_000,
+          color: '#00ff00',
+          lineStyle: 'solid',
+          label: { primaryText: '1' },
+          targetPaneId: 'main',
+        },
+        {
+          id: 'main-wide',
+          price: 51_000,
+          color: '#00ff00',
+          lineStyle: 'solid',
+          label: { primaryText: '123,456.0' },
+          targetPaneId: 'main',
+        },
+        {
+          id: 'pane-short',
+          price: 30,
+          color: '#00ff00',
+          lineStyle: 'solid',
+          label: { primaryText: '2' },
+          targetPaneId: 'pane_1',
+        },
+        {
+          id: 'pane-wide',
+          price: 40,
+          color: '#00ff00',
+          lineStyle: 'solid',
+          label: { primaryText: '999.9' },
+          targetPaneId: 'pane_1',
+        },
+      ];
+
+      const bounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
+      const byId = new Map(bounds.map((bound) => [bound.lineId, bound]));
+
+      expect(byId.get('main-short')?.width).toBe(byId.get('main-wide')?.width);
+      expect(byId.get('pane-short')?.width).toBe(byId.get('pane-wide')?.width);
+      expect(byId.get('main-short')?.width).toBeGreaterThan(byId.get('pane-short')?.width ?? 0);
     });
 
     it('renders label drawings in the main pane', () => {
@@ -2778,7 +2907,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(roundRect).toHaveBeenCalled();
       expect(fill).toHaveBeenCalled();
@@ -2825,13 +2966,26 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       const drawnX = roundRect.mock.calls[0]?.[0];
       const options = renderer.getOptions();
       const chartWidth = options.width - options.margins.left;
-      const expectedX = options.margins.left
-        + ((bars[12]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
+      const expectedX =
+        options.margins.left +
+        ((bars[12]!.time - viewport.startTime) / (viewport.endTime - viewport.startTime)) * chartWidth;
       expect(drawnX).toBeCloseTo(expectedX, 0);
     });
 
@@ -2885,7 +3039,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       const labelCall = fillText.mock.calls.find((call) => call[0] === 'Pane routed');
       const mainPaneBottom = (600 - TIME_AXIS_HEIGHT) * 0.7;
@@ -2943,7 +3109,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       const labelCall = fillText.mock.calls.find((call) => call[0] === 'Main routed');
       const mainPaneBottom = (600 - TIME_AXIS_HEIGHT) * 0.7;
@@ -2997,7 +3175,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(setLineDash).toHaveBeenCalledWith([6, 4]);
       expect(moveTo).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
@@ -3049,7 +3239,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(stroke).toHaveBeenCalled();
       expect(fill).toHaveBeenCalledTimes(2);
@@ -3098,7 +3300,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(stroke).toHaveBeenCalled();
       expect(fill).not.toHaveBeenCalled();
@@ -3155,7 +3369,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(strokeStyles).toContain('#ABCDEF');
     });
@@ -3224,7 +3450,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(fill).toHaveBeenCalled();
       expect(stroke).toHaveBeenCalled();
@@ -3282,7 +3520,19 @@ describe('TealchartRenderer coordinate transforms', () => {
         },
       ];
 
-      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, undefined, undefined, drawings);
+      renderer.renderWithLayout(
+        bars,
+        viewport,
+        layout,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        drawings,
+      );
 
       expect(fillRect).toHaveBeenCalled();
       expect(strokeRect).toHaveBeenCalled();
@@ -3354,7 +3604,15 @@ describe('pane overlay geometry origin', () => {
       timeAxisHeight: TIME_AXIS_HEIGHT,
       panes: [
         { id: 'main', type: 'main', heightRatio: 0.7, yMin: 0, yMax: 0, fixedRange: false },
-        { id: 'pane_1', type: 'indicator', heightRatio: 0.3, yMin: 0, yMax: 100, fixedRange: true, indicatorIds: ['macd'] },
+        {
+          id: 'pane_1',
+          type: 'indicator',
+          heightRatio: 0.3,
+          yMin: 0,
+          yMax: 100,
+          fixedRange: true,
+          indicatorIds: ['macd'],
+        },
       ],
     };
 
@@ -3363,5 +3621,48 @@ describe('pane overlay geometry origin', () => {
 
     expect(overlay.map((p) => p.top)).toEqual(rendered.map((p) => p.top));
     expect(overlay.map((p) => p.bottom)).toEqual(rendered.map((p) => p.bottom));
+  });
+});
+
+describe('value axis label layout', () => {
+  it('uses one shared lane while centering main labels and left-aligning indicator labels', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.25,
+            yMin: -1_000_000,
+            yMax: 1_000_000,
+            fixedRange: true,
+          },
+        ],
+      },
+      400,
+    );
+    const frame = { computedPanes, labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>() } as any;
+
+    const mainLabels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'main');
+    const indicatorLabels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
+
+    expect(mainLabels.length).toBeGreaterThan(0);
+    expect(indicatorLabels.length).toBeGreaterThan(0);
+    expect(new Set(mainLabels.map((label) => label.labelWidth)).size).toBe(1);
+    expect(new Set(indicatorLabels.map((label) => label.labelWidth)).size).toBe(1);
+    expect(mainLabels[0]!.labelWidth).toBeGreaterThan(0);
+    expect(mainLabels[0]!.labelWidth).toBeGreaterThanOrEqual(indicatorLabels[0]!.labelWidth);
+    expect(mainLabels.every((label) => label.textAlign === 'center')).toBe(true);
+    expect(indicatorLabels.every((label) => label.textAlign === 'left')).toBe(true);
+    expect(indicatorLabels.every((label) => label.labelX === mainLabels[0]!.labelX)).toBe(true);
+    expect(mainLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
+    expect(indicatorLabels.every((label) => label.x === label.labelX)).toBe(true);
   });
 });

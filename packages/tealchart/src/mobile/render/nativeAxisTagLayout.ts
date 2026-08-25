@@ -1,14 +1,15 @@
+import type { NativeChartFrame } from './nativeChartFrame';
+
 import { Skia } from '@shopify/react-native-skia';
 
-import { createNativePriceAxisTagLayout, createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout';
 import { getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import {
+  createNativePriceAxisLane,
   NATIVE_PRICE_AXIS_TAG_MIN_WIDTH,
   NATIVE_PRICE_AXIS_TAG_PADDING_X,
-  createNativePriceAxisLane,
 } from '../utils/nativePriceAxisLane';
+import { createNativePriceAxisTagLayout, createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout';
 import { fitNativeSkiaTextToWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
-import type { NativeChartFrame } from './nativeChartFrame';
 
 export const PRICE_AXIS_TAG_HEIGHT = 22;
 
@@ -93,7 +94,7 @@ export function createNativeAxisTagLayout(
     frame,
     text,
     textWidth: (value) => measureNativeSkiaTextWidth(font, value),
-    minWidth,
+    minWidth: Math.max(minWidth, lane.width),
     paddingX: NATIVE_PRICE_AXIS_TAG_PADDING_X,
     rightInset: frame.dimensions.width - lane.right,
   });
@@ -111,5 +112,8 @@ export function createNativeAxisLaneTagLayout(frame: NativeChartFrame) {
 }
 
 export function getNativeAxisTagTextCharacterCapacity(tagWidth: number, characterWidth: number): number {
-  return getNativeAxisTextCharacterCapacity(Math.max(0, tagWidth - NATIVE_PRICE_AXIS_TAG_PADDING_X * 2), characterWidth);
+  return getNativeAxisTextCharacterCapacity(
+    Math.max(0, tagWidth - NATIVE_PRICE_AXIS_TAG_PADDING_X * 2),
+    characterWidth,
+  );
 }
