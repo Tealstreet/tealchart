@@ -148,6 +148,7 @@ import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartS
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
 import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
+import { intervalToMs } from './viewport/viewScale';
 
 const STATIC_TOP_BAR_HEIGHT = 36;
 const TRADE_LABEL_HEIGHT = 18;
@@ -1897,6 +1898,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     frame,
     hasContextMenu: hasNativeContextMenu,
     hasDataViewport,
+    intervalMs: intervalToMs(nativeRenderInterval),
     leftToolRailLayout,
     orderDragState,
     orderDragZones,
@@ -2015,6 +2017,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 gridColor={gridColor}
                 hasDataViewport={nativeRenderHasDataViewport}
                 hasContextMenu={hasNativeContextMenu}
+                intervalMs={intervalToMs(nativeRenderInterval)}
                 indicatorPaneInfo={nativeIndicatorPaneInfo}
                 indicatorPlots={nativeIndicatorPlots}
                 paneRangeOverrides={paneRangeOverrides}

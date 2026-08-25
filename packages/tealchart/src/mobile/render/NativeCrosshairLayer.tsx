@@ -14,6 +14,8 @@ import {
   isNativeCrosshairOverMainPane,
   NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
   nativeCrosshairXToTime,
+  resolveNativeCrosshairSnappedX,
+  resolveNativeCrosshairSnappedY,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
   resolveNativeCrosshairPriceLabelText,
@@ -38,6 +40,7 @@ export interface NativeCrosshairLayerProps {
   crosshair: NativeCrosshairSharedValues;
   frame: NativeChartFrame;
   hasContextMenu: boolean;
+  intervalMs: number;
   options: RenderOptions;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   pricePrecision: number;
@@ -49,6 +52,7 @@ export function NativeCrosshairLayerImpl({
   crosshair,
   frame,
   hasContextMenu,
+  intervalMs,
   options,
   paneRangeOverrides,
   pricePrecision,
@@ -57,17 +61,21 @@ export function NativeCrosshairLayerImpl({
   const color = options.crosshairColor ?? '#888888';
   const textColor = options.backgroundColor ?? '#131722';
   const opacity = useDerivedValue(() => (crosshair.visible.value ? 1 : 0));
+  const snappedX = useDerivedValue(() => resolveNativeCrosshairSnappedX(frame, sharedViewport, crosshair.x.value, intervalMs));
+  const snappedY = useDerivedValue(() =>
+    resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision),
+  );
   // Through every pane, not just the main one - the panes tile contiguously
   // down to the time axis, so that whole span is the plot.
-  const verticalStart = useDerivedValue(() => ({ x: crosshair.x.value, y: frame.mainPane.top }));
-  const verticalEnd = useDerivedValue(() => ({ x: crosshair.x.value, y: frame.timeAxisTop }));
-  const horizontalStart = useDerivedValue(() => ({ x: frame.contentLeft, y: crosshair.y.value }));
+  const verticalStart = useDerivedValue(() => ({ x: snappedX.value, y: frame.mainPane.top }));
+  const verticalEnd = useDerivedValue(() => ({ x: snappedX.value, y: frame.timeAxisTop }));
+  const horizontalStart = useDerivedValue(() => ({ x: frame.contentLeft, y: snappedY.value }));
   const priceText = useDerivedValue(() =>
     resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision, paneRangeOverrides),
   );
   // The button opens order actions at a price, which only the price pane has.
   const contextMenuVisible = useDerivedValue(
-    () => hasContextMenu && isNativeCrosshairOverMainPane(frame, crosshair.y.value),
+    () => hasContextMenu && isNativeCrosshairOverMainPane(frame, snappedY.value),
   );
   const contextMenuOpacity = useDerivedValue(() => (contextMenuVisible.value ? 1 : 0));
   const priceLabel = useDerivedValue(() => {
@@ -91,7 +99,7 @@ export function NativeCrosshairLayerImpl({
           frame.contentLeft,
           resolveNativeCrosshairContextMenuButtonLayout(
             frame,
-            crosshair.y.value,
+            snappedY.value,
             pricePrecision,
             priceText.value,
             crosshair.priceLabelMaxWidth?.value ?? 0,
@@ -100,24 +108,24 @@ export function NativeCrosshairLayerImpl({
             NATIVE_CROSSHAIR_BUTTON_LINE_GAP,
         )
       : frame.contentRight,
-    y: crosshair.y.value,
+    y: snappedY.value,
   }));
-  const priceLabelY = useDerivedValue(() => crosshair.y.value - NATIVE_CROSSHAIR_LABEL_HEIGHT / 2);
+  const priceLabelY = useDerivedValue(() => snappedY.value - NATIVE_CROSSHAIR_LABEL_HEIGHT / 2);
   const priceTextY = useDerivedValue(() => priceLabelY.value + NATIVE_CROSSHAIR_TEXT_BASELINE_OFFSET);
   const timeLabelX = useDerivedValue(() =>
-    clampNativeCrosshairLabelX(frame, crosshair.x.value, NATIVE_CROSSHAIR_TIME_LABEL_WIDTH),
+    clampNativeCrosshairLabelX(frame, snappedX.value, NATIVE_CROSSHAIR_TIME_LABEL_WIDTH),
   );
   const timeTextX = useDerivedValue(() => timeLabelX.value + 8);
   const timeTextY = frame.timeAxisTop + NATIVE_CROSSHAIR_TEXT_BASELINE_OFFSET;
   const timeText = useDerivedValue(() => {
     const timeStep =
       (sharedViewport.endTime.value - sharedViewport.startTime.value) / Math.max(1, frame.contentWidth / 80);
-    return formatNativeTimeAxisLabelWorklet(nativeCrosshairXToTime(crosshair.x.value, sharedViewport, frame), timeStep);
+    return formatNativeTimeAxisLabelWorklet(nativeCrosshairXToTime(snappedX.value, sharedViewport, frame), timeStep);
   });
   const contextButtonLayout = useDerivedValue(() =>
     resolveNativeCrosshairContextMenuButtonLayout(
       frame,
-      crosshair.y.value,
+      snappedY.value,
       pricePrecision,
       priceText.value,
       crosshair.priceLabelMaxWidth?.value ?? 0,

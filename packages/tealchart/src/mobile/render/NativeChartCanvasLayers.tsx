@@ -40,6 +40,7 @@ export interface NativeChartCanvasLayersProps {
   gridColor: string;
   hasDataViewport: boolean;
   hasContextMenu: boolean;
+  intervalMs: number;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   indicatorPlots: readonly PlotOutput[];
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
@@ -81,6 +82,7 @@ export function NativeChartCanvasLayersImpl({
   gridColor,
   hasDataViewport,
   hasContextMenu,
+  intervalMs,
   indicatorPaneInfo,
   indicatorPlots,
   paneRangeOverrides,
@@ -215,6 +217,7 @@ export function NativeChartCanvasLayersImpl({
             crosshair={crosshair}
             frame={frame}
             hasContextMenu={hasContextMenu}
+            intervalMs={intervalMs}
             options={options}
             paneRangeOverrides={paneRangeOverrides}
             pricePrecision={pricePrecision}

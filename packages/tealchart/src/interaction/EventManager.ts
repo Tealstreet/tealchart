@@ -40,6 +40,10 @@ export interface EventManagerCallbacks {
   onCrossHairMoved?: (x: number, y: number, options?: DrawingInputEventOptions) => void;
   /** Called when crosshair visibility changes */
   onCrossHairVisibilityChange?: (visible: boolean) => void;
+  /** Snap a raw crosshair point to canonical render/callback coordinates. */
+  snapCrosshairPoint?: (x: number, y: number) => { x: number; y: number };
+  /** Called when per-hover crosshair measurements should be cleared. */
+  onCrosshairMeasureReset?: () => void;
   /** Called on mouse down (for hotkey integration) */
   onMouseDown?: () => void;
   /** Called on mouse up (for hotkey integration) */
@@ -461,16 +465,20 @@ export class EventManager {
   ): void {
     const { shouldShowCrosshair } = hitState;
     const wasVisible = this.crosshair.visible;
+    const point = this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y };
 
     this.crosshair.visible = shouldShowCrosshair;
-    this.crosshair.x = x;
-    this.crosshair.y = y;
+    this.crosshair.x = point.x;
+    this.crosshair.y = point.y;
 
     if (shouldShowCrosshair) {
-      this.callbacks.onCrossHairMoved?.(x, y, options);
+      this.callbacks.onCrossHairMoved?.(point.x, point.y, options);
     }
     if (wasVisible !== shouldShowCrosshair) {
       this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
+      if (!shouldShowCrosshair) {
+        this.callbacks.onCrosshairMeasureReset?.();
+      }
     }
   }
 
@@ -479,12 +487,13 @@ export class EventManager {
     const clampedX = Math.max(dims.leftMargin, Math.min(x, dims.width - dims.priceAxisWidth - 1));
     const clampedY = Math.max(dims.topMargin, Math.min(y, dims.height - dims.timeAxisHeight));
     const wasVisible = this.crosshair.visible;
+    const point = this.callbacks.snapCrosshairPoint?.(clampedX, clampedY) ?? { x: clampedX, y: clampedY };
 
     this.crosshair.visible = true;
-    this.crosshair.x = clampedX;
-    this.crosshair.y = clampedY;
+    this.crosshair.x = point.x;
+    this.crosshair.y = point.y;
 
-    this.callbacks.onCrossHairMoved?.(clampedX, clampedY, options);
+    this.callbacks.onCrossHairMoved?.(point.x, point.y, options);
     if (!wasVisible) {
       this.callbacks.onCrossHairVisibilityChange?.(true);
     }
@@ -1156,6 +1165,7 @@ export class EventManager {
       this.crosshair.visible = false;
       if (wasVisible) {
         this.callbacks.onCrossHairVisibilityChange?.(false);
+        this.callbacks.onCrosshairMeasureReset?.();
       }
       this.callbacks.onPaneDividerHover?.(null);
       this.scheduleRender();
@@ -1198,6 +1208,7 @@ export class EventManager {
       this.crosshair.visible = false;
       this.state.isOverPriceAxis = false;
       this.callbacks.onCrossHairVisibilityChange?.(false);
+      this.callbacks.onCrosshairMeasureReset?.();
       this.scheduleRender();
       this.callbacks.onCursorChange?.('crosshair');
     }
@@ -1355,10 +1366,7 @@ export class EventManager {
       if (!drawingDragStarted) {
         this.longPressTimer = setTimeout(() => {
           if (!this.isTouchDragging && this.touchStart) {
-            // Long press triggered - show context menu
-            const price = this.callbacks.getPriceFromY?.(y) ?? 0;
-            const time = this.callbacks.getTimeFromX?.(x) ?? 0;
-            this.callbacks.onContextMenu?.(x, y, price, time);
+            this.emitContextMenuForPoint(x, y);
           }
         }, LONG_PRESS_DURATION);
       }
@@ -1434,9 +1442,12 @@ export class EventManager {
           this.scheduleRender();
         } else if (this.touchCrosshairLocked) {
           // Move crosshair proportionally
-          this.crosshair.x = this.touchCrosshairPosition.x + dx;
-          this.crosshair.y = this.touchCrosshairPosition.y + dy;
-          this.callbacks.onCrossHairMoved?.(this.crosshair.x, this.crosshair.y);
+          const rawX = this.touchCrosshairPosition.x + dx;
+          const rawY = this.touchCrosshairPosition.y + dy;
+          const point = this.callbacks.snapCrosshairPoint?.(rawX, rawY) ?? { x: rawX, y: rawY };
+          this.crosshair.x = point.x;
+          this.crosshair.y = point.y;
+          this.callbacks.onCrossHairMoved?.(point.x, point.y);
         } else if (this.state.dragMode === 'priceAxisZoom') {
           this.handlePriceAxisZoom(dy);
         } else {
@@ -1600,13 +1611,15 @@ export class EventManager {
       if (this.touchCrosshairLocked) {
         this.touchCrosshairLocked = false;
         this.crosshair.visible = false;
+        this.callbacks.onCrosshairMeasureReset?.();
       } else {
+        const point = this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y };
         this.touchCrosshairLocked = true;
         this.crosshair.visible = true;
-        this.crosshair.x = x;
-        this.crosshair.y = y;
+        this.crosshair.x = point.x;
+        this.crosshair.y = point.y;
         this.touchCrosshairPosition = { x, y };
-        this.callbacks.onCrossHairMoved?.(x, y);
+        this.callbacks.onCrossHairMoved?.(point.x, point.y);
       }
     }
 
@@ -1625,10 +1638,15 @@ export class EventManager {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const price = this.callbacks.getPriceFromY?.(y) ?? 0;
-    const time = this.callbacks.getTimeFromX?.(x) ?? 0;
+    this.emitContextMenuForPoint(x, y);
+  }
 
-    this.callbacks.onContextMenu?.(x, y, price, time);
+  private emitContextMenuForPoint(x: number, y: number): void {
+    const point = this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y };
+    const price = this.callbacks.getPriceFromY?.(point.y) ?? 0;
+    const time = this.callbacks.getTimeFromX?.(point.x) ?? 0;
+
+    this.callbacks.onContextMenu?.(point.x, point.y, price, time);
   }
 
   // ============================================================================

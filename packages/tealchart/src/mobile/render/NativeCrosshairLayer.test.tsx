@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
+  resolveNativeCrosshairSnappedY,
 } from '../interaction/nativeCrosshairContextMenu';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeCrosshairLayerImpl } from './NativeCrosshairLayer';
@@ -70,6 +71,7 @@ function renderCrosshair(hasContextMenu = false, rememberedPriceLabelWidth = 0) 
     },
     frame,
     hasContextMenu,
+    intervalMs: 60_000,
     options: { crosshairColor: '#888888', backgroundColor: '#131722' } as RenderOptions,
     pricePrecision: 0.1,
     sharedViewport,
@@ -83,8 +85,9 @@ describe('NativeCrosshairLayer price axis tag', () => {
   it('pins the price tag to the crosshair rather than any stacked position', () => {
     const boxes = collectElementsByType(renderCrosshair(), RoundedRect);
     const priceBox = boxes[0];
+    const snappedY = resolveNativeCrosshairSnappedY(frame, sharedViewport, 180, 0.1);
 
-    expect(valueOf<number>(priceBox.props.y) + valueOf<number>(priceBox.props.height) / 2).toBe(180);
+    expect(valueOf<number>(priceBox.props.y) + valueOf<number>(priceBox.props.height) / 2).toBe(snappedY);
   });
 
   it('sizes the price tag from its text, not the whole axis lane', () => {

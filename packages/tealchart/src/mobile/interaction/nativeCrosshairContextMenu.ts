@@ -3,6 +3,7 @@ import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 
+import { snapPriceToTick, snapTimeToInterval } from '../../interaction/crosshairSnap';
 import { getNativePaneAtY } from '../render/nativeChartFrame';
 import { getNativePriceGridSlot, NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING } from '../render/nativeGridSlots';
 import { resolveNativePaneRange } from '../render/nativePaneRangeOverride';
@@ -108,11 +109,7 @@ export function resolveNativeCrosshairPriceLabelText(
     });
     return formatNativeIndicatorAxisTickWorklet(value, slot.spacing);
   }
-  const range = sharedViewport.priceMax.value - sharedViewport.priceMin.value;
-  const price =
-    range === 0 || frame.mainPane.height === 0
-      ? sharedViewport.priceMin.value
-      : sharedViewport.priceMax.value - ((crosshairY - frame.mainPane.top) / frame.mainPane.height) * range;
+  const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshairY, pricePrecision);
   return formatNativeTradeLinePriceWorklet(price, pricePrecision);
 }
 
@@ -138,6 +135,53 @@ export function nativeCrosshairXToTime(
   if (range === 0 || frame.contentWidth === 0) return sharedViewport.startTime.value;
   const ratio = (x - frame.contentLeft) / frame.contentWidth;
   return sharedViewport.startTime.value + ratio * range;
+}
+
+export function resolveNativeCrosshairSnappedPrice(
+  frame: NativeChartFrame,
+  sharedViewport: NativeViewportSharedValues,
+  crosshairY: number,
+  pricePrecision: number,
+): number {
+  'worklet';
+  return snapPriceToTick(nativeCrosshairYToPrice(crosshairY, sharedViewport, frame), pricePrecision);
+}
+
+export function resolveNativeCrosshairSnappedY(
+  frame: NativeChartFrame,
+  sharedViewport: NativeViewportSharedValues,
+  crosshairY: number,
+  pricePrecision: number,
+): number {
+  'worklet';
+  if (!isNativeCrosshairOverMainPane(frame, crosshairY)) return crosshairY;
+  const priceRange = sharedViewport.priceMax.value - sharedViewport.priceMin.value;
+  if (priceRange === 0 || frame.mainPane.height === 0) return frame.mainPane.top + frame.mainPane.height / 2;
+  const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshairY, pricePrecision);
+  return frame.mainPane.top + ((sharedViewport.priceMax.value - price) / priceRange) * frame.mainPane.height;
+}
+
+export function resolveNativeCrosshairSnappedTime(
+  frame: NativeChartFrame,
+  sharedViewport: NativeViewportSharedValues,
+  crosshairX: number,
+  intervalMs: number,
+): number {
+  'worklet';
+  return snapTimeToInterval(nativeCrosshairXToTime(crosshairX, sharedViewport, frame), intervalMs);
+}
+
+export function resolveNativeCrosshairSnappedX(
+  frame: NativeChartFrame,
+  sharedViewport: NativeViewportSharedValues,
+  crosshairX: number,
+  intervalMs: number,
+): number {
+  'worklet';
+  const timeRange = sharedViewport.endTime.value - sharedViewport.startTime.value;
+  if (timeRange === 0 || frame.contentWidth === 0) return frame.contentLeft + frame.contentWidth / 2;
+  const time = resolveNativeCrosshairSnappedTime(frame, sharedViewport, crosshairX, intervalMs);
+  return frame.contentLeft + ((time - sharedViewport.startTime.value) / timeRange) * frame.contentWidth;
 }
 
 export function resolveNativeCrosshairContextMenuButtonLayout(

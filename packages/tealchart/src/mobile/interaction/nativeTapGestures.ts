@@ -21,10 +21,11 @@ import { resolveNativeCanvasTap } from './nativeCanvasTapResolver';
 import { hideNativeCrosshair, toggleNativeCrosshair } from './nativeCrosshair';
 import {
   isNativeCrosshairContextMenuButtonTap,
-  nativeCrosshairXToTime,
-  nativeCrosshairYToPrice,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
+  resolveNativeCrosshairSnappedPrice,
+  resolveNativeCrosshairSnappedTime,
+  resolveNativeCrosshairSnappedY,
 } from './nativeCrosshairContextMenu';
 import { isNativeGestureControlPoint, isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
@@ -52,6 +53,7 @@ export interface NativeCanvasTapGestureInput {
   drawingSelectionEnabled: boolean;
   frame: NativeChartFrame | null;
   hasContextMenu: boolean;
+  intervalMs: number;
   onContextMenuTap: (time: number, price: number, anchorX: number, anchorY: number) => void;
   onDrawingPlacementTap: (x: number, y: number) => void;
   /** Calls `claim` when it takes the tap; otherwise the crosshair gets it. */
@@ -86,6 +88,7 @@ export function createNativeCanvasTapGesture({
   drawingSelectionEnabled,
   frame,
   hasContextMenu,
+  intervalMs,
   onContextMenuTap,
   onDrawingPlacementTap,
   onDrawingSelectionTap,
@@ -130,6 +133,7 @@ export function createNativeCanvasTapGesture({
     .maxDistance(NATIVE_TAP_MAX_DISTANCE)
     .onEnd((event, success) => {
       if (!success) return;
+      const snappedCrosshairY = resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision);
       const outcome = resolveNativeCanvasTap(
         { x: event.x, y: event.y },
         {
@@ -138,7 +142,7 @@ export function createNativeCanvasTapGesture({
           controlZones,
           resetViewVisible,
           crosshairVisible: crosshair.visible.value,
-          crosshairY: crosshair.y.value,
+          crosshairY: snappedCrosshairY,
           drawingTapEnabled: drawingPlacementEnabled || drawingSelectionEnabled,
           frame,
           hasContextMenu,
@@ -164,11 +168,12 @@ export function createNativeCanvasTapGesture({
       }
       if (outcome.kind === 'crosshairContextMenu') {
         // The menu opens at the crosshair, not at the finger.
-        const time = nativeCrosshairXToTime(crosshair.x.value, sharedViewport, frame);
-        const price = nativeCrosshairYToPrice(crosshair.y.value, sharedViewport, frame);
+        const time = resolveNativeCrosshairSnappedTime(frame, sharedViewport, crosshair.x.value, intervalMs);
+        const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshair.y.value, pricePrecision);
+        const snappedY = resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision);
         const layout = resolveNativeCrosshairContextMenuButtonLayout(
           frame,
-          crosshair.y.value,
+          snappedY,
           pricePrecision,
           resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision),
           crosshair.priceLabelMaxWidth?.value ?? 0,

@@ -50,6 +50,7 @@ const props = {
   gridColor: '#222831',
   hasDataViewport: true,
   hasContextMenu: false,
+  intervalMs: 60_000,
   indicatorPaneInfo: {},
   indicatorPlots: [],
   indicatorTotalBarCount: 0,
