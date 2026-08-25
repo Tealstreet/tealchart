@@ -453,6 +453,16 @@ export class ChartCore {
 
   // Data refs
   private bars: Bar[] = [];
+  private jailbreakTooltipBarsCache:
+    | {
+        source: Bar[];
+        length: number;
+        firstTime: number | undefined;
+        lastTime: number | undefined;
+        lastClose: number | undefined;
+        barsInSeconds: Bar[];
+      }
+    | null = null;
   private viewport: Viewport | null = null;
   private priceLines: PriceLine[] = [];
   private rawOrderLines: OrderLineRenderData[] = [];
@@ -868,6 +878,7 @@ export class ChartCore {
    * Uses reference equality check - bars array is always new when data changes
    */
   setBars(bars: Bar[]): void {
+    this.jailbreakTooltipBarsCache = null;
     // Reference check — skip if same array. Real-time ticks mutate the widget's
     // shared bar array in place, so this is called with the same reference and
     // the render still runs (paint() calls renderMainCanvas regardless).
@@ -1862,13 +1873,20 @@ export class ChartCore {
   }
 
   private resolveSnappedCrosshairPoint(x: number, y: number): { x: number; y: number } {
-    const viewport = this.viewport ?? TealchartRenderer.calculateViewport(this.bars);
+    const viewport = this.viewport;
+    if (!viewport) return { x, y };
+
     const layout = this.getUnifiedLayout();
     const intervalMs = intervalToMs(this.options.interval ?? '60');
     const snappedTime = snapTimeToInterval(this.renderer.publicXToTime(x, viewport), intervalMs);
     const snappedX = this.renderer.publicTimeToX(snappedTime, viewport);
-    const pane = this.getPaneAtY(y);
-    if (pane?.paneId !== 'main') return { x: snappedX, y };
+    const panes = computePaneGeometry({
+      paneLayout: layout,
+      height: this.options.height,
+      topOffset: this.margins.top,
+    });
+    const pane = panes.find((candidate) => y >= candidate.top && y < candidate.bottom);
+    if (pane?.id !== 'main') return { x: snappedX, y };
 
     const pricePrecision = this.options.renderOptions?.pricePrecision;
     const snappedPrice = snapPriceToTick(this.renderer.publicYToPriceWithLayout(y, viewport, layout), pricePrecision);
@@ -2646,6 +2664,35 @@ export class ChartCore {
     this._drawJailbreakTooltips(ctx, x, y);
   }
 
+  private getJailbreakTooltipBarsInSeconds(bars: Bar[]): Bar[] {
+    const firstTime = bars[0]?.time;
+    const lastBar = bars[bars.length - 1];
+    const lastTime = lastBar?.time;
+    const lastClose = lastBar?.close;
+    const cache = this.jailbreakTooltipBarsCache;
+    if (
+      cache &&
+      cache.source === bars &&
+      cache.length === bars.length &&
+      cache.firstTime === firstTime &&
+      cache.lastTime === lastTime &&
+      cache.lastClose === lastClose
+    ) {
+      return cache.barsInSeconds;
+    }
+
+    const barsInSeconds = bars.map((b) => ({ ...b, time: Math.floor(b.time / 1000) }));
+    this.jailbreakTooltipBarsCache = {
+      source: bars,
+      length: bars.length,
+      firstTime,
+      lastTime,
+      lastClose,
+      barsInSeconds,
+    };
+    return barsInSeconds;
+  }
+
   /**
    * Draw jailbreak indicator tooltips near the crosshair.
    * Collects tooltips from all visible indicators and renders grouped text boxes.
@@ -2678,14 +2725,11 @@ export class ChartCore {
     }
     barIndex = Math.min(lo, bars.length - 1);
 
-    // Convert bars to seconds for indicator compatibility (same as buildJailbreakDrawArgs)
-    const barsInSeconds = bars.map((b) => ({ ...b, time: Math.floor(b.time / 1000) }));
-
     const exchange = this.options.renderOptions?.exchange ?? '';
     const symbol = this.options.renderOptions?.symbol ?? '';
 
     const tooltipGroups = jailbreakManager.getTooltips({
-      bars: barsInSeconds,
+      bars: this.getJailbreakTooltipBarsInSeconds(bars),
       mouseX: cursorX,
       mouseY: cursorY,
       barIndex,
