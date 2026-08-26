@@ -1937,6 +1937,39 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  it('ceil-measures the crosshair price-axis label so decimal text is not clipped', async () => {
+    const fillText = vi.fn();
+    const roundRect = vi.fn();
+    const measureText = vi.fn((text: string) => ({ width: text.length * 7 + 0.4 }));
+    stubCanvasContext({ fillText, measureText, roundRect });
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+      renderOptions: { pricePrecision: 0.1 },
+    });
+
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 69000, priceMax: 73000 });
+
+    const eventManager = eventManagerInstances[0];
+    eventManager.callbacks.onCrossHairMoved?.(700, 250);
+    eventManager.callbacks.onCrosshairRender?.();
+
+    const priceText = fillText.mock.calls.find((call) => String(call[0]).match(/^\d{2},\d{3}\.\d$/))?.[0] as
+      | string
+      | undefined;
+    expect(priceText).toBeDefined();
+
+    const priceLabelRect = roundRect.mock.calls.find((call) => call[3] === 18 && Math.abs(Number(call[1]) - 241) < 1);
+    expect(priceLabelRect).toBeDefined();
+    expect(priceLabelRect?.[2]).toBeGreaterThanOrEqual(Math.ceil(priceText!.length * 7 + 0.4) + 14);
+    expect(Number.isInteger(priceLabelRect?.[2])).toBe(true);
+
+    core.dispose();
+  });
+
   it('does not let hover processing override the active price-axis cursor', async () => {
     const { ChartCore } = await import('./ChartCore');
     const core = new ChartCore({
