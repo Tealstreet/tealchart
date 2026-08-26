@@ -21,9 +21,9 @@ import { createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout'
 import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 
-export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 18;
-export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 36;
-const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = 4;
+export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 15;
+export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 30;
+const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = 3;
 const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
 
 export interface NativeIndicatorOutputAxisLabel {
@@ -81,9 +81,9 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
       {labelGroups.flatMap((group) => {
         const clip = {
           x: group.x,
-          y: group.pane.top,
+          y: group.pane.top + 1,
           width: frame.priceAxisRight - group.x,
-          height: group.pane.height,
+          height: Math.max(0, group.pane.height - 2),
         };
         return group.labels.map((label) => {
           const textLayout = createNativePriceAxisTagTextLayout(

@@ -5,11 +5,11 @@ import {
 } from './tradeLineLayout';
 import { NATIVE_PRICE_AXIS_COUNTDOWN_SAMPLE } from './priceAxisTagLayout';
 
-export const DEFAULT_NATIVE_PRICE_AXIS_WIDTH = 76;
-export const NATIVE_PRICE_AXIS_LANE_LEFT_INSET = 2;
+export const DEFAULT_NATIVE_PRICE_AXIS_WIDTH = 68;
+export const NATIVE_PRICE_AXIS_LANE_LEFT_INSET = 1;
 export const NATIVE_PRICE_AXIS_LANE_RIGHT_INSET = 1;
-export const NATIVE_PRICE_AXIS_TAG_MIN_WIDTH = 52;
-export const NATIVE_PRICE_AXIS_TAG_PADDING_X = 6;
+export const NATIVE_PRICE_AXIS_TAG_MIN_WIDTH = 48;
+export const NATIVE_PRICE_AXIS_TAG_PADDING_X = 5;
 
 export interface NativePriceAxisLaneWidthInput {
   pricePrecision: number;
