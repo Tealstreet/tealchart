@@ -2,6 +2,7 @@ import type { DrawingOutput, PlotLineStyle, PlotOutput, PlotStyle } from '@teals
 import type { JailbreakIndicatorManager } from './jailbreak/JailbreakIndicatorManager';
 import type { TimeAxisMarker } from './rendering/axisMarkers';
 import type { CanvasContext } from './rendering/CanvasContext';
+import type { IndicatorOutputAxisLabelSource } from './rendering/indicatorOutputAxisLabels';
 import type { PaneOffset } from './rendering/PaneManager';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
@@ -18,6 +19,10 @@ import {
   generatePriceMarkers as generateAxisPriceMarkers,
   generateTimeMarkers as generateAxisTimeMarkers,
 } from './rendering/axisMarkers';
+import {
+  formatIndicatorOutputAxisValue,
+  getIndicatorOutputAxisLabelSources,
+} from './rendering/indicatorOutputAxisLabels';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './rendering/TealScriptDrawingRenderer';
@@ -117,6 +122,7 @@ export interface TealchartPreparedRenderFrame extends TealchartRenderFrameInput 
 
 interface ValueAxisLabelLayout {
   commonLabelWidth: number;
+  indicatorOutputLabelsByPane: Map<string, IndicatorOutputAxisLabelSource[]>;
   paneLabelWidths: Map<string, number>;
 }
 
@@ -128,6 +134,10 @@ export interface ValueAxisLabelRenderData {
   x: number;
   labelX: number;
   labelWidth: number;
+  kind: 'tick' | 'indicator-output';
+  backgroundColor?: string;
+  borderColor?: string;
+  height?: number;
   textAlign: 'center' | 'left' | 'right';
   y: number;
   color: string;
@@ -140,6 +150,10 @@ interface MeasuredValueAxisLabel {
   value: number;
   text: string;
   textWidth: number;
+  kind: 'tick' | 'indicator-output';
+  backgroundColor?: string;
+  borderColor?: string;
+  height?: number;
   y: number;
   color: string;
   fontSize: number;
@@ -192,6 +206,9 @@ export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
 type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
 const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
+const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 22;
+const INDICATOR_OUTPUT_AXIS_TAG_GAP = 2;
+const INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 46;
 
 // Cached number formatters by decimal places
 const numberFormatterCache = new Map<number, Intl.NumberFormat>();
@@ -3773,6 +3790,9 @@ export class TealchartRenderer {
       computedPanes,
       labelBoundsByPane,
       passOptions?.valueAxisOverscanPx,
+      plots,
+      indicatorPaneInfo,
+      bars.length,
     );
 
     // Render each pane with its specific price lines and TealScript drawings
@@ -4384,7 +4404,7 @@ export class TealchartRenderer {
     valueAxisOverscanPx = 0,
     valueAxisLabelLayout?: ValueAxisLabelLayout,
   ): void {
-    const { ctx } = this;
+    const { ctx, options } = this;
 
     const labels = this.computePaneYAxisLabels(pane, priceLineBounds, valueAxisOverscanPx, valueAxisLabelLayout);
 
@@ -4392,6 +4412,19 @@ export class TealchartRenderer {
     ctx.textBaseline = 'middle';
 
     for (const label of labels) {
+      if (label.kind === 'indicator-output') {
+        const height = label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
+        const tagY = label.y - height / 2;
+        ctx.beginPath();
+        ctx.fillStyle = label.backgroundColor ?? options.backgroundColor;
+        ctx.roundRect(label.labelX, tagY, label.labelWidth, height, 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.strokeStyle = label.borderColor ?? label.color;
+        ctx.lineWidth = 1;
+        ctx.roundRect(label.labelX, tagY, label.labelWidth, height, 2);
+        ctx.stroke();
+      }
       ctx.fillStyle = label.color;
       ctx.textAlign = label.textAlign;
       ctx.fillText(label.text, label.x, label.y);
@@ -4409,6 +4442,9 @@ export class TealchartRenderer {
       frame.computedPanes,
       frame.labelBoundsByPane,
       valueAxisOverscanPx,
+      frame.plots,
+      frame.indicatorPaneInfo,
+      frame.bars?.length,
     );
     return this.computePaneYAxisLabels(
       pane,
@@ -4422,12 +4458,26 @@ export class TealchartRenderer {
     computedPanes: ComputedPane[],
     labelBoundsByPane: Map<string, PriceLineLabelBounds[]>,
     valueAxisOverscanPx = 0,
+    plots?: PlotOutput[],
+    indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
+    totalBarCount?: number,
   ): ValueAxisLabelLayout {
     const paneLabelWidths = new Map<string, number>();
+    const indicatorOutputLabelsByPane = this.getIndicatorOutputLabelsByPane(
+      computedPanes,
+      plots,
+      indicatorPaneInfo,
+      totalBarCount,
+    );
     let commonLabelWidth = this.valueAxisCommonLabelWidth;
 
     for (const pane of computedPanes) {
-      const measuredLabels = this.measurePaneYAxisLabels(pane, labelBoundsByPane.get(pane.id), valueAxisOverscanPx);
+      const measuredLabels = this.measurePaneYAxisLabels(
+        pane,
+        labelBoundsByPane.get(pane.id),
+        valueAxisOverscanPx,
+        indicatorOutputLabelsByPane.get(pane.id),
+      );
       const measuredWidth =
         measuredLabels.length > 0 ? Math.ceil(Math.max(...measuredLabels.map((label) => label.textWidth))) : 0;
       const paneLabelWidth = Math.max(this.valueAxisPaneLabelWidths.get(pane.id) ?? 0, measuredWidth);
@@ -4441,14 +4491,39 @@ export class TealchartRenderer {
 
     return {
       commonLabelWidth,
+      indicatorOutputLabelsByPane,
       paneLabelWidths,
     };
+  }
+
+  private getIndicatorOutputLabelsByPane(
+    computedPanes: ComputedPane[],
+    plots?: PlotOutput[],
+    indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
+    totalBarCount?: number,
+  ): Map<string, IndicatorOutputAxisLabelSource[]> {
+    const labelsByPane = new Map<string, IndicatorOutputAxisLabelSource[]>();
+    const outputLabels = getIndicatorOutputAxisLabelSources({
+      indicatorPaneInfo,
+      panes: computedPanes,
+      plots,
+      totalBarCount,
+    });
+
+    for (const label of outputLabels) {
+      const paneLabels = labelsByPane.get(label.paneId) ?? [];
+      paneLabels.push(label);
+      labelsByPane.set(label.paneId, paneLabels);
+    }
+
+    return labelsByPane;
   }
 
   private measurePaneYAxisLabels(
     pane: ComputedPane,
     priceLineBounds?: PriceLineLabelBounds[],
     valueAxisOverscanPx = 0,
+    indicatorOutputLabels: readonly IndicatorOutputAxisLabelSource[] = [],
   ): MeasuredValueAxisLabel[] {
     const { options, margins } = this;
 
@@ -4474,6 +4549,14 @@ export class TealchartRenderer {
     const measuredLabels: MeasuredValueAxisLabel[] = [];
     // For main pane, labels should stay below the transparent top bar (safe zone)
     const visibleTop = pane.type === 'main' ? margins.top : pane.top;
+    const outputLabels =
+      pane.type === 'indicator'
+        ? this.measureIndicatorOutputYAxisLabels(pane, indicatorOutputLabels, visibleTop, textFont)
+        : [];
+    const outputAvoidanceRanges = outputLabels.map((label) => ({
+      bottom: label.y + (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 + 6,
+      top: label.y - (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 - 6,
+    }));
 
     for (const value of gridLines) {
       const y = this.valueToY(value, pane);
@@ -4491,6 +4574,8 @@ export class TealchartRenderer {
         if (wouldOverlap) continue;
       }
 
+      if (outputAvoidanceRanges.some((range) => y >= range.top && y <= range.bottom)) continue;
+
       const text = formatter.format(value);
       measuredLabels.push({
         id: `${pane.id}:value-axis:${value}`,
@@ -4498,13 +4583,84 @@ export class TealchartRenderer {
         value,
         text,
         textWidth: getCachedTextWidth(this.ctx, text, textFont),
+        kind: 'tick',
         y,
         color: options.textColor,
         fontSize: 11,
       });
     }
 
-    return measuredLabels;
+    return [...measuredLabels, ...outputLabels];
+  }
+
+  private measureIndicatorOutputYAxisLabels(
+    pane: ComputedPane,
+    outputLabels: readonly IndicatorOutputAxisLabelSource[],
+    visibleTop: number,
+    textFont: string,
+  ): MeasuredValueAxisLabel[] {
+    if (outputLabels.length === 0) return [];
+
+    const range = pane.yMax - pane.yMin;
+    const measured: MeasuredValueAxisLabel[] = [];
+    for (const output of outputLabels) {
+      if (output.value < pane.yMin || output.value > pane.yMax) continue;
+
+      const y = this.valueToY(output.value, pane);
+      if (y < visibleTop || y > pane.bottom) continue;
+
+      const text = formatIndicatorOutputAxisValue(output.value, range, output.precision);
+      measured.push({
+        id: output.id,
+        paneId: pane.id,
+        value: output.value,
+        text,
+        textWidth: Math.max(
+          INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
+          getCachedTextWidth(this.ctx, text, textFont) + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2,
+        ),
+        kind: 'indicator-output',
+        backgroundColor: this.options.backgroundColor,
+        borderColor: output.color,
+        y,
+        color: output.color,
+        fontSize: 11,
+        height: INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
+      });
+    }
+
+    return this.resolveIndicatorOutputYAxisLabelCollisions(measured, pane, visibleTop);
+  }
+
+  private resolveIndicatorOutputYAxisLabelCollisions(
+    labels: MeasuredValueAxisLabel[],
+    pane: ComputedPane,
+    visibleTop: number,
+  ): MeasuredValueAxisLabel[] {
+    if (labels.length <= 1) return labels;
+
+    const height = INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
+    const minCenterY = visibleTop + height / 2;
+    const maxCenterY = pane.bottom - height / 2;
+    if (maxCenterY <= minCenterY) return labels;
+
+    const sorted = [...labels].sort((a, b) => a.y - b.y);
+    const minGap = height + INDICATOR_OUTPUT_AXIS_TAG_GAP;
+    for (let index = 0; index < sorted.length; index += 1) {
+      const previous = sorted[index - 1];
+      const label = sorted[index]!;
+      const lowerBound = previous ? previous.y + minGap : minCenterY;
+      label.y = Math.max(lowerBound, Math.min(maxCenterY, label.y));
+    }
+
+    for (let index = sorted.length - 1; index >= 0; index -= 1) {
+      const next = sorted[index + 1];
+      const label = sorted[index]!;
+      const upperBound = next ? next.y - minGap : maxCenterY;
+      label.y = Math.min(upperBound, Math.max(minCenterY, label.y));
+    }
+
+    return sorted;
   }
 
   private computePaneYAxisLabels(
@@ -4514,7 +4670,12 @@ export class TealchartRenderer {
     valueAxisLabelLayout?: ValueAxisLabelLayout,
   ): ValueAxisLabelRenderData[] {
     const { options } = this;
-    const measuredLabels = this.measurePaneYAxisLabels(pane, priceLineBounds, valueAxisOverscanPx);
+    const measuredLabels = this.measurePaneYAxisLabels(
+      pane,
+      priceLineBounds,
+      valueAxisOverscanPx,
+      valueAxisLabelLayout?.indicatorOutputLabelsByPane.get(pane.id),
+    );
 
     if (measuredLabels.length === 0) return [];
 
@@ -4526,6 +4687,7 @@ export class TealchartRenderer {
       this.valueAxisCommonLabelWidth = Math.max(this.valueAxisCommonLabelWidth, paneLabelWidth);
       labelLayout = {
         commonLabelWidth: this.valueAxisCommonLabelWidth,
+        indicatorOutputLabelsByPane: new Map(),
         paneLabelWidths: new Map([[pane.id, paneLabelWidth]]),
       };
     }
@@ -4539,15 +4701,20 @@ export class TealchartRenderer {
     return measuredLabels.map((label) => {
       const labelWidth = isMainPane ? commonLabelWidth : paneLabelWidth;
       const labelX = commonLabelX;
+      const textAlign = label.kind === 'indicator-output' || isMainPane ? 'center' : 'left';
       return {
         id: label.id,
         paneId: label.paneId,
         value: label.value,
         text: label.text,
-        x: isMainPane ? labelX + labelWidth / 2 : labelX,
+        x: textAlign === 'center' ? labelX + labelWidth / 2 : labelX,
         labelX,
         labelWidth,
-        textAlign: isMainPane ? 'center' : 'left',
+        kind: label.kind,
+        backgroundColor: label.backgroundColor,
+        borderColor: label.borderColor,
+        height: label.height,
+        textAlign,
         y: label.y,
         color: label.color,
         fontSize: label.fontSize,

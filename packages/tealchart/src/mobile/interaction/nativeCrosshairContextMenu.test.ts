@@ -81,8 +81,8 @@ describe('native crosshair context menu geometry', () => {
     );
     const viewport = sharedViewport({ startTime: 1_000, endTime: 2_000, priceMin: 1.9, priceMax: 2.3 });
 
-    expect(displayedLabel.width).toBeLessThan(capacityLabel.width);
-    expect(displayedLabel.x).toBeGreaterThan(capacityLabel.x);
+    expect(displayedLabel.width).toBe(capacityLabel.width);
+    expect(displayedLabel.x).toBe(capacityLabel.x);
     expect(rememberedLabel.width).toBe(capacityLabel.width);
     expect(rememberedLabel.x).toBe(capacityLabel.x);
     expect(rememberedLabel.textX).toBe(displayedLabel.textX);

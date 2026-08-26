@@ -12,6 +12,7 @@ import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
 import { NativeChartTradeLinesLayer } from './NativeChartTradeLinesLayer';
 import { NativeCrosshairLayer } from './NativeCrosshairLayer';
+import { NativeIndicatorOutputAxisLabelLayer } from './NativeIndicatorOutputAxisLabelLayer';
 import { NativeIndicatorPaneAxisLayer } from './NativeIndicatorPaneAxisLayer';
 import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
@@ -121,6 +122,7 @@ describe('NativeChartCanvasLayers', () => {
       NativeIndicatorPlotLayer,
       NativeChartPrimitiveLayer,
       NativeIndicatorPaneAxisLayer,
+      NativeIndicatorOutputAxisLabelLayer,
       NativeUserDrawingLayer,
       NativeChartTradeLinesLayer,
       NativeCrosshairLayer,
@@ -139,7 +141,12 @@ describe('NativeChartCanvasLayers', () => {
     });
     expect(plotChildren[4]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
     expect(plotChildren[5]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
-    expect(plotChildren[8]?.props).toMatchObject({ hasContextMenu: false });
+    expect(plotChildren[6]?.props).toMatchObject({
+      indicatorPaneInfo: {},
+      plots: [],
+      totalBarCount: 0,
+    });
+    expect(plotChildren[9]?.props).toMatchObject({ hasContextMenu: false });
   });
 
   it('applies loading opacity inside the Skia plot layer', () => {
