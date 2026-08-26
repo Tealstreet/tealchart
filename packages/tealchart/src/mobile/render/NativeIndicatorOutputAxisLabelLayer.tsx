@@ -6,7 +6,7 @@ import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 
 import { memo, useMemo } from 'react';
 
-import { Group, Skia } from '@shopify/react-native-skia';
+import { DashPathEffect, Group, Line as SkiaLine, Skia } from '@shopify/react-native-skia';
 
 import {
   formatIndicatorOutputAxisValue,
@@ -21,10 +21,11 @@ import { createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout'
 import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 
-export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 15;
+export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 13;
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 30;
 const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = 3;
 const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
+const NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH = [4, 4];
 
 export interface NativeIndicatorOutputAxisLabel {
   id: string;
@@ -80,9 +81,9 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
     <Group>
       {labelGroups.flatMap((group) => {
         const clip = {
-          x: group.x,
+          x: frame.contentLeft,
           y: group.pane.top + 1,
-          width: frame.priceAxisRight - group.x,
+          width: frame.priceAxisRight - frame.contentLeft,
           height: Math.max(0, group.pane.height - 2),
         };
         return group.labels.map((label) => {
@@ -94,8 +95,18 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
             NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X,
           );
           const tagY = label.y - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;
+          const guideY = Math.round(label.y) + 0.5;
           return (
             <Group key={label.id} clip={clip}>
+              <SkiaLine
+                p1={{ x: frame.contentLeft, y: guideY }}
+                p2={{ x: group.x, y: guideY }}
+                color={label.color}
+                strokeWidth={1}
+                opacity={0.65}
+              >
+                <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
+              </SkiaLine>
               <NativePriceAxisTagBox
                 x={group.x}
                 y={tagY}

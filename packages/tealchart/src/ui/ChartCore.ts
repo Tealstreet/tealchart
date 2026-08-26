@@ -3229,7 +3229,7 @@ export class ChartCore {
       else decimals = 6;
     }
     const priceText = getNumberFormatter(decimals).format(price);
-    const labelHeight = 20;
+    const labelHeight = 18;
     const labelPaddingX = 8;
     const labelWidth = Math.max(this.margins.right - 8, ctx.measureText(priceText).width + labelPaddingX * 2);
     const labelX = this.options.width - labelWidth - 4;
