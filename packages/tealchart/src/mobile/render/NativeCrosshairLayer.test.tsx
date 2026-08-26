@@ -9,6 +9,7 @@ import {
   resolveNativeCrosshairPriceLabelLayout,
   resolveNativeCrosshairSnappedY,
 } from '../interaction/nativeCrosshairContextMenu';
+import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativeCrosshairLayerImpl } from './NativeCrosshairLayer';
 
@@ -93,9 +94,8 @@ describe('NativeCrosshairLayer price axis tag', () => {
   it('uses the full price-axis lane width for the price tag', () => {
     const boxes = collectElementsByType(renderCrosshair(), RoundedRect);
     const priceBox = boxes[0];
-    const laneWidth = frame.dimensions.width - frame.priceAxisLeft - 6;
 
-    expect(valueOf<number>(priceBox.props.width)).toBe(laneWidth);
+    expect(valueOf<number>(priceBox.props.width)).toBe(createNativePriceAxisLane(frame).width);
   });
 
   it('keeps the price and time tags the same height', () => {
