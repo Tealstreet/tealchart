@@ -189,6 +189,7 @@ export function NativeChartCanvasLayersImpl({
             backgroundColor={backgroundColor}
             frame={frame}
             indicatorPaneInfo={indicatorPaneInfo}
+            paneRangeOverrides={paneRangeOverrides}
             plots={indicatorPlots}
             totalBarCount={indicatorTotalBarCount}
           />

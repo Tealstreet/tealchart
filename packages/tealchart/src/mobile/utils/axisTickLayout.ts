@@ -1,5 +1,7 @@
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 
+import { createNativePriceAxisLane } from './nativePriceAxisLane';
+
 export interface NativeAxisTextLayout {
   text: string;
   x: number;
@@ -24,9 +26,10 @@ function resolveFittedText(input: NativeAxisTextLayoutInput, maxWidth: number): 
 }
 
 export function createNativePriceAxisTickTextLayout(input: NativeAxisTextLayoutInput): NativeAxisStaticTextLayout {
-  const left = input.frame.priceAxisLeft + 4;
-  const right = input.frame.priceAxisRight - 4;
-  const maxWidth = Math.max(0, right - left);
+  const lane = createNativePriceAxisLane(input.frame);
+  const left = lane.left;
+  const right = lane.right;
+  const maxWidth = lane.width;
   const fitted = resolveFittedText(input, maxWidth);
   const x = Math.max(left, right - fitted.width);
 

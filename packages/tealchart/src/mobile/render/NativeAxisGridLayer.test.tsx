@@ -12,6 +12,7 @@ vi.mock('react', async (importOriginal) => {
 });
 
 import { getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
+import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import { NativeIndicatorPaneAxisLayerImpl } from './NativeIndicatorPaneAxisLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { NativePriceGridLayer, resolveNativePriceGridSlotModel } from './NativePriceGridLayer';
@@ -67,9 +68,9 @@ const frame = createNativeChartFrameFromPanes({
 });
 
 const characterWidth = 7;
-const priceLabelLeft = frame.priceAxisLeft + 4;
-const priceLabelRight = frame.priceAxisRight - 4;
-const priceLabelMaxWidth = Math.max(0, priceLabelRight - priceLabelLeft);
+const priceAxisLane = createNativePriceAxisLane(frame);
+const priceLabelLeft = priceAxisLane.left;
+const priceLabelMaxWidth = priceAxisLane.width;
 const priceMaxCharacters = getNativeAxisTextCharacterCapacity(priceLabelMaxWidth, characterWidth);
 const timeMaxCharacters = Math.min(8, getNativeAxisTextCharacterCapacity(frame.contentWidth, characterWidth));
 

@@ -59,4 +59,30 @@ describe('indicator output axis labels', () => {
     expect(getLatestIndicatorPlotValue(plot({ values: [10, 20, null], showLast: 1 }), 3)).toBeNull();
     expect(formatIndicatorOutputAxisValue(24.234, 300, 1)).toBe('24.2');
   });
+
+  it('uses pane ids from native indicator pane info when pane frames omit indicator ids', () => {
+    const labels = getIndicatorOutputAxisLabelSources({
+      indicatorPaneInfo: {
+        macd: { overlay: false, paneId: 'pane_1' },
+      },
+      panes: [{ id: 'pane_1', type: 'indicator' }],
+      plots: [
+        plot({
+          id: 'signal',
+          scriptId: 'macd',
+          values: [1, 2.5],
+          color: '#ff9900',
+        }),
+      ],
+      totalBarCount: 2,
+    });
+
+    expect(labels).toEqual([
+      expect.objectContaining({
+        id: 'pane_1:indicator-output:macd:signal',
+        paneId: 'pane_1',
+        value: 2.5,
+      }),
+    ]);
+  });
 });
