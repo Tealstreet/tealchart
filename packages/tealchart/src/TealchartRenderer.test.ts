@@ -3665,4 +3665,67 @@ describe('value axis label layout', () => {
     expect(mainLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
     expect(indicatorLabels.every((label) => label.x === label.labelX)).toBe(true);
   });
+
+  it('adds colored output tags for indicator pane plot values', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.25,
+            yMin: -100,
+            yMax: 100,
+            fixedRange: true,
+            indicatorIds: ['macd'],
+          },
+        ],
+      },
+      400,
+    );
+    const frame = {
+      bars: makeBars(3),
+      computedPanes,
+      indicatorPaneInfo: { macd: { overlay: false } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
+      plots: [
+        {
+          id: 'macd-line',
+          title: 'MACD',
+          type: 'plot',
+          scriptId: 'macd',
+          values: [12, 18, 24.2],
+          color: '#2196F3',
+          precision: 1,
+        },
+        {
+          id: 'signal',
+          title: 'Signal',
+          type: 'plot',
+          scriptId: 'macd',
+          values: [-4, -8, -11.6],
+          color: '#ff9900',
+          precision: 1,
+        },
+      ],
+    } as any;
+
+    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
+    const outputLabels = labels.filter((label) => label.kind === 'indicator-output');
+
+    expect(outputLabels).toHaveLength(2);
+    expect(outputLabels.map((label) => label.text)).toEqual(['24.2', '-11.6']);
+    expect(outputLabels.map((label) => label.borderColor)).toEqual(['#2196F3', '#ff9900']);
+    expect(outputLabels.every((label) => label.backgroundColor === '#111418')).toBe(true);
+    expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
+    expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
+    expect(labels.some((label) => label.kind === 'tick' && label.textAlign === 'left')).toBe(true);
+  });
 });
