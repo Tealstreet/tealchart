@@ -8,6 +8,7 @@ import {
   NATIVE_EMPTY_RENDER_VIEWPORT,
   resolveNativeHistoryBackfillHint,
   resolveNativeRenderViewport,
+  resolveNativeSharedViewportSyncTarget,
   restoreNativeDataLoadViewport,
   shouldRebaseNativeCandidateViewport,
   shouldResetNativeViewScalePricePadding,
@@ -201,6 +202,23 @@ describe('useNativeViewportRuntime helpers', () => {
         viewport: { ...autoViewport },
       }),
     ).toBe(false);
+  });
+
+  it('syncs native shared viewport to the render candidate only before manual gestures', () => {
+    expect(
+      resolveNativeSharedViewportSyncTarget({
+        hasManualViewport: false,
+        projectionViewport: autoViewport,
+        viewport: settledViewport,
+      }),
+    ).toBe(autoViewport);
+    expect(
+      resolveNativeSharedViewportSyncTarget({
+        hasManualViewport: true,
+        projectionViewport: autoViewport,
+        viewport: settledViewport,
+      }),
+    ).toBe(settledViewport);
   });
 
   it('captures and restores data-load viewport by visible candle count', () => {
