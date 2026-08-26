@@ -15,15 +15,16 @@ import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
+import { snapPriceToTick } from '../../interaction/crosshairSnap';
 import { getNativePaneAtY } from '../render/nativeChartFrame';
 import { isNativeLeftToolRailToggleTap } from '../utils/leftToolRailLayout';
 import { resolveNativeCanvasTap } from './nativeCanvasTapResolver';
 import { hideNativeCrosshair, toggleNativeCrosshair } from './nativeCrosshair';
 import {
   isNativeCrosshairContextMenuButtonTap,
+  nativeCrosshairYToPrice,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
-  resolveNativeCrosshairSnappedPrice,
   resolveNativeCrosshairSnappedTime,
   resolveNativeCrosshairSnappedY,
 } from './nativeCrosshairContextMenu';
@@ -169,7 +170,7 @@ export function createNativeCanvasTapGesture({
       if (outcome.kind === 'crosshairContextMenu') {
         // The menu opens at the crosshair, not at the finger.
         const time = resolveNativeCrosshairSnappedTime(frame, sharedViewport, crosshair.x.value, intervalMs);
-        const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshair.y.value, pricePrecision);
+        const price = snapPriceToTick(nativeCrosshairYToPrice(crosshair.y.value, sharedViewport, frame), pricePrecision);
         const snappedY = resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision);
         const layout = resolveNativeCrosshairContextMenuButtonLayout(
           frame,

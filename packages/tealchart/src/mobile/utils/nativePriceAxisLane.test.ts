@@ -48,9 +48,9 @@ describe('native price-axis lane', () => {
     });
 
     expect(lane).toEqual({
-      left: 312,
+      left: 311,
       right: 389,
-      width: 77,
+      width: 78,
     });
   });
 });

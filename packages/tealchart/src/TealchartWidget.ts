@@ -4015,11 +4015,6 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._logger?.warn(LogCategory.Layout, 'Layout load warnings', warnings);
     }
 
-    // Update symbol if different
-    if (settings.symbol && settings.symbol !== this._symbol) {
-      this._chartApi.setSymbol(settings.symbol);
-    }
-
     // Update interval if different
     if (settings.interval && settings.interval !== this._interval) {
       this._chartApi.setResolution(settings.interval);
@@ -4036,7 +4031,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('chartProperties', settings.chartProperties);
       this._chartStore.settings.setKey('preservedTvProperties', settings.preservedTvProperties);
       this._chartStore.settings.setKey('preservedTradingViewStudies', settings.preservedTradingViewStudies);
-      this._chartStore.settings.setKey('symbol', settings.symbol || this._symbol);
+      this._chartStore.settings.setKey('symbol', this._symbol);
       this._chartStore.settings.setKey('interval', settings.interval || this._interval);
     }
 
