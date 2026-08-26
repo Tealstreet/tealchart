@@ -86,6 +86,7 @@ export interface RenderOptions {
   gridColor: string;
   crosshairColor: string;
   showVolume: boolean;
+  showIndicatorOutputAxisLabels: boolean;
   volumeHeight: number; // Percentage of chart height for volume (0-1)
   devicePixelRatio: number;
   candleSpacing: number; // Gap between candles in pixels
@@ -507,6 +508,7 @@ export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   gridColor: '#202124',
   crosshairColor: '#71757a',
   showVolume: true,
+  showIndicatorOutputAxisLabels: true,
   volumeHeight: 0.2,
   devicePixelRatio: 1,
   candleSpacing: 2,

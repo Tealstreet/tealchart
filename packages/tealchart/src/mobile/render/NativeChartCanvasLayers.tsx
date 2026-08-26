@@ -184,15 +184,18 @@ export function NativeChartCanvasLayersImpl({
             textColor={textColor}
           />
 
-          <NativeIndicatorOutputAxisLabelLayer
-            backgroundColor={backgroundColor}
-            frame={frame}
-            indicatorPaneInfo={indicatorPaneInfo}
-            paneRangeOverrides={paneRangeOverrides}
-            plots={indicatorPlots}
-            smallFont={smallFont}
-            totalBarCount={indicatorTotalBarCount}
-          />
+          {options.showIndicatorOutputAxisLabels !== false ? (
+            <NativeIndicatorOutputAxisLabelLayer
+              backgroundColor={backgroundColor}
+              frame={frame}
+              indicatorPaneInfo={indicatorPaneInfo}
+              paneRangeOverrides={paneRangeOverrides}
+              plots={indicatorPlots}
+              smallFont={smallFont}
+              totalBarCount={indicatorTotalBarCount}
+              visibleBars={visibleBars}
+            />
+          ) : null}
 
           <NativeUserDrawingLayer
             draftAnchorColor={userDrawingDraftAnchorColor}

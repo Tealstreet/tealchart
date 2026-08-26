@@ -3690,8 +3690,9 @@ describe('value axis label layout', () => {
       },
       400,
     );
+    const bars = makeBars(3);
     const frame = {
-      bars: makeBars(3),
+      bars,
       computedPanes,
       indicatorPaneInfo: { macd: { overlay: false } },
       labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
@@ -3715,6 +3716,7 @@ describe('value axis label layout', () => {
           precision: 1,
         },
       ],
+      viewport: { startTime: bars[0]!.time, endTime: bars[2]!.time, priceMin: 78_000, priceMax: 88_000 },
     } as any;
 
     const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
@@ -3727,7 +3729,101 @@ describe('value axis label layout', () => {
     expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
     expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.valueY))).toBe(true);
+    expect(outputLabels.every((label) => Number.isFinite(label.sourceX))).toBe(true);
     expect(labels.some((label) => label.kind === 'tick' && label.textAlign === 'left')).toBe(true);
+  });
+
+  it('adds colored output tags for overlay indicator values on the main pane', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 78_000, yMax: 88_000, fixedRange: false }],
+      },
+      400,
+    );
+    const bars = makeBars(2);
+    const frame = {
+      bars,
+      computedPanes,
+      indicatorPaneInfo: { ema: { overlay: true } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
+      plots: [
+        {
+          id: 'ema',
+          title: 'EMA',
+          type: 'plot',
+          scriptId: 'ema',
+          values: [79_000, 79_500],
+          color: '#2196F3',
+          precision: 0,
+        },
+      ],
+      viewport: { startTime: bars[0]!.time, endTime: bars[1]!.time, priceMin: 78_000, priceMax: 88_000 },
+    } as any;
+
+    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'main');
+    const outputLabels = labels.filter((label) => label.kind === 'indicator-output');
+
+    expect(outputLabels).toEqual([
+      expect.objectContaining({
+        paneId: 'main',
+        text: '79,500',
+        borderColor: '#2196F3',
+      }),
+    ]);
+    expect(Number.isFinite(outputLabels[0]!.sourceX)).toBe(true);
+  });
+
+  it('does not add indicator output tags when disabled', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 400, showIndicatorOutputAxisLabels: false, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.25,
+            yMin: -100,
+            yMax: 100,
+            fixedRange: true,
+            indicatorIds: ['macd'],
+          },
+        ],
+      },
+      400,
+    );
+    const frame = {
+      bars: makeBars(1),
+      computedPanes,
+      indicatorPaneInfo: { macd: { overlay: false } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
+      plots: [
+        {
+          id: 'signal',
+          title: 'Signal',
+          type: 'plot',
+          scriptId: 'macd',
+          values: [24.2],
+          color: '#ff9900',
+          precision: 1,
+        },
+      ],
+    } as any;
+
+    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
+
+    expect(labels.some((label) => label.kind === 'indicator-output')).toBe(false);
   });
 
   it('keeps indicator output guide positions pinned to source values after de-overlap', () => {
@@ -3754,8 +3850,9 @@ describe('value axis label layout', () => {
       },
       260,
     );
+    const bars = makeBars(1);
     const frame = {
-      bars: makeBars(1),
+      bars,
       computedPanes,
       indicatorPaneInfo: { macd: { overlay: false } },
       labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
@@ -3779,6 +3876,7 @@ describe('value axis label layout', () => {
           precision: 0,
         },
       ],
+      viewport: { startTime: bars[0]!.time, endTime: bars[0]!.time + 60_000, priceMin: 78_000, priceMax: 88_000 },
     } as any;
 
     const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');

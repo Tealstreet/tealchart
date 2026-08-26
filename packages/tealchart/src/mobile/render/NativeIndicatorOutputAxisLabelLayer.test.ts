@@ -7,6 +7,10 @@ vi.mock('react-native', () => ({
   View: 'View',
 }));
 
+vi.mock('react-native-reanimated', () => ({
+  useDerivedValue: (factory: () => unknown) => ({ value: factory() }),
+}));
+
 vi.mock('@shopify/react-native-skia', async () => await import('../../test/reactNativeSkiaMock'));
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
@@ -56,6 +60,7 @@ describe('native indicator output axis labels', () => {
         }),
       ],
       totalBarCount: 2,
+      visibleBars: [{ sourceIndex: 1, x: 184 } as never],
     });
     const groups = resolveNativeIndicatorOutputAxisLabelGroups({ axisFont, frame, labels });
 
@@ -64,6 +69,7 @@ describe('native indicator output axis labels', () => {
         id: 'pane_1:indicator-output:macd:signal',
         text: '24.2',
         color: '#ff9900',
+        sourceX: 184,
       }),
     ]);
     expect(groups).toEqual([
@@ -102,6 +108,7 @@ describe('native indicator output axis labels', () => {
         }),
       ],
       totalBarCount: 2,
+      visibleBars: [],
     });
 
     expect(labels).toEqual([
@@ -133,6 +140,7 @@ describe('native indicator output axis labels', () => {
         plot({ id: 'signal', scriptId: 'macd', values: [-50], color: '#ff9900', precision: 0 }),
       ],
       totalBarCount: 1,
+      visibleBars: [],
     });
 
     const halfHeight = NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;

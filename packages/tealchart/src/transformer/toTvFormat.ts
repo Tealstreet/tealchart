@@ -165,6 +165,7 @@ function buildTvContent(settings: ChartSettings): TvChartContent {
     // Preserve original settings for lossless round-trip
     _tealstreetOriginalSettings: {
       showVolume: settings.showVolume,
+      showIndicatorOutputAxisLabels: settings.showIndicatorOutputAxisLabels,
       volumeHeight: settings.volumeHeight,
       chartType: settings.chartType,
       autoScale: settings.autoScale,

@@ -14,6 +14,7 @@ function createSettings(overrides: Partial<ChartSettings> = {}): ChartSettings {
     symbol: 'BTCUSDT',
     interval: '60' as ResolutionString,
     showVolume: true,
+    showIndicatorOutputAxisLabels: true,
     volumeHeight: 0.2,
     chartType: 'candle',
     autoScale: true,

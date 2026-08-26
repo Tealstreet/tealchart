@@ -143,6 +143,7 @@ export interface ValueAxisLabelRenderData {
   y: number;
   color: string;
   fontSize: number;
+  sourceX?: number;
 }
 
 interface MeasuredValueAxisLabel {
@@ -159,6 +160,7 @@ interface MeasuredValueAxisLabel {
   y: number;
   color: string;
   fontSize: number;
+  sourceX?: number;
 }
 
 function normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
@@ -3795,6 +3797,8 @@ export class TealchartRenderer {
       plots,
       indicatorPaneInfo,
       bars.length,
+      bars,
+      viewport,
     );
 
     // Render each pane with its specific price lines and TealScript drawings
@@ -4436,8 +4440,9 @@ export class TealchartRenderer {
 
   private drawIndicatorOutputAxisGuide(pane: ComputedPane, label: ValueAxisLabelRenderData): void {
     const { ctx, margins } = this;
-    const startX = margins.left;
     const endX = label.labelX;
+    const rawStartX = label.sourceX ?? margins.left;
+    const startX = Math.max(margins.left, Math.min(rawStartX, endX));
     if (endX <= startX) return;
 
     const y = Math.round(label.valueY) + 0.5;
@@ -4472,6 +4477,8 @@ export class TealchartRenderer {
       frame.plots,
       frame.indicatorPaneInfo,
       frame.bars?.length,
+      frame.bars,
+      frame.viewport,
     );
     return this.computePaneYAxisLabels(
       pane,
@@ -4488,6 +4495,8 @@ export class TealchartRenderer {
     plots?: PlotOutput[],
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     totalBarCount?: number,
+    bars?: readonly Bar[],
+    viewport?: Viewport,
   ): ValueAxisLabelLayout {
     const paneLabelWidths = new Map<string, number>();
     const indicatorOutputLabelsByPane = this.getIndicatorOutputLabelsByPane(
@@ -4495,6 +4504,8 @@ export class TealchartRenderer {
       plots,
       indicatorPaneInfo,
       totalBarCount,
+      bars,
+      viewport,
     );
     let commonLabelWidth = this.valueAxisCommonLabelWidth;
 
@@ -4528,8 +4539,12 @@ export class TealchartRenderer {
     plots?: PlotOutput[],
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
     totalBarCount?: number,
+    bars?: readonly Bar[],
+    viewport?: Viewport,
   ): Map<string, IndicatorOutputAxisLabelSource[]> {
     const labelsByPane = new Map<string, IndicatorOutputAxisLabelSource[]>();
+    if (this.options.showIndicatorOutputAxisLabels === false) return labelsByPane;
+
     const outputLabels = getIndicatorOutputAxisLabelSources({
       indicatorPaneInfo,
       panes: computedPanes,
@@ -4538,12 +4553,26 @@ export class TealchartRenderer {
     });
 
     for (const label of outputLabels) {
+      const sourceX = this.resolveIndicatorOutputSourceX(label.sourceIndex, bars, viewport);
       const paneLabels = labelsByPane.get(label.paneId) ?? [];
-      paneLabels.push(label);
+      paneLabels.push({ ...label, sourceX });
       labelsByPane.set(label.paneId, paneLabels);
     }
 
     return labelsByPane;
+  }
+
+  private resolveIndicatorOutputSourceX(
+    sourceIndex: number | undefined,
+    bars: readonly Bar[] | undefined,
+    viewport: Viewport | undefined,
+  ): number | undefined {
+    if (!bars || !viewport || sourceIndex == null || sourceIndex < 0 || sourceIndex >= bars.length) return undefined;
+    const bar = bars[sourceIndex];
+    if (!bar || !Number.isFinite(bar.time)) return undefined;
+
+    const chartWidth = this.options.width - this.margins.left;
+    return this.timeToX(bar.time, viewport, chartWidth);
   }
 
   private measurePaneYAxisLabels(
@@ -4576,10 +4605,7 @@ export class TealchartRenderer {
     const measuredLabels: MeasuredValueAxisLabel[] = [];
     // For main pane, labels should stay below the transparent top bar (safe zone)
     const visibleTop = pane.type === 'main' ? margins.top : pane.top;
-    const outputLabels =
-      pane.type === 'indicator'
-        ? this.measureIndicatorOutputYAxisLabels(pane, indicatorOutputLabels, visibleTop, textFont)
-        : [];
+    const outputLabels = this.measureIndicatorOutputYAxisLabels(pane, indicatorOutputLabels, visibleTop, textFont);
     const outputAvoidanceRanges = outputLabels.map((label) => ({
       bottom: label.y + (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 + 3,
       top: label.y - (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 - 3,
@@ -4655,6 +4681,7 @@ export class TealchartRenderer {
         color: output.color,
         fontSize: 11,
         height: INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
+        sourceX: output.sourceX,
       });
     }
 
@@ -4748,6 +4775,7 @@ export class TealchartRenderer {
         y: label.y,
         color: label.color,
         fontSize: label.fontSize,
+        sourceX: label.sourceX,
       };
     });
   }

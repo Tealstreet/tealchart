@@ -2,6 +2,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
+import type { NativeVisibleBar } from './nativeVisibleBars';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 
 import { memo, useMemo } from 'react';
@@ -36,6 +37,7 @@ export interface NativeIndicatorOutputAxisLabel {
   color: string;
   valueY: number;
   y: number;
+  sourceX?: number;
 }
 
 export interface NativeIndicatorOutputAxisLabelGroup {
@@ -54,6 +56,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   plots,
   smallFont,
   totalBarCount,
+  visibleBars,
 }: {
   backgroundColor: string;
   frame: NativeChartFrame;
@@ -62,6 +65,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   plots: readonly PlotOutput[];
   smallFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
+  visibleBars: readonly NativeVisibleBar[];
 }) {
   const labels = useMemo(
     () =>
@@ -71,8 +75,9 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
         paneRangeOverrides: paneRangeOverrides?.value,
         plots,
         totalBarCount,
+        visibleBars,
       }),
-    [frame, indicatorPaneInfo, paneRangeOverrides, plots, totalBarCount],
+    [frame, indicatorPaneInfo, paneRangeOverrides, plots, totalBarCount, visibleBars],
   );
   if (labels.length === 0) return null;
 
@@ -141,7 +146,10 @@ function NativeIndicatorOutputAxisTag({
   const tagY = useDerivedValue(() => labelCenterY.value - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2);
   const textY = useDerivedValue(() => tagY.value + baselineOffset);
   const guideY = useDerivedValue(() => Math.round(valueY.value) + 0.5);
-  const guideStart = useDerivedValue(() => ({ x: frame.contentLeft, y: guideY.value }));
+  const guideStart = useDerivedValue(() => {
+    const rawX = Number.isFinite(label.sourceX ?? NaN) ? label.sourceX! : frame.contentLeft;
+    return { x: Math.max(frame.contentLeft, Math.min(rawX, group.x)), y: guideY.value };
+  });
   const guideEnd = useDerivedValue(() => ({ x: group.x, y: guideY.value }));
 
   return (
@@ -214,14 +222,17 @@ export function resolveNativeIndicatorOutputAxisLabels({
   paneRangeOverrides,
   plots,
   totalBarCount,
+  visibleBars,
 }: {
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
   totalBarCount: number;
+  visibleBars: readonly NativeVisibleBar[];
 }): NativeIndicatorOutputAxisLabel[] {
   const paneById = new Map(frame.panes.map((pane) => [pane.id, pane]));
+  const xBySourceIndex = new Map(visibleBars.map((bar) => [bar.sourceIndex, bar.x]));
   const rawLabels = getIndicatorOutputAxisLabelSources({
     indicatorPaneInfo,
     panes: frame.panes,
@@ -249,6 +260,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
       color: rawLabel.color,
       valueY: y,
       y,
+      sourceX: xBySourceIndex.get(rawLabel.sourceIndex),
     });
   }
 

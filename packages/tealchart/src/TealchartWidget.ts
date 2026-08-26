@@ -1800,6 +1800,10 @@ export class TealchartWidget implements ITealchartWebWidget {
           this._renderOptions = { ...this._renderOptions, showVolume: Boolean(value) };
           this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
         }
+        if (key === 'showIndicatorOutputAxisLabels') {
+          this._renderOptions = { ...this._renderOptions, showIndicatorOutputAxisLabels: Boolean(value) };
+          this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
+        }
       },
       setChartProperties: (properties) => {
         this._chartStore?.settings.setKey('chartProperties', properties);
@@ -4025,6 +4029,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._chartStore.settings.setKey('indicators', settings.indicators || []);
       this._chartStore.settings.setKey('userDrawingState', settings.userDrawingState);
       this._chartStore.settings.setKey('showVolume', settings.showVolume);
+      this._chartStore.settings.setKey('showIndicatorOutputAxisLabels', settings.showIndicatorOutputAxisLabels);
       this._chartStore.settings.setKey('volumeHeight', settings.volumeHeight);
       this._chartStore.settings.setKey('chartType', settings.chartType || 'candle');
       this._chartStore.settings.setKey('autoScale', settings.autoScale);
@@ -4047,6 +4052,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._renderOptions = {
       ...applyChartOverridesToRenderOptions(this._baseRenderOptions(), settings.chartProperties ?? {}),
       showVolume: settings.showVolume,
+      showIndicatorOutputAxisLabels: settings.showIndicatorOutputAxisLabels,
     };
 
     this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), {
@@ -4372,6 +4378,8 @@ export class TealchartWidget implements ITealchartWebWidget {
       symbol: this._symbol,
       interval: this._interval,
       showVolume: storeSettings?.showVolume ?? this._renderOptions.showVolume ?? true,
+      showIndicatorOutputAxisLabels:
+        storeSettings?.showIndicatorOutputAxisLabels ?? this._renderOptions.showIndicatorOutputAxisLabels ?? true,
       // Height stays sourced from what actually renders. The settings store is
       // seeded from DEFAULT_CHART_SETTINGS, not from the host's renderOptions,
       // so reading height from it would save a value the chart never drew.

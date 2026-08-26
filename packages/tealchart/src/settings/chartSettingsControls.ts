@@ -98,6 +98,7 @@ export function createChartPropertyControl(options: {
 }
 
 export const SHOW_VOLUME_CONTROL_ID = 'showVolume';
+export const SHOW_INDICATOR_OUTPUT_AXIS_LABELS_CONTROL_ID = 'showIndicatorOutputAxisLabels';
 
 /**
  * The registry. Volume is first; everything after it should be an entry here
@@ -114,6 +115,17 @@ export const CHART_SETTINGS_CONTROLS: readonly ChartSettingControl[] = [
     read: (context) => context.getSettings().showVolume,
     write: (context, value) => {
       context.setSetting('showVolume', Boolean(value));
+      context.markLayoutDirty();
+    },
+  },
+  {
+    id: SHOW_INDICATOR_OUTPUT_AXIS_LABELS_CONTROL_ID,
+    tabId: 'scales',
+    label: 'Indicator axis labels',
+    kind: 'bool',
+    read: (context) => context.getSettings().showIndicatorOutputAxisLabels,
+    write: (context, value) => {
+      context.setSetting('showIndicatorOutputAxisLabels', Boolean(value));
       context.markLayoutDirty();
     },
   },
