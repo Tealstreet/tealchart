@@ -46,6 +46,7 @@ describe('NativeChartCanvasLayers', () => {
     return {
       axisFont,
       backgroundColor: '#101418',
+      bars: [],
       bracketDragState: {
         activeObjectId: shared(''),
         activeObjectType: shared(''),
@@ -142,8 +143,10 @@ describe('NativeChartCanvasLayers', () => {
     expect(plotChildren[4]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
     expect(plotChildren[5]?.props).toMatchObject({ showAxisLabels: true, showGridLines: false });
     expect(plotChildren[6]?.props).toMatchObject({
+      bars: [],
       indicatorPaneInfo: {},
       plots: [],
+      staticProjection: undefined,
       totalBarCount: 0,
     });
     expect(plotChildren[9]?.props).toMatchObject({ hasContextMenu: false });

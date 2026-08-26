@@ -2023,6 +2023,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
               <NativeChartCanvasLayers
                 axisFont={axisFont}
                 backgroundColor={backgroundColor}
+                bars={nativeRenderBars}
                 bracketDragState={bracketDragState}
                 crosshair={crosshair}
                 extraPriceLines={nativePriceLines}

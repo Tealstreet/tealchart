@@ -1,9 +1,11 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
+import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
-import type { NativeVisibleBar } from './nativeVisibleBars';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
+import type { NativeChartProjection } from './nativeProjection';
+import type { NativeVisibleBar } from './nativeVisibleBars';
 
 import { memo, useMemo } from 'react';
 
@@ -50,19 +52,23 @@ export interface NativeIndicatorOutputAxisLabelGroup {
 
 export function NativeIndicatorOutputAxisLabelLayerImpl({
   backgroundColor,
+  bars,
   frame,
   indicatorPaneInfo,
   paneRangeOverrides,
   plots,
+  staticProjection,
   smallFont,
   totalBarCount,
   visibleBars,
 }: {
   backgroundColor: string;
+  bars: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
+  staticProjection?: NativeChartProjection | null;
   smallFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
@@ -70,14 +76,16 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   const labels = useMemo(
     () =>
       resolveNativeIndicatorOutputAxisLabels({
+        bars,
         frame,
         indicatorPaneInfo,
         paneRangeOverrides: paneRangeOverrides?.value,
         plots,
+        staticProjection,
         totalBarCount,
         visibleBars,
       }),
-    [frame, indicatorPaneInfo, paneRangeOverrides, plots, totalBarCount, visibleBars],
+    [bars, frame, indicatorPaneInfo, paneRangeOverrides, plots, staticProjection, totalBarCount, visibleBars],
   );
   if (labels.length === 0) return null;
 
@@ -148,15 +156,18 @@ function NativeIndicatorOutputAxisTag({
   const guideY = useDerivedValue(() => Math.round(valueY.value) + 0.5);
   const guideStart = useDerivedValue(() => {
     const rawX = Number.isFinite(label.sourceX ?? NaN) ? label.sourceX! : frame.contentLeft;
-    return { x: Math.max(frame.contentLeft, Math.min(rawX, group.x)), y: guideY.value };
+    return { x: Math.max(frame.contentLeft, rawX), y: guideY.value };
   });
   const guideEnd = useDerivedValue(() => ({ x: group.x, y: guideY.value }));
+  const shouldDrawGuide = Number.isFinite(label.sourceX ?? NaN) && label.sourceX! < group.x;
 
   return (
     <Group clip={clip}>
-      <SkiaLine p1={guideStart} p2={guideEnd} color={label.color} strokeWidth={1} opacity={0.65}>
-        <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
-      </SkiaLine>
+      {shouldDrawGuide ? (
+        <SkiaLine p1={guideStart} p2={guideEnd} color={label.color} strokeWidth={1} opacity={0.65}>
+          <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
+        </SkiaLine>
+      ) : null}
       <NativePriceAxisTagBox
         x={group.x}
         y={tagY}
@@ -217,17 +228,21 @@ export function resolveNativeIndicatorOutputAxisLabelGroups({
 }
 
 export function resolveNativeIndicatorOutputAxisLabels({
+  bars,
   frame,
   indicatorPaneInfo,
   paneRangeOverrides,
   plots,
+  staticProjection,
   totalBarCount,
   visibleBars,
 }: {
+  bars?: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
+  staticProjection?: NativeChartProjection | null;
   totalBarCount: number;
   visibleBars: readonly NativeVisibleBar[];
 }): NativeIndicatorOutputAxisLabel[] {
@@ -260,11 +275,38 @@ export function resolveNativeIndicatorOutputAxisLabels({
       color: rawLabel.color,
       valueY: y,
       y,
-      sourceX: xBySourceIndex.get(rawLabel.sourceIndex),
+      sourceX: resolveNativeIndicatorOutputSourceX({
+        bars,
+        projection: staticProjection,
+        sourceIndex: rawLabel.sourceIndex,
+        xBySourceIndex,
+      }),
     });
   }
 
   return resolveNativeIndicatorOutputLabelCollisions(labels);
+}
+
+function resolveNativeIndicatorOutputSourceX({
+  bars,
+  projection,
+  sourceIndex,
+  xBySourceIndex,
+}: {
+  bars?: readonly Bar[];
+  projection?: NativeChartProjection | null;
+  sourceIndex: number | undefined;
+  xBySourceIndex: ReadonlyMap<number, number>;
+}): number | undefined {
+  if (sourceIndex == null) return undefined;
+
+  const visibleX = xBySourceIndex.get(sourceIndex);
+  if (Number.isFinite(visibleX ?? NaN)) return visibleX!;
+
+  const bar = bars?.[sourceIndex];
+  if (!bar || !projection || !Number.isFinite(bar.time)) return undefined;
+
+  return projection.timeToX(bar.time);
 }
 
 function resolveNativeIndicatorOutputLabelCollisions(

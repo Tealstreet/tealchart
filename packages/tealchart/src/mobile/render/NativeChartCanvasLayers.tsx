@@ -1,7 +1,7 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
 import type { UserDrawingAnchor, UserDrawingRenderEntry } from '../../drawings';
-import type { OrderLineRenderData, PositionLineRenderData, RenderOptions } from '../../types';
+import type { Bar, OrderLineRenderData, PositionLineRenderData, RenderOptions } from '../../types';
 import type { NativeCrosshairSharedValues } from '../interaction/nativeCrosshair';
 import type { NativeBracketDragSharedValues, NativeOrderDragSharedValues } from '../interaction/nativeOemsDragState';
 import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines';
@@ -32,6 +32,7 @@ import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
 export interface NativeChartCanvasLayersProps {
   axisFont: ReturnType<typeof Skia.Font>;
   backgroundColor: string;
+  bars: readonly Bar[];
   bracketDragState: NativeBracketDragSharedValues;
   crosshair: NativeCrosshairSharedValues;
   extraPriceLines: readonly NativeRenderablePriceLine[];
@@ -74,6 +75,7 @@ export interface NativeChartCanvasLayersProps {
 export function NativeChartCanvasLayersImpl({
   axisFont,
   backgroundColor,
+  bars,
   bracketDragState,
   crosshair,
   extraPriceLines,
@@ -187,11 +189,13 @@ export function NativeChartCanvasLayersImpl({
           {options.showIndicatorOutputAxisLabels !== false ? (
             <NativeIndicatorOutputAxisLabelLayer
               backgroundColor={backgroundColor}
+              bars={bars}
               frame={frame}
               indicatorPaneInfo={indicatorPaneInfo}
               paneRangeOverrides={paneRangeOverrides}
               plots={indicatorPlots}
               smallFont={smallFont}
+              staticProjection={staticProjection}
               totalBarCount={indicatorTotalBarCount}
               visibleBars={visibleBars}
             />

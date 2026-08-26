@@ -41,6 +41,7 @@ const frame = createNativeChartFrameFromPanes({
 const props = {
   axisFont: null,
   backgroundColor: '#101418',
+  bars: [],
   bracketDragState: shared(null),
   crosshair: { visible: shared(false), x: shared(0), y: shared(0) },
   extraPriceLines: [],
