@@ -70,7 +70,7 @@ describe('native indicator output axis labels', () => {
       expect.objectContaining({
         paneId: 'pane_1',
         x: frame.priceAxisLeft + 1,
-        width: 34,
+        width: 32,
       }),
     ]);
   });
