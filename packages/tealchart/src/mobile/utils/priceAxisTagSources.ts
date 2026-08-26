@@ -7,7 +7,8 @@ import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './trade
 
 import { getNativeOrderObjectId, getNativePositionObjectId } from './tradeLineLayout';
 
-export const DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT = 22;
+export const DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT = 18;
+export const DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT = 30;
 export const NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY = 90;
 export const NATIVE_SELECTED_TRADE_LINE_AXIS_TAG_PRIORITY = 95;
 
@@ -53,7 +54,9 @@ export function getNativePriceLineTagHeight(
   line: PriceLine,
   priceLineTagHeight = DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT,
 ): number {
-  return line.countdownToTime !== undefined || line.label.secondaryText ? 34 : priceLineTagHeight;
+  return line.countdownToTime !== undefined || line.label.secondaryText
+    ? DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT
+    : priceLineTagHeight;
 }
 
 function createNativePriceLineTagSource(
@@ -70,7 +73,7 @@ function createNativePriceLineTagSource(
     ...(line.showAxisTag === true ? { clampToPane: true } : {}),
     priority: line.priority,
     ...(options?.fixed === true ? { fixed: true } : {}),
-    bracketRef: line.nativeBracketRef,
+    ...(line.nativeBracketRef ? { bracketRef: line.nativeBracketRef } : {}),
   };
 }
 
