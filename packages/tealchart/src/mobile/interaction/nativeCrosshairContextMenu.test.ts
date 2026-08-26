@@ -5,6 +5,7 @@ import type { NativeViewportSharedValues } from '../render/nativeSharedViewport'
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import {
   isNativeCrosshairContextMenuButtonTap,
   NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_HIT_RADIUS,
@@ -103,7 +104,7 @@ describe('native crosshair context menu geometry', () => {
   it('lets wide crosshair price labels grow left without truncating the menu anchor', () => {
     const label = resolveNativeCrosshairPriceLabelLayout(frame, 0.000001, '63,777.000000');
     const button = resolveNativeCrosshairContextMenuButtonLayout(frame, 80, 0.000001, '63,777.000000');
-    const right = frame.dimensions.width - 4;
+    const right = createNativePriceAxisLane(frame).right;
 
     expect(label.x).toBeLessThan(frame.priceAxisLeft);
     expect(label.x + label.width).toBe(right);

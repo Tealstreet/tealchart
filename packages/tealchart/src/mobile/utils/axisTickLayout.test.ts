@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { createNativePriceAxisLane } from './nativePriceAxisLane';
 import {
   clampNativePriceAxisTickLabelY,
   clampNativeTimeAxisTickLabelX,
@@ -22,6 +23,7 @@ const frame = createNativeChartFrameFromPanes({
   },
   panes: [{ id: 'main', type: 'main', top: 44, height: 404, yMin: 62000, yMax: 66000 }],
 });
+const priceAxisLane = createNativePriceAxisLane(frame);
 
 describe('native axis tick layout', () => {
   it('keeps price labels inside the reserved price-axis lane', () => {
@@ -33,12 +35,12 @@ describe('native axis tick layout', () => {
     });
 
     expect(layout.x).toBeGreaterThanOrEqual(frame.priceAxisLeft);
-    expect(layout.x + 54).toBeLessThanOrEqual(frame.priceAxisRight - 4);
-    expect(layout.x + 54).toBe(frame.priceAxisRight - 4);
+    expect(layout.x + 54).toBeLessThanOrEqual(priceAxisLane.right);
+    expect(layout.x + 54).toBe(priceAxisLane.right);
     expect(layout.text).toBe('64,000');
     expect(layout.y).toBe(224);
-    expect(layout.maxWidth).toBe(frame.priceAxisRight - frame.priceAxisLeft - 8);
-    expect(layout.right).toBe(frame.priceAxisRight - 4);
+    expect(layout.maxWidth).toBe(priceAxisLane.width);
+    expect(layout.right).toBe(priceAxisLane.right);
   });
 
   it('separates static price-axis tick text layout from animated y clamping', () => {
@@ -50,9 +52,9 @@ describe('native axis tick layout', () => {
 
     expect(layout).toEqual({
       text: '64,000',
-      x: frame.priceAxisRight - 4 - 54,
-      maxWidth: frame.priceAxisRight - frame.priceAxisLeft - 8,
-      right: frame.priceAxisRight - 4,
+      x: priceAxisLane.right - 54,
+      maxWidth: priceAxisLane.width,
+      right: priceAxisLane.right,
     });
     expect(clampNativePriceAxisTickLabelY(frame, 220)).toBe(224);
   });
@@ -72,7 +74,7 @@ describe('native axis tick layout', () => {
     });
 
     expect(layout.text).toBe('123...');
-    expect(layout.x + 42).toBe(frame.priceAxisRight - 4);
+    expect(layout.x + 42).toBe(priceAxisLane.right);
   });
 
   it('does not claim oversized text fits without an explicit fitter', () => {
@@ -84,12 +86,12 @@ describe('native axis tick layout', () => {
     });
 
     expect(layout.text).toBe('1234567890');
-    expect(layout.x).toBe(frame.priceAxisLeft + 4);
-    expect(layout.x + 120).toBeGreaterThan(frame.priceAxisRight - 4);
+    expect(layout.x).toBe(priceAxisLane.left);
+    expect(layout.x + 120).toBeGreaterThan(priceAxisLane.right);
   });
 
   it('right-aligns live price labels with their own fitted length', () => {
-    const right = frame.priceAxisRight - 4;
+    const right = priceAxisLane.right;
     const characterWidth = 6;
     const maxWidth = 42;
 
@@ -99,7 +101,7 @@ describe('native axis tick layout', () => {
   });
 
   it('centers main price-axis labels in the shared axis lane', () => {
-    const left = frame.priceAxisLeft + 4;
+    const left = priceAxisLane.left;
     const characterWidth = 6;
     const maxWidth = 42;
 
@@ -109,7 +111,7 @@ describe('native axis tick layout', () => {
   });
 
   it('left-aligns secondary pane labels to the shared axis lane', () => {
-    expect(createNativeLeftAlignedAxisTextX(frame.priceAxisLeft + 4)).toBe(frame.priceAxisLeft + 4);
+    expect(createNativeLeftAlignedAxisTextX(priceAxisLane.left)).toBe(priceAxisLane.left);
   });
 
   it('derives price-label slot capacity from the reserved axis lane', () => {

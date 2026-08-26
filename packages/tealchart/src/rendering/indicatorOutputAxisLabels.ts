@@ -2,6 +2,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 
 export interface IndicatorOutputPaneInfo {
   overlay: boolean;
+  paneId?: string;
 }
 
 export interface IndicatorOutputPane {
@@ -84,7 +85,7 @@ export function getIndicatorOutputAxisLabelSources({
     const info = indicatorPaneInfo?.[scriptId];
     if (info?.overlay !== false) continue;
 
-    const paneId = paneByScriptId.get(scriptId);
+    const paneId = info.paneId ?? paneByScriptId.get(scriptId);
     if (!paneId) continue;
 
     const latest = getLatestIndicatorPlotValue(plot, totalBarCount);

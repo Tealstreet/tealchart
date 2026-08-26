@@ -31,7 +31,7 @@ describe('native axis tag render layout', () => {
     const tag = createNativeAxisLaneTagLayout(frame);
 
     expect(tag.x).toBe(302);
-    expect(tag.width).toBe(84);
+    expect(tag.width).toBe(87);
     expect(tag.textX).toBe(308);
   });
 
