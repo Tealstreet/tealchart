@@ -2,6 +2,7 @@ import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
 
 import { describe, expect, it } from 'vitest';
 
+import { createNativePriceAxisLane } from './nativePriceAxisLane';
 import {
   buildNativeTradeLineGeometries,
   createNativeTradeLineRows,
@@ -24,6 +25,11 @@ const dimensions = {
   margins: { bottom: 32, left: 8, right: 76, top: 20 },
   width: 390,
 };
+
+const priceAxisLane = createNativePriceAxisLane({
+  dimensions,
+  priceAxisLeft: dimensions.width - dimensions.margins.right,
+});
 
 const measureText = (text: string) => text.length * 7;
 const measureVariableText = (text: string) =>
@@ -183,7 +189,7 @@ describe('native trade line layout', () => {
     expect(layout.maxLabelWidth).toBeGreaterThan(0);
     expect(layout.labelX + layout.labelWidth).toBeLessThanOrEqual(layout.priceLabelLeft - 2);
     expect(layout.rightLineLeft + layout.rightLineWidth).toBeLessThanOrEqual(layout.priceLabelLeft - 2);
-    expect(layout.priceLabelLeft + layout.priceLabelWidth).toBeLessThanOrEqual(dimensions.width - 4);
+    expect(layout.priceLabelLeft + layout.priceLabelWidth).toBeLessThanOrEqual(priceAxisLane.right);
   });
 
   it('treats pixel line length as the right connector length', () => {
@@ -298,8 +304,8 @@ describe('native trade line layout', () => {
 
   it('places price tags inside the native price-axis lane when provided', () => {
     const priceLabelLane = {
-      left: dimensions.width - dimensions.margins.right + 2,
-      right: dimensions.width - 4,
+      left: priceAxisLane.left,
+      right: priceAxisLane.right,
     };
     const [geometry] = buildNativeTradeLineGeometries([createOrderLine()], [], {
       dimensions,
@@ -320,8 +326,8 @@ describe('native trade line layout', () => {
 
   it('lets wide price tags grow left from the native price-axis lane', () => {
     const priceLabelLane = {
-      left: dimensions.width - dimensions.margins.right + 2,
-      right: dimensions.width - 4,
+      left: priceAxisLane.left,
+      right: priceAxisLane.right,
     };
     const [geometry] = buildNativeTradeLineGeometries([createOrderLine()], [], {
       dimensions,
