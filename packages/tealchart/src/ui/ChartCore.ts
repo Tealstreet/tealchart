@@ -413,6 +413,8 @@ interface CrosshairPlusButtonBounds {
 }
 
 const CROSSHAIR_PRICE_LABEL_HEIGHT = 18;
+const CROSSHAIR_PRICE_LABEL_HORIZONTAL_PADDING = 12;
+const CROSSHAIR_PRICE_LABEL_WIDTH_GUARD = 2;
 const CROSSHAIR_PLUS_BUTTON_RADIUS = 9;
 const CROSSHAIR_PLUS_BUTTON_RIGHT_OFFSET = 11;
 const CROSSHAIR_PLUS_BUTTON_LINE_GAP = 4;
@@ -2529,12 +2531,15 @@ export class ChartCore {
       const priceText = getNumberFormatter(decimals).format(safeNum(value, 0, 'crosshairPrice'));
       const font = this.renderer.getFont();
       ctx.font = `11px ${font}`;
-      const measuredPriceLabelWidth = ctx.measureText(priceText).width + 10;
+      const measuredPriceLabelWidth =
+        Math.ceil(ctx.measureText(priceText).width) +
+        CROSSHAIR_PRICE_LABEL_HORIZONTAL_PADDING +
+        CROSSHAIR_PRICE_LABEL_WIDTH_GUARD;
       this.crosshairPriceLabelMaxWidth = Math.max(this.crosshairPriceLabelMaxWidth, measuredPriceLabelWidth);
-      const priceLabelWidth = Math.max(
+      const priceLabelWidth = Math.ceil(Math.max(
         this.crosshairPriceLabelMaxWidth,
         ...this.labelBoundsCache.map((bound) => bound.width),
-      );
+      ));
       const priceLabelRight = width - PRICE_AXIS_RIGHT_PADDING;
       priceLabel = {
         text: priceText,
