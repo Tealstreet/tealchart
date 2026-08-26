@@ -144,7 +144,7 @@ export function resolveNativeCrosshairPriceLabelText(
     });
     return formatNativeIndicatorAxisTickWorklet(value, slot.spacing);
   }
-  const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshairY, pricePrecision);
+  const price = snapPriceToTick(nativeCrosshairYToPrice(crosshairY, sharedViewport, frame), pricePrecision);
   return formatNativeTradeLinePriceWorklet(price, pricePrecision);
 }
 
@@ -158,7 +158,7 @@ export function resolveNativeCrosshairSnappedY(
   if (!isNativeCrosshairOverMainPane(frame, crosshairY)) return crosshairY;
   const priceRange = sharedViewport.priceMax.value - sharedViewport.priceMin.value;
   if (priceRange === 0 || frame.mainPane.height === 0) return frame.mainPane.top + frame.mainPane.height / 2;
-  const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshairY, pricePrecision);
+  const price = snapPriceToTick(nativeCrosshairYToPrice(crosshairY, sharedViewport, frame), pricePrecision);
   return frame.mainPane.top + ((sharedViewport.priceMax.value - price) / priceRange) * frame.mainPane.height;
 }
 

@@ -1138,7 +1138,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       // was saved back into the host — usually from another exchange — and the
       // host then corrects itself while the chart stays on a symbol its account
       // cannot resolve, which reads as a chart that never loads.
-      const nextSymbol = propSymbol || settings.symbol || symbol;
+      const nextSymbol = propSymbol || symbol;
       if (nextSymbol && nextSymbol !== chartApi.symbol()) {
         chartApi.setSymbol(nextSymbol);
       }
