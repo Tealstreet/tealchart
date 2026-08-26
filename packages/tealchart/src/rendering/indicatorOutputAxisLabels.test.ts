@@ -20,13 +20,16 @@ function plot(overrides: Partial<PlotOutput>): PlotOutput {
 }
 
 describe('indicator output axis labels', () => {
-  it('uses the latest finite visible plot value for non-overlay panes', () => {
+  it('uses the latest finite visible plot value for main and non-overlay panes', () => {
     const labels = getIndicatorOutputAxisLabelSources({
       indicatorPaneInfo: {
         macd: { overlay: false },
         ema: { overlay: true },
       },
-      panes: [{ id: 'pane_1', type: 'indicator', indicatorIds: ['macd'] }],
+      panes: [
+        { id: 'main', type: 'main' },
+        { id: 'pane_1', type: 'indicator', indicatorIds: ['macd'] },
+      ],
       plots: [
         plot({
           id: 'signal',
@@ -51,6 +54,13 @@ describe('indicator output axis labels', () => {
         plotId: 'signal',
         value: 2.5,
         color: '#ff9900',
+      }),
+      expect.objectContaining({
+        id: 'main:indicator-output:ema:ema',
+        paneId: 'main',
+        plotId: 'ema',
+        value: 10,
+        color: '#00ff00',
       }),
     ]);
   });

@@ -10,6 +10,7 @@ describe('toTvFormat', () => {
     symbol: 'BTCUSDT',
     interval: '60' as ResolutionString,
     showVolume: true,
+    showIndicatorOutputAxisLabels: true,
     volumeHeight: 0.2,
     chartType: 'candle',
     autoScale: true,
@@ -141,6 +142,7 @@ describe('toTvFormat', () => {
     it('preserves original settings for round-trip', () => {
       const settings = createTestSettings({
         showVolume: true,
+        showIndicatorOutputAxisLabels: false,
         volumeHeight: 0.3,
         chartType: 'area',
         autoScale: false,
@@ -149,6 +151,7 @@ describe('toTvFormat', () => {
       const content: TvChartContent = JSON.parse(result.content);
 
       expect(content._tealstreetOriginalSettings?.showVolume).toBe(true);
+      expect(content._tealstreetOriginalSettings?.showIndicatorOutputAxisLabels).toBe(false);
       expect(content._tealstreetOriginalSettings?.volumeHeight).toBe(0.3);
       expect(content._tealstreetOriginalSettings?.chartType).toBe('area');
       expect(content._tealstreetOriginalSettings?.autoScale).toBe(false);

@@ -342,6 +342,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => chartStore.settings.get().preservedTvProperties,
   );
   const [nativeShowVolume, setNativeShowVolume] = useState(() => chartStore.settings.get().showVolume);
+  const [nativeShowIndicatorOutputAxisLabels, setNativeShowIndicatorOutputAxisLabels] = useState(
+    () => chartStore.settings.get().showIndicatorOutputAxisLabels,
+  );
   const [nativeChartSettingsOpen, setNativeChartSettingsOpen] = useState(false);
   const [nativeIndicatorsOpen, setNativeIndicatorsOpen] = useState(false);
   useEffect(() => {
@@ -349,11 +352,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativeChartProperties(chartStore.settings.get().chartProperties);
     setNativePreservedTvProperties(chartStore.settings.get().preservedTvProperties);
     setNativeShowVolume(chartStore.settings.get().showVolume);
+    setNativeShowIndicatorOutputAxisLabels(chartStore.settings.get().showIndicatorOutputAxisLabels);
     return chartStore.settings.listen((nextSettings) => {
       setNativeAutoScaleEnabled(nextSettings.autoScale);
       setNativeChartProperties(nextSettings.chartProperties);
       setNativePreservedTvProperties(nextSettings.preservedTvProperties);
       setNativeShowVolume(nextSettings.showVolume);
+      setNativeShowIndicatorOutputAxisLabels(nextSettings.showIndicatorOutputAxisLabels);
     });
   }, [chartStore]);
   useEffect(() => {
@@ -756,9 +761,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => ({
       ...applyChartOverridesToRenderOptions(renderOptions ?? {}, nativeChartProperties ?? {}),
       showVolume: nativeShowVolume,
+      showIndicatorOutputAxisLabels: nativeShowIndicatorOutputAxisLabels,
       ...(imperativeRenderOptions ?? {}),
     }),
-    [imperativeRenderOptions, nativeChartProperties, nativeShowVolume, renderOptions],
+    [
+      imperativeRenderOptions,
+      nativeChartProperties,
+      nativeShowIndicatorOutputAxisLabels,
+      nativeShowVolume,
+      renderOptions,
+    ],
   );
 
   const widgetEmitterRef = useRef<EventEmitter | null>(null);
@@ -1176,6 +1188,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         chartType: settings.chartType || 'candle',
         indicators: settings.indicators || [],
         interval: settings.interval || interval,
+        showIndicatorOutputAxisLabels: settings.showIndicatorOutputAxisLabels,
         showVolume: settings.showVolume,
         symbol: nextSymbol,
         userDrawingState: settings.userDrawingState,
@@ -1216,6 +1229,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         chartType: 'candle',
         indicators: indicatorManager?.getLayoutIndicators() ?? [],
         interval: interval as ResolutionString,
+        showIndicatorOutputAxisLabels: nativeShowIndicatorOutputAxisLabels,
         showVolume: nativeShowVolume,
         symbol,
         userDrawingState: nativeUserDrawingState,
@@ -1234,6 +1248,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       nativeChartProperties,
       nativeIndicatorsRevision,
       nativePreservedTvProperties,
+      nativeShowIndicatorOutputAxisLabels,
       nativeShowVolume,
       nativeUserDrawingState,
       symbol,

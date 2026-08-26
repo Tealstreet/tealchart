@@ -101,6 +101,8 @@ export interface ChartSettings {
   symbol: string;
   /** Whether to show volume */
   showVolume: boolean;
+  /** Whether to show indicator output axis labels and guides */
+  showIndicatorOutputAxisLabels: boolean;
   /** Volume pane height (0-1) */
   volumeHeight: number;
   /** Chart type (candle, line, etc.) - for future */
@@ -146,6 +148,7 @@ export const DEFAULT_CHART_SETTINGS: ChartSettings = {
   interval: '60' as ResolutionString,
   symbol: 'BTCUSDT',
   showVolume: true,
+  showIndicatorOutputAxisLabels: true,
   volumeHeight: 0.2,
   chartType: 'candle',
   autoScale: true,
@@ -610,6 +613,7 @@ export function createChartFocusAtoms(chartKey: string) {
   const intervalAtom = computed(store.settings, (s) => s.interval);
   const symbolAtom = computed(store.settings, (s) => s.symbol);
   const showVolumeAtom = computed(store.settings, (s) => s.showVolume);
+  const showIndicatorOutputAxisLabelsAtom = computed(store.settings, (s) => s.showIndicatorOutputAxisLabels);
   const volumeHeightAtom = computed(store.settings, (s) => s.volumeHeight);
   const chartTypeAtom = computed(store.settings, (s) => s.chartType);
   const autoScaleAtom = computed(store.settings, (s) => s.autoScale);
@@ -638,6 +642,9 @@ export function createChartFocusAtoms(chartKey: string) {
     /** Show volume toggle computed store */
     showVolumeAtom,
 
+    /** Indicator output axis labels toggle computed store */
+    showIndicatorOutputAxisLabelsAtom,
+
     /** Volume height computed store */
     volumeHeightAtom,
 
@@ -657,6 +664,8 @@ export function createChartFocusAtoms(chartKey: string) {
     setInterval: (value: ResolutionString) => updateChartSetting(chartKey, 'interval', value),
     setSymbol: (value: string) => updateChartSetting(chartKey, 'symbol', value),
     setShowVolume: (value: boolean) => updateChartSetting(chartKey, 'showVolume', value),
+    setShowIndicatorOutputAxisLabels: (value: boolean) =>
+      updateChartSetting(chartKey, 'showIndicatorOutputAxisLabels', value),
     setVolumeHeight: (value: number) => updateChartSetting(chartKey, 'volumeHeight', value),
     setChartType: (value: 'candle' | 'line' | 'area') => updateChartSetting(chartKey, 'chartType', value),
     setAutoScale: (value: boolean) => updateChartSetting(chartKey, 'autoScale', value),

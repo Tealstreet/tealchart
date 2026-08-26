@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CHART_SETTINGS } from '../state/chartState';
 import {
   CHART_SETTINGS_CONTROLS,
+  SHOW_INDICATOR_OUTPUT_AXIS_LABELS_CONTROL_ID,
   SHOW_VOLUME_CONTROL_ID,
   createChartPropertyControl,
   getChartSettingsControlsForTab,
@@ -50,6 +51,15 @@ describe('chart settings controls', () => {
 
     expect(getSettings().showVolume).toBe(false);
     // Without this the change never autosaves.
+    expect(markLayoutDirty).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes indicator axis labels through the injected setter and marks the layout dirty', () => {
+    const { context, markLayoutDirty, getSettings } = createContext({ showIndicatorOutputAxisLabels: true });
+
+    getControl(SHOW_INDICATOR_OUTPUT_AXIS_LABELS_CONTROL_ID).write(context, false);
+
+    expect(getSettings().showIndicatorOutputAxisLabels).toBe(false);
     expect(markLayoutDirty).toHaveBeenCalledTimes(1);
   });
 
@@ -98,8 +108,7 @@ describe('chart settings controls', () => {
     expect(getChartSettingsControlsForTab('symbol').map((control) => control.id)).toContain(SHOW_VOLUME_CONTROL_ID);
     const tabs = getPopulatedChartSettingsTabs().map((tab) => tab.id);
     expect(tabs).toContain('symbol');
-    // No controls yet, so the tab should not be rendered as an empty panel.
-    expect(tabs).not.toContain('scales');
+    expect(tabs).toContain('scales');
   });
 
   it('gives every control a unique id', () => {

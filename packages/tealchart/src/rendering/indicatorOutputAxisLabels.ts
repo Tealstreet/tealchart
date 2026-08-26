@@ -20,6 +20,7 @@ export interface IndicatorOutputAxisLabelSource {
   value: number;
   color: string;
   precision?: number;
+  sourceX?: number;
 }
 
 export function getIndicatorPlotColor(color: PlotOutput['color'], sourceIndex: number, fallback = '#2196F3'): string {
@@ -71,6 +72,7 @@ export function getIndicatorOutputAxisLabelSources({
 }): IndicatorOutputAxisLabelSource[] {
   if (!plots || plots.length === 0) return [];
 
+  const mainPaneId = panes.find((pane) => pane.type === 'main')?.id ?? 'main';
   const paneByScriptId = new Map<string, string>();
   for (const pane of panes) {
     if (pane.type !== 'indicator') continue;
@@ -83,9 +85,7 @@ export function getIndicatorOutputAxisLabelSources({
   for (const plot of plots) {
     const scriptId = plot.scriptId ?? 'unknown';
     const info = indicatorPaneInfo?.[scriptId];
-    if (info?.overlay !== false) continue;
-
-    const paneId = info.paneId ?? paneByScriptId.get(scriptId);
+    const paneId = info?.overlay === false ? info.paneId ?? paneByScriptId.get(scriptId) : mainPaneId;
     if (!paneId) continue;
 
     const latest = getLatestIndicatorPlotValue(plot, totalBarCount);

@@ -194,6 +194,7 @@ function getEmptySettings(): ChartSettings {
     symbol: 'BTCUSDT',
     interval: '60' as any,
     showVolume: true,
+    showIndicatorOutputAxisLabels: true,
     volumeHeight: 0.2,
     chartType: 'candle',
     autoScale: true,
