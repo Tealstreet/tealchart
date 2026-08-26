@@ -21,7 +21,7 @@ import {
   getNativePriceAxisSingleLineTextBaselineOffset,
   getNativePriceLineMeasurementText,
 } from '../utils/priceAxisTagLayout';
-import { getNativePriceLineTagId } from '../utils/priceAxisTagSources';
+import { DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT, getNativePriceLineTagId } from '../utils/priceAxisTagSources';
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
 import { NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
@@ -89,7 +89,7 @@ export function AnimatedPriceLine({
     ? getNativeCountdownLayoutText(formatNativeCountdown(countdownTargetTimeMs))
     : staticSecondaryLabel;
   const hasSecondaryText = hasCountdown || Boolean(staticSecondaryLabel);
-  const tagHeight = hasSecondaryText ? 34 : PRICE_AXIS_TAG_HEIGHT;
+  const tagHeight = hasSecondaryText ? DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT : PRICE_AXIS_TAG_HEIGHT;
   const measurementLabel = getNativePriceLineMeasurementText(label, secondaryLayoutLabel, (value) =>
     measureNativeSkiaTextWidth(axisFont, value),
   );
