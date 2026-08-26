@@ -22,10 +22,10 @@ import { createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout'
 import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 
-export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 13;
-export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 30;
-const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = 3;
-const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
+export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 11;
+export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 28;
+const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = 2;
+const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP = 0;
 const NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH = [4, 4];
 
 export interface NativeIndicatorOutputAxisLabel {
