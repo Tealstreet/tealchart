@@ -185,12 +185,12 @@ export function NativeChartCanvasLayersImpl({
           />
 
           <NativeIndicatorOutputAxisLabelLayer
-            axisFont={axisFont}
             backgroundColor={backgroundColor}
             frame={frame}
             indicatorPaneInfo={indicatorPaneInfo}
             paneRangeOverrides={paneRangeOverrides}
             plots={indicatorPlots}
+            smallFont={smallFont}
             totalBarCount={indicatorTotalBarCount}
           />
 
