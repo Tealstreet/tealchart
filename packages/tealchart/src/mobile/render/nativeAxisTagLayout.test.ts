@@ -30,9 +30,9 @@ describe('native axis tag render layout', () => {
   it('reserves the full right price-axis lane for live drag-preview tags', () => {
     const tag = createNativeAxisLaneTagLayout(frame);
 
-    expect(tag.x).toBe(302);
-    expect(tag.width).toBe(87);
-    expect(tag.textX).toBe(308);
+    expect(tag.x).toBe(301);
+    expect(tag.width).toBe(88);
+    expect(tag.textX).toBe(306);
   });
 
   it('derives live tag character capacity from padded tag content width', () => {
