@@ -46,6 +46,7 @@ describe('native indicator output axis labels', () => {
     });
 
     const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }, { time: 60_000 }] as never,
       frame,
       indicatorPaneInfo: {
         macd: { overlay: false, paneId: 'pane_1' },
@@ -81,6 +82,43 @@ describe('native indicator output axis labels', () => {
     ]);
   });
 
+  it('projects source x from the full bar series when the latest source is offscreen', () => {
+    const frame = createNativeChartFrameFromPanes({
+      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      panes: [
+        { id: 'main', type: 'main', top: 24, height: 200, yMin: 63_000, yMax: 64_000 },
+        { id: 'pane_1', type: 'indicator', top: 224, height: 104, yMin: -100, yMax: 100 },
+      ],
+    });
+
+    const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }, { time: 60_000 }, { time: 120_000 }] as never,
+      frame,
+      indicatorPaneInfo: {
+        macd: { overlay: false, paneId: 'pane_1' },
+      },
+      plots: [
+        plot({
+          id: 'signal',
+          scriptId: 'macd',
+          values: [null, 20, 24.234],
+          color: '#ff9900',
+          precision: 1,
+        }),
+      ],
+      staticProjection: { timeToX: (time: number) => time / 1_000 } as never,
+      totalBarCount: 3,
+      visibleBars: [],
+    });
+
+    expect(labels).toEqual([
+      expect.objectContaining({
+        id: 'pane_1:indicator-output:macd:signal',
+        sourceX: 120,
+      }),
+    ]);
+  });
+
   it('uses live indicator pane range overrides for label placement', () => {
     const frame = createNativeChartFrameFromPanes({
       dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
@@ -91,6 +129,7 @@ describe('native indicator output axis labels', () => {
     });
 
     const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }, { time: 60_000 }] as never,
       frame,
       indicatorPaneInfo: {
         macd: { overlay: false, paneId: 'pane_1' },
@@ -130,6 +169,7 @@ describe('native indicator output axis labels', () => {
     });
 
     const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }] as never,
       frame,
       indicatorPaneInfo: {
         macd: { overlay: false, paneId: 'pane_1' },

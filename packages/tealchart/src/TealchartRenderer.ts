@@ -4441,8 +4441,11 @@ export class TealchartRenderer {
   private drawIndicatorOutputAxisGuide(pane: ComputedPane, label: ValueAxisLabelRenderData): void {
     const { ctx, margins } = this;
     const endX = label.labelX;
-    const rawStartX = label.sourceX ?? margins.left;
-    const startX = Math.max(margins.left, Math.min(rawStartX, endX));
+    const sourceX = Number.isFinite(label.sourceX ?? NaN) ? label.sourceX! : undefined;
+    if (sourceX == null) return;
+    if (sourceX >= endX) return;
+
+    const startX = Math.max(margins.left, sourceX);
     if (endX <= startX) return;
 
     const y = Math.round(label.valueY) + 0.5;
