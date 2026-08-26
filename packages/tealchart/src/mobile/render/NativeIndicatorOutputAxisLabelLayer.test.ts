@@ -1,6 +1,12 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('react-native', () => ({
+  Platform: { OS: 'ios' },
+}));
+
+vi.mock('@shopify/react-native-skia', async () => await import('../../test/reactNativeSkiaMock'));
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import {
@@ -62,8 +68,8 @@ describe('native indicator output axis labels', () => {
     expect(groups).toEqual([
       expect.objectContaining({
         paneId: 'pane_1',
-        x: frame.priceAxisLeft + 2,
-        width: 36,
+        x: frame.priceAxisLeft + 1,
+        width: 34,
       }),
     ]);
   });

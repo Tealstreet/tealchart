@@ -108,7 +108,7 @@ describe('native crosshair context menu geometry', () => {
 
     expect(label.x).toBeLessThan(frame.priceAxisLeft);
     expect(label.x + label.width).toBe(right);
-    expect(label.textX + Math.ceil('63,777.000000'.length * 6.8)).toBe(right - 6);
+    expect(label.textX + Math.ceil('63,777.000000'.length * 6.8)).toBe(right - 5);
     expect(button.centerX).toBe(label.x - 11);
   });
 
