@@ -12,6 +12,7 @@ import {
   createNativeCenteredAxisTextX,
   getNativeAxisTextCharacterCapacity,
 } from '../utils/axisTickLayout';
+import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
 import { getNativePriceGridSlot, getNativePriceGridSlotCount } from './nativeGridSlots';
 import { formatNativePriceAxisTickWithPrecisionWorklet } from './nativePriceFormat';
@@ -225,9 +226,9 @@ export function NativePriceGridLayer({
   if (!showAxisLabels && !showGridLines) return null;
 
   const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
-  const labelLeft = frame.priceAxisLeft + 4;
-  const labelRight = frame.priceAxisRight - 4;
-  const labelMaxWidth = Math.max(0, labelRight - labelLeft);
+  const priceAxisLane = createNativePriceAxisLane(frame);
+  const labelLeft = priceAxisLane.left;
+  const labelMaxWidth = priceAxisLane.width;
   const maxCharacters = getNativeAxisTextCharacterCapacity(labelMaxWidth, characterWidth);
   const slotCount = getNativePriceGridSlotCount(frame.mainPane.height);
   const staticSlots = useMemo(

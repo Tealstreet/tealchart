@@ -9,6 +9,7 @@ import { Glyphs, Path as SkiaPath, Skia as SkiaApi } from '@shopify/react-native
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeLeftAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
+import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
 import {
   getNativePriceGridSlot,
@@ -128,9 +129,9 @@ export function NativeIndicatorPaneAxisLayerImpl({
   if (!showAxisLabels && !showGridLines) return null;
 
   const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
-  const labelLeft = frame.priceAxisLeft + 4;
-  const labelRight = frame.priceAxisRight - 4;
-  const labelMaxWidth = Math.max(0, labelRight - labelLeft);
+  const priceAxisLane = createNativePriceAxisLane(frame);
+  const labelLeft = priceAxisLane.left;
+  const labelMaxWidth = priceAxisLane.width;
   const maxCharacters = getNativeAxisTextCharacterCapacity(labelMaxWidth, characterWidth);
   const indicatorPanes = frame.panes.filter((pane) => pane.type === 'indicator');
   // getNativePriceGridSlotCount is not a worklet, so the bound is counted here

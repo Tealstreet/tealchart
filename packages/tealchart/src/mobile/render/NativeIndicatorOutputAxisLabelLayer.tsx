@@ -1,6 +1,8 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
+import type { SharedValue } from 'react-native-reanimated';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
+import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 
 import { memo, useMemo } from 'react';
 
@@ -10,11 +12,18 @@ import {
   formatIndicatorOutputAxisValue,
   getIndicatorOutputAxisLabelSources,
 } from '../../rendering/indicatorOutputAxisLabels';
+import {
+  createNativePriceAxisLane,
+  NATIVE_PRICE_AXIS_TAG_MIN_WIDTH,
+  NATIVE_PRICE_AXIS_TAG_PADDING_X,
+} from '../utils/nativePriceAxisLane';
+import { nativePaneValueToYWithRange, resolveNativePaneRange } from './nativePaneRangeOverride';
 import { getNativePriceAxisSingleLineTextBaselineOffset } from '../utils/priceAxisTagLayout';
-import { createNativeAxisTagLayout, createNativeAxisTagTextLayout, PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
+import { createNativeAxisTagTextLayout, PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
+import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 
-interface NativeIndicatorOutputAxisLabel {
+export interface NativeIndicatorOutputAxisLabel {
   id: string;
   pane: NativePaneFrame;
   value: number;
@@ -23,11 +32,19 @@ interface NativeIndicatorOutputAxisLabel {
   y: number;
 }
 
+export interface NativeIndicatorOutputAxisLabelGroup {
+  paneId: string;
+  labels: NativeIndicatorOutputAxisLabel[];
+  x: number;
+  width: number;
+}
+
 export function NativeIndicatorOutputAxisLabelLayerImpl({
   axisFont,
   backgroundColor,
   frame,
   indicatorPaneInfo,
+  paneRangeOverrides,
   plots,
   totalBarCount,
 }: {
@@ -35,59 +52,103 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   backgroundColor: string;
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
   totalBarCount: number;
 }) {
   const labels = useMemo(
-    () => resolveNativeIndicatorOutputAxisLabels({ frame, indicatorPaneInfo, plots, totalBarCount }),
-    [frame, indicatorPaneInfo, plots, totalBarCount],
+    () =>
+      resolveNativeIndicatorOutputAxisLabels({
+        frame,
+        indicatorPaneInfo,
+        paneRangeOverrides: paneRangeOverrides?.value,
+        plots,
+        totalBarCount,
+      }),
+    [frame, indicatorPaneInfo, paneRangeOverrides, plots, totalBarCount],
   );
   if (labels.length === 0) return null;
 
-  const longestText = labels.reduce(
-    (longest, label) => (label.text.length > longest.length ? label.text : longest),
-    '',
-  );
-  const tagLayout = createNativeAxisTagLayout(frame, axisFont, longestText);
+  const labelGroups = resolveNativeIndicatorOutputAxisLabelGroups({ axisFont, frame, labels });
   const baselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(PRICE_AXIS_TAG_HEIGHT);
 
   return (
     <Group>
-      {labels.map((label) => {
-        const textLayout = createNativeAxisTagTextLayout(tagLayout.x, tagLayout.width, axisFont, label.text);
-        const tagY = label.y - PRICE_AXIS_TAG_HEIGHT / 2;
-        return (
-          <Group key={label.id}>
-            <NativePriceAxisTagBox
-              x={tagLayout.x}
-              y={tagY}
-              width={tagLayout.width}
-              height={PRICE_AXIS_TAG_HEIGHT}
-              backgroundColor={backgroundColor}
-              borderColor={label.color}
-            />
-            <NativePriceAxisTagStaticText
-              x={textLayout.x}
-              y={tagY + baselineOffset}
-              text={textLayout.text}
-              font={axisFont}
-              color={label.color}
-            />
-          </Group>
-        );
-      })}
+      {labelGroups.flatMap((group) =>
+        group.labels.map((label) => {
+          const textLayout = createNativeAxisTagTextLayout(group.x, group.width, axisFont, label.text);
+          const tagY = label.y - PRICE_AXIS_TAG_HEIGHT / 2;
+          return (
+            <Group key={label.id}>
+              <NativePriceAxisTagBox
+                x={group.x}
+                y={tagY}
+                width={group.width}
+                height={PRICE_AXIS_TAG_HEIGHT}
+                backgroundColor={backgroundColor}
+                borderColor={label.color}
+              />
+              <NativePriceAxisTagStaticText
+                x={textLayout.x}
+                y={tagY + baselineOffset}
+                text={textLayout.text}
+                font={axisFont}
+                color={label.color}
+              />
+            </Group>
+          );
+        }),
+      )}
     </Group>
   );
 }
 
-function resolveNativeIndicatorOutputAxisLabels({
+export function resolveNativeIndicatorOutputAxisLabelGroups({
+  axisFont,
+  frame,
+  labels,
+}: {
+  axisFont: ReturnType<typeof Skia.Font>;
+  frame: NativeChartFrame;
+  labels: readonly NativeIndicatorOutputAxisLabel[];
+}): NativeIndicatorOutputAxisLabelGroup[] {
+  const lane = createNativePriceAxisLane(frame);
+  const labelsByPane = new Map<string, NativeIndicatorOutputAxisLabel[]>();
+  for (const label of labels) {
+    const paneLabels = labelsByPane.get(label.pane.id) ?? [];
+    paneLabels.push(label);
+    labelsByPane.set(label.pane.id, paneLabels);
+  }
+
+  return Array.from(labelsByPane.entries(), ([paneId, paneLabels]) => {
+    const textWidth = paneLabels.reduce(
+      (maxWidth, label) => Math.max(maxWidth, measureNativeSkiaTextWidth(axisFont, label.text)),
+      0,
+    );
+    const width = Math.min(
+      lane.width,
+      Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, Math.ceil(textWidth + NATIVE_PRICE_AXIS_TAG_PADDING_X * 2)),
+    );
+
+    return {
+      paneId,
+      labels: paneLabels,
+      x: lane.left,
+      width,
+    };
+  });
+}
+
+export function resolveNativeIndicatorOutputAxisLabels({
   frame,
   indicatorPaneInfo,
+  paneRangeOverrides,
   plots,
   totalBarCount,
 }: {
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
+  paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
   totalBarCount: number;
 }): NativeIndicatorOutputAxisLabel[] {
@@ -102,9 +163,12 @@ function resolveNativeIndicatorOutputAxisLabels({
 
   for (const rawLabel of rawLabels) {
     const pane = paneById.get(rawLabel.paneId);
-    if (!pane || pane.height <= 0 || rawLabel.value < pane.yMin || rawLabel.value > pane.yMax) continue;
+    if (!pane || pane.height <= 0) continue;
 
-    const range = pane.yMax - pane.yMin;
+    const paneRange = resolveNativePaneRange(pane, paneRangeOverrides);
+    if (rawLabel.value < paneRange.yMin || rawLabel.value > paneRange.yMax) continue;
+
+    const range = paneRange.yMax - paneRange.yMin;
     if (range <= 0) continue;
 
     labels.push({
@@ -113,7 +177,7 @@ function resolveNativeIndicatorOutputAxisLabels({
       value: rawLabel.value,
       text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision),
       color: rawLabel.color,
-      y: pane.top + ((pane.yMax - rawLabel.value) / range) * pane.height,
+      y: nativePaneValueToYWithRange(rawLabel.value, pane, paneRange),
     });
   }
 
