@@ -3726,6 +3726,68 @@ describe('value axis label layout', () => {
     expect(outputLabels.every((label) => label.backgroundColor === '#111418')).toBe(true);
     expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
     expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
+    expect(outputLabels.every((label) => Number.isFinite(label.valueY))).toBe(true);
     expect(labels.some((label) => label.kind === 'tick' && label.textAlign === 'left')).toBe(true);
+  });
+
+  it('keeps indicator output guide positions pinned to source values after de-overlap', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 260, width: 640 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.25,
+            yMin: -50,
+            yMax: 50,
+            fixedRange: true,
+            indicatorIds: ['macd'],
+          },
+        ],
+      },
+      260,
+    );
+    const frame = {
+      bars: makeBars(1),
+      computedPanes,
+      indicatorPaneInfo: { macd: { overlay: false } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
+      plots: [
+        {
+          id: 'histogram',
+          title: 'Histogram',
+          type: 'plot',
+          scriptId: 'macd',
+          values: [2],
+          color: '#ff003d',
+          precision: 0,
+        },
+        {
+          id: 'macd-line',
+          title: 'MACD',
+          type: 'plot',
+          scriptId: 'macd',
+          values: [1],
+          color: '#2196F3',
+          precision: 0,
+        },
+      ],
+    } as any;
+
+    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
+    const outputLabels = labels.filter((label) => label.kind === 'indicator-output');
+
+    expect(outputLabels).toHaveLength(2);
+    expect(outputLabels.some((label) => label.valueY !== label.y)).toBe(true);
+    expect(outputLabels.map((label) => label.valueY).sort((a, b) => a - b)).not.toEqual(
+      outputLabels.map((label) => label.y).sort((a, b) => a - b),
+    );
   });
 });

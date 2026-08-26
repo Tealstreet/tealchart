@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('react-native', () => ({
   Platform: { OS: 'ios' },
+  View: 'View',
 }));
 
 vi.mock('@shopify/react-native-skia', async () => await import('../../test/reactNativeSkiaMock'));
@@ -106,6 +107,7 @@ describe('native indicator output axis labels', () => {
     expect(labels).toEqual([
       expect.objectContaining({
         text: '25.0',
+        valueY: 274,
         y: 274,
       }),
     ]);
@@ -134,9 +136,12 @@ describe('native indicator output axis labels', () => {
     });
 
     const halfHeight = NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;
+    expect(labels.some((label) => label.valueY !== label.y)).toBe(true);
     for (const label of labels) {
       expect(label.y - halfHeight).toBeGreaterThanOrEqual(224);
       expect(label.y + halfHeight).toBeLessThanOrEqual(256);
+      expect(label.valueY).toBeGreaterThanOrEqual(224);
+      expect(label.valueY).toBeLessThanOrEqual(256);
     }
   });
 });
