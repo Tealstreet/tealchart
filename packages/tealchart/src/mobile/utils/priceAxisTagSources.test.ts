@@ -5,6 +5,7 @@ import type { OrderLineRenderData, PositionLineRenderData, PriceLine } from '../
 import {
   createNativePriceAxisTagSources,
   DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT,
+  DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT,
   getNativeBracketDragTagId,
   getNativePriceLineTagHeight,
   getNativePriceLineTagId,
@@ -36,8 +37,12 @@ describe('native price axis tag sources', () => {
 
   it('uses taller tags for price lines with secondary labels', () => {
     expect(getNativePriceLineTagHeight(priceLine({ label: { primaryText: '100' } }))).toBe(DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT);
-    expect(getNativePriceLineTagHeight(priceLine({ label: { primaryText: '100', secondaryText: '09:59' } }))).toBe(34);
-    expect(getNativePriceLineTagHeight(priceLine({ countdownToTime: 1_000, label: { primaryText: '100' } }))).toBe(34);
+    expect(getNativePriceLineTagHeight(priceLine({ label: { primaryText: '100', secondaryText: '09:59' } }))).toBe(
+      DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT,
+    );
+    expect(getNativePriceLineTagHeight(priceLine({ countdownToTime: 1_000, label: { primaryText: '100' } }))).toBe(
+      DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT,
+    );
   });
 
   it('creates price, order, and position sources with stable object identity', () => {
@@ -87,7 +92,7 @@ describe('native price axis tag sources', () => {
         tagId: 'priceLine:last',
         objectId: 'last',
         price: 103,
-        height: 34,
+        height: DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT,
         priority: 100,
         fixed: true,
       },

@@ -11,7 +11,7 @@ import {
 import { createNativePriceAxisTagLayout, createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout';
 import { fitNativeSkiaTextToWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
 
-export const PRICE_AXIS_TAG_HEIGHT = 22;
+export const PRICE_AXIS_TAG_HEIGHT = 18;
 
 export function formatNativeCountdown(targetTimeMs: number, nowMs: number = Date.now()): string {
   const remaining = Math.max(0, targetTimeMs - nowMs);

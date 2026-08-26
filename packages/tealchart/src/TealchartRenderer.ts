@@ -206,8 +206,8 @@ export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
 type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
 const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
-const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 22;
-const INDICATOR_OUTPUT_AXIS_TAG_GAP = 2;
+const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 16;
+const INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
 const INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 46;
 
 // Cached number formatters by decimal places
@@ -1046,7 +1046,7 @@ export class TealchartRenderer {
     let chartLabelWidth = 0;
     const lineStartX = getTradingLineMinX(margins, options.chartLabelMinX);
     let chartLabelX = lineStartX;
-    const labelHeight = 18;
+    const labelHeight = 16;
 
     if (chartLabel && chartLabel.segments.length > 0) {
       ctx.font = `11px ${this.font}`;
@@ -1280,7 +1280,7 @@ export class TealchartRenderer {
     const textWidth = text ? ctx.measureText(text).width + 8 : 0;
     const quantityWidth = quantity ? ctx.measureText(quantity).width + 8 : 0;
     const cancelButtonWidth = line.cancellable ? 18 : 0;
-    const labelHeight = 18;
+    const labelHeight = 16;
     const totalLabelWidth = textWidth + quantityWidth + cancelButtonWidth + 4; // gaps
 
     // Label position based on lineLength percentage
@@ -1441,7 +1441,7 @@ export class TealchartRenderer {
     const quantityWidth = quantity ? ctx.measureText(quantity).width + 14 : 0;
     const reverseButtonWidth = line.reversible ? 18 : 0; // ↩ button (only if callback provided)
     const closeButtonWidth = line.closeable ? 18 : 0; // X button (only if callback provided)
-    const labelHeight = 18;
+    const labelHeight = 16;
     const totalLabelWidth = textWidth + pnlWidth + quantityWidth + reverseButtonWidth + closeButtonWidth + 8; // gaps
 
     // Label position based on lineLength percentage
@@ -4415,6 +4415,7 @@ export class TealchartRenderer {
       if (label.kind === 'indicator-output') {
         const height = label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
         const tagY = label.y - height / 2;
+        this.drawIndicatorOutputAxisGuide(pane, label);
         ctx.beginPath();
         ctx.fillStyle = label.backgroundColor ?? options.backgroundColor;
         ctx.roundRect(label.labelX, tagY, label.labelWidth, height, 2);
@@ -4429,6 +4430,30 @@ export class TealchartRenderer {
       ctx.textAlign = label.textAlign;
       ctx.fillText(label.text, label.x, label.y);
     }
+  }
+
+  private drawIndicatorOutputAxisGuide(pane: ComputedPane, label: ValueAxisLabelRenderData): void {
+    const { ctx, margins } = this;
+    const startX = margins.left;
+    const endX = label.labelX;
+    if (endX <= startX) return;
+
+    const y = Math.round(label.y) + 0.5;
+    if (y < pane.top || y > pane.bottom) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(startX, pane.top, endX - startX, pane.height);
+    ctx.clip();
+    ctx.globalAlpha = 0.65;
+    ctx.strokeStyle = label.borderColor ?? label.color;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(startX, y);
+    ctx.lineTo(endX, y);
+    ctx.stroke();
+    ctx.restore();
   }
 
   computeYAxisLabelsForPreparedFrame(
@@ -4554,8 +4579,8 @@ export class TealchartRenderer {
         ? this.measureIndicatorOutputYAxisLabels(pane, indicatorOutputLabels, visibleTop, textFont)
         : [];
     const outputAvoidanceRanges = outputLabels.map((label) => ({
-      bottom: label.y + (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 + 6,
-      top: label.y - (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 - 6,
+      bottom: label.y + (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 + 3,
+      top: label.y - (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 - 3,
     }));
 
     for (const value of gridLines) {
@@ -5197,7 +5222,7 @@ export class TealchartRenderer {
       const width = Math.max(primaryWidth, secondaryWidth) + 12;
       // Height includes text + padding + border + extra margin for collision
       // Must match or exceed actual rendered height to prevent visual overlap
-      const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
+      const baseHeight = line.type === 'price' || !line.type ? 18 : 16;
       const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
 
       return {
@@ -5439,7 +5464,7 @@ export class TealchartRenderer {
     let chartLabelWidth = 0;
     const lineStartX = getTradingLineMinX(margins, options.chartLabelMinX);
     let chartLabelX = lineStartX;
-    const labelHeight = 18;
+    const labelHeight = 16;
 
     if (chartLabel && chartLabel.segments.length > 0) {
       ctx.font = `11px ${this.font}`;
