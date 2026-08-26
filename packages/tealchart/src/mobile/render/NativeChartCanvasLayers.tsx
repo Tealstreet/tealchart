@@ -24,6 +24,7 @@ import { NativeChartChromeLayer } from './NativeChartChromeLayer';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
 import { NativeChartTradeLinesLayer } from './NativeChartTradeLinesLayer';
 import { NativeCrosshairLayer } from './NativeCrosshairLayer';
+import { NativeIndicatorOutputAxisLabelLayer } from './NativeIndicatorOutputAxisLabelLayer';
 import { NativeIndicatorPaneAxisLayer } from './NativeIndicatorPaneAxisLayer';
 import { NativeIndicatorPlotLayer } from './NativeIndicatorPlotLayer';
 import { NativeUserDrawingLayer } from './NativeUserDrawingLayer';
@@ -181,6 +182,15 @@ export function NativeChartCanvasLayersImpl({
             showAxisLabels={true}
             showGridLines={false}
             textColor={textColor}
+          />
+
+          <NativeIndicatorOutputAxisLabelLayer
+            axisFont={axisFont}
+            backgroundColor={backgroundColor}
+            frame={frame}
+            indicatorPaneInfo={indicatorPaneInfo}
+            plots={indicatorPlots}
+            totalBarCount={indicatorTotalBarCount}
           />
 
           <NativeUserDrawingLayer
