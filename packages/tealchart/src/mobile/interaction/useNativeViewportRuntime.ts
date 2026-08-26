@@ -198,6 +198,18 @@ export function shouldSyncNativeCandidateViewport({
   return !currentCandidateViewport || !nativeViewportsMatch(currentCandidateViewport, viewport);
 }
 
+export function resolveNativeSharedViewportSyncTarget({
+  hasManualViewport,
+  projectionViewport,
+  viewport,
+}: {
+  hasManualViewport: boolean;
+  projectionViewport: Viewport;
+  viewport: Viewport;
+}): Viewport {
+  return hasManualViewport ? viewport : projectionViewport;
+}
+
 export function useNativeViewportRuntime({
   autoScaleEnabled,
   bars,
@@ -520,11 +532,16 @@ export function useNativeViewportRuntime({
       panActive.value || pinchActive.value || priceScaleActive.value || timeScaleActive.value;
     if (viewportOwnershipRef.current.nativeViewportOwned || nativeInteractionActive) return;
 
+    const syncTargetViewport = resolveNativeSharedViewportSyncTarget({
+      hasManualViewport: viewportOwnershipRef.current.hasManualViewport,
+      projectionViewport,
+      viewport,
+    });
     const pendingTarget = pendingSharedViewportSyncTargetRef.current;
-    if (pendingTarget && nativeViewportsMatch(pendingTarget, projectionViewport)) return;
-    if (nativeViewportsMatch(getNativeSharedViewport(sharedViewport), projectionViewport)) return;
+    if (pendingTarget && nativeViewportsMatch(pendingTarget, syncTargetViewport)) return;
+    if (nativeViewportsMatch(getNativeSharedViewport(sharedViewport), syncTargetViewport)) return;
 
-    requestNativeRenderViewportSync(projectionViewport);
+    requestNativeRenderViewportSync(syncTargetViewport);
   }, [
     hasDataViewport,
     panActive,
@@ -535,6 +552,7 @@ export function useNativeViewportRuntime({
     requestNativeRenderViewportSync,
     sharedViewport,
     timeScaleActive,
+    viewport,
   ]);
 
   const commitPanViewport = useCallback(
