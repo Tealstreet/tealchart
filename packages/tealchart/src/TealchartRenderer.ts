@@ -139,6 +139,7 @@ export interface ValueAxisLabelRenderData {
   borderColor?: string;
   height?: number;
   textAlign: 'center' | 'left' | 'right';
+  valueY: number;
   y: number;
   color: string;
   fontSize: number;
@@ -154,6 +155,7 @@ interface MeasuredValueAxisLabel {
   backgroundColor?: string;
   borderColor?: string;
   height?: number;
+  valueY: number;
   y: number;
   color: string;
   fontSize: number;
@@ -4438,7 +4440,7 @@ export class TealchartRenderer {
     const endX = label.labelX;
     if (endX <= startX) return;
 
-    const y = Math.round(label.y) + 0.5;
+    const y = Math.round(label.valueY) + 0.5;
     if (y < pane.top || y > pane.bottom) return;
 
     ctx.save();
@@ -4609,6 +4611,7 @@ export class TealchartRenderer {
         text,
         textWidth: getCachedTextWidth(this.ctx, text, textFont),
         kind: 'tick',
+        valueY: y,
         y,
         color: options.textColor,
         fontSize: 11,
@@ -4647,6 +4650,7 @@ export class TealchartRenderer {
         kind: 'indicator-output',
         backgroundColor: this.options.backgroundColor,
         borderColor: output.color,
+        valueY: y,
         y,
         color: output.color,
         fontSize: 11,
@@ -4740,6 +4744,7 @@ export class TealchartRenderer {
         borderColor: label.borderColor,
         height: label.height,
         textAlign,
+        valueY: label.valueY,
         y: label.y,
         color: label.color,
         fontSize: label.fontSize,

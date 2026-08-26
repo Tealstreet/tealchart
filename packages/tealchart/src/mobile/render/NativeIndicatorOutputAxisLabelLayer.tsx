@@ -7,6 +7,7 @@ import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import { memo, useMemo } from 'react';
 
 import { DashPathEffect, Group, Line as SkiaLine, Skia } from '@shopify/react-native-skia';
+import { useDerivedValue } from 'react-native-reanimated';
 
 import {
   formatIndicatorOutputAxisValue,
@@ -33,6 +34,7 @@ export interface NativeIndicatorOutputAxisLabel {
   value: number;
   text: string;
   color: string;
+  valueY: number;
   y: number;
 }
 
@@ -86,46 +88,82 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
           width: frame.priceAxisRight - frame.contentLeft,
           height: Math.max(0, group.pane.height - 2),
         };
-        return group.labels.map((label) => {
-          const textLayout = createNativePriceAxisTagTextLayout(
-            group.x,
-            group.width,
-            label.text,
-            (value) => measureNativeSkiaTextWidth(smallFont, value),
-            NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X,
-          );
-          const tagY = label.y - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;
-          const guideY = Math.round(label.y) + 0.5;
-          return (
-            <Group key={label.id} clip={clip}>
-              <SkiaLine
-                p1={{ x: frame.contentLeft, y: guideY }}
-                p2={{ x: group.x, y: guideY }}
-                color={label.color}
-                strokeWidth={1}
-                opacity={0.65}
-              >
-                <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
-              </SkiaLine>
-              <NativePriceAxisTagBox
-                x={group.x}
-                y={tagY}
-                width={group.width}
-                height={NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT}
-                backgroundColor={backgroundColor}
-                borderColor={label.color}
-              />
-              <NativePriceAxisTagStaticText
-                x={textLayout.x}
-                y={tagY + baselineOffset}
-                text={textLayout.text}
-                font={smallFont}
-                color={label.color}
-              />
-            </Group>
-          );
-        });
+        return group.labels.map((label) => (
+          <NativeIndicatorOutputAxisTag
+            key={label.id}
+            backgroundColor={backgroundColor}
+            baselineOffset={baselineOffset}
+            clip={clip}
+            frame={frame}
+            group={group}
+            label={label}
+            paneRangeOverrides={paneRangeOverrides}
+            smallFont={smallFont}
+          />
+        ));
       })}
+    </Group>
+  );
+}
+
+function NativeIndicatorOutputAxisTag({
+  backgroundColor,
+  baselineOffset,
+  clip,
+  frame,
+  group,
+  label,
+  paneRangeOverrides,
+  smallFont,
+}: {
+  backgroundColor: string;
+  baselineOffset: number;
+  clip: { x: number; y: number; width: number; height: number };
+  frame: NativeChartFrame;
+  group: NativeIndicatorOutputAxisLabelGroup;
+  label: NativeIndicatorOutputAxisLabel;
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
+  smallFont: ReturnType<typeof Skia.Font>;
+}) {
+  const textLayout = createNativePriceAxisTagTextLayout(
+    group.x,
+    group.width,
+    label.text,
+    (value) => measureNativeSkiaTextWidth(smallFont, value),
+    NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X,
+  );
+  const labelOffsetFromValueY = label.y - label.valueY;
+  const valueY = useDerivedValue(() => {
+    const range = resolveNativePaneRange(label.pane, paneRangeOverrides?.value);
+    return nativePaneValueToYWithRange(label.value, label.pane, range);
+  });
+  const labelCenterY = useDerivedValue(() => valueY.value + labelOffsetFromValueY);
+  const tagY = useDerivedValue(() => labelCenterY.value - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2);
+  const textY = useDerivedValue(() => tagY.value + baselineOffset);
+  const guideY = useDerivedValue(() => Math.round(valueY.value) + 0.5);
+  const guideStart = useDerivedValue(() => ({ x: frame.contentLeft, y: guideY.value }));
+  const guideEnd = useDerivedValue(() => ({ x: group.x, y: guideY.value }));
+
+  return (
+    <Group clip={clip}>
+      <SkiaLine p1={guideStart} p2={guideEnd} color={label.color} strokeWidth={1} opacity={0.65}>
+        <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
+      </SkiaLine>
+      <NativePriceAxisTagBox
+        x={group.x}
+        y={tagY}
+        width={group.width}
+        height={NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT}
+        backgroundColor={backgroundColor}
+        borderColor={label.color}
+      />
+      <NativePriceAxisTagStaticText
+        x={textLayout.x}
+        y={textY}
+        text={textLayout.text}
+        font={smallFont}
+        color={label.color}
+      />
     </Group>
   );
 }
@@ -202,13 +240,15 @@ export function resolveNativeIndicatorOutputAxisLabels({
     const range = paneRange.yMax - paneRange.yMin;
     if (range <= 0) continue;
 
+    const y = nativePaneValueToYWithRange(rawLabel.value, pane, paneRange);
     labels.push({
       id: rawLabel.id,
       pane,
       value: rawLabel.value,
       text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision),
       color: rawLabel.color,
-      y: nativePaneValueToYWithRange(rawLabel.value, pane, paneRange),
+      valueY: y,
+      y,
     });
   }
 
