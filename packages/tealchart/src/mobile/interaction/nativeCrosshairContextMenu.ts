@@ -82,38 +82,6 @@ export function isNativeCrosshairOverMainPane(frame: NativeChartFrame, crosshair
   return pane !== null && pane.type === 'main';
 }
 
-export function resolveNativeCrosshairPriceLabelText(
-  frame: NativeChartFrame,
-  sharedViewport: NativeViewportSharedValues,
-  crosshairY: number,
-  pricePrecision: number,
-  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>,
-): string {
-  'worklet';
-  const pane = getNativePaneAtY(frame, crosshairY);
-  if (pane !== null && pane.type === 'indicator') {
-    // An indicator pane's scale is not a price - RSI runs 0-100, MACD is
-    // unitless - so the label reads the way that pane's own axis ticks read,
-    // off the same live range the plot is drawn against.
-    const paneRange = resolveNativePaneRange(pane, paneRangeOverrides?.value);
-    const span = paneRange.yMax - paneRange.yMin;
-    const value =
-      pane.height === 0 || span === 0
-        ? paneRange.yMin
-        : paneRange.yMax - ((crosshairY - pane.top) / pane.height) * span;
-    const slot = getNativePriceGridSlot({
-      index: 0,
-      priceMin: paneRange.yMin,
-      priceMax: paneRange.yMax,
-      priceHeight: pane.height,
-      minLabelSpacing: NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING,
-    });
-    return formatNativeIndicatorAxisTickWorklet(value, slot.spacing);
-  }
-  const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshairY, pricePrecision);
-  return formatNativeTradeLinePriceWorklet(price, pricePrecision);
-}
-
 export function nativeCrosshairYToPrice(
   y: number,
   sharedViewport: NativeViewportSharedValues,
@@ -146,6 +114,38 @@ export function resolveNativeCrosshairSnappedPrice(
 ): number {
   'worklet';
   return snapPriceToTick(nativeCrosshairYToPrice(crosshairY, sharedViewport, frame), pricePrecision);
+}
+
+export function resolveNativeCrosshairPriceLabelText(
+  frame: NativeChartFrame,
+  sharedViewport: NativeViewportSharedValues,
+  crosshairY: number,
+  pricePrecision: number,
+  paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>,
+): string {
+  'worklet';
+  const pane = getNativePaneAtY(frame, crosshairY);
+  if (pane !== null && pane.type === 'indicator') {
+    // An indicator pane's scale is not a price - RSI runs 0-100, MACD is
+    // unitless - so the label reads the way that pane's own axis ticks read,
+    // off the same live range the plot is drawn against.
+    const paneRange = resolveNativePaneRange(pane, paneRangeOverrides?.value);
+    const span = paneRange.yMax - paneRange.yMin;
+    const value =
+      pane.height === 0 || span === 0
+        ? paneRange.yMin
+        : paneRange.yMax - ((crosshairY - pane.top) / pane.height) * span;
+    const slot = getNativePriceGridSlot({
+      index: 0,
+      priceMin: paneRange.yMin,
+      priceMax: paneRange.yMax,
+      priceHeight: pane.height,
+      minLabelSpacing: NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING,
+    });
+    return formatNativeIndicatorAxisTickWorklet(value, slot.spacing);
+  }
+  const price = resolveNativeCrosshairSnappedPrice(frame, sharedViewport, crosshairY, pricePrecision);
+  return formatNativeTradeLinePriceWorklet(price, pricePrecision);
 }
 
 export function resolveNativeCrosshairSnappedY(
