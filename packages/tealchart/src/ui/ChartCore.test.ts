@@ -6,7 +6,7 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from '../drawings';
-import type { Bar, PositionLineRenderData, PriceLineLabelBounds, Viewport } from '../types';
+import type { Bar, OrderLineRenderData, PositionLineRenderData, PriceLineLabelBounds, Viewport } from '../types';
 
 import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -165,6 +165,44 @@ function makePositionLine(overrides: Partial<PositionLineRenderData> = {}): Posi
       isLong: true,
       notional: 1000,
     },
+    callbacks: {},
+    ...overrides,
+  };
+}
+
+function makeOrderLine(overrides: Partial<OrderLineRenderData> = {}): OrderLineRenderData {
+  return {
+    id: 'order-1',
+    price: 50010,
+    lineColor: '#2196F3',
+    lineStyle: 2,
+    lineLength: 100,
+    lineLengthUnit: 'percentage',
+    extendLeft: true,
+    lineWidth: 1,
+    editable: true,
+    cancellable: true,
+    cancelAsSubmit: false,
+    partialEnabled: false,
+    brackets: null,
+    text: 'Limit',
+    textShort: 'Lmt',
+    quantity: '1',
+    quantityShort: '1',
+    bodyBackgroundColor: '#111111',
+    bodyTextColor: '#ffffff',
+    bodyBorderColor: '#2196F3',
+    bodyFont: '',
+    quantityBackgroundColor: '#111111',
+    quantityTextColor: '#ffffff',
+    quantityBorderColor: '#2196F3',
+    quantityFont: '',
+    cancelButtonBackgroundColor: '#111111',
+    cancelButtonIconColor: '#ffffff',
+    cancelButtonBorderColor: '#2196F3',
+    tooltip: '',
+    cancelTooltip: 'Cancel',
+    modifyTooltip: 'Modify',
     callbacks: {},
     ...overrides,
   };
@@ -1029,6 +1067,41 @@ describe('ChartCore viewport management', () => {
     core.paint(0xff);
 
     expect(core.getViewport()).not.toBeNull();
+    core.dispose();
+  });
+
+  it('passes Konva-managed order bounds to the renderer as axis-label obstacles', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderOptions: {
+        upColor: '#00aa77',
+        downColor: '#ee3355',
+      },
+    });
+
+    const renderer = (core as unknown as { renderer: TealchartRenderer }).renderer;
+    const renderSpy = vi.spyOn(renderer, 'renderWithLayout');
+
+    core.setBars(makeBars(5));
+    core.setOrderLines([makeOrderLine()]);
+    core.paint(DIRTY.FULL);
+
+    const renderCall = renderSpy.mock.calls.at(-1);
+    expect(renderCall).toBeDefined();
+    const canvasPriceLines = renderCall?.[3] ?? [];
+    const precomputedBounds = renderCall?.[8] ?? [];
+
+    expect(canvasPriceLines.some((line) => line.type === 'order' || line.id === 'order-1')).toBe(false);
+    expect(precomputedBounds).toContainEqual(
+      expect.objectContaining({
+        lineId: 'order-1',
+        type: 'order',
+      }),
+    );
+
     core.dispose();
   });
 

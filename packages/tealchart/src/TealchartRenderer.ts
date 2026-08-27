@@ -4052,18 +4052,31 @@ export class TealchartRenderer {
       this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx, valueAxisLabelLayout);
     }
 
-    if (labelBounds && labelBounds.length > 0) {
+    const drawableLabelBounds = this.getDrawablePriceLineLabelBounds(labelBounds, priceLines);
+    if (drawableLabelBounds.length > 0) {
       if (passes.has('main-price-line-content') && passes.has('main-price-line-labels')) {
-        this.drawPriceLinesInPane(labelBounds, viewport, pane);
+        this.drawPriceLinesInPane(drawableLabelBounds, viewport, pane);
       } else {
         if (passes.has('main-price-line-content')) {
-          this.drawPriceLinesInPane(labelBounds, viewport, pane, 'content');
+          this.drawPriceLinesInPane(drawableLabelBounds, viewport, pane, 'content');
         }
         if (passes.has('main-price-line-labels')) {
-          this.drawPriceLinesInPane(labelBounds, viewport, pane, 'labels');
+          this.drawPriceLinesInPane(drawableLabelBounds, viewport, pane, 'labels');
         }
       }
     }
+  }
+
+  private getDrawablePriceLineLabelBounds(
+    labelBounds: readonly PriceLineLabelBounds[] | undefined,
+    priceLines: readonly PriceLine[] | undefined,
+  ): PriceLineLabelBounds[] {
+    if (!labelBounds || labelBounds.length === 0) return [];
+    if (!priceLines) return [...labelBounds];
+    if (priceLines.length === 0) return [];
+
+    const drawableLineIds = new Set(priceLines.map((line) => line.id));
+    return labelBounds.filter((bound) => drawableLineIds.has(bound.lineId));
   }
 
   private renderOverlayIndicatorPlots(
@@ -4339,8 +4352,9 @@ export class TealchartRenderer {
       this.renderPaneYAxis(pane, labelBounds, passOptions?.valueAxisOverscanPx, valueAxisLabelLayout);
     }
 
-    if (passes.has('indicator-price-lines') && labelBounds && labelBounds.length > 0) {
-      this.drawPriceLinesInPane(labelBounds, viewport, pane);
+    const drawableLabelBounds = this.getDrawablePriceLineLabelBounds(labelBounds, undefined);
+    if (passes.has('indicator-price-lines') && drawableLabelBounds.length > 0) {
+      this.drawPriceLinesInPane(drawableLabelBounds, viewport, pane);
     }
   }
 
