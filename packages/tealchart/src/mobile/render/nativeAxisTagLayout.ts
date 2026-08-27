@@ -94,7 +94,7 @@ export function createNativeAxisTagLayout(
     frame,
     text,
     textWidth: (value) => measureNativeSkiaTextWidth(font, value),
-    minWidth,
+    minWidth: Math.max(minWidth, lane.width),
     paddingX: NATIVE_PRICE_AXIS_TAG_PADDING_X,
     rightInset: frame.dimensions.width - lane.right,
   });

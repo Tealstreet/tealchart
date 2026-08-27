@@ -925,7 +925,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'left',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -940,7 +940,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'left',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -963,7 +963,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'left',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1563,7 +1563,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'left',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1578,7 +1578,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'left',
         verticalAlign: 'middle',
         listening: false,
       });
@@ -1602,7 +1602,7 @@ export class PriceLineManager {
         fontSize: 11,
         fontFamily,
         fill: tagStyle.textColor,
-        align: 'center',
+        align: 'left',
         verticalAlign: 'middle',
         listening: false,
       });

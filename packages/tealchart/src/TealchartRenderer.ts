@@ -166,11 +166,24 @@ interface MeasuredValueAxisLabel {
 }
 
 function normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-  return bounds;
+  if (bounds.length <= 1) return bounds;
+  const width = Math.ceil(Math.max(...bounds.map((bound) => bound.width)));
+  if (!Number.isFinite(width) || width <= 0) return bounds;
+  return bounds.map((bound) => ({ ...bound, width }));
 }
 
 function normalizePriceLineLabelWidthsByPane(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-  return bounds;
+  const widthsByPane = new Map<string, number>();
+  for (const bound of bounds) {
+    const paneId = bound.targetPaneId || 'main';
+    widthsByPane.set(paneId, Math.max(widthsByPane.get(paneId) ?? 0, bound.width));
+  }
+
+  return bounds.map((bound) => {
+    const paneId = bound.targetPaneId || 'main';
+    const width = Math.ceil(widthsByPane.get(paneId) ?? bound.width);
+    return Number.isFinite(width) && width > 0 ? { ...bound, width } : bound;
+  });
 }
 
 export const MAIN_VOLUME_OVERLAY_RATIO = 0.15;
@@ -989,11 +1002,11 @@ export class TealchartRenderer {
     // Draw text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
-    const labelTextX = labelX + bound.width / 2;
+    const labelTextX = labelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (secondaryText) {
       // Two lines of text with minimal padding
@@ -1187,9 +1200,9 @@ export class TealchartRenderer {
     const textColor = bound.label.textColor || '#ffffff';
     ctx.fillStyle = textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    const priceAxisTextX = priceAxisLabelX + bound.width / 2;
+    const priceAxisTextX = priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (bound.label.secondaryText) {
       ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);
@@ -3438,6 +3451,10 @@ export class TealchartRenderer {
     return this.font;
   }
 
+  getMeasuredValueAxisWidth(): number {
+    return Math.ceil(this.valueAxisCommonLabelWidth + 4);
+  }
+
   /**
    * Compute label bounds for price lines without rendering
    * Used by Konva layer for interactive elements
@@ -4859,13 +4876,18 @@ export class TealchartRenderer {
     return measuredLabels.map((label) => {
       const labelWidth = isMainPane ? commonLabelWidth : paneLabelWidth;
       const labelX = commonLabelX;
-      const textAlign = label.kind === 'indicator-output' || isMainPane ? 'center' : 'left';
+      const textAlign = label.kind === 'indicator-output' ? 'left' : isMainPane ? 'center' : 'left';
       return {
         id: label.id,
         paneId: label.paneId,
         value: label.value,
         text: label.text,
-        x: textAlign === 'center' ? labelX + labelWidth / 2 : labelX,
+        x:
+          textAlign === 'center'
+            ? labelX + labelWidth / 2
+            : label.kind === 'indicator-output'
+              ? labelX + PRICE_AXIS_LABEL_TEXT_PADDING_X
+              : labelX,
         labelX,
         labelWidth,
         kind: label.kind,
@@ -5510,11 +5532,11 @@ export class TealchartRenderer {
     // Label text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
-    const labelTextX = labelX + bound.width / 2;
+    const labelTextX = labelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (secondaryText) {
       ctx.fillText(bound.label.primaryText, labelTextX, labelY + 7);
@@ -5746,9 +5768,9 @@ export class TealchartRenderer {
 
     ctx.fillStyle = bound.label.textColor || '#ffffff';
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    const priceAxisTextX = priceAxisLabelX + bound.width / 2;
+    const priceAxisTextX = priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
 
     if (bound.label.secondaryText) {
       ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);

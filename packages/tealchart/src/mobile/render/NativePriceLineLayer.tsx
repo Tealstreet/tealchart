@@ -23,6 +23,7 @@ import {
 } from '../utils/priceAxisTagLayout';
 import { DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT, getNativePriceLineTagId } from '../utils/priceAxisTagSources';
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
+import { NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   createNativeAxisTagLayout,
   createNativeAxisTagTextLayout,
@@ -102,8 +103,7 @@ export function AnimatedPriceLine({
     hasCountdown ? formatNativeCountdownWorklet(countdownTargetTimeMs, nowMs.value) : '',
   );
   const countdownTextX = useDerivedValue(() => {
-    const textWidth = countdownText.value.length * countdownCharacterWidth;
-    return axisTag.x + (axisTag.width - textWidth) / 2;
+    return axisTag.x + NATIVE_PRICE_AXIS_TAG_PADDING_X;
   });
   const primaryTextBaselineOffset = hasSecondaryText
     ? getNativePriceAxisPrimaryTextBaselineOffset(tagHeight)

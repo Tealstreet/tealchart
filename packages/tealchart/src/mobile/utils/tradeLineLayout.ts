@@ -674,11 +674,7 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   const renderedLabelWidth = Math.max(0, currentX - layout.labelX);
   const leftLineEndX = line.extendLeft === false ? layout.lineStartX : layout.labelX - LABEL_TO_LINE_GAP;
   const rightLineStartX = layout.labelX + renderedLabelWidth + LABEL_TO_LINE_GAP;
-  const measuredPriceTextWidth = Math.min(
-    priceTextWidth(priceLabelText),
-    Math.max(0, layout.priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2),
-  );
-  const priceLabelTextX = Math.round(layout.priceLabelLeft + (layout.priceLabelWidth - measuredPriceTextWidth) / 2);
+  const priceLabelTextX = Math.round(layout.priceLabelLeft + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
 
   return {
     objectType,
@@ -762,7 +758,9 @@ export function layoutNativeTradeLine(input: NativeTradeLineLayoutInput): Native
     input.chartLabelMinX ?? computeTradingLineLabelMinX(MOBILE_CHART_CHROME_METRICS, input.dimensions.margins),
   );
   const requestedPriceLabelWidth = input.priceLabelWidth ?? measureNativeTradeLinePriceLabelWidth(input.formattedPrice);
-  const priceLabelWidth = requestedPriceLabelWidth;
+  const priceLabelWidth = input.priceLabelLane
+    ? Math.max(requestedPriceLabelWidth, input.priceLabelLane.right - input.priceLabelLane.left)
+    : requestedPriceLabelWidth;
   const priceLabelLeft = input.priceLabelLane
     ? Math.round(input.priceLabelLane.right - priceLabelWidth)
     : Math.round(input.dimensions.width - priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);

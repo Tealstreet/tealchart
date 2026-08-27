@@ -2371,8 +2371,9 @@ export class ChartCore {
         .sort()
         .join(',') +
       `|${safeToFixed(vp.priceMin, 4, 'collisionKey.priceMin')},${safeToFixed(vp.priceMax, 4, 'collisionKey.priceMax')}`;
+    const collisionKeyWithAxis = `${collisionKey}|axis:${this.margins.right}`;
     const now = Date.now();
-    const collisionKeyChanged = collisionKey !== this.lastCollisionKey;
+    const collisionKeyChanged = collisionKeyWithAxis !== this.lastCollisionKey;
     const isDragging = this.eventManager.getIsDragging();
     const shouldResolveCollisions = collisionKeyChanged || (isDragging && now - this.lastCollisionUpdate > 16);
 
@@ -2390,7 +2391,7 @@ export class ChartCore {
       for (const b of resolvedBounds) {
         this.collisionOffsetCache.set(b.lineId, b.adjustedY - b.originalY);
       }
-      this.lastCollisionKey = collisionKey;
+      this.lastCollisionKey = collisionKeyWithAxis;
       this.lastCollisionUpdate = now;
       // Use the fully resolved bounds directly (content is fresh since allPriceLines is current)
       this.labelBoundsCache = resolvedBounds;
@@ -2457,6 +2458,7 @@ export class ChartCore {
       this.executionLines,
       this.drawings,
     );
+    this.growPriceAxisWidthFromMeasuredLabels();
 
     if (this.userDrawingState) {
       renderUserDrawingLayer(this.canvasContext, this.userDrawingState, this.getUserDrawingSpaces(vp), {
@@ -3267,5 +3269,22 @@ export class ChartCore {
       visible: false,
       color: '',
     });
+  }
+
+  private growPriceAxisWidthFromMeasuredLabels(): void {
+    const measuredValueAxisWidth = this.renderer.getMeasuredValueAxisWidth();
+    const measuredLineAxisWidth =
+      this.labelBoundsCache.length > 0
+        ? Math.ceil(Math.max(...this.labelBoundsCache.map((bound) => bound.width + PRICE_AXIS_RIGHT_PADDING)))
+        : 0;
+    const nextRight = Math.ceil(Math.max(this.margins.right, measuredValueAxisWidth, measuredLineAxisWidth));
+    if (!Number.isFinite(nextRight) || nextRight <= this.margins.right) return;
+
+    this.margins = { ...this.margins, right: nextRight };
+    const chartLabelMinX = this.getChartLabelMinX();
+    this.renderer.setOptions({ chartLabelMinX, margins: this.margins });
+    this.priceLineManager?.setDimensions(this.options.width, this.options.height, this.margins);
+    this.priceLineManager?.setChartLabelMinX(chartLabelMinX);
+    this.scheduleRender();
   }
 }

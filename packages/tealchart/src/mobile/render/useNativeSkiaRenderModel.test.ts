@@ -282,6 +282,38 @@ describe('useNativeSkiaRenderModel', () => {
     expect(model.nativePriceLines.find((line) => line.id === 'last-trade')?.label.primaryText).toBe('0.0686');
   });
 
+  it('measures price-axis width from actual small-price labels instead of max-capacity placeholders', () => {
+    const smallPriceProjection = createNativeChartProjection({
+      frame,
+      viewport: {
+        startTime: 0,
+        endTime: 2_700,
+        priceMin: 0.74,
+        priceMax: 0.77,
+      },
+    });
+    const model = useNativeSkiaRenderModel({
+      bars: [{ time: 0, open: 0.74958, high: 0.74958, low: 0.74737, close: 0.74737, volume: 100 }],
+      frame,
+      interval: '15',
+      lineSnapshot: { orderLines: [], positionLines: [] },
+      marginsBottom: 32,
+      options: DEFAULT_RENDER_OPTIONS,
+      priceAxisTagHeight: 22,
+      pricePrecision: 0.00001,
+      projection: smallPriceProjection,
+      showTopBar: true,
+      symbol: 'SUI-USD',
+      topBarDefaultVisibleValues: new Set(['1', '5', '15', '30', '60']),
+      topBarHeight: 36,
+      tradeLabelHeight: 18,
+      volumeHeightRatio: 0.2,
+    });
+
+    expect(model.measuredPriceAxisWidth).toBeGreaterThan(0);
+    expect(model.measuredPriceAxisWidth).toBeLessThan(100);
+  });
+
   it('returns inert drawing inputs when frame and projection are not ready', () => {
     const model = useNativeSkiaRenderModel({
       bars,
@@ -303,6 +335,7 @@ describe('useNativeSkiaRenderModel', () => {
 
     expect(model.topBarLayout).toBeNull();
     expect(model.leftToolRailLayout).toBeNull();
+    expect(model.measuredPriceAxisWidth).toBeGreaterThan(0);
     expect(model.tradeLineGeometries).toEqual([]);
     expect(model.visibleBars).toEqual([]);
     expect(model.plotPrimitiveClip.value).toEqual({ x: 0, y: 0, width: 0, height: 0 });

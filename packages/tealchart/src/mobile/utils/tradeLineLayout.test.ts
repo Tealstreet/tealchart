@@ -221,9 +221,7 @@ describe('native trade line layout', () => {
     expect(geometry?.priceLabelText).toBe('63,777.0');
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
     expect(geometry?.priceLabelTextX).toBeGreaterThanOrEqual(geometry?.priceLabelX ?? 0);
-    expect(geometry?.priceLabelTextX).toBe(
-      Math.round((geometry?.priceLabelX ?? 0) + ((geometry?.priceLabelWidth ?? 0) - measureText('63,777.0')) / 2),
-    );
+    expect(geometry?.priceLabelTextX).toBe((geometry?.priceLabelX ?? 0) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
     expect(geometry?.segments[0]?.displayText).toBe('Long');
     expect(geometry?.buttons.map((button) => button.type)).toEqual(['cancel', 'tp', 'sl']);
     expect(geometry?.fitting).toEqual({
@@ -292,9 +290,7 @@ describe('native trade line layout', () => {
     });
 
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', priceTextWidth));
-    expect(geometry?.priceLabelTextX).toBe(
-      Math.round((geometry?.priceLabelX ?? 0) + ((geometry?.priceLabelWidth ?? 0) - priceTextWidth('63,777.0')) / 2),
-    );
+    expect(geometry?.priceLabelTextX).toBe((geometry?.priceLabelX ?? 0) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
     expect(geometry?.buttons.map((button) => button.textX)).toEqual([
       Math.round((geometry?.buttons[0]?.x ?? 0) + 8 - measureText('×') / 2),
       Math.round((geometry?.buttons[1]?.x ?? 0) + 13 - measureText('TP') / 2),
@@ -302,7 +298,7 @@ describe('native trade line layout', () => {
     ]);
   });
 
-  it('right-aligns compact price tags inside the native price-axis lane when provided', () => {
+  it('places price tags inside the native price-axis lane when provided', () => {
     const priceLabelLane = {
       left: priceAxisLane.left,
       right: priceAxisLane.right,
@@ -320,8 +316,7 @@ describe('native trade line layout', () => {
 
     expect(geometry?.priceLabelX).toBeGreaterThanOrEqual(priceLabelLane.left);
     expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBeLessThanOrEqual(priceLabelLane.right);
-    expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
-    expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBe(priceLabelLane.right);
+    expect(geometry?.priceLabelWidth).toBe(priceLabelLane.right - priceLabelLane.left);
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
   });
 
@@ -345,9 +340,7 @@ describe('native trade line layout', () => {
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.000000', measureText));
     expect(geometry?.priceLabelX).toBeLessThan(priceLabelLane.left);
     expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBe(priceLabelLane.right);
-    expect(geometry?.priceLabelTextX).toBe(
-      Math.round((geometry?.priceLabelX ?? 0) + ((geometry?.priceLabelWidth ?? 0) - measureText('63,777.000000')) / 2),
-    );
+    expect(geometry?.priceLabelTextX).toBe((geometry?.priceLabelX ?? 0) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
   });
 
