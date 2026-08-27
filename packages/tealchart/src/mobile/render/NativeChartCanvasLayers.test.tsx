@@ -146,7 +146,7 @@ describe('NativeChartCanvasLayers', () => {
       bars: [],
       indicatorPaneInfo: {},
       plots: [],
-      staticProjection: undefined,
+      sharedViewport,
       totalBarCount: 0,
     });
     expect(plotChildren[9]?.props).toMatchObject({ hasContextMenu: false });

@@ -777,9 +777,9 @@ export class TealchartWidget implements ITealchartWebWidget {
         // Single dirty flag triggers atomic render of viewport + bars + empty plots
         this._scheduler.markDirty(DIRTY.DATA_LOAD);
 
-        // Notify Tealscript AFTER markDirty — worker callback may fire fast and
-        // overwrite _plots. DATA_LOAD in the RAF snapshot ensures empty plots are
-        // pushed first, then PLOTS from worker callback gets its own render frame.
+        // Notify Tealscript AFTER markDirty. If the worker callback lands before
+        // the RAF, the DATA_LOAD render snapshot carries PLOTS/DRAWINGS too and
+        // _render preserves those fresh outputs instead of blanking them.
         if (this._tealScriptManager) {
           this._tealScriptManager.setBars(normalizedBars);
         }
@@ -1469,19 +1469,24 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._ensureUI();
     if (!this._ui) return;
 
-    // Atomic data transition: push viewport + bars + FORCE empty plots in one go.
-    // Worker callback may have raced and set _plots to stale data between
-    // markDirty(DATA_LOAD) and this RAF — override with empty to guarantee clean slate.
+    // Atomic data transition: push viewport + bars with a clean indicator slate,
+    // unless a fresh worker PLOTS/DRAWINGS update is already coalesced into this
+    // same RAF snapshot. Without this guard, fast first-load worker output
+    // (notably MACD) can be cleared by DATA_LOAD with no follow-up render.
     if (dirty & DIRTY.DATA_LOAD) {
-      this._plots = []; // Force empty — reject any stale worker callback
-      this._drawings = [];
+      const nextPlots = dirty & DIRTY.PLOTS ? this._plots : [];
+      const nextDrawings = dirty & DIRTY.DRAWINGS ? this._drawings : [];
+      this._plots = nextPlots;
+      this._drawings = nextDrawings;
       if (this._viewport) {
         this._ui.setViewport(this._viewport);
       }
       this._ui.setBars(this._bars);
-      this._ui.setPlots([]); // Explicitly empty
-      this._ui.setDrawings([]);
-      dirty = DIRTY.FULL; // Force full repaint of everything
+      this._ui.setPlots(nextPlots);
+      this._ui.setDrawings(nextDrawings);
+      // Force full repaint of everything, but avoid re-pushing plots/drawings
+      // already handled by this DATA_LOAD transition.
+      dirty = DIRTY.FULL & ~DIRTY.PLOTS & ~DIRTY.DRAWINGS;
     }
 
     // Viewport changed (pan/zoom)

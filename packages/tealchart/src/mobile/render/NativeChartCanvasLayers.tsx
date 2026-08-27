@@ -194,10 +194,9 @@ export function NativeChartCanvasLayersImpl({
               indicatorPaneInfo={indicatorPaneInfo}
               paneRangeOverrides={paneRangeOverrides}
               plots={indicatorPlots}
+              sharedViewport={sharedViewport}
               smallFont={smallFont}
-              staticProjection={staticProjection}
               totalBarCount={indicatorTotalBarCount}
-              visibleBars={visibleBars}
             />
           ) : null}
 

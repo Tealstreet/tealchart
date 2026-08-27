@@ -6,6 +6,7 @@ import {
   formatIndicatorOutputAxisValue,
   getIndicatorOutputAxisLabelSources,
   getLatestIndicatorPlotValue,
+  resolveIndicatorOutputSourceTime,
 } from './indicatorOutputAxisLabels';
 
 function plot(overrides: Partial<PlotOutput>): PlotOutput {
@@ -68,6 +69,14 @@ describe('indicator output axis labels', () => {
   it('respects showLast windows and indicator precision', () => {
     expect(getLatestIndicatorPlotValue(plot({ values: [10, 20, null], showLast: 1 }), 3)).toBeNull();
     expect(formatIndicatorOutputAxisValue(24.234, 300, 1)).toBe('24.2');
+  });
+
+  it('resolves source time with plot offset applied', () => {
+    const bars = [{ time: 0 }, { time: 60_000 }, { time: 120_000 }];
+
+    expect(resolveIndicatorOutputSourceTime({ bars, sourceIndex: 1 })).toBe(60_000);
+    expect(resolveIndicatorOutputSourceTime({ bars, plotOffset: 1, sourceIndex: 1 })).toBe(120_000);
+    expect(resolveIndicatorOutputSourceTime({ bars, plotOffset: -1, sourceIndex: 1 })).toBe(0);
   });
 
   it('uses pane ids from native indicator pane info when pane frames omit indicator ids', () => {
