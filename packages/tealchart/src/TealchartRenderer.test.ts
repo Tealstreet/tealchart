@@ -2912,6 +2912,41 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(byId.get('main-short')?.width).toBeGreaterThan(byId.get('pane-short')?.width ?? 0);
     });
 
+    it('reserves text-rendering slack for trailing-zero price-axis labels', () => {
+      const ctx = createMockCtx();
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const viewport: Viewport = {
+        startTime: 0,
+        endTime: 1,
+        priceMin: 70_000,
+        priceMax: 80_000,
+      };
+      const layout: UnifiedPaneLayout = {
+        panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 0, yMax: 0, fixedRange: false }],
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+      };
+      const primaryText = '79,530.0';
+
+      const [bound] = renderer.computePriceLineLabelBoundsWithLayout(
+        [
+          {
+            id: 'last-trade',
+            price: 79_530,
+            color: '#00b5e2',
+            lineStyle: 'dotted',
+            label: { primaryText },
+            targetPaneId: 'main',
+            type: 'price',
+          },
+        ],
+        viewport,
+        layout,
+      );
+
+      expect(bound).toBeDefined();
+      expect((bound?.width ?? 0) - 12).toBeGreaterThan(ctx.measureText(primaryText).width);
+    });
+
     it('renders label drawings in the main pane', () => {
       const fillText = vi.fn();
       const roundRect = vi.fn();

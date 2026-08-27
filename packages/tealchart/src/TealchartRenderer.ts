@@ -212,6 +212,7 @@ export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
 type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
 const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
+const PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X = 4;
 const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 16;
 const INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
 const INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 46;
@@ -246,6 +247,22 @@ function formatCountdown(targetTimeMs: number): string {
   }
 
   return `${totalMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function getPriceLineSecondaryLabelText(line: PriceLine): string {
+  if (line.countdownToTime !== undefined) return formatCountdown(line.countdownToTime);
+  return line.label.secondaryText ?? '';
+}
+
+function measurePriceLineAxisLabelWidth(ctx: CanvasContext, line: PriceLine, font: string): number {
+  const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, font);
+  const secondaryText = getPriceLineSecondaryLabelText(line);
+  const secondaryWidth = secondaryText ? getCachedTextWidth(ctx, secondaryText, font) : 0;
+  return Math.ceil(
+    Math.max(primaryWidth, secondaryWidth) +
+      PRICE_AXIS_LABEL_TEXT_PADDING_X * 2 +
+      PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X,
+  );
 }
 
 function getTradingLineMinX(margins: ChartMargins, chartLabelMinX?: number): number {
@@ -823,15 +840,9 @@ export class TealchartRenderer {
     const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
       const originalY = this.priceToY(line.price, viewport, priceHeight);
-      const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const secondaryWidth = line.label.secondaryText
-        ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont)
-        : line.countdownToTime
-          ? 40
-          : 0;
-      const width = Math.max(primaryWidth, secondaryWidth) + 12;
+      const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
       // Height includes text + padding + border + extra margin for collision
       // Must match or exceed actual rendered height to prevent visual overlap
       const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
@@ -3504,15 +3515,9 @@ export class TealchartRenderer {
 
       // Use valueToY with the correct pane
       const originalY = this.valueToY(line.price, targetPane);
-      const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const secondaryWidth = line.label.secondaryText
-        ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont)
-        : line.countdownToTime
-          ? 40
-          : 0;
-      const width = Math.max(primaryWidth, secondaryWidth) + 12;
+      const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
       const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
       const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
 
@@ -5368,15 +5373,9 @@ export class TealchartRenderer {
     const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
       const originalY = this.valueToY(line.price, pane);
-      const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, labelFont);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const secondaryWidth = line.label.secondaryText
-        ? getCachedTextWidth(ctx, line.label.secondaryText, labelFont)
-        : line.countdownToTime
-          ? 40
-          : 0;
-      const width = Math.max(primaryWidth, secondaryWidth) + 12;
+      const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
       // Height includes text + padding + border + extra margin for collision
       // Must match or exceed actual rendered height to prevent visual overlap
       const baseHeight = line.type === 'price' || !line.type ? 18 : 16;
