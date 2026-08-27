@@ -21,6 +21,8 @@ import type {
   FromWorkerMessage,
   WorkerOutputMetadata,
 } from '@tealstreet/tealscript';
+import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from '../debug/plotDebug';
+import { preserveLongerCurrentPlotSeries } from './plotSeriesFreshness';
 
 /**
  * Managed script state
@@ -106,6 +108,7 @@ class TealscriptWorkerWrapper {
   private options: TealscriptWorkerOptions;
   private requestId = 0;
   private latestRequestId = 0;
+  private latestFullRequestId = 0;
   private lastSettledRequestId = 0;
   private generation = 0;
 
@@ -226,13 +229,23 @@ class TealscriptWorkerWrapper {
       this.generation += 1;
     }
     this.latestRequestId = ++this.requestId;
+    if (newGeneration) {
+      this.latestFullRequestId = this.latestRequestId;
+    }
     return {
       generation: this.generation,
       requestId: this.latestRequestId,
+      requestKind: newGeneration ? 'full' : 'incremental',
     };
   }
 
   private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
+    if (typeof metadata?.generation === 'number' && metadata.generation < this.generation) {
+      return true;
+    }
+    if (metadata?.requestKind === 'full') {
+      return typeof metadata.requestId === 'number' && metadata.requestId < this.latestFullRequestId;
+    }
     return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
   }
 
@@ -306,6 +319,13 @@ export class TealscriptManager {
     this.scripts.set(scriptId, managedScript);
 
     // Initialize worker with the latest bars and inputs once the worker is ready.
+    if (isTealchartPlotDebugEnabled()) {
+      console.info('[tealchart:plots] manager addScript', {
+        scriptId,
+        barCount: this.bars.length,
+        inputs,
+      });
+    }
     await this.initializeCurrentWorker(scriptId, workerGeneration);
   }
 
@@ -327,6 +347,13 @@ export class TealscriptManager {
    */
   setBars(bars: Bar[]): void {
     this.bars = bars;
+
+    if (isTealchartPlotDebugEnabled()) {
+      console.info('[tealchart:plots] manager setBars', {
+        barCount: bars.length,
+        scriptIds: Array.from(this.scripts.keys()),
+      });
+    }
 
     // Restart all workers so expensive stale full recalculations are cancelled.
     for (const script of this.scripts.values()) {
@@ -516,7 +543,17 @@ export class TealscriptManager {
     const workerGeneration = ++this.nextWorkerGeneration;
     script.workerGeneration = workerGeneration;
     script.worker = this.createScriptWorker(script.id, workerGeneration);
+    script.plots = [];
+    script.drawings = [];
     script.isReady = false;
+
+    if (isTealchartPlotDebugEnabled()) {
+      console.info('[tealchart:plots] manager restartScriptWorker', {
+        scriptId: script.id,
+        workerGeneration,
+        barCount: this.bars.length,
+      });
+    }
 
     void this.initializeCurrentWorker(script.id, workerGeneration).catch((error: unknown) => {
       this.handleError(script.id, workerGeneration, {
@@ -558,9 +595,33 @@ export class TealscriptManager {
     // Clear any previous error
     script.error = undefined;
 
-    // Update visual outputs
-    script.plots = result.plots;
+    const resultMetadata = result.metadata;
+    const shouldPreserveExistingPlots =
+      resultMetadata?.requestKind === 'incremental' && result.plots.length === 0 && script.plots.length > 0;
+
+    // Update visual outputs. Incremental live-bar responses should update the
+    // current series, not replace a full-history plot with a shorter payload.
+    script.plots = shouldPreserveExistingPlots
+      ? script.plots
+      : preserveLongerCurrentPlotSeries(script.plots, result.plots);
     script.drawings = result.drawings;
+
+    if (isTealchartPlotDebugEnabled()) {
+      console.info('[tealchart:plots] manager result', {
+        scriptId,
+        workerGeneration,
+        metadata: resultMetadata,
+        preservedExistingPlots: shouldPreserveExistingPlots,
+        inputPlotCount: result.plots.length,
+        storedPlotCount: script.plots.length,
+        bars: this.bars.length,
+        inputPlots: summarizePlotsForDebug(result.plots),
+        storedPlots: summarizePlotsForDebug(script.plots),
+        declaration: result.declaration
+          ? { title: result.declaration.title, shortTitle: result.declaration.shortTitle, overlay: result.declaration.overlay }
+          : undefined,
+      });
+    }
 
     // Update input definitions if changed
     if (JSON.stringify(script.inputs) !== JSON.stringify(result.inputs)) {
@@ -585,6 +646,10 @@ export class TealscriptManager {
     script.error = error;
     script.plots = []; // Clear plots on error
     script.drawings = []; // Clear drawings on error
+
+    if (isTealchartPlotDebugEnabled()) {
+      console.error('[tealchart:plots] manager error', { scriptId, workerGeneration, error });
+    }
 
     this.options.onError?.(scriptId, error);
     this.notifyPlotsUpdated();

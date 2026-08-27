@@ -6,6 +6,7 @@ import type { ChartProperties, PreservedTvProperties, ResolutionString } from '.
 import { atom, computed, map } from 'nanostores';
 
 import { createLocalStorageKeyValueStorage } from '../transformer/storageSaveLoadAdapter';
+import { formatPriceWithDecimalPlaces } from '../utils/priceFormatters';
 import { CHART_SETTINGS_VERSION } from './safeDeepMerge';
 
 /**
@@ -844,8 +845,5 @@ export function getDecimalPlacesFromPrecision(precision: number): number {
  */
 export function formatPriceWithPrecision(price: number, precision: number): string {
   const decimals = getDecimalPlacesFromPrecision(precision);
-  return price.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  return formatPriceWithDecimalPlaces(price, decimals);
 }

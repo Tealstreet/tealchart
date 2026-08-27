@@ -136,4 +136,24 @@ describe('ChartLegend layout', () => {
 
     legend.unmount();
   });
+
+  it('formats OHLC labels without changing visible price precision', () => {
+    const legend = new ChartLegend({
+      symbol: 'BTCUSDT',
+      interval: '60',
+    });
+    legend.mount(document.body);
+
+    legend.setBars(
+      { time: 1, open: 12345.67, high: 123.456, low: 0.1234567, close: 1.234, volume: 1 },
+      { time: 0, open: 12000, high: 12500, low: 11900, close: 1.2, volume: 1 },
+    );
+
+    expect(legend.getElement().textContent).toContain('O12,345.7');
+    expect(legend.getElement().textContent).toContain('H123.46');
+    expect(legend.getElement().textContent).toContain('L0.123457');
+    expect(legend.getElement().textContent).toContain('C1.23');
+
+    legend.unmount();
+  });
 });

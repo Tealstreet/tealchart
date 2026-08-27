@@ -51,6 +51,7 @@ const selectorStyles = {
     fontWeight: '500',
     transition: 'background-color 0.15s, color 0.15s',
     whiteSpace: 'nowrap',
+    flexShrink: '0',
     maxWidth: '160px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -355,6 +356,7 @@ export class LayoutSelector {
     this.buttonLabelEl = document.createElement('span');
     this.buttonLabelEl.style.overflow = 'hidden';
     this.buttonLabelEl.style.textOverflow = 'ellipsis';
+    this.buttonLabelEl.style.minWidth = '0';
     this.buttonLabelEl.textContent = DEFAULT_LAYOUT_NAME;
     this.buttonEl.appendChild(this.buttonLabelEl);
 

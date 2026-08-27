@@ -13,6 +13,7 @@ import {
   TRADE_LINE_DOTTED_DASH_PATTERN,
 } from './constants';
 import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
+import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from './debug/plotDebug';
 import { computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import {
   formatTimeAxisLabel,
@@ -51,7 +52,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from './types';
-import { resolveLabelCollisions } from './utils/labelCollision';
+import { resolveLabelCollisions, type LabelBounds } from './utils/labelCollision';
 import { resolvePriceAxisTagStyle } from './utils/priceAxisTagStyle';
 
 /**
@@ -1902,6 +1903,21 @@ export class TealchartRenderer {
     paneLayout?: PaneLayout,
     indicatorPaneInfo?: Record<string, IndicatorPaneInfo>,
   ): void {
+    if (isTealchartPlotDebugEnabled()) {
+      console.info('[tealchart:plots] renderer renderPlots', {
+        plotCount: plots.length,
+        barCount: bars.length,
+        hasPaneLayout: Boolean(paneLayout),
+        panes: paneLayout?.indicatorPanes.map((pane) => ({
+          id: pane.id,
+          indicatorIds: pane.indicatorIds,
+          yMin: pane.yMin,
+          yMax: pane.yMax,
+        })),
+        indicatorPaneInfo,
+        plots: summarizePlotsForDebug(plots),
+      });
+    }
     if (plots.length === 0 || bars.length === 0) return;
 
     const { ctx, options, margins } = this;
@@ -1964,6 +1980,14 @@ export class TealchartRenderer {
       const isOverlay = info?.overlay !== false; // Default to overlay if unknown
 
       if (isOverlay || !paneLayout || paneLayout.indicatorPanes.length === 0) {
+        if (isTealchartPlotDebugEnabled()) {
+          console.info('[tealchart:plots] renderer route main', {
+            scriptId,
+            isOverlay,
+            plotCount: scriptPlots.length,
+            plots: summarizePlotsForDebug(scriptPlots),
+          });
+        }
         this.renderPlotsInMainPane(scriptPlots, bars, viewport, info?.explicitPlotZOrder);
       } else {
         const forceOverlayPlots = scriptPlots.filter((plot) => plot.forceOverlay);
@@ -1979,6 +2003,20 @@ export class TealchartRenderer {
         if (pane && panePlots.length > 0) {
           const paneOffset = paneOffsets.get(pane.id);
           if (paneOffset) {
+            if (isTealchartPlotDebugEnabled()) {
+              console.info('[tealchart:plots] renderer route indicator', {
+                scriptId,
+                pane: {
+                  id: pane.id,
+                  indicatorIds: pane.indicatorIds,
+                  yMin: pane.yMin,
+                  yMax: pane.yMax,
+                },
+                paneOffset,
+                plotCount: panePlots.length,
+                plots: summarizePlotsForDebug(panePlots),
+              });
+            }
             // Y ranges are now computed by AutoScaleManager in TealchartWidget
             // and applied via ChartCore.setPaneYRanges() before rendering.
 
@@ -1988,6 +2026,14 @@ export class TealchartRenderer {
             // Render plots in this pane
             this.renderPlotsInPane(panePlots, bars, viewport, paneOffset, info?.explicitPlotZOrder);
           }
+        } else if (isTealchartPlotDebugEnabled()) {
+          console.warn('[tealchart:plots] renderer route skipped', {
+            scriptId,
+            hasPane: Boolean(pane),
+            panePlotCount: panePlots.length,
+            layoutPanes: paneLayout.indicatorPanes.map((p) => ({ id: p.id, indicatorIds: p.indicatorIds })),
+            plots: summarizePlotsForDebug(scriptPlots),
+          });
         }
       }
     }
@@ -4317,6 +4363,23 @@ export class TealchartRenderer {
   ): void {
     if (!plots || !pane.indicatorIds) return;
 
+    if (isTealchartPlotDebugEnabled()) {
+      console.info('[tealchart:plots] renderer indicatorPanePlots', {
+        domain,
+        pane: {
+          id: pane.id,
+          type: pane.type,
+          indicatorIds: pane.indicatorIds,
+          yMin: pane.yMin,
+          yMax: pane.yMax,
+          top: pane.top,
+          height: pane.height,
+        },
+        inputPlotCount: plots.length,
+        plots: summarizePlotsForDebug(plots.filter((plot) => pane.indicatorIds?.includes(plot.scriptId ?? 'unknown'))),
+      });
+    }
+
     const plotsByScript = new Map<string, PlotOutput[]>();
     for (const plot of plots) {
       const scriptId = plot.scriptId ?? 'unknown';
@@ -4333,6 +4396,18 @@ export class TealchartRenderer {
           ? scriptPlots.filter((plot) => plot.type === 'hline')
           : scriptPlots.filter((plot) => plot.type !== 'hline');
       if (renderPlots.length === 0) continue;
+
+      if (isTealchartPlotDebugEnabled()) {
+        console.info('[tealchart:plots] renderer indicatorPaneRenderPlots', {
+          domain,
+          scriptId,
+          paneId: pane.id,
+          yMin: pane.yMin,
+          yMax: pane.yMax,
+          renderPlotCount: renderPlots.length,
+          renderPlots: summarizePlotsForDebug(renderPlots),
+        });
+      }
 
       this.renderPlotsInComputedPane(
         renderPlots,
@@ -4613,7 +4688,13 @@ export class TealchartRenderer {
     const measuredLabels: MeasuredValueAxisLabel[] = [];
     // For main pane, labels should stay below the transparent top bar (safe zone)
     const visibleTop = pane.type === 'main' ? margins.top : pane.top;
-    const outputLabels = this.measureIndicatorOutputYAxisLabels(pane, indicatorOutputLabels, visibleTop, textFont);
+    const outputLabels = this.measureIndicatorOutputYAxisLabels(
+      pane,
+      indicatorOutputLabels,
+      visibleTop,
+      textFont,
+      priceLineBounds,
+    );
     const outputAvoidanceRanges = outputLabels.map((label) => ({
       bottom: label.y + (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 + 3,
       top: label.y - (label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT) / 2 - 3,
@@ -4660,6 +4741,7 @@ export class TealchartRenderer {
     outputLabels: readonly IndicatorOutputAxisLabelSource[],
     visibleTop: number,
     textFont: string,
+    priceLineBounds: readonly PriceLineLabelBounds[] = [],
   ): MeasuredValueAxisLabel[] {
     if (outputLabels.length === 0) return [];
 
@@ -4693,38 +4775,59 @@ export class TealchartRenderer {
       });
     }
 
-    return this.resolveIndicatorOutputYAxisLabelCollisions(measured, pane, visibleTop);
+    return this.resolveIndicatorOutputYAxisLabelCollisions(measured, pane, visibleTop, priceLineBounds);
   }
 
   private resolveIndicatorOutputYAxisLabelCollisions(
     labels: MeasuredValueAxisLabel[],
     pane: ComputedPane,
     visibleTop: number,
+    priceLineBounds: readonly PriceLineLabelBounds[] = [],
   ): MeasuredValueAxisLabel[] {
-    if (labels.length <= 1) return labels;
+    if (labels.length === 0) return labels;
 
-    const height = INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
-    const minCenterY = visibleTop + height / 2;
-    const maxCenterY = pane.bottom - height / 2;
-    if (maxCenterY <= minCenterY) return labels;
+    type OutputCollisionBounds = LabelBounds & { outputLabel?: MeasuredValueAxisLabel };
 
-    const sorted = [...labels].sort((a, b) => a.y - b.y);
-    const minGap = height + INDICATOR_OUTPUT_AXIS_TAG_GAP;
-    for (let index = 0; index < sorted.length; index += 1) {
-      const previous = sorted[index - 1];
-      const label = sorted[index]!;
-      const lowerBound = previous ? previous.y + minGap : minCenterY;
-      label.y = Math.max(lowerBound, Math.min(maxCenterY, label.y));
+    const outputBounds: OutputCollisionBounds[] = labels.map((label) => {
+      const height = label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
+      return {
+        id: `indicator-output:${label.id}`,
+        originalY: label.y,
+        adjustedY: label.y,
+        height: height + INDICATOR_OUTPUT_AXIS_TAG_GAP,
+        outputLabel: label,
+      };
+    });
+
+    const priceLineObstacles: OutputCollisionBounds[] = priceLineBounds
+      .filter((bound) => !bound.floatingLabel)
+      .map((bound) => ({
+        id: `price-line:${bound.lineId}`,
+        originalY: bound.adjustedY,
+        adjustedY: bound.adjustedY,
+        height: bound.height + INDICATOR_OUTPUT_AXIS_TAG_GAP,
+        priority: 10_000,
+        fixed: true,
+      }));
+
+    const collisionBounds = [...outputBounds, ...priceLineObstacles];
+    if (collisionBounds.length > 1) {
+      resolveLabelCollisions(collisionBounds);
     }
 
-    for (let index = sorted.length - 1; index >= 0; index -= 1) {
-      const next = sorted[index + 1];
-      const label = sorted[index]!;
-      const upperBound = next ? next.y - minGap : maxCenterY;
-      label.y = Math.min(upperBound, Math.max(minCenterY, label.y));
+    for (const bound of outputBounds) {
+      if (!bound.outputLabel) continue;
+      const height = bound.outputLabel.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
+      const minCenterY = visibleTop + height / 2;
+      const maxCenterY = pane.bottom - height / 2;
+      if (maxCenterY > minCenterY) {
+        bound.outputLabel.y = Math.max(minCenterY, Math.min(maxCenterY, bound.adjustedY));
+      } else {
+        bound.outputLabel.y = bound.adjustedY;
+      }
     }
 
-    return sorted;
+    return [...labels].sort((a, b) => a.y - b.y);
   }
 
   private computePaneYAxisLabels(

@@ -12,6 +12,7 @@ import {
   WEB_CHART_CHROME_METRICS,
 } from '../layout/chartGeometry';
 import { safeToFixed } from '../utils/safeNumber';
+import { formatPriceByMagnitude } from '../utils/priceFormatters';
 import { Component } from './Component';
 import { button, div, icons, span } from './dom';
 
@@ -709,13 +710,7 @@ export class ChartLegend extends Component<ChartLegendState> {
   // ============================================================================
 
   private formatPrice(price: number): string {
-    if (price >= 1000) {
-      return price.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    }
-    if (price >= 1) {
-      return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-    return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+    return formatPriceByMagnitude(price);
   }
 
   private formatInterval(interval: ResolutionString): string {

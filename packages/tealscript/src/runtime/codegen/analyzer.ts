@@ -109,6 +109,22 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
   'ta.stdev': { className: 'StdDev', returnsTuple: false },
 };
 
+const REQUIRED_STATIC_TA_CTOR_ARG_COUNTS: Record<string, number> = {
+  'ta.sma': 1,
+  'ta.ema': 1,
+  'ta.rma': 1,
+  'ta.rsi': 1,
+  'ta.highest': 1,
+  'ta.lowest': 1,
+  'ta.stdev': 1,
+  'ta.dema': 1,
+  'ta.tema': 1,
+  'ta.atr': 1,
+  'ta.stoch': 1,
+  'ta.macd': 3,
+  'ta.bb': 2,
+};
+
 const UNSUPPORTED_REQUEST_FUNCS = new Set([
   'request.dividends', 'request.earnings', 'request.splits',
   'request.financial', 'request.economic', 'request.currency_rate',
@@ -236,10 +252,16 @@ export function analyze(ast: Program): AnalysisContext {
 
         if (fullName in TA_CLASS_MAP) {
           const info = TA_CLASS_MAP[fullName];
+          const ctorArgs = extractCtorArgs(fullName, expr.arguments);
+          const requiredCtorArgCount = REQUIRED_STATIC_TA_CTOR_ARG_COUNTS[fullName] ?? 0;
+          if (ctorArgs.length < requiredCtorArgCount) {
+            const msg = `${fullName} with dynamic constructor parameters not yet supported by transpiler`;
+            if (!ctx.unsupported.includes(msg)) ctx.unsupported.push(msg);
+          }
           const site: TACallSite = {
             memberName: `_ta_${info.className.toLowerCase()}_${taIndex++}`,
             className: info.className,
-            ctorArgs: extractCtorArgs(fullName, expr.arguments),
+            ctorArgs,
             computeArgExprs: extractComputeArgs(fullName, expr.arguments),
             returnsTuple: info.returnsTuple,
             tupleFields: info.tupleFields,
