@@ -4010,6 +4010,83 @@ describe('value axis label layout', () => {
     expect(outputBottom <= orderTop || outputTop >= orderBottom).toBe(true);
   });
 
+  it('lets non-fixed price line tags move in the shared indicator output axis collision pass', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 78_000, yMax: 88_000, fixedRange: false }],
+      },
+      400,
+    );
+    const mainPane = computedPanes.find((pane) => pane.id === 'main')!;
+    const bars = makeBars(1);
+    const outputValue = 79_500;
+    const projectedY = renderer.valueToY(outputValue, mainPane);
+    const orderOriginalY = projectedY + 6;
+    const fixedLastTradeY = projectedY + 80;
+    const orderBounds = {
+      lineId: 'order-1',
+      price: outputValue,
+      originalY: orderOriginalY,
+      adjustedY: orderOriginalY,
+      width: 80,
+      height: 18,
+      color: '#2196F3',
+      label: { primaryText: 'Limit' },
+      lineStyle: 'dashed',
+      type: 'order',
+    } as PriceLineLabelBounds;
+    const lastTradeBounds = {
+      lineId: 'last-trade',
+      price: outputValue,
+      originalY: fixedLastTradeY,
+      adjustedY: fixedLastTradeY,
+      width: 66,
+      height: 24,
+      color: '#16a7dc',
+      label: { primaryText: '79,500', secondaryText: '02:45' },
+      lineStyle: 'dotted',
+      fixed: true,
+    } as PriceLineLabelBounds;
+    const frame = {
+      bars,
+      computedPanes,
+      indicatorPaneInfo: { bb: { overlay: true } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>([['main', [orderBounds, lastTradeBounds]]]),
+      plots: [
+        {
+          id: 'bb-mid',
+          title: 'Basis',
+          type: 'plot',
+          scriptId: 'bb',
+          values: [outputValue],
+          color: '#2196F3',
+          precision: 0,
+        },
+      ],
+      viewport: { startTime: bars[0]!.time, endTime: bars[0]!.time + 60_000, priceMin: 78_000, priceMax: 88_000 },
+    } as any;
+
+    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'main');
+    const outputLabel = labels.find((label) => label.kind === 'indicator-output')!;
+
+    const outputHeight = outputLabel.height ?? 16;
+    const outputTop = outputLabel.y - outputHeight / 2;
+    const outputBottom = outputLabel.y + outputHeight / 2;
+    const orderTop = orderBounds.adjustedY - orderBounds.height / 2;
+    const orderBottom = orderBounds.adjustedY + orderBounds.height / 2;
+
+    expect(outputLabel.valueY).toBeCloseTo(projectedY);
+    expect(orderBounds.adjustedY).not.toBeCloseTo(orderOriginalY);
+    expect(lastTradeBounds.adjustedY).toBe(fixedLastTradeY);
+    expect(outputBottom <= orderTop || outputTop >= orderBottom).toBe(true);
+  });
+
   it('does not add indicator output tags when disabled', () => {
     const renderer = new TealchartRenderer(
       createMockCtx(),
