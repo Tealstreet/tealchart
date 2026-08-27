@@ -762,9 +762,7 @@ export function layoutNativeTradeLine(input: NativeTradeLineLayoutInput): Native
     input.chartLabelMinX ?? computeTradingLineLabelMinX(MOBILE_CHART_CHROME_METRICS, input.dimensions.margins),
   );
   const requestedPriceLabelWidth = input.priceLabelWidth ?? measureNativeTradeLinePriceLabelWidth(input.formattedPrice);
-  const priceLabelWidth = input.priceLabelLane
-    ? Math.max(requestedPriceLabelWidth, input.priceLabelLane.right - input.priceLabelLane.left)
-    : requestedPriceLabelWidth;
+  const priceLabelWidth = requestedPriceLabelWidth;
   const priceLabelLeft = input.priceLabelLane
     ? Math.round(input.priceLabelLane.right - priceLabelWidth)
     : Math.round(input.dimensions.width - priceLabelWidth - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);

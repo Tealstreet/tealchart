@@ -166,24 +166,11 @@ interface MeasuredValueAxisLabel {
 }
 
 function normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-  if (bounds.length <= 1) return bounds;
-  const width = Math.ceil(Math.max(...bounds.map((bound) => bound.width)));
-  if (!Number.isFinite(width) || width <= 0) return bounds;
-  return bounds.map((bound) => ({ ...bound, width }));
+  return bounds;
 }
 
 function normalizePriceLineLabelWidthsByPane(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-  const widthsByPane = new Map<string, number>();
-  for (const bound of bounds) {
-    const paneId = bound.targetPaneId || 'main';
-    widthsByPane.set(paneId, Math.max(widthsByPane.get(paneId) ?? 0, bound.width));
-  }
-
-  return bounds.map((bound) => {
-    const paneId = bound.targetPaneId || 'main';
-    const width = Math.ceil(widthsByPane.get(paneId) ?? bound.width);
-    return Number.isFinite(width) && width > 0 ? { ...bound, width } : bound;
-  });
+  return bounds;
 }
 
 export const MAIN_VOLUME_OVERLAY_RATIO = 0.15;

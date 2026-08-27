@@ -2853,7 +2853,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(drawSpy).not.toHaveBeenCalled();
     });
 
-    it('normalizes price line label widths within each pane', () => {
+    it('keeps price line label widths content-sized within each pane', () => {
       const ctx = createMockCtx();
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
       const viewport: Viewport = {
@@ -2907,9 +2907,9 @@ describe('TealchartRenderer coordinate transforms', () => {
       const bounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
       const byId = new Map(bounds.map((bound) => [bound.lineId, bound]));
 
-      expect(byId.get('main-short')?.width).toBe(byId.get('main-wide')?.width);
-      expect(byId.get('pane-short')?.width).toBe(byId.get('pane-wide')?.width);
-      expect(byId.get('main-short')?.width).toBeGreaterThan(byId.get('pane-short')?.width ?? 0);
+      expect(byId.get('main-short')?.width).toBeLessThan(byId.get('main-wide')?.width ?? 0);
+      expect(byId.get('pane-short')?.width).toBeLessThan(byId.get('pane-wide')?.width ?? 0);
+      expect(byId.get('main-short')?.width).toBe(byId.get('pane-short')?.width);
     });
 
     it('renders label drawings in the main pane', () => {

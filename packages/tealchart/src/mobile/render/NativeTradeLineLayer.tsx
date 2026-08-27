@@ -142,9 +142,8 @@ export function AnimatedTradeLine({
     const staticPriceTextY = staticLabelY - 1 + priceTagTextBaselineOffset;
     const staticPriceLabelText = geometry.priceLabelText;
     const staticPriceLabelTextX =
-      priceLabelRight -
-      NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X -
-      staticPriceLabelText.length * priceLabelCharacterWidth;
+      geometry.priceLabelX +
+      (geometry.priceLabelWidth - staticPriceLabelText.length * priceLabelCharacterWidth) / 2;
     const staticOpacity = isNativeYInMainPane(staticRawY, frame) ? pendingOpacity : 0;
     const staticLeftLineStart = { x: geometry.leftLineStartX, y: staticLineY };
     const staticLeftLineEnd = { x: geometry.leftLineEndX, y: staticLineY };
@@ -324,7 +323,7 @@ export function AnimatedTradeLineDragTag({
   const x = useDerivedValue(() => right - width.value);
   const y = useDerivedValue(() => centerY.value - tagHeight / 2);
   const textX = useDerivedValue(
-    () => right - NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X - text.value.length * characterWidth,
+    () => x.value + (width.value - text.value.length * characterWidth) / 2,
   );
   const textY = useDerivedValue(() => y.value + baselineOffset);
 
