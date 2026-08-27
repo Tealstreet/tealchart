@@ -69,8 +69,8 @@ function context(overrides: Partial<NativeCanvasTapContext> = {}): NativeCanvasT
   };
 }
 
-// Above the reset-view reveal strip, which is a full-width band across the
-// bottom of the frame that the crosshair has always yielded to.
+// Above the reset-view reveal target, which is a centered band near the bottom
+// of the frame that the crosshair yields to.
 const EMPTY_PLOT = { x: 60, y: 50 };
 const ON_CANCEL = { x: 140, y: CENTER_Y };
 
@@ -97,6 +97,11 @@ describe('resolveNativeCanvasTap', () => {
 
   it('gives empty plot space to the crosshair', () => {
     expect(resolveNativeCanvasTap(EMPTY_PLOT, context()).kind).toBe('crosshair');
+  });
+
+  it('does not let off-center bottom taps reveal the reset view button', () => {
+    expect(resolveNativeCanvasTap({ x: 60, y: 100 }, context()).kind).toBe('crosshair');
+    expect(resolveNativeCanvasTap({ x: 110, y: 100 }, context()).kind).toBe('none');
   });
 
   it('gives chrome nothing at all', () => {

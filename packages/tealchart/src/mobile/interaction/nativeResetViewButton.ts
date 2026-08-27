@@ -1,7 +1,7 @@
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 
 export const NATIVE_RESET_VIEW_BUTTON_SIZE = 28;
-export const NATIVE_RESET_VIEW_HIT_SIZE = 100;
+export const NATIVE_RESET_VIEW_HIT_SIZE = 80;
 export const NATIVE_RESET_VIEW_DISMISS_MS = 2500;
 export const NATIVE_RESET_VIEW_REVEAL_TOP_BUFFER = 8;
 export const NATIVE_RESET_VIEW_BOTTOM_OFFSET = 30;
@@ -35,9 +35,10 @@ export function resolveNativeResetViewRevealTopY(frame: NativeChartFrame): numbe
 
 export function isNativeResetViewRevealTap(frame: NativeChartFrame, x: number, y: number): boolean {
   'worklet';
+  const layout = resolveNativeResetViewButtonLayout(frame);
   return (
-    x >= 0 &&
-    x <= frame.dimensions.width &&
+    x >= layout.centerX - layout.hitRadius &&
+    x <= layout.centerX + layout.hitRadius &&
     y >= resolveNativeResetViewRevealTopY(frame) &&
     y <= frame.dimensions.height
   );
