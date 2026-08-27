@@ -4,8 +4,7 @@ import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
-import type { NativeChartProjection } from './nativeProjection';
-import type { NativeVisibleBar } from './nativeVisibleBars';
+import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { memo, useMemo } from 'react';
 
@@ -15,6 +14,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 import {
   formatIndicatorOutputAxisValue,
   getIndicatorOutputAxisLabelSources,
+  resolveIndicatorOutputSourceTime,
 } from '../../rendering/indicatorOutputAxisLabels';
 import {
   createNativePriceAxisLane,
@@ -24,6 +24,7 @@ import { getNativePriceAxisSingleLineTextBaselineOffset } from '../utils/priceAx
 import { createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout';
 import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
+import { sharedTimeToNativeX } from './nativeSharedViewport';
 
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 11;
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 28;
@@ -39,7 +40,7 @@ export interface NativeIndicatorOutputAxisLabel {
   color: string;
   valueY: number;
   y: number;
-  sourceX?: number;
+  sourceTime?: number;
 }
 
 export interface NativeIndicatorOutputAxisLabelGroup {
@@ -57,10 +58,9 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   indicatorPaneInfo,
   paneRangeOverrides,
   plots,
-  staticProjection,
+  sharedViewport,
   smallFont,
   totalBarCount,
-  visibleBars,
 }: {
   backgroundColor: string;
   bars: readonly Bar[];
@@ -68,10 +68,9 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
-  staticProjection?: NativeChartProjection | null;
+  sharedViewport: NativeViewportSharedValues;
   smallFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
-  visibleBars: readonly NativeVisibleBar[];
 }) {
   const labels = useMemo(
     () =>
@@ -81,11 +80,9 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
         indicatorPaneInfo,
         paneRangeOverrides: paneRangeOverrides?.value,
         plots,
-        staticProjection,
         totalBarCount,
-        visibleBars,
       }),
-    [bars, frame, indicatorPaneInfo, paneRangeOverrides, plots, staticProjection, totalBarCount, visibleBars],
+    [bars, frame, indicatorPaneInfo, paneRangeOverrides, plots, totalBarCount],
   );
   if (labels.length === 0) return null;
 
@@ -111,6 +108,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
             group={group}
             label={label}
             paneRangeOverrides={paneRangeOverrides}
+            sharedViewport={sharedViewport}
             smallFont={smallFont}
           />
         ));
@@ -127,6 +125,7 @@ function NativeIndicatorOutputAxisTag({
   group,
   label,
   paneRangeOverrides,
+  sharedViewport,
   smallFont,
 }: {
   backgroundColor: string;
@@ -136,6 +135,7 @@ function NativeIndicatorOutputAxisTag({
   group: NativeIndicatorOutputAxisLabelGroup;
   label: NativeIndicatorOutputAxisLabel;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
+  sharedViewport: NativeViewportSharedValues;
   smallFont: ReturnType<typeof Skia.Font>;
 }) {
   const textLayout = createNativePriceAxisTagTextLayout(
@@ -154,20 +154,24 @@ function NativeIndicatorOutputAxisTag({
   const tagY = useDerivedValue(() => labelCenterY.value - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2);
   const textY = useDerivedValue(() => tagY.value + baselineOffset);
   const guideY = useDerivedValue(() => Math.round(valueY.value) + 0.5);
+  const sourceTime = label.sourceTime;
+  const sourceX = useDerivedValue(
+    () => {
+      if (!Number.isFinite(sourceTime ?? NaN)) return Number.NaN;
+      return sharedTimeToNativeX(sourceTime!, sharedViewport, frame);
+    },
+    [sourceTime, sharedViewport, frame],
+  );
   const guideStart = useDerivedValue(() => {
-    const rawX = Number.isFinite(label.sourceX ?? NaN) ? label.sourceX! : frame.contentLeft;
-    return { x: Math.max(frame.contentLeft, rawX), y: guideY.value };
-  });
-  const guideEnd = useDerivedValue(() => ({ x: group.x, y: guideY.value }));
-  const shouldDrawGuide = Number.isFinite(label.sourceX ?? NaN) && label.sourceX! < group.x;
+    return { x: resolveNativeIndicatorOutputGuideStartX(sourceX.value, frame, group.x), y: guideY.value };
+  }, [sourceX, frame, group.x, guideY]);
+  const guideEnd = useDerivedValue(() => ({ x: group.x, y: guideY.value }), [group.x, guideY]);
 
   return (
     <Group clip={clip}>
-      {shouldDrawGuide ? (
-        <SkiaLine p1={guideStart} p2={guideEnd} color={label.color} strokeWidth={1} opacity={0.65}>
-          <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
-        </SkiaLine>
-      ) : null}
+      <SkiaLine p1={guideStart} p2={guideEnd} color={label.color} strokeWidth={1} opacity={0.65}>
+        <DashPathEffect intervals={NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH} />
+      </SkiaLine>
       <NativePriceAxisTagBox
         x={group.x}
         y={tagY}
@@ -233,21 +237,16 @@ export function resolveNativeIndicatorOutputAxisLabels({
   indicatorPaneInfo,
   paneRangeOverrides,
   plots,
-  staticProjection,
   totalBarCount,
-  visibleBars,
 }: {
   bars?: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
   paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
-  staticProjection?: NativeChartProjection | null;
   totalBarCount: number;
-  visibleBars: readonly NativeVisibleBar[];
 }): NativeIndicatorOutputAxisLabel[] {
   const paneById = new Map(frame.panes.map((pane) => [pane.id, pane]));
-  const xBySourceIndex = new Map(visibleBars.map((bar) => [bar.sourceIndex, bar.x]));
   const rawLabels = getIndicatorOutputAxisLabelSources({
     indicatorPaneInfo,
     panes: frame.panes,
@@ -275,11 +274,10 @@ export function resolveNativeIndicatorOutputAxisLabels({
       color: rawLabel.color,
       valueY: y,
       y,
-      sourceX: resolveNativeIndicatorOutputSourceX({
+      sourceTime: resolveNativeIndicatorOutputSourceTime({
         bars,
-        projection: staticProjection,
+        plotOffset: rawLabel.plotOffset,
         sourceIndex: rawLabel.sourceIndex,
-        xBySourceIndex,
       }),
     });
   }
@@ -287,26 +285,26 @@ export function resolveNativeIndicatorOutputAxisLabels({
   return resolveNativeIndicatorOutputLabelCollisions(labels);
 }
 
-function resolveNativeIndicatorOutputSourceX({
+function resolveNativeIndicatorOutputSourceTime({
   bars,
-  projection,
+  plotOffset,
   sourceIndex,
-  xBySourceIndex,
 }: {
   bars?: readonly Bar[];
-  projection?: NativeChartProjection | null;
+  plotOffset?: number;
   sourceIndex: number | undefined;
-  xBySourceIndex: ReadonlyMap<number, number>;
 }): number | undefined {
-  if (sourceIndex == null) return undefined;
+  return resolveIndicatorOutputSourceTime({ bars, plotOffset, sourceIndex });
+}
 
-  const visibleX = xBySourceIndex.get(sourceIndex);
-  if (Number.isFinite(visibleX ?? NaN)) return visibleX!;
-
-  const bar = bars?.[sourceIndex];
-  if (!bar || !projection || !Number.isFinite(bar.time)) return undefined;
-
-  return projection.timeToX(bar.time);
+export function resolveNativeIndicatorOutputGuideStartX(
+  sourceX: number,
+  frame: NativeChartFrame,
+  labelX: number,
+): number {
+  'worklet';
+  if (!Number.isFinite(sourceX) || sourceX >= labelX) return labelX;
+  return Math.max(frame.contentLeft, sourceX);
 }
 
 function resolveNativeIndicatorOutputLabelCollisions(
