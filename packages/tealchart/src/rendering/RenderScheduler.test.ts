@@ -56,9 +56,10 @@ describe('RenderScheduler', () => {
       expect(unique.size).toBe(flags.length);
     });
 
-    // FULL must repaint everything but NOT carry DATA_LOAD: DATA_LOAD force-clears
-    // indicator plots (TealchartWidget._render), so implying it from a plain
-    // "repaint all" blanks live indicators for a frame → flicker on add/remove.
+    // FULL must repaint everything but NOT carry DATA_LOAD: DATA_LOAD is the
+    // atomic data-transition flag (TealchartWidget._render), so implying it from
+    // a plain "repaint all" can blank live indicators for a frame → flicker on
+    // add/remove.
     it('FULL includes every render flag except DATA_LOAD', () => {
       const renderFlags = [
         DIRTY.CROSSHAIR,

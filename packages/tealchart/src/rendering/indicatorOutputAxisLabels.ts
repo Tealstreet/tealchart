@@ -15,12 +15,36 @@ export interface IndicatorOutputAxisLabelSource {
   id: string;
   paneId: string;
   plotId: string;
+  plotOffset?: number;
   scriptId: string;
   sourceIndex: number;
   value: number;
   color: string;
   precision?: number;
   sourceX?: number;
+}
+
+export function resolveIndicatorOutputSourceTime({
+  bars,
+  plotOffset,
+  sourceIndex,
+}: {
+  bars?: readonly { time?: number }[];
+  plotOffset?: number;
+  sourceIndex: number | undefined;
+}): number | undefined {
+  if (sourceIndex == null) return undefined;
+
+  const bar = bars?.[sourceIndex];
+  if (!bar || !Number.isFinite(bar.time ?? NaN)) return undefined;
+
+  const offset = Number.isFinite(plotOffset ?? NaN) ? plotOffset! : 0;
+  if (offset === 0 || !bars || bars.length < 2) return bar.time;
+
+  const interval = (bars[1]?.time ?? NaN) - (bars[0]?.time ?? NaN);
+  if (!Number.isFinite(interval) || interval === 0) return bar.time;
+
+  return bar.time! + offset * interval;
 }
 
 export function getIndicatorPlotColor(color: PlotOutput['color'], sourceIndex: number, fallback = '#2196F3'): string {
@@ -95,6 +119,7 @@ export function getIndicatorOutputAxisLabelSources({
       id: `${paneId}:indicator-output:${scriptId}:${plot.id}`,
       paneId,
       plotId: plot.id,
+      plotOffset: plot.offset,
       scriptId,
       sourceIndex: latest.sourceIndex,
       value: latest.value,

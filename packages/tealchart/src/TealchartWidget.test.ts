@@ -472,6 +472,78 @@ describe('TealchartWidget', () => {
       expect(setPlotsCalls).toHaveLength(0);
       expect(setDrawingsCalls).toEqual([[drawing]]);
     });
+
+    it('preserves worker outputs coalesced with a data-load render', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+      setPlotsCalls.length = 0;
+      setDrawingsCalls.length = 0;
+
+      const macdPlot: PlotOutput = {
+        id: 'plot_macd',
+        scriptId: 'macd',
+        type: 'plot',
+        title: 'MACD',
+        values: [null, 0.25, 0.5],
+        color: '#2196f3',
+      };
+      const signalDrawing: DrawingOutput = {
+        id: 'label_1',
+        scriptId: 'macd',
+        type: 'label',
+        barIndex: 2,
+        x: 2,
+        y: 0.5,
+        text: 'M',
+        xloc: 'bar_index',
+        yloc: 'price',
+        style: 'label.style_label_down',
+        color: '#000000',
+        textColor: '#ffffff',
+        size: 'normal',
+      };
+      const testWidget = widget as unknown as {
+        _plots: PlotOutput[];
+        _drawings: DrawingOutput[];
+        _render(dirty: number): void;
+      };
+
+      testWidget._plots = [macdPlot];
+      testWidget._drawings = [signalDrawing];
+      testWidget._render(DIRTY.DATA_LOAD | DIRTY.PLOTS | DIRTY.DRAWINGS);
+
+      expect(setPlotsCalls.at(-1)).toEqual([macdPlot]);
+      expect(setDrawingsCalls.at(-1)).toEqual([signalDrawing]);
+    });
+
+    it('clears stale worker outputs during data load when no fresh output is coalesced', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+      setPlotsCalls.length = 0;
+      setDrawingsCalls.length = 0;
+
+      const stalePlot: PlotOutput = {
+        id: 'plot_stale',
+        scriptId: 'old-study',
+        type: 'plot',
+        title: 'Stale',
+        values: [1, 2, 3],
+        color: '#ffffff',
+      };
+      const testWidget = widget as unknown as {
+        _plots: PlotOutput[];
+        _drawings: DrawingOutput[];
+        _render(dirty: number): void;
+      };
+
+      testWidget._plots = [stalePlot];
+      testWidget._render(DIRTY.DATA_LOAD);
+
+      expect(setPlotsCalls.at(-1)).toEqual([]);
+      expect(setDrawingsCalls.at(-1)).toEqual([]);
+    });
   });
 
   // ============================================================================

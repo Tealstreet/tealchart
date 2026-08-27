@@ -3733,6 +3733,64 @@ describe('value axis label layout', () => {
     expect(labels.some((label) => label.kind === 'tick' && label.textAlign === 'left')).toBe(true);
   });
 
+  it('applies plot offset to indicator output guide source x', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [
+          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
+          {
+            id: 'pane_1',
+            type: 'indicator',
+            heightRatio: 0.25,
+            yMin: -100,
+            yMax: 100,
+            fixedRange: true,
+            indicatorIds: ['macd'],
+          },
+        ],
+      },
+      400,
+    );
+    const bars = makeBars(3);
+    const frame = {
+      bars,
+      computedPanes,
+      indicatorPaneInfo: { macd: { overlay: false } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
+      plots: [
+        {
+          id: 'signal',
+          title: 'Signal',
+          type: 'plot',
+          scriptId: 'macd',
+          values: [12, 24.2, null],
+          color: '#ff9900',
+          offset: 1,
+          precision: 1,
+        },
+      ],
+      viewport: { startTime: bars[0]!.time, endTime: bars[2]!.time, priceMin: 78_000, priceMax: 88_000 },
+    } as any;
+
+    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
+    const outputLabels = labels.filter((label) => label.kind === 'indicator-output');
+    const opts = renderer.getOptions();
+    const chartWidth = opts.width - opts.margins.left;
+    const expectedSourceX =
+      opts.margins.left +
+      ((bars[2]!.time - frame.viewport.startTime) / (frame.viewport.endTime - frame.viewport.startTime)) *
+        chartWidth;
+
+    expect(outputLabels).toEqual([expect.objectContaining({ text: '24.2' })]);
+    expect(outputLabels[0]!.sourceX).toBeCloseTo(expectedSourceX);
+  });
+
   it('adds colored output tags for overlay indicator values on the main pane', () => {
     const renderer = new TealchartRenderer(
       createMockCtx(),

@@ -22,6 +22,7 @@ import {
 import {
   formatIndicatorOutputAxisValue,
   getIndicatorOutputAxisLabelSources,
+  resolveIndicatorOutputSourceTime,
 } from './rendering/indicatorOutputAxisLabels';
 import { routeTealScriptDrawings } from './rendering/TealScriptDrawingPaneRouting';
 import { partitionTealScriptDrawings } from './rendering/TealScriptDrawingPartition';
@@ -4556,7 +4557,7 @@ export class TealchartRenderer {
     });
 
     for (const label of outputLabels) {
-      const sourceX = this.resolveIndicatorOutputSourceX(label.sourceIndex, bars, viewport);
+      const sourceX = this.resolveIndicatorOutputSourceX(label, bars, viewport);
       const paneLabels = labelsByPane.get(label.paneId) ?? [];
       paneLabels.push({ ...label, sourceX });
       labelsByPane.set(label.paneId, paneLabels);
@@ -4566,16 +4567,20 @@ export class TealchartRenderer {
   }
 
   private resolveIndicatorOutputSourceX(
-    sourceIndex: number | undefined,
+    label: Pick<IndicatorOutputAxisLabelSource, 'plotOffset' | 'sourceIndex'>,
     bars: readonly Bar[] | undefined,
     viewport: Viewport | undefined,
   ): number | undefined {
-    if (!bars || !viewport || sourceIndex == null || sourceIndex < 0 || sourceIndex >= bars.length) return undefined;
-    const bar = bars[sourceIndex];
-    if (!bar || !Number.isFinite(bar.time)) return undefined;
+    if (!bars || !viewport) return undefined;
+    const sourceTime = resolveIndicatorOutputSourceTime({
+      bars,
+      plotOffset: label.plotOffset,
+      sourceIndex: label.sourceIndex,
+    });
+    if (!Number.isFinite(sourceTime ?? NaN)) return undefined;
 
     const chartWidth = this.options.width - this.margins.left;
-    return this.timeToX(bar.time, viewport, chartWidth);
+    return this.timeToX(sourceTime!, viewport, chartWidth);
   }
 
   private measurePaneYAxisLabels(
