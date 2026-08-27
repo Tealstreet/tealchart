@@ -64,10 +64,10 @@ describe('native price axis tag layout', () => {
     expect(getNativePriceLineMeasurementText('1', '888:88:88', textWidth)).toBe('888:88:88');
   });
 
-  it('centers text inside a fixed-width price-axis tag', () => {
+  it('left-aligns text inside a fixed-width price-axis tag', () => {
     const layout = createNativePriceAxisTagTextLayout(100, 120, '63,777', textWidth, 6);
 
-    expect(layout.x).toBe(100 + (120 - textWidth('63,777')) / 2);
+    expect(layout.x).toBe(106);
   });
 
   it('derives price-line tag text baselines from tag height', () => {
@@ -111,7 +111,7 @@ describe('native price axis tag layout', () => {
     expect(tag.text).toBe('123,456,789.0');
     expect(tag.x).toBeLessThan(302);
     expect(tag.x + tag.width).toBe(376);
-    expect(tag.textX + textWidth(tag.text)).toBe(370);
+    expect(tag.textX).toBe(tag.x + 6);
   });
 
   it('stacks overlapping price-axis tags without changing their order', () => {

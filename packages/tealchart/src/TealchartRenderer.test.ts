@@ -2853,7 +2853,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(drawSpy).not.toHaveBeenCalled();
     });
 
-    it('keeps price line label widths content-sized within each pane', () => {
+    it('normalizes price line label widths within each pane', () => {
       const ctx = createMockCtx();
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
       const viewport: Viewport = {
@@ -2907,9 +2907,9 @@ describe('TealchartRenderer coordinate transforms', () => {
       const bounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
       const byId = new Map(bounds.map((bound) => [bound.lineId, bound]));
 
-      expect(byId.get('main-short')?.width).toBeLessThan(byId.get('main-wide')?.width ?? 0);
-      expect(byId.get('pane-short')?.width).toBeLessThan(byId.get('pane-wide')?.width ?? 0);
-      expect(byId.get('main-short')?.width).toBe(byId.get('pane-short')?.width);
+      expect(byId.get('main-short')?.width).toBe(byId.get('main-wide')?.width);
+      expect(byId.get('pane-short')?.width).toBe(byId.get('pane-wide')?.width);
+      expect(byId.get('main-short')?.width).toBeGreaterThan(byId.get('pane-short')?.width ?? 0);
     });
 
     it('renders label drawings in the main pane', () => {
@@ -3775,7 +3775,7 @@ describe('value axis label layout', () => {
     expect(outputLabels.map((label) => label.text)).toEqual(['24.2', '-11.6']);
     expect(outputLabels.map((label) => label.borderColor)).toEqual(['#2196F3', '#ff9900']);
     expect(outputLabels.every((label) => label.backgroundColor === '#111418')).toBe(true);
-    expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
+    expect(outputLabels.every((label) => label.textAlign === 'left')).toBe(true);
     expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.valueY))).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.sourceX))).toBe(true);

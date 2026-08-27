@@ -119,6 +119,7 @@ import {
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
+import { createNativePriceAxisLaneWidth } from './mobile/utils/nativePriceAxisLane';
 import {
   createNativeChartLayoutSettings,
   resolveNativeDefaultLayoutPersistence,
@@ -458,6 +459,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     () => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision ?? Number.NaN),
     [pricePrecision],
   );
+  const createNativeInitialPriceAxisWidth = useCallback(
+    () => createNativePriceAxisLaneWidth({ pricePrecision: nativePricePrecision, measurementTexts: [] }),
+    [nativePricePrecision],
+  );
+  const [nativePriceAxisWidth, setNativePriceAxisWidth] = useState(createNativeInitialPriceAxisWidth);
+  useEffect(() => {
+    setNativePriceAxisWidth(createNativeInitialPriceAxisWidth());
+  }, [createNativeInitialPriceAxisWidth, symbol]);
   // Pane heights the user set by dragging a divider. Chart-owned, exactly as web
   // keeps them in ChartCore rather than pushing them back into the manager.
   const [nativePaneHeightOverrides, setNativePaneHeightOverrides] = useState<Readonly<Record<string, number>>>({});
@@ -874,6 +883,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     leftToolRailCollapsed,
     marginsProp,
     paneLayout: nativeIndicatorPaneLayout,
+    priceAxisWidth: nativePriceAxisWidth,
     pricePrecision: nativePricePrecision,
     propHeight: layoutPropHeight,
     propWidth: layoutPropWidth,
@@ -1564,6 +1574,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     chromeTheme,
     gridColor,
     leftToolRailLayout,
+    measuredPriceAxisWidth,
     nativeMutedTextColor,
     nativePriceLines,
     plotPrimitiveClip,
@@ -1603,6 +1614,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     userDrawingRecentToolsByCategory,
     volumeHeightRatio: VOLUME_HEIGHT_RATIO,
   });
+  useLayoutEffect(() => {
+    const nextWidth = Math.ceil(measuredPriceAxisWidth);
+    if (!Number.isFinite(nextWidth) || nextWidth <= nativePriceAxisWidth) return;
+    setNativePriceAxisWidth(nextWidth);
+  }, [measuredPriceAxisWidth, nativePriceAxisWidth]);
 
   const { resolvedPriceAxisTags } = useNativeSkiaSharedValueBridge({
     bracketDragState: bracketDragInteractionState,

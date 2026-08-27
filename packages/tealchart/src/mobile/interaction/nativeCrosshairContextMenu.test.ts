@@ -5,7 +5,7 @@ import type { NativeViewportSharedValues } from '../render/nativeSharedViewport'
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
-import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
+import { createNativePriceAxisLane, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   isNativeCrosshairContextMenuButtonTap,
   NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_HIT_RADIUS,
@@ -64,7 +64,7 @@ describe('native crosshair context menu geometry', () => {
     expect(button.centerX).toBe(priceLabel.x - 11);
   });
 
-  it('keeps text flush right while a remembered label width prevents button jitter', () => {
+  it('keeps text left-aligned while a remembered label width prevents button jitter', () => {
     const capacityLabel = resolveNativeCrosshairPriceLabelLayout(widePriceAxisFrame, 0.0001);
     const displayedLabel = resolveNativeCrosshairPriceLabelLayout(widePriceAxisFrame, 0.0001, '2.1033');
     const rememberedLabel = resolveNativeCrosshairPriceLabelLayout(
@@ -108,7 +108,7 @@ describe('native crosshair context menu geometry', () => {
 
     expect(label.x).toBeLessThan(frame.priceAxisLeft);
     expect(label.x + label.width).toBe(right);
-    expect(label.textX + Math.ceil('63,777.000000'.length * 6.8)).toBe(right - 5);
+    expect(label.textX).toBe(label.x + NATIVE_PRICE_AXIS_TAG_PADDING_X);
     expect(button.centerX).toBe(label.x - 11);
   });
 

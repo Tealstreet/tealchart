@@ -1,6 +1,5 @@
 import {
   estimateNativeTradeLineTextWidth,
-  getNativeTradeLinePriceLabelCapacityText,
   measureNativeTradeLinePriceLabelWidth,
 } from './tradeLineLayout';
 import { NATIVE_PRICE_AXIS_COUNTDOWN_SAMPLE } from './priceAxisTagLayout';
@@ -56,19 +55,14 @@ export function measureNativePriceAxisTagWidth(text: string, textWidth = estimat
 export function createNativePriceAxisLaneWidth({
   minimumWidth = DEFAULT_NATIVE_PRICE_AXIS_WIDTH,
   measurementTexts,
-  pricePrecision,
+  pricePrecision: _pricePrecision,
   textWidth = estimateNativeTradeLineTextWidth,
 }: NativePriceAxisLaneWidthInput): number {
-  const positiveCapacityText = getNativeTradeLinePriceLabelCapacityText(pricePrecision);
-  const negativeCapacityText = `-${positiveCapacityText}`;
-  const semanticMeasurementTexts = measurementTexts ?? [
-    positiveCapacityText,
-    negativeCapacityText,
-    NATIVE_PRICE_AXIS_COUNTDOWN_SAMPLE,
-  ];
-  const requiredTagWidth = Math.max(
-    measureNativeTradeLinePriceLabelWidth(positiveCapacityText, textWidth),
-    ...semanticMeasurementTexts.map((text) => measureNativePriceAxisTagWidth(text, textWidth)),
+  const semanticMeasurementTexts = measurementTexts ?? [NATIVE_PRICE_AXIS_COUNTDOWN_SAMPLE];
+  const requiredTagWidth = semanticMeasurementTexts.reduce(
+    (width, text) =>
+      Math.max(width, measureNativePriceAxisTagWidth(text, textWidth), measureNativeTradeLinePriceLabelWidth(text, textWidth)),
+    0,
   );
 
   return Math.ceil(

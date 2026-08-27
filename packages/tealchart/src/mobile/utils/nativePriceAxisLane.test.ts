@@ -8,20 +8,30 @@ import {
   measureNativePriceAxisTagWidth,
 } from './nativePriceAxisLane';
 import { NATIVE_PRICE_AXIS_COUNTDOWN_SAMPLE } from './priceAxisTagLayout';
-import {
-  getNativeTradeLinePriceLabelCapacityText,
-  measureNativeTradeLinePriceLabelWidth,
-} from './tradeLineLayout';
+import { measureNativeTradeLinePriceLabelWidth } from './tradeLineLayout';
 
 describe('native price-axis lane', () => {
-  it('reserves enough lane width for configured trade-line price tags', () => {
+  it('does not reserve for fake six-digit prices before actual labels are measured', () => {
     const textWidth = (text: string) => text.length * 7;
-    const laneWidth = createNativePriceAxisLaneWidth({ pricePrecision: 2, textWidth });
+    const laneWidth = createNativePriceAxisLaneWidth({ pricePrecision: 0.000001, textWidth });
     const usableWidth = getNativePriceAxisLaneUsableWidth(laneWidth);
-    const capacityText = getNativeTradeLinePriceLabelCapacityText(2);
+    const fakeCapacityWidth = measureNativeTradeLinePriceLabelWidth('999,999.000000', textWidth);
 
-    expect(laneWidth).toBeGreaterThan(DEFAULT_NATIVE_PRICE_AXIS_WIDTH);
-    expect(usableWidth).toBeGreaterThanOrEqual(measureNativeTradeLinePriceLabelWidth(`-${capacityText}`, textWidth));
+    expect(laneWidth).toBeGreaterThanOrEqual(DEFAULT_NATIVE_PRICE_AXIS_WIDTH);
+    expect(usableWidth).toBeLessThan(fakeCapacityWidth);
+  });
+
+  it('grows from actual measured labels', () => {
+    const textWidth = (text: string) => text.length * 7;
+    const laneWidth = createNativePriceAxisLaneWidth({
+      pricePrecision: 0.000001,
+      measurementTexts: ['0.747370', '0.770000'],
+      textWidth,
+    });
+    const usableWidth = getNativePriceAxisLaneUsableWidth(laneWidth);
+
+    expect(usableWidth).toBeGreaterThanOrEqual(measureNativeTradeLinePriceLabelWidth('0.770000', textWidth));
+    expect(usableWidth).toBeLessThan(measureNativeTradeLinePriceLabelWidth('999,999.000000', textWidth));
   });
 
   it('reserves enough lane width for two-line price-axis countdown tags', () => {

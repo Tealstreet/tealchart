@@ -29,8 +29,9 @@ import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions } from '..
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
 import { createNativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import { createNativeBracketPriceLines } from '../utils/nativeBracketPriceLines';
-import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
+import { createNativePriceAxisLane, createNativePriceAxisLaneWidth } from '../utils/nativePriceAxisLane';
 import { createNativePriceAxisTagSources } from '../utils/priceAxisTagSources';
+import { getNativeCountdownLayoutText } from '../utils/priceAxisTagLayout';
 import { createNativeTopBarLayout, createNativeTopBarTimeframes } from '../utils/topBarLayout';
 import {
   buildNativeTradeLineGeometries,
@@ -38,11 +39,49 @@ import {
   getNativePositionObjectId,
   promoteNativeSelectedTradeLineGeometry,
 } from '../utils/tradeLineLayout';
-import { normalizeNativePricePrecisionToTickSizeWorklet } from './nativePriceFormat';
+import { formatNativeCountdown } from './nativeAxisTagLayout';
+import { getNativePriceGridSlot, getNativePriceGridSlotCount } from './nativeGridSlots';
+import {
+  formatNativePriceAxisTickWithPrecisionWorklet,
+  normalizeNativePricePrecisionToTickSizeWorklet,
+} from './nativePriceFormat';
 import { createNativeSkiaAxisFont, createNativeSkiaFont, measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { getNativeVisibleBars } from './nativeVisibleBars';
 
 const EMPTY_NATIVE_PRICE_LINES: readonly PriceLine[] = [];
+
+function collectNativePriceGridMeasurementTexts(
+  frame: NativeChartFrame | null,
+  projection: NativeChartProjection | null,
+  pricePrecision: number,
+): string[] {
+  if (!frame || !projection) return [];
+
+  const texts: string[] = [];
+  const slotCount = getNativePriceGridSlotCount(frame.mainPane.height);
+  for (let index = 0; index < slotCount; index += 1) {
+    const slot = getNativePriceGridSlot({
+      index,
+      priceMin: projection.viewport.priceMin,
+      priceMax: projection.viewport.priceMax,
+      priceHeight: frame.mainPane.height,
+    });
+    if (!slot.visible) continue;
+    texts.push(formatNativePriceAxisTickWithPrecisionWorklet(slot.price, slot.spacing, pricePrecision));
+  }
+  return texts;
+}
+
+function collectNativePriceLineMeasurementTexts(priceLines: readonly NativeRenderablePriceLine[]): string[] {
+  return priceLines.flatMap((line) => {
+    const primaryLabel = line.label.primaryText;
+    const secondaryLabel =
+      line.countdownToTime !== undefined
+        ? getNativeCountdownLayoutText(formatNativeCountdown(line.countdownToTime))
+        : line.label.secondaryText;
+    return secondaryLabel ? [primaryLabel, secondaryLabel] : [primaryLabel];
+  });
+}
 
 export interface NativeSkiaRenderModelInput {
   bars: readonly Bar[];
@@ -82,6 +121,7 @@ export interface NativeSkiaRenderModel {
   chromeTheme: ChartChromeTheme;
   gridColor: string;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
+  measuredPriceAxisWidth: number;
   nativeMutedTextColor: string;
   nativePriceLines: readonly NativeRenderablePriceLine[];
   plotPrimitiveClip: SharedValue<NativePrimitiveClip>;
@@ -324,6 +364,19 @@ export function useNativeSkiaRenderModel({
   const textColor = options.textColor;
   const backgroundColor = options.backgroundColor;
   const volumeHeight = frame && options.showVolume ? Math.max(24, frame.mainPane.height * volumeHeightRatio) : 0;
+  const measuredPriceAxisWidth = useMemo(() => {
+    const measurementTexts = [
+      ...collectNativePriceGridMeasurementTexts(frame, projection, pricePrecision),
+      ...collectNativePriceLineMeasurementTexts(nativePriceLines),
+      ...tradeLineGeometries.map((geometry) => geometry.priceLabelText),
+    ];
+
+    return createNativePriceAxisLaneWidth({
+      pricePrecision,
+      measurementTexts,
+      textWidth: (text) => measureNativeSkiaTextWidth(axisFont, text),
+    });
+  }, [axisFont, frame, nativePriceLines, pricePrecision, projection, tradeLineGeometries]);
 
   return {
     axisFont,
@@ -331,6 +384,7 @@ export function useNativeSkiaRenderModel({
     chromeTheme,
     gridColor,
     leftToolRailLayout,
+    measuredPriceAxisWidth,
     nativeMutedTextColor,
     nativePriceLines,
     plotPrimitiveClip,

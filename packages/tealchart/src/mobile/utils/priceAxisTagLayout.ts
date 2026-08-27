@@ -72,11 +72,10 @@ export function createNativePriceAxisTagTextLayout(
 ): NativePriceAxisTagTextLayout {
   const availableWidth = Math.max(0, width - paddingX * 2);
   const displayText = fitNativePriceAxisTextToWidth(text, availableWidth, textWidth);
-  const measuredTextWidth = textWidth(displayText);
 
   return {
     text: displayText,
-    x: x + (width - measuredTextWidth) / 2,
+    x: x + paddingX,
   };
 }
 

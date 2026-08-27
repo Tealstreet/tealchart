@@ -1,5 +1,5 @@
-import { matchFont } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
+import { matchFont } from '@shopify/react-native-skia';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import {
@@ -32,13 +32,15 @@ const frame = createNativeChartFrameFromPanes({
 });
 
 describe('native axis tag render layout', () => {
-  it('sizes price-axis tags to their content instead of the whole axis lane', () => {
+  it('uses the full right price-axis lane for price-axis tags', () => {
     const font = matchFont({ fontSize: 11 });
     const tag = createNativeAxisTagLayout(frame, font, '0.74737');
     const laneTag = createNativeAxisLaneTagLayout(frame);
 
-    expect(tag.width).toBeLessThan(laneTag.width);
+    expect(tag.width).toBe(laneTag.width);
+    expect(tag.x).toBe(laneTag.x);
     expect(tag.x + tag.width).toBe(laneTag.x + laneTag.width);
+    expect(tag.textX).toBe(tag.x + 5);
   });
 
   it('reserves the full right price-axis lane for live drag-preview tags', () => {
