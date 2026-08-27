@@ -986,19 +986,6 @@ export class TealchartRenderer {
       return;
     }
 
-    // Draw connector line if label is offset from price line
-    if (Math.abs(labelCenterY - lineY) > 2) {
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(labelX, lineY);
-      ctx.lineTo(labelX, labelCenterY);
-      ctx.stroke();
-      ctx.restore();
-    }
-
     // Draw label border with rounded corners. Unfilled keeps the dark backing
     // rather than going transparent, so the grid cannot read through the tag.
     const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color });
@@ -1191,22 +1178,9 @@ export class TealchartRenderer {
       }
     }
 
-    // Draw price axis label with connector if needed
+    // Draw price axis label.
     const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
-
-    // Draw connector line if label is offset from price line
-    if (Math.abs(labelCenterY - lineY) > 2) {
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(priceAxisLabelX, lineY);
-      ctx.lineTo(priceAxisLabelX, labelCenterY);
-      ctx.stroke();
-      ctx.restore();
-    }
 
     // Draw price axis label with background (for trading lines)
     const bgColor = bound.label.backgroundColor || color;
@@ -5531,19 +5505,6 @@ export class TealchartRenderer {
     // (Konva handles these for collision resolution with order/position labels)
     if (bound.renderLineOnCanvas || !drawLabels) {
       return;
-    }
-
-    // Connector
-    if (drawLabels && Math.abs(labelCenterY - lineY) > 2) {
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(labelX, lineY);
-      ctx.lineTo(labelX, labelCenterY);
-      ctx.stroke();
-      ctx.restore();
     }
 
     // Label border. Unfilled keeps the dark backing rather than going
