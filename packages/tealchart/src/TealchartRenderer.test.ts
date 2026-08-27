@@ -16,7 +16,7 @@ import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
-import { PRICE_AXIS_RIGHT_PADDING, TIME_AXIS_HEIGHT } from './types';
+import { PRICE_AXIS_TAG_HORIZONTAL_PADDING, TIME_AXIS_HEIGHT } from './types';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -702,12 +702,12 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const trackY = renderer.publicPriceToY(120, viewport);
-      const labelWidth = '120'.length * 7 + 8;
+      const labelWidth = '120'.length * 7 + PRICE_AXIS_TAG_HORIZONTAL_PADDING * 2;
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
       expect(roundRect).toHaveBeenCalledWith(
-        opts.width - labelWidth - PRICE_AXIS_RIGHT_PADDING,
+        opts.width - opts.margins.right,
         trackY - 8,
         labelWidth,
         16,
@@ -2843,7 +2843,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(drawSpy).not.toHaveBeenCalled();
     });
 
-    it('normalizes price line label widths within each pane', () => {
+    it('keeps price line label boxes content-sized across panes', () => {
       const ctx = createMockCtx();
       const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
       const viewport: Viewport = {
@@ -2897,16 +2897,16 @@ describe('TealchartRenderer coordinate transforms', () => {
       const bounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
       const byId = new Map(bounds.map((bound) => [bound.lineId, bound]));
 
-      expect(byId.get('main-short')?.width).toBe(byId.get('main-wide')?.width);
+      expect(byId.get('main-short')?.width).toBeLessThan(byId.get('main-wide')?.width ?? 0);
+      expect(byId.get('pane-short')?.width).toBeLessThan(byId.get('pane-wide')?.width ?? 0);
       expect(byId.get('main-short')?.width).toBe(byId.get('pane-short')?.width);
-      expect(byId.get('main-short')?.width).toBe(byId.get('pane-wide')?.width);
 
       const shortBounds = renderer.computePriceLineLabelBoundsWithLayout(
         priceLines.filter((line) => line.id === 'main-short' || line.id === 'pane-short'),
         viewport,
         layout,
       );
-      expect(shortBounds.every((bound) => bound.width === byId.get('main-wide')?.width)).toBe(true);
+      expect(shortBounds.every((bound) => bound.width === byId.get('main-short')?.width)).toBe(true);
     });
 
     it('reserves text-rendering slack for trailing-zero price-axis labels', () => {
@@ -2941,7 +2941,9 @@ describe('TealchartRenderer coordinate transforms', () => {
       );
 
       expect(bound).toBeDefined();
-      expect((bound?.width ?? 0) - 12).toBeGreaterThan(ctx.measureText(primaryText).width);
+      expect((bound?.width ?? 0) - PRICE_AXIS_TAG_HORIZONTAL_PADDING * 2).toBeGreaterThan(
+        ctx.measureText(primaryText).width,
+      );
     });
 
     it('renders label drawings in the main pane', () => {

@@ -46,6 +46,7 @@ import {
   PaneLayout,
   PositionLineRenderData,
   PRICE_AXIS_RIGHT_PADDING,
+  PRICE_AXIS_TAG_HORIZONTAL_PADDING,
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
@@ -166,11 +167,6 @@ interface MeasuredValueAxisLabel {
   sourceX?: number;
 }
 
-function getMaxPriceLineLabelWidth(bounds: PriceLineLabelBounds[]): number {
-  if (bounds.length === 0) return 0;
-  return Math.ceil(Math.max(...bounds.map((bound) => bound.width)));
-}
-
 export const MAIN_VOLUME_OVERLAY_RATIO = 0.15;
 
 export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
@@ -196,7 +192,7 @@ export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
 
 type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
-const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
+const PRICE_AXIS_LABEL_TEXT_PADDING_X = PRICE_AXIS_TAG_HORIZONTAL_PADDING;
 const PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X = 4;
 const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 16;
 const INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
@@ -291,22 +287,11 @@ export class TealchartRenderer {
   private jailbreakManager: JailbreakIndicatorManager | null = null;
   private valueAxisCommonLabelWidth = 0;
   private valueAxisPaneLabelWidths = new Map<string, number>();
-  private priceAxisTagLabelWidth = 0;
 
   constructor(ctx: CanvasContext, options: Partial<RenderOptions> = {}, margins: Partial<ChartMargins> = {}) {
     this.ctx = ctx;
     this.options = { ...DEFAULT_RENDER_OPTIONS, ...options };
     this.margins = { ...DEFAULT_MARGINS, ...margins };
-  }
-
-  private normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-    if (bounds.length === 0) return bounds;
-    const measuredWidth = getMaxPriceLineLabelWidth(bounds);
-    const laneWidth = Math.max(0, this.margins.right - PRICE_AXIS_RIGHT_PADDING);
-    const width = Math.ceil(Math.max(this.priceAxisTagLabelWidth, measuredWidth, laneWidth));
-    if (!Number.isFinite(width) || width <= 0) return bounds;
-    this.priceAxisTagLabelWidth = width;
-    return bounds.map((bound) => ({ ...bound, width }));
   }
 
   /**
@@ -912,19 +897,17 @@ export class TealchartRenderer {
       }
     }
 
-    return this.normalizePriceLineLabelWidths(
-      allBounds
-        .filter((b) => {
-          // Hide if line is completely outside visible area
-          return b.originalY >= visibleTop && b.originalY <= visibleBottom;
-        })
-        .map((b) => {
-          return {
-            ...b,
-            isOffScreen: false, // If we got here, it's on screen
-          };
-        }),
-    );
+    return allBounds
+      .filter((b) => {
+        // Hide if line is completely outside visible area
+        return b.originalY >= visibleTop && b.originalY <= visibleBottom;
+      })
+      .map((b) => {
+        return {
+          ...b,
+          isOffScreen: false, // If we got here, it's on screen
+        };
+      });
   }
 
   /**
@@ -967,8 +950,8 @@ export class TealchartRenderer {
     // Clamp lineY: can go to top (0) and into volume area, but not below time axis
     const lineY = Math.max(0, Math.min(options.height - margins.bottom, rawLineY));
 
-    // Label box position with padding from right edge (matches Konva PriceLineLayer)
-    const labelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+    // Keep tag boxes content-sized, but align them to the left edge of the axis lane.
+    const labelX = options.width - margins.right;
     const labelY = labelCenterY - bound.height / 2;
 
     // Draw horizontal line - stop before label with gap (always draw, clamped to visible area)
@@ -1093,7 +1076,7 @@ export class TealchartRenderer {
       }
     } else {
       // No chart label - draw line all the way to price axis label
-      const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+      const priceAxisLabelX = options.width - margins.right;
       ctx.beginPath();
       ctx.moveTo(lineStartX, lineY);
       ctx.lineTo(priceAxisLabelX, lineY);
@@ -1166,7 +1149,7 @@ export class TealchartRenderer {
 
       // Draw line from right side of chart label to price axis label
       const chartLabelRightX = currentX;
-      const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+      const priceAxisLabelX = options.width - margins.right;
       if (chartLabelRightX < priceAxisLabelX) {
         ctx.save();
         ctx.strokeStyle = color;
@@ -1186,7 +1169,7 @@ export class TealchartRenderer {
     }
 
     // Draw price axis label.
-    const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+    const priceAxisLabelX = options.width - margins.right;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Draw price axis label with background (for trading lines)
@@ -1602,11 +1585,11 @@ export class TealchartRenderer {
     // Calculate label dimensions
     ctx.font = `11px ${this.font}`;
     const textWidth = ctx.measureText(priceText).width;
-    const labelWidth = textWidth + 8;
+    const labelWidth = textWidth + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2;
     const labelHeight = 16;
 
     // Position label in the price axis area
-    const labelX = options.width - labelWidth - PRICE_AXIS_RIGHT_PADDING;
+    const labelX = options.width - margins.right;
     const labelY = lineY - labelHeight / 2;
 
     // Clamp label to visible area
@@ -3584,13 +3567,11 @@ export class TealchartRenderer {
     }
 
     // Filter to visible area within each line's target pane
-    return this.normalizePriceLineLabelWidths(
-      allBounds.filter((b) => {
-        const targetPaneId = b.targetPaneId || 'main';
-        const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
-        return b.originalY >= targetPane.top && b.originalY <= targetPane.bottom;
-      }),
-    );
+    return allBounds.filter((b) => {
+      const targetPaneId = b.targetPaneId || 'main';
+      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
+      return b.originalY >= targetPane.top && b.originalY <= targetPane.bottom;
+    });
   }
 
   /**
@@ -4590,7 +4571,8 @@ export class TealchartRenderer {
       );
       const measuredWidth =
         measuredLabels.length > 0 ? Math.ceil(Math.max(...measuredLabels.map((label) => label.textWidth))) : 0;
-      const paneLabelWidth = Math.max(this.valueAxisPaneLabelWidths.get(pane.id) ?? 0, measuredWidth);
+      const previousPaneWidth = this.valueAxisPaneLabelWidths.get(pane.id) ?? 0;
+      const paneLabelWidth = Math.max(previousPaneWidth, measuredWidth);
 
       this.valueAxisPaneLabelWidths.set(pane.id, paneLabelWidth);
       paneLabelWidths.set(pane.id, paneLabelWidth);
@@ -4747,15 +4729,16 @@ export class TealchartRenderer {
       if (y < visibleTop || y > pane.bottom) continue;
 
       const text = formatIndicatorOutputAxisValue(output.value, range, output.precision);
+      const measuredTagWidth = Math.max(
+        INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
+        getCachedTextWidth(this.ctx, text, textFont) + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2,
+      );
       measured.push({
         id: output.id,
         paneId: pane.id,
         value: output.value,
         text,
-        textWidth: Math.max(
-          INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
-          getCachedTextWidth(this.ctx, text, textFont) + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2,
-        ),
+        textWidth: measuredTagWidth,
         kind: 'indicator-output',
         backgroundColor: this.options.backgroundColor,
         borderColor: output.color,
@@ -4874,7 +4857,7 @@ export class TealchartRenderer {
     const axisLabelWidth = Math.max(0, labelRightEdge - axisLabelX);
 
     return measuredLabels.map((label) => {
-      const labelWidth = axisLabelWidth;
+      const labelWidth = label.kind === 'indicator-output' ? Math.ceil(label.textWidth) : axisLabelWidth;
       const labelX = axisLabelX;
       const textAlign = label.kind === 'indicator-output' ? 'center' : 'left';
       return {
@@ -5432,9 +5415,7 @@ export class TealchartRenderer {
     }
 
     // Filter to visible area (labels with original Y in top bar should still render, just clamped)
-    return this.normalizePriceLineLabelWidths(
-      allBounds.filter((b) => b.originalY >= pane.top && b.originalY <= pane.bottom),
-    );
+    return allBounds.filter((b) => b.originalY >= pane.top && b.originalY <= pane.bottom);
   }
 
   /**
@@ -5479,8 +5460,8 @@ export class TealchartRenderer {
     const color = bound.color;
     const labelCenterY = Math.max(pane.top, Math.min(pane.bottom, bound.adjustedY));
 
-    // Label box position with padding from right edge (matches Konva PriceLineLayer)
-    const labelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+    // Keep tag boxes content-sized, but align them to the left edge of the axis lane.
+    const labelX = options.width - margins.right;
     const labelY = labelCenterY - bound.height / 2;
 
     if (drawContent) {
@@ -5552,7 +5533,7 @@ export class TealchartRenderer {
     const lineY = Math.max(pane.top, Math.min(pane.bottom, this.valueToY(bound.price, pane)));
     const color = bound.color;
     const lineWidth = bound.lineWidth || 1;
-    const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+    const priceAxisLabelX = options.width - margins.right;
 
     // Draw one continuous line as a fallback path.
     // In the current pipeline, interactive order/position lines are rendered by
@@ -5633,7 +5614,7 @@ export class TealchartRenderer {
           ctx.stroke();
         }
       } else {
-        const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+        const priceAxisLabelX = options.width - margins.right;
         ctx.beginPath();
         ctx.moveTo(lineStartX, lineY);
         ctx.lineTo(priceAxisLabelX, lineY);
@@ -5707,7 +5688,7 @@ export class TealchartRenderer {
 
       // Line to price axis label
       const chartLabelRightX = currentX;
-      const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+      const priceAxisLabelX = options.width - margins.right;
       if (chartLabelRightX < priceAxisLabelX) {
         ctx.save();
         ctx.strokeStyle = color;
@@ -5726,7 +5707,7 @@ export class TealchartRenderer {
     if (!drawLabels) return;
 
     // Price axis label
-    const priceAxisLabelX = options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+    const priceAxisLabelX = options.width - margins.right;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Connector

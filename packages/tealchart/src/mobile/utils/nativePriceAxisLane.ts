@@ -2,13 +2,14 @@ import {
   estimateNativeTradeLineTextWidth,
   measureNativeTradeLinePriceLabelWidth,
 } from './tradeLineLayout';
+import { PRICE_AXIS_TAG_HORIZONTAL_PADDING } from '../../types';
 import { NATIVE_PRICE_AXIS_COUNTDOWN_SAMPLE } from './priceAxisTagLayout';
 
 export const DEFAULT_NATIVE_PRICE_AXIS_WIDTH = 68;
 export const NATIVE_PRICE_AXIS_LANE_LEFT_INSET = 1;
 export const NATIVE_PRICE_AXIS_LANE_RIGHT_INSET = 1;
 export const NATIVE_PRICE_AXIS_TAG_MIN_WIDTH = 48;
-export const NATIVE_PRICE_AXIS_TAG_PADDING_X = 5;
+export const NATIVE_PRICE_AXIS_TAG_PADDING_X = PRICE_AXIS_TAG_HORIZONTAL_PADDING;
 
 export interface NativePriceAxisLaneWidthInput {
   pricePrecision: number;

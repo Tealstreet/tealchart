@@ -32,15 +32,16 @@ const frame = createNativeChartFrameFromPanes({
 });
 
 describe('native axis tag render layout', () => {
-  it('uses the full right price-axis lane for price-axis tags', () => {
+  it('left-aligns content-sized price-axis tags inside the right price-axis lane', () => {
     const font = matchFont({ fontSize: 11 });
     const tag = createNativeAxisTagLayout(frame, font, '0.74737');
     const laneTag = createNativeAxisLaneTagLayout(frame);
 
-    expect(tag.width).toBe(laneTag.width);
     expect(tag.x).toBe(laneTag.x);
-    expect(tag.x + tag.width).toBe(laneTag.x + laneTag.width);
-    expect(tag.textX).toBe(tag.x + 19.5);
+    expect(tag.width).toBeLessThan(laneTag.width);
+    expect(tag.x + tag.width).toBeLessThan(laneTag.x + laneTag.width);
+    expect(tag.textX).toBeGreaterThan(tag.x);
+    expect(tag.textX).toBeLessThan(tag.x + tag.width);
   });
 
   it('reserves the full right price-axis lane for live drag-preview tags', () => {
