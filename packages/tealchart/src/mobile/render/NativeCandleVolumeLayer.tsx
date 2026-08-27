@@ -11,7 +11,7 @@ import { Group, Skia, Path as SkiaPath } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeOhlcvPrimitiveClip } from './nativePrimitiveClip';
-import { sharedPriceToNativeY, sharedTimeToNativeX } from './nativeSharedViewport';
+import { isNativeMainPaneVisible, sharedPriceToNativeY, sharedTimeToNativeX } from './nativeSharedViewport';
 import { getNativeCandleWidth, getNativeViewportMaxVolume, getNativeVisibleCandleGeometry } from './nativeVisibleBars';
 
 interface NativeLiveCandleGeometry {
@@ -96,6 +96,21 @@ export function getNativeLiveCandleGeometry({
     sharedViewport.endTime.value - sharedViewport.startTime.value,
     frame.contentWidth,
   );
+
+  if (!isNativeMainPaneVisible(frame)) {
+    return {
+      bodyHeight: 0,
+      bodyVisible: false,
+      bodyWidth,
+      bodyX: x - bodyWidth / 2,
+      bodyY: frame.mainPane.top,
+      visible: false,
+      wickBottomY: frame.mainPane.top,
+      wickTopY: frame.mainPane.top,
+      x,
+    };
+  }
+
   const candleGeometry = getNativeVisibleCandleGeometry({
     clipBottom: frame.timeAxisBottom,
     clipTop: frame.mainPane.top,
@@ -139,6 +154,16 @@ export function getNativeLiveVolumeGeometry({
     sharedViewport.endTime.value - sharedViewport.startTime.value,
     frame.contentWidth,
   );
+  if (!isNativeMainPaneVisible(frame)) {
+    return {
+      bodyHeight: 0,
+      bodyWidth,
+      bodyX: x - bodyWidth / 2,
+      bodyY: frame.mainPane.top,
+      opacity: 0,
+    };
+  }
+
   const barVolumeHeight = volumeHeight * ((bar.volume || 0) / Math.max(1, maxVolume));
   return {
     bodyHeight: barVolumeHeight,
@@ -164,6 +189,21 @@ export function getNativeProjectedCandleGeometry({
     projection.viewport.endTime - projection.viewport.startTime,
     frame.contentWidth,
   );
+
+  if (!isNativeMainPaneVisible(frame)) {
+    return {
+      bodyHeight: 0,
+      bodyVisible: false,
+      bodyWidth,
+      bodyX: x - bodyWidth / 2,
+      bodyY: frame.mainPane.top,
+      visible: false,
+      wickBottomY: frame.mainPane.top,
+      wickTopY: frame.mainPane.top,
+      x,
+    };
+  }
+
   const candleGeometry = getNativeVisibleCandleGeometry({
     clipBottom: frame.timeAxisBottom,
     clipTop: frame.mainPane.top,
@@ -206,6 +246,16 @@ export function getNativeProjectedVolumeGeometry({
     projection.viewport.endTime - projection.viewport.startTime,
     frame.contentWidth,
   );
+  if (!isNativeMainPaneVisible(frame)) {
+    return {
+      bodyHeight: 0,
+      bodyWidth,
+      bodyX: x - bodyWidth / 2,
+      bodyY: frame.mainPane.top,
+      opacity: 0,
+    };
+  }
+
   const barVolumeHeight = volumeHeight * ((bar.volume || 0) / Math.max(1, maxVolume));
   return {
     bodyHeight: barVolumeHeight,
@@ -239,6 +289,7 @@ export function getNativeLiveCandlesPath({
 }): SkPath {
   'worklet';
   const path = Skia.Path.Make();
+  if (!isNativeMainPaneVisible(frame)) return path;
 
   for (let index = 0; index < bars.length; index += 1) {
     const bar = bars[index];
@@ -261,6 +312,7 @@ export function getNativeProjectedCandlesPath({
   side: NativeOhlcvPathSide;
 }): SkPath {
   const path = Skia.Path.Make();
+  if (!isNativeMainPaneVisible(frame)) return path;
 
   for (const bar of bars) {
     if (!isNativeBarOnPathSide(bar, side)) continue;
@@ -285,6 +337,8 @@ export function getNativeLiveVolumePath({
 }): SkPath {
   'worklet';
   const path = Skia.Path.Make();
+  if (!isNativeMainPaneVisible(frame)) return path;
+
   const startTime = sharedViewport.startTime.value;
   const endTime = sharedViewport.endTime.value;
   const maxVolume = getNativeViewportMaxVolume(bars, startTime, endTime);
@@ -322,6 +376,8 @@ export function getNativeProjectedVolumePath({
   volumeHeight: number;
 }): SkPath {
   const path = Skia.Path.Make();
+  if (!isNativeMainPaneVisible(frame)) return path;
+
   const maxVolume = getNativeViewportMaxVolume(bars, projection.viewport.startTime, projection.viewport.endTime);
 
   for (const bar of bars) {

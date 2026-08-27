@@ -8,6 +8,9 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   getNativeLiveCandleGeometry,
   getNativeLiveCandlesPath,
+  getNativeLiveVolumePath,
+  getNativeProjectedCandlesPath,
+  getNativeProjectedVolumePath,
   getNativeLiveVolumeGeometry,
   NativeCandleVolumeLayerImpl,
 } from './NativeCandleVolumeLayer';
@@ -60,6 +63,18 @@ const frame = createNativeChartFrameFromPanes({
     margins: { bottom: 32, left: 62, right: 76, top: 24 },
   },
   panes: [{ id: 'main', type: 'main', top: 24, height: 364, yMin: 63000, yMax: 64000 }],
+});
+
+const collapsedMainFrame = createNativeChartFrameFromPanes({
+  dimensions: {
+    width: 390,
+    height: 420,
+    margins: { bottom: 32, left: 62, right: 76, top: 24 },
+  },
+  panes: [
+    { id: 'main', type: 'main', top: 24, height: 0, yMin: 63000, yMax: 64000 },
+    { id: 'macd', type: 'indicator', top: 24, height: 364, yMin: -1, yMax: 1 },
+  ],
 });
 
 const options = {
@@ -228,6 +243,56 @@ describe('NativeCandleVolumeLayer', () => {
 
     expect(vi.mocked(upPath.close).mock.calls).toHaveLength(2);
     expect(vi.mocked(downPath.close).mock.calls).toHaveLength(2);
+  });
+
+  it('builds empty OHLCV paths when another pane has maximized the main pane away', () => {
+    const projection = createNativeChartProjection({
+      frame: collapsedMainFrame,
+      paneRanges: { main: { yMin: 63000, yMax: 64000 } },
+      viewport: { startTime: 0, endTime: 60_000 },
+    });
+    const liveCandlePath = getNativeLiveCandlesPath({
+      bars,
+      frame: collapsedMainFrame,
+      sharedViewport,
+      side: 'up',
+    });
+    const liveVolumePath = getNativeLiveVolumePath({
+      bars,
+      frame: collapsedMainFrame,
+      sharedViewport,
+      side: 'up',
+      volumeHeight: 80,
+    });
+    const projectedCandlePath = getNativeProjectedCandlesPath({
+      bars,
+      frame: collapsedMainFrame,
+      projection,
+      side: 'up',
+    });
+    const projectedVolumePath = getNativeProjectedVolumePath({
+      bars,
+      frame: collapsedMainFrame,
+      projection,
+      side: 'up',
+      volumeHeight: 80,
+    });
+    const candleGeometry = getNativeLiveCandleGeometry({ bar: bars[0], frame: collapsedMainFrame, sharedViewport });
+    const volumeGeometry = getNativeLiveVolumeGeometry({
+      bar: bars[0],
+      frame: collapsedMainFrame,
+      maxVolume: 200,
+      sharedViewport,
+      volumeHeight: 80,
+    });
+
+    expect(candleGeometry.visible).toBe(false);
+    expect(candleGeometry.bodyVisible).toBe(false);
+    expect(volumeGeometry.opacity).toBe(0);
+    expect(vi.mocked(liveCandlePath.close).mock.calls).toHaveLength(0);
+    expect(vi.mocked(liveVolumePath.close).mock.calls).toHaveLength(0);
+    expect(vi.mocked(projectedCandlePath.close).mock.calls).toHaveLength(0);
+    expect(vi.mocked(projectedVolumePath.close).mock.calls).toHaveLength(0);
   });
 
   it('keeps OHLCV visible when paint extends into the right price-axis lane', () => {

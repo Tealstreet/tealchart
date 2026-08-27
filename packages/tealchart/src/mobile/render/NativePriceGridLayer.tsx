@@ -18,6 +18,7 @@ import { getNativePriceGridSlot, getNativePriceGridSlotCount } from './nativeGri
 import { formatNativePriceAxisTickWithPrecisionWorklet } from './nativePriceFormat';
 import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
 import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
+import { isNativeMainPaneVisible } from './nativeSharedViewport';
 import {
   measureNativeSkiaAxisCharacterWidth,
   NATIVE_ANIMATED_TEXT_CHARACTERS,
@@ -94,7 +95,7 @@ export function resolveNativePriceGridSlotModel({
     labelY: clampNativePriceAxisTickLabelY(frame, y),
     lineEnd: { x: frame.priceAxisRight, y },
     lineStart: { x: frame.contentLeft, y },
-    visible: slot.visible && y >= frame.mainPane.top && y <= frame.mainPane.bottom,
+    visible: isNativeMainPaneVisible(frame) && slot.visible && y >= frame.mainPane.top && y <= frame.mainPane.bottom,
     y,
   };
 }
@@ -196,7 +197,7 @@ function getNativeStaticPriceGridSlots({
       labelY: clampNativePriceAxisTickLabelY(frame, y),
       lineEnd: { x: frame.priceAxisRight, y },
       lineStart: { x: frame.contentLeft, y },
-      visible: slot.visible && y >= frame.mainPane.top && y <= frame.mainPane.bottom,
+      visible: isNativeMainPaneVisible(frame) && slot.visible && y >= frame.mainPane.top && y <= frame.mainPane.bottom,
       y,
     };
   });

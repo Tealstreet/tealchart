@@ -136,6 +136,18 @@ describe('indicator plot clip channel', () => {
     });
   }
 
+  function renderWithFrame(targetFrame: typeof frame, staticProjection: unknown) {
+    return NativeIndicatorPlotLayerImpl({
+      frame: targetFrame,
+      indicatorPaneInfo: {},
+      plots,
+      sharedViewport,
+      staticProjection: staticProjection as never,
+      totalBarCount: 2,
+      visibleBars,
+    });
+  }
+
   // A plain-prop clip lands on the React commit while a derived path lands a
   // propagation later, so a pane whose height just changed paints clipped to the
   // new geometry and drawn at the old one. Each branch keeps both on one channel.
@@ -166,5 +178,37 @@ describe('indicator plot clip channel', () => {
     expect(projectedClip).not.toHaveProperty('value');
     expect(projectedPath).not.toHaveProperty('value');
   });
-});
 
+  it('builds empty overlay plot paths when another pane has maximized the main pane away', () => {
+    const collapsedMainFrame = createNativeChartFrameFromPanes({
+      dimensions: { width: 400, height: 600, margins: { top: 0, right: 58, bottom: 24, left: 0 } },
+      panes: [
+        { id: 'main', type: 'main', top: 0, height: 0, yMin: 0, yMax: 100 },
+        { id: 'pane_1', type: 'indicator', top: 0, height: 576, yMin: 0, yMax: 100 },
+      ],
+    });
+
+    const live = expandChildren(expandChildren(renderWithFrame(collapsedMainFrame, null)));
+    const livePath = findProps(live, SkiaPath)[0]?.path as { value: { moveTo: unknown; lineTo: unknown } };
+
+    expect(vi.mocked(livePath.value.moveTo as never).mock.calls).toHaveLength(0);
+    expect(vi.mocked(livePath.value.lineTo as never).mock.calls).toHaveLength(0);
+
+    const projected = expandChildren(
+      expandChildren(
+        renderWithFrame(
+          collapsedMainFrame,
+          createNativeChartProjection({
+            frame: collapsedMainFrame,
+            paneRanges: { main: { yMin: 0, yMax: 100 } },
+            viewport: { startTime: 0, endTime: 60_000 },
+          }),
+        ),
+      ),
+    );
+    const projectedPath = findProps(projected, SkiaPath)[0]?.path as { moveTo: unknown; lineTo: unknown };
+
+    expect(vi.mocked(projectedPath.moveTo as never).mock.calls).toHaveLength(0);
+    expect(vi.mocked(projectedPath.lineTo as never).mock.calls).toHaveLength(0);
+  });
+});
