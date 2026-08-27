@@ -156,8 +156,8 @@ export function resolveNativeCanvasTap(
     return { kind: 'crosshairContextMenu' };
   }
 
-  // The reveal strip is not a control zone; it is a frame-relative affordance
-  // the crosshair has always yielded to.
+  // The reveal target is not a control zone; it is a frame-relative affordance
+  // centered on the reset button, and the crosshair yields only to that target.
   if (isNativeResetViewRevealTap(ctx.frame, point.x, point.y)) return { kind: 'none' };
 
   if (ctx.chartInteractionEnabled) {

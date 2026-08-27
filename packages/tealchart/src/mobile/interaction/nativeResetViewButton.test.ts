@@ -33,18 +33,19 @@ describe('native reset view button', () => {
     });
   });
 
-  it('reveals from just above the reset button top down to the canvas bottom', () => {
+  it('reveals from a centered target just above the reset button top down to the canvas bottom', () => {
     const layout = resolveNativeResetViewButtonLayout(frame);
     const revealTopY = layout.centerY - layout.radius - NATIVE_RESET_VIEW_REVEAL_TOP_BUFFER;
 
     expect(resolveNativeResetViewRevealTopY(frame)).toBe(revealTopY);
-    expect(isNativeResetViewRevealTap(frame, 100, revealTopY)).toBe(true);
-    expect(isNativeResetViewRevealTap(frame, 100, revealTopY - 0.1)).toBe(false);
-    expect(isNativeResetViewRevealTap(frame, -1, revealTopY)).toBe(false);
-    expect(isNativeResetViewRevealTap(frame, 391, revealTopY)).toBe(false);
+    expect(isNativeResetViewRevealTap(frame, layout.centerX, revealTopY)).toBe(true);
+    expect(isNativeResetViewRevealTap(frame, layout.centerX + layout.hitRadius, revealTopY)).toBe(true);
+    expect(isNativeResetViewRevealTap(frame, layout.centerX, revealTopY - 0.1)).toBe(false);
+    expect(isNativeResetViewRevealTap(frame, layout.centerX - layout.hitRadius - 0.1, revealTopY)).toBe(false);
+    expect(isNativeResetViewRevealTap(frame, layout.centerX + layout.hitRadius + 0.1, revealTopY)).toBe(false);
   });
 
-  it('uses the same generous circular hit zone as the web hover target', () => {
+  it('uses a tightened circular hit zone around the visible button', () => {
     const layout = resolveNativeResetViewButtonLayout(frame);
 
     expect(isNativeResetViewButtonTap(layout, layout.centerX, layout.centerY)).toBe(true);
@@ -69,7 +70,7 @@ describe('native reset view button', () => {
       resolveNativeResetViewTapTarget({
         frame,
         resetButtonVisible: false,
-        x: 100,
+        x: layout.centerX,
         y: 420,
         isTradeLineTarget: false,
       }),
@@ -79,7 +80,7 @@ describe('native reset view button', () => {
       resolveNativeResetViewTapTarget({
         frame,
         resetButtonVisible: false,
-        x: 100,
+        x: layout.centerX,
         y: 420,
         isTradeLineTarget: true,
       }),
@@ -89,9 +90,19 @@ describe('native reset view button', () => {
       resolveNativeResetViewTapTarget({
         frame,
         resetButtonVisible: false,
-        x: 100,
+        x: layout.centerX,
         y: 420,
         isControlTarget: true,
+        isTradeLineTarget: false,
+      }),
+    ).toBeNull();
+
+    expect(
+      resolveNativeResetViewTapTarget({
+        frame,
+        resetButtonVisible: false,
+        x: layout.centerX + layout.hitRadius + 1,
+        y: 420,
         isTradeLineTarget: false,
       }),
     ).toBeNull();
