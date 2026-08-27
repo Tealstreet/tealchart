@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_TRADE_LINE_LABEL_COLOR } from '../../constants';
 import { getNativePriceLineTagId, getNativeTradeLineTagId } from '../utils/priceAxisTagSources';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import { PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
 import {
   NativePriceAxisTagAnimatedText,
   NativePriceAxisTagBox,
@@ -454,7 +455,7 @@ describe('native trade and price line layers', () => {
     const axisTag = collectElementsByType(layer, NativePriceAxisTagBox)[0];
     const lineY = sharedValueOf<{ x: number; y: number }>(priceLine.props.p1).y;
 
-    expect(sharedValueOf<number>(axisTag.props.y)).toBe(129);
+    expect(sharedValueOf<number>(axisTag.props.y)).toBe(140 - PRICE_AXIS_TAG_HEIGHT / 2);
     expect(lineY).not.toBe(140);
   });
 
