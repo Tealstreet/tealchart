@@ -10,8 +10,8 @@ import type { NativeViewportSharedValues } from './nativeSharedViewport';
 import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
 import { resolvePriceAxisTagStyle } from '../../utils/priceAxisTagStyle';
+import { isNativeBracketPriceLineRefActive } from '../utils/nativeBracketPriceLines';
 import {
   clampNativePriceAxisTagCenterY,
   findNativeResolvedPriceAxisTagCenterY,
@@ -23,7 +23,6 @@ import {
 } from '../utils/priceAxisTagLayout';
 import { DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT, getNativePriceLineTagId } from '../utils/priceAxisTagSources';
 import { formatNativeTradeLinePrice } from '../utils/tradeLineLayout';
-import { NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   createNativeAxisTagLayout,
   createNativeAxisTagTextLayout,
@@ -103,7 +102,7 @@ export function AnimatedPriceLine({
     hasCountdown ? formatNativeCountdownWorklet(countdownTargetTimeMs, nowMs.value) : '',
   );
   const countdownTextX = useDerivedValue(() => {
-    return axisTag.x + NATIVE_PRICE_AXIS_TAG_PADDING_X;
+    return axisTag.x + Math.max(0, (axisTag.width - countdownText.value.length * countdownCharacterWidth) / 2);
   });
   const primaryTextBaselineOffset = hasSecondaryText
     ? getNativePriceAxisPrimaryTextBaselineOffset(tagHeight)
@@ -113,7 +112,11 @@ export function AnimatedPriceLine({
   // lane is a trading line and always fills. Unfilled still keeps the dark
   // backing rather than going transparent, which is what stops the grid reading
   // straight through a tag that overlaps it.
-  const { filled: tagFilled, backgroundColor: tagBackgroundColor, textColor: tagColor } = resolvePriceAxisTagStyle({
+  const {
+    filled: tagFilled,
+    backgroundColor: tagBackgroundColor,
+    textColor: tagColor,
+  } = resolvePriceAxisTagStyle({
     type: 'price',
     label: line.label,
     color: line.color,
@@ -128,9 +131,15 @@ export function AnimatedPriceLine({
   // Clamped here as well as in the stack: a tag whose price leaves the pane is
   // filtered out of the resolved stack and falls back to its raw price Y, and
   // the tag still draws. The line itself is not clamped - only the label.
-  const labelY = useDerivedValue(() =>
-    clampNativePriceAxisTagCenterY(labelCenterY.value, tagHeight, frame.mainPane.top, getNativePriceAxisTagFloor(frame)) -
-    tagHeight / 2,
+  const labelY = useDerivedValue(
+    () =>
+      clampNativePriceAxisTagCenterY(
+        labelCenterY.value,
+        tagHeight,
+        frame.mainPane.top,
+        getNativePriceAxisTagFloor(frame),
+      ) -
+      tagHeight / 2,
   );
   const primaryTextY = useDerivedValue(() => labelY.value + primaryTextBaselineOffset);
   const secondaryTextY = useDerivedValue(() => labelY.value + secondaryTextBaselineOffset);

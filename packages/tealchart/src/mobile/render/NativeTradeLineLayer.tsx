@@ -106,7 +106,11 @@ export function AnimatedTradeLine({
     ),
   );
   const priceLabelX = useDerivedValue(() => priceLabelRight - priceLabelWidth.value);
-  const priceLabelTextX = useDerivedValue(() => priceLabelX.value + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
+  const priceLabelTextX = useDerivedValue(
+    () =>
+      priceLabelX.value +
+      Math.max(0, (priceLabelWidth.value - priceLabelText.value.length * priceLabelCharacterWidth) / 2),
+  );
   const leftLineStart = useDerivedValue(() => ({ x: geometry.leftLineStartX, y: lineY.value }));
   const leftLineEnd = useDerivedValue(() => ({ x: geometry.leftLineEndX, y: lineY.value }));
   const rightLineStart = useDerivedValue(() => ({ x: geometry.rightLineStartX, y: lineY.value }));
@@ -139,7 +143,7 @@ export function AnimatedTradeLine({
     const staticPriceLabelY = staticLabelY - 1;
     const staticPriceTextY = staticLabelY - 1 + priceTagTextBaselineOffset;
     const staticPriceLabelText = geometry.priceLabelText;
-    const staticPriceLabelTextX = geometry.priceLabelX + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X;
+    const staticPriceLabelTextX = geometry.priceLabelTextX;
     const staticOpacity = isNativeYInMainPane(staticRawY, frame) ? pendingOpacity : 0;
     const staticLeftLineStart = { x: geometry.leftLineStartX, y: staticLineY };
     const staticLeftLineEnd = { x: geometry.leftLineEndX, y: staticLineY };
@@ -318,7 +322,7 @@ export function AnimatedTradeLineDragTag({
   );
   const x = useDerivedValue(() => right - width.value);
   const y = useDerivedValue(() => centerY.value - tagHeight / 2);
-  const textX = useDerivedValue(() => x.value + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
+  const textX = useDerivedValue(() => x.value + Math.max(0, (width.value - text.value.length * characterWidth) / 2));
   const textY = useDerivedValue(() => y.value + baselineOffset);
 
   return (

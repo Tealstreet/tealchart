@@ -1,23 +1,23 @@
+import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { useMemo } from 'react';
 
-import { Glyphs, Group, Path as SkiaPath, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Glyphs, Group, Skia, Line as SkiaLine, Path as SkiaPath } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import {
   clampNativePriceAxisTickLabelY,
-  createNativeCenteredAxisTextX,
+  createNativeLeftAlignedAxisTextX,
   getNativeAxisTextCharacterCapacity,
 } from '../utils/axisTickLayout';
 import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
+import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
 import { getNativePriceGridSlot, getNativePriceGridSlotCount } from './nativeGridSlots';
 import { formatNativePriceAxisTickWithPrecisionWorklet } from './nativePriceFormat';
-import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
-import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
 import { isNativeMainPaneVisible } from './nativeSharedViewport';
 import {
   measureNativeSkiaAxisCharacterWidth,
@@ -56,20 +56,16 @@ function nativePriceToYFromViewport({
 }
 
 export function resolveNativePriceGridSlotModel({
-  characterWidth,
   frame,
   index,
-  labelMaxWidth,
   labelLeft,
   maxCharacters,
   priceMax,
   priceMin,
   pricePrecision,
 }: {
-  characterWidth: number;
   frame: NativeChartFrame;
   index: number;
-  labelMaxWidth: number;
   labelLeft: number;
   maxCharacters: number;
   priceMax: number;
@@ -91,7 +87,7 @@ export function resolveNativePriceGridSlotModel({
 
   return {
     labelText,
-    labelX: createNativeCenteredAxisTextX(labelLeft, labelText.length, characterWidth, labelMaxWidth),
+    labelX: createNativeLeftAlignedAxisTextX(labelLeft),
     labelY: clampNativePriceAxisTickLabelY(frame, y),
     lineEnd: { x: frame.priceAxisRight, y },
     lineStart: { x: frame.contentLeft, y },
@@ -102,11 +98,9 @@ export function resolveNativePriceGridSlotModel({
 
 function NativeAnimatedPriceGrid({
   axisFont,
-  characterWidth,
   frame,
   gridColor,
   index,
-  labelMaxWidth,
   labelLeft,
   maxCharacters,
   pricePrecision,
@@ -116,11 +110,9 @@ function NativeAnimatedPriceGrid({
   textColor,
 }: {
   axisFont: ReturnType<typeof Skia.Font>;
-  characterWidth: number;
   frame: NativeChartFrame;
   gridColor: string;
   index: number;
-  labelMaxWidth: number;
   labelLeft: number;
   maxCharacters: number;
   pricePrecision: number;
@@ -131,10 +123,8 @@ function NativeAnimatedPriceGrid({
 }) {
   const model = useDerivedValue(() =>
     resolveNativePriceGridSlotModel({
-      characterWidth,
       frame,
       index,
-      labelMaxWidth,
       labelLeft,
       maxCharacters,
       priceMax: sharedViewport.priceMax.value,
@@ -160,18 +150,14 @@ function NativeAnimatedPriceGrid({
 }
 
 function getNativeStaticPriceGridSlots({
-  characterWidth,
   frame,
-  labelMaxWidth,
   labelLeft,
   maxCharacters,
   projection,
   pricePrecision,
   slotCount,
 }: {
-  characterWidth: number;
   frame: NativeChartFrame;
-  labelMaxWidth: number;
   labelLeft: number;
   maxCharacters: number;
   projection: NativeChartProjection;
@@ -193,7 +179,7 @@ function getNativeStaticPriceGridSlots({
 
     return {
       labelText,
-      labelX: createNativeCenteredAxisTextX(labelLeft, labelText.length, characterWidth, labelMaxWidth),
+      labelX: createNativeLeftAlignedAxisTextX(labelLeft),
       labelY: clampNativePriceAxisTickLabelY(frame, y),
       lineEnd: { x: frame.priceAxisRight, y },
       lineStart: { x: frame.contentLeft, y },
@@ -236,9 +222,7 @@ export function NativePriceGridLayer({
     () =>
       staticProjection
         ? getNativeStaticPriceGridSlots({
-            characterWidth,
             frame,
-            labelMaxWidth,
             labelLeft,
             maxCharacters,
             pricePrecision,
@@ -246,7 +230,7 @@ export function NativePriceGridLayer({
             slotCount,
           })
         : null,
-    [characterWidth, frame, labelLeft, labelMaxWidth, maxCharacters, pricePrecision, staticProjection, slotCount],
+    [frame, labelLeft, maxCharacters, pricePrecision, staticProjection, slotCount],
   );
 
   if (staticSlots) {
@@ -282,9 +266,7 @@ export function NativePriceGridLayer({
     return (
       <NativePriceGridLabelGlyphs
         axisFont={axisFont}
-        characterWidth={characterWidth}
         frame={frame}
-        labelMaxWidth={labelMaxWidth}
         labelLeft={labelLeft}
         maxCharacters={maxCharacters}
         pricePrecision={pricePrecision}
@@ -298,10 +280,8 @@ export function NativePriceGridLayer({
   if (showGridLines && !showAxisLabels) {
     return (
       <NativePriceGridLinePath
-        characterWidth={characterWidth}
         frame={frame}
         gridColor={gridColor}
-        labelMaxWidth={labelMaxWidth}
         labelLeft={labelLeft}
         maxCharacters={maxCharacters}
         pricePrecision={pricePrecision}
@@ -317,11 +297,9 @@ export function NativePriceGridLayer({
         <NativeAnimatedPriceGrid
           key={`price-grid-${index}`}
           axisFont={axisFont}
-          characterWidth={characterWidth}
           frame={frame}
           gridColor={gridColor}
           index={index}
-          labelMaxWidth={labelMaxWidth}
           labelLeft={labelLeft}
           maxCharacters={maxCharacters}
           pricePrecision={pricePrecision}
@@ -337,20 +315,16 @@ export function NativePriceGridLayer({
 
 /** The live price grid's lines as one stroked path. */
 function NativePriceGridLinePath({
-  characterWidth,
   frame,
   gridColor,
-  labelMaxWidth,
   labelLeft,
   maxCharacters,
   pricePrecision,
   sharedViewport,
   slotCount,
 }: {
-  characterWidth: number;
   frame: NativeChartFrame;
   gridColor: string;
-  labelMaxWidth: number;
   labelLeft: number;
   maxCharacters: number;
   pricePrecision: number;
@@ -361,10 +335,8 @@ function NativePriceGridLinePath({
     const built = Skia.Path.Make();
     for (let index = 0; index < slotCount; index += 1) {
       const model = resolveNativePriceGridSlotModel({
-        characterWidth,
         frame,
         index,
-        labelMaxWidth,
         labelLeft,
         maxCharacters,
         priceMax: sharedViewport.priceMax.value,
@@ -384,9 +356,7 @@ function NativePriceGridLinePath({
 /** The live price axis's labels as one Glyphs node. */
 function NativePriceGridLabelGlyphs({
   axisFont,
-  characterWidth,
   frame,
-  labelMaxWidth,
   labelLeft,
   maxCharacters,
   pricePrecision,
@@ -395,9 +365,7 @@ function NativePriceGridLabelGlyphs({
   textColor,
 }: {
   axisFont: ReturnType<typeof Skia.Font>;
-  characterWidth: number;
   frame: NativeChartFrame;
-  labelMaxWidth: number;
   labelLeft: number;
   maxCharacters: number;
   pricePrecision: number;
@@ -413,10 +381,8 @@ function NativePriceGridLabelGlyphs({
     const out: NativeAxisGlyph[] = [];
     for (let index = 0; index < slotCount; index += 1) {
       const model = resolveNativePriceGridSlotModel({
-        characterWidth,
         frame,
         index,
-        labelMaxWidth,
         labelLeft,
         maxCharacters,
         priceMax: sharedViewport.priceMax.value,

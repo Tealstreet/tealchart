@@ -107,7 +107,7 @@ export function createNativeAxisLaneTagLayout(frame: NativeChartFrame) {
     x: lane.right - lane.width,
     width: lane.width,
     text: '',
-    textX: lane.left + NATIVE_PRICE_AXIS_TAG_PADDING_X,
+    textX: lane.left + lane.width / 2,
   };
 }
 

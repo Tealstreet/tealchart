@@ -71,7 +71,7 @@ export function resolveNativeCrosshairPriceLabelLayout(
   return {
     x,
     width,
-    textX: x + NATIVE_PRICE_AXIS_TAG_PADDING_X,
+    textX: x + Math.max(0, (width - textWidth) / 2),
   };
 }
 
