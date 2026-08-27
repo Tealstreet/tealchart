@@ -145,6 +145,29 @@ indicator("test")
 plot(macdLine)`, bars);
   });
 
+  it('declines dynamic TA constructor parameters so callers fall back to the interpreter', () => {
+    const macdAst = parse(`//@version=6
+indicator("test")
+fastLen = input.int(12, "Fast Length")
+slowLen = input.int(26, "Slow Length")
+signalLen = input.int(9, "Signal Length")
+[macdLine, signalLine, hist] = ta.macd(close, fastLen, slowLen, signalLen)
+plot(macdLine, "MACD")`);
+    const macdCompiled = tryCompile(macdAst);
+    expect(macdCompiled.success).toBe(false);
+    expect(macdCompiled.unsupported).toContain('ta.macd with dynamic constructor parameters not yet supported by transpiler');
+
+    const bbAst = parse(`//@version=6
+indicator("test")
+length = input.int(20, "Length")
+mult = input.float(2.0, "StdDev")
+[basis, upper, lower] = ta.bb(close, length, mult)
+plot(upper, "Upper")`);
+    const bbCompiled = tryCompile(bbAst);
+    expect(bbCompiled.success).toBe(false);
+    expect(bbCompiled.unsupported).toContain('ta.bb with dynamic constructor parameters not yet supported by transpiler');
+  });
+
   it('boolean logic with TA', () => {
     assertPlotParity(`//@version=6
 indicator("test")

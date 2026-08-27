@@ -2,6 +2,7 @@ import type { Bar, PriceLine } from '../types';
 
 import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from '../constants';
 import { formatPriceWithPrecision } from '../state/chartState';
+import { formatPriceByMagnitude } from './priceFormatters';
 import { intervalToMs } from '../viewport/viewScale';
 
 interface BuildLastTradePriceLineOptions {
@@ -19,14 +20,7 @@ function formatLastTradePrice(price: number, pricePrecision?: number): string {
     return formatPriceWithPrecision(price, pricePrecision);
   }
 
-  if (price >= 1000) {
-    return price.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  }
-  if (price >= 1) {
-    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
-  return price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+  return formatPriceByMagnitude(price);
 }
 
 export function buildLastTradePriceLine({

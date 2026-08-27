@@ -234,9 +234,9 @@ export const int fast = 2
 
     expect(mock.messages.map((message) => message.type)).toEqual(['init', 'updateBar', 'updateBar']);
     expect(mock.messages.map((message) => 'metadata' in message ? message.metadata : undefined)).toEqual([
-      { generation: 1, requestId: 1 },
-      { generation: 1, requestId: 2 },
-      { generation: 1, requestId: 3 },
+      { generation: 1, requestId: 1, requestKind: 'full' },
+      { generation: 1, requestId: 2, requestKind: 'incremental' },
+      { generation: 1, requestId: 3, requestKind: 'incremental' },
     ]);
 
     mock.emit({

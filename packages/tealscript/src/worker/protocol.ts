@@ -91,6 +91,7 @@ export interface ReadyMessage {
 export interface WorkerOutputMetadata {
   generation?: number;
   requestId?: number;
+  requestKind?: 'full' | 'incremental';
 }
 
 /**

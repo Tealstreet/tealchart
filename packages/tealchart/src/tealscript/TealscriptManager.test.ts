@@ -30,6 +30,7 @@ interface PostedWorkerMessage {
   metadata?: {
     generation?: number;
     requestId?: number;
+    requestKind?: 'full' | 'incremental';
   };
 }
 
@@ -124,7 +125,7 @@ describe('TealscriptManager', () => {
     expect(declarations).toHaveLength(1);
   });
 
-  it('ignores stale bundled worker results without hiding unsettled init errors', async () => {
+  it('accepts full init results when a live update is already pending', async () => {
     const worker = new FakeWorker();
     const plotUpdates: PlotOutput[][] = [];
     const errors: Array<{ scriptId: string; error: WorkerError }> = [];
@@ -141,8 +142,8 @@ describe('TealscriptManager', () => {
     manager.updateBar(bar);
 
     const [initMessage, updateBarMessage] = worker.messages as PostedWorkerMessage[];
-    expect(initMessage?.metadata).toEqual({ generation: 1, requestId: 1 });
-    expect(updateBarMessage?.metadata).toEqual({ generation: 1, requestId: 2 });
+    expect(initMessage?.metadata).toEqual({ generation: 1, requestId: 1, requestKind: 'full' });
+    expect(updateBarMessage?.metadata).toEqual({ generation: 1, requestId: 2, requestKind: 'incremental' });
 
     worker.emit(createResultMessage('study-1', {
       plots: [plot],
@@ -151,7 +152,85 @@ describe('TealscriptManager', () => {
       inputs: [],
       metadata: initMessage?.metadata,
     }));
-    expect(plotUpdates).toHaveLength(0);
+    expect(plotUpdates).toEqual([[{ ...plot, scriptId: 'study-1' }]]);
+
+    worker.emit({
+      type: 'error',
+      scriptId: 'study-1',
+      message: 'init error',
+      metadata: initMessage?.metadata,
+    });
+
+    expect(plotUpdates).toHaveLength(1);
+    expect(errors).toHaveLength(0);
+
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: updateBarMessage?.metadata,
+    }));
+
+    expect(plotUpdates).toHaveLength(2);
+    expect(plotUpdates[1]).toEqual([{ ...plot, scriptId: 'study-1' }]);
+  });
+
+  it('does not clear current plots from an empty incremental update result', async () => {
+    const worker = new FakeWorker();
+    const plotUpdates: PlotOutput[][] = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+    }));
+
+    manager.updateBar(bar);
+    const updateBarMessage = worker.messages[1] as PostedWorkerMessage;
+    expect(updateBarMessage?.metadata).toEqual({ generation: 1, requestId: 2, requestKind: 'incremental' });
+
+    worker.emit(createResultMessage('study-1', {
+      plots: [],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: updateBarMessage?.metadata,
+    }));
+
+    expect(plotUpdates).toHaveLength(2);
+    expect(plotUpdates[1]).toEqual([{ ...plot, scriptId: 'study-1' }]);
+  });
+
+  it('surfaces unsettled init errors when a live update is already pending', async () => {
+    const worker = new FakeWorker();
+    const plotUpdates: PlotOutput[][] = [];
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+    manager.updateBar(bar);
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
 
     worker.emit({
       type: 'error',
@@ -172,17 +251,59 @@ describe('TealscriptManager', () => {
         },
       },
     ]);
+  });
 
-    worker.emit(createResultMessage('study-1', {
-      plots: [plot],
+  it('keeps full-history plot series when a live-bar update races worker init', async () => {
+    const worker = new FakeWorker();
+    const plotUpdates: PlotOutput[][] = [];
+    const fullMacdPlot: PlotOutput = {
+      ...plot,
+      id: 'plot_macd',
+      title: 'MACD',
+      values: [null, 0.25, 0.5, 0.75],
+    };
+    const truncatedLivePlot: PlotOutput = {
+      ...fullMacdPlot,
+      values: [0.75],
+    };
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+    });
+
+    manager.setBars([
+      bar,
+      { ...bar, time: 2, close: 101 },
+      { ...bar, time: 3, close: 102 },
+      { ...bar, time: 4, close: 103 },
+    ]);
+    const addScript = manager.addScript('macd', 'indicator("MACD")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+    manager.updateBar({ ...bar, time: 4, close: 104 });
+
+    const [initMessage, updateBarMessage] = worker.messages as PostedWorkerMessage[];
+
+    worker.emit(createResultMessage('macd', {
+      plots: [fullMacdPlot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+    }));
+
+    expect(plotUpdates.at(-1)).toEqual([{ ...fullMacdPlot, scriptId: 'macd' }]);
+
+    worker.emit(createResultMessage('macd', {
+      plots: [truncatedLivePlot],
       drawings: [],
       alerts: [],
       inputs: [],
       metadata: updateBarMessage?.metadata,
     }));
 
-    expect(plotUpdates).toHaveLength(2);
-    expect(plotUpdates[1]).toEqual([{ ...plot, scriptId: 'study-1' }]);
+    expect(plotUpdates.at(-1)).toEqual([{ ...fullMacdPlot, scriptId: 'macd' }]);
   });
 
   it('ignores errors from requests older than a settled newer result', async () => {

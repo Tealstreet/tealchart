@@ -70,6 +70,7 @@ import {
   resolveLeftHistoryBackfillRequest,
   resolveViewportHistoryBackfillHint,
 } from './core/historyBackfill';
+import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from './debug/plotDebug';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -415,6 +416,13 @@ export class TealchartWidget implements ITealchartWebWidget {
       this._tealScriptManager = new TealscriptManager({
         createWorker: options.createTealscriptWorker,
         onPlotsUpdated: (plots) => {
+          if (isTealchartPlotDebugEnabled()) {
+            console.info('[tealchart:plots] widget onPlotsUpdated', {
+              plotCount: plots.length,
+              bars: this._bars.length,
+              plots: summarizePlotsForDebug(plots),
+            });
+          }
           this._plots = plots;
           this._scheduler.markDirty(DIRTY.PLOTS);
         },
@@ -1476,6 +1484,16 @@ export class TealchartWidget implements ITealchartWebWidget {
     if (dirty & DIRTY.DATA_LOAD) {
       const nextPlots = dirty & DIRTY.PLOTS ? this._plots : [];
       const nextDrawings = dirty & DIRTY.DRAWINGS ? this._drawings : [];
+      if (isTealchartPlotDebugEnabled()) {
+        console.info('[tealchart:plots] widget dataLoad', {
+          dirty,
+          hadPlotsDirty: Boolean(dirty & DIRTY.PLOTS),
+          currentPlotCount: this._plots.length,
+          nextPlotCount: nextPlots.length,
+          bars: this._bars.length,
+          plots: summarizePlotsForDebug(nextPlots),
+        });
+      }
       this._plots = nextPlots;
       this._drawings = nextDrawings;
       if (this._viewport) {
@@ -1503,6 +1521,14 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     // Plots changed (worker callback with new indicator data)
     if (dirty & DIRTY.PLOTS) {
+      if (isTealchartPlotDebugEnabled()) {
+        console.info('[tealchart:plots] widget pushPlotsToUi', {
+          dirty,
+          plotCount: this._plots.length,
+          bars: this._bars.length,
+          plots: summarizePlotsForDebug(this._plots),
+        });
+      }
       this._ui.setPlots(this._plots);
     }
 
@@ -1555,6 +1581,20 @@ export class TealchartWidget implements ITealchartWebWidget {
           this._viewport.startTime,
           this._viewport.endTime,
         );
+        if (isTealchartPlotDebugEnabled()) {
+          console.info('[tealchart:plots] widget paneYRanges', {
+            dirty,
+            viewport: { startTime: this._viewport.startTime, endTime: this._viewport.endTime },
+            panes: paneLayout.indicatorPanes.map((pane) => ({
+              id: pane.id,
+              indicatorIds: pane.indicatorIds,
+              yMin: pane.yMin,
+              yMax: pane.yMax,
+            })),
+            autoScaleRanges: Array.from(autoScaleRanges.entries()),
+            plots: summarizePlotsForDebug(this._plots),
+          });
+        }
         this._ui.setPaneYRanges(autoScaleRanges);
       }
     }

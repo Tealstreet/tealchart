@@ -31,6 +31,7 @@ export interface WorkerResult {
   inputs: InputDefinition[];
   declaration?: IndicatorDeclarationMetadata;
   profile?: RuntimeProfile;
+  metadata?: WorkerOutputMetadata;
 }
 
 /**
@@ -103,6 +104,7 @@ export class TealscriptWorker {
   private readyResolve: (() => void) | null = null;
   private requestId = 0;
   private latestRequestId = 0;
+  private latestFullRequestId = 0;
   private lastSettledRequestId = 0;
   private generation = 0;
 
@@ -271,13 +273,23 @@ export class TealscriptWorker {
       this.generation += 1;
     }
     this.latestRequestId = ++this.requestId;
+    if (newGeneration) {
+      this.latestFullRequestId = this.latestRequestId;
+    }
     return {
       generation: this.generation,
       requestId: this.latestRequestId,
+      requestKind: newGeneration ? 'full' : 'incremental',
     };
   }
 
   private isStaleMessage(metadata: WorkerOutputMetadata | undefined): boolean {
+    if (typeof metadata?.generation === 'number' && metadata.generation < this.generation) {
+      return true;
+    }
+    if (metadata?.requestKind === 'full') {
+      return typeof metadata.requestId === 'number' && metadata.requestId < this.latestFullRequestId;
+    }
     return typeof metadata?.requestId === 'number' && metadata.requestId < this.latestRequestId;
   }
 

@@ -94,6 +94,38 @@ describe('ChartTopBar drawing toolbar', () => {
     inertTopBar.unmount();
   });
 
+  it('keeps the layout selector readable instead of shrinking in the overflow row', () => {
+    const topBar = new ChartTopBar({
+      chartKey: 'topbar-layout-selector-overflow',
+      symbol: 'BTCUSDT',
+      layoutCallbacks: {
+        getAllLayouts: vi.fn().mockResolvedValue([]),
+        onSave: vi.fn(),
+        onSaveAs: vi.fn(),
+        onLoad: vi.fn(),
+        onDelete: vi.fn(),
+        onRename: vi.fn(),
+      },
+    });
+    topBar.mount(document.body);
+    topBar.setCurrentLayout('layout-1', 'Scalp layout with a very long display name');
+
+    const layoutButton = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((button) =>
+      button.textContent?.includes('Scalp layout'),
+    );
+    const layoutLabel = layoutButton?.querySelector('span');
+
+    expect(layoutButton).not.toBeUndefined();
+    expect(topBar.getElement().style.overflowX).toBe('auto');
+    expect(layoutButton?.style.flexShrink).toBe('0');
+    expect(layoutButton?.style.maxWidth).toBe('160px');
+    expect(layoutLabel?.style.overflow).toBe('hidden');
+    expect(layoutLabel?.style.textOverflow).toBe('ellipsis');
+    expect(layoutLabel?.style.minWidth).toBe('0px');
+
+    topBar.unmount();
+  });
+
   it('renders pinned TradingView intervals and selects from the grouped dropdown', () => {
     const onIntervalChange = vi.fn();
     const topBar = new ChartTopBar({

@@ -39,6 +39,15 @@ describe('buildLastTradePriceLine', () => {
     expect(line?.countdownToTime).toBe(1710000060000);
   });
 
+  it('formats the last-trade label by magnitude when market precision is absent', () => {
+    const line = buildLastTradePriceLine({
+      latestBar: { ...latestBar, close: 12345.67 },
+      interval: '1',
+    });
+
+    expect(line?.label.primaryText).toBe('12,345.7');
+  });
+
   it('returns null when there is no bar data', () => {
     expect(
       buildLastTradePriceLine({
