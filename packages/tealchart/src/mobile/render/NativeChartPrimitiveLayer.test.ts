@@ -6,6 +6,7 @@ import type { Bar } from '../../types';
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import { resolveNativePriceGridSlotModel } from './NativePriceGridLayer';
 import {
   getNativePriceGridSlot,
   getNativePriceGridSlotCount,
@@ -108,6 +109,53 @@ describe('NativeChartPrimitiveLayer', () => {
         chartWidth: frame.contentWidth,
       }).showMonthLabel,
     ).toBe(true);
+  });
+
+  it('hides main price grid slots when another pane has maximized the main pane away', () => {
+    const collapsedMain = createNativeChartFrameFromPanes({
+      dimensions: {
+        width: 140,
+        height: 120,
+        margins: {
+          top: 0,
+          right: 40,
+          bottom: 20,
+          left: 0,
+        },
+      },
+      panes: [
+        {
+          id: 'main',
+          type: 'main',
+          top: 0,
+          height: 0,
+          yMin: 0,
+          yMax: 100,
+        },
+        {
+          id: 'macd',
+          type: 'indicator',
+          top: 0,
+          height: 100,
+          yMin: -1,
+          yMax: 1,
+        },
+      ],
+    });
+
+    expect(
+      resolveNativePriceGridSlotModel({
+        characterWidth: 7,
+        frame: collapsedMain,
+        index: 0,
+        labelMaxWidth: 40,
+        labelLeft: 100,
+        maxCharacters: 6,
+        priceMax: 100,
+        priceMin: 0,
+        pricePrecision: 1,
+      }).visible,
+    ).toBe(false);
   });
 
   it('projects the candidate cache overscan window and clamps candle width', () => {

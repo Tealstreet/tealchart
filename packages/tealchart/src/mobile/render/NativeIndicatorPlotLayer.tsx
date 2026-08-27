@@ -158,6 +158,8 @@ function getNativeIndicatorLinePath({
 }): SkPath {
   'worklet';
   const path = Skia.Path.Make();
+  if (pane.height <= 0) return path;
+
   const breaksOnNa = nativePlotStyleBreaksOnNa(style);
   const isStepLine = nativePlotStyleUsesStepLine(style);
   const startTime = projection?.viewport.startTime ?? sharedViewport?.startTime.value ?? 0;
@@ -214,6 +216,8 @@ function getNativeIndicatorHistogramPath({
 }): SkPath {
   'worklet';
   const path = Skia.Path.Make();
+  if (pane.height <= 0) return path;
+
   const startTime = projection?.viewport.startTime ?? sharedViewport?.startTime.value ?? 0;
   const endTime = projection?.viewport.endTime ?? sharedViewport?.endTime.value ?? 0;
   const timeRange = endTime - startTime;
