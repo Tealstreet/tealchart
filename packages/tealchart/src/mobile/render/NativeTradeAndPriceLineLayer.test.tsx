@@ -358,10 +358,17 @@ describe('native trade and price line layers', () => {
 
     const staticTexts = collectElementsByType(layer, NativePriceAxisTagStaticText);
     const animatedTexts = collectElementsByType(layer, NativePriceAxisTagAnimatedText);
+    const axisTag = collectElementsByType(layer, NativePriceAxisTagBox)[0];
 
     expect(staticTexts.map((element) => element.props.text)).toEqual(['63,777.0']);
     expect(animatedTexts).toHaveLength(1);
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:10');
+    expect(sharedValueOf<number>(animatedTexts[0].props.x)).toBe(
+      sharedValueOf<number>(axisTag.props.x) +
+        (sharedValueOf<number>(axisTag.props.width) -
+          '00:10'.length * animatedTexts[0].props.characterWidth) /
+          2,
+    );
 
     nowMs.value = 5_000;
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:05');

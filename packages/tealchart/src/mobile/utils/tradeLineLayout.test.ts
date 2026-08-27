@@ -302,7 +302,7 @@ describe('native trade line layout', () => {
     ]);
   });
 
-  it('places price tags inside the native price-axis lane when provided', () => {
+  it('right-aligns compact price tags inside the native price-axis lane when provided', () => {
     const priceLabelLane = {
       left: priceAxisLane.left,
       right: priceAxisLane.right,
@@ -320,7 +320,8 @@ describe('native trade line layout', () => {
 
     expect(geometry?.priceLabelX).toBeGreaterThanOrEqual(priceLabelLane.left);
     expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBeLessThanOrEqual(priceLabelLane.right);
-    expect(geometry?.priceLabelWidth).toBe(priceLabelLane.right - priceLabelLane.left);
+    expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
+    expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBe(priceLabelLane.right);
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
   });
 
