@@ -38,6 +38,7 @@ describe('native price axis tag layout', () => {
       textWidth,
       minWidth: 52,
       paddingX: 6,
+      leftInset: 302,
       rightInset: 4,
     });
     const liveText = createNativePriceAxisTagTextLayout(tag.x, tag.width, '100:00:00', textWidth, 6);
@@ -87,6 +88,7 @@ describe('native price axis tag layout', () => {
       textWidth,
       minWidth: 52,
       paddingX: 6,
+      leftInset: 302,
       rightInset: 4,
     });
 
@@ -94,7 +96,7 @@ describe('native price axis tag layout', () => {
     expect(tag.x + tag.width).toBeLessThanOrEqual(376);
   });
 
-  it('lets wide price-axis tags grow left while preserving the full label', () => {
+  it('keeps wide price-axis tags inside the left-aligned axis lane', () => {
     const tag = createNativePriceAxisTagLayout({
       frame: {
         dimensions: {
@@ -105,13 +107,15 @@ describe('native price axis tag layout', () => {
       textWidth,
       minWidth: 52,
       paddingX: 6,
+      leftInset: 302,
       rightInset: 4,
     });
 
-    expect(tag.text).toBe('123,456,789.0');
-    expect(tag.x).toBeLessThan(302);
+    expect(tag.text).toMatch(/\.\.\.$/);
+    expect(tag.x).toBe(302);
     expect(tag.x + tag.width).toBe(376);
-    expect(tag.textX).toBe(tag.x + 6);
+    expect(tag.textX).toBeGreaterThanOrEqual(tag.x + 6);
+    expect(tag.textX).toBeLessThanOrEqual(tag.x + tag.width - 6);
   });
 
   it('stacks overlapping price-axis tags without changing their order', () => {

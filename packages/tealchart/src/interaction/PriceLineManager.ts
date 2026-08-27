@@ -12,7 +12,7 @@ import type { ChartMargins, PriceLineLabelBounds } from '../types';
 import Konva from 'konva';
 
 import { TRADE_LINE_ACCENT_RAIL_WIDTH, TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
-import { PRICE_AXIS_RIGHT_PADDING } from '../types';
+import { PRICE_AXIS_RIGHT_PADDING, PRICE_AXIS_TAG_HORIZONTAL_PADDING } from '../types';
 import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
@@ -97,7 +97,7 @@ export interface CrosshairState {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
-const PRICE_AXIS_LABEL_TEXT_PADDING_X = 6;
+const PRICE_AXIS_LABEL_TEXT_PADDING_X = PRICE_AXIS_TAG_HORIZONTAL_PADDING;
 const DRAG_THRESHOLD = 5;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
@@ -718,7 +718,7 @@ export class PriceLineManager {
     for (const bound of this.labelBounds) {
       if ((bound.type !== 'order' && bound.type !== 'position') || !bound.chartLabel?.segments.length) continue;
       const lineY = this.cachedLineGroups.get(bound.lineId)?.getAttr('lineY') ?? this.options.priceToY(bound.price);
-      const priceAxisLabelX = this.options.width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+      const priceAxisLabelX = this.options.width - this.options.margins.right;
       const { chartLabelWidth, chartLabelX, lineStartX, rightLineEndX } = this.resolveTradingLineChartLabelLayout(
         bound,
         priceAxisLabelX,
@@ -853,7 +853,7 @@ export class PriceLineManager {
     const labelCenterY = lineY + collisionOffset;
 
     // Price axis label position
-    const priceAxisLabelX = width - bound.width - PRICE_AXIS_RIGHT_PADDING;
+    const priceAxisLabelX = width - margins.right;
     const priceAxisLabelY = labelCenterY - bound.height / 2;
 
     // Line dash pattern

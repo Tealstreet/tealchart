@@ -1651,6 +1651,12 @@ export const MIN_PANE_HEIGHT = 0.05;
  */
 export const PRICE_AXIS_RIGHT_PADDING = 2;
 
+/**
+ * Horizontal text padding inside boxed price-axis/y-axis tags.
+ * Shared by web canvas, web Konva overlays, and native Skia tag layout.
+ */
+export const PRICE_AXIS_TAG_HORIZONTAL_PADDING = 4;
+
 // ============================================================================
 // Gap Detection & Recovery
 // ============================================================================

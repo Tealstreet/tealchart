@@ -18,6 +18,7 @@ import {
 } from '../../rendering/indicatorOutputAxisLabels';
 import {
   createNativePriceAxisLane,
+  NATIVE_PRICE_AXIS_TAG_PADDING_X,
 } from '../utils/nativePriceAxisLane';
 import { nativePaneValueToYWithRange, resolveNativePaneRange } from './nativePaneRangeOverride';
 import { getNativePriceAxisSingleLineTextBaselineOffset } from '../utils/priceAxisTagLayout';
@@ -28,7 +29,7 @@ import { sharedTimeToNativeX } from './nativeSharedViewport';
 
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 11;
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 28;
-const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = 2;
+const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = NATIVE_PRICE_AXIS_TAG_PADDING_X;
 const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP = 0;
 const NATIVE_INDICATOR_OUTPUT_AXIS_GUIDE_DASH = [4, 4];
 

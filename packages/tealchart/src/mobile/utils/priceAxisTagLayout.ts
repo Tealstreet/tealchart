@@ -24,6 +24,7 @@ export interface NativePriceAxisTagLayoutInput {
   textWidth: (text: string) => number;
   minWidth: number;
   paddingX: number;
+  leftInset: number;
   rightInset: number;
 }
 
@@ -81,10 +82,12 @@ export function createNativePriceAxisTagTextLayout(
 }
 
 export function createNativePriceAxisTagLayout(input: NativePriceAxisTagLayoutInput): NativePriceAxisTagLayout {
+  const axisLeft = input.leftInset;
   const axisRight = input.frame.dimensions.width - input.rightInset;
   const measuredWidth = input.textWidth(input.text) + input.paddingX * 2;
-  const width = Math.max(0, Math.max(input.minWidth, measuredWidth));
-  const x = axisRight - width;
+  const laneWidth = Math.max(0, axisRight - axisLeft);
+  const width = Math.min(laneWidth, Math.max(0, Math.max(input.minWidth, measuredWidth)));
+  const x = axisLeft;
   const label = createNativePriceAxisTagTextLayout(x, width, input.text, input.textWidth, input.paddingX);
 
   return {
