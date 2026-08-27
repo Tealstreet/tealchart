@@ -4798,9 +4798,12 @@ export class TealchartRenderer {
     visibleTop: number,
     priceLineBounds: readonly PriceLineLabelBounds[] = [],
   ): MeasuredValueAxisLabel[] {
-    if (labels.length === 0) return labels;
+    if (labels.length === 0 && priceLineBounds.length === 0) return labels;
 
-    type OutputCollisionBounds = LabelBounds & { outputLabel?: MeasuredValueAxisLabel };
+    type OutputCollisionBounds = LabelBounds & {
+      outputLabel?: MeasuredValueAxisLabel;
+      priceLineBound?: PriceLineLabelBounds;
+    };
 
     const outputBounds: OutputCollisionBounds[] = labels.map((label) => {
       const height = label.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
@@ -4813,20 +4816,33 @@ export class TealchartRenderer {
       };
     });
 
-    const priceLineObstacles: OutputCollisionBounds[] = priceLineBounds
+    const priceLineCollisionBounds: OutputCollisionBounds[] = priceLineBounds
       .filter((bound) => !bound.floatingLabel)
       .map((bound) => ({
         id: `price-line:${bound.lineId}`,
-        originalY: bound.adjustedY,
+        originalY: bound.originalY,
         adjustedY: bound.adjustedY,
         height: bound.height + INDICATOR_OUTPUT_AXIS_TAG_GAP,
-        priority: 10_000,
-        fixed: true,
+        priority: bound.fixed === true ? 10_000 : 0,
+        fixed: bound.fixed === true,
+        priceLineBound: bound,
       }));
 
-    const collisionBounds = [...outputBounds, ...priceLineObstacles];
+    const collisionBounds = [...priceLineCollisionBounds, ...outputBounds];
     if (collisionBounds.length > 1) {
       resolveLabelCollisions(collisionBounds);
+    }
+
+    for (const bound of priceLineCollisionBounds) {
+      if (!bound.priceLineBound) continue;
+      if (bound.priceLineBound.fixed === true) continue;
+      const minCenterY = visibleTop + bound.priceLineBound.height / 2;
+      const maxCenterY = pane.bottom - bound.priceLineBound.height / 2;
+      if (maxCenterY > minCenterY) {
+        bound.priceLineBound.adjustedY = Math.max(minCenterY, Math.min(maxCenterY, bound.adjustedY));
+      } else {
+        bound.priceLineBound.adjustedY = bound.adjustedY;
+      }
     }
 
     for (const bound of outputBounds) {
