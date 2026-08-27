@@ -2438,9 +2438,9 @@ export class ChartCore {
       }
     }
 
-    const canvasLabelBounds = (
-      dragLineId ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId) : this.labelBoundsCache
-    ).filter((bound) => bound.type !== 'order' && bound.type !== 'position');
+    const canvasLabelBounds = dragLineId
+      ? this.labelBoundsCache.filter((bound) => bound.lineId !== dragLineId)
+      : this.labelBoundsCache;
 
     // Render candles, grid, axes, volume, indicators, price lines on main canvas
     // Crosshair is NOT drawn here — it goes on the overlay canvas
