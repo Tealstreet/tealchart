@@ -555,6 +555,8 @@ export class PriceLineManager {
     const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
     if (!refs) return;
 
+    this.updatePriceAxisLabelPosition(group, bound, refs);
+
     // Unfilled keeps the dark backing rather than going transparent, so the
     // grid cannot read straight through a tag that overlaps it.
     const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color: bound.color });
@@ -591,6 +593,27 @@ export class PriceLineManager {
       refs.buttonTexts?.[index]?.fill(button.iconColor);
       refs.buttonIcons?.[index]?.forEach((icon) => icon.stroke(button.iconColor));
     });
+  }
+
+  private updatePriceAxisLabelPosition(
+    group: Konva.Group,
+    bound: PriceLineLabelBounds,
+    refs: CachedLineContentRefs,
+  ): void {
+    const lineY = group.getAttr('lineY') ?? this.options.priceToY(bound.price);
+    const collisionOffset = bound.adjustedY - bound.originalY;
+    const labelCenterY = lineY + collisionOffset;
+    const labelTopY = labelCenterY - bound.height / 2;
+    const groupOffsetY = group.y();
+    const localLabelTopY = labelTopY - groupOffsetY;
+
+    refs.priceAxisRect?.y(localLabelTopY);
+    if (refs.priceAxisSecondaryText) {
+      refs.priceAxisPrimaryText?.y(localLabelTopY + 1);
+      refs.priceAxisSecondaryText.y(localLabelTopY + bound.height / 2 - 1);
+    } else {
+      refs.priceAxisPrimaryText?.y(localLabelTopY);
+    }
   }
 
   /**
@@ -856,18 +879,6 @@ export class PriceLineManager {
             stroke: bound.color,
             strokeWidth: bound.lineWidth || 1,
             dash: lineDash,
-          }),
-        );
-      }
-
-      // Connector line if offset
-      if (Math.abs(labelCenterY - lineY) > 2) {
-        lineGroup.add(
-          new Konva.Line({
-            points: [priceAxisLabelX, lineY, priceAxisLabelX, labelCenterY],
-            stroke: bound.color,
-            strokeWidth: 1,
-            opacity: 0.5,
           }),
         );
       }
@@ -1519,18 +1530,6 @@ export class PriceLineManager {
           stroke: bound.color,
           strokeWidth: bound.lineWidth || 1,
           dash: lineDash,
-        }),
-      );
-    }
-
-    // Connector line if offset
-    if (Math.abs(labelCenterY - lineY) > 2) {
-      group.add(
-        new Konva.Line({
-          points: [priceAxisLabelX, lineY, priceAxisLabelX, labelCenterY],
-          stroke: bound.color,
-          strokeWidth: 1,
-          opacity: 0.5,
         }),
       );
     }

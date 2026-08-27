@@ -14,6 +14,7 @@ interface PriceLineManagerProbe {
 }
 
 interface CachedLineContentRefsProbe {
+  priceAxisRect?: Konva.Rect;
   buttonIcons?: Array<Konva.Shape[] | undefined>;
 }
 
@@ -265,6 +266,72 @@ describe('PriceLineManager TP/SL dragging', () => {
     expect(gapLine).toBeDefined();
     expect(gapLine!.points()[3]).toBe(100);
     expect(gapLine!.stroke()).toBe('#23d18b');
+
+    manager.dispose();
+    stage.destroy();
+  });
+
+  it('does not draw vertical connector artifacts when an axis tag is de-overlapped', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+    const bound = makeOrderBound(100);
+    bound.adjustedY = 130;
+
+    manager.update([bound]);
+
+    const lineGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+    const verticalLines = lineGroup?.find((node: Konva.Node) => {
+      if (!(node instanceof Konva.Line)) return false;
+      const points = node.points();
+      return points.length === 4 && points[0] === points[2] && points[1] !== points[3];
+    }) as Konva.Line[] | undefined;
+
+    expect(verticalLines).toHaveLength(0);
+
+    manager.dispose();
+    stage.destroy();
+  });
+
+  it('updates cached axis tag positions immediately when only de-overlap changes', () => {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+    const initialBound = makeOrderBound(100);
+
+    manager.update([initialBound]);
+    const lineGroup = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+    const refs = lineGroup?.getAttr('contentRefs') as CachedLineContentRefsProbe | undefined;
+
+    expect(refs?.priceAxisRect?.y()).toBe(100 - initialBound.height / 2);
+
+    const shiftedBound = { ...initialBound, adjustedY: 130 };
+    manager.update([shiftedBound]);
+
+    expect((manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1')).toBe(lineGroup);
+    expect(refs?.priceAxisRect?.y()).toBe(130 - shiftedBound.height / 2);
 
     manager.dispose();
     stage.destroy();
