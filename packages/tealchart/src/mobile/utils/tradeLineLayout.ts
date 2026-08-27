@@ -674,7 +674,9 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   const renderedLabelWidth = Math.max(0, currentX - layout.labelX);
   const leftLineEndX = line.extendLeft === false ? layout.lineStartX : layout.labelX - LABEL_TO_LINE_GAP;
   const rightLineStartX = layout.labelX + renderedLabelWidth + LABEL_TO_LINE_GAP;
-  const priceLabelTextX = Math.round(layout.priceLabelLeft + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X);
+  const priceLabelTextX = Math.round(
+    layout.priceLabelLeft + Math.max(0, (layout.priceLabelWidth - priceTextWidth(priceLabelText)) / 2),
+  );
 
   return {
     objectType,

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
-import { createNativePriceAxisLane } from './nativePriceAxisLane';
 import {
   clampNativePriceAxisTickLabelY,
   clampNativeTimeAxisTickLabelX,
@@ -14,6 +13,7 @@ import {
   createNativeTimeAxisTickTextLayout,
   getNativeAxisTextCharacterCapacity,
 } from './axisTickLayout';
+import { createNativePriceAxisLane } from './nativePriceAxisLane';
 
 const frame = createNativeChartFrameFromPanes({
   dimensions: {
@@ -36,7 +36,7 @@ describe('native axis tick layout', () => {
 
     expect(layout.x).toBeGreaterThanOrEqual(frame.priceAxisLeft);
     expect(layout.x + 54).toBeLessThanOrEqual(priceAxisLane.right);
-    expect(layout.x + 54).toBe(priceAxisLane.right);
+    expect(layout.x).toBe(priceAxisLane.left);
     expect(layout.text).toBe('64,000');
     expect(layout.y).toBe(224);
     expect(layout.maxWidth).toBe(priceAxisLane.width);
@@ -52,7 +52,7 @@ describe('native axis tick layout', () => {
 
     expect(layout).toEqual({
       text: '64,000',
-      x: priceAxisLane.right - 54,
+      x: priceAxisLane.left,
       maxWidth: priceAxisLane.width,
       right: priceAxisLane.right,
     });
@@ -60,11 +60,15 @@ describe('native axis tick layout', () => {
   });
 
   it('clamps price label baselines to the visible main pane', () => {
-    expect(createNativePriceAxisTickLabelLayout({ frame, text: '64,000', textWidth: 54, y: 0 }).y).toBe(frame.mainPane.top + 11);
-    expect(createNativePriceAxisTickLabelLayout({ frame, text: '64,000', textWidth: 54, y: 999 }).y).toBe(frame.mainPane.bottom - 3);
+    expect(createNativePriceAxisTickLabelLayout({ frame, text: '64,000', textWidth: 54, y: 0 }).y).toBe(
+      frame.mainPane.top + 11,
+    );
+    expect(createNativePriceAxisTickLabelLayout({ frame, text: '64,000', textWidth: 54, y: 999 }).y).toBe(
+      frame.mainPane.bottom - 3,
+    );
   });
 
-  it('fits oversized price labels before aligning to the right axis edge', () => {
+  it('fits oversized price labels before aligning to the left axis edge', () => {
     const layout = createNativePriceAxisTickLabelLayout({
       frame,
       text: '1234567890',
@@ -74,7 +78,7 @@ describe('native axis tick layout', () => {
     });
 
     expect(layout.text).toBe('123...');
-    expect(layout.x + 42).toBe(priceAxisLane.right);
+    expect(layout.x).toBe(priceAxisLane.left);
   });
 
   it('does not claim oversized text fits without an explicit fitter', () => {
@@ -122,7 +126,12 @@ describe('native axis tick layout', () => {
 
   it('keeps time labels inside the plot time-content lane', () => {
     const left = createNativeTimeAxisTickLabelLayout({ frame, text: '00:00', textWidth: 36, x: frame.contentLeft });
-    const center = createNativeTimeAxisTickLabelLayout({ frame, text: '00:00', textWidth: 36, x: frame.contentLeft + frame.contentWidth / 2 });
+    const center = createNativeTimeAxisTickLabelLayout({
+      frame,
+      text: '00:00',
+      textWidth: 36,
+      x: frame.contentLeft + frame.contentWidth / 2,
+    });
     const right = createNativeTimeAxisTickLabelLayout({ frame, text: '00:00', textWidth: 36, x: frame.contentRight });
 
     expect(left.x).toBe(frame.contentLeft);

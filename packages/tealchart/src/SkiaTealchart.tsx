@@ -9,6 +9,7 @@ import type {
   UserDrawingState,
   UserDrawingTool,
 } from './drawings';
+import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
 import type {
@@ -19,9 +20,9 @@ import type {
 } from './mobile/render/NativeChartLegendOverlay';
 import type { NativeChartSettingsActionCommand } from './mobile/render/NativeChartSettingsOverlay';
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
-import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
+import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './mobile/utils/tradeLineLayout';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
 import type { ChartThemeInput } from './theme';
@@ -119,7 +120,6 @@ import {
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
-import { createNativePriceAxisLaneWidth } from './mobile/utils/nativePriceAxisLane';
 import {
   createNativeChartLayoutSettings,
   resolveNativeDefaultLayoutPersistence,
@@ -133,6 +133,7 @@ import {
   createNativePaneLayoutSignature,
   nativePaneHeightsMatchRatios,
 } from './mobile/utils/nativePaneLayoutOverrides';
+import { createNativePriceAxisLaneWidth } from './mobile/utils/nativePriceAxisLane';
 import {
   createNativeUserDrawingCoordinateSpaces,
   resolveNativeUserDrawingInputPoint,
@@ -141,8 +142,6 @@ import {
 import {
   getNativeOrderObjectId as getOrderObjectId,
   getNativePositionObjectId as getPositionObjectId,
-  type NativeSelectedTradeLine,
-  type NativeTradeLineObjectType,
 } from './mobile/utils/tradeLineLayout';
 import { applyChartOverridesToRenderOptions } from './overrides';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore } from './state/chartState';
@@ -465,8 +464,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const [nativePriceAxisWidth, setNativePriceAxisWidth] = useState(createNativeInitialPriceAxisWidth);
   useEffect(() => {
-    setNativePriceAxisWidth(createNativeInitialPriceAxisWidth());
-  }, [createNativeInitialPriceAxisWidth, symbol]);
+    const nextWidth = createNativeInitialPriceAxisWidth();
+    setNativePriceAxisWidth((current) => Math.max(current, nextWidth));
+  }, [createNativeInitialPriceAxisWidth]);
   // Pane heights the user set by dragging a divider. Chart-owned, exactly as web
   // keeps them in ChartCore rather than pushing them back into the manager.
   const [nativePaneHeightOverrides, setNativePaneHeightOverrides] = useState<Readonly<Record<string, number>>>({});

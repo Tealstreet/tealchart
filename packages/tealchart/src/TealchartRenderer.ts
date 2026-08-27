@@ -6,14 +6,15 @@ import type { IndicatorOutputAxisLabelSource } from './rendering/indicatorOutput
 import type { PaneOffset } from './rendering/PaneManager';
 import type { DrawingCoordinateResolvers } from './rendering/TealScriptDrawingCoordinates';
 import type { TealScriptDrawingPartition } from './rendering/TealScriptDrawingPartition';
+import type { LabelBounds } from './utils/labelCollision';
 
 import {
   DEFAULT_SELL_CANDLE_COLOR,
   DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
   TRADE_LINE_DOTTED_DASH_PATTERN,
 } from './constants';
-import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from './debug/plotDebug';
+import { computeCandleCoordinates } from './jailbreak/computeCandleCoordinates';
 import { computeTradingLineLabelMinX, WEB_CHART_CHROME_METRICS } from './layout/chartGeometry';
 import {
   formatTimeAxisLabel,
@@ -52,7 +53,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from './types';
-import { resolveLabelCollisions, type LabelBounds } from './utils/labelCollision';
+import { resolveLabelCollisions } from './utils/labelCollision';
 import { resolvePriceAxisTagStyle } from './utils/priceAxisTagStyle';
 
 /**
@@ -165,25 +166,9 @@ interface MeasuredValueAxisLabel {
   sourceX?: number;
 }
 
-function normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-  if (bounds.length <= 1) return bounds;
-  const width = Math.ceil(Math.max(...bounds.map((bound) => bound.width)));
-  if (!Number.isFinite(width) || width <= 0) return bounds;
-  return bounds.map((bound) => ({ ...bound, width }));
-}
-
-function normalizePriceLineLabelWidthsByPane(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
-  const widthsByPane = new Map<string, number>();
-  for (const bound of bounds) {
-    const paneId = bound.targetPaneId || 'main';
-    widthsByPane.set(paneId, Math.max(widthsByPane.get(paneId) ?? 0, bound.width));
-  }
-
-  return bounds.map((bound) => {
-    const paneId = bound.targetPaneId || 'main';
-    const width = Math.ceil(widthsByPane.get(paneId) ?? bound.width);
-    return Number.isFinite(width) && width > 0 ? { ...bound, width } : bound;
-  });
+function getMaxPriceLineLabelWidth(bounds: PriceLineLabelBounds[]): number {
+  if (bounds.length === 0) return 0;
+  return Math.ceil(Math.max(...bounds.map((bound) => bound.width)));
 }
 
 export const MAIN_VOLUME_OVERLAY_RATIO = 0.15;
@@ -306,11 +291,22 @@ export class TealchartRenderer {
   private jailbreakManager: JailbreakIndicatorManager | null = null;
   private valueAxisCommonLabelWidth = 0;
   private valueAxisPaneLabelWidths = new Map<string, number>();
+  private priceAxisTagLabelWidth = 0;
 
   constructor(ctx: CanvasContext, options: Partial<RenderOptions> = {}, margins: Partial<ChartMargins> = {}) {
     this.ctx = ctx;
     this.options = { ...DEFAULT_RENDER_OPTIONS, ...options };
     this.margins = { ...DEFAULT_MARGINS, ...margins };
+  }
+
+  private normalizePriceLineLabelWidths(bounds: PriceLineLabelBounds[]): PriceLineLabelBounds[] {
+    if (bounds.length === 0) return bounds;
+    const measuredWidth = getMaxPriceLineLabelWidth(bounds);
+    const laneWidth = Math.max(0, this.margins.right - PRICE_AXIS_RIGHT_PADDING);
+    const width = Math.ceil(Math.max(this.priceAxisTagLabelWidth, measuredWidth, laneWidth));
+    if (!Number.isFinite(width) || width <= 0) return bounds;
+    this.priceAxisTagLabelWidth = width;
+    return bounds.map((bound) => ({ ...bound, width }));
   }
 
   /**
@@ -916,7 +912,7 @@ export class TealchartRenderer {
       }
     }
 
-    return normalizePriceLineLabelWidths(
+    return this.normalizePriceLineLabelWidths(
       allBounds
         .filter((b) => {
           // Hide if line is completely outside visible area
@@ -1013,11 +1009,11 @@ export class TealchartRenderer {
     // Draw text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'left';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
-    const labelTextX = labelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const labelTextX = labelX + bound.width / 2;
 
     if (secondaryText) {
       // Two lines of text with minimal padding
@@ -1211,9 +1207,9 @@ export class TealchartRenderer {
     const textColor = bound.label.textColor || '#ffffff';
     ctx.fillStyle = textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'left';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const priceAxisTextX = priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const priceAxisTextX = priceAxisLabelX + bound.width / 2;
 
     if (bound.label.secondaryText) {
       ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);
@@ -3588,7 +3584,7 @@ export class TealchartRenderer {
     }
 
     // Filter to visible area within each line's target pane
-    return normalizePriceLineLabelWidthsByPane(
+    return this.normalizePriceLineLabelWidths(
       allBounds.filter((b) => {
         const targetPaneId = b.targetPaneId || 'main';
         const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
@@ -4873,26 +4869,20 @@ export class TealchartRenderer {
     }
 
     const commonLabelWidth = labelLayout.commonLabelWidth;
-    const paneLabelWidth = labelLayout.paneLabelWidths.get(pane.id) ?? commonLabelWidth;
     const labelRightEdge = options.width - 4;
-    const commonLabelX = labelRightEdge - commonLabelWidth;
-    const isMainPane = pane.type === 'main';
+    const axisLabelX = Math.min(options.width - this.margins.right, labelRightEdge - commonLabelWidth);
+    const axisLabelWidth = Math.max(0, labelRightEdge - axisLabelX);
 
     return measuredLabels.map((label) => {
-      const labelWidth = isMainPane ? commonLabelWidth : paneLabelWidth;
-      const labelX = commonLabelX;
-      const textAlign = label.kind === 'indicator-output' ? 'left' : isMainPane ? 'center' : 'left';
+      const labelWidth = axisLabelWidth;
+      const labelX = axisLabelX;
+      const textAlign = label.kind === 'indicator-output' ? 'center' : 'left';
       return {
         id: label.id,
         paneId: label.paneId,
         value: label.value,
         text: label.text,
-        x:
-          textAlign === 'center'
-            ? labelX + labelWidth / 2
-            : label.kind === 'indicator-output'
-              ? labelX + PRICE_AXIS_LABEL_TEXT_PADDING_X
-              : labelX,
+        x: textAlign === 'center' ? labelX + labelWidth / 2 : labelX,
         labelX,
         labelWidth,
         kind: label.kind,
@@ -5442,7 +5432,7 @@ export class TealchartRenderer {
     }
 
     // Filter to visible area (labels with original Y in top bar should still render, just clamped)
-    return normalizePriceLineLabelWidths(
+    return this.normalizePriceLineLabelWidths(
       allBounds.filter((b) => b.originalY >= pane.top && b.originalY <= pane.bottom),
     );
   }
@@ -5531,11 +5521,11 @@ export class TealchartRenderer {
     // Label text
     ctx.fillStyle = tagStyle.textColor;
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'left';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
-    const labelTextX = labelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const labelTextX = labelX + bound.width / 2;
 
     if (secondaryText) {
       ctx.fillText(bound.label.primaryText, labelTextX, labelY + 7);
@@ -5767,9 +5757,9 @@ export class TealchartRenderer {
 
     ctx.fillStyle = bound.label.textColor || '#ffffff';
     ctx.font = `11px ${this.font}`;
-    ctx.textAlign = 'left';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const priceAxisTextX = priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X;
+    const priceAxisTextX = priceAxisLabelX + bound.width / 2;
 
     if (bound.label.secondaryText) {
       ctx.fillText(bound.label.primaryText, priceAxisTextX, priceAxisLabelY + 7);

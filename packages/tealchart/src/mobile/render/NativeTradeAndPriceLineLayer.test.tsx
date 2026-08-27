@@ -7,14 +7,15 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_TRADE_LINE_LABEL_COLOR } from '../../constants';
 import { getNativePriceLineTagId, getNativeTradeLineTagId } from '../utils/priceAxisTagSources';
-import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
+import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import {
   NativePriceAxisTagAnimatedText,
   NativePriceAxisTagBox,
   NativePriceAxisTagStaticText,
 } from './NativePriceAxisTag';
 import { AnimatedPriceLine } from './NativePriceLineLayer';
+import { measureNativeSkiaAxisCharacterWidth } from './nativeSkiaText';
 import { NativeTradeLineLabelBody } from './NativeTradeLineLabelBody';
 import { AnimatedTradeLine, AnimatedTradeLineDragTag } from './NativeTradeLineLayer';
 
@@ -363,7 +364,15 @@ describe('native trade and price line layers', () => {
     expect(staticTexts.map((element) => element.props.text)).toEqual(['63,777.0']);
     expect(animatedTexts).toHaveLength(1);
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:10');
-    expect(sharedValueOf<number>(animatedTexts[0].props.x)).toBe(sharedValueOf<number>(axisTag.props.x) + 5);
+    expect(sharedValueOf<number>(animatedTexts[0].props.x)).toBe(
+      sharedValueOf<number>(axisTag.props.x) +
+        Math.max(
+          0,
+          (sharedValueOf<number>(axisTag.props.width) -
+            '00:10'.length * measureNativeSkiaAxisCharacterWidth(axisFont)) /
+            2,
+        ),
+    );
 
     nowMs.value = 5_000;
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:05');

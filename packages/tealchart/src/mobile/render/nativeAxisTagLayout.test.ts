@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest';
 import { matchFont } from '@shopify/react-native-skia';
+import { describe, expect, it } from 'vitest';
 
-import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import {
   createNativeAxisLaneTagLayout,
   createNativeAxisTagLayout,
   getNativeAxisTagTextCharacterCapacity,
 } from './nativeAxisTagLayout';
+import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 
 const frame = createNativeChartFrameFromPanes({
   dimensions: {
@@ -40,7 +40,7 @@ describe('native axis tag render layout', () => {
     expect(tag.width).toBe(laneTag.width);
     expect(tag.x).toBe(laneTag.x);
     expect(tag.x + tag.width).toBe(laneTag.x + laneTag.width);
-    expect(tag.textX).toBe(tag.x + 5);
+    expect(tag.textX).toBe(tag.x + 19.5);
   });
 
   it('reserves the full right price-axis lane for live drag-preview tags', () => {
@@ -48,7 +48,7 @@ describe('native axis tag render layout', () => {
 
     expect(tag.x).toBe(301);
     expect(tag.width).toBe(88);
-    expect(tag.textX).toBe(306);
+    expect(tag.textX).toBe(345);
   });
 
   it('derives live tag character capacity from padded tag content width', () => {

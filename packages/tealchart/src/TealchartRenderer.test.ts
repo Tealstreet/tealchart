@@ -2838,17 +2838,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         targetPaneId: 'main',
       } as PriceLineLabelBounds;
 
-      renderer.renderWithLayout(
-        bars,
-        viewport,
-        layout,
-        [],
-        [],
-        undefined,
-        undefined,
-        undefined,
-        [orderBounds],
-      );
+      renderer.renderWithLayout(bars, viewport, layout, [], [], undefined, undefined, undefined, [orderBounds]);
 
       expect(drawSpy).not.toHaveBeenCalled();
     });
@@ -2908,8 +2898,15 @@ describe('TealchartRenderer coordinate transforms', () => {
       const byId = new Map(bounds.map((bound) => [bound.lineId, bound]));
 
       expect(byId.get('main-short')?.width).toBe(byId.get('main-wide')?.width);
-      expect(byId.get('pane-short')?.width).toBe(byId.get('pane-wide')?.width);
-      expect(byId.get('main-short')?.width).toBeGreaterThan(byId.get('pane-short')?.width ?? 0);
+      expect(byId.get('main-short')?.width).toBe(byId.get('pane-short')?.width);
+      expect(byId.get('main-short')?.width).toBe(byId.get('pane-wide')?.width);
+
+      const shortBounds = renderer.computePriceLineLabelBoundsWithLayout(
+        priceLines.filter((line) => line.id === 'main-short' || line.id === 'pane-short'),
+        viewport,
+        layout,
+      );
+      expect(shortBounds.every((bound) => bound.width === byId.get('main-wide')?.width)).toBe(true);
     });
 
     it('reserves text-rendering slack for trailing-zero price-axis labels', () => {
@@ -3743,10 +3740,10 @@ describe('value axis label layout', () => {
     expect(new Set(indicatorLabels.map((label) => label.labelWidth)).size).toBe(1);
     expect(mainLabels[0]!.labelWidth).toBeGreaterThan(0);
     expect(mainLabels[0]!.labelWidth).toBeGreaterThanOrEqual(indicatorLabels[0]!.labelWidth);
-    expect(mainLabels.every((label) => label.textAlign === 'center')).toBe(true);
+    expect(mainLabels.every((label) => label.textAlign === 'left')).toBe(true);
     expect(indicatorLabels.every((label) => label.textAlign === 'left')).toBe(true);
     expect(indicatorLabels.every((label) => label.labelX === mainLabels[0]!.labelX)).toBe(true);
-    expect(mainLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
+    expect(mainLabels.every((label) => label.x === label.labelX)).toBe(true);
     expect(indicatorLabels.every((label) => label.x === label.labelX)).toBe(true);
   });
 
@@ -3810,8 +3807,9 @@ describe('value axis label layout', () => {
     expect(outputLabels.map((label) => label.text)).toEqual(['24.2', '-11.6']);
     expect(outputLabels.map((label) => label.borderColor)).toEqual(['#2196F3', '#ff9900']);
     expect(outputLabels.every((label) => label.backgroundColor === '#111418')).toBe(true);
-    expect(outputLabels.every((label) => label.textAlign === 'left')).toBe(true);
+    expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
     expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
+    expect(outputLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.valueY))).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.sourceX))).toBe(true);
     expect(labels.some((label) => label.kind === 'tick' && label.textAlign === 'left')).toBe(true);
@@ -3868,8 +3866,7 @@ describe('value axis label layout', () => {
     const chartWidth = opts.width - opts.margins.left;
     const expectedSourceX =
       opts.margins.left +
-      ((bars[2]!.time - frame.viewport.startTime) / (frame.viewport.endTime - frame.viewport.startTime)) *
-        chartWidth;
+      ((bars[2]!.time - frame.viewport.startTime) / (frame.viewport.endTime - frame.viewport.startTime)) * chartWidth;
 
     expect(outputLabels).toEqual([expect.objectContaining({ text: '24.2' })]);
     expect(outputLabels[0]!.sourceX).toBeCloseTo(expectedSourceX);

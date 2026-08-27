@@ -31,7 +31,7 @@ export function createNativePriceAxisTickTextLayout(input: NativeAxisTextLayoutI
   const right = lane.right;
   const maxWidth = lane.width;
   const fitted = resolveFittedText(input, maxWidth);
-  const x = Math.max(left, right - fitted.width);
+  const x = left;
 
   return {
     text: fitted.text,
@@ -46,7 +46,9 @@ export function clampNativePriceAxisTickLabelY(frame: NativeChartFrame, y: numbe
   return Math.max(frame.mainPane.top + 11, Math.min(frame.mainPane.bottom - 3, y + baselineOffset));
 }
 
-export function createNativePriceAxisTickLabelLayout(input: NativeAxisTextLayoutInput & { y: number }): NativeAxisTextLayout {
+export function createNativePriceAxisTickLabelLayout(
+  input: NativeAxisTextLayoutInput & { y: number },
+): NativeAxisTextLayout {
   return {
     ...createNativePriceAxisTickTextLayout(input),
     y: clampNativePriceAxisTickLabelY(input.frame, input.y, input.baselineOffset),
@@ -81,7 +83,9 @@ export function clampNativeTimeAxisTickLabelX(frame: NativeChartFrame, x: number
   return Math.max(frame.contentLeft, Math.min(frame.contentRight - width, x - width / 2));
 }
 
-export function createNativeTimeAxisTickLabelLayout(input: NativeAxisTextLayoutInput & { x: number }): NativeAxisTextLayout {
+export function createNativeTimeAxisTickLabelLayout(
+  input: NativeAxisTextLayoutInput & { x: number },
+): NativeAxisTextLayout {
   const textLayout = createNativeTimeAxisTickTextLayout(input);
 
   return {
@@ -93,14 +97,24 @@ export function createNativeTimeAxisTickLabelLayout(input: NativeAxisTextLayoutI
   };
 }
 
-export function createNativeRightAlignedAxisTextX(right: number, textLength: number, characterWidth: number, maxWidth: number): number {
+export function createNativeRightAlignedAxisTextX(
+  right: number,
+  textLength: number,
+  characterWidth: number,
+  maxWidth: number,
+): number {
   'worklet';
   if (characterWidth <= 0) return right;
   const width = Math.min(Math.max(0, textLength) * characterWidth, maxWidth);
   return right - width;
 }
 
-export function createNativeCenteredAxisTextX(left: number, textLength: number, characterWidth: number, maxWidth: number): number {
+export function createNativeCenteredAxisTextX(
+  left: number,
+  textLength: number,
+  characterWidth: number,
+  maxWidth: number,
+): number {
   'worklet';
   if (characterWidth <= 0) return left;
   const width = Math.min(Math.max(0, textLength) * characterWidth, maxWidth);
