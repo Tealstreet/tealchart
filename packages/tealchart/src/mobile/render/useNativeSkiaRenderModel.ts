@@ -27,6 +27,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 import { resolveChartChromeTheme } from '../../chromeTheme';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions } from '../../state/chartState';
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { createNativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import { createNativeBracketPriceLines } from '../utils/nativeBracketPriceLines';
 import { createNativePriceAxisLane, createNativePriceAxisLaneWidth } from '../utils/nativePriceAxisLane';
@@ -108,7 +109,9 @@ export interface NativeSkiaRenderModelInput {
   topBarInterval?: string;
   topBarDefaultVisibleValues: ReadonlySet<ResolutionString>;
   topBarHeight: number;
-  tradeLabelHeight: number;
+  tradeAxisTagHeight?: number;
+  /** @deprecated Trade chart-label height no longer controls order/position price-axis tags. */
+  tradeLabelHeight?: number;
   userDrawingActiveTool?: UserDrawingTool;
   userDrawingCommandAvailability?: UserDrawingCommandAvailability;
   userDrawingRecentToolsByCategory?: UserDrawingRecentToolByCategory;
@@ -130,6 +133,7 @@ export interface NativeSkiaRenderModel {
   textColor: string;
   textFont: ReturnType<typeof Skia.Font>;
   topBarLayout: NativeTopBarLayout | null;
+  tradeAxisFont: ReturnType<typeof Skia.Font>;
   tradeLineGeometries: readonly NativeTradeLineGeometry[];
   visibleBars: readonly NativeVisibleBar[];
   volumeHeight: number;
@@ -157,16 +161,18 @@ export function useNativeSkiaRenderModel({
   topBarInterval,
   topBarDefaultVisibleValues,
   topBarHeight,
-  tradeLabelHeight,
+  tradeAxisTagHeight,
   userDrawingActiveTool,
   userDrawingCommandAvailability,
   userDrawingRecentToolsByCategory,
   volumeHeightRatio,
 }: NativeSkiaRenderModelInput): NativeSkiaRenderModel {
-  const textFont = useMemo(() => createNativeSkiaFont(11), []);
-  const smallFont = useMemo(() => createNativeSkiaFont(10), []);
+  const resolvedTradeAxisTagHeight = tradeAxisTagHeight ?? NATIVE_PRICE_AXIS_TAG_SIZING.trade.height;
+  const textFont = useMemo(() => createNativeSkiaFont(NATIVE_PRICE_AXIS_TAG_SIZING.other.fontSize), []);
+  const smallFont = useMemo(() => createNativeSkiaFont(NATIVE_PRICE_AXIS_TAG_SIZING.indicatorOutput.fontSize), []);
   const titleFont = useMemo(() => createNativeSkiaFont(13), []);
-  const axisFont = useMemo(() => createNativeSkiaAxisFont(11), []);
+  const axisFont = useMemo(() => createNativeSkiaAxisFont(NATIVE_PRICE_AXIS_TAG_SIZING.other.fontSize), []);
+  const tradeAxisFont = useMemo(() => createNativeSkiaAxisFont(NATIVE_PRICE_AXIS_TAG_SIZING.trade.fontSize), []);
   const priceTickSize = useMemo(() => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision), [pricePrecision]);
   const chromeTheme = useMemo(() => resolveChartChromeTheme(options), [options]);
   const nativeMutedTextColor = chromeTheme.mutedTextColor;
@@ -259,7 +265,7 @@ export function useNativeSkiaRenderModel({
             chartLabelMinX: options.chartLabelMinX,
             textWidth: (text) => measureNativeSkiaTextWidth(textFont, text),
             smallTextWidth: (text) => measureNativeSkiaTextWidth(smallFont, text),
-            priceTextWidth: (text) => measureNativeSkiaTextWidth(axisFont, text),
+            priceTextWidth: (text) => measureNativeSkiaTextWidth(tradeAxisFont, text),
             positiveColor: options.upColor,
             negativeColor: options.downColor,
           })
@@ -267,7 +273,6 @@ export function useNativeSkiaRenderModel({
       return promoteNativeSelectedTradeLineGeometry(geometries, selectedTradeLine);
     },
     [
-      axisFont,
       lineSnapshot.orderLines,
       lineSnapshot.positionLines,
       options.downColor,
@@ -278,6 +283,7 @@ export function useNativeSkiaRenderModel({
       selectedTradeLine,
       smallFont,
       textFont,
+      tradeAxisFont,
     ],
   );
   const visibleBars = useMemo(() => (projection ? getNativeVisibleBars(bars, projection) : []), [bars, projection]);
@@ -347,7 +353,7 @@ export function useNativeSkiaRenderModel({
         positionLines: lineSnapshot.positionLines,
         priceLineTagHeight: priceAxisTagHeight,
         selectedTradeLine,
-        tradeLineTagHeight: tradeLabelHeight + 2,
+        tradeLineTagHeight: resolvedTradeAxisTagHeight,
       }),
     [
       bracketPriceLines,
@@ -357,7 +363,7 @@ export function useNativeSkiaRenderModel({
       lineSnapshot.positionLines,
       priceAxisTagHeight,
       selectedTradeLine,
-      tradeLabelHeight,
+      resolvedTradeAxisTagHeight,
     ],
   );
   const gridColor = options.gridColor;
@@ -393,6 +399,7 @@ export function useNativeSkiaRenderModel({
     textColor,
     textFont,
     topBarLayout,
+    tradeAxisFont,
     tradeLineGeometries,
     visibleBars,
     volumeHeight,

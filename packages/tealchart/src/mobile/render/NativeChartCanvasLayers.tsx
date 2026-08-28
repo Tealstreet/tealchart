@@ -19,6 +19,7 @@ import { memo } from 'react';
 
 import { Group, Skia } from '@shopify/react-native-skia';
 
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { NativeCandleVolumeLayer } from './NativeCandleVolumeLayer';
 import { NativeChartChromeLayer } from './NativeChartChromeLayer';
 import { NativeChartPrimitiveLayer } from './NativeChartPrimitiveLayer';
@@ -63,6 +64,8 @@ export interface NativeChartCanvasLayersProps {
   staticProjection?: NativeChartProjection | null;
   textColor: string;
   textFont: ReturnType<typeof Skia.Font>;
+  tradeAxisFont?: ReturnType<typeof Skia.Font>;
+  tradeAxisTagHeight?: number;
   tradeLabelHeight: number;
   tradeLineGeometries: readonly NativeTradeLineGeometry[];
   userDrawingDraftAnchorColor?: string;
@@ -103,6 +106,8 @@ export function NativeChartCanvasLayersImpl({
   staticProjection,
   textColor,
   textFont,
+  tradeAxisFont,
+  tradeAxisTagHeight,
   tradeLabelHeight,
   tradeLineGeometries,
   userDrawingDraftAnchorColor,
@@ -111,6 +116,9 @@ export function NativeChartCanvasLayersImpl({
   visibleBars,
   volumeHeight,
 }: NativeChartCanvasLayersProps) {
+  const resolvedTradeAxisFont = tradeAxisFont ?? axisFont;
+  const resolvedTradeAxisTagHeight = tradeAxisTagHeight ?? NATIVE_PRICE_AXIS_TAG_SIZING.trade.height;
+
   return (
     <>
       <NativeChartChromeLayer
@@ -225,6 +233,8 @@ export function NativeChartCanvasLayersImpl({
             smallFont={smallFont}
             staticProjection={staticProjection}
             textFont={textFont}
+            tradeAxisFont={resolvedTradeAxisFont}
+            tradeAxisTagHeight={resolvedTradeAxisTagHeight}
             tradeLabelHeight={tradeLabelHeight}
             tradeLineGeometries={tradeLineGeometries}
           />

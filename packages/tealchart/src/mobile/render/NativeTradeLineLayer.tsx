@@ -18,7 +18,6 @@ import {
 } from '../utils/priceAxisTagLayout';
 import { getNativeTradeLineTagId } from '../utils/priceAxisTagSources';
 import {
-  getNativeTradeLinePriceTagTextBaselineOffset,
   NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X,
   nativeTradeLineDashArray,
 } from '../utils/tradeLineLayout';
@@ -54,6 +53,7 @@ export function AnimatedTradeLine({
   axisFont,
   textFont,
   smallFont,
+  tradeAxisTagHeight,
   tradeLabelHeight,
 }: {
   dragState?: NativeOrderDragSharedValues;
@@ -67,6 +67,7 @@ export function AnimatedTradeLine({
   axisFont: ReturnType<typeof Skia.Font>;
   textFont: ReturnType<typeof Skia.Font>;
   smallFont: ReturnType<typeof Skia.Font>;
+  tradeAxisTagHeight: number;
   tradeLabelHeight: number;
 }) {
   const livePrice = useDerivedValue(() => {
@@ -87,11 +88,9 @@ export function AnimatedTradeLine({
       lineY.value,
     ),
   );
-  const priceTagTextBaselineOffset = getNativeTradeLinePriceTagTextBaselineOffset(tradeLabelHeight);
-  const priceLabelY = useDerivedValue(() => axisTagCenterY.value - tradeLabelHeight / 2 - 1);
-  const priceTextY = useDerivedValue(
-    () => axisTagCenterY.value - tradeLabelHeight / 2 - 1 + priceTagTextBaselineOffset,
-  );
+  const priceTagTextBaselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(tradeAxisTagHeight);
+  const priceLabelY = useDerivedValue(() => axisTagCenterY.value - tradeAxisTagHeight / 2);
+  const priceTextY = useDerivedValue(() => axisTagCenterY.value - tradeAxisTagHeight / 2 + priceTagTextBaselineOffset);
   const priceLabelCharacterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
   const priceLabelRight = geometry.priceLabelX + geometry.priceLabelWidth;
   const priceLabelText = useDerivedValue(() => {
@@ -140,8 +139,9 @@ export function AnimatedTradeLine({
     const staticRawY = staticProjection.priceToY(line.price);
     const staticLineY = clampNativeTradeLineY(staticRawY, frame);
     const staticLabelY = staticLineY - tradeLabelHeight / 2;
-    const staticPriceLabelY = staticLabelY - 1;
-    const staticPriceTextY = staticLabelY - 1 + priceTagTextBaselineOffset;
+    const staticAxisTagCenterY = staticLineY;
+    const staticPriceLabelY = staticAxisTagCenterY - tradeAxisTagHeight / 2;
+    const staticPriceTextY = staticPriceLabelY + priceTagTextBaselineOffset;
     const staticPriceLabelText = geometry.priceLabelText;
     const staticPriceLabelTextX = geometry.priceLabelTextX;
     const staticOpacity = isNativeYInMainPane(staticRawY, frame) ? pendingOpacity : 0;
@@ -189,7 +189,7 @@ export function AnimatedTradeLine({
             x={geometry.priceLabelX}
             y={staticPriceLabelY}
             width={geometry.priceLabelWidth}
-            height={tradeLabelHeight + 2}
+            height={tradeAxisTagHeight}
             backgroundColor={tagStyle.backgroundColor}
             borderColor={tagStyle.borderColor}
           />
@@ -243,7 +243,7 @@ export function AnimatedTradeLine({
           x={priceLabelX}
           y={priceLabelY}
           width={priceLabelWidth}
-          height={tradeLabelHeight + 2}
+          height={tradeAxisTagHeight}
           backgroundColor={tagStyle.backgroundColor}
           borderColor={tagStyle.borderColor}
         />
@@ -284,7 +284,7 @@ export function AnimatedTradeLineDragTag({
   geometry,
   pricePrecision,
   sharedViewport,
-  tradeLabelHeight,
+  tradeAxisTagHeight,
 }: {
   axisFont: ReturnType<typeof Skia.Font>;
   color: string;
@@ -297,11 +297,11 @@ export function AnimatedTradeLineDragTag({
   geometry: NativeTradeLineGeometry;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
-  tradeLabelHeight: number;
+  tradeAxisTagHeight: number;
 }) {
   const tagStyle = resolvePriceAxisTagStyle({ type: 'order', label: { backgroundColor, textColor }, color });
   const characterWidth = measureNativeSkiaAxisCharacterWidth(axisFont);
-  const tagHeight = tradeLabelHeight + 2;
+  const tagHeight = tradeAxisTagHeight;
   const baselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(tagHeight);
   const right = geometry.priceLabelX + geometry.priceLabelWidth;
   const opacity = useDerivedValue(() => (dragState.activeObjectId.value === geometry.objectId ? 1 : 0));

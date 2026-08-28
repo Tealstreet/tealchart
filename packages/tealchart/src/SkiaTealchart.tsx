@@ -147,11 +147,13 @@ import { applyChartOverridesToRenderOptions } from './overrides';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
 import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
 import { intervalToMs } from './viewport/viewScale';
 
 const STATIC_TOP_BAR_HEIGHT = 36;
 const TRADE_LABEL_HEIGHT = 18;
+const TRADE_AXIS_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_SIZING.trade.height;
 const VOLUME_HEIGHT_RATIO = 0.15;
 const NATIVE_CHART_UI_DEFAULTS = { leftToolRailCollapsed: true };
 const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>['anchors'] = [];
@@ -1583,6 +1585,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     textColor,
     textFont,
     topBarLayout,
+    tradeAxisFont,
     tradeLineGeometries,
     visibleBars,
     volumeHeight,
@@ -1608,7 +1611,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     topBarInterval: nativeDisplayedInterval,
     topBarDefaultVisibleValues: nativeTopBarTimeframeValues,
     topBarHeight: STATIC_TOP_BAR_HEIGHT,
-    tradeLabelHeight: TRADE_LABEL_HEIGHT,
+    tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
     userDrawingActiveTool: nativeUserDrawingState.activeTool,
     userDrawingCommandAvailability,
     userDrawingRecentToolsByCategory,
@@ -2067,6 +2070,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 staticProjection={staticNativeRenderProjection}
                 textColor={textColor}
                 textFont={textFont}
+                tradeAxisFont={tradeAxisFont}
+                tradeAxisTagHeight={TRADE_AXIS_TAG_HEIGHT}
                 tradeLabelHeight={TRADE_LABEL_HEIGHT}
                 tradeLineGeometries={tradeLineGeometries}
                 userDrawingDraftAnchorColor={nativeUserDrawingDraftAnchorColor}

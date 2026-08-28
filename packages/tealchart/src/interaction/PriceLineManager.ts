@@ -14,6 +14,7 @@ import Konva from 'konva';
 import { TRADE_LINE_ACCENT_RAIL_WIDTH, TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
 import { PRICE_AXIS_RIGHT_PADDING, PRICE_AXIS_TAG_HORIZONTAL_PADDING } from '../types';
 import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
+import { resolvePriceLineAxisTagDomain, WEB_PRICE_AXIS_TAG_SIZING } from '../utils/priceAxisTagSizing';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
 import { resolveTradingLineRowHitRect } from './tradingLineHitGeometry';
@@ -185,6 +186,10 @@ function measureLabelTextWidth(text: string, fontSize = 11, fontFamily = 'sans-s
 
 function getSegmentWidth(text: string, fontFamily: string): number {
   return Math.ceil(measureLabelTextWidth(text, 11, fontFamily)) + SEGMENT_HORIZONTAL_PADDING;
+}
+
+function getPriceAxisTagFontSize(bound: PriceLineLabelBounds): number {
+  return WEB_PRICE_AXIS_TAG_SIZING[resolvePriceLineAxisTagDomain(bound)].fontSize;
 }
 
 function createCloseIcon(x: number, centerY: number, width: number, color: string): Konva.Line[] {
@@ -895,6 +900,7 @@ export class PriceLineManager {
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
     const fontFamily = this.getTextFontFamily();
+    const fontSize = getPriceAxisTagFontSize(bound);
 
     // Unfilled keeps the dark backing rather than going transparent, matching
     // updateLineContent - creating the node with the old filled-only rule is
@@ -922,7 +928,7 @@ export class PriceLineManager {
         width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: bound.label.primaryText,
-        fontSize: 11,
+        fontSize,
         fontFamily,
         fill: tagStyle.textColor,
         align: 'center',
@@ -937,7 +943,7 @@ export class PriceLineManager {
         width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: secondaryText,
-        fontSize: 11,
+        fontSize,
         fontFamily,
         fill: tagStyle.textColor,
         align: 'center',
@@ -960,7 +966,7 @@ export class PriceLineManager {
         width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height,
         text: bound.label.primaryText,
-        fontSize: 11,
+        fontSize,
         fontFamily,
         fill: tagStyle.textColor,
         align: 'center',
@@ -1536,6 +1542,7 @@ export class PriceLineManager {
 
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
     const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color: bound.color });
+    const fontSize = getPriceAxisTagFontSize(bound);
 
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
     const priceAxisRect = new Konva.Rect({
@@ -1560,7 +1567,7 @@ export class PriceLineManager {
         width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: bound.label.primaryText,
-        fontSize: 11,
+        fontSize,
         fontFamily,
         fill: tagStyle.textColor,
         align: 'center',
@@ -1575,7 +1582,7 @@ export class PriceLineManager {
         width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height / 2,
         text: secondaryText,
-        fontSize: 11,
+        fontSize,
         fontFamily,
         fill: tagStyle.textColor,
         align: 'center',
@@ -1599,7 +1606,7 @@ export class PriceLineManager {
         width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
         height: bound.height,
         text: bound.label.primaryText,
-        fontSize: 11,
+        fontSize,
         fontFamily,
         fill: tagStyle.textColor,
         align: 'center',

@@ -17,6 +17,7 @@ import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
 import { PRICE_AXIS_TAG_HORIZONTAL_PADDING, TIME_AXIS_HEIGHT } from './types';
+import { WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -2892,6 +2893,24 @@ describe('TealchartRenderer coordinate transforms', () => {
           label: { primaryText: '999.9' },
           targetPaneId: 'pane_1',
         },
+        {
+          id: 'order-line',
+          price: 52_000,
+          color: '#00aaff',
+          lineStyle: 'dashed',
+          label: { primaryText: '52,000.0' },
+          targetPaneId: 'main',
+          type: 'order',
+        },
+        {
+          id: 'position-line',
+          price: 53_000,
+          color: '#22cc88',
+          lineStyle: 'dashed',
+          label: { primaryText: '53,000.0' },
+          targetPaneId: 'main',
+          type: 'position',
+        },
       ];
 
       const bounds = renderer.computePriceLineLabelBoundsWithLayout(priceLines, viewport, layout);
@@ -2900,6 +2919,9 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(byId.get('main-short')?.width).toBeLessThan(byId.get('main-wide')?.width ?? 0);
       expect(byId.get('pane-short')?.width).toBeLessThan(byId.get('pane-wide')?.width ?? 0);
       expect(byId.get('main-short')?.width).toBe(byId.get('pane-short')?.width);
+      expect(byId.get('main-short')?.height).toBe(WEB_PRICE_AXIS_TAG_SIZING.other.height);
+      expect(byId.get('order-line')?.height).toBe(WEB_PRICE_AXIS_TAG_SIZING.trade.height);
+      expect(byId.get('position-line')?.height).toBe(WEB_PRICE_AXIS_TAG_SIZING.trade.height);
 
       const shortBounds = renderer.computePriceLineLabelBoundsWithLayout(
         priceLines.filter((line) => line.id === 'main-short' || line.id === 'pane-short'),

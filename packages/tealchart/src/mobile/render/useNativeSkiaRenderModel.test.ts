@@ -3,6 +3,7 @@ import type { Bar, OrderLineRenderData, PositionLineRenderData, PriceLine } from
 import { describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_RENDER_OPTIONS } from '../../types';
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { NATIVE_LEFT_TOOL_RAIL_TOGGLE_WIDTH } from '../utils/leftToolRailLayout';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import { createNativeChartProjection } from './nativeProjection';
@@ -228,6 +229,13 @@ describe('useNativeSkiaRenderModel', () => {
       'order:adapter-order',
       'position:adapter-position',
     ]);
+    expect(model.priceAxisTagSources.find((source) => source.tagId === 'priceLine:oracle')?.height).toBe(22);
+    expect(model.priceAxisTagSources.find((source) => source.tagId === 'order:adapter-order')?.height).toBe(
+      NATIVE_PRICE_AXIS_TAG_SIZING.trade.height,
+    );
+    expect(model.priceAxisTagSources.find((source) => source.tagId === 'position:adapter-position')?.height).toBe(
+      NATIVE_PRICE_AXIS_TAG_SIZING.trade.height,
+    );
   });
 
   it('promotes the selected trade line to the top of the native draw order', () => {

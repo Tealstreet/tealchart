@@ -12,6 +12,7 @@ import { memo } from 'react';
 
 import { Skia } from '@shopify/react-native-skia';
 
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { AnimatedBracketDragPreview } from './NativeBracketDragPreviewLayer';
 import { AnimatedPriceLine } from './NativePriceLineLayer';
 import { AnimatedTradeLine, AnimatedTradeLineDragTag } from './NativeTradeLineLayer';
@@ -32,6 +33,8 @@ export function NativeChartTradeLinesLayerImpl({
   smallFont,
   staticProjection,
   textFont,
+  tradeAxisFont,
+  tradeAxisTagHeight,
   tradeLabelHeight,
   tradeLineGeometries,
 }: {
@@ -53,9 +56,14 @@ export function NativeChartTradeLinesLayerImpl({
   smallFont: ReturnType<typeof Skia.Font>;
   staticProjection?: NativeChartProjection | null;
   textFont: ReturnType<typeof Skia.Font>;
+  tradeAxisFont?: ReturnType<typeof Skia.Font>;
+  tradeAxisTagHeight?: number;
   tradeLabelHeight: number;
   tradeLineGeometries: readonly NativeTradeLineGeometry[];
 }) {
+  const resolvedTradeAxisFont = tradeAxisFont ?? axisFont;
+  const resolvedTradeAxisTagHeight = tradeAxisTagHeight ?? NATIVE_PRICE_AXIS_TAG_SIZING.trade.height;
+
   return (
     <>
       {extraPriceLines.map((line) => (
@@ -80,7 +88,7 @@ export function NativeChartTradeLinesLayerImpl({
           return (
             <AnimatedTradeLine
               key={`order-${geometry.objectId}`}
-              axisFont={axisFont}
+              axisFont={resolvedTradeAxisFont}
               dragState={orderDragState}
               frame={frame}
               geometry={geometry}
@@ -91,6 +99,7 @@ export function NativeChartTradeLinesLayerImpl({
               smallFont={smallFont}
               staticProjection={staticProjection}
               textFont={textFont}
+              tradeAxisTagHeight={resolvedTradeAxisTagHeight}
               tradeLabelHeight={tradeLabelHeight}
             />
           );
@@ -101,7 +110,7 @@ export function NativeChartTradeLinesLayerImpl({
         return (
           <AnimatedTradeLine
             key={`position-${geometry.objectId}`}
-            axisFont={axisFont}
+            axisFont={resolvedTradeAxisFont}
             frame={frame}
             geometry={geometry}
             line={line}
@@ -111,6 +120,7 @@ export function NativeChartTradeLinesLayerImpl({
             smallFont={smallFont}
             staticProjection={staticProjection}
             textFont={textFont}
+            tradeAxisTagHeight={resolvedTradeAxisTagHeight}
             tradeLabelHeight={tradeLabelHeight}
           />
         );
@@ -127,7 +137,7 @@ export function NativeChartTradeLinesLayerImpl({
         return (
           <AnimatedTradeLineDragTag
             key={`order-drag-tag-${objectId}`}
-            axisFont={axisFont}
+            axisFont={resolvedTradeAxisFont}
             color={line.lineColor}
             backgroundColor={line.bodyBackgroundColor}
             textColor={line.bodyTextColor}
@@ -136,7 +146,7 @@ export function NativeChartTradeLinesLayerImpl({
             geometry={geometry}
             pricePrecision={pricePrecision}
             sharedViewport={sharedViewport}
-            tradeLabelHeight={tradeLabelHeight}
+            tradeAxisTagHeight={resolvedTradeAxisTagHeight}
           />
         );
       })}

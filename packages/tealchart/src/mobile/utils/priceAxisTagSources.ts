@@ -5,10 +5,11 @@ import type {
 } from './nativeBracketPriceLines';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './tradeLineLayout';
 
+import { NATIVE_PRICE_AXIS_TAG_SIZING, NATIVE_PRICE_AXIS_TAG_TWO_LINE_HEIGHT } from '../../utils/priceAxisTagSizing';
 import { getNativeOrderObjectId, getNativePositionObjectId } from './tradeLineLayout';
 
-export const DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT = 18;
-export const DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT = 30;
+export const DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_SIZING.other.height;
+export const DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_TWO_LINE_HEIGHT;
 export const NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY = 90;
 export const NATIVE_SELECTED_TRADE_LINE_AXIS_TAG_PRIORITY = 95;
 
