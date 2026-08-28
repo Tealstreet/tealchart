@@ -69,6 +69,13 @@ export function formatRgba(red: number, green: number, blue: number, alpha: numb
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
+export function withColorAlpha(color: string, alpha: number): string {
+  const channels = parseColorChannels(color);
+  if (!channels) return color;
+
+  return formatRgba(channels.red, channels.green, channels.blue, clampAlpha(alpha));
+}
+
 /**
  * Lays `tint` over `base` at `ratio`, keeping the base's own opacity.
  *

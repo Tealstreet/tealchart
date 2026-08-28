@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseColorChannels, pickReadableTextColor, tintOver } from './colorAlpha';
+import { parseColorChannels, pickReadableTextColor, tintOver, withColorAlpha } from './colorAlpha';
 
 describe('parseColorChannels', () => {
   it('reads short and long hex, with or without an alpha channel', () => {
@@ -31,6 +31,17 @@ describe('tintOver', () => {
 
   it('falls back to the tint when a color cannot be read', () => {
     expect(tintOver('currentColor', '#0ecb81', 0.14)).toBe('#0ecb81');
+  });
+});
+
+describe('withColorAlpha', () => {
+  it('replaces the opacity while preserving the colour channels', () => {
+    expect(withColorAlpha('#0ba7da', 0.88)).toBe('rgba(11, 167, 218, 0.88)');
+    expect(withColorAlpha('rgba(32, 33, 42, 0.4)', 0.88)).toBe('rgba(32, 33, 42, 0.88)');
+  });
+
+  it('falls back to the original colour when it cannot be parsed', () => {
+    expect(withColorAlpha('currentColor', 0.88)).toBe('currentColor');
   });
 });
 

@@ -3830,7 +3830,7 @@ describe('value axis label layout', () => {
     expect(outputLabels).toHaveLength(2);
     expect(outputLabels.map((label) => label.text)).toEqual(['24.2', '-11.6']);
     expect(outputLabels.map((label) => label.borderColor)).toEqual(['#2196F3', '#ff9900']);
-    expect(outputLabels.every((label) => label.backgroundColor === '#111418')).toBe(true);
+    expect(outputLabels.every((label) => label.backgroundColor === 'rgba(17, 20, 24, 0.88)')).toBe(true);
     expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
     expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
     expect(outputLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
