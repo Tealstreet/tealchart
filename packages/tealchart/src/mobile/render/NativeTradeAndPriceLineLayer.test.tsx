@@ -6,6 +6,7 @@ import { Group, matchFont, Line as SkiaLine } from '@shopify/react-native-skia';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_TRADE_LINE_LABEL_COLOR } from '../../constants';
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { getNativePriceLineTagId, getNativeTradeLineTagId } from '../utils/priceAxisTagSources';
 import { PRICE_AXIS_TAG_HEIGHT } from './nativeAxisTagLayout';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
@@ -146,6 +147,8 @@ const geometry: NativeTradeLineGeometry = {
   actionZones: [],
 };
 
+const TRADE_AXIS_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_SIZING.trade.height;
+
 describe('native trade and price line layers', () => {
   it('wires native trade-line body and price-axis text surfaces', () => {
     const axisFont = matchFont({ fontSize: 11 });
@@ -161,6 +164,7 @@ describe('native trade and price line layers', () => {
       sharedViewport,
       smallFont,
       textFont,
+      tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
       tradeLabelHeight: 18,
     });
 
@@ -200,6 +204,7 @@ describe('native trade and price line layers', () => {
       sharedViewport,
       smallFont: matchFont({ fontSize: 10 }),
       textFont: matchFont({ fontSize: 11 }),
+      tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
       tradeLabelHeight: 18,
     };
     const idle = AnimatedTradeLine({ ...props, dragState: orderDrag('', 0) });
@@ -227,7 +232,7 @@ describe('native trade and price line layers', () => {
       geometry,
       pricePrecision: 0.1,
       sharedViewport,
-      tradeLabelHeight: 18,
+      tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
     });
     const box = collectElementsByType(overlay, NativePriceAxisTagBox)[0];
     const expectedY = frame.mainPane.top + ((64_000 - 63_500) / (64_000 - 63_000)) * frame.mainPane.height;
@@ -244,7 +249,7 @@ describe('native trade and price line layers', () => {
       geometry,
       pricePrecision: 0.1,
       sharedViewport,
-      tradeLabelHeight: 18,
+      tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
     });
 
     expect(sharedValueOf<number>(collectElementsByType(overlay, Group)[0].props.opacity)).toBe(0);
@@ -271,6 +276,7 @@ describe('native trade and price line layers', () => {
       sharedViewport,
       smallFont,
       textFont,
+      tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
       tradeLabelHeight: 18,
     });
 
@@ -304,6 +310,7 @@ describe('native trade and price line layers', () => {
       sharedViewport,
       smallFont,
       textFont,
+      tradeAxisTagHeight: TRADE_AXIS_TAG_HEIGHT,
       tradeLabelHeight: 18,
     });
 
@@ -320,7 +327,7 @@ describe('native trade and price line layers', () => {
     expect(horizontalLineYs[0]).toBeCloseTo(projectedY);
     expect(horizontalLineYs).not.toContain(140);
     expect(sharedValueOf<number>(body.props.labelY)).toBeCloseTo(projectedY - 9);
-    expect(sharedValueOf<number>(axisTag.props.y)).toBe(130);
+    expect(sharedValueOf<number>(axisTag.props.y)).toBe(140 - TRADE_AXIS_TAG_HEIGHT / 2);
   });
 
   it('wires current-price axis tag primary and countdown text surfaces', () => {
@@ -420,7 +427,7 @@ describe('native trade and price line layers', () => {
 
     expect(outline.props.backgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(outline.props.borderColor).toBe('#12c48b');
-    expect(solid.props.backgroundColor).toBe('#12c48b');
+    expect(solid.props.backgroundColor).toBe('rgba(18, 196, 139, 0.88)');
   });
 
   it('uses resolved native price-axis tag centers for price-line labels', () => {
