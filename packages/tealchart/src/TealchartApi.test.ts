@@ -5,6 +5,39 @@ import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi'
 // Mirrors LINE_REMOVAL_COALESCE_MS; the constant is module-private.
 const LINE_REMOVAL_COALESCE_MS_FOR_TEST = 250;
 
+describe('TealchartApi TradingView compatibility', () => {
+  it('supports TradingView-style time scale setters and subscriptions', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const timeScale = api.getTimeScale();
+    const defaultOffsetListener = vi.fn();
+    const barSpacingListener = vi.fn();
+    const rightOffsetListener = vi.fn();
+
+    timeScale.defaultRightOffset().subscribe(defaultOffsetListener);
+    timeScale.barSpacingChanged().subscribe(null, barSpacingListener);
+    timeScale.rightOffsetChanged().subscribe(null, rightOffsetListener);
+
+    timeScale.defaultRightOffset().setValue(80);
+    timeScale.setBarSpacing(12);
+    timeScale.setRightOffset(30);
+
+    expect(timeScale.defaultRightOffset().value()).toBe(80);
+    expect(defaultOffsetListener).toHaveBeenCalledWith(80);
+    expect(barSpacingListener).toHaveBeenCalledWith(12);
+    expect(rightOffsetListener).toHaveBeenCalledWith(30);
+  });
+
+  it('emits TradingView-style onDataLoaded subscriptions', () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const listener = vi.fn();
+
+    api.onDataLoaded().subscribe(null, listener);
+    api.emitDataLoaded();
+
+    expect(listener).toHaveBeenCalledOnce();
+  });
+});
+
 describe('TealchartApi studies', () => {
   it('notifies when study visibility changes', async () => {
     const api = new TealchartApi('BTCUSDT', '60');

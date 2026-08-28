@@ -4468,6 +4468,28 @@ describe('TealchartWidget', () => {
       });
     });
 
+    it('propagates resolved symbol metadata to existing renderers for jailbreak draw args', () => {
+      const datafeed = createMockDatafeed();
+      createWidget(datafeed);
+
+      setRenderOptionsCalls.length = 0;
+      completeInit(datafeed, undefined, {
+        ...defaultSymbolInfo,
+        name: 'BTCUSDT',
+        exchange: 'BYBITV5',
+        pricescale: 10,
+      });
+
+      expect(setRenderOptionsCalls).toContainEqual(
+        expect.objectContaining({
+          exchange: 'bybitv5',
+          symbol: 'BTCUSDT',
+          resolutionString: '60',
+          pricePrecision: 0.1,
+        }),
+      );
+    });
+
     it('activeChart().symbolExt() derives symbol from full_name when resolved info is sparse', () => {
       const datafeed = createMockDatafeed();
       const widget = createWidget(datafeed);

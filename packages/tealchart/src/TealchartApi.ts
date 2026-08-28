@@ -410,6 +410,13 @@ export class TealchartApi {
   private _crossHairMovedSubscription: Subscription<(params: CrossHairMovedEventParams) => void>;
   private _symbolChangedSubscription: Subscription<() => void>;
   private _intervalChangedSubscription: Subscription<(interval: ResolutionString) => void>;
+  private _dataLoadedSubscription: Subscription<() => void>;
+  private _barSpacingChangedSubscription: Subscription<(value: number) => void>;
+  private _rightOffsetChangedSubscription: Subscription<(value: number) => void>;
+  private _defaultRightOffsetSubscribers = new Set<(value: number) => void>();
+  private _defaultRightOffset = 10;
+  private _barSpacing = 6;
+  private _rightOffset = 10;
 
   // Trading lines
   private _orderLines: Map<string, InternalOrderLineAdapter> = new Map();
@@ -514,6 +521,9 @@ export class TealchartApi {
     this._crossHairMovedSubscription = new Subscription();
     this._symbolChangedSubscription = new Subscription();
     this._intervalChangedSubscription = new Subscription();
+    this._dataLoadedSubscription = new Subscription();
+    this._barSpacingChangedSubscription = new Subscription();
+    this._rightOffsetChangedSubscription = new Subscription();
     tealchartApiLineRenderSnapshotReaders.set(this, () => ({
       orderLines: this._getOrderLinesRenderData(),
       positionLines: this._getPositionLinesRenderData(),
@@ -610,6 +620,13 @@ export class TealchartApi {
     return this._intervalChangedSubscription;
   }
 
+  /**
+   * Subscribe to data load events.
+   */
+  onDataLoaded(): ISubscription<() => void> {
+    return this._dataLoadedSubscription;
+  }
+
   // ============================================================================
   // Internal methods for emitting events (called by widget/renderer)
   // ============================================================================
@@ -619,6 +636,13 @@ export class TealchartApi {
    */
   emitCrossHairMoved(params: CrossHairMovedEventParams): void {
     this._crossHairMovedSubscription.emit(params);
+  }
+
+  /**
+   * @internal Emit data loaded event.
+   */
+  emitDataLoaded(): void {
+    this._dataLoadedSubscription.emit();
   }
 
   /**
@@ -673,17 +697,39 @@ export class TealchartApi {
    * Get time scale API
    */
   getTimeScale(): ITimeScaleApi {
-    // Return a minimal time scale API
-    let rightOffset = 10; // Default right offset in bars
-
     return {
       defaultRightOffset: () => ({
-        value: () => rightOffset,
+        value: () => this._defaultRightOffset,
         setValue: (value: number) => {
-          rightOffset = value;
-          // TODO: Apply to renderer viewport
+          if (!Number.isFinite(value)) return;
+          if (this._defaultRightOffset === value) return;
+          this._defaultRightOffset = value;
+          for (const callback of this._defaultRightOffsetSubscribers) {
+            try {
+              callback(value);
+            } catch (e) {
+              console.error('[Tealchart] Error in defaultRightOffset subscription handler:', e);
+            }
+          }
+        },
+        subscribe: (callback: (value: number) => void) => {
+          this._defaultRightOffsetSubscribers.add(callback);
         },
       }),
+      setBarSpacing: (value: number) => {
+        if (!Number.isFinite(value) || value <= 0) return;
+        if (this._barSpacing === value) return;
+        this._barSpacing = value;
+        this._barSpacingChangedSubscription.emit(value);
+      },
+      setRightOffset: (value: number) => {
+        if (!Number.isFinite(value)) return;
+        if (this._rightOffset === value) return;
+        this._rightOffset = value;
+        this._rightOffsetChangedSubscription.emit(value);
+      },
+      barSpacingChanged: () => this._barSpacingChangedSubscription,
+      rightOffsetChanged: () => this._rightOffsetChangedSubscription,
     };
   }
 
