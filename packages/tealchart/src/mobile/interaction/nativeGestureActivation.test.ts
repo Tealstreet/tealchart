@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import { createNativeLeftToolRailLayout, resolveNativeLeftToolRailToggleHitRect } from '../utils/leftToolRailLayout';
+import { createNativeChartGesture } from './nativeChartGestures';
 import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
@@ -237,6 +238,34 @@ function canvasTapInput(overrides: Record<string, unknown> = {}) {
 }
 
 describe('native gesture activation', () => {
+  it('prioritizes crosshair drags over generic chart pan but after drawing edit drags', () => {
+    const chartPanGesture = { id: 'chartPanGesture' };
+    const crosshairPanGesture = { id: 'crosshairPanGesture' };
+    const drawingEditDragGesture = { id: 'drawingEditDragGesture' };
+    const gesture = createNativeChartGesture({
+      bracketDragGesture: { id: 'bracketDragGesture' },
+      canvasTapGesture: { id: 'canvasTapGesture' },
+      chartAxisPinchGesture: { id: 'chartAxisPinchGesture' },
+      chartPanGesture,
+      crosshairLongPressGesture: { id: 'crosshairLongPressGesture' },
+      crosshairPanGesture,
+      drawingEditDragGesture,
+      leftToolRailToggleTapGesture: { id: 'leftToolRailToggleTapGesture' },
+      orderDragGesture: { id: 'orderDragGesture' },
+      overlayActionTapGesture: { id: 'overlayActionTapGesture' },
+      paneMaximizeTapGesture: { id: 'paneMaximizeTapGesture' },
+      priceAxisResetTapGesture: { id: 'priceAxisResetTapGesture' },
+      priceScaleGesture: { id: 'priceScaleGesture' },
+      resetViewTapGesture: { id: 'resetViewTapGesture' },
+      selectedDrawingActionTapGesture: { id: 'selectedDrawingActionTapGesture' },
+      timeScaleGesture: { id: 'timeScaleGesture' },
+    } as never) as any;
+
+    const exclusive = gesture.gestures.find((candidate: { type?: string }) => candidate.type === 'Exclusive');
+    expect(exclusive?.gestures).toEqual([drawingEditDragGesture, crosshairPanGesture, chartPanGesture]);
+    expect(gesture.gestures).not.toContain(crosshairPanGesture);
+  });
+
   it('routes selected drawing drags only after the start point is accepted', () => {
     const began: [number, number][] = [];
     const moved: [number, number][] = [];
@@ -460,6 +489,61 @@ describe('native gesture activation', () => {
       visibleCrosshair,
     );
     expect(visibleCrosshair.failed).toBe(true);
+
+    panActive.value = true;
+    const alreadyActive = mockStateManager();
+    chartPanGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: 60 }], allTouches: [{ x: 80, y: 60 }] },
+      alreadyActive,
+    );
+    expect(alreadyActive.failed).toBe(true);
+  });
+
+  it('does not move the viewport if crosshair becomes visible before a recognized pan updates', () => {
+    const panActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const tradeLineRows = shared([]);
+    const tradeLineActionZones = shared([]);
+    const orderDragZones = shared([]);
+    const crosshair = createCrosshair(false);
+    const chartPanGesture = createNativeChartPanGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      chartPanGestureState: {
+        active: panActive,
+        indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeTimePerPixel: shared(0),
+        activePricePerPixel: shared(0),
+      },
+      commitPanViewport: () => {},
+      crosshair,
+      frame,
+      orderDragZones,
+      panActive,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones,
+      tradeLineRows,
+    }) as any;
+
+    const accepted = mockStateManager();
+    chartPanGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: 60 }], allTouches: [{ x: 80, y: 60 }] },
+      accepted,
+    );
+    expect(accepted.failed).toBe(false);
+
+    chartPanGesture.handlers.onBegin({ x: 80, y: 60 });
+    expect(panActive.value).toBe(true);
+
+    crosshair.visible.value = true;
+    chartPanGesture.handlers.onUpdate({ translationX: 30, translationY: 10 });
+    expect(readViewport(viewport)).toEqual(viewportValue);
   });
 
   it('leaves overlay control zones to overlay gesture owners instead of chart pan', () => {
