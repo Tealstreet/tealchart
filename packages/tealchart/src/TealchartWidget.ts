@@ -241,6 +241,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
   // Render options derived from overrides
   private _renderOptions: Partial<RenderOptions> = {};
+  private _resolvedRenderMetadata: Partial<Pick<RenderOptions, 'exchange' | 'resolutionString' | 'symbol'>> = {};
 
   // Context menu
   private _contextMenuCallback: ContextMenuCallback | null = null;
@@ -343,6 +344,29 @@ export class TealchartWidget implements ITealchartWebWidget {
   // The _render(dirty) method pushes only what changed to ChartCore, then calls paint().
   private _scheduler = new RenderScheduler((dirty) => this._render(dirty));
 
+  private _setRenderOptions(options: Partial<RenderOptions>): void {
+    this._renderOptions = {
+      ...options,
+      ...this._resolvedRenderMetadata,
+    };
+  }
+
+  private _mergeRenderOptions(options: Partial<RenderOptions>): void {
+    this._setRenderOptions({
+      ...this._renderOptions,
+      ...options,
+    });
+  }
+
+  private _setResolvedRenderMetadata(symbolInfo: LibrarySymbolInfo): void {
+    this._resolvedRenderMetadata = {
+      symbol: this._symbol,
+      resolutionString: this._interval,
+      exchange: ((symbolInfo as any).exchange || '').toLowerCase(),
+    };
+    this._setRenderOptions(this._renderOptions);
+  }
+
   constructor(container: HTMLElement, options: TealchartWidgetOptions) {
     this._container = container;
     this._options = resolveDefaultLayoutPersistence(options);
@@ -397,7 +421,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     this._eventEmitter = new EventEmitter();
     this._chartApi = new TealchartApi(this._symbol, this._interval, options.account);
-    this._renderOptions = mergeChartThemeRenderOptions(options.theme, options.renderOptions);
+    this._setRenderOptions(mergeChartThemeRenderOptions(options.theme, options.renderOptions));
     this._userDrawingState = createUserDrawingState(options.userDrawingState);
 
     // Apply initial overrides if provided
@@ -640,20 +664,12 @@ export class TealchartWidget implements ITealchartWebWidget {
         }
         this._symbolInfo = symbolInfo;
         this._chartApi.setSymbolInfo(symbolInfo);
+        this._setResolvedRenderMetadata(symbolInfo);
         // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
         if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
-          this._renderOptions = {
-            ...this._renderOptions,
-            pricePrecision: 1 / symbolInfo.pricescale,
-          };
+          this._mergeRenderOptions({ pricePrecision: 1 / symbolInfo.pricescale });
         }
-        // Pass symbol/interval metadata for jailbreak indicators
-        this._renderOptions = {
-          ...this._renderOptions,
-          symbol: this._symbol,
-          resolutionString: this._interval,
-          exchange: ((symbolInfo as any).exchange || '').toLowerCase(),
-        };
+        this._ui?.setRenderOptions(this._renderOptions);
         // Start loading bars immediately (don't wait for layout)
         this._loadBars();
         // Load active layout from adapter async (races with bar load)
@@ -824,6 +840,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._isLoadingBars = false;
         // Single dirty flag triggers atomic render of viewport + bars + empty plots
         this._scheduler.markDirty(DIRTY.DATA_LOAD);
+        this._chartApi.emitDataLoaded();
 
         // Notify Tealscript AFTER markDirty. If the worker callback lands before
         // the RAF, the DATA_LOAD render snapshot carries PLOTS/DRAWINGS too and
@@ -1931,18 +1948,18 @@ export class TealchartWidget implements ITealchartWebWidget {
       setSetting: (key, value) => {
         this._chartStore?.settings.setKey(key, value);
         if (key === 'showVolume') {
-          this._renderOptions = { ...this._renderOptions, showVolume: Boolean(value) };
+          this._mergeRenderOptions({ showVolume: Boolean(value) });
           this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
         }
         if (key === 'showIndicatorOutputAxisLabels') {
-          this._renderOptions = { ...this._renderOptions, showIndicatorOutputAxisLabels: Boolean(value) };
+          this._mergeRenderOptions({ showIndicatorOutputAxisLabels: Boolean(value) });
           this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
         }
       },
       setChartProperties: (properties) => {
         this._chartStore?.settings.setKey('chartProperties', properties);
         if (properties) {
-          this._renderOptions = applyChartOverridesToRenderOptions(this._renderOptions, properties);
+          this._setRenderOptions(applyChartOverridesToRenderOptions(this._renderOptions, properties));
           this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);
         }
       },
@@ -2545,13 +2562,12 @@ export class TealchartWidget implements ITealchartWebWidget {
         }
         this._symbolInfo = symbolInfo;
         this._chartApi.setSymbolInfo(symbolInfo);
+        this._setResolvedRenderMetadata(symbolInfo);
         // Update price precision from symbol's pricescale
         if (symbolInfo.pricescale && symbolInfo.pricescale > 0) {
-          this._renderOptions = {
-            ...this._renderOptions,
-            pricePrecision: 1 / symbolInfo.pricescale,
-          };
+          this._mergeRenderOptions({ pricePrecision: 1 / symbolInfo.pricescale });
         }
+        this._ui?.setRenderOptions(this._renderOptions);
         // Push supported resolutions to UI (may have changed on exchange switch)
         this._ui?.setSupportedResolutions(this._supportedResolutions);
         this._loadBars();
@@ -3788,7 +3804,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   applyOverrides(overrides: ChartOverrides): void {
     const newOptions = applyChartOverridesToRenderOptions(this._renderOptions, overrides);
 
-    this._renderOptions = newOptions;
+    this._setRenderOptions(newOptions);
 
     // Keep the persisted toggle in step, or an override-hidden volume still
     // saves as visible and comes back on the next load.
@@ -4183,11 +4199,11 @@ export class TealchartWidget implements ITealchartWebWidget {
     // _renderOptions is cumulative: merging would leave the previous layout's
     // colours in place for any property the new layout does not set, so the
     // chart would draw layout A while saving layout B.
-    this._renderOptions = {
+    this._setRenderOptions({
       ...applyChartOverridesToRenderOptions(this._baseRenderOptions(), settings.chartProperties ?? {}),
       showVolume: settings.showVolume,
       showIndicatorOutputAxisLabels: settings.showIndicatorOutputAxisLabels,
-    };
+    });
 
     this.setUserDrawingState(settings.userDrawingState ?? createUserDrawingState(), {
       markLayoutDirty: false,
@@ -4578,14 +4594,14 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Persisted chart properties are re-applied on top: a theme change rebuilds
     // from theme + host options, which would otherwise silently drop the user's
     // saved colours while the store kept saving them.
-    this._renderOptions = applyChartOverridesToRenderOptions(
+    this._setRenderOptions(applyChartOverridesToRenderOptions(
       {
         ...this._renderOptions,
         ...chartThemeToRenderOptions(theme),
         ...this._options.renderOptions,
       },
       this._chartStore?.settings.get().chartProperties ?? {},
-    );
+    ));
 
     if (this._ui) {
       this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);

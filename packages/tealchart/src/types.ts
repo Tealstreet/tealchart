@@ -634,7 +634,12 @@ export interface ITimeScaleApi {
   defaultRightOffset(): {
     value(): number;
     setValue(value: number): void;
+    subscribe(callback: (value: number) => void): void;
   };
+  setBarSpacing(value: number): void;
+  setRightOffset(value: number): void;
+  barSpacingChanged(): ISubscription<(value: number) => void>;
+  rightOffsetChanged(): ISubscription<(value: number) => void>;
 }
 
 export type OrderLineLengthUnit = 'pixel' | 'percentage';
