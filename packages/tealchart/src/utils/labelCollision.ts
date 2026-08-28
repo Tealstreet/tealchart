@@ -47,12 +47,10 @@ export function clearCollisionCache(): void {
  */
 function getCacheKey(labels: LabelBounds[]): string {
   // Include id (if present) so different sets of lines with same geometry produce different keys.
-  const segments = labels.map(
-    (l) => {
-      const originalYKey = l.fixed ? l.originalY : Math.round(l.originalY * 10);
-      return `${l.id || ''}:${originalYKey}:${Math.round(l.height * 10)}:${l.priority ?? 0}:${l.fixed ? 1 : 0}`;
-    },
-  );
+  const segments = labels.map((l) => {
+    const originalYKey = l.fixed ? l.originalY : Math.round(l.originalY * 10);
+    return `${l.id || ''}:${originalYKey}:${Math.round(l.height * 10)}:${l.priority ?? 0}:${l.fixed ? 1 : 0}`;
+  });
   // Only sort when all labels have IDs — otherwise keep positional order
   // so index-based fallback in collision resolution stays consistent.
   if (labels.every((l) => l.id)) {
@@ -441,6 +439,66 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
     result: labels.map((l) => ({ ...l })),
     timestamp: now,
   });
+
+  return labels;
+}
+
+/**
+ * Resolve label collisions and keep the resulting stack inside a vertical band.
+ *
+ * Callers should use this instead of resolving first and then clamping each
+ * label independently. Per-label clamps can collapse an already de-overlapped
+ * stack back onto the same top/bottom edge.
+ */
+export function resolveLabelCollisionsWithinBounds<T extends LabelBounds>(
+  labels: T[],
+  minY: number,
+  maxY: number,
+): T[] {
+  resolveLabelCollisions(labels);
+  if (labels.length === 0) return labels;
+
+  const boundedMin = Math.min(minY, maxY);
+  const boundedMax = Math.max(minY, maxY);
+
+  for (let pass = 0; pass < labels.length + 2; pass += 1) {
+    let changed = false;
+    const sorted = [...labels].sort((a, b) => a.adjustedY - b.adjustedY);
+
+    for (let index = 0; index < sorted.length; index += 1) {
+      const current = sorted[index];
+      if (current.fixed) continue;
+
+      const previous = sorted[index - 1];
+      const minCenter = Math.max(
+        boundedMin + current.height / 2,
+        previous ? previous.adjustedY + previous.height / 2 + current.height / 2 : -Infinity,
+      );
+
+      if (current.adjustedY < minCenter) {
+        current.adjustedY = minCenter;
+        changed = true;
+      }
+    }
+
+    for (let index = sorted.length - 1; index >= 0; index -= 1) {
+      const current = sorted[index];
+      if (current.fixed) continue;
+
+      const next = sorted[index + 1];
+      const maxCenter = Math.min(
+        boundedMax - current.height / 2,
+        next ? next.adjustedY - next.height / 2 - current.height / 2 : Infinity,
+      );
+
+      if (current.adjustedY > maxCenter) {
+        current.adjustedY = maxCenter;
+        changed = true;
+      }
+    }
+
+    if (!changed) break;
+  }
 
   return labels;
 }
