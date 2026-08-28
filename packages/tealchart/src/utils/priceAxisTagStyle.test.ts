@@ -5,7 +5,6 @@ import {
   getPriceAxisTagContrastTextColor,
   PRICE_AXIS_TAG_LIGHT_TEXT_COLOR,
   resolvePriceAxisTagStyle,
-  withPriceAxisTagBackgroundAlpha,
 } from './priceAxisTagStyle';
 
 describe('resolvePriceAxisTagStyle', () => {
@@ -15,7 +14,7 @@ describe('resolvePriceAxisTagStyle', () => {
     it('fills an order tag from the line colour', () => {
       expect(resolvePriceAxisTagStyle({ type: 'order', label: undefined, color: '#d9534f' })).toEqual({
         filled: true,
-        backgroundColor: 'rgba(217, 83, 79, 0.88)',
+        backgroundColor: '#d9534f',
         borderColor: '#d9534f',
         textColor: PRICE_AXIS_TAG_LIGHT_TEXT_COLOR,
       });
@@ -24,7 +23,7 @@ describe('resolvePriceAxisTagStyle', () => {
     it('fills a position tag even when the label says it is not filled', () => {
       const style = resolvePriceAxisTagStyle({ type: 'position', label: { filled: false }, color: '#12c48b' });
       expect(style.filled).toBe(true);
-      expect(style.backgroundColor).toBe('rgba(18, 196, 139, 0.88)');
+      expect(style.backgroundColor).toBe('#12c48b');
     });
 
     // `type` is optional on the web bounds, and absent has always meant a
@@ -39,7 +38,7 @@ describe('resolvePriceAxisTagStyle', () => {
         label: { backgroundColor: '#101820' },
         color: '#d9534f',
       });
-      expect(style.backgroundColor).toBe('rgba(16, 24, 32, 0.88)');
+      expect(style.backgroundColor).toBe('#101820');
       expect(style.borderColor).toBe('#d9534f');
     });
   });
@@ -63,7 +62,7 @@ describe('resolvePriceAxisTagStyle', () => {
     it('fills a price tag that asks to be filled', () => {
       const style = resolvePriceAxisTagStyle({ type: 'price', label: { filled: true }, color: '#12c48b' });
       expect(style.filled).toBe(true);
-      expect(style.backgroundColor).toBe('rgba(18, 196, 139, 0.88)');
+      expect(style.backgroundColor).toBe('#12c48b');
     });
   });
 
@@ -89,9 +88,5 @@ describe('resolvePriceAxisTagStyle', () => {
       });
       expect(style.textColor).toBe('#ff00ff');
     });
-  });
-
-  it('exposes the shared y-axis tag background alpha for non-price-line renderers', () => {
-    expect(withPriceAxisTagBackgroundAlpha('#101418')).toBe('rgba(16, 20, 24, 0.88)');
   });
 });

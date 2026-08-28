@@ -20,11 +20,8 @@ export const DEFAULT_TRADE_LINE_SELL_COLOR = '#fa6b67';
 /** Default neutral order/position line color. */
 export const DEFAULT_TRADE_LINE_COLOR = DEFAULT_TRADE_LINE_BUY_COLOR;
 
-/** Shared backing opacity for y-axis tags. */
-export const PRICE_AXIS_TAG_BACKGROUND_ALPHA = 0.88;
-
 /** Low-glare default fill for order/position line labels and action buttons. */
-export const DEFAULT_TRADE_LINE_LABEL_COLOR = `rgba(32, 33, 42, ${PRICE_AXIS_TAG_BACKGROUND_ALPHA})`;
+export const DEFAULT_TRADE_LINE_LABEL_COLOR = 'rgba(32, 33, 42, 0.88)';
 
 /** Default font for order/position line label segments. */
 export const DEFAULT_TRADE_LINE_LABEL_FONT = '600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';

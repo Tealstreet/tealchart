@@ -16,8 +16,8 @@ import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
-import { TIME_AXIS_HEIGHT } from './types';
-import { WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING, WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
+import { PRICE_AXIS_TAG_HORIZONTAL_PADDING, TIME_AXIS_HEIGHT } from './types';
+import { WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -63,15 +63,6 @@ function createMockCtx(): any {
     scale: () => {},
     translate: () => {},
   };
-}
-
-function assertValueAxisLabelsDoNotOverlap(labels: Array<{ y: number; height?: number }>): void {
-  const sorted = [...labels].sort((a, b) => a.y - b.y);
-  for (let index = 1; index < sorted.length; index += 1) {
-    const previous = sorted[index - 1]!;
-    const current = sorted[index]!;
-    expect(current.y - (current.height ?? 0) / 2).toBeGreaterThanOrEqual(previous.y + (previous.height ?? 0) / 2 - 0.5);
-  }
 }
 
 function createTraceCtx(): { ctx: any; trace: string[] } {
@@ -712,11 +703,17 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const trackY = renderer.publicPriceToY(120, viewport);
-      const labelWidth = '120'.length * 7 + WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.paddingX * 2;
+      const labelWidth = '120'.length * 7 + PRICE_AXIS_TAG_HORIZONTAL_PADDING * 2;
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
-      expect(roundRect).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY - 8, labelWidth, 16, 2);
+      expect(roundRect).toHaveBeenCalledWith(
+        opts.width - opts.margins.right,
+        trackY - 8,
+        labelWidth,
+        16,
+        2,
+      );
       expect(fillText).toHaveBeenCalledWith('120', expect.any(Number), trackY);
       expect(ctx.strokeStyle).toBe('#333333');
     });
@@ -2966,7 +2963,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       );
 
       expect(bound).toBeDefined();
-      expect((bound?.width ?? 0) - WEB_PRICE_AXIS_TAG_SIZING.lastTrade.paddingX * 2).toBeGreaterThan(
+      expect((bound?.width ?? 0) - PRICE_AXIS_TAG_HORIZONTAL_PADDING * 2).toBeGreaterThan(
         ctx.measureText(primaryText).width,
       );
     });
@@ -3833,7 +3830,7 @@ describe('value axis label layout', () => {
     expect(outputLabels).toHaveLength(2);
     expect(outputLabels.map((label) => label.text)).toEqual(['24.2', '-11.6']);
     expect(outputLabels.map((label) => label.borderColor)).toEqual(['#2196F3', '#ff9900']);
-    expect(outputLabels.every((label) => label.backgroundColor === 'rgba(17, 20, 24, 0.88)')).toBe(true);
+    expect(outputLabels.every((label) => label.backgroundColor === '#111418')).toBe(true);
     expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
     expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
     expect(outputLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
@@ -4254,80 +4251,5 @@ describe('value axis label layout', () => {
     expect(outputLabels.map((label) => label.valueY).sort((a, b) => a - b)).not.toEqual(
       outputLabels.map((label) => label.y).sort((a, b) => a - b),
     );
-  });
-
-  it('keeps bottom-crowded secondary indicator output tags separated inside the pane', () => {
-    const renderer = new TealchartRenderer(
-      createMockCtx(),
-      { backgroundColor: '#111418', height: 360, width: 800 },
-      { bottom: 32, right: 76, top: 24 },
-    );
-    const computedPanes = renderer.computePanesLayout(
-      {
-        timeAxisHeight: TIME_AXIS_HEIGHT,
-        panes: [
-          { id: 'main', type: 'main', heightRatio: 0.75, yMin: 78_000, yMax: 88_000, fixedRange: false },
-          {
-            id: 'pane_1',
-            type: 'indicator',
-            heightRatio: 0.25,
-            yMin: -120,
-            yMax: 60,
-            fixedRange: true,
-            indicatorIds: ['macd'],
-          },
-        ],
-      },
-      360,
-    );
-    const pane = computedPanes.find((current) => current.id === 'pane_1')!;
-    const bars = makeBars(1);
-    const frame = {
-      bars,
-      computedPanes,
-      indicatorPaneInfo: { macd: { overlay: false } },
-      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
-      plots: [
-        {
-          id: 'histogram',
-          title: 'Histogram',
-          type: 'plot',
-          scriptId: 'macd',
-          values: [-90],
-          color: '#ff003d',
-          precision: 0,
-        },
-        {
-          id: 'macd-line',
-          title: 'MACD',
-          type: 'plot',
-          scriptId: 'macd',
-          values: [-100],
-          color: '#2196F3',
-          precision: 0,
-        },
-        {
-          id: 'signal',
-          title: 'Signal',
-          type: 'plot',
-          scriptId: 'macd',
-          values: [-110],
-          color: '#ff9900',
-          precision: 0,
-        },
-      ],
-      viewport: { startTime: bars[0]!.time, endTime: bars[0]!.time + 60_000, priceMin: 78_000, priceMax: 88_000 },
-    } as any;
-
-    const labels = renderer.computeYAxisLabelsForPreparedFrame(frame, 'pane_1');
-    const outputLabels = labels.filter((label) => label.kind === 'indicator-output');
-
-    expect(outputLabels).toHaveLength(3);
-    expect(outputLabels.some((label) => label.valueY !== label.y)).toBe(true);
-    assertValueAxisLabelsDoNotOverlap(outputLabels);
-    for (const label of outputLabels) {
-      expect(label.y - (label.height ?? 0) / 2).toBeGreaterThanOrEqual(pane.top);
-      expect(label.y + (label.height ?? 0) / 2).toBeLessThanOrEqual(pane.bottom);
-    }
   });
 });

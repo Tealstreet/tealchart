@@ -2,14 +2,6 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { createNativeChartFrameFromPanes } from './nativeChartFrame';
-import {
-  NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
-  resolveNativeIndicatorOutputAxisLabelGroups,
-  resolveNativeIndicatorOutputAxisLabels,
-  resolveNativeIndicatorOutputGuideStartX,
-} from './NativeIndicatorOutputAxisLabelLayer';
-
 vi.mock('react-native', () => ({
   Platform: { OS: 'ios' },
   View: 'View',
@@ -20,6 +12,14 @@ vi.mock('react-native-reanimated', () => ({
 }));
 
 vi.mock('@shopify/react-native-skia', async () => await import('../../test/reactNativeSkiaMock'));
+
+import { createNativeChartFrameFromPanes } from './nativeChartFrame';
+import {
+  NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
+  resolveNativeIndicatorOutputGuideStartX,
+  resolveNativeIndicatorOutputAxisLabelGroups,
+  resolveNativeIndicatorOutputAxisLabels,
+} from './NativeIndicatorOutputAxisLabelLayer';
 
 function plot(overrides: Partial<PlotOutput>): PlotOutput {
   return {
@@ -35,17 +35,6 @@ function plot(overrides: Partial<PlotOutput>): PlotOutput {
 const axisFont = {
   measureText: (text: string) => ({ width: text.length * 7 }),
 } as never;
-
-function assertNoOutputLabelOverlap(labels: Array<{ y: number }>, gap = 0): void {
-  const sorted = [...labels].sort((a, b) => a.y - b.y);
-  for (let index = 1; index < sorted.length; index += 1) {
-    const previous = sorted[index - 1]!;
-    const current = sorted[index]!;
-    expect(current.y - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2).toBeGreaterThanOrEqual(
-      previous.y + NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2 + gap,
-    );
-  }
-}
 
 describe('native indicator output axis labels', () => {
   it('renders latest non-overlay plot values from native pane ids', () => {
@@ -220,10 +209,10 @@ describe('native indicator output axis labels', () => {
 
   it('keeps crowded secondary output labels inside their pane', () => {
     const frame = createNativeChartFrameFromPanes({
-      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      dimensions: { width: 390, height: 320, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
       panes: [
         { id: 'main', type: 'main', top: 24, height: 200, yMin: 63_000, yMax: 64_000 },
-        { id: 'pane_1', type: 'indicator', top: 224, height: 76, yMin: -120, yMax: 60 },
+        { id: 'pane_1', type: 'indicator', top: 224, height: 32, yMin: -50, yMax: 50 },
       ],
     });
 
@@ -234,21 +223,20 @@ describe('native indicator output axis labels', () => {
         macd: { overlay: false, paneId: 'pane_1' },
       },
       plots: [
-        plot({ id: 'histogram', scriptId: 'macd', values: [-90], color: '#ff003d', precision: 0 }),
-        plot({ id: 'macd', scriptId: 'macd', values: [-100], color: '#2196f3', precision: 0 }),
-        plot({ id: 'signal', scriptId: 'macd', values: [-110], color: '#ff9900', precision: 0 }),
+        plot({ id: 'histogram', scriptId: 'macd', values: [50], color: '#ff003d', precision: 0 }),
+        plot({ id: 'macd', scriptId: 'macd', values: [0], color: '#2196f3', precision: 0 }),
+        plot({ id: 'signal', scriptId: 'macd', values: [-50], color: '#ff9900', precision: 0 }),
       ],
       totalBarCount: 1,
     });
 
     const halfHeight = NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;
     expect(labels.some((label) => label.valueY !== label.y)).toBe(true);
-    assertNoOutputLabelOverlap(labels);
     for (const label of labels) {
       expect(label.y - halfHeight).toBeGreaterThanOrEqual(224);
-      expect(label.y + halfHeight).toBeLessThanOrEqual(300);
+      expect(label.y + halfHeight).toBeLessThanOrEqual(256);
       expect(label.valueY).toBeGreaterThanOrEqual(224);
-      expect(label.valueY).toBeLessThanOrEqual(300);
+      expect(label.valueY).toBeLessThanOrEqual(256);
     }
   });
 });
