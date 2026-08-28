@@ -1,9 +1,5 @@
-import {
-  DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
-  DEFAULT_TRADE_LINE_LABEL_COLOR,
-  PRICE_AXIS_TAG_BACKGROUND_ALPHA,
-} from '../constants';
-import { parseColorChannels, withColorAlpha } from './colorAlpha';
+import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR, DEFAULT_TRADE_LINE_LABEL_COLOR } from '../constants';
+import { parseColorChannels } from './colorAlpha';
 
 /**
  * The one place a price-axis tag's colours are decided.
@@ -41,10 +37,6 @@ export interface PriceAxisTagStyle {
   textColor: string;
 }
 
-export function withPriceAxisTagBackgroundAlpha(color: string): string {
-  return withColorAlpha(color, PRICE_AXIS_TAG_BACKGROUND_ALPHA);
-}
-
 function getRelativeLuminance(red: number, green: number, blue: number): number {
   const [r, g, b] = [red, green, blue].map((channel) => {
     const normalized = channel / 255;
@@ -73,9 +65,7 @@ export function resolvePriceAxisTagStyle({
   color: string;
 }): PriceAxisTagStyle {
   const filled = type !== 'price' || label?.filled === true;
-  const backgroundColor = withPriceAxisTagBackgroundAlpha(
-    filled ? label?.backgroundColor || color : DEFAULT_TRADE_LINE_LABEL_COLOR,
-  );
+  const backgroundColor = filled ? label?.backgroundColor || color : DEFAULT_TRADE_LINE_LABEL_COLOR;
 
   return {
     filled,

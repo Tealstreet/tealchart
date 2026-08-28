@@ -10,16 +10,15 @@ import { memo } from 'react';
 import { DashPathEffect, Group, RoundedRect, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
-import { withPriceAxisTagBackgroundAlpha } from '../../utils/priceAxisTagStyle';
 import {
   isNativeCrosshairOverMainPane,
   NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS,
   nativeCrosshairXToTime,
+  resolveNativeCrosshairSnappedX,
+  resolveNativeCrosshairSnappedY,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelLayout,
   resolveNativeCrosshairPriceLabelText,
-  resolveNativeCrosshairSnappedX,
-  resolveNativeCrosshairSnappedY,
 } from '../interaction/nativeCrosshairContextMenu';
 import { NativeAnimatedSkiaText } from './nativeSkiaText';
 import { formatNativeTimeAxisLabelWorklet } from './nativeTimeFormat';
@@ -60,12 +59,9 @@ export function NativeCrosshairLayerImpl({
   sharedViewport,
 }: NativeCrosshairLayerProps) {
   const color = options.crosshairColor ?? '#888888';
-  const labelBackgroundColor = withPriceAxisTagBackgroundAlpha(color);
   const textColor = options.backgroundColor ?? '#131722';
   const opacity = useDerivedValue(() => (crosshair.visible.value ? 1 : 0));
-  const snappedX = useDerivedValue(() =>
-    resolveNativeCrosshairSnappedX(frame, sharedViewport, crosshair.x.value, intervalMs),
-  );
+  const snappedX = useDerivedValue(() => resolveNativeCrosshairSnappedX(frame, sharedViewport, crosshair.x.value, intervalMs));
   const snappedY = useDerivedValue(() =>
     resolveNativeCrosshairSnappedY(frame, sharedViewport, crosshair.y.value, pricePrecision),
   );
@@ -185,7 +181,7 @@ export function NativeCrosshairLayerImpl({
         width={priceLabelWidth}
         height={NATIVE_CROSSHAIR_LABEL_HEIGHT}
         r={2}
-        color={labelBackgroundColor}
+        color={color}
       />
       <NativeAnimatedSkiaText x={priceTextX} y={priceTextY} text={priceText} font={axisFont} color={textColor} />
       <RoundedRect
@@ -194,7 +190,7 @@ export function NativeCrosshairLayerImpl({
         width={NATIVE_CROSSHAIR_TIME_LABEL_WIDTH}
         height={NATIVE_CROSSHAIR_LABEL_HEIGHT}
         r={2}
-        color={labelBackgroundColor}
+        color={color}
       />
       <NativeAnimatedSkiaText x={timeTextX} y={timeTextY} text={timeText} font={axisFont} color={textColor} />
     </Group>

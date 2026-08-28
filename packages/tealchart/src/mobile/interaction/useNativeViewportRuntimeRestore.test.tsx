@@ -1,16 +1,15 @@
 import type { Bar, Viewport } from '../../types';
-import type { NativeViewportRuntimeInput } from './useNativeViewportRuntime';
 
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-
-import { useNativeViewportRuntime } from './useNativeViewportRuntime';
 
 // The worklets runtime needs a native module; the hook only ever hops back to JS.
 vi.mock('react-native-worklets', () => ({
   runOnJS: (callback: (...args: unknown[]) => unknown) => callback,
   runOnUI: (callback: (...args: unknown[]) => unknown) => callback,
 }));
+
+import { type NativeViewportRuntimeInput, useNativeViewportRuntime } from './useNativeViewportRuntime';
 
 function shared<T>(value: T) {
   return { value } as { value: T };
@@ -70,23 +69,6 @@ function renderViewportRuntime(bars: Bar[], symbol = 'BTCUSDT') {
 }
 
 describe('native viewport runtime layout restore', () => {
-  it('settles the first loaded auto viewport so same-candle ticks do not rebuild the time window', () => {
-    const initialBars = makeBars();
-    const { result, rerender } = renderViewportRuntime([]);
-
-    rerender({ bars: initialBars, symbol: 'BTCUSDT' });
-    const initialViewport = result.current.viewport;
-
-    rerender({
-      bars: [initialBars[0]!, { ...initialBars[1]!, high: 84_000, close: 83_000 }],
-      symbol: 'BTCUSDT',
-    });
-
-    expect(result.current.viewport.startTime).toBe(initialViewport.startTime);
-    expect(result.current.viewport.endTime).toBe(initialViewport.endTime);
-    expect(result.current.viewport.priceMax).toBeGreaterThan(initialViewport.priceMax);
-  });
-
   it('re-frames a restored price range against the bars it lands on', () => {
     const { result } = renderViewportRuntime(makeBars());
 

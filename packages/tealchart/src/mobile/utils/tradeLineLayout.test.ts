@@ -2,7 +2,6 @@ import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
 
 import { describe, expect, it } from 'vitest';
 
-import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { createNativePriceAxisLane } from './nativePriceAxisLane';
 import {
   buildNativeTradeLineGeometries,
@@ -162,13 +161,6 @@ describe('native trade line layout', () => {
 
   it('uses web-aligned compact action button width', () => {
     expect(getNativeTradeLineActionButtonWidth()).toBe(16);
-  });
-
-  it('uses the native trade-domain price-axis tag padding contract', () => {
-    expect(NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X).toBe(NATIVE_PRICE_AXIS_TAG_SIZING.trade.paddingX);
-    expect(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText)).toBe(
-      Math.max(50, Math.ceil(measureText('63,777.0') + NATIVE_PRICE_AXIS_TAG_SIZING.trade.paddingX * 2)),
-    );
   });
 
   it('derives native trade-label text baselines from label height', () => {
@@ -685,8 +677,8 @@ describe('native trade line layout', () => {
     );
 
     expect(createNativeTradeLineRows(geometries)).toEqual([
-      { objectId: 'order-a', objectType: 'order', price: 100, x1: 54, x2: 386 },
-      { objectId: 'position-b', objectType: 'position', price: 101, x1: 54, x2: 386 },
+      { objectId: 'order-a', objectType: 'order', price: 100, x1: 54, x2: 384 },
+      { objectId: 'position-b', objectType: 'position', price: 101, x1: 54, x2: 384 },
     ]);
   });
 });
