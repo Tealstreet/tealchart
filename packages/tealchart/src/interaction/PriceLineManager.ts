@@ -12,9 +12,9 @@ import type { ChartMargins, PriceLineLabelBounds } from '../types';
 import Konva from 'konva';
 
 import { TRADE_LINE_ACCENT_RAIL_WIDTH, TRADE_LINE_DOTTED_DASH_PATTERN } from '../constants';
-import { PRICE_AXIS_RIGHT_PADDING, PRICE_AXIS_TAG_HORIZONTAL_PADDING } from '../types';
-import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
+import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { resolvePriceLineAxisTagDomain, WEB_PRICE_AXIS_TAG_SIZING } from '../utils/priceAxisTagSizing';
+import { resolvePriceAxisTagStyle } from '../utils/priceAxisTagStyle';
 import { splitTradeLineButtonsForDisplay } from '../utils/tradeLineLabel';
 import { calculatePartialBracketPercent } from './partialBrackets';
 import { resolveTradingLineRowHitRect } from './tradingLineHitGeometry';
@@ -98,7 +98,6 @@ export interface CrosshairState {
 
 const TOUCH_TARGET_HEIGHT = 44; // Minimum 44px for touch-friendly hit area
 const LABEL_HEIGHT = 18;
-const PRICE_AXIS_LABEL_TEXT_PADDING_X = PRICE_AXIS_TAG_HORIZONTAL_PADDING;
 const DRAG_THRESHOLD = 5;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
@@ -190,6 +189,10 @@ function getSegmentWidth(text: string, fontFamily: string): number {
 
 function getPriceAxisTagFontSize(bound: PriceLineLabelBounds): number {
   return WEB_PRICE_AXIS_TAG_SIZING[resolvePriceLineAxisTagDomain(bound)].fontSize;
+}
+
+function getPriceAxisTagPaddingX(bound: PriceLineLabelBounds): number {
+  return WEB_PRICE_AXIS_TAG_SIZING[resolvePriceLineAxisTagDomain(bound)].paddingX;
 }
 
 function createCloseIcon(x: number, centerY: number, width: number, color: string): Konva.Line[] {
@@ -901,6 +904,7 @@ export class PriceLineManager {
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
     const fontFamily = this.getTextFontFamily();
     const fontSize = getPriceAxisTagFontSize(bound);
+    const paddingX = getPriceAxisTagPaddingX(bound);
 
     // Unfilled keeps the dark backing rather than going transparent, matching
     // updateLineContent - creating the node with the old filled-only rule is
@@ -923,9 +927,9 @@ export class PriceLineManager {
     if (secondaryText) {
       // Two-line label
       const primaryTextNode = new Konva.Text({
-        x: x + PRICE_AXIS_LABEL_TEXT_PADDING_X,
+        x: x + paddingX,
         y: y + 1,
-        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
+        width: Math.max(0, bound.width - paddingX * 2),
         height: bound.height / 2,
         text: bound.label.primaryText,
         fontSize,
@@ -938,9 +942,9 @@ export class PriceLineManager {
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
       const secondaryTextNode = new Konva.Text({
-        x: x + PRICE_AXIS_LABEL_TEXT_PADDING_X,
+        x: x + paddingX,
         y: y + bound.height / 2 - 1,
-        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
+        width: Math.max(0, bound.width - paddingX * 2),
         height: bound.height / 2,
         text: secondaryText,
         fontSize,
@@ -961,9 +965,9 @@ export class PriceLineManager {
       }
     } else {
       const primaryTextNode = new Konva.Text({
-        x: x + PRICE_AXIS_LABEL_TEXT_PADDING_X,
+        x: x + paddingX,
         y,
-        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
+        width: Math.max(0, bound.width - paddingX * 2),
         height: bound.height,
         text: bound.label.primaryText,
         fontSize,
@@ -1543,6 +1547,7 @@ export class PriceLineManager {
     const secondaryText = bound.countdownToTime ? formatCountdown(bound.countdownToTime) : bound.label.secondaryText;
     const tagStyle = resolvePriceAxisTagStyle({ type: bound.type, label: bound.label, color: bound.color });
     const fontSize = getPriceAxisTagFontSize(bound);
+    const paddingX = getPriceAxisTagPaddingX(bound);
 
     const refs = (group.getAttr('contentRefs') as CachedLineContentRefs | undefined) || {};
     const priceAxisRect = new Konva.Rect({
@@ -1562,9 +1567,9 @@ export class PriceLineManager {
     if (secondaryText) {
       const fontFamily = this.getTextFontFamily();
       const primaryTextNode = new Konva.Text({
-        x: priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X,
+        x: priceAxisLabelX + paddingX,
         y: priceAxisLabelY + 1,
-        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
+        width: Math.max(0, bound.width - paddingX * 2),
         height: bound.height / 2,
         text: bound.label.primaryText,
         fontSize,
@@ -1577,9 +1582,9 @@ export class PriceLineManager {
       group.add(primaryTextNode);
       refs.priceAxisPrimaryText = primaryTextNode;
       const tradingSecondaryTextNode = new Konva.Text({
-        x: priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X,
+        x: priceAxisLabelX + paddingX,
         y: priceAxisLabelY + bound.height / 2 - 1,
-        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
+        width: Math.max(0, bound.width - paddingX * 2),
         height: bound.height / 2,
         text: secondaryText,
         fontSize,
@@ -1601,9 +1606,9 @@ export class PriceLineManager {
     } else {
       const fontFamily = this.getTextFontFamily();
       const primaryTextNode = new Konva.Text({
-        x: priceAxisLabelX + PRICE_AXIS_LABEL_TEXT_PADDING_X,
+        x: priceAxisLabelX + paddingX,
         y: priceAxisLabelY,
-        width: Math.max(0, bound.width - PRICE_AXIS_LABEL_TEXT_PADDING_X * 2),
+        width: Math.max(0, bound.width - paddingX * 2),
         height: bound.height,
         text: bound.label.primaryText,
         fontSize,

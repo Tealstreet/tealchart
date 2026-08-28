@@ -3,6 +3,7 @@ import type { ChartDimensions } from './coordinates';
 
 import { getOemsOrderObjectId, getOemsPositionObjectId } from '../../interaction/oemsLineState';
 import { computeTradingLineLabelMinX, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import {
   orderTradeLineButtonsForDisplay,
   resolveOrderTradeLineLabel,
@@ -25,7 +26,7 @@ const BRACKET_BUTTON_WIDTH = 26;
 const DEFAULT_CHARACTER_WIDTH = 6.8;
 const DEFAULT_PRICE_LABEL_MIN_WIDTH = 50;
 const LABEL_TO_LINE_GAP = 2;
-export const NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X = 6;
+export const NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X = NATIVE_PRICE_AXIS_TAG_SIZING.trade.paddingX;
 const SEGMENT_BORDER_OVERLAP = 1;
 const DEFAULT_PRICE_DECIMALS = 2;
 const MAX_PRICE_DECIMALS = 20;
