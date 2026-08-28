@@ -55,7 +55,6 @@ import {
   Viewport,
 } from './types';
 import { resolveLabelCollisions } from './utils/labelCollision';
-import { resolvePriceAxisTagStyle } from './utils/priceAxisTagStyle';
 import {
   PriceAxisTagDomain,
   resolvePriceLineAxisTagDomain,
@@ -63,6 +62,7 @@ import {
   WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT,
   WEB_PRICE_AXIS_TAG_SIZING,
 } from './utils/priceAxisTagSizing';
+import { resolvePriceAxisTagStyle, withPriceAxisTagBackgroundAlpha } from './utils/priceAxisTagStyle';
 
 /**
  * TealchartRenderer - Pure canvas rendering for OHLCV data
@@ -250,8 +250,7 @@ function getWebPriceLineAxisTagFont(line: PriceLine | PriceLineLabelBounds, font
 function getWebPriceLineAxisTagHeight(line: PriceLine | PriceLineLabelBounds, hasSecondaryText: unknown): number {
   const domain = resolvePriceLineAxisTagDomain(line);
   return (
-    WEB_PRICE_AXIS_TAG_SIZING[domain].height +
-    (hasSecondaryText ? WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT : 0)
+    WEB_PRICE_AXIS_TAG_SIZING[domain].height + (hasSecondaryText ? WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT : 0)
   );
 }
 
@@ -4760,7 +4759,7 @@ export class TealchartRenderer {
         text,
         textWidth: measuredTagWidth,
         kind: 'indicator-output',
-        backgroundColor: this.options.backgroundColor,
+        backgroundColor: withPriceAxisTagBackgroundAlpha(this.options.backgroundColor),
         borderColor: output.color,
         valueY: y,
         y,

@@ -420,7 +420,7 @@ describe('native trade and price line layers', () => {
 
     expect(outline.props.backgroundColor).toBe(DEFAULT_TRADE_LINE_LABEL_COLOR);
     expect(outline.props.borderColor).toBe('#12c48b');
-    expect(solid.props.backgroundColor).toBe('#12c48b');
+    expect(solid.props.backgroundColor).toBe('rgba(18, 196, 139, 0.88)');
   });
 
   it('uses resolved native price-axis tag centers for price-line labels', () => {

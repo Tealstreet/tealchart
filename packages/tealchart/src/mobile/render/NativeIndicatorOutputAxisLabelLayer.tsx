@@ -8,7 +8,7 @@ import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { memo, useMemo } from 'react';
 
-import { DashPathEffect, Group, Line as SkiaLine, Skia } from '@shopify/react-native-skia';
+import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import {
@@ -17,16 +17,16 @@ import {
   resolveIndicatorOutputSourceTime,
 } from '../../rendering/indicatorOutputAxisLabels';
 import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
+import { withPriceAxisTagBackgroundAlpha } from '../../utils/priceAxisTagStyle';
+import { createNativePriceAxisLane, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
-  createNativePriceAxisLane,
-  NATIVE_PRICE_AXIS_TAG_PADDING_X,
-} from '../utils/nativePriceAxisLane';
+  createNativePriceAxisTagTextLayout,
+  getNativePriceAxisSingleLineTextBaselineOffset,
+} from '../utils/priceAxisTagLayout';
 import { nativePaneValueToYWithRange, resolveNativePaneRange } from './nativePaneRangeOverride';
-import { getNativePriceAxisSingleLineTextBaselineOffset } from '../utils/priceAxisTagLayout';
-import { createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout';
-import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 import { sharedTimeToNativeX } from './nativeSharedViewport';
+import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_SIZING.indicatorOutput.height;
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 28;
@@ -74,6 +74,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   smallFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
 }) {
+  const tagBackgroundColor = withPriceAxisTagBackgroundAlpha(backgroundColor);
   const labels = useMemo(
     () =>
       resolveNativeIndicatorOutputAxisLabels({
@@ -103,7 +104,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
         return group.labels.map((label) => (
           <NativeIndicatorOutputAxisTag
             key={label.id}
-            backgroundColor={backgroundColor}
+            backgroundColor={tagBackgroundColor}
             baselineOffset={baselineOffset}
             clip={clip}
             frame={frame}
@@ -157,13 +158,10 @@ function NativeIndicatorOutputAxisTag({
   const textY = useDerivedValue(() => tagY.value + baselineOffset);
   const guideY = useDerivedValue(() => Math.round(valueY.value) + 0.5);
   const sourceTime = label.sourceTime;
-  const sourceX = useDerivedValue(
-    () => {
-      if (!Number.isFinite(sourceTime ?? NaN)) return Number.NaN;
-      return sharedTimeToNativeX(sourceTime!, sharedViewport, frame);
-    },
-    [sourceTime, sharedViewport, frame],
-  );
+  const sourceX = useDerivedValue(() => {
+    if (!Number.isFinite(sourceTime ?? NaN)) return Number.NaN;
+    return sharedTimeToNativeX(sourceTime!, sharedViewport, frame);
+  }, [sourceTime, sharedViewport, frame]);
   const guideStart = useDerivedValue(() => {
     return { x: resolveNativeIndicatorOutputGuideStartX(sourceX.value, frame, group.x), y: guideY.value };
   }, [sourceX, frame, group.x, guideY]);
