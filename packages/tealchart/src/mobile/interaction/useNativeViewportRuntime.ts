@@ -20,7 +20,11 @@ import { TealchartRenderer } from '../../TealchartRenderer';
 import { captureViewScale, intervalToMs, restoreViewport, withDefaultPricePadding } from '../../viewport/viewScale';
 import { createNativeChartProjection } from '../render/nativeProjection';
 import { getNativeCandidateTimeWindow, nativeViewportCoversCandidateTimeWindow } from '../render/nativeTimeWindow';
-import { createNativeAutoScaleBars, fitNativeRestoredViewportPrice } from './nativeAutoScale';
+import {
+  applyNativePriceAutoScale,
+  createNativeAutoScaleBars,
+  fitNativeRestoredViewportPrice,
+} from './nativeAutoScale';
 import { resetNativeViewportGestureActiveFlags, syncNativeViewportGestureMetrics } from './nativeViewportGestureState';
 import {
   applyNativeViewportSync,
@@ -113,6 +117,32 @@ export function shouldResetNativeViewScalePricePadding({
   previousSymbol: string;
 }): boolean {
   return previousSymbol !== nextSymbol;
+}
+
+export function restoreNativeAutoOwnedViewportAcrossBars({
+  autoScaleEnabled,
+  bars,
+  interval,
+  previousBars,
+  previousInterval,
+  viewport,
+}: {
+  autoScaleEnabled: boolean;
+  bars: readonly Bar[];
+  interval: string;
+  previousBars: readonly Bar[];
+  previousInterval: string;
+  viewport: Viewport;
+}): Viewport | null {
+  if (bars.length === 0 || previousBars.length === 0) return null;
+
+  const carried = restoreViewport(
+    captureViewScale(viewport, [...previousBars], intervalToMs(previousInterval)),
+    [...bars],
+    intervalToMs(interval),
+  );
+
+  return autoScaleEnabled ? applyNativePriceAutoScale(carried, createNativeAutoScaleBars(bars)) : carried;
 }
 
 export function captureNativeDataLoadViewScale({
@@ -394,7 +424,7 @@ export function useNativeViewportRuntime({
     if (!capture) {
       candidateViewportRef.current = autoViewport;
       setCandidateViewport(autoViewport);
-      setSettledViewport(null);
+      setSettledViewport(autoViewport);
       if (autoViewport) {
         syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
         syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
@@ -457,6 +487,75 @@ export function useNativeViewportRuntime({
     onViewportChange,
     pendingDataLoadViewport,
     requestNativeRenderViewportSync,
+  ]);
+
+  useLayoutEffect(() => {
+    if (
+      !autoViewport ||
+      !barsMatchRequestedData ||
+      isLoading ||
+      settledViewport ||
+      viewportOwnershipRef.current.hasManualViewport ||
+      viewportOwnershipRef.current.nativeViewportOwned
+    ) {
+      return;
+    }
+
+    candidateViewportRef.current = autoViewport;
+    setCandidateViewport(autoViewport);
+    setSettledViewport(autoViewport);
+    syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
+    syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
+    onViewportChange?.(autoViewport);
+  }, [
+    autoViewport,
+    barsMatchRequestedData,
+    isLoading,
+    onViewportChange,
+    panStartViewport,
+    settledViewport,
+    sharedViewport,
+  ]);
+
+  useLayoutEffect(() => {
+    if (
+      !barsMatchRequestedData ||
+      isLoading ||
+      bars.length === 0 ||
+      settledViewport === null ||
+      viewportOwnershipRef.current.hasManualViewport ||
+      viewportOwnershipRef.current.nativeViewportOwned ||
+      Object.is(loadedBarsRef.current, bars)
+    ) {
+      return;
+    }
+
+    const nextViewport = restoreNativeAutoOwnedViewportAcrossBars({
+      autoScaleEnabled: priceAutoScale.active.value,
+      bars,
+      interval,
+      previousBars: loadedBarsRef.current,
+      previousInterval: loadedBarsIntervalRef.current,
+      viewport: settledViewport,
+    });
+    if (!nextViewport || nativeViewportsMatch(nextViewport, settledViewport)) return;
+
+    candidateViewportRef.current = nextViewport;
+    setCandidateViewport(nextViewport);
+    setSettledViewport(nextViewport);
+    syncNativeSharedViewportIfChanged(sharedViewport, nextViewport);
+    syncNativeSharedViewportIfChanged(panStartViewport, nextViewport);
+    onViewportChange?.(nextViewport);
+  }, [
+    bars,
+    barsMatchRequestedData,
+    interval,
+    isLoading,
+    onViewportChange,
+    panStartViewport,
+    priceAutoScale,
+    settledViewport,
+    sharedViewport,
   ]);
 
   useEffect(() => {
@@ -593,7 +692,7 @@ export function useNativeViewportRuntime({
     setViewportOwnership(createNativeViewportOwnershipState());
     candidateViewportRef.current = autoViewport;
     setCandidateViewport(autoViewport);
-    setSettledViewport(null);
+    setSettledViewport(autoViewport);
     syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
     syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
     resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
