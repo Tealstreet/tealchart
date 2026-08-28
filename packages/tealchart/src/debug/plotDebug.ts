@@ -2,6 +2,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 
 type TealchartPlotDebugGlobal = typeof globalThis & {
   __TEALCHART_DEBUG_PLOTS?: boolean;
+  __TEALCHART_INDICATOR_AUDIT?: boolean;
   localStorage?: { getItem?: (key: string) => string | null };
 };
 
@@ -10,6 +11,16 @@ export function isTealchartPlotDebugEnabled(): boolean {
   if (debugGlobal.__TEALCHART_DEBUG_PLOTS) return true;
   try {
     return debugGlobal.localStorage?.getItem?.('__TEALCHART_DEBUG_PLOTS') === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function isTealchartIndicatorAuditEnabled(): boolean {
+  const debugGlobal = globalThis as TealchartPlotDebugGlobal;
+  if (debugGlobal.__TEALCHART_INDICATOR_AUDIT) return true;
+  try {
+    return debugGlobal.localStorage?.getItem?.('__TEALCHART_INDICATOR_AUDIT') === 'true';
   } catch {
     return false;
   }

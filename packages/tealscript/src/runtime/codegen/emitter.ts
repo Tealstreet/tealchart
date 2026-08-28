@@ -475,6 +475,12 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
     }
 
+    if (site.className === 'OBV') {
+      const source = args[0] ?? 'ctx.bar.close';
+      const volume = args[1] ?? 'ctx.bar.volume';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ${volume}) : ${member}.recompute(${source}, ${volume}))`;
+    }
+
     const argStr = args.join(', ');
     return `(ctx.isFirstTick ? ${member}.compute(${argStr}) : ${member}.recompute(${argStr}))`;
   }

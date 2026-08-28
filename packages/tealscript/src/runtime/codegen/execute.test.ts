@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
 import { executeScript } from '../engine';
-import { tryCompile, executeCompiled } from './execute';
+import { tryCompile, tryExecuteScript, executeCompiled } from './execute';
 import type { Bar } from '../context';
 import { InMemoryRequestDatafeed } from '../requestDatafeed';
 
@@ -166,6 +166,32 @@ plot(upper, "Upper")`);
     const bbCompiled = tryCompile(bbAst);
     expect(bbCompiled.success).toBe(false);
     expect(bbCompiled.unsupported).toContain('ta.bb with dynamic constructor parameters not yet supported by transpiler');
+  });
+
+  it('compiles additional scalar TA helpers with interpreter parity', () => {
+    assertPlotParity(`//@version=6
+indicator("test")
+plot(ta.wma(close, 7), "WMA")
+plot(ta.mom(close, 3), "Momentum")
+plot(ta.roc(close, 4), "ROC")
+plot(ta.obv(close, volume), "OBV")
+plot(ta.obv(), "Default OBV")`, bars);
+  });
+
+  it('declines TA calls that do not have compiled runtime parity', () => {
+    const ast = parse(`//@version=6
+indicator("test")
+plot(ta.hma(close, 7), "HMA")`);
+
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(false);
+    expect(compiled.unsupported).toContain('ta.hma not yet supported by transpiler');
+
+    expect(tryExecuteScript(ast, bars)).toBeNull();
+
+    const interpreted = executeScript(ast, bars);
+    const hma = interpreted.plots[0]?.values ?? [];
+    expect(hma.some((value) => typeof value === 'number' && Number.isFinite(value))).toBe(true);
   });
 
   it('boolean logic with TA', () => {

@@ -1,6 +1,8 @@
 import type { BarsIndicator } from './BarsIndicator';
 import type { CrossHairTooltip, IndicatorDrawArgs, IndicatorTooltipArgs } from './types';
 
+import { isTealchartIndicatorAuditEnabled } from '../debug/plotDebug';
+
 /**
  * A registered indicator with its settings and render ordering.
  */
@@ -18,6 +20,7 @@ interface RegisteredIndicator {
 export class JailbreakIndicatorManager {
   private indicators = new Map<string, RegisteredIndicator>();
   private _tooltipContext: Record<string, unknown> = {};
+  private loggedDrawIds = new Set<string>();
 
   /**
    * Set extra context that will be merged into tooltip args for all indicators.
@@ -36,6 +39,7 @@ export class JailbreakIndicatorManager {
    */
   register(id: string, indicator: BarsIndicator, settings: Record<string, unknown>, behindCandles: boolean): void {
     this.indicators.set(id, { id, indicator, settings, behindCandles });
+    this.loggedDrawIds.delete(id);
   }
 
   /**
@@ -43,6 +47,7 @@ export class JailbreakIndicatorManager {
    */
   unregister(id: string): void {
     this.indicators.delete(id);
+    this.loggedDrawIds.delete(id);
   }
 
   /**
@@ -65,6 +70,7 @@ export class JailbreakIndicatorManager {
       if (!entry.indicator.isVisible()) continue;
       try {
         const drawArgs: IndicatorDrawArgs = { ...args, settings: entry.settings };
+        this.logFirstDraw('behind', entry, args);
         entry.indicator.drawBehind(drawArgs);
         entry.indicator.draw(drawArgs);
       } catch (err) {
@@ -82,6 +88,7 @@ export class JailbreakIndicatorManager {
       if (!entry.indicator.isVisible()) continue;
       try {
         const drawArgs: IndicatorDrawArgs = { ...args, settings: entry.settings };
+        this.logFirstDraw('after', entry, args);
         entry.indicator.draw(drawArgs);
         entry.indicator.drawInFront(drawArgs);
       } catch (err) {
@@ -126,5 +133,28 @@ export class JailbreakIndicatorManager {
    */
   get size(): number {
     return this.indicators.size;
+  }
+
+  private logFirstDraw(
+    stage: 'behind' | 'after',
+    entry: RegisteredIndicator,
+    args: Omit<IndicatorDrawArgs, 'settings'>,
+  ): void {
+    if (!isTealchartIndicatorAuditEnabled() || this.loggedDrawIds.has(entry.id)) return;
+    this.loggedDrawIds.add(entry.id);
+    console.info('[tealchart:indicator-audit] jailbreak first draw', {
+      id: entry.id,
+      stage,
+      className: entry.indicator.constructor?.name ?? null,
+      behindCandles: entry.behindCandles,
+      barCount: args.bars.length,
+      candleCoordCount: args.candleCoords.length,
+      exchange: args.exchange,
+      symbol: args.symbol,
+      resolutionString: args.resolutionString,
+      chartWidth: args.chartWidth,
+      chartHeight: args.chartHeight,
+      settingKeys: Object.keys(entry.settings),
+    });
   }
 }
