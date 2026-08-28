@@ -237,6 +237,47 @@ describe('ChartWidgetCore data identity', () => {
     });
   });
 
+  it('normalizes historical and realtime current bars to the same open time', () => {
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const emitted: Array<{ lastClose: number; lastTime: number; length: number; source: string }> = [];
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '5',
+      onBarsChanged: (bars, context) => {
+        const lastBar = bars[bars.length - 1]!;
+        emitted.push({
+          lastClose: lastBar.close,
+          lastTime: lastBar.time,
+          length: bars.length,
+          source: context.source,
+        });
+      },
+    });
+    const bucketOpen = 1_700_000_100_000;
+    const bars = makeBars(bucketOpen - 2 * 5 * 60_000, 5 * 60_000, 3);
+    bars[bars.length - 1] = {
+      ...bars[bars.length - 1]!,
+      time: bucketOpen + 12_345,
+      close: 120,
+    };
+
+    core.initialize();
+    historyRequests[0]!.onResult(bars);
+    subscriptions[0]!.onTick({
+      ...bars[bars.length - 1]!,
+      time: bucketOpen,
+      close: 125,
+    });
+
+    expect(emitted).toEqual([
+      { lastClose: 120, lastTime: bucketOpen, length: 3, source: 'history' },
+      { lastClose: 125, lastTime: bucketOpen, length: 3, source: 'realtime' },
+    ]);
+    expect(core.getBars()).toHaveLength(3);
+    expect(core.getBars().at(-1)).toMatchObject({ time: bucketOpen, close: 125 });
+  });
+
   it('does not emit or subscribe when disposed before history resolves', () => {
     const { datafeed, historyRequests, subscriptions, unsubscribedGuids } = createControlledDatafeed();
     const emitted: Array<{ interval: string; source: string }> = [];

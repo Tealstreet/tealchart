@@ -25,6 +25,8 @@ import type { HistoryBackfillDirection, HistoryBackfillRequestHint } from './his
 import { EventEmitter } from '../events/EventEmitter';
 import { PaneManager } from '../rendering/PaneManager';
 import { barValuesEqual, dedupeBarsByTime } from '../utils/dedupeBars';
+import { intervalToMs } from '../utils/intervalMs';
+import { normalizeDatafeedBar, normalizeDatafeedBars } from '../utils/normalizeDatafeedBars';
 import { normalizeResolution } from '../utils/normalizeResolution';
 import {
   DEFAULT_HISTORY_BACKFILL_BAR_COUNT,
@@ -48,39 +50,11 @@ type PlotOutput = {
 // Constants
 export const INITIAL_BAR_COUNT = DEFAULT_HISTORY_BACKFILL_BAR_COUNT;
 
-const normalizeDatafeedBar = (bar: DatafeedBar): Bar => ({
-  ...bar,
-  volume: bar.volume ?? 0,
-});
-
-const normalizeDatafeedBars = (bars: DatafeedBar[]): Bar[] => bars.map(normalizeDatafeedBar);
-
 /**
  * Convert resolution string to milliseconds
  */
 export function getIntervalMs(resolution: ResolutionString | string): number {
-  const upper = resolution.toUpperCase();
-
-  // Handle day/week resolutions
-  if (upper === '1D' || upper === 'D') return 24 * 60 * 60 * 1000;
-  if (upper === '1W' || upper === 'W') return 7 * 24 * 60 * 60 * 1000;
-
-  // Parse numeric value and optional suffix (e.g., "1h", "4H", "1D", "15", "60")
-  const match = resolution.match(/^(\d+)([hHdDwW]?)$/);
-  if (match) {
-    const value = parseInt(match[1], 10);
-    const suffix = match[2].toUpperCase();
-
-    if (suffix === 'H') return value * 60 * 60 * 1000;
-    if (suffix === 'D') return value * 24 * 60 * 60 * 1000;
-    if (suffix === 'W') return value * 7 * 24 * 60 * 60 * 1000;
-
-    // No suffix means minutes
-    return value * 60 * 1000;
-  }
-
-  // Default to 1 hour
-  return 60 * 60 * 1000;
+  return intervalToMs(resolution);
 }
 
 /**
@@ -255,7 +229,7 @@ export class ChartWidgetCore {
     );
     if (!cached?.length) return;
 
-    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached), 'cache load');
+    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached, this._interval), 'cache load');
     if (!normalizedBars.length) return;
 
     this._bars = normalizedBars;
@@ -403,7 +377,7 @@ export class ChartWidgetCore {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars), 'history load');
+        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars, requestInterval), 'history load');
         this._bars = normalizedBars;
         // Clear old plots — they belong to the old symbol/interval
         this._plots = [];
@@ -523,7 +497,7 @@ export class ChartWidgetCore {
         }
 
         const existingTimes = new Set(this._bars.map((bar) => bar.time));
-        const newBars = normalizeDatafeedBars(bars).filter((bar) => !existingTimes.has(bar.time));
+        const newBars = normalizeDatafeedBars(bars, requestInterval).filter((bar) => !existingTimes.has(bar.time));
         if (newBars.length === 0) {
           this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
           return;
@@ -572,7 +546,7 @@ export class ChartWidgetCore {
         ) {
           return;
         }
-        this._handleNewBar(normalizeDatafeedBar(bar));
+        this._handleNewBar(normalizeDatafeedBar(bar, subscriptionInterval));
       },
       subscriptionGuid,
       () => {
@@ -604,6 +578,8 @@ export class ChartWidgetCore {
         this._bars[this._bars.length - 1] = bar;
       } else if (bar.time > lastBar.time) {
         this._bars.push(bar);
+      } else {
+        return;
       }
     }
 
