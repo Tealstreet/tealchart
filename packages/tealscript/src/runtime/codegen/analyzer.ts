@@ -102,6 +102,10 @@ const TA_CLASS_MAP: Record<string, { className: string; returnsTuple: boolean; t
   'ta.macd': { className: 'MACD', returnsTuple: true, tupleFields: ['macdLine', 'signalLine', 'histogram'] },
   'ta.atr': { className: 'ATR', returnsTuple: false },
   'ta.stoch': { className: 'Stoch', returnsTuple: false },
+  'ta.wma': { className: 'WMA', returnsTuple: false },
+  'ta.mom': { className: 'Mom', returnsTuple: false },
+  'ta.roc': { className: 'ROC', returnsTuple: false },
+  'ta.obv': { className: 'OBV', returnsTuple: false },
   'ta.bb': { className: 'BB', returnsTuple: true, tupleFields: ['middle', 'upper', 'lower'] },
   'ta.dema': { className: 'DEMA', returnsTuple: false },
   'ta.tema': { className: 'TEMA', returnsTuple: false },
@@ -121,6 +125,9 @@ const REQUIRED_STATIC_TA_CTOR_ARG_COUNTS: Record<string, number> = {
   'ta.tema': 1,
   'ta.atr': 1,
   'ta.stoch': 1,
+  'ta.wma': 1,
+  'ta.mom': 1,
+  'ta.roc': 1,
   'ta.macd': 3,
   'ta.bb': 2,
 };
@@ -248,6 +255,11 @@ export function analyze(ast: Program): AnalysisContext {
             });
           }
           break;
+        }
+
+        if (namespace === 'ta' && !(fullName in TA_CLASS_MAP)) {
+          const msg = `${fullName} not yet supported by transpiler`;
+          if (!ctx.unsupported.includes(msg)) ctx.unsupported.push(msg);
         }
 
         if (fullName in TA_CLASS_MAP) {
@@ -540,6 +552,9 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
     case 'ta.stdev':
     case 'ta.dema':
     case 'ta.tema':
+    case 'ta.wma':
+    case 'ta.mom':
+    case 'ta.roc':
     case 'ta.atr': {
       const lengthExpr = args.find((a) => a.name?.name === 'length')?.value ?? positional[1];
       if (lengthExpr) {
@@ -573,6 +588,7 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
     case 'ta.crossover':
     case 'ta.crossunder':
     case 'ta.cum':
+    case 'ta.obv':
       return [];
     default:
       return [];
@@ -591,8 +607,16 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
     case 'ta.stdev':
     case 'ta.dema':
     case 'ta.tema':
+    case 'ta.wma':
+    case 'ta.mom':
+    case 'ta.roc':
     case 'ta.cum':
       return [args.find((a) => a.name?.name === 'source')?.value ?? positional[0]].filter(Boolean) as Expression[];
+    case 'ta.obv': {
+      const source = args.find((a) => a.name?.name === 'source')?.value ?? positional[0];
+      const volume = args.find((a) => a.name?.name === 'volume')?.value ?? positional[1];
+      return [source, volume].filter(Boolean) as Expression[];
+    }
     case 'ta.macd':
       return [args.find((a) => a.name?.name === 'source')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.bb':

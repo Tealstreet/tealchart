@@ -471,6 +471,204 @@ export class Change implements Saveable {
 }
 
 // ==========================================================================
+// WMA — Weighted Moving Average
+// ==========================================================================
+
+interface SeriesSnapshot {
+  series: unknown;
+}
+
+export class WMA implements Saveable {
+  private series: NumericSeries;
+  private readonly length: number;
+
+  private snap: SeriesSnapshot | null = null;
+
+  constructor(length: number) {
+    this.length = Math.max(1, Math.trunc(length));
+    this.series = new NumericSeries(this.length);
+  }
+
+  compute(src: number): number {
+    this.snap = { series: this.series.save() };
+    return this._advance(src);
+  }
+
+  recompute(src: number): number {
+    if (this.snap) {
+      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+    }
+    return this._advance(src);
+  }
+
+  private _advance(src: number): number {
+    this.series.push(src);
+    if (this.series.length < this.length) return NaN;
+
+    let weightedSum = 0;
+    let weightSum = 0;
+    for (let index = 0; index < this.length; index += 1) {
+      const value = this.series.get(index);
+      if (value !== value) return NaN;
+      const weight = this.length - index;
+      weightedSum += value * weight;
+      weightSum += weight;
+    }
+    return weightedSum / weightSum;
+  }
+
+  save(): SeriesSnapshot {
+    return { series: this.series.save() };
+  }
+
+  restore(snap: SeriesSnapshot): void {
+    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.snap = null;
+  }
+}
+
+// ==========================================================================
+// MOM / ROC — fixed-lookback momentum helpers
+// ==========================================================================
+
+export class Mom implements Saveable {
+  private series: NumericSeries;
+  private readonly length: number;
+
+  private snap: SeriesSnapshot | null = null;
+
+  constructor(length: number) {
+    this.length = Math.max(1, Math.trunc(length));
+    this.series = new NumericSeries(this.length + 1);
+  }
+
+  compute(src: number): number {
+    this.snap = { series: this.series.save() };
+    return this._advance(src);
+  }
+
+  recompute(src: number): number {
+    if (this.snap) {
+      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+    }
+    return this._advance(src);
+  }
+
+  private _advance(src: number): number {
+    this.series.push(src);
+    if (this.series.length <= this.length) return NaN;
+    const previous = this.series.get(this.length);
+    return previous === undefined || previous !== previous || src !== src ? NaN : src - previous;
+  }
+
+  save(): SeriesSnapshot {
+    return { series: this.series.save() };
+  }
+
+  restore(snap: SeriesSnapshot): void {
+    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.snap = null;
+  }
+}
+
+export class ROC implements Saveable {
+  private series: NumericSeries;
+  private readonly length: number;
+
+  private snap: SeriesSnapshot | null = null;
+
+  constructor(length: number) {
+    this.length = Math.max(1, Math.trunc(length));
+    this.series = new NumericSeries(this.length + 1);
+  }
+
+  compute(src: number): number {
+    this.snap = { series: this.series.save() };
+    return this._advance(src);
+  }
+
+  recompute(src: number): number {
+    if (this.snap) {
+      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+    }
+    return this._advance(src);
+  }
+
+  private _advance(src: number): number {
+    this.series.push(src);
+    if (this.series.length <= this.length) return NaN;
+    const previous = this.series.get(this.length);
+    return previous === undefined || previous === 0 || previous !== previous || src !== src
+      ? NaN
+      : ((src - previous) / previous) * 100;
+  }
+
+  save(): SeriesSnapshot {
+    return { series: this.series.save() };
+  }
+
+  restore(snap: SeriesSnapshot): void {
+    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.snap = null;
+  }
+}
+
+// ==========================================================================
+// OBV — On-Balance Volume
+// ==========================================================================
+
+interface OBVSnapshot {
+  previousSource: number;
+  value: number;
+}
+
+export class OBV implements Saveable {
+  private previousSource: number = NaN;
+  private value = 0;
+
+  private snap: OBVSnapshot | null = null;
+
+  compute(source: number, volume: number): number {
+    this.snap = {
+      previousSource: this.previousSource,
+      value: this.value,
+    };
+    return this._advance(source, volume);
+  }
+
+  recompute(source: number, volume: number): number {
+    if (this.snap) {
+      this.previousSource = this.snap.previousSource;
+      this.value = this.snap.value;
+    }
+    return this._advance(source, volume);
+  }
+
+  private _advance(source: number, volume: number): number {
+    if (source !== source || volume !== volume) return NaN;
+    if (this.previousSource === this.previousSource) {
+      if (source > this.previousSource) this.value += volume;
+      if (source < this.previousSource) this.value -= volume;
+    }
+    this.previousSource = source;
+    return this.value;
+  }
+
+  save(): OBVSnapshot {
+    return {
+      previousSource: this.previousSource,
+      value: this.value,
+    };
+  }
+
+  restore(snap: OBVSnapshot): void {
+    this.previousSource = snap.previousSource;
+    this.value = snap.value;
+    this.snap = null;
+  }
+}
+
+// ==========================================================================
 // Highest / Lowest — sliding window max/min
 // ==========================================================================
 

@@ -70,7 +70,11 @@ import {
   resolveLeftHistoryBackfillRequest,
   resolveViewportHistoryBackfillHint,
 } from './core/historyBackfill';
-import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from './debug/plotDebug';
+import {
+  isTealchartIndicatorAuditEnabled,
+  isTealchartPlotDebugEnabled,
+  summarizePlotsForDebug,
+} from './debug/plotDebug';
 import { LogCategory, TealchartLogger } from './debug/TealchartLogger';
 import {
   canRedoUserDrawingCommand as canRedoUserDrawingCommandHistory,
@@ -474,6 +478,21 @@ export class TealchartWidget implements ITealchartWebWidget {
           // The native host already resolves them; this is that same lookup.
           const definition = this._getIndicatorForStudyRequest(request.name);
           const code = definition?.code || request.name;
+          if (isTealchartIndicatorAuditEnabled()) {
+            console.info('[tealchart:indicator-audit] study create requested', {
+              studyId: request.studyId,
+              requestName: request.name,
+              displayName: request.displayName,
+              resolvedDefinitionId: definition?.id ?? null,
+              resolvedDefinitionName: definition?.name ?? null,
+              category: definition?.category ?? null,
+              forceOverlay: request.forceOverlay,
+              inputKeys: Object.keys(request.inputs ?? {}),
+              codeLength: code.length,
+              codePreview: code.slice(0, 120),
+              barCount: this._bars.length,
+            });
+          }
           await this._tealScriptManager.addScript(request.studyId, code, request.inputs);
           this._indicatorConfigMap.set(request.studyId, {
             id: request.studyId,
@@ -496,8 +515,29 @@ export class TealchartWidget implements ITealchartWebWidget {
             this._tealScriptManager.setBars(this._bars);
           }
           this._scheduler.markDirty(DIRTY.FULL);
+          if (isTealchartIndicatorAuditEnabled()) {
+            console.info('[tealchart:indicator-audit] study create succeeded', {
+              studyId: request.studyId,
+              displayName: request.displayName,
+              resolvedDefinitionId: definition?.id ?? null,
+              panes: this._paneManager.getPanes().map((pane) => ({
+                id: pane.id,
+                type: pane.type,
+                indicatorIds: pane.indicatorIds,
+                heightRatio: pane.heightRatio,
+              })),
+            });
+          }
           return true;
         } catch (error) {
+          if (isTealchartIndicatorAuditEnabled()) {
+            console.error('[tealchart:indicator-audit] study create failed', {
+              studyId: request.studyId,
+              requestName: request.name,
+              displayName: request.displayName,
+              error,
+            });
+          }
           this._logger?.error(LogCategory.Indicators, `Failed to create study ${request.studyId}`, error);
           return false;
         }
@@ -1741,6 +1781,19 @@ export class TealchartWidget implements ITealchartWebWidget {
    * Handle adding a built-in indicator
    */
   private _handleAddIndicator(indicator: BuiltinIndicator): void {
+    if (isTealchartIndicatorAuditEnabled()) {
+      console.info('[tealchart:indicator-audit] picker add requested', {
+        id: indicator.id,
+        name: indicator.name,
+        sourceKind: indicator.sourceKind ?? 'builtin',
+        category: indicator.category,
+        overlay: indicator.overlay,
+        isJailbreak: isJailbreakIndicator(indicator),
+        hasCode: indicator.code.length > 0,
+        codeLength: indicator.code.length,
+      });
+    }
+
     // Handle jailbreak indicators
     if (isJailbreakIndicator(indicator)) {
       this._handleAddJailbreakIndicator(indicator);
@@ -1783,9 +1836,25 @@ export class TealchartWidget implements ITealchartWebWidget {
 
           // Trigger immediate re-render to update chart layout for the new pane
           this._scheduler.markDirty(DIRTY.FULL);
+          if (isTealchartIndicatorAuditEnabled()) {
+            console.info('[tealchart:indicator-audit] picker add study resolved', {
+              requestedId: indicator.id,
+              instanceId,
+              studyId,
+              name: indicator.name,
+            });
+          }
         }
       })
       .catch((error) => {
+        if (isTealchartIndicatorAuditEnabled()) {
+          console.error('[tealchart:indicator-audit] picker add study failed', {
+            requestedId: indicator.id,
+            instanceId,
+            name: indicator.name,
+            error,
+          });
+        }
         this._logger?.error(LogCategory.Indicators, `Failed to add indicator ${indicator.name}`, error);
       });
   }
@@ -1810,6 +1879,18 @@ export class TealchartWidget implements ITealchartWebWidget {
     const settings = this._buildJailbreakSettings(indicator, {});
     const behindCandles = indicator.jailbreak.behindCandles ?? false;
 
+    if (isTealchartIndicatorAuditEnabled()) {
+      console.info('[tealchart:indicator-audit] jailbreak register requested', {
+        id: indicator.id,
+        instanceId,
+        name: indicator.name,
+        className: barsIndicator.constructor?.name ?? null,
+        behindCandles,
+        settingKeys: Object.keys(settings),
+        barCount: this._bars.length,
+      });
+    }
+
     this._jailbreakManager.register(instanceId, barsIndicator, settings, behindCandles);
     this._jailbreakInstanceIds.add(instanceId);
 
@@ -1823,6 +1904,14 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._ui?.setJailbreakManager(this._jailbreakManager);
 
     this._scheduler.markDirty(DIRTY.FULL);
+
+    if (isTealchartIndicatorAuditEnabled()) {
+      console.info('[tealchart:indicator-audit] jailbreak register succeeded', {
+        id: indicator.id,
+        instanceId,
+        managerSize: this._jailbreakManager.size,
+      });
+    }
   }
 
   /**
