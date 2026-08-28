@@ -16,8 +16,8 @@ import { DEFAULT_BUY_CANDLE_COLOR } from './constants';
 import { computePaneGeometry } from './layout/chartGeometry';
 import { clearChartStoreCache } from './state/chartState';
 import { TealchartRenderer } from './TealchartRenderer';
-import { PRICE_AXIS_TAG_HORIZONTAL_PADDING, TIME_AXIS_HEIGHT } from './types';
-import { WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
+import { TIME_AXIS_HEIGHT } from './types';
+import { WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING, WEB_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -712,7 +712,7 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       const opts = renderer.getOptions();
       const trackY = renderer.publicPriceToY(120, viewport);
-      const labelWidth = '120'.length * 7 + PRICE_AXIS_TAG_HORIZONTAL_PADDING * 2;
+      const labelWidth = '120'.length * 7 + WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.paddingX * 2;
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
@@ -2966,7 +2966,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       );
 
       expect(bound).toBeDefined();
-      expect((bound?.width ?? 0) - PRICE_AXIS_TAG_HORIZONTAL_PADDING * 2).toBeGreaterThan(
+      expect((bound?.width ?? 0) - WEB_PRICE_AXIS_TAG_SIZING.lastTrade.paddingX * 2).toBeGreaterThan(
         ctx.measureText(primaryText).width,
       );
     });

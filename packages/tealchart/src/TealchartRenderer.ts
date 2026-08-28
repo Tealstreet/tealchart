@@ -46,7 +46,6 @@ import {
   PaneLayout,
   PositionLineRenderData,
   PRICE_AXIS_RIGHT_PADDING,
-  PRICE_AXIS_TAG_HORIZONTAL_PADDING,
   PriceLine,
   PriceLineLabelBounds,
   RenderOptions,
@@ -199,7 +198,6 @@ export const TEALCHART_RENDER_PASSES: readonly TealchartRenderPass[] = [
 
 type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
-const PRICE_AXIS_LABEL_TEXT_PADDING_X = PRICE_AXIS_TAG_HORIZONTAL_PADDING;
 const PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X = 4;
 const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.height;
 const INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
@@ -254,13 +252,17 @@ function getWebPriceLineAxisTagHeight(line: PriceLine | PriceLineLabelBounds, ha
   );
 }
 
+function getWebPriceLineAxisTagPaddingX(line: PriceLine | PriceLineLabelBounds): number {
+  return WEB_PRICE_AXIS_TAG_SIZING[resolvePriceLineAxisTagDomain(line)].paddingX;
+}
+
 function measurePriceLineAxisLabelWidth(ctx: CanvasContext, line: PriceLine, font: string): number {
   const primaryWidth = getCachedTextWidth(ctx, line.label.primaryText, font);
   const secondaryText = getPriceLineSecondaryLabelText(line);
   const secondaryWidth = secondaryText ? getCachedTextWidth(ctx, secondaryText, font) : 0;
   return Math.ceil(
     Math.max(primaryWidth, secondaryWidth) +
-      PRICE_AXIS_LABEL_TEXT_PADDING_X * 2 +
+      getWebPriceLineAxisTagPaddingX(line) * 2 +
       PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X,
   );
 }
@@ -1604,7 +1606,7 @@ export class TealchartRenderer {
     // Calculate label dimensions
     ctx.font = `${sizing.fontSize}px ${this.font}`;
     const textWidth = ctx.measureText(priceText).width;
-    const labelWidth = textWidth + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2;
+    const labelWidth = textWidth + sizing.paddingX * 2;
     const labelHeight = sizing.height;
 
     // Position label in the price axis area
@@ -4761,7 +4763,7 @@ export class TealchartRenderer {
       const text = formatIndicatorOutputAxisValue(output.value, range, output.precision);
       const measuredTagWidth = Math.max(
         INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
-        getCachedTextWidth(this.ctx, text, textFont) + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2,
+        getCachedTextWidth(this.ctx, text, textFont) + WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.paddingX * 2,
       );
       measured.push({
         id: output.id,
