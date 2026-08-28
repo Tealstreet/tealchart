@@ -2,7 +2,7 @@ import type { LabelBounds } from './labelCollision';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { clearCollisionCache, resolveLabelCollisions } from './labelCollision';
+import { clearCollisionCache, resolveLabelCollisions, resolveLabelCollisionsWithinBounds } from './labelCollision';
 
 /**
  * Helper: create a label with defaults
@@ -314,5 +314,40 @@ describe('resolveLabelCollisions', () => {
         assertOrdering(labels);
       }
     });
+  });
+});
+
+describe('resolveLabelCollisionsWithinBounds', () => {
+  beforeEach(() => {
+    clearCollisionCache();
+  });
+
+  it('moves a bottom-crowded stack into bounds without collapsing labels onto the floor', () => {
+    const labels = [
+      { ...label(178, 20), id: 'a' },
+      { ...label(188, 20), id: 'b' },
+      { ...label(198, 20), id: 'c' },
+    ];
+
+    resolveLabelCollisionsWithinBounds(labels, 100, 200);
+
+    assertNoOverlaps(labels);
+    for (const current of labels) {
+      expect(current.adjustedY - current.height / 2).toBeGreaterThanOrEqual(100);
+      expect(current.adjustedY + current.height / 2).toBeLessThanOrEqual(200);
+    }
+  });
+
+  it('keeps fixed labels stable while bounded movable labels give way', () => {
+    const labels = [
+      { ...label(170, 20), id: 'movable-a' },
+      { ...label(180, 20), id: 'last-trade', fixed: true },
+      { ...label(190, 20), id: 'movable-b' },
+    ];
+
+    resolveLabelCollisionsWithinBounds(labels, 100, 220);
+
+    expect(labels.find((current) => current.id === 'last-trade')?.adjustedY).toBe(180);
+    assertNoOverlaps(labels);
   });
 });

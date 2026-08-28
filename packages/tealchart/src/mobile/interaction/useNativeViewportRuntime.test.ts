@@ -9,6 +9,7 @@ import {
   resolveNativeHistoryBackfillHint,
   resolveNativeRenderViewport,
   resolveNativeSharedViewportSyncTarget,
+  restoreNativeAutoOwnedViewportAcrossBars,
   restoreNativeDataLoadViewport,
   shouldRebaseNativeCandidateViewport,
   shouldResetNativeViewScalePricePadding,
@@ -87,6 +88,58 @@ describe('useNativeViewportRuntime helpers', () => {
       hasDataViewport: true,
       viewport: settledViewport,
     });
+  });
+
+  it('carries an auto-owned viewport across same-candle updates without moving the time window', () => {
+    const previousBars = makeBars(50, 60_000);
+    const bars = [...previousBars.slice(0, -1), { ...previousBars[49]!, high: 200, close: 190 }];
+    const viewport: Viewport = {
+      startTime: previousBars[20]!.time,
+      endTime: previousBars[49]!.time + 5 * 60_000,
+      priceMin: 90,
+      priceMax: 160,
+    };
+
+    const next = restoreNativeAutoOwnedViewportAcrossBars({
+      autoScaleEnabled: true,
+      bars,
+      interval: '1',
+      previousBars,
+      previousInterval: '1',
+      viewport,
+    });
+
+    expect(next).not.toBeNull();
+    expect(next!.startTime).toBe(viewport.startTime);
+    expect(next!.endTime).toBe(viewport.endTime);
+    expect(next!.priceMax).toBeGreaterThan(viewport.priceMax);
+  });
+
+  it('carries an auto-owned viewport to a new candle while preserving right offset', () => {
+    const previousBars = makeBars(50, 60_000);
+    const bars = [
+      ...previousBars,
+      ...makeBars(1, 60_000).map((bar) => ({ ...bar, time: previousBars[49]!.time + 60_000 })),
+    ];
+    const viewport: Viewport = {
+      startTime: previousBars[20]!.time,
+      endTime: previousBars[49]!.time + 5 * 60_000,
+      priceMin: 90,
+      priceMax: 160,
+    };
+
+    const next = restoreNativeAutoOwnedViewportAcrossBars({
+      autoScaleEnabled: true,
+      bars,
+      interval: '1',
+      previousBars,
+      previousInterval: '1',
+      viewport,
+    });
+
+    expect(next).not.toBeNull();
+    expect(next!.endTime).toBe(viewport.endTime + 60_000);
+    expect(next!.startTime).toBe(viewport.startTime + 60_000);
   });
 
   it('keeps the candidate viewport for in-range pan commits', () => {
