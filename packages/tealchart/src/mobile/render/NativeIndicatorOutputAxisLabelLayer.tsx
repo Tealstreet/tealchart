@@ -16,6 +16,7 @@ import {
   getIndicatorOutputAxisLabelSources,
   resolveIndicatorOutputSourceTime,
 } from '../../rendering/indicatorOutputAxisLabels';
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import {
   createNativePriceAxisLane,
   NATIVE_PRICE_AXIS_TAG_PADDING_X,
@@ -27,7 +28,7 @@ import { measureNativeSkiaTextWidth } from './nativeSkiaText';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 import { sharedTimeToNativeX } from './nativeSharedViewport';
 
-export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 11;
+export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_SIZING.indicatorOutput.height;
 export const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 28;
 const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X = NATIVE_PRICE_AXIS_TAG_PADDING_X;
 const NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP = 0;

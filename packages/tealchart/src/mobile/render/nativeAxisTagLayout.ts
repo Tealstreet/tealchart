@@ -2,6 +2,7 @@ import type { NativeChartFrame } from './nativeChartFrame';
 
 import { Skia } from '@shopify/react-native-skia';
 
+import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
 import { getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import {
   createNativePriceAxisLane,
@@ -11,7 +12,7 @@ import {
 import { createNativePriceAxisTagLayout, createNativePriceAxisTagTextLayout } from '../utils/priceAxisTagLayout';
 import { fitNativeSkiaTextToWidth, measureNativeSkiaTextWidth } from './nativeSkiaText';
 
-export const PRICE_AXIS_TAG_HEIGHT = 18;
+export const PRICE_AXIS_TAG_HEIGHT = NATIVE_PRICE_AXIS_TAG_SIZING.other.height;
 
 export function formatNativeCountdown(targetTimeMs: number, nowMs: number = Date.now()): string {
   const remaining = Math.max(0, targetTimeMs - nowMs);

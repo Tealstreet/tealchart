@@ -56,6 +56,13 @@ import {
 } from './types';
 import { resolveLabelCollisions } from './utils/labelCollision';
 import { resolvePriceAxisTagStyle } from './utils/priceAxisTagStyle';
+import {
+  PriceAxisTagDomain,
+  resolvePriceLineAxisTagDomain,
+  WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING,
+  WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT,
+  WEB_PRICE_AXIS_TAG_SIZING,
+} from './utils/priceAxisTagSizing';
 
 /**
  * TealchartRenderer - Pure canvas rendering for OHLCV data
@@ -194,7 +201,7 @@ type PriceLineRenderPart = 'all' | 'content' | 'labels';
 
 const PRICE_AXIS_LABEL_TEXT_PADDING_X = PRICE_AXIS_TAG_HORIZONTAL_PADDING;
 const PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X = 4;
-const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = 16;
+const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.height;
 const INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
 const INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 46;
 
@@ -233,6 +240,19 @@ function formatCountdown(targetTimeMs: number): string {
 function getPriceLineSecondaryLabelText(line: PriceLine): string {
   if (line.countdownToTime !== undefined) return formatCountdown(line.countdownToTime);
   return line.label.secondaryText ?? '';
+}
+
+function getWebPriceLineAxisTagFont(line: PriceLine | PriceLineLabelBounds, fontFamily: string): string {
+  const domain = resolvePriceLineAxisTagDomain(line);
+  return `${WEB_PRICE_AXIS_TAG_SIZING[domain].fontSize}px ${fontFamily}`;
+}
+
+function getWebPriceLineAxisTagHeight(line: PriceLine | PriceLineLabelBounds, hasSecondaryText: unknown): number {
+  const domain = resolvePriceLineAxisTagDomain(line);
+  return (
+    WEB_PRICE_AXIS_TAG_SIZING[domain].height +
+    (hasSecondaryText ? WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT : 0)
+  );
 }
 
 function measurePriceLineAxisLabelWidth(ctx: CanvasContext, line: PriceLine, font: string): number {
@@ -818,16 +838,13 @@ export class TealchartRenderer {
     const priceHeight = chartHeight - volumeHeight;
 
     // Calculate initial bounds for each label
-    const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
+      const labelFont = getWebPriceLineAxisTagFont(line, this.font);
       const originalY = this.priceToY(line.price, viewport, priceHeight);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
       const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
-      // Height includes text + padding + border + extra margin for collision
-      // Must match or exceed actual rendered height to prevent visual overlap
-      const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
-      const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
+      const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
 
       return {
         lineId: line.id,
@@ -991,7 +1008,7 @@ export class TealchartRenderer {
 
     // Draw text
     ctx.fillStyle = tagStyle.textColor;
-    ctx.font = `11px ${this.font}`;
+    ctx.font = getWebPriceLineAxisTagFont(bound, this.font);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -1189,7 +1206,7 @@ export class TealchartRenderer {
     // Draw text
     const textColor = bound.label.textColor || '#ffffff';
     ctx.fillStyle = textColor;
-    ctx.font = `11px ${this.font}`;
+    ctx.font = getWebPriceLineAxisTagFont(bound, this.font);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const priceAxisTextX = priceAxisLabelX + bound.width / 2;
@@ -1363,6 +1380,7 @@ export class TealchartRenderer {
       line.bodyTextColor,
       viewport,
       priceHeight,
+      'trade',
     );
   }
 
@@ -1562,6 +1580,7 @@ export class TealchartRenderer {
       line.bodyTextColor,
       viewport,
       priceHeight,
+      'trade',
     );
   }
 
@@ -1576,17 +1595,19 @@ export class TealchartRenderer {
     textColor: string,
     viewport: Viewport,
     _priceHeight: number,
+    domain?: PriceAxisTagDomain,
   ): void {
     const { ctx, options, margins } = this;
 
     // Format price
     const priceText = this.formatPrice(price, viewport);
+    const sizing = domain ? WEB_PRICE_AXIS_TAG_SIZING[domain] : WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING;
 
     // Calculate label dimensions
-    ctx.font = `11px ${this.font}`;
+    ctx.font = `${sizing.fontSize}px ${this.font}`;
     const textWidth = ctx.measureText(priceText).width;
     const labelWidth = textWidth + PRICE_AXIS_LABEL_TEXT_PADDING_X * 2;
-    const labelHeight = 16;
+    const labelHeight = sizing.height;
 
     // Position label in the price axis area
     const labelX = options.width - margins.right;
@@ -3486,8 +3507,8 @@ export class TealchartRenderer {
     // The panes already have correct yMin/yMax values set.
 
     // Calculate bounds using pane coordinate system
-    const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
+      const labelFont = getWebPriceLineAxisTagFont(line, this.font);
       // Find the target pane (default to main if not specified)
       const targetPaneId = line.targetPaneId || 'main';
       const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
@@ -3497,8 +3518,7 @@ export class TealchartRenderer {
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
       const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
-      const baseHeight = line.type === 'price' || !line.type ? 20 : 18;
-      const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
+      const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
 
       return {
         lineId: line.id,
@@ -4704,7 +4724,7 @@ export class TealchartRenderer {
         valueY: y,
         y,
         color: options.textColor,
-        fontSize: 11,
+        fontSize: WEB_PRICE_AXIS_TAG_SIZING.other.fontSize,
       });
     }
 
@@ -4745,7 +4765,7 @@ export class TealchartRenderer {
         valueY: y,
         y,
         color: output.color,
-        fontSize: 11,
+        fontSize: WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.fontSize,
         height: INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
         sourceX: output.sourceX,
       });
@@ -5343,16 +5363,13 @@ export class TealchartRenderer {
     const { ctx, margins } = this;
 
     // Calculate initial bounds for each label
-    const labelFont = `11px ${this.font}`;
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
+      const labelFont = getWebPriceLineAxisTagFont(line, this.font);
       const originalY = this.valueToY(line.price, pane);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
       const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
-      // Height includes text + padding + border + extra margin for collision
-      // Must match or exceed actual rendered height to prevent visual overlap
-      const baseHeight = line.type === 'price' || !line.type ? 18 : 16;
-      const height = hasSecondaryText ? baseHeight + 6 : baseHeight;
+      const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
 
       return {
         lineId: line.id,
@@ -5501,7 +5518,7 @@ export class TealchartRenderer {
 
     // Label text
     ctx.fillStyle = tagStyle.textColor;
-    ctx.font = `11px ${this.font}`;
+    ctx.font = getWebPriceLineAxisTagFont(bound, this.font);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -5737,7 +5754,7 @@ export class TealchartRenderer {
     ctx.stroke();
 
     ctx.fillStyle = bound.label.textColor || '#ffffff';
-    ctx.font = `11px ${this.font}`;
+    ctx.font = getWebPriceLineAxisTagFont(bound, this.font);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const priceAxisTextX = priceAxisLabelX + bound.width / 2;
