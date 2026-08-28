@@ -187,11 +187,11 @@ export function createNativeChartPanGesture({
   return Gesture.Pan()
     .minDistance(2)
     .onTouchesDown((event, stateManager) => {
-      if (panActive.value) return;
       if (crosshair?.visible.value) {
         stateManager.fail();
         return;
       }
+      if (panActive.value) return;
       if (!isNativeInitialSingleTouch(event)) {
         stateManager.fail();
         return;
@@ -239,6 +239,7 @@ export function createNativeChartPanGesture({
       // branch commits no viewport, nothing ever hands either back — which left
       // `panActive` stuck true and made every drag after the first a no-op.
       if (chartPanGestureState.paneDividerTarget.value) return;
+      if (crosshair?.visible.value) return;
       beginNativeChartPanGestureStateFromFrame(chartPanGestureState, frame);
       runOnJS(beginNativeViewportInteraction)();
     })
@@ -256,6 +257,7 @@ export function createNativeChartPanGesture({
         }
         return;
       }
+      if (crosshair?.visible.value) return;
 
       const pane = chartPanGestureState.indicatorPaneTarget.value;
       updateNativeChartPanGestureState(chartPanGestureState, event.translationX, pane ? 0 : event.translationY);
@@ -282,6 +284,7 @@ export function createNativeChartPanGesture({
         }
         return;
       }
+      if (crosshair?.visible.value) return;
       // Only when the drag actually moved vertically. A sideways pan through an
       // indicator pane must not silently pin its range against auto-scale.
       const pane = chartPanGestureState.indicatorPaneTarget.value;
