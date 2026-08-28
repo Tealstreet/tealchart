@@ -54,7 +54,7 @@ import {
   UnifiedPaneLayout,
   Viewport,
 } from './types';
-import { resolveLabelCollisions } from './utils/labelCollision';
+import { resolveLabelCollisionsWithinBounds } from './utils/labelCollision';
 import {
   PriceAxisTagDomain,
   resolvePriceLineAxisTagDomain,
@@ -883,7 +883,7 @@ export class TealchartRenderer {
     const staticBounds = bounds.filter((b) => !b.floatingLabel);
 
     // Resolve collisions using cluster-based stacking (gap-free by construction)
-    resolveLabelCollisions(staticBounds);
+    resolveLabelCollisionsWithinBounds(staticBounds, margins.top, options.height - margins.bottom);
 
     // Sort by Y position for consistent rendering order
     staticBounds.sort((a, b) => a.adjustedY - b.adjustedY);
@@ -897,9 +897,8 @@ export class TealchartRenderer {
     const visibleTop = margins.top;
     const visibleBottom = options.height - margins.bottom;
 
-    // Clamp adjustedY to keep labels within visible bounds
-    // This prevents labels from being pushed into the top bar or time axis during collision resolution
-    for (const bound of allBounds) {
+    // Floating labels bypass collision, so keep only those inside the visible bounds here.
+    for (const bound of floatingBounds) {
       const labelTop = bound.adjustedY - bound.height / 2;
       const labelBottom = bound.adjustedY + bound.height / 2;
 
@@ -3557,17 +3556,29 @@ export class TealchartRenderer {
     const floatingBounds = bounds.filter((b) => b.floatingLabel);
     const staticBounds = bounds.filter((b) => !b.floatingLabel);
 
-    // Resolve collisions
-    resolveLabelCollisions(staticBounds);
+    // Resolve collisions within each target pane. A global resolve followed by
+    // per-label pane clamps can collapse labels onto pane edges.
+    const staticBoundsByPane = new Map<string, PriceLineLabelBounds[]>();
+    for (const bound of staticBounds) {
+      const targetPaneId = bound.targetPaneId || 'main';
+      const paneBounds = staticBoundsByPane.get(targetPaneId) ?? [];
+      paneBounds.push(bound);
+      staticBoundsByPane.set(targetPaneId, paneBounds);
+    }
+    for (const [targetPaneId, paneBounds] of staticBoundsByPane) {
+      const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
+      const paneTop = targetPane.type === 'main' ? this.margins.top : targetPane.top;
+      resolveLabelCollisionsWithinBounds(paneBounds, paneTop, targetPane.bottom);
+    }
 
     // Sort by Y for rendering order
     staticBounds.sort((a, b) => a.adjustedY - b.adjustedY);
 
     const allBounds = [...staticBounds, ...floatingBounds];
 
-    // Clamp adjustedY to keep labels within their target pane's visible bounds
+    // Floating labels bypass collision, so keep only those inside their target pane here.
     const visibleTop = this.margins.top;
-    for (const bound of allBounds) {
+    for (const bound of floatingBounds) {
       const targetPaneId = bound.targetPaneId || 'main';
       const targetPane = computedPanes.find((p) => p.id === targetPaneId) || mainPane;
 
@@ -4810,32 +4821,17 @@ export class TealchartRenderer {
       }));
 
     const collisionBounds = [...priceLineCollisionBounds, ...outputBounds];
-    if (collisionBounds.length > 1) {
-      resolveLabelCollisions(collisionBounds);
-    }
+    resolveLabelCollisionsWithinBounds(collisionBounds, visibleTop, pane.bottom);
 
     for (const bound of priceLineCollisionBounds) {
       if (!bound.priceLineBound) continue;
       if (bound.priceLineBound.fixed === true) continue;
-      const minCenterY = visibleTop + bound.priceLineBound.height / 2;
-      const maxCenterY = pane.bottom - bound.priceLineBound.height / 2;
-      if (maxCenterY > minCenterY) {
-        bound.priceLineBound.adjustedY = Math.max(minCenterY, Math.min(maxCenterY, bound.adjustedY));
-      } else {
-        bound.priceLineBound.adjustedY = bound.adjustedY;
-      }
+      bound.priceLineBound.adjustedY = bound.adjustedY;
     }
 
     for (const bound of outputBounds) {
       if (!bound.outputLabel) continue;
-      const height = bound.outputLabel.height ?? INDICATOR_OUTPUT_AXIS_TAG_HEIGHT;
-      const minCenterY = visibleTop + height / 2;
-      const maxCenterY = pane.bottom - height / 2;
-      if (maxCenterY > minCenterY) {
-        bound.outputLabel.y = Math.max(minCenterY, Math.min(maxCenterY, bound.adjustedY));
-      } else {
-        bound.outputLabel.y = bound.adjustedY;
-      }
+      bound.outputLabel.y = bound.adjustedY;
     }
 
     return [...labels].sort((a, b) => a.y - b.y);
@@ -5407,17 +5403,16 @@ export class TealchartRenderer {
     const staticBounds = bounds.filter((b) => !b.floatingLabel);
 
     // Resolve collisions using cluster-based stacking (gap-free by construction)
-    resolveLabelCollisions(staticBounds);
+    resolveLabelCollisionsWithinBounds(staticBounds, pane.type === 'main' ? margins.top : pane.top, pane.bottom);
 
     // Sort by Y for rendering order
     staticBounds.sort((a, b) => a.adjustedY - b.adjustedY);
 
     const allBounds = [...staticBounds, ...floatingBounds];
 
-    // Clamp adjustedY to keep labels within visible bounds
-    // For main pane (top=0), labels should stay below the transparent top bar (margins.top)
+    // Floating labels bypass collision, so keep only those inside the visible bounds here.
     const visibleTop = pane.type === 'main' ? margins.top : pane.top;
-    for (const bound of allBounds) {
+    for (const bound of floatingBounds) {
       const labelTop = bound.adjustedY - bound.height / 2;
       const labelBottom = bound.adjustedY + bound.height / 2;
 

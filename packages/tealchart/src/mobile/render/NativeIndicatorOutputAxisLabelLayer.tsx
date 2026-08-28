@@ -22,6 +22,7 @@ import { createNativePriceAxisLane, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../u
 import {
   createNativePriceAxisTagTextLayout,
   getNativePriceAxisSingleLineTextBaselineOffset,
+  resolveNativePriceAxisTagStack,
 } from '../utils/priceAxisTagLayout';
 import { nativePaneValueToYWithRange, resolveNativePaneRange } from './nativePaneRangeOverride';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
@@ -323,26 +324,20 @@ function resolveNativeIndicatorOutputLabelCollisions(
     const firstPane = sorted[0]?.pane;
     if (!firstPane) continue;
 
-    const minCenterY = firstPane.top + NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;
-    const maxCenterY = firstPane.bottom - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2;
-    const minGap = NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT + NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP;
-
-    for (let index = 0; index < sorted.length; index += 1) {
-      const previous = sorted[index - 1];
-      const label = sorted[index]!;
-      const lowerBound = previous ? previous.y + minGap : minCenterY;
-      label.y = Math.max(lowerBound, Math.min(maxCenterY, label.y));
-    }
-
-    for (let index = sorted.length - 1; index >= 0; index -= 1) {
-      const next = sorted[index + 1];
-      const label = sorted[index]!;
-      const upperBound = next ? next.y - minGap : maxCenterY;
-      label.y = Math.min(upperBound, Math.max(minCenterY, label.y));
-    }
+    const stack = resolveNativePriceAxisTagStack(
+      sorted.map((label) => ({
+        id: label.id,
+        originalY: label.y,
+        height: NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
+      })),
+      firstPane.top,
+      firstPane.bottom,
+      NATIVE_INDICATOR_OUTPUT_AXIS_TAG_GAP,
+    );
+    const stackById = new Map(stack.map((label) => [label.id, label.centerY]));
 
     for (const label of sorted) {
-      label.y = Math.max(minCenterY, Math.min(maxCenterY, label.y));
+      label.y = stackById.get(label.id) ?? label.y;
     }
 
     resolved.push(...sorted);
