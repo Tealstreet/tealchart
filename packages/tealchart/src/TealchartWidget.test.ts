@@ -39,6 +39,7 @@ const setSymbolCalls: { symbol: string; exchangeName?: string }[] = [];
 const setBarsCalls: Bar[][] = [];
 const setPlotsCalls: PlotOutput[][] = [];
 const setDrawingsCalls: DrawingOutput[][] = [];
+const updateBarCalls: Array<{ bar: Bar; bars: Bar[] }> = [];
 const setUserDrawingStateCalls: UserDrawingState[] = [];
 const setRenderOptionsCalls: Array<unknown> = [];
 const setExecutionLinesCalls: Array<unknown> = [];
@@ -100,7 +101,9 @@ vi.mock('./ui/TealchartWidgetUI', () => ({
     setActiveIndicators() {}
     setViewport() {}
     setCanvasOpacity() {}
-    updateBar() {}
+    updateBar(bar: Bar, bars: Bar[]) {
+      updateBarCalls.push({ bar, bars: [...bars] });
+    }
     setRenderOptions(options: unknown) {
       setRenderOptionsCalls.push(options);
     }
@@ -366,6 +369,7 @@ describe('TealchartWidget', () => {
     setBarsCalls.length = 0;
     setPlotsCalls.length = 0;
     setDrawingsCalls.length = 0;
+    updateBarCalls.length = 0;
     setUserDrawingStateCalls.length = 0;
     setRenderOptionsCalls.length = 0;
     setExecutionLinesCalls.length = 0;
@@ -4097,6 +4101,32 @@ describe('TealchartWidget', () => {
   });
 
   describe('real-time updates', () => {
+    it('normalizes historical and realtime current bars to the same open time', () => {
+      const datafeed = createMockDatafeed();
+      createWidget(datafeed, { interval: '5' as ResolutionString });
+      const bucketOpen = 1_700_000_100_000;
+      const bars = makeBars(3, bucketOpen - 2 * 5 * 60_000, 5 * 60_000);
+      bars[bars.length - 1] = {
+        ...bars[bars.length - 1]!,
+        time: bucketOpen + 12_345,
+        close: 50_200,
+      };
+
+      completeInit(datafeed, bars);
+
+      expect(setBarsCalls.at(-1)?.at(-1)?.time).toBe(bucketOpen);
+
+      datafeed._subscribeCb?.({
+        ...bars[bars.length - 1]!,
+        time: bucketOpen,
+        close: 50_250,
+      });
+
+      expect(updateBarCalls.at(-1)?.bar.time).toBe(bucketOpen);
+      expect(updateBarCalls.at(-1)?.bars).toHaveLength(3);
+      expect(updateBarCalls.at(-1)?.bars.at(-1)).toMatchObject({ time: bucketOpen, close: 50_250 });
+    });
+
     it('does not reapply render options on last-bar ticks', () => {
       const datafeed = createMockDatafeed();
       createWidget(datafeed);

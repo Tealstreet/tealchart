@@ -132,7 +132,6 @@ import {
   ContextMenuCallback,
   ContextMenuRenderContext,
   ContextMenuItem,
-  DatafeedBar,
   DEFAULT_RENDER_OPTIONS,
   GapDetectionErrorState,
   GapDetectionEvent,
@@ -151,18 +150,12 @@ import { UserDrawingObjectTreePanel } from './ui/UserDrawingObjectTreePanel';
 import { UserDrawingPropertiesPanel } from './ui/UserDrawingPropertiesPanel';
 import { buildLastTradePriceLine } from './utils/buildLastTradePriceLine';
 import { barValuesEqual, dedupeBarsByTime } from './utils/dedupeBars';
+import { normalizeDatafeedBar, normalizeDatafeedBars } from './utils/normalizeDatafeedBars';
 import { normalizeResolution } from './utils/normalizeResolution';
 import { ViewportController } from './viewport/ViewportController';
 import { intervalToMs, VIEWPORT_ZOOM_IN_FACTOR, zoomViewportTimeRange } from './viewport/viewScale';
 
 type EventCallback = (...args: unknown[]) => void;
-
-const normalizeDatafeedBar = (bar: DatafeedBar): Bar => ({
-  ...bar,
-  volume: bar.volume ?? 0,
-});
-
-const normalizeDatafeedBars = (bars: DatafeedBar[]): Bar[] => bars.map(normalizeDatafeedBar);
 
 /** Auto-save debounce applied only when the default localStorage adapter is used. */
 const DEFAULT_AUTO_SAVE_DELAY_SECONDS = 1;
@@ -764,7 +757,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     );
     if (!cached?.length) return;
 
-    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached), 'cache load');
+    const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(cached, this._interval), 'cache load');
     if (!normalizedBars.length) return;
 
     this._bars = normalizedBars;
@@ -820,7 +813,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         // Normalize on ingest — drop duplicate/out-of-order timestamps so candles
         // don't render as overlapping bodies (feeds occasionally emit dupes).
-        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars), 'history load');
+        const normalizedBars = dedupeBarsByTime(normalizeDatafeedBars(bars, this._interval), 'history load');
 
         // Atomic data transition: set all state before markDirty so it renders in one frame
         this._bars = normalizedBars;
@@ -929,7 +922,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
           return;
         }
-        this._handleNewBar(normalizeDatafeedBar(bar));
+        this._handleNewBar(normalizeDatafeedBar(bar, this._interval));
       },
       this._barSubscriptionGuid,
       () => {
@@ -972,6 +965,10 @@ export class TealchartWidget implements ITealchartWebWidget {
       } else if (bar.time > lastBar.time) {
         // New bar
         this._bars.push(bar);
+      } else {
+        this._gapDetectionManager?.recordBar(lastBar.time);
+        this._gapDetectionManager?.resetRetryState();
+        return;
       }
     }
 
@@ -1067,7 +1064,7 @@ export class TealchartWidget implements ITealchartWebWidget {
 
         // Prepend new bars to existing bars (avoid duplicates)
         const existingTimes = new Set(this._bars.map((b) => b.time));
-        const newBars = normalizeDatafeedBars(bars).filter((b) => !existingTimes.has(b.time));
+        const newBars = normalizeDatafeedBars(bars, this._interval).filter((b) => !existingTimes.has(b.time));
 
         if (newBars.length > 0) {
           this._bars = dedupeBarsByTime([...newBars, ...this._bars], 'history prepend');
