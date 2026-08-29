@@ -1,7 +1,7 @@
 import type { SharedValue } from 'react-native-reanimated';
 import type { PriceLine } from '../../types';
 import type { NativeBracketDragSharedValues } from '../interaction/nativeOemsDragState';
-import type { NativeBracketPriceLineRef } from '../utils/nativeBracketPriceLines';
+import type { NativeRenderablePriceLine } from '../utils/nativeBracketPriceLines';
 import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeChartProjection } from './nativeProjection';
@@ -71,7 +71,7 @@ export function AnimatedPriceLine({
 }: {
   bracketDragState: NativeBracketDragSharedValues;
   frame: NativeChartFrame;
-  line: PriceLine & { nativeBracketRef?: NativeBracketPriceLineRef };
+  line: NativeRenderablePriceLine;
   nowMs: SharedValue<number>;
   pricePrecision: number;
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
@@ -92,7 +92,10 @@ export function AnimatedPriceLine({
   const measurementLabel = getNativePriceLineMeasurementText(label, secondaryLayoutLabel, (value) =>
     measureNativeSkiaTextWidth(axisFont, value),
   );
-  const axisTag = createNativeAxisTagLayout(frame, axisFont, measurementLabel);
+  const measuredAxisTag = createNativeAxisTagLayout(frame, axisFont, measurementLabel);
+  const axisTag = line.nativeAxisTagWidth
+    ? { ...measuredAxisTag, width: line.nativeAxisTagWidth }
+    : measuredAxisTag;
   const primaryText = createNativeAxisTagTextLayout(axisTag.x, axisTag.width, axisFont, label);
   const secondaryText = staticSecondaryLabel
     ? createNativeAxisTagTextLayout(axisTag.x, axisTag.width, axisFont, staticSecondaryLabel)

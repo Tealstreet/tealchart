@@ -333,7 +333,7 @@ describe('native trade and price line layers', () => {
   it('wires current-price axis tag primary and countdown text surfaces', () => {
     const axisFont = matchFont({ fontSize: 11 });
     const nowMs = shared(0);
-    const line: PriceLine = {
+    const line: PriceLine & { nativeAxisTagWidth: number } = {
       id: 'last-price',
       price: 63777,
       lineStyle: 'dotted',
@@ -383,6 +383,44 @@ describe('native trade and price line layers', () => {
 
     nowMs.value = 5_000;
     expect(sharedValueOf<string>(animatedTexts[0].props.text)).toBe('00:05');
+  });
+
+  it('renders native price-line tags with cached grow-only width', () => {
+    const axisFont = matchFont({ fontSize: 11 });
+    const line: PriceLine = {
+      id: 'last-price',
+      price: 63777,
+      lineStyle: 'dotted',
+      color: '#12c48b',
+      label: {
+        primaryText: '63,777.0',
+      },
+      nativeAxisTagWidth: 96,
+      renderLineOnCanvas: true,
+      showAxisTag: true,
+    };
+
+    const layer = AnimatedPriceLine({
+      axisFont,
+      bracketDragState: {
+        activeObjectId: shared(null),
+        activeObjectType: shared(null),
+        activeActionType: shared(null),
+        activePrice: shared(0),
+        startPrice: shared(0),
+        startY: shared(0),
+      },
+      frame,
+      line,
+      nowMs: shared(0),
+      pricePrecision: 0.1,
+      resolvedPriceAxisTags: shared([]),
+      sharedViewport,
+    });
+
+    const axisTag = collectElementsByType(layer, NativePriceAxisTagBox)[0];
+
+    expect(sharedValueOf<number>(axisTag.props.width)).toBe(96);
   });
 
   // `filled` is web's flag for a solid tag rather than an outline one. Native

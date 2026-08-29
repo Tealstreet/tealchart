@@ -4007,6 +4007,109 @@ describe('value axis label layout', () => {
     expect(outputBottom <= lastTradeTop || outputTop >= lastTradeBottom).toBe(true);
   });
 
+  it('keeps web price-line axis tag widths grow-only per line id', () => {
+    const renderer = new TealchartRenderer(createMockCtx(), { height: 400, width: 800 }, { bottom: 32, right: 76, top: 24 });
+    const layout: UnifiedPaneLayout = {
+      timeAxisHeight: TIME_AXIS_HEIGHT,
+      panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 78_000, yMax: 88_000, fixedRange: false }],
+    };
+    const viewport = { startTime: 0, endTime: 60_000, priceMin: 78_000, priceMax: 88_000 };
+    const wide = renderer.computePriceLineLabelBoundsWithLayout(
+      [
+        {
+          id: 'last-trade',
+          price: 79_500,
+          color: '#16a7dc',
+          label: { primaryText: '79,500.0000', secondaryText: '02:45' },
+          lineStyle: 'dotted',
+        },
+      ],
+      viewport,
+      layout,
+    )[0]!;
+    const narrow = renderer.computePriceLineLabelBoundsWithLayout(
+      [
+        {
+          id: 'last-trade',
+          price: 79_500,
+          color: '#16a7dc',
+          label: { primaryText: '79,500.0', secondaryText: '02:45' },
+          lineStyle: 'dotted',
+        },
+      ],
+      viewport,
+      layout,
+    )[0]!;
+
+    expect(narrow.width).toBe(wide.width);
+  });
+
+  it('keeps web indicator output axis tag widths grow-only per output id', () => {
+    const renderer = new TealchartRenderer(
+      createMockCtx(),
+      { backgroundColor: '#111418', height: 400, width: 800 },
+      { bottom: 32, right: 76, top: 24 },
+    );
+    const computedPanes = renderer.computePanesLayout(
+      {
+        timeAxisHeight: TIME_AXIS_HEIGHT,
+        panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 0, yMax: 10_000, fixedRange: false }],
+      },
+      400,
+    );
+    const bars = makeBars(1);
+    const baseFrame = {
+      bars,
+      computedPanes,
+      indicatorPaneInfo: { bb: { overlay: true } },
+      labelBoundsByPane: new Map<string, PriceLineLabelBounds[]>(),
+      viewport: { startTime: bars[0]!.time, endTime: bars[0]!.time + 60_000, priceMin: 0, priceMax: 10_000 },
+    } as any;
+    const wide = renderer
+      .computeYAxisLabelsForPreparedFrame(
+        {
+          ...baseFrame,
+          plots: [
+            {
+              id: 'bb-mid',
+              title: 'Basis',
+              type: 'plot',
+              scriptId: 'bb',
+              values: [8_888],
+              color: '#2196F3',
+              precision: 0,
+            },
+          ],
+        },
+        'main',
+      )
+      .find((label) => label.kind === 'indicator-output')!;
+    const narrow = renderer
+      .computeYAxisLabelsForPreparedFrame(
+        {
+          ...baseFrame,
+          plots: [
+            {
+              id: 'bb-mid',
+              title: 'Basis',
+              type: 'plot',
+              scriptId: 'bb',
+              values: [8],
+              color: '#2196F3',
+              precision: 0,
+            },
+          ],
+        },
+        'main',
+      )
+      .find((label) => label.kind === 'indicator-output')!;
+
+    expect(narrow.text).toBe('8');
+    expect((narrow as unknown as { textWidth: number }).textWidth).toBe(
+      (wide as unknown as { textWidth: number }).textWidth,
+    );
+  });
+
   it('de-overlaps overlay indicator output tags from precomputed order label bounds', () => {
     const renderer = new TealchartRenderer(
       createMockCtx(),

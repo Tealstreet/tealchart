@@ -20,19 +20,23 @@ import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { resolveChartChromeTheme } from '../../chromeTheme';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions } from '../../state/chartState';
 import { buildLastTradePriceLine } from '../../utils/buildLastTradePriceLine';
-import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
+import { NATIVE_PRICE_AXIS_TAG_SIZING, PriceAxisTagWidthCache } from '../../utils/priceAxisTagSizing';
 import { createNativeLeftToolRailLayout } from '../utils/leftToolRailLayout';
 import { createNativeBracketPriceLines } from '../utils/nativeBracketPriceLines';
-import { createNativePriceAxisLane, createNativePriceAxisLaneWidth } from '../utils/nativePriceAxisLane';
-import { createNativePriceAxisTagSources } from '../utils/priceAxisTagSources';
-import { getNativeCountdownLayoutText } from '../utils/priceAxisTagLayout';
+import {
+  createNativePriceAxisLane,
+  createNativePriceAxisLaneWidth,
+  measureNativePriceAxisTagWidth,
+} from '../utils/nativePriceAxisLane';
+import { createNativePriceAxisTagSources, getNativePriceLineTagId } from '../utils/priceAxisTagSources';
+import { getNativeCountdownLayoutText, getNativePriceLineMeasurementText } from '../utils/priceAxisTagLayout';
 import { createNativeTopBarLayout, createNativeTopBarTimeframes } from '../utils/topBarLayout';
 import {
   buildNativeTradeLineGeometries,
@@ -82,6 +86,19 @@ function collectNativePriceLineMeasurementTexts(priceLines: readonly NativeRende
         : line.label.secondaryText;
     return secondaryLabel ? [primaryLabel, secondaryLabel] : [primaryLabel];
   });
+}
+
+function measureNativePriceLineAxisTagWidth(
+  line: NativeRenderablePriceLine,
+  axisFont: ReturnType<typeof Skia.Font>,
+): number {
+  const secondaryLabel =
+    line.countdownToTime !== undefined
+      ? getNativeCountdownLayoutText(formatNativeCountdown(line.countdownToTime))
+      : line.label.secondaryText;
+  const textWidth = (text: string) => measureNativeSkiaTextWidth(axisFont, text);
+  const measurementText = getNativePriceLineMeasurementText(line.label.primaryText, secondaryLabel, textWidth);
+  return measureNativePriceAxisTagWidth(measurementText, textWidth);
 }
 
 export interface NativeSkiaRenderModelInput {
@@ -173,6 +190,8 @@ export function useNativeSkiaRenderModel({
   const titleFont = useMemo(() => createNativeSkiaFont(13), []);
   const axisFont = useMemo(() => createNativeSkiaAxisFont(NATIVE_PRICE_AXIS_TAG_SIZING.other.fontSize), []);
   const tradeAxisFont = useMemo(() => createNativeSkiaAxisFont(NATIVE_PRICE_AXIS_TAG_SIZING.trade.fontSize), []);
+  const priceLineAxisTagWidthCache = useRef(new PriceAxisTagWidthCache()).current;
+  const tradeLineAxisTagWidthCache = useRef(new PriceAxisTagWidthCache()).current;
   const priceTickSize = useMemo(() => normalizeNativePricePrecisionToTickSizeWorklet(pricePrecision), [pricePrecision]);
   const chromeTheme = useMemo(() => resolveChartChromeTheme(options), [options]);
   const nativeMutedTextColor = chromeTheme.mutedTextColor;
@@ -266,6 +285,7 @@ export function useNativeSkiaRenderModel({
             textWidth: (text) => measureNativeSkiaTextWidth(textFont, text),
             smallTextWidth: (text) => measureNativeSkiaTextWidth(smallFont, text),
             priceTextWidth: (text) => measureNativeSkiaTextWidth(tradeAxisFont, text),
+            priceAxisTagWidthCache: tradeLineAxisTagWidthCache,
             positiveColor: options.upColor,
             negativeColor: options.downColor,
           })
@@ -284,6 +304,7 @@ export function useNativeSkiaRenderModel({
       smallFont,
       textFont,
       tradeAxisFont,
+      tradeLineAxisTagWidthCache,
     ],
   );
   const visibleBars = useMemo(() => (projection ? getNativeVisibleBars(bars, projection) : []), [bars, projection]);
@@ -340,8 +361,15 @@ export function useNativeSkiaRenderModel({
     [lineSnapshot.orderLines, lineSnapshot.positionLines, options.upColor, pricePrecision, priceTickSize],
   );
   const nativePriceLines = useMemo(
-    () => [...extraPriceLines, ...bracketPriceLines, ...(lastTradeLine ? [lastTradeLine] : [])],
-    [bracketPriceLines, extraPriceLines, lastTradeLine],
+    () =>
+      [...extraPriceLines, ...bracketPriceLines, ...(lastTradeLine ? [lastTradeLine] : [])].map((line) => ({
+        ...line,
+        nativeAxisTagWidth: priceLineAxisTagWidthCache.resolve(
+          getNativePriceLineTagId(line.id),
+          measureNativePriceLineAxisTagWidth(line, axisFont),
+        ),
+      })),
+    [axisFont, bracketPriceLines, extraPriceLines, lastTradeLine, priceLineAxisTagWidthCache],
   );
   const priceAxisTagSources = useMemo<NativePriceAxisTagSource[]>(
     () =>

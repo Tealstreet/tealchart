@@ -2,7 +2,7 @@ import type { OrderLineRenderData, PositionLineRenderData } from '../../types';
 
 import { describe, expect, it } from 'vitest';
 
-import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
+import { NATIVE_PRICE_AXIS_TAG_SIZING, PriceAxisTagWidthCache } from '../../utils/priceAxisTagSizing';
 import { createNativePriceAxisLane } from './nativePriceAxisLane';
 import {
   buildNativeTradeLineGeometries,
@@ -331,6 +331,35 @@ describe('native trade line layout', () => {
     expect(geometry?.priceLabelWidth).toBe(measureNativeTradeLinePriceLabelWidth('63,777.0', measureText));
     expect((geometry?.priceLabelX ?? 0) + (geometry?.priceLabelWidth ?? 0)).toBe(priceLabelLane.right);
     expect(geometry?.rightLineEndX).toBeLessThanOrEqual((geometry?.priceLabelX ?? 0) - 2);
+  });
+
+  it('keeps native trade price-tag widths grow-only per object id', () => {
+    const priceAxisTagWidthCache = new PriceAxisTagWidthCache();
+    const wide = buildNativeTradeLineGeometries([createOrderLine({ price: 63777.1234 })], [], {
+      dimensions,
+      pricePrecision: 0.0001,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      priceTextWidth: measureText,
+      priceAxisTagWidthCache,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    })[0]!;
+    const narrow = buildNativeTradeLineGeometries([createOrderLine({ price: 63777 })], [], {
+      dimensions,
+      pricePrecision: 0.1,
+      textWidth: measureText,
+      smallTextWidth: measureText,
+      priceTextWidth: measureText,
+      priceAxisTagWidthCache,
+      positiveColor: '#12c48b',
+      negativeColor: '#ff4d67',
+    })[0]!;
+
+    expect(wide.priceLabelText).toBe('63,777.1234');
+    expect(narrow.priceLabelText).toBe('63,777.0');
+    expect(narrow.priceLabelWidth).toBe(wide.priceLabelWidth);
+    expect(narrow.priceLabelX + narrow.priceLabelWidth).toBe(wide.priceLabelX + wide.priceLabelWidth);
   });
 
   it('lets wide price tags grow left from the native price-axis lane', () => {

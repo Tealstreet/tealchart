@@ -3,7 +3,7 @@ import type { ChartDimensions } from './coordinates';
 
 import { getOemsOrderObjectId, getOemsPositionObjectId } from '../../interaction/oemsLineState';
 import { computeTradingLineLabelMinX, MOBILE_CHART_CHROME_METRICS } from '../../layout/chartGeometry';
-import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
+import { NATIVE_PRICE_AXIS_TAG_SIZING, PriceAxisTagWidthCache } from '../../utils/priceAxisTagSizing';
 import {
   orderTradeLineButtonsForDisplay,
   resolveOrderTradeLineLabel,
@@ -130,6 +130,7 @@ export interface NativeTradeLineGeometryInput {
   textWidth: (text: string) => number;
   smallTextWidth: (text: string) => number;
   priceTextWidth?: (text: string) => number;
+  priceAxisTagWidthCache?: PriceAxisTagWidthCache;
   positiveColor: string;
   negativeColor: string;
   chartLabelMinX?: number;
@@ -530,10 +531,13 @@ export function buildNativeTradeLineGeometry(input: NativeTradeLineGeometryInput
   const objectType = isOrderLineRenderData(line) ? 'order' : 'position';
   const objectId = isOrderLineRenderData(line) ? getNativeOrderObjectId(line) : getNativePositionObjectId(line);
   const priceLabelText = formatNativeTradeLinePrice(line.price, pricePrecision);
-  const priceLabelWidth = measureNativeTradeLinePriceLabelWidth(priceLabelText, priceTextWidth);
   const label = isOrderLineRenderData(line)
     ? resolveOrderTradeLineLabel(line, positiveColor)
     : resolvePositionTradeLineLabel(line, positiveColor, negativeColor);
+  const measuredPriceLabelWidth = measureNativeTradeLinePriceLabelWidth(priceLabelText, priceTextWidth);
+  const priceLabelWidth =
+    input.priceAxisTagWidthCache?.resolve(`${objectType}:${objectId}`, measuredPriceLabelWidth) ??
+    measuredPriceLabelWidth;
   const segments = label.segments;
   const buttons = orderTradeLineButtonsForDisplay(label.buttons ?? []);
   const layout = layoutNativeTradeLine({

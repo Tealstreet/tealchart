@@ -11,6 +11,31 @@ export interface PriceAxisTagDomainSizing {
   paddingX: number;
 }
 
+export class PriceAxisTagWidthCache {
+  private readonly widths = new Map<string, number>();
+
+  resolve(key: string, measuredWidth: number): number {
+    if (!Number.isFinite(measuredWidth) || measuredWidth <= 0) return measuredWidth;
+
+    const width = Math.ceil(measuredWidth);
+    const cachedWidth = this.widths.get(key);
+    if (cachedWidth === undefined || width > cachedWidth) {
+      this.widths.set(key, width);
+      return width;
+    }
+
+    return cachedWidth;
+  }
+
+  get(key: string): number | undefined {
+    return this.widths.get(key);
+  }
+
+  clear(): void {
+    this.widths.clear();
+  }
+}
+
 export const WEB_PRICE_AXIS_TAG_SIZING: Record<PriceAxisTagDomain, PriceAxisTagDomainSizing> = {
   lastTrade: { fontSize: 11, height: 20, paddingX: 4 },
   trade: { fontSize: 11, height: 17, paddingX: 4 },

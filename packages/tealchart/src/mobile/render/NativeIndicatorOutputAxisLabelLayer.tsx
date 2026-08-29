@@ -6,7 +6,7 @@ import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef } from 'react';
 
 import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
@@ -16,7 +16,7 @@ import {
   getIndicatorOutputAxisLabelSources,
   resolveIndicatorOutputSourceTime,
 } from '../../rendering/indicatorOutputAxisLabels';
-import { NATIVE_PRICE_AXIS_TAG_SIZING } from '../../utils/priceAxisTagSizing';
+import { NATIVE_PRICE_AXIS_TAG_SIZING, PriceAxisTagWidthCache } from '../../utils/priceAxisTagSizing';
 import { withPriceAxisTagBackgroundAlpha } from '../../utils/priceAxisTagStyle';
 import { createNativePriceAxisLane, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
@@ -76,6 +76,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   totalBarCount: number;
 }) {
   const tagBackgroundColor = withPriceAxisTagBackgroundAlpha(backgroundColor);
+  const axisTagWidthCache = useRef(new PriceAxisTagWidthCache()).current;
   const labels = useMemo(
     () =>
       resolveNativeIndicatorOutputAxisLabels({
@@ -90,7 +91,12 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   );
   if (labels.length === 0) return null;
 
-  const labelGroups = resolveNativeIndicatorOutputAxisLabelGroups({ axisFont: smallFont, frame, labels });
+  const labelGroups = resolveNativeIndicatorOutputAxisLabelGroups({
+    axisFont: smallFont,
+    frame,
+    labels,
+    widthCache: axisTagWidthCache,
+  });
   const baselineOffset = getNativePriceAxisSingleLineTextBaselineOffset(NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT);
 
   return (
@@ -196,10 +202,12 @@ export function resolveNativeIndicatorOutputAxisLabelGroups({
   axisFont,
   frame,
   labels,
+  widthCache,
 }: {
   axisFont: ReturnType<typeof Skia.Font>;
   frame: NativeChartFrame;
   labels: readonly NativeIndicatorOutputAxisLabel[];
+  widthCache?: PriceAxisTagWidthCache;
 }): NativeIndicatorOutputAxisLabelGroup[] {
   const lane = createNativePriceAxisLane(frame);
   const labelsByPane = new Map<string, NativeIndicatorOutputAxisLabel[]>();
@@ -214,13 +222,14 @@ export function resolveNativeIndicatorOutputAxisLabelGroups({
       (maxWidth, label) => Math.max(maxWidth, measureNativeSkiaTextWidth(axisFont, label.text)),
       0,
     );
-    const width = Math.min(
+    const measuredWidth = Math.min(
       lane.width,
       Math.max(
         NATIVE_INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
         Math.ceil(textWidth + NATIVE_INDICATOR_OUTPUT_AXIS_TAG_PADDING_X * 2),
       ),
     );
+    const width = widthCache?.resolve(`${paneId}:indicator-output`, measuredWidth) ?? measuredWidth;
 
     return {
       paneId,
