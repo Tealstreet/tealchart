@@ -56,6 +56,7 @@ import {
 import { resolveLabelCollisionsWithinBounds } from './utils/labelCollision';
 import {
   PriceAxisTagDomain,
+  PriceAxisTagWidthCache,
   resolvePriceLineAxisTagDomain,
   WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING,
   WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT,
@@ -306,6 +307,8 @@ export class TealchartRenderer {
   private options: RenderOptions;
   private margins: ChartMargins;
   private jailbreakManager: JailbreakIndicatorManager | null = null;
+  private readonly priceLineAxisTagWidthCache = new PriceAxisTagWidthCache();
+  private readonly indicatorOutputAxisTagWidthCache = new PriceAxisTagWidthCache();
   private valueAxisCommonLabelWidth = 0;
   private valueAxisPaneLabelWidths = new Map<string, number>();
 
@@ -365,6 +368,11 @@ export class TealchartRenderer {
       timeToX: (time, viewport, chartWidth) => this.timeToX(time, viewport, chartWidth),
       valueToY: (value, pane) => this.valueToY(value, pane),
     };
+  }
+
+  private measureGrowOnlyPriceLineAxisLabelWidth(line: PriceLine, font: string): number {
+    const cacheKey = `${line.targetPaneId ?? 'main'}:${resolvePriceLineAxisTagDomain(line)}:${line.id}`;
+    return this.priceLineAxisTagWidthCache.resolve(cacheKey, measurePriceLineAxisLabelWidth(this.ctx, line, font));
   }
 
   /**
@@ -833,7 +841,7 @@ export class TealchartRenderer {
    * Returns labels with adjusted Y positions to prevent overlap
    */
   private calculatePriceLineLabelBounds(priceLines: PriceLine[], viewport: Viewport): PriceLineLabelBounds[] {
-    const { ctx, options, margins } = this;
+    const { options, margins } = this;
     const chartHeight = options.height - margins.top - margins.bottom;
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
@@ -844,7 +852,7 @@ export class TealchartRenderer {
       const originalY = this.priceToY(line.price, viewport, priceHeight);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
+      const width = this.measureGrowOnlyPriceLineAxisLabelWidth(line, labelFont);
       const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
 
       return {
@@ -3487,7 +3495,7 @@ export class TealchartRenderer {
     _plots?: PlotOutput[],
     _crosshair?: { y: number; visible: boolean; color: string },
   ): PriceLineLabelBounds[] {
-    const { ctx, options } = this;
+    const { options } = this;
 
     // Compute pane positions (same as canvas rendering)
     const computedPanes = this.computePanesLayout(layout, options.height);
@@ -3517,7 +3525,7 @@ export class TealchartRenderer {
       const originalY = this.valueToY(line.price, targetPane);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
+      const width = this.measureGrowOnlyPriceLineAxisLabelWidth(line, labelFont);
       const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
 
       return {
@@ -4765,12 +4773,13 @@ export class TealchartRenderer {
         INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
         getCachedTextWidth(this.ctx, text, textFont) + WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.paddingX * 2,
       );
+      const tagWidth = this.indicatorOutputAxisTagWidthCache.resolve(output.id, measuredTagWidth);
       measured.push({
         id: output.id,
         paneId: pane.id,
         value: output.value,
         text,
-        textWidth: measuredTagWidth,
+        textWidth: tagWidth,
         kind: 'indicator-output',
         backgroundColor: withPriceAxisTagBackgroundAlpha(this.options.backgroundColor),
         borderColor: output.color,
@@ -5357,7 +5366,7 @@ export class TealchartRenderer {
     viewport: Viewport,
     pane: ComputedPane,
   ): PriceLineLabelBounds[] {
-    const { ctx, margins } = this;
+    const { margins } = this;
 
     // Calculate initial bounds for each label
     const bounds: PriceLineLabelBounds[] = priceLines.map((line) => {
@@ -5365,7 +5374,7 @@ export class TealchartRenderer {
       const originalY = this.valueToY(line.price, pane);
       // Check for secondary text or countdown (countdown renders as secondary text)
       const hasSecondaryText = line.label.secondaryText || line.countdownToTime;
-      const width = measurePriceLineAxisLabelWidth(ctx, line, labelFont);
+      const width = this.measureGrowOnlyPriceLineAxisLabelWidth(line, labelFont);
       const height = getWebPriceLineAxisTagHeight(line, hasSecondaryText);
 
       return {

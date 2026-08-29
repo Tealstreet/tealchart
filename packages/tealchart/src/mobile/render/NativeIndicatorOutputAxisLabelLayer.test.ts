@@ -2,6 +2,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { PriceAxisTagWidthCache } from '../../utils/priceAxisTagSizing';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
 import {
   NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
@@ -177,6 +178,52 @@ describe('native indicator output axis labels', () => {
     expect(resolveNativeIndicatorOutputGuideStartX(40, frame, 300)).toBe(frame.contentLeft);
     expect(resolveNativeIndicatorOutputGuideStartX(340, frame, 300)).toBe(300);
     expect(resolveNativeIndicatorOutputGuideStartX(Number.NaN, frame, 300)).toBe(300);
+  });
+
+  it('keeps native indicator output tag widths grow-only per pane', () => {
+    const frame = createNativeChartFrameFromPanes({
+      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      panes: [
+        { id: 'main', type: 'main', top: 24, height: 200, yMin: 63_000, yMax: 64_000 },
+        { id: 'pane_1', type: 'indicator', top: 224, height: 104, yMin: -100, yMax: 100 },
+      ],
+    });
+    const pane = frame.panes.find((candidate) => candidate.id === 'pane_1')!;
+    const widthCache = new PriceAxisTagWidthCache();
+    const wide = resolveNativeIndicatorOutputAxisLabelGroups({
+      axisFont,
+      frame,
+      labels: [
+        {
+          id: 'pane_1:indicator-output:macd:signal',
+          pane,
+          value: 88.8,
+          text: '88.8',
+          color: '#ff9900',
+          valueY: 250,
+          y: 250,
+        },
+      ],
+      widthCache,
+    })[0]!;
+    const narrow = resolveNativeIndicatorOutputAxisLabelGroups({
+      axisFont,
+      frame,
+      labels: [
+        {
+          id: 'pane_1:indicator-output:macd:signal',
+          pane,
+          value: 8,
+          text: '8',
+          color: '#ff9900',
+          valueY: 250,
+          y: 250,
+        },
+      ],
+      widthCache,
+    })[0]!;
+
+    expect(narrow.width).toBe(wide.width);
   });
 
   it('uses live indicator pane range overrides for label placement', () => {

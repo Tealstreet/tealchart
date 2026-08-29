@@ -13,6 +13,7 @@ export interface NativeBracketPriceLineRef {
 
 export type NativeRenderablePriceLine = PriceLine & {
   nativeBracketRef?: NativeBracketPriceLineRef;
+  nativeAxisTagWidth?: number;
 };
 
 export function isNativeBracketPriceLineRefActive(
