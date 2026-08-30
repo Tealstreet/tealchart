@@ -165,7 +165,9 @@ const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
-const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
+// Intentionally off by default. Flip locally when an Android OTA needs the
+// gesture trace overlay, but never ship it enabled for all Android users.
+const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = false;
 const NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT = 9;
 
 interface NativeGestureDebugEntry {
