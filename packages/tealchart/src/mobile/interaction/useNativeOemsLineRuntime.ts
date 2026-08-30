@@ -247,8 +247,8 @@ export function useNativeOemsLineRuntime({
    * Reanimated's next propagation - so the line drew one frame at its ORIGINAL
    * price before the new one landed. That is the flap on release.
    *
-   * Waiting a frame lets the closure catch up first, so the drag lets go of a
-   * line that is already drawn where the user dropped it.
+   * The release-hold controller owns that extra propagation wait, so this path
+   * never schedules its own frame gate.
    */
   const releaseNativeOrderDragAfterCommit = useCallback(
     (handoff: NativeOemsDragHandoff | null) => {
@@ -279,7 +279,7 @@ export function useNativeOemsLineRuntime({
 
   /** The bracket preview's version of the same hand-off, for the same reason:
    *  the line's optimistic bracket arrives by closure, the preview goes away by
-   *  shared value. */
+   *  shared value, and the release-hold controller owns the timing seam. */
   const releaseNativeBracketDragAfterCommit = useCallback(
     (handoff: NativeOemsBracketDragHandoff | null) => {
       if (!handoff) {
