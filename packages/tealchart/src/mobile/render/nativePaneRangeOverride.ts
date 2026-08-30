@@ -5,18 +5,6 @@ export interface NativePaneRange {
   yMax: number;
 }
 
-export interface NativePaneRangeOverride extends NativePaneRange {
-  /**
-   * False while the gesture is live, true after the final range was handed to
-   * the pane manager. A committed override is only a handoff bridge: it should
-   * cover the frames where React still renders the drag-start pane range, then
-   * become inert once the frame has moved on.
-   */
-  committed?: boolean;
-  startYMin?: number;
-  startYMax?: number;
-}
-
 /**
  * Live value ranges for indicator panes, keyed by pane id.
  *
@@ -25,51 +13,7 @@ export interface NativePaneRangeOverride extends NativePaneRange {
  * every frame of the gesture rebuilds the chart — so gestures write here, the
  * render layers prefer it, and the value is committed to the pane on release.
  */
-export type NativePaneRangeOverrides = Record<string, NativePaneRangeOverride>;
-
-export function createNativePaneRangeOverride({
-  committed,
-  range,
-  startYMax,
-  startYMin,
-}: {
-  committed: boolean;
-  range: NativePaneRange;
-  startYMax: number;
-  startYMin: number;
-}): NativePaneRangeOverride {
-  'worklet';
-  return {
-    yMin: range.yMin,
-    yMax: range.yMax,
-    committed,
-    startYMin,
-    startYMax,
-  };
-}
-
-export function nativePaneRangesEqual(left: NativePaneRange, right: NativePaneRange): boolean {
-  'worklet';
-  return left.yMin === right.yMin && left.yMax === right.yMax;
-}
-
-export function shouldApplyNativePaneRangeOverride(
-  pane: NativePaneFrame,
-  override: NativePaneRangeOverride | undefined,
-): boolean {
-  'worklet';
-  if (!override) return false;
-  if (!override.committed) return true;
-  if (nativePaneRangesEqual({ yMin: pane.yMin, yMax: pane.yMax }, override)) return false;
-  if (
-    override.startYMin !== undefined &&
-    override.startYMax !== undefined &&
-    !nativePaneRangesEqual({ yMin: pane.yMin, yMax: pane.yMax }, { yMin: override.startYMin, yMax: override.startYMax })
-  ) {
-    return false;
-  }
-  return true;
-}
+export type NativePaneRangeOverrides = Record<string, NativePaneRange>;
 
 export function resolveNativePaneRange(
   pane: NativePaneFrame,
@@ -77,7 +21,7 @@ export function resolveNativePaneRange(
 ): NativePaneRange {
   'worklet';
   const override = overrides ? overrides[pane.id] : undefined;
-  if (shouldApplyNativePaneRangeOverride(pane, override)) return override!;
+  if (override) return override;
   return { yMin: pane.yMin, yMax: pane.yMax };
 }
 
@@ -113,7 +57,7 @@ export function resolveSettledNativePaneRangeOverrides({
       settled = true;
       continue;
     }
-    if (!shouldApplyNativePaneRangeOverride(pane, override)) {
+    if (pane.yMin === override.yMin && pane.yMax === override.yMax) {
       settled = true;
       continue;
     }
