@@ -7,7 +7,11 @@ import type {
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
-import type { NativePriceAutoScaleSharedValues, NativeViewportGestureMetrics } from './nativeViewportGestureState';
+import type {
+  NativePriceAutoScaleSharedValues,
+  NativeViewportGestureMetrics,
+  NativeViewportGestureTransactionState,
+} from './nativeViewportGestureState';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -18,13 +22,10 @@ import {
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
 } from './nativeCrosshairContextMenu';
-import {
-  createNativeCrosshairLongPressGesture,
-  createNativeCrosshairPanGesture,
-} from './nativeCrosshairGestures';
+import { createNativeCrosshairLongPressGesture, createNativeCrosshairPanGesture } from './nativeCrosshairGestures';
+import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import { createNativeBracketDragGesture, createNativeOrderDragGesture } from './nativeOemsDragGestures';
 import { createNativeOverlayActionTapGesture } from './nativeOverlayActionGestures';
-import { NATIVE_TAP_MAX_DISTANCE } from './nativeGestureThresholds';
 import {
   NATIVE_RESET_VIEW_HIT_SIZE,
   resolveNativeResetViewButtonLayout,
@@ -85,6 +86,13 @@ function gestureMetrics(): NativeViewportGestureMetrics {
     contentWidth: shared(10_000),
     timePerPixel: shared(999),
     pricePerPixel: shared(999),
+  };
+}
+
+function gestureTransaction(): NativeViewportGestureTransactionState {
+  return {
+    accepted: shared(false),
+    committed: shared(false),
   };
 }
 
@@ -662,7 +670,10 @@ describe('native gesture activation', () => {
 
     const manager = mockStateManager();
     gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }], allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }] },
+      {
+        changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }],
+        allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 60 }],
+      },
       manager,
     );
     expect(manager.failed).toBe(false);
@@ -674,7 +685,10 @@ describe('native gesture activation', () => {
     gesture.handlers.onFinalize({}, true);
     crosshair.visible.value = false;
     gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }], allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }] },
+      {
+        changedTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }],
+        allTouches: [{ x: multiPaneFrame.contentLeft + 10, y: 150 }],
+      },
       mockStateManager(),
     );
     gesture.handlers.onEnd({ x: multiPaneFrame.contentLeft + 10, y: 150 }, true);
@@ -1234,6 +1248,167 @@ describe('native gesture activation', () => {
     );
   });
 
+  it('does not roll back an axis pinch that Android finalizes as failed after commit', () => {
+    const panActive = shared(false);
+    const pinchActive = shared(false);
+    const priceScaleActive = shared(false);
+    const timeScaleActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const transaction = gestureTransaction();
+    const commitPanViewport = vi.fn();
+    const cancelNativeViewportInteraction = vi.fn();
+    const gesture = createNativeChartAxisPinchGesture({
+      beginNativeViewportInteraction: () => {},
+      bracketDragActive: shared(false),
+      bracketDragInteractionState: createBracketDragState(),
+      cancelNativeViewportInteraction,
+      chartAxisPinchGestureState: {
+        active: pinchActive,
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+        activeAnchorPrice: shared(0),
+        activeStartSpanX: shared(0),
+        activeStartSpanY: shared(0),
+        transaction,
+      },
+      commitPanViewport,
+      frame,
+      orderDragState: createOrderDragState(),
+      orderDragZones: shared([]),
+      panActive,
+      pinchActive,
+      priceScaleActive,
+      sharedViewport: viewport,
+      timeScaleActive,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+    }) as any;
+
+    const manager = mockStateManager();
+    gesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 120, y: 100 }],
+        allTouches: [
+          { x: 60, y: 60 },
+          { x: 120, y: 100 },
+        ],
+      },
+      manager,
+    );
+    gesture.handlers.onTouchesMove({
+      changedTouches: [{ x: 150, y: 90 }],
+      allTouches: [
+        { x: 30, y: 70 },
+        { x: 150, y: 90 },
+      ],
+    });
+    const committedPreview = readViewport(viewport);
+    gesture.handlers.onTouchesUp(
+      {
+        numberOfTouches: 1,
+        changedTouches: [{ x: 150, y: 90 }],
+        allTouches: [{ x: 30, y: 70 }],
+      },
+      manager,
+    );
+    gesture.handlers.onFinalize({}, false);
+
+    expect(commitPanViewport).toHaveBeenCalledTimes(1);
+    expect(cancelNativeViewportInteraction).not.toHaveBeenCalled();
+    expect(readViewport(viewport)).toEqual(committedPreview);
+    expect(transaction.committed.value).toBe(true);
+  });
+
+  it('does not mutate a failed time-scale touch sequence when Android later sends begin and update', () => {
+    const timeScaleActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const transaction = gestureTransaction();
+    const beginNativeViewportInteraction = vi.fn();
+    const gesture = createNativeTimeScaleGesture({
+      beginNativeViewportInteraction,
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      frame,
+      sharedViewport: viewport,
+      timeScaleActive,
+      timeScaleGestureState: {
+        active: timeScaleActive,
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+        transaction,
+      },
+    }) as any;
+
+    const manager = mockStateManager();
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 80, y: 60 }], allTouches: [{ x: 80, y: 60 }] }, manager);
+    expect(manager.failed).toBe(true);
+
+    gesture.handlers.onBegin();
+    gesture.handlers.onUpdate({ translationX: 40 });
+    gesture.handlers.onEnd();
+
+    expect(beginNativeViewportInteraction).not.toHaveBeenCalled();
+    expect(readViewport(viewport)).toEqual(viewportValue);
+    expect(transaction.accepted.value).toBe(false);
+  });
+
+  it('keeps a committed indicator pane range override through failed Android finalize', () => {
+    const panActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const paneRangeOverrides = shared({});
+    const transaction = gestureTransaction();
+    const commitPanViewport = vi.fn();
+    const onIndicatorPaneScale = vi.fn();
+    const gesture = createNativeChartPanGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      chartPanGestureState: {
+        active: panActive,
+        indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
+        sharedViewport: viewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeTimePerPixel: shared(0),
+        activePricePerPixel: shared(0),
+        transaction,
+      },
+      commitPanViewport,
+      frame: multiPaneFrame,
+      onIndicatorPaneScale,
+      orderDragZones: shared([]),
+      paneRangeOverrides,
+      panActive,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+    }) as any;
+
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: 150 }], allTouches: [{ x: 80, y: 150 }] },
+      mockStateManager(),
+    );
+    gesture.handlers.onBegin({ x: 80, y: 150 });
+    gesture.handlers.onUpdate({ translationX: 0, translationY: 10 });
+    gesture.handlers.onEnd({ translationX: 0, translationY: 10 });
+    gesture.handlers.onFinalize({}, false);
+
+    expect(onIndicatorPaneScale).toHaveBeenCalledWith('pane_1', expect.any(Number), expect.any(Number));
+    expect(commitPanViewport).toHaveBeenCalledTimes(1);
+    expect(paneRangeOverrides.value.pane_1?.committed).toBe(true);
+    expect(paneRangeOverrides.value.pane_1?.startYMin).toBe(0);
+    expect(paneRangeOverrides.value.pane_1?.startYMax).toBe(100);
+  });
+
   it('leaves overlay control zones to overlay gesture owners instead of axis pinch touch starts', () => {
     const panActive = shared(false);
     const pinchActive = shared(false);
@@ -1656,19 +1831,13 @@ describe('canvas tap vs pane maximize double tap', () => {
     // On a cancel button: double-tap maximize must stand down so chrome keeps
     // the tap sequence.
     const onButton = mockStateManager();
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 95, y: 78 }], allTouches: [{ x: 95, y: 78 }] },
-      onButton,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 95, y: 78 }], allTouches: [{ x: 95, y: 78 }] }, onButton);
     expect(onButton.failed).toBe(true);
 
     // On open plot, where the single tap would only toggle the crosshair, the
     // double tap stays armed.
     const onPlot = mockStateManager();
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
-      onPlot,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] }, onPlot);
     expect(onPlot.failed).toBe(false);
   });
 
@@ -1680,10 +1849,7 @@ describe('canvas tap vs pane maximize double tap', () => {
     const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ drawingTapEnabled: true })) as any;
     const manager = mockStateManager();
 
-    gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] },
-      manager,
-    );
+    gesture.handlers.onTouchesDown({ changedTouches: [{ x: 150, y: 100 }], allTouches: [{ x: 150, y: 100 }] }, manager);
 
     expect(manager.failed).toBe(false);
   });
@@ -1707,14 +1873,15 @@ describe('canvas tap vs pane maximize double tap', () => {
   it('stands down on the crosshair context-menu button', () => {
     const crosshair = createCrosshair(true);
     crosshair.y.value = 78;
-    const gesture = createNativePaneMaximizeTapGesture(
-      paneMaximizeInput({ crosshair, hasContextMenu: true }),
-    ) as any;
+    const gesture = createNativePaneMaximizeTapGesture(paneMaximizeInput({ crosshair, hasContextMenu: true })) as any;
     const button = resolveNativeCrosshairContextMenuButtonLayout(multiPaneFrame, crosshair.y.value, 2);
     const manager = mockStateManager();
 
     gesture.handlers.onTouchesDown(
-      { changedTouches: [{ x: button.centerX, y: button.centerY }], allTouches: [{ x: button.centerX, y: button.centerY }] },
+      {
+        changedTouches: [{ x: button.centerX, y: button.centerY }],
+        allTouches: [{ x: button.centerX, y: button.centerY }],
+      },
       manager,
     );
 
