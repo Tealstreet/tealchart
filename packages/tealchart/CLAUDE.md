@@ -432,11 +432,13 @@ shared value to hand back over:
 | `paneRangeOverrides[paneId]` | `pane.yMin` / `pane.yMax` |
 | `bracketDragState.activeObjectId` | the line's optimistic `brackets` |
 
-Every one of them retires on a `requestAnimationFrame`, never inline. Indicator
+Every one of them retires through `mobile/interaction/nativeReleaseHold.ts`,
+never inline and never through a private `requestAnimationFrame` gate. Indicator
 pane range is the one that is easy to miss, because the hold-until-the-frame-
 agrees logic looks like it already solves this — it makes the override survive
-the *commit*, but the release itself was still a frame early, so dragging or
-scaling a MACD pane snapped back to its pre-drag scale for one frame.
+the *commit*, but the release itself can still be a frame early if it is not
+routed through the shared hold controller. That is what makes dragging or
+scaling a MACD pane snap back to its pre-drag scale for one frame.
 
 ## Worklets do not hoist
 
