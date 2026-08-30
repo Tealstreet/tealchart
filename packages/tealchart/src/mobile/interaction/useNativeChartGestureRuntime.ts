@@ -84,7 +84,8 @@ export interface NativeChartGestureRuntimeInput {
   orderDragZones: SharedValue<NativeOrderDragZone[]>;
   onDrawingTap: (x: number, y: number) => void;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
-  onPaneDividerResizeEnd?: () => void;
+  onIndicatorPaneScaleStart?: (paneId: string) => void;
+  onPaneDividerResizeEnd?: (success: boolean) => void;
   onPaneDividerResizeStart?: () => void;
   onPaneHeightsChange?: (heights: NativePaneHeight[]) => void;
   paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
@@ -178,6 +179,7 @@ export function useNativeChartGestureRuntime({
   orderDragZones,
   onDrawingTap,
   onIndicatorPaneScale,
+  onIndicatorPaneScaleStart,
   onPaneDividerResizeEnd,
   onPaneDividerResizeStart,
   onPaneHeightsChange,
@@ -226,6 +228,7 @@ export function useNativeChartGestureRuntime({
   const stableOnDrawingTap = useLatestNativeCallback(onDrawingTap);
   const stableOnDebugGestureEvent = useLatestNativeCallback(onDebugGestureEvent ?? (() => undefined));
   const stableOnIndicatorPaneScale = useLatestNativeCallback(onIndicatorPaneScale ?? noopNativeIndicatorPaneScale);
+  const stableOnIndicatorPaneScaleStart = useLatestNativeCallback(onIndicatorPaneScaleStart ?? (() => undefined));
   const stableOnPaneHeightsChange = useLatestNativeCallback(onPaneHeightsChange ?? noopNativePaneHeightsChange);
   const stableOnPaneDividerResizeStart = useLatestNativeCallback(onPaneDividerResizeStart ?? noopNativePaneDividerResize);
   const stableOnPaneDividerResizeEnd = useLatestNativeCallback(onPaneDividerResizeEnd ?? noopNativePaneDividerResize);
@@ -281,6 +284,7 @@ export function useNativeChartGestureRuntime({
       cancelNativeViewportInteraction: stableCancelNativeViewportInteraction,
       chartPanGestureState,
       onIndicatorPaneScale: stableOnIndicatorPaneScale,
+      onIndicatorPaneScaleStart: stableOnIndicatorPaneScaleStart,
       onPaneHeightsChange: stableOnPaneHeightsChange,
       onPaneDividerResizeStart: stableOnPaneDividerResizeStart,
       onPaneDividerResizeEnd: stableOnPaneDividerResizeEnd,
@@ -307,6 +311,7 @@ export function useNativeChartGestureRuntime({
     sharedViewport,
     stableBeginNativeViewportInteraction,
     stableCancelNativeViewportInteraction,
+    stableOnIndicatorPaneScaleStart,
     stableOnPaneHeightsChange,
     stableOnPaneDividerResizeStart,
     stableOnPaneDividerResizeEnd,
@@ -679,6 +684,7 @@ export function useNativeChartGestureRuntime({
       frame: chartInteractionFrame,
       onDebugGestureEvent: stableOnDebugGestureEvent,
       onIndicatorPaneScale: stableOnIndicatorPaneScale,
+      onIndicatorPaneScaleStart: stableOnIndicatorPaneScaleStart,
       paneRangeOverrides,
       priceScaleActive,
       priceScaleGestureState,
@@ -697,6 +703,7 @@ export function useNativeChartGestureRuntime({
     stableCommitPanViewport,
     stableOnDebugGestureEvent,
     stableOnIndicatorPaneScale,
+    stableOnIndicatorPaneScaleStart,
   ]);
 
   const timeScaleGesture = useMemo<GestureType>(() => {

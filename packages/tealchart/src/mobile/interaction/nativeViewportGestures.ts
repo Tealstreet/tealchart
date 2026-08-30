@@ -166,7 +166,8 @@ export interface NativeChartPanGestureInput {
   frame: NativeChartFrame | null;
   onDebugGestureEvent?: NativeGestureDebugEventHandler;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
-  onPaneDividerResizeEnd?: () => void;
+  onIndicatorPaneScaleStart?: (paneId: string) => void;
+  onPaneDividerResizeEnd?: (success: boolean) => void;
   onPaneDividerResizeStart?: () => void;
   onPaneHeightsChange?: (heights: NativePaneHeight[]) => void;
   paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
@@ -190,6 +191,7 @@ export function createNativeChartPanGesture({
   frame,
   onDebugGestureEvent,
   onIndicatorPaneScale,
+  onIndicatorPaneScaleStart,
   onPaneDividerResizeEnd,
   onPaneDividerResizeStart,
   onPaneHeightsChange,
@@ -267,6 +269,9 @@ export function createNativeChartPanGesture({
         pane && pane.type === 'indicator' && pane.yMax > pane.yMin
           ? { id: pane.id, height: pane.height, startYMin: pane.yMin, startYMax: pane.yMax, yMin: pane.yMin, yMax: pane.yMax }
           : null;
+      if (chartPanGestureState.indicatorPaneTarget.value && onIndicatorPaneScaleStart) {
+        runOnJS(onIndicatorPaneScaleStart)(chartPanGestureState.indicatorPaneTarget.value.id);
+      }
     })
     .onBegin(() => {
       // A divider drag resizes panes; it is not a viewport gesture. Starting one
@@ -345,7 +350,7 @@ export function createNativeChartPanGesture({
       emitNativeGestureDebug(onDebugGestureEvent, `pan finalize success=${success ? 'yes' : 'no'}`);
       if (chartPanGestureState.paneDividerTarget.value) {
         chartPanGestureState.paneDividerTarget.value = null;
-        if (onPaneDividerResizeEnd) runOnJS(onPaneDividerResizeEnd)();
+        if (onPaneDividerResizeEnd) runOnJS(onPaneDividerResizeEnd)(success);
       }
       if (
         finalizeNativeViewportGestureState({
@@ -519,6 +524,7 @@ export interface NativePriceScaleGestureInput {
   frame: NativeChartFrame | null;
   onDebugGestureEvent?: NativeGestureDebugEventHandler;
   onIndicatorPaneScale?: (paneId: string, yMin: number, yMax: number) => void;
+  onIndicatorPaneScaleStart?: (paneId: string) => void;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   priceScaleActive: SharedValue<boolean>;
   priceScaleGestureState: NativePriceScaleGestureState;
@@ -534,6 +540,7 @@ export function createNativePriceScaleGesture({
   frame,
   onDebugGestureEvent,
   onIndicatorPaneScale,
+  onIndicatorPaneScaleStart,
   paneRangeOverrides,
   priceScaleActive,
   priceScaleGestureState,
@@ -580,6 +587,7 @@ export function createNativePriceScaleGesture({
         return;
       }
       emitNativeGestureDebug(onDebugGestureEvent, `priceScale target pane=${pane.id}`);
+      if (onIndicatorPaneScaleStart) runOnJS(onIndicatorPaneScaleStart)(pane.id);
       indicatorPane.value = {
         id: pane.id,
         height: pane.height,

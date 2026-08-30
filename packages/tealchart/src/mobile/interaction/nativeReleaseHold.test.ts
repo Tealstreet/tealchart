@@ -7,6 +7,7 @@ import {
   createNativeReleaseHold,
   nativePaneRangeOverridesCaughtUp,
   nativePaneRatiosCaughtUp,
+  omitReleasedNativePaneRangeOverrides,
   resolveNativeReleaseHold,
 } from './nativeReleaseHold';
 
@@ -67,5 +68,20 @@ describe('native release-hold caught-up predicates', () => {
 
     expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 70), pane('macd', 30)], ratios: target })).toBe(false);
     expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 75), pane('macd', 25)], ratios: target })).toBe(true);
+  });
+
+  it('only removes released pane-range overrides that still match the hold target', () => {
+    expect(
+      omitReleasedNativePaneRangeOverrides({
+        current: {
+          macd: { yMin: -5, yMax: 5 },
+          rsi: { yMin: 20, yMax: 80 },
+        },
+        released: {
+          macd: { yMin: -5, yMax: 5 },
+          rsi: { yMin: 10, yMax: 90 },
+        },
+      }),
+    ).toEqual({ rsi: { yMin: 20, yMax: 80 } });
   });
 });
