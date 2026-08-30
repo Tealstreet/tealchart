@@ -42,6 +42,17 @@ describe('resolveNativeReleaseHold', () => {
 
     expect(resolveNativeReleaseHold({ hold, caughtUp: true })).toEqual({ hold: null, released: true });
   });
+
+  it('retires independent domain holds without sharing release state', () => {
+    const divider = createNativeReleaseHold({ kind: 'paneDividerResize', target: { main: 0.7, macd: 0.3 }, token: 1 });
+    const range = createNativeReleaseHold({ kind: 'paneRangeOverride', target: { macd: { yMin: -5, yMax: 5 } }, token: 2 });
+
+    const nextDivider = resolveNativeReleaseHold({ hold: divider, caughtUp: true });
+    const nextRange = resolveNativeReleaseHold({ hold: range, caughtUp: false });
+
+    expect(nextDivider).toEqual({ hold: { ...divider, releaseFramesRemaining: 0 }, released: false });
+    expect(nextRange).toEqual({ hold: range, released: false });
+  });
 });
 
 describe('native release-hold caught-up predicates', () => {
