@@ -238,12 +238,16 @@ function canvasTapInput(overrides: Record<string, unknown> = {}) {
 }
 
 describe('native gesture activation', () => {
-  it('prioritizes crosshair drags over generic chart pan but after drawing edit drags', () => {
+  it('keeps one-finger drag and scale gestures in one exclusive ownership group', () => {
     const chartPanGesture = { id: 'chartPanGesture' };
     const crosshairPanGesture = { id: 'crosshairPanGesture' };
     const drawingEditDragGesture = { id: 'drawingEditDragGesture' };
+    const bracketDragGesture = { id: 'bracketDragGesture' };
+    const orderDragGesture = { id: 'orderDragGesture' };
+    const priceScaleGesture = { id: 'priceScaleGesture' };
+    const timeScaleGesture = { id: 'timeScaleGesture' };
     const gesture = createNativeChartGesture({
-      bracketDragGesture: { id: 'bracketDragGesture' },
+      bracketDragGesture,
       canvasTapGesture: { id: 'canvasTapGesture' },
       chartAxisPinchGesture: { id: 'chartAxisPinchGesture' },
       chartPanGesture,
@@ -251,18 +255,30 @@ describe('native gesture activation', () => {
       crosshairPanGesture,
       drawingEditDragGesture,
       leftToolRailToggleTapGesture: { id: 'leftToolRailToggleTapGesture' },
-      orderDragGesture: { id: 'orderDragGesture' },
+      orderDragGesture,
       overlayActionTapGesture: { id: 'overlayActionTapGesture' },
       paneMaximizeTapGesture: { id: 'paneMaximizeTapGesture' },
       priceAxisResetTapGesture: { id: 'priceAxisResetTapGesture' },
-      priceScaleGesture: { id: 'priceScaleGesture' },
+      priceScaleGesture,
       resetViewTapGesture: { id: 'resetViewTapGesture' },
       selectedDrawingActionTapGesture: { id: 'selectedDrawingActionTapGesture' },
-      timeScaleGesture: { id: 'timeScaleGesture' },
+      timeScaleGesture,
     } as never) as any;
 
     const exclusive = gesture.gestures.find((candidate: { type?: string }) => candidate.type === 'Exclusive');
-    expect(exclusive?.gestures).toEqual([drawingEditDragGesture, crosshairPanGesture, chartPanGesture]);
+    expect(exclusive?.gestures).toEqual([
+      bracketDragGesture,
+      orderDragGesture,
+      priceScaleGesture,
+      timeScaleGesture,
+      drawingEditDragGesture,
+      crosshairPanGesture,
+      chartPanGesture,
+    ]);
+    expect(gesture.gestures).not.toContain(bracketDragGesture);
+    expect(gesture.gestures).not.toContain(orderDragGesture);
+    expect(gesture.gestures).not.toContain(priceScaleGesture);
+    expect(gesture.gestures).not.toContain(timeScaleGesture);
     expect(gesture.gestures).not.toContain(crosshairPanGesture);
   });
 
