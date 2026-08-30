@@ -12,9 +12,10 @@ import type {
 
 import { describe, expect, it } from 'vitest';
 
-import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../../viewport/timeRangeConstraints';
+import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import {
+  acceptNativeViewportGestureTransaction,
   beginNativeChartAxisPinchGestureState,
   beginNativeChartPanGestureState,
   beginNativePriceScaleGestureState,
@@ -22,13 +23,17 @@ import {
   canBeginNativePriceScaleGesture,
   canBeginNativeTimeScaleGesture,
   cancelNativeViewportGestureState,
+  commitNativeViewportGestureTransaction,
   finalizeNativeViewportGestureState,
   getNativeChartAxisPinchGeometry,
   getNativeChartAxisPinchRatios,
   getNativePriceScaleHitGeometry,
   getNativeTimeScaleHitGeometry,
   getNativeViewportGestureCommit,
+  nativeViewportGestureTransactionAccepted,
+  nativeViewportGestureTransactionCommitted,
   resetNativeViewportGestureActiveFlags,
+  resetNativeViewportGestureTransaction,
   resolveNativeAxisPinchScale,
   syncNativeViewportGestureMetrics,
   updateNativeChartAxisPinchGestureState,
@@ -215,6 +220,24 @@ describe('native viewport gesture state', () => {
     ).toBe(false);
     expect(active.value).toBe(true);
     expect(readViewport(sharedLive)).toEqual(viewport);
+  });
+
+  it('tracks accepted and committed gesture transactions on the UI thread', () => {
+    const transaction = { accepted: shared(false), committed: shared(false) };
+
+    resetNativeViewportGestureTransaction(transaction);
+    expect(nativeViewportGestureTransactionAccepted(transaction)).toBe(false);
+    expect(nativeViewportGestureTransactionCommitted(transaction)).toBe(false);
+
+    acceptNativeViewportGestureTransaction(transaction);
+    expect(nativeViewportGestureTransactionAccepted(transaction)).toBe(true);
+
+    commitNativeViewportGestureTransaction(transaction);
+    expect(nativeViewportGestureTransactionCommitted(transaction)).toBe(true);
+
+    resetNativeViewportGestureTransaction(transaction);
+    expect(nativeViewportGestureTransactionAccepted(transaction)).toBe(false);
+    expect(nativeViewportGestureTransactionCommitted(transaction)).toBe(false);
   });
 
   it('scales prices around the touched anchor', () => {

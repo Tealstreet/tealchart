@@ -1,8 +1,9 @@
 import type { SkImage } from '@shopify/react-native-skia';
 import type { SharedValue } from 'react-native-reanimated';
 import type { NativePaneDividerBand, NativePaneDividerTarget } from '../interaction/nativePaneDivider';
+import type { NativeChartFrame } from './nativeChartFrame';
 
-import { Image as SkiaImage, Rect, Line as SkiaLine } from '@shopify/react-native-skia';
+import { Group, Rect, Image as SkiaImage, Line as SkiaLine } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import {
@@ -17,6 +18,28 @@ export interface NativePaneSnapshot {
   image: SkImage;
   paneId: string;
   top: number;
+}
+
+export function nativePaneDividerSnapshotBridgeVisible({
+  bands,
+  frame,
+  target,
+}: {
+  bands: readonly NativePaneDividerBand[];
+  frame: NativeChartFrame;
+  target: NativePaneDividerTarget | null;
+}): boolean {
+  'worklet';
+  if (target) return true;
+  if (bands.length === 0) return false;
+
+  for (let index = 0; index < bands.length; index += 1) {
+    const band = bands[index]!;
+    const pane = frame.panes.find((entry) => entry.id === band.paneId);
+    if (!pane) return false;
+    if (pane.top !== band.srcTop || pane.height !== band.srcHeight) return false;
+  }
+  return true;
 }
 
 /**
@@ -95,17 +118,23 @@ function NativePaneDividerHighlight({
 
 export function NativePaneDividerResizeLayer({
   bands,
+  frame,
   snapshots,
   target,
   width,
 }: {
   bands: SharedValue<NativePaneDividerBand[]>;
+  frame: NativeChartFrame;
   snapshots: readonly NativePaneSnapshot[];
   target: SharedValue<NativePaneDividerTarget | null>;
   width: number;
 }) {
+  const opacity = useDerivedValue(() =>
+    nativePaneDividerSnapshotBridgeVisible({ bands: bands.value, frame, target: target.value }) ? 1 : 0,
+  );
+
   return (
-    <>
+    <Group opacity={opacity}>
       {snapshots.map((snapshot, index) => (
         <NativePaneDividerBandImage
           key={snapshot.paneId}
@@ -116,6 +145,6 @@ export function NativePaneDividerResizeLayer({
         />
       ))}
       <NativePaneDividerHighlight bands={bands} target={target} width={width} />
-    </>
+    </Group>
   );
 }

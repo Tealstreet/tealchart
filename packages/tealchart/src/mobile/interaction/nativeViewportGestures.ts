@@ -2,12 +2,12 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
-import type { NativePaneDividerBand, NativePaneHeight } from './nativePaneDivider';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeOrderDragZone, NativeTradeLineActionZone, NativeTradeLineRow } from '../utils/tradeLineLayout';
 import type { NativeCrosshairSharedValues } from './nativeCrosshair';
 import type { NativeGestureControlZone } from './nativeGestureControlZones';
 import type { NativeBracketDragInteractionState, NativeOrderDragInteractionState } from './nativeOemsDragState';
+import type { NativePaneDividerBand, NativePaneHeight } from './nativePaneDivider';
 import type {
   NativeChartAxisPinchGestureState,
   NativeChartPanGestureState,
@@ -20,24 +20,34 @@ import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-worklets';
 
 import { getNativePaneAtY, getNativePriceAxisPaneAt } from '../render/nativeChartFrame';
-import { resolveNativePaneDividerAtY, resolveNativePaneDividerBands, resolveNativePaneDividerHeights } from './nativePaneDivider';
 import {
+  createNativePaneRangeOverride,
   resolveNativeIndicatorPaneTranslateRange,
 } from '../render/nativePaneRangeOverride';
 import { isNativeReservedControlPoint } from './nativeGestureControlZones';
 import { resolveNativeIndicatorPaneScaleRange } from './nativeIndicatorPaneScale';
+import {
+  resolveNativePaneDividerAtY,
+  resolveNativePaneDividerBands,
+  resolveNativePaneDividerHeights,
+} from './nativePaneDivider';
 import { canBeginNativeChartPan } from './nativeTradeLineHitTest';
 import {
+  acceptNativeViewportGestureTransaction,
   beginNativeChartAxisPinchGestureState,
   beginNativeChartPanGestureStateFromFrame,
   beginNativePriceScaleGestureState,
   beginNativeTimeScaleGestureState,
   canBeginNativePriceScaleGesture,
   canBeginNativeTimeScaleGesture,
+  commitNativeViewportGestureTransaction,
   finalizeNativeViewportGestureState,
   getNativePriceScaleHitGeometry,
   getNativeTimeScaleHitGeometry,
   getNativeViewportGestureCommit,
+  nativeViewportGestureTransactionAccepted,
+  nativeViewportGestureTransactionCommitted,
+  resetNativeViewportGestureTransaction,
   updateNativeChartAxisPinchGestureState,
   updateNativeChartPanGestureState,
   updateNativePriceScaleGestureState,
@@ -67,7 +77,10 @@ function formatNativeGestureDebugPoint(point: { x: number; y: number } | null): 
   return `${formatNativeGestureDebugNumber(point.x)},${formatNativeGestureDebugNumber(point.y)}`;
 }
 
-function emitNativeGestureDebug(onDebugGestureEvent: NativeGestureDebugEventHandler | undefined, message: string): void {
+function emitNativeGestureDebug(
+  onDebugGestureEvent: NativeGestureDebugEventHandler | undefined,
+  message: string,
+): void {
   'worklet';
   if (!onDebugGestureEvent) return;
   runOnJS(onDebugGestureEvent)(message);
@@ -212,12 +225,17 @@ export function createNativeChartPanGesture({
         onDebugGestureEvent,
         `pan down touches=${event.allTouches.length} p=${formatNativeGestureDebugPoint(point)}`,
       );
+      if (panActive.value) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'pan fail already-active');
+        stateManager.fail();
+        return;
+      }
+      resetNativeViewportGestureTransaction(chartPanGestureState.transaction);
       if (crosshair?.visible.value) {
         emitNativeGestureDebug(onDebugGestureEvent, 'pan fail crosshair-visible');
         stateManager.fail();
         return;
       }
-      if (panActive.value) return;
       if (!isNativeInitialSingleTouch(event)) {
         emitNativeGestureDebug(onDebugGestureEvent, `pan fail touches=${event.allTouches.length}`);
         stateManager.fail();
@@ -241,6 +259,7 @@ export function createNativeChartPanGesture({
         stateManager.fail();
         return;
       }
+      acceptNativeViewportGestureTransaction(chartPanGestureState.transaction);
       // A boundary between panes resizes them; it never pans or rescales, so it
       // claims the touch outright and the other targets stay null.
       const divider = frame && onPaneHeightsChange ? resolveNativePaneDividerAtY(frame, point.y) : null;
@@ -259,16 +278,24 @@ export function createNativeChartPanGesture({
       }
 
       const pane = getNativePaneAtY(frame, point.y);
-      emitNativeGestureDebug(
-        onDebugGestureEvent,
-        `pan target ${pane ? pane.id : 'none'} type=${pane?.type ?? 'none'}`,
-      );
+      emitNativeGestureDebug(onDebugGestureEvent, `pan target ${pane ? pane.id : 'none'} type=${pane?.type ?? 'none'}`);
       chartPanGestureState.indicatorPaneTarget.value =
         pane && pane.type === 'indicator' && pane.yMax > pane.yMin
-          ? { id: pane.id, height: pane.height, startYMin: pane.yMin, startYMax: pane.yMax, yMin: pane.yMin, yMax: pane.yMax }
+          ? {
+              id: pane.id,
+              height: pane.height,
+              startYMin: pane.yMin,
+              startYMax: pane.yMax,
+              yMin: pane.yMin,
+              yMax: pane.yMax,
+            }
           : null;
     })
     .onBegin(() => {
+      if (!nativeViewportGestureTransactionAccepted(chartPanGestureState.transaction)) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'pan begin ignored');
+        return;
+      }
       // A divider drag resizes panes; it is not a viewport gesture. Starting one
       // marks the pan active and takes viewport ownership, and since the divider
       // branch commits no viewport, nothing ever hands either back — which left
@@ -283,12 +310,16 @@ export function createNativeChartPanGesture({
       runOnJS(beginNativeViewportInteraction)();
     })
     .onUpdate((event) => {
+      if (!nativeViewportGestureTransactionAccepted(chartPanGestureState.transaction)) return;
       // The two components are independent. Time slides across every pane; the
       // vertical drag moves only the pane it started in, so the main viewport
       // takes no vertical delta while one is targeted.
       const divider = chartPanGestureState.paneDividerTarget.value;
       if (divider) {
-        emitNativeGestureDebug(onDebugGestureEvent, `pan update divider dy=${formatNativeGestureDebugNumber(event.translationY)}`);
+        emitNativeGestureDebug(
+          onDebugGestureEvent,
+          `pan update divider dy=${formatNativeGestureDebugNumber(event.translationY)}`,
+        );
         // Preview only. Each pane was captured to its own bitmap on touch-down,
         // so the drag just moves those, entirely on the UI thread. The real
         // heights are committed once, on release.
@@ -315,14 +346,27 @@ export function createNativeChartPanGesture({
       });
       chartPanGestureState.indicatorPaneTarget.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
       if (paneRangeOverrides) {
-        paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
+        paneRangeOverrides.value = {
+          ...paneRangeOverrides.value,
+          [pane.id]: createNativePaneRangeOverride({
+            committed: false,
+            range: next,
+            startYMax: pane.startYMax,
+            startYMin: pane.startYMin,
+          }),
+        };
       }
     })
     .onEnd((event) => {
+      if (!nativeViewportGestureTransactionAccepted(chartPanGestureState.transaction)) return;
       const dividerTarget = chartPanGestureState.paneDividerTarget.value;
       if (dividerTarget) {
-        emitNativeGestureDebug(onDebugGestureEvent, `pan end divider dy=${formatNativeGestureDebugNumber(event.translationY)}`);
+        emitNativeGestureDebug(
+          onDebugGestureEvent,
+          `pan end divider dy=${formatNativeGestureDebugNumber(event.translationY)}`,
+        );
         if (onPaneHeightsChange) {
+          commitNativeViewportGestureTransaction(chartPanGestureState.transaction);
           runOnJS(onPaneHeightsChange)(
             resolveNativePaneDividerHeights({ target: dividerTarget, translationY: event.translationY }),
           );
@@ -334,19 +378,37 @@ export function createNativeChartPanGesture({
       // indicator pane must not silently pin its range against auto-scale.
       const pane = chartPanGestureState.indicatorPaneTarget.value;
       if (pane && onIndicatorPaneScale && pane.yMin !== pane.startYMin) {
+        commitNativeViewportGestureTransaction(chartPanGestureState.transaction);
+        if (paneRangeOverrides) {
+          paneRangeOverrides.value = {
+            ...paneRangeOverrides.value,
+            [pane.id]: createNativePaneRangeOverride({
+              committed: true,
+              range: pane,
+              startYMax: pane.startYMax,
+              startYMin: pane.startYMin,
+            }),
+          };
+        }
         runOnJS(onIndicatorPaneScale)(pane.id, pane.yMin, pane.yMax);
       }
       const nextViewport = getNativeViewportGestureCommit(panActive, sharedViewport);
       if (!nextViewport) return;
       emitNativeGestureDebug(onDebugGestureEvent, 'pan end viewport commit');
+      commitNativeViewportGestureTransaction(chartPanGestureState.transaction);
       runOnJS(commitPanViewport)(nextViewport);
     })
     .onFinalize((_event, success) => {
       emitNativeGestureDebug(onDebugGestureEvent, `pan finalize success=${success ? 'yes' : 'no'}`);
+      if (!nativeViewportGestureTransactionAccepted(chartPanGestureState.transaction)) return;
       if (chartPanGestureState.paneDividerTarget.value) {
         chartPanGestureState.paneDividerTarget.value = null;
-        if (onPaneDividerResizeEnd) runOnJS(onPaneDividerResizeEnd)();
+        if (!nativeViewportGestureTransactionCommitted(chartPanGestureState.transaction) && onPaneDividerResizeEnd) {
+          runOnJS(onPaneDividerResizeEnd)();
+        }
       }
+      chartPanGestureState.indicatorPaneTarget.value = null;
+      if (nativeViewportGestureTransactionCommitted(chartPanGestureState.transaction)) return;
       if (
         finalizeNativeViewportGestureState({
           active: panActive,
@@ -410,7 +472,12 @@ export function createNativeChartAxisPinchGesture({
   return Gesture.Manual()
     .onTouchesDown((event, stateManager) => {
       emitNativeGestureDebug(onDebugGestureEvent, `pinch down touches=${event.allTouches.length}`);
-      if (pinchActive.value) return;
+      if (pinchActive.value) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'pinch fail already-active');
+        stateManager.fail();
+        return;
+      }
+      resetNativeViewportGestureTransaction(chartAxisPinchGestureState.transaction);
       if (
         bracketDragActive.value ||
         bracketDragInteractionState.active.value ||
@@ -442,6 +509,7 @@ export function createNativeChartAxisPinchGesture({
         stateManager.fail();
         return;
       }
+      acceptNativeViewportGestureTransaction(chartAxisPinchGestureState.transaction);
 
       const transitioningFromPan = panActive.value;
       emitNativeGestureDebug(
@@ -465,6 +533,7 @@ export function createNativeChartAxisPinchGesture({
       stateManager.activate();
     })
     .onTouchesMove((event) => {
+      if (!nativeViewportGestureTransactionAccepted(chartAxisPinchGestureState.transaction)) return;
       if (!pinchActive.value) return;
       const vector = getNativeTwoTouchVector(event);
       if (!vector) return;
@@ -482,11 +551,13 @@ export function createNativeChartAxisPinchGesture({
       );
     })
     .onTouchesUp((event, stateManager) => {
+      if (!nativeViewportGestureTransactionAccepted(chartAxisPinchGestureState.transaction)) return;
       if (!pinchActive.value) return;
       if ((event.numberOfTouches ?? event.allTouches.length) >= 2 && event.allTouches.length >= 2) return;
       const nextViewport = getNativeViewportGestureCommit(pinchActive, sharedViewport);
       if (nextViewport) {
         emitNativeGestureDebug(onDebugGestureEvent, 'pinch end commit');
+        commitNativeViewportGestureTransaction(chartAxisPinchGestureState.transaction);
         runOnJS(commitPanViewport)(nextViewport);
       }
       stateManager.end();
@@ -497,6 +568,8 @@ export function createNativeChartAxisPinchGesture({
     })
     .onFinalize((_event, success) => {
       emitNativeGestureDebug(onDebugGestureEvent, `pinch finalize success=${success ? 'yes' : 'no'}`);
+      if (!nativeViewportGestureTransactionAccepted(chartAxisPinchGestureState.transaction)) return;
+      if (nativeViewportGestureTransactionCommitted(chartAxisPinchGestureState.transaction)) return;
       if (
         finalizeNativeViewportGestureState({
           active: pinchActive,
@@ -555,14 +628,22 @@ export function createNativePriceScaleGesture({
         onDebugGestureEvent,
         `priceScale down touches=${event.allTouches.length} p=${formatNativeGestureDebugPoint(point)} axis=${formatNativeGestureDebugNumber(geometry.axisLeft)}-${formatNativeGestureDebugNumber(geometry.axisRight)}`,
       );
-      if (priceScaleActive.value) return;
+      if (priceScaleActive.value) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'priceScale fail already-active');
+        stateManager.fail();
+        return;
+      }
+      resetNativeViewportGestureTransaction(priceScaleGestureState.transaction);
       if (!isNativeInitialSingleTouch(event)) {
         emitNativeGestureDebug(onDebugGestureEvent, `priceScale fail touches=${event.allTouches.length}`);
         stateManager.fail();
         return;
       }
       if (!point || isNativeReservedControlPoint({ controlZones, frame, resetViewVisible, x: point.x, y: point.y })) {
-        emitNativeGestureDebug(onDebugGestureEvent, `priceScale fail reserved p=${formatNativeGestureDebugPoint(point)}`);
+        emitNativeGestureDebug(
+          onDebugGestureEvent,
+          `priceScale fail reserved p=${formatNativeGestureDebugPoint(point)}`,
+        );
         stateManager.fail();
         return;
       }
@@ -570,16 +651,21 @@ export function createNativePriceScaleGesture({
       indicatorPane.value = null;
       if (canBeginNativePriceScaleGesture(geometry, point.x, point.y)) {
         emitNativeGestureDebug(onDebugGestureEvent, 'priceScale target main');
+        acceptNativeViewportGestureTransaction(priceScaleGestureState.transaction);
         return;
       }
 
       const pane = onIndicatorPaneScale ? getNativePriceAxisPaneAt(frame, point.x, point.y) : null;
       if (!pane || pane.type !== 'indicator' || !(pane.yMax > pane.yMin)) {
-        emitNativeGestureDebug(onDebugGestureEvent, `priceScale fail no-pane p=${formatNativeGestureDebugPoint(point)}`);
+        emitNativeGestureDebug(
+          onDebugGestureEvent,
+          `priceScale fail no-pane p=${formatNativeGestureDebugPoint(point)}`,
+        );
         stateManager.fail();
         return;
       }
       emitNativeGestureDebug(onDebugGestureEvent, `priceScale target pane=${pane.id}`);
+      acceptNativeViewportGestureTransaction(priceScaleGestureState.transaction);
       indicatorPane.value = {
         id: pane.id,
         height: pane.height,
@@ -590,6 +676,10 @@ export function createNativePriceScaleGesture({
       };
     })
     .onBegin((event) => {
+      if (!nativeViewportGestureTransactionAccepted(priceScaleGestureState.transaction)) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'priceScale begin ignored');
+        return;
+      }
       if (indicatorPane.value) {
         emitNativeGestureDebug(onDebugGestureEvent, `priceScale begin pane=${indicatorPane.value.id}`);
         return;
@@ -599,9 +689,13 @@ export function createNativePriceScaleGesture({
       runOnJS(beginNativeViewportInteraction)();
     })
     .onUpdate((event) => {
+      if (!nativeViewportGestureTransactionAccepted(priceScaleGestureState.transaction)) return;
       const pane = indicatorPane.value;
       if (pane) {
-        emitNativeGestureDebug(onDebugGestureEvent, `priceScale update pane=${pane.id} dy=${formatNativeGestureDebugNumber(event.translationY)}`);
+        emitNativeGestureDebug(
+          onDebugGestureEvent,
+          `priceScale update pane=${pane.id} dy=${formatNativeGestureDebugNumber(event.translationY)}`,
+        );
         // Tracked on the UI thread and committed once on release. Committing
         // per update rebuilt the frame — and with it this gesture — on every
         // frame of the drag, which is what made it crawl.
@@ -614,31 +708,58 @@ export function createNativePriceScaleGesture({
         });
         indicatorPane.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
         if (paneRangeOverrides) {
-          paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
+          paneRangeOverrides.value = {
+            ...paneRangeOverrides.value,
+            [pane.id]: createNativePaneRangeOverride({
+              committed: false,
+              range: next,
+              startYMax: pane.startYMax,
+              startYMin: pane.startYMin,
+            }),
+          };
         }
         return;
       }
-      emitNativeGestureDebug(onDebugGestureEvent, `priceScale update main dy=${formatNativeGestureDebugNumber(event.translationY)}`);
+      emitNativeGestureDebug(
+        onDebugGestureEvent,
+        `priceScale update main dy=${formatNativeGestureDebugNumber(event.translationY)}`,
+      );
       updateNativePriceScaleGestureState(priceScaleGestureState, event.translationY);
     })
     .onEnd(() => {
+      if (!nativeViewportGestureTransactionAccepted(priceScaleGestureState.transaction)) return;
       const pane = indicatorPane.value;
       if (pane) {
         emitNativeGestureDebug(onDebugGestureEvent, `priceScale end pane=${pane.id}`);
+        commitNativeViewportGestureTransaction(priceScaleGestureState.transaction);
+        if (paneRangeOverrides) {
+          paneRangeOverrides.value = {
+            ...paneRangeOverrides.value,
+            [pane.id]: createNativePaneRangeOverride({
+              committed: true,
+              range: pane,
+              startYMax: pane.startYMax,
+              startYMin: pane.startYMin,
+            }),
+          };
+        }
         if (onIndicatorPaneScale) runOnJS(onIndicatorPaneScale)(pane.id, pane.yMin, pane.yMax);
         return;
       }
       const nextViewport = getNativeViewportGestureCommit(priceScaleActive, sharedViewport);
       if (!nextViewport) return;
       emitNativeGestureDebug(onDebugGestureEvent, 'priceScale end main commit');
+      commitNativeViewportGestureTransaction(priceScaleGestureState.transaction);
       runOnJS(commitPanViewport)(nextViewport);
     })
     .onFinalize((_event, success) => {
       emitNativeGestureDebug(onDebugGestureEvent, `priceScale finalize success=${success ? 'yes' : 'no'}`);
+      if (!nativeViewportGestureTransactionAccepted(priceScaleGestureState.transaction)) return;
       if (indicatorPane.value) {
         indicatorPane.value = null;
         return;
       }
+      if (nativeViewportGestureTransactionCommitted(priceScaleGestureState.transaction)) return;
       if (
         finalizeNativeViewportGestureState({
           active: priceScaleActive,
@@ -688,7 +809,12 @@ export function createNativeTimeScaleGesture({
         onDebugGestureEvent,
         `timeScale down touches=${event.allTouches.length} p=${formatNativeGestureDebugPoint(point)} y=${formatNativeGestureDebugNumber(geometry.axisTop)}-${formatNativeGestureDebugNumber(geometry.axisBottom)}`,
       );
-      if (timeScaleActive.value) return;
+      if (timeScaleActive.value) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'timeScale fail already-active');
+        stateManager.fail();
+        return;
+      }
+      resetNativeViewportGestureTransaction(timeScaleGestureState.transaction);
       if (!isNativeInitialSingleTouch(event)) {
         emitNativeGestureDebug(onDebugGestureEvent, `timeScale fail touches=${event.allTouches.length}`);
         stateManager.fail();
@@ -701,25 +827,39 @@ export function createNativeTimeScaleGesture({
       ) {
         emitNativeGestureDebug(onDebugGestureEvent, `timeScale fail hit=${formatNativeGestureDebugPoint(point)}`);
         stateManager.fail();
+        return;
       }
+      acceptNativeViewportGestureTransaction(timeScaleGestureState.transaction);
     })
     .onBegin(() => {
+      if (!nativeViewportGestureTransactionAccepted(timeScaleGestureState.transaction)) {
+        emitNativeGestureDebug(onDebugGestureEvent, 'timeScale begin ignored');
+        return;
+      }
       emitNativeGestureDebug(onDebugGestureEvent, 'timeScale begin');
       beginNativeTimeScaleGestureState(timeScaleGestureState);
       runOnJS(beginNativeViewportInteraction)();
     })
     .onUpdate((event) => {
-      emitNativeGestureDebug(onDebugGestureEvent, `timeScale update dx=${formatNativeGestureDebugNumber(event.translationX)}`);
+      if (!nativeViewportGestureTransactionAccepted(timeScaleGestureState.transaction)) return;
+      emitNativeGestureDebug(
+        onDebugGestureEvent,
+        `timeScale update dx=${formatNativeGestureDebugNumber(event.translationX)}`,
+      );
       updateNativeTimeScaleGestureState(timeScaleGestureState, event.translationX);
     })
     .onEnd(() => {
+      if (!nativeViewportGestureTransactionAccepted(timeScaleGestureState.transaction)) return;
       const nextViewport = getNativeViewportGestureCommit(timeScaleActive, sharedViewport);
       if (!nextViewport) return;
       emitNativeGestureDebug(onDebugGestureEvent, 'timeScale end commit');
+      commitNativeViewportGestureTransaction(timeScaleGestureState.transaction);
       runOnJS(commitPanViewport)(nextViewport);
     })
     .onFinalize((_event, success) => {
       emitNativeGestureDebug(onDebugGestureEvent, `timeScale finalize success=${success ? 'yes' : 'no'}`);
+      if (!nativeViewportGestureTransactionAccepted(timeScaleGestureState.transaction)) return;
+      if (nativeViewportGestureTransactionCommitted(timeScaleGestureState.transaction)) return;
       if (
         finalizeNativeViewportGestureState({
           active: timeScaleActive,
