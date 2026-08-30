@@ -42,22 +42,29 @@ export function createNativeChartGesture({
   timeScaleGesture,
 }: NativeChartGestureInput): NativeChartGesture {
   // Canvas taps are owned by canvasTapGesture, which resolves the point once
-  // and dispatches a single outcome. The gestures listed alongside it are drags,
-  // pinches and chrome - none of them competes for a plain tap on the plot.
+  // and dispatches a single outcome. Drag/scale gestures are mutually exclusive:
+  // a touch can resize a divider, scale an axis, move a drawing, drag a trade
+  // line, move the crosshair, or pan the chart - never more than one. Android's
+  // gesture arbiter is stricter about top-level simultaneous pans, so keeping
+  // this group explicit avoids viewport gestures cancelling each other.
   return Gesture.Simultaneous(
-    bracketDragGesture,
     canvasTapGesture,
     selectedDrawingActionTapGesture,
     overlayActionTapGesture,
-    orderDragGesture,
     leftToolRailToggleTapGesture,
     chartAxisPinchGesture,
     crosshairLongPressGesture,
-    Gesture.Exclusive(drawingEditDragGesture, crosshairPanGesture, chartPanGesture),
+    Gesture.Exclusive(
+      bracketDragGesture,
+      orderDragGesture,
+      priceScaleGesture,
+      timeScaleGesture,
+      drawingEditDragGesture,
+      crosshairPanGesture,
+      chartPanGesture,
+    ),
     resetViewTapGesture,
     paneMaximizeTapGesture,
     priceAxisResetTapGesture,
-    priceScaleGesture,
-    timeScaleGesture,
   );
 }

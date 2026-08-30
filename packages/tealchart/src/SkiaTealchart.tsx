@@ -2039,49 +2039,51 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       {liveChartMounted ? (
         <View pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'} style={styles.liveChartLayer}>
           <GestureDetector gesture={nativeChartGesture}>
-            <Canvas ref={canvasRef} style={styles.canvas}>
-              <NativeChartCanvasLayers
-                axisFont={axisFont}
-                backgroundColor={backgroundColor}
-                bars={nativeRenderBars}
-                bracketDragState={bracketDragState}
-                crosshair={crosshair}
-                extraPriceLines={nativePriceLines}
-                frame={frame}
-                getOrderObjectId={getOrderObjectId}
-                getPositionObjectId={getPositionObjectId}
-                gridColor={gridColor}
-                hasDataViewport={nativeRenderHasDataViewport}
-                hasContextMenu={hasNativeContextMenu}
-                intervalMs={intervalToMs(nativeRenderInterval)}
-                indicatorPaneInfo={nativeIndicatorPaneInfo}
-                indicatorPlots={nativeIndicatorPlots}
-                paneRangeOverrides={paneRangeOverrides}
-                indicatorTotalBarCount={nativeRenderBars.length}
-                lineSnapshot={lineSnapshot}
-                options={options}
-                plotOpacity={nativeCanvasLoading ? LOADING_OPACITY : 1}
-                orderDragState={orderDragState}
-                plotPrimitiveClip={plotPrimitiveClip}
-                pricePrecision={nativePricePrecision}
-                nowMs={nativeCountdownNowMs}
-                resolvedPriceAxisTags={resolvedPriceAxisTags}
-                sharedViewport={sharedViewport}
-                smallFont={smallFont}
-                staticProjection={staticNativeRenderProjection}
-                textColor={textColor}
-                textFont={textFont}
-                tradeAxisFont={tradeAxisFont}
-                tradeAxisTagHeight={TRADE_AXIS_TAG_HEIGHT}
-                tradeLabelHeight={TRADE_LABEL_HEIGHT}
-                tradeLineGeometries={tradeLineGeometries}
-                userDrawingDraftAnchorColor={nativeUserDrawingDraftAnchorColor}
-                userDrawingDraftAnchors={nativeUserDrawingDraftAnchors}
-                userDrawingRenderEntries={nativeUserDrawingRenderEntries}
-                visibleBars={visibleBars}
-                volumeHeight={volumeHeight}
-              />
-            </Canvas>
+            <View collapsable={false} style={styles.gestureSurface}>
+              <Canvas ref={canvasRef} style={styles.canvas}>
+                <NativeChartCanvasLayers
+                  axisFont={axisFont}
+                  backgroundColor={backgroundColor}
+                  bars={nativeRenderBars}
+                  bracketDragState={bracketDragState}
+                  crosshair={crosshair}
+                  extraPriceLines={nativePriceLines}
+                  frame={frame}
+                  getOrderObjectId={getOrderObjectId}
+                  getPositionObjectId={getPositionObjectId}
+                  gridColor={gridColor}
+                  hasDataViewport={nativeRenderHasDataViewport}
+                  hasContextMenu={hasNativeContextMenu}
+                  intervalMs={intervalToMs(nativeRenderInterval)}
+                  indicatorPaneInfo={nativeIndicatorPaneInfo}
+                  indicatorPlots={nativeIndicatorPlots}
+                  paneRangeOverrides={paneRangeOverrides}
+                  indicatorTotalBarCount={nativeRenderBars.length}
+                  lineSnapshot={lineSnapshot}
+                  options={options}
+                  plotOpacity={nativeCanvasLoading ? LOADING_OPACITY : 1}
+                  orderDragState={orderDragState}
+                  plotPrimitiveClip={plotPrimitiveClip}
+                  pricePrecision={nativePricePrecision}
+                  nowMs={nativeCountdownNowMs}
+                  resolvedPriceAxisTags={resolvedPriceAxisTags}
+                  sharedViewport={sharedViewport}
+                  smallFont={smallFont}
+                  staticProjection={staticNativeRenderProjection}
+                  textColor={textColor}
+                  textFont={textFont}
+                  tradeAxisFont={tradeAxisFont}
+                  tradeAxisTagHeight={TRADE_AXIS_TAG_HEIGHT}
+                  tradeLabelHeight={TRADE_LABEL_HEIGHT}
+                  tradeLineGeometries={tradeLineGeometries}
+                  userDrawingDraftAnchorColor={nativeUserDrawingDraftAnchorColor}
+                  userDrawingDraftAnchors={nativeUserDrawingDraftAnchors}
+                  userDrawingRenderEntries={nativeUserDrawingRenderEntries}
+                  visibleBars={visibleBars}
+                  volumeHeight={volumeHeight}
+                />
+              </Canvas>
+            </View>
           </GestureDetector>
         </View>
       ) : null}
@@ -2280,6 +2282,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   canvas: {
+    flex: 1,
+  },
+  gestureSurface: {
     flex: 1,
   },
   liveChartLayer: {
