@@ -14,7 +14,7 @@ import type {
   NativeTradeLineObjectType,
 } from '../utils/tradeLineLayout';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { OemsActionSettlement } from '../../interaction/oemsActionManager';
 import { OemsActionManager } from '../../interaction/oemsActionManager';
@@ -48,6 +48,7 @@ import {
   confirmNativePositionLineSnapshots,
   type NativeOemsTradingLineState,
 } from './nativeOemsLineState';
+import { createNativeReleaseHold, resolveNativeReleaseHold, type NativeReleaseHold } from './nativeReleaseHold';
 
 /** Long enough that a normal venue round trip never hits it, short enough that a
  *  stranded preview is not left on the chart. */
@@ -55,6 +56,12 @@ const NATIVE_BRACKET_PREVIEW_HANDOFF_TIMEOUT_MS = 6000;
 
 export interface NativeOemsDragHandoff {
   objectId: string;
+}
+
+export interface NativeOemsBracketDragHandoff {
+  objectId: string;
+  objectType: NativeTradeLineObjectType;
+  seq: number;
 }
 
 /**
@@ -180,6 +187,15 @@ export function useNativeOemsLineRuntime({
     objectType: NativeTradeLineObjectType;
     seq: number;
   } | null>(null);
+  const [orderPreviewReleaseHold, setOrderPreviewReleaseHold] =
+    useState<NativeReleaseHold<NativeOemsDragHandoff> | null>(null);
+  const [bracketPreviewReleaseHold, setBracketPreviewReleaseHold] =
+    useState<NativeReleaseHold<NativeOemsBracketDragHandoff> | null>(null);
+  const releaseHoldTokenRef = useRef(0);
+  const createReleaseHoldToken = useCallback(() => {
+    releaseHoldTokenRef.current += 1;
+    return releaseHoldTokenRef.current;
+  }, []);
   const bracketHandoffSeqRef = useRef(0);
   const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
 
@@ -217,6 +233,7 @@ export function useNativeOemsLineRuntime({
 
   const clearNativeOrderDrag = useCallback(() => {
     orderHandoffRef.current = null;
+    setOrderPreviewReleaseHold(null);
     clearNativeOrderDragState(orderDragState);
   }, [orderDragState]);
 
@@ -233,22 +250,65 @@ export function useNativeOemsLineRuntime({
    * Waiting a frame lets the closure catch up first, so the drag lets go of a
    * line that is already drawn where the user dropped it.
    */
-  const releaseNativeOrderDragAfterCommit = useCallback(() => {
-    requestAnimationFrame(() => {
+  const releaseNativeOrderDragAfterCommit = useCallback(
+    (handoff: NativeOemsDragHandoff | null) => {
+      if (!handoff) {
+        clearNativeOrderDragState(orderDragState);
+        return;
+      }
+      setOrderPreviewReleaseHold(
+        createNativeReleaseHold({
+          kind: 'oemsOrderPreview',
+          target: handoff,
+          token: createReleaseHoldToken(),
+        }),
+      );
+    },
+    [createReleaseHoldToken, orderDragState],
+  );
+
+  useLayoutEffect(() => {
+    if (!orderPreviewReleaseHold) return;
+    const resolution = resolveNativeReleaseHold({ caughtUp: true, hold: orderPreviewReleaseHold });
+    if (resolution.hold === orderPreviewReleaseHold) return;
+    setOrderPreviewReleaseHold(resolution.hold);
+    if (resolution.released) {
       clearNativeOrderDragState(orderDragState);
-    });
-  }, [orderDragState]);
+    }
+  }, [orderDragState, orderPreviewReleaseHold]);
 
   /** The bracket preview's version of the same hand-off, for the same reason:
    *  the line's optimistic bracket arrives by closure, the preview goes away by
    *  shared value. */
-  const releaseNativeBracketDragAfterCommit = useCallback(() => {
-    requestAnimationFrame(() => {
+  const releaseNativeBracketDragAfterCommit = useCallback(
+    (handoff: NativeOemsBracketDragHandoff | null) => {
+      if (!handoff) {
+        clearNativeBracketDragState(bracketDragInteractionState);
+        return;
+      }
+      setBracketPreviewReleaseHold(
+        createNativeReleaseHold({
+          kind: 'oemsBracketPreview',
+          target: handoff,
+          token: createReleaseHoldToken(),
+        }),
+      );
+    },
+    [bracketDragInteractionState, createReleaseHoldToken],
+  );
+
+  useLayoutEffect(() => {
+    if (!bracketPreviewReleaseHold) return;
+    const resolution = resolveNativeReleaseHold({ caughtUp: true, hold: bracketPreviewReleaseHold });
+    if (resolution.hold === bracketPreviewReleaseHold) return;
+    setBracketPreviewReleaseHold(resolution.hold);
+    if (resolution.released) {
       clearNativeBracketDragState(bracketDragInteractionState);
-    });
-  }, [bracketDragInteractionState]);
+    }
+  }, [bracketDragInteractionState, bracketPreviewReleaseHold]);
 
   const clearNativeBracketDrag = useCallback(() => {
+    setBracketPreviewReleaseHold(null);
     clearNativeBracketDragState(bracketDragInteractionState);
   }, [bracketDragInteractionState]);
 
@@ -341,8 +401,9 @@ export function useNativeOemsLineRuntime({
     });
     if (!release) return;
 
+    const handoff = orderHandoffRef.current;
     orderHandoffRef.current = null;
-    releaseNativeOrderDragAfterCommit();
+    releaseNativeOrderDragAfterCommit(handoff);
   }, [lineSnapshot.orderLines, oemsActions, orderDragState, releaseNativeOrderDragAfterCommit]);
 
   /**
@@ -369,8 +430,9 @@ export function useNativeOemsLineRuntime({
     });
     if (!release) return;
 
+    const handoff = orderHandoffRef.current;
     orderHandoffRef.current = null;
-    releaseNativeOrderDragAfterCommit();
+    releaseNativeOrderDragAfterCommit(handoff);
   };
 
   const syncNativeBracketDragStateForSnapshot = useCallback(() => {
@@ -393,8 +455,9 @@ export function useNativeOemsLineRuntime({
     const settled = handoff ? !oemsActions.getAction(handoff.objectType, handoff.objectId) : false;
     if (!pendingObserved && !settled) return;
 
+    const handoffToRelease = bracketHandoffRef.current;
     bracketHandoffRef.current = null;
-    releaseNativeBracketDragAfterCommit();
+    releaseNativeBracketDragAfterCommit(handoffToRelease);
   }, [
     bracketDragInteractionState,
     releaseNativeBracketDragAfterCommit,
