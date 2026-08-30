@@ -165,21 +165,12 @@ crosshair, and axis state like web's imperative canvas runtime:
   gesture-start state.
 - Secondary-pane range drags and pane divider drags are not special cases. They
   need the same begin/update/commit/observe/release semantics as the primary
-  viewport.
+  viewport. Do not patch them with `requestAnimationFrame`, `setTimeout`, or
+  layout-effect timing guesses.
 - Shared values are the transport for live preview state. React state/frame
   updates are the committed model catching up. Render helpers must be able to
   bridge that handoff deterministically from current frame data rather than by
   waiting “a frame or two.”
-- Committed preview handoff is target-based, not start-based. After a gesture
-  commits, native preview state remains visually authoritative until the current
-  frame reaches the committed target. Never release a preview merely because the
-  frame no longer matches the drag-start geometry; that exposes intermediate
-  frames and causes release flap.
-- React lifecycle cleanup may remove already-inert preview data after a pure
-  helper proves the current frame has caught the committed target. That cleanup
-  must not be what makes the UI visually correct. `requestAnimationFrame` is only
-  acceptable for this inert cleanup step, never as a timing guess after gesture
-  end.
 
 `src/mobile/interaction/nativeLifecycleBoundary.test.ts` enforces the strictest
 part of this rule for the core gesture/preview modules. If a future change needs

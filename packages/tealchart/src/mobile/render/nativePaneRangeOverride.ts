@@ -8,9 +8,9 @@ export interface NativePaneRange {
 export interface NativePaneRangeOverride extends NativePaneRange {
   /**
    * False while the gesture is live, true after the final range was handed to
-   * the pane manager. A committed override is a handoff bridge: it should keep
-   * drawing the committed target range until the React frame reaches that exact
-   * target, then become inert.
+   * the pane manager. A committed override is only a handoff bridge: it should
+   * cover the frames where React still renders the drag-start pane range, then
+   * become inert once the frame has moved on.
    */
   committed?: boolean;
   startYMin?: number;
@@ -61,6 +61,13 @@ export function shouldApplyNativePaneRangeOverride(
   if (!override) return false;
   if (!override.committed) return true;
   if (nativePaneRangesEqual({ yMin: pane.yMin, yMax: pane.yMax }, override)) return false;
+  if (
+    override.startYMin !== undefined &&
+    override.startYMax !== undefined &&
+    !nativePaneRangesEqual({ yMin: pane.yMin, yMax: pane.yMax }, { yMin: override.startYMin, yMax: override.startYMax })
+  ) {
+    return false;
+  }
   return true;
 }
 
