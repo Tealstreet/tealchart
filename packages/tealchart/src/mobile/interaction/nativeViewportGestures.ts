@@ -408,7 +408,10 @@ export function createNativeChartPanGesture({
         }
       }
       chartPanGestureState.indicatorPaneTarget.value = null;
-      if (nativeViewportGestureTransactionCommitted(chartPanGestureState.transaction)) return;
+      if (nativeViewportGestureTransactionCommitted(chartPanGestureState.transaction)) {
+        panActive.value = false;
+        return;
+      }
       if (
         finalizeNativeViewportGestureState({
           active: panActive,
@@ -569,7 +572,10 @@ export function createNativeChartAxisPinchGesture({
     .onFinalize((_event, success) => {
       emitNativeGestureDebug(onDebugGestureEvent, `pinch finalize success=${success ? 'yes' : 'no'}`);
       if (!nativeViewportGestureTransactionAccepted(chartAxisPinchGestureState.transaction)) return;
-      if (nativeViewportGestureTransactionCommitted(chartAxisPinchGestureState.transaction)) return;
+      if (nativeViewportGestureTransactionCommitted(chartAxisPinchGestureState.transaction)) {
+        pinchActive.value = false;
+        return;
+      }
       if (
         finalizeNativeViewportGestureState({
           active: pinchActive,
@@ -759,7 +765,10 @@ export function createNativePriceScaleGesture({
         indicatorPane.value = null;
         return;
       }
-      if (nativeViewportGestureTransactionCommitted(priceScaleGestureState.transaction)) return;
+      if (nativeViewportGestureTransactionCommitted(priceScaleGestureState.transaction)) {
+        priceScaleActive.value = false;
+        return;
+      }
       if (
         finalizeNativeViewportGestureState({
           active: priceScaleActive,
@@ -859,7 +868,10 @@ export function createNativeTimeScaleGesture({
     .onFinalize((_event, success) => {
       emitNativeGestureDebug(onDebugGestureEvent, `timeScale finalize success=${success ? 'yes' : 'no'}`);
       if (!nativeViewportGestureTransactionAccepted(timeScaleGestureState.transaction)) return;
-      if (nativeViewportGestureTransactionCommitted(timeScaleGestureState.transaction)) return;
+      if (nativeViewportGestureTransactionCommitted(timeScaleGestureState.transaction)) {
+        timeScaleActive.value = false;
+        return;
+      }
       if (
         finalizeNativeViewportGestureState({
           active: timeScaleActive,

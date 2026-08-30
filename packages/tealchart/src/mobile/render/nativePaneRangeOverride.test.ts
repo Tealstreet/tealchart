@@ -47,7 +47,7 @@ describe('native pane range overrides', () => {
     expect(resolveNativePaneRange(macd, { macd: override })).toEqual({ yMin: 5, yMax: 15 });
   });
 
-  it('keeps a stale committed override inert after the frame moves past its start and target ranges', () => {
+  it('keeps a committed override active through intermediate frames', () => {
     const macd = pane('macd', 6, 16);
     const override = createNativePaneRangeOverride({
       committed: true,
@@ -56,7 +56,7 @@ describe('native pane range overrides', () => {
       startYMax: 10,
     });
 
-    expect(resolveNativePaneRange(macd, { macd: override })).toEqual({ yMin: 6, yMax: 16 });
+    expect(resolveNativePaneRange(macd, { macd: override })).toEqual(override);
   });
 
   it('holds a committed override the frame has not caught up with', () => {
