@@ -146,6 +146,37 @@ src/
 > only React-adjacent code is `react/VanillaChartReact.tsx`,
 > `SkiaTealchart.tsx`, and `state/ChartApiContext.tsx`.
 
+## Native Skia Runtime Rules
+
+The native chart is React Native at the shell, but the chart runtime is not a
+React lifecycle control loop. Treat Skia/Reanimated gesture, viewport, pane,
+crosshair, and axis state like web's imperative canvas runtime:
+
+- React lifecycle hooks may mount/unmount resources, subscribe/unsubscribe,
+  push host props into shared values, and perform non-correctness cleanup.
+- React lifecycle hooks must not decide when an active chart interaction
+  preview is released. Gesture preview release is chart correctness state and
+  belongs in explicit runtime state machines keyed by the interaction that
+  produced the preview.
+- Gesture handlers follow this protocol: hit-test/accept on touch-down, mutate
+  shared preview on update, record a committed target on end, and make finalize
+  cleanup-only after a commit. Android may report `finalize(success=false)`
+  after a committed end; that must never roll shared values back to the
+  gesture-start state.
+- Secondary-pane range drags and pane divider drags are not special cases. They
+  need the same begin/update/commit/observe/release semantics as the primary
+  viewport. Do not patch them with `requestAnimationFrame`, `setTimeout`, or
+  layout-effect timing guesses.
+- Shared values are the transport for live preview state. React state/frame
+  updates are the committed model catching up. Render helpers must be able to
+  bridge that handoff deterministically from current frame data rather than by
+  waiting “a frame or two.”
+
+`src/mobile/interaction/nativeLifecycleBoundary.test.ts` enforces the strictest
+part of this rule for the core gesture/preview modules. If a future change needs
+a lifecycle hook in one of those files, the architecture is probably drifting;
+move the policy into a runtime helper instead.
+
 ## State Management
 
 Uses Nanostores-backed, chart-keyed stores for chart state and UI preference persistence:
@@ -286,7 +317,7 @@ comparison would never match.
 **A bracket the user drags into existence has no order yet.** The optimistic
 TP/SL is merged into `brackets` even when the line has none
 (`applyOemsBracketActionState`), or it would have nowhere to live. Bracket
-*creation* settles on the callback rather than the echo (`settleOnCallback`),
+_creation_ settles on the callback rather than the echo (`settleOnCallback`),
 which is deliberate — see `3c84ee37` — because the echo may arrive as its own
 order line and never as a bracket on the parent.
 
@@ -396,7 +427,7 @@ animation frame collapses them. Skia commits per notification and draws them.
 **Removals are deferred, additions are not.** A host reconciling its feed removes
 a stale line in one store update and creates the replacement in the next — real
 time apart. Painting between them draws a frame with no line. Deferring the
-*notification* does not work: any unrelated line ticking triggers one, and with
+_notification_ does not work: any unrelated line ticking triggers one, and with
 live orders that is constant. The **deletion** is deferred instead
 (`LINE_REMOVAL_COALESCE_MS`), and creating a line flushes pending removals, so
 remove-then-create collapses into a single paint.
@@ -406,7 +437,7 @@ shared value and falls back to `line.price` from its closure. Writing a shared
 value re-evaluates the worklet on the UI thread at once, but a new closure
 reaches it only on Reanimated's next propagation. Releasing the drag the moment
 the snapshot went pending handed the line to a closure still holding the
-*original* price — one frame at the old position, ~23ms. The hand-off waits a
+_original_ price — one frame at the old position, ~23ms. The hand-off waits a
 frame.
 
 **Any worklet mixing a shared value with a captured one has this hazard, and it
@@ -414,16 +445,16 @@ has bitten three times.** The shape to look for is a value that a gesture drives
 through a shared value and React commits through a prop, where JS clears the
 shared value to hand back over:
 
-| shared (immediate) | closure (a frame later) |
-| --- | --- |
-| `orderDragState.activePrice` | `line.price` |
-| `paneRangeOverrides[paneId]` | `pane.yMin` / `pane.yMax` |
+| shared (immediate)                | closure (a frame later)          |
+| --------------------------------- | -------------------------------- |
+| `orderDragState.activePrice`      | `line.price`                     |
+| `paneRangeOverrides[paneId]`      | `pane.yMin` / `pane.yMax`        |
 | `bracketDragState.activeObjectId` | the line's optimistic `brackets` |
 
 Every one of them retires on a `requestAnimationFrame`, never inline. Indicator
 pane range is the one that is easy to miss, because the hold-until-the-frame-
 agrees logic looks like it already solves this — it makes the override survive
-the *commit*, but the release itself was still a frame early, so dragging or
+the _commit_, but the release itself was still a frame early, so dragging or
 scaling a MACD pane snapped back to its pre-drag scale for one frame.
 
 ## Worklets do not hoist
@@ -459,8 +490,8 @@ Two attempts to hide the seam failed first, and both are worth knowing about.
 A covering bitmap could never have worked. It lived in a sibling `<Canvas>` - its
 own reconciler root, its own `CAMetalLayer`, its own drawable present - and its
 visibility was an `opacity` toggle on a React Native view, a third pipeline again.
-Nothing ordered the three. At the *release* both orderings look identical, which
-is why two fixes aimed there changed nothing; at the *start* both orderings expose
+Nothing ordered the three. At the _release_ both orderings look identical, which
+is why two fixes aimed there changed nothing; at the _start_ both orderings expose
 the live chart underneath. It also cost a `makeImageSnapshot` per tap, which is a
 full offscreen GPU render run synchronously on the JS thread.
 
@@ -502,21 +533,21 @@ it**. So during an ordinary maximize `staticProjection` is null and the live
 branches are the ones drawing. The static branches belong to data loads, where
 being all-plain makes them internally consistent on their own.
 
-The gap that leaves: a maximize tapped *while a data load is holding* puts the
+The gap that leaves: a maximize tapped _while a data load is holding_ puts the
 plot and candle layers on the commit channel and the grid on the derived one, so
 that combination can still shear for a frame. Rare, and not worth a bitmap.
 
 Shared-value props are free here. The Skia container restarts one mapper over
 every shared value in the tree and it fires once per frame, so a clip that only
 changes when `frame` changes adds no repaint that the sibling path was not
-already causing. Identity also stabilises, which *reduces* memo pressure.
+already causing. Identity also stabilises, which _reduces_ memo pressure.
 
 **Geometry must not decide what exists.** Mount and unmount happen on the React
 commit, full stop, so a layer that filters panes by `height > 0` or sizes a tick
 array from `pane.height` adds and removes nodes a frame before the canvas follows.
 Pooling ticks at the full plot height and hiding the spares was measured and
 rejected - it triples the node count and scales with pane count. What works is
-collapsing the whole layer into one node whose *contents* carry the geometry:
+collapsing the whole layer into one node whose _contents_ carry the geometry:
 the pane separators and both axis grid lines are a single derived `SkPath` each,
 and both axis label sets are a single `Glyphs` node each, laid out in a worklet
 from a char-to-glyph map resolved once on the JS thread. Three panes went from 136
@@ -532,7 +563,7 @@ there is a test pinning the alphabet for that reason.
 ## Gesture rebuilds on native
 
 The chart's fifteen gestures are composed into one `Gesture.Simultaneous`, so a
-new identity for *any* of them rebuilds the composition and makes the
+new identity for _any_ of them rebuilds the composition and makes the
 `GestureDetector` re-attach. Nearly all of them take `controlZones`, which React
 derives from layout — so anything that reaches that array at UI speed rebuilds
 the entire gesture tree.

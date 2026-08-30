@@ -25,6 +25,7 @@ import type {
   NativePriceScaleGestureState,
   NativeTimeScaleGestureState,
   NativeViewportGestureMetrics,
+  NativeViewportGestureTransactionState,
 } from './nativeViewportGestureState';
 
 import { useMemo } from 'react';
@@ -118,6 +119,14 @@ export function useNativeSkiaInteractionRuntime({
   const priceAutoScaleActive = useSharedValue(autoScaleEnabled);
   const priceAutoScaleBars = useSharedValue<NativeAutoScaleBar[]>([]);
   const timeScaleActive = useSharedValue(false);
+  const panGestureAccepted = useSharedValue(false);
+  const panGestureCommitted = useSharedValue(false);
+  const pinchGestureAccepted = useSharedValue(false);
+  const pinchGestureCommitted = useSharedValue(false);
+  const priceScaleGestureAccepted = useSharedValue(false);
+  const priceScaleGestureCommitted = useSharedValue(false);
+  const timeScaleGestureAccepted = useSharedValue(false);
+  const timeScaleGestureCommitted = useSharedValue(false);
   const viewportSyncEpoch = useSharedValue(0);
   const crosshairVisible = useSharedValue(false);
   const crosshairX = useSharedValue(0);
@@ -230,6 +239,22 @@ export function useNativeSkiaInteractionRuntime({
   const panPaneDividerTarget = useSharedValue<NativePaneDividerTarget | null>(null);
   const paneRangeOverrides = useSharedValue<NativePaneRangeOverrides>({});
   const paneDividerBands = useSharedValue<NativePaneDividerBand[]>([]);
+  const panGestureTransaction = useMemo<NativeViewportGestureTransactionState>(
+    () => ({ accepted: panGestureAccepted, committed: panGestureCommitted }),
+    [panGestureAccepted, panGestureCommitted],
+  );
+  const pinchGestureTransaction = useMemo<NativeViewportGestureTransactionState>(
+    () => ({ accepted: pinchGestureAccepted, committed: pinchGestureCommitted }),
+    [pinchGestureAccepted, pinchGestureCommitted],
+  );
+  const priceScaleGestureTransaction = useMemo<NativeViewportGestureTransactionState>(
+    () => ({ accepted: priceScaleGestureAccepted, committed: priceScaleGestureCommitted }),
+    [priceScaleGestureAccepted, priceScaleGestureCommitted],
+  );
+  const timeScaleGestureTransaction = useMemo<NativeViewportGestureTransactionState>(
+    () => ({ accepted: timeScaleGestureAccepted, committed: timeScaleGestureCommitted }),
+    [timeScaleGestureAccepted, timeScaleGestureCommitted],
+  );
   const chartPanGestureState = useMemo<NativeChartPanGestureState>(
     () => ({
       active: panActive,
@@ -241,6 +266,7 @@ export function useNativeSkiaInteractionRuntime({
       priceAutoScale,
       activeTimePerPixel: activePanTimePerPixel,
       activePricePerPixel: activePanPricePerPixel,
+      transaction: panGestureTransaction,
     }),
     [
       activePanPricePerPixel,
@@ -250,6 +276,7 @@ export function useNativeSkiaInteractionRuntime({
       panPaneDividerTarget,
       panMetrics,
       panStartViewport,
+      panGestureTransaction,
       priceAutoScale,
       sharedViewport,
     ],
@@ -265,6 +292,7 @@ export function useNativeSkiaInteractionRuntime({
       activeAnchorPrice: activeAxisPinchAnchorPrice,
       activeStartSpanX: activeAxisPinchStartSpanX,
       activeStartSpanY: activeAxisPinchStartSpanY,
+      transaction: pinchGestureTransaction,
     }),
     [
       activeAxisPinchAnchorPrice,
@@ -274,6 +302,7 @@ export function useNativeSkiaInteractionRuntime({
       panMetrics,
       panStartViewport,
       pinchActive,
+      pinchGestureTransaction,
       priceAutoScale,
       sharedViewport,
     ],
@@ -287,12 +316,14 @@ export function useNativeSkiaInteractionRuntime({
       priceAutoScale,
       activeAnchorPrice: activePriceScaleAnchorPrice,
       indicatorPaneTarget: indicatorPaneScaleTarget,
+      transaction: priceScaleGestureTransaction,
     }),
     [
       activePriceScaleAnchorPrice,
       indicatorPaneScaleTarget,
       panStartViewport,
       priceAutoScale,
+      priceScaleGestureTransaction,
       priceScaleActive,
       sharedViewport,
     ],
@@ -305,8 +336,17 @@ export function useNativeSkiaInteractionRuntime({
       metrics: panMetrics,
       priceAutoScale,
       activeAnchorTime: activeTimeScaleAnchorTime,
+      transaction: timeScaleGestureTransaction,
     }),
-    [activeTimeScaleAnchorTime, panMetrics, panStartViewport, priceAutoScale, sharedViewport, timeScaleActive],
+    [
+      activeTimeScaleAnchorTime,
+      panMetrics,
+      panStartViewport,
+      priceAutoScale,
+      sharedViewport,
+      timeScaleActive,
+      timeScaleGestureTransaction,
+    ],
   );
 
   return {

@@ -2,9 +2,9 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { TimeRangeClampAnchor } from '../../viewport/timeRangeConstraints';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
-import type { NativePaneDividerTarget } from './nativePaneDivider';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeAutoScaleBar } from './nativeAutoScale';
+import type { NativePaneDividerTarget } from './nativePaneDivider';
 
 import { clampViewportTimeRange } from '../../viewport/timeRangeConstraints';
 import { applyNativePriceAutoScale } from './nativeAutoScale';
@@ -29,6 +29,22 @@ export interface NativePriceAutoScaleSharedValues {
   bars: SharedValue<NativeAutoScaleBar[]>;
 }
 
+/**
+ * UI-thread gesture transaction flags.
+ *
+ * Android can deliver begin/update/finalize callbacks after a touch sequence
+ * was failed or after an end callback already handed the committed value to JS.
+ * These flags make the worklet state explicit:
+ *
+ * - accepted: the touch-down hit-test claimed this gesture.
+ * - committed: the gesture handed off its final value; finalize must not roll
+ *   the shared preview back after this point even when RNGH reports failure.
+ */
+export interface NativeViewportGestureTransactionState {
+  accepted: SharedValue<boolean>;
+  committed: SharedValue<boolean>;
+}
+
 export interface NativeChartPanGestureState {
   /**
    * Set when a pan starts inside an indicator pane. A drag there is two
@@ -46,6 +62,7 @@ export interface NativeChartPanGestureState {
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeTimePerPixel: SharedValue<number>;
   activePricePerPixel: SharedValue<number>;
+  transaction?: NativeViewportGestureTransactionState;
 }
 
 export interface NativeChartAxisPinchGestureState {
@@ -58,6 +75,7 @@ export interface NativeChartAxisPinchGestureState {
   activeAnchorPrice: SharedValue<number>;
   activeStartSpanX: SharedValue<number>;
   activeStartSpanY: SharedValue<number>;
+  transaction?: NativeViewportGestureTransactionState;
 }
 
 /**
@@ -84,6 +102,7 @@ export interface NativePriceScaleGestureState {
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeAnchorPrice: SharedValue<number>;
   indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
+  transaction?: NativeViewportGestureTransactionState;
 }
 
 export interface NativeTimeScaleGestureState {
@@ -93,6 +112,7 @@ export interface NativeTimeScaleGestureState {
   metrics: NativeViewportGestureMetrics;
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeAnchorTime: SharedValue<number>;
+  transaction?: NativeViewportGestureTransactionState;
 }
 
 export interface NativePriceScaleHitGeometry {
@@ -244,6 +264,45 @@ export function resetNativeViewportGestureActiveFlags({
   pinchActive.value = false;
   priceScaleActive.value = false;
   timeScaleActive.value = false;
+}
+
+export function resetNativeViewportGestureTransaction(
+  transaction: NativeViewportGestureTransactionState | undefined,
+): void {
+  'worklet';
+  if (!transaction) return;
+  transaction.accepted.value = false;
+  transaction.committed.value = false;
+}
+
+export function acceptNativeViewportGestureTransaction(
+  transaction: NativeViewportGestureTransactionState | undefined,
+): void {
+  'worklet';
+  if (!transaction) return;
+  transaction.accepted.value = true;
+}
+
+export function commitNativeViewportGestureTransaction(
+  transaction: NativeViewportGestureTransactionState | undefined,
+): void {
+  'worklet';
+  if (!transaction) return;
+  transaction.committed.value = true;
+}
+
+export function nativeViewportGestureTransactionAccepted(
+  transaction: NativeViewportGestureTransactionState | undefined,
+): boolean {
+  'worklet';
+  return transaction ? transaction.accepted.value : true;
+}
+
+export function nativeViewportGestureTransactionCommitted(
+  transaction: NativeViewportGestureTransactionState | undefined,
+): boolean {
+  'worklet';
+  return transaction ? transaction.committed.value : false;
 }
 
 export function syncNativeViewportGestureMetrics({
