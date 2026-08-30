@@ -83,7 +83,7 @@ export function nativePaneRangeOverridesCaughtUp({
   panes: readonly NativePaneFrame[];
 }): boolean {
   if (Object.keys(overrides).length === 0) return true;
-  return resolveSettledNativePaneRangeOverrides({ overrides, panes }).settled;
+  return Object.keys(resolveSettledNativePaneRangeOverrides({ overrides, panes }).remaining).length === 0;
 }
 
 export function nativePaneRangesEqual(
@@ -122,5 +122,6 @@ export function nativePaneRatiosCaughtUp({
   panes: readonly { height: number; id: string }[];
   ratios: Readonly<Record<string, number>>;
 }): boolean {
-  return nativePaneHeightsMatchRatios(panes, ratios);
+  const targetPanes = panes.filter((pane) => ratios[pane.id] !== undefined);
+  return nativePaneHeightsMatchRatios(targetPanes, ratios);
 }
