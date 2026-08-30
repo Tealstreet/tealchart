@@ -66,7 +66,6 @@ import {
 import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
-import { resolveNativePaneDividerAtY } from './mobile/interaction/nativePaneDivider';
 import {
   NATIVE_RESET_VIEW_DISMISS_MS,
   resolveNativeResetViewButtonLayout,
@@ -87,7 +86,6 @@ import { useNativeUserDrawingRuntime } from './mobile/interaction/useNativeUserD
 import { useNativeViewportRuntime } from './mobile/interaction/useNativeViewportRuntime';
 import { PRICE_AXIS_TAG_HEIGHT } from './mobile/render/nativeAxisTagLayout';
 import { NativeChartCanvasLayers } from './mobile/render/NativeChartCanvasLayers';
-import { getNativePaneAtY } from './mobile/render/nativeChartFrame';
 import { NativeChartLegendOverlay } from './mobile/render/NativeChartLegendOverlay';
 import {
   NativeChartSettingsButton,
@@ -102,10 +100,10 @@ import {
   NATIVE_LEFT_TOOL_RAIL_DRAWER_WIDTH,
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
-import {
-  NativePaneDividerResizeLayer,
-  nativePaneDividerSnapshotBridgeVisible,
-} from './mobile/render/NativePaneDividerResizeLayer';
+import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
+import { getNativePaneAtY } from './mobile/render/nativeChartFrame';
+import { resolveNativePaneDividerAtY } from './mobile/interaction/nativePaneDivider';
+import { resolveSettledNativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
@@ -151,8 +149,8 @@ import { applyChartOverridesToRenderOptions } from './overrides';
 import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
-import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
 import { NATIVE_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
+import { IDLE_PANE_MAXIMIZE_STATE, togglePaneMaximize } from './utils/paneMaximize';
 import { intervalToMs } from './viewport/viewScale';
 
 const STATIC_TOP_BAR_HEIGHT = 36;
@@ -753,13 +751,21 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
   }, [canvasRef, cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
 
-  // Cancellation cleanup only. A committed divider drag is released by the
-  // snapshot bridge itself once the frame no longer matches the captured
-  // drag-start geometry; clearing here would re-open the Android flap.
+  // Held one tick past the commit so the live chart has drawn the new heights
+  // before the bitmaps go, or the release flashes the pre-drag layout.
   const handleNativePaneDividerResizeEnd = useCallback(() => {
     cancelNativePaneSnapshotRelease();
-    paneDividerBands.value = [];
-    replaceNativePaneSnapshots([]);
+    nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
+      nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
+        nativePaneSnapshotReleaseRef.current = null;
+        // Cleared with the bitmaps, not at finalize: the bands still place them
+        // for the two frames the live chart needs to draw the committed heights.
+        // Leaving them set displaces every legend permanently, since the frame
+        // has by then moved the panes too.
+        paneDividerBands.value = [];
+        replaceNativePaneSnapshots([]);
+      });
+    });
   }, [cancelNativePaneSnapshotRelease, paneDividerBands, replaceNativePaneSnapshots]);
 
   useEffect(
@@ -909,27 +915,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   });
 
   nativePaneSnapshotFrameRef.current = frame;
-
-  useEffect(() => {
-    if (!frame || nativePaneSnapshots.length === 0) return;
-    if (
-      nativePaneDividerSnapshotBridgeVisible({
-        bands: paneDividerBands.value,
-        frame,
-        target: chartPanGestureState.paneDividerTarget.value,
-      })
-    ) {
-      return;
-    }
-    paneDividerBands.value = [];
-    replaceNativePaneSnapshots([]);
-  }, [
-    chartPanGestureState.paneDividerTarget,
-    frame,
-    nativePaneSnapshots.length,
-    paneDividerBands,
-    replaceNativePaneSnapshots,
-  ]);
 
   // Held while the transition runs, so the legend stays on the geometry it was
   // last drawn at rather than dropping a collapsing pane's rows a commit early.
@@ -1878,9 +1863,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       message,
     };
     nativeGestureDebugSequenceRef.current = nextEntry.id;
-    setNativeGestureDebugEntries((current) =>
-      [nextEntry, ...current].slice(0, NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT),
-    );
+    setNativeGestureDebugEntries((current) => [nextEntry, ...current].slice(0, NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT));
   }, []);
   const resolveNativeGestureDebugHit = useCallback(
     (x: number, y: number): string => {
@@ -1936,6 +1919,35 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [indicatorManager],
   );
+
+  // The override is what the layers drew from during the drag; the frame catches
+  // up a render later. Dropping it on commit meant those in-between frames fell
+  // back to the pre-drag range and the pane visibly snapped back before
+  // settling, so it is held until the frame agrees and only then released.
+  useEffect(() => {
+    if (!frame) return;
+    if (!resolveSettledNativePaneRangeOverrides({ overrides: paneRangeOverrides.value, panes: frame.panes }).settled) {
+      return;
+    }
+
+    // Hand the pane back a frame late, for the same reason the order drag does.
+    // These layers read the override from a shared value but fall back to the
+    // pane from their closure. Clearing the shared value re-evaluates them on
+    // the UI thread at once, while the closure carrying the committed range only
+    // reaches it on Reanimated's next propagation - so the pane drew one frame
+    // at its PRE-drag scale before the new one landed. That is the flap.
+    //
+    // Re-resolved inside the frame rather than reusing what was computed above,
+    // so a drag that started in the meantime keeps its own override.
+    const handle = requestAnimationFrame(() => {
+      const { remaining, settled } = resolveSettledNativePaneRangeOverrides({
+        overrides: paneRangeOverrides.value,
+        panes: frame.panes,
+      });
+      if (settled) paneRangeOverrides.value = remaining;
+    });
+    return () => cancelAnimationFrame(handle);
+  }, [frame, paneRangeOverrides]);
 
   const handleNativePriceAxisResetTap = useCallback(() => {
     if (!hasDataViewport) return;
@@ -2160,7 +2172,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         {nativePaneSnapshots.length > 0 && frame ? (
           <NativePaneDividerResizeLayer
             bands={paneDividerBands}
-            frame={frame}
             snapshots={nativePaneSnapshots}
             target={chartPanGestureState.paneDividerTarget}
             width={frame.dimensions.width}

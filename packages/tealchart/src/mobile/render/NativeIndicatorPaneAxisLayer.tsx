@@ -1,25 +1,24 @@
 import type { Skia } from '@shopify/react-native-skia';
 import type { SharedValue } from 'react-native-reanimated';
-import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 
 import { memo, useMemo } from 'react';
 
-import { Glyphs, Skia as SkiaApi, Path as SkiaPath } from '@shopify/react-native-skia';
+import { Glyphs, Path as SkiaPath, Skia as SkiaApi } from '@shopify/react-native-skia';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { createNativeLeftAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
-import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
 import { fitNativeAxisTextToCharacterCountWorklet } from './nativeAxisTagLayout';
 import {
   getNativePriceGridSlot,
   getNativePriceGridSlotCount,
   NATIVE_INDICATOR_PANE_MIN_LABEL_SPACING,
 } from './nativeGridSlots';
-import { resolveNativePaneRange } from './nativePaneRangeOverride';
 import { formatNativeIndicatorAxisTickWorklet } from './nativePriceFormat';
+import type { NativeAxisGlyph } from './nativeAxisLabelGlyphs';
+import { appendNativeAxisLabelGlyphs, createNativeAxisGlyphMetrics } from './nativeAxisLabelGlyphs';
 import { measureNativeSkiaAxisCharacterWidth, NATIVE_ANIMATED_TEXT_CHARACTERS } from './nativeSkiaText';
 
 export interface NativeIndicatorPaneAxisSlot {
@@ -198,7 +197,8 @@ function NativeIndicatorPaneAxisGridPath({
     for (let paneIndex = 0; paneIndex < indicatorPanes.length; paneIndex += 1) {
       const pane = indicatorPanes[paneIndex];
       if (!pane) continue;
-      const range = resolveNativePaneRange(pane, overrides);
+      const override = overrides ? overrides[pane.id] : undefined;
+      const range = override ?? { yMin: pane.yMin, yMax: pane.yMax };
       const count = slotCounts[paneIndex] ?? 0;
       for (let index = 0; index < count; index += 1) {
         const slot = resolveNativeIndicatorPaneAxisSlot({
@@ -251,7 +251,8 @@ function NativeIndicatorPaneAxisLabelGlyphs({
     for (let paneIndex = 0; paneIndex < indicatorPanes.length; paneIndex += 1) {
       const pane = indicatorPanes[paneIndex];
       if (!pane) continue;
-      const range = resolveNativePaneRange(pane, overrides);
+      const override = overrides ? overrides[pane.id] : undefined;
+      const range = override ?? { yMin: pane.yMin, yMax: pane.yMax };
       const count = slotCounts[paneIndex] ?? 0;
       for (let index = 0; index < count; index += 1) {
         const slot = resolveNativeIndicatorPaneAxisSlot({

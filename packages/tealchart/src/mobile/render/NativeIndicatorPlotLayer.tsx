@@ -1,6 +1,6 @@
 import type { SkPath } from '@shopify/react-native-skia';
-import type { PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { SharedValue } from 'react-native-reanimated';
+import type { PlotLineStyle, PlotOutput, PlotStyle } from '@tealstreet/tealscript';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
@@ -68,24 +68,6 @@ function nativePaneValueToY(value: number, pane: NativePaneFrame): number {
   return pane.top + ((pane.yMax - value) / range) * pane.height;
 }
 
-function shouldApplyNativeIndicatorPlotPaneRangeOverride(
-  pane: NativePaneFrame,
-  override: NativePaneRangeOverrides[string] | undefined,
-): boolean {
-  'worklet';
-  if (!override) return false;
-  if (!override.committed) return true;
-  if (pane.yMin === override.yMin && pane.yMax === override.yMax) return false;
-  if (
-    override.startYMin !== undefined &&
-    override.startYMax !== undefined &&
-    (pane.yMin !== override.startYMin || pane.yMax !== override.startYMax)
-  ) {
-    return false;
-  }
-  return true;
-}
-
 function nativeIndicatorPlotPane(
   frame: NativeChartFrame,
   plot: PlotOutput,
@@ -131,9 +113,8 @@ function nativeSharedIndicatorYToPathValue({
     // Inlined rather than shared with the axis layer: a worklet reaching across
     // modules for this resolved to undefined on the UI runtime at run time.
     const override = paneRangeOverrides ? paneRangeOverrides[pane.id] : undefined;
-    const applyOverride = shouldApplyNativeIndicatorPlotPaneRangeOverride(pane, override);
-    const yMin = applyOverride ? override!.yMin : pane.yMin;
-    const yMax = applyOverride ? override!.yMax : pane.yMax;
+    const yMin = override ? override.yMin : pane.yMin;
+    const yMax = override ? override.yMax : pane.yMax;
     const span = yMax - yMin;
     if (span === 0) return pane.top + pane.height / 2;
     return pane.top + ((yMax - value) / span) * pane.height;
@@ -198,13 +179,7 @@ function getNativeIndicatorLinePath({
     const x = nativeIndicatorPointX({ frame, point, projection, sharedViewport });
     const y = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: point.value })
-      : nativeSharedIndicatorYToPathValue({
-          frame,
-          pane,
-          paneRangeOverrides,
-          sharedViewport: sharedViewport!,
-          value: point.value,
-        });
+      : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport: sharedViewport!, value: point.value });
 
     if (!isDrawing) {
       path.moveTo(x, y);
@@ -248,13 +223,7 @@ function getNativeIndicatorHistogramPath({
   const timeRange = endTime - startTime;
   const baselineY = projection
     ? nativeIndicatorYToPathValue({ frame, pane, projection, value: histbase })
-    : nativeSharedIndicatorYToPathValue({
-        frame,
-        pane,
-        paneRangeOverrides,
-        sharedViewport: sharedViewport!,
-        value: histbase,
-      });
+    : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport: sharedViewport!, value: histbase });
 
   for (let index = 0; index < points.length; index += 1) {
     const point = points[index];
@@ -266,13 +235,7 @@ function getNativeIndicatorHistogramPath({
     const x = nativeIndicatorPointX({ frame, point, projection, sharedViewport });
     const y = projection
       ? nativeIndicatorYToPathValue({ frame, pane, projection, value: point.value })
-      : nativeSharedIndicatorYToPathValue({
-          frame,
-          pane,
-          paneRangeOverrides,
-          sharedViewport: sharedViewport!,
-          value: point.value,
-        });
+      : nativeSharedIndicatorYToPathValue({ frame, pane, paneRangeOverrides, sharedViewport: sharedViewport!, value: point.value });
     const barTop = Math.min(y, baselineY);
     const barHeight = Math.max(1, Math.abs(y - baselineY));
     path.addRect(Skia.XYWHRect(x - barWidth / 2, barTop, barWidth, barHeight));
@@ -338,14 +301,7 @@ function NativeLiveIndicatorPlotPath({
   const path = useDerivedValue(() => {
     const overrides = paneRangeOverrides?.value;
     return isHistogram
-      ? getNativeIndicatorHistogramPath({
-          frame,
-          histbase,
-          pane,
-          paneRangeOverrides: overrides,
-          points,
-          sharedViewport,
-        })
+      ? getNativeIndicatorHistogramPath({ frame, histbase, pane, paneRangeOverrides: overrides, points, sharedViewport })
       : getNativeIndicatorLinePath({ frame, pane, paneRangeOverrides: overrides, points, sharedViewport, style });
   });
 
