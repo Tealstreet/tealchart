@@ -1,6 +1,9 @@
 import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
+import type { NativeReleaseHold } from './nativeReleaseHold';
+
+import { createNativeReleaseHold, resolveNativeReleaseHold } from './nativeReleaseHold';
 
 const VIEWPORT_MATCH_EPSILON = 1e-6;
 
@@ -99,7 +102,8 @@ export function syncNativeSharedViewportIfIdle({
 export interface NativeViewportOwnershipState {
   hasManualViewport: boolean;
   nativeViewportOwned: boolean;
-  pendingNativeViewportCommit: Viewport | null;
+  releaseHoldToken: number;
+  viewportReleaseHold: NativeReleaseHold<Viewport> | null;
 }
 
 export type NativeViewportSyncResult =
@@ -116,7 +120,8 @@ export function createNativeViewportOwnershipState(): NativeViewportOwnershipSta
   return {
     hasManualViewport: false,
     nativeViewportOwned: false,
-    pendingNativeViewportCommit: null,
+    releaseHoldToken: 0,
+    viewportReleaseHold: null,
   };
 }
 
@@ -131,7 +136,7 @@ export function cancelNativeViewportOwnership(state: NativeViewportOwnershipStat
   return {
     ...state,
     nativeViewportOwned: false,
-    pendingNativeViewportCommit: null,
+    viewportReleaseHold: null,
   };
 }
 
@@ -142,7 +147,13 @@ export function commitNativeViewportOwnership(
   return {
     hasManualViewport: true,
     nativeViewportOwned: true,
-    pendingNativeViewportCommit: nextViewport,
+    releaseHoldToken: state.releaseHoldToken + 1,
+    viewportReleaseHold: createNativeReleaseHold({
+      kind: 'viewport',
+      releaseFrames: 0,
+      target: nextViewport,
+      token: state.releaseHoldToken + 1,
+    }),
   };
 }
 
@@ -166,7 +177,18 @@ export function applyNativeViewportSync({
   nativeInteractionActive: boolean;
   viewport: Viewport;
 }): NativeViewportSyncResult {
-  if (state.pendingNativeViewportCommit && nativeViewportsMatch(viewport, state.pendingNativeViewportCommit)) {
+  if (state.viewportReleaseHold) {
+    const nextHold = resolveNativeReleaseHold({
+      caughtUp: nativeViewportsMatch(viewport, state.viewportReleaseHold.target),
+      hold: state.viewportReleaseHold,
+    });
+    if (!nextHold.released) {
+      return {
+        type: 'skipped',
+        state: nextHold.hold === state.viewportReleaseHold ? state : { ...state, viewportReleaseHold: nextHold.hold },
+      };
+    }
+
     syncNativeSharedViewportIfChanged(sharedViewport, viewport);
     syncNativeSharedViewportIfChanged(panStartViewport, viewport);
     return {
@@ -174,7 +196,7 @@ export function applyNativeViewportSync({
       state: {
         ...state,
         nativeViewportOwned: false,
-        pendingNativeViewportCommit: null,
+        viewportReleaseHold: null,
       },
     };
   }

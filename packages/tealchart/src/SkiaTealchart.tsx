@@ -22,6 +22,7 @@ import type { NativeChartSettingsActionCommand } from './mobile/render/NativeCha
 import type { NativeCrosshairContextMenuState } from './mobile/render/NativeCrosshairContextMenuOverlay';
 import type { NativeIndicatorPaneInfo } from './mobile/render/NativeIndicatorPlotLayer';
 import type { NativePaneSnapshot } from './mobile/render/NativePaneDividerResizeLayer';
+import type { NativeReleaseHold } from './mobile/interaction/nativeReleaseHold';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './mobile/utils/tradeLineLayout';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
 import type { ChartSettings, CurrentLayoutState, SaveStatus } from './state/chartState';
@@ -67,6 +68,14 @@ import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
 import {
+  createNativePaneRatioTarget,
+  createNativeReleaseHold,
+  nativePaneRangeOverridesCaughtUp,
+  nativePaneRatiosCaughtUp,
+  omitReleasedNativePaneRangeOverrides,
+  resolveNativeReleaseHold,
+} from './mobile/interaction/nativeReleaseHold';
+import {
   NATIVE_RESET_VIEW_DISMISS_MS,
   resolveNativeResetViewButtonLayout,
   resolveNativeResetViewTapTarget,
@@ -103,7 +112,7 @@ import {
 import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
 import { getNativePaneAtY } from './mobile/render/nativeChartFrame';
 import { resolveNativePaneDividerAtY } from './mobile/interaction/nativePaneDivider';
-import { resolveSettledNativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
+import type { NativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
@@ -133,7 +142,6 @@ import { resolveNativeLeftToolRailToggleHitRect } from './mobile/utils/leftToolR
 import {
   applyNativePaneHeightOverrides,
   createNativePaneLayoutSignature,
-  nativePaneHeightsMatchRatios,
 } from './mobile/utils/nativePaneLayoutOverrides';
 import { createNativePriceAxisLaneWidth } from './mobile/utils/nativePriceAxisLane';
 import {
@@ -162,7 +170,6 @@ const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>[
 const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
-const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
 const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
 const NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT = 9;
 
@@ -487,56 +494,55 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     const nextWidth = createNativeInitialPriceAxisWidth();
     setNativePriceAxisWidth((current) => Math.max(current, nextWidth));
   }, [createNativeInitialPriceAxisWidth]);
+  const nativeReleaseHoldTokenRef = useRef(0);
+  const createNextNativeReleaseHoldToken = useCallback(() => {
+    nativeReleaseHoldTokenRef.current += 1;
+    return nativeReleaseHoldTokenRef.current;
+  }, []);
+  const [nativePaneRangeReleaseHold, setNativePaneRangeReleaseHold] =
+    useState<NativeReleaseHold<NativePaneRangeOverrides> | null>(null);
+  const [nativePaneDividerReleaseHold, setNativePaneDividerReleaseHold] =
+    useState<NativeReleaseHold<Readonly<Record<string, number>>> | null>(null);
+  const [nativeMaximizeReleaseHold, setNativeMaximizeReleaseHold] =
+    useState<NativeReleaseHold<Readonly<Record<string, number>>> | null>(null);
   // Pane heights the user set by dragging a divider. Chart-owned, exactly as web
   // keeps them in ChartCore rather than pushing them back into the manager.
   const [nativePaneHeightOverrides, setNativePaneHeightOverrides] = useState<Readonly<Record<string, number>>>({});
-  const handleNativePaneHeightsChange = useCallback((heights: readonly { heightRatio: number; paneId: string }[]) => {
-    setNativePaneHeightOverrides((current) => {
-      let changed = false;
-      const next = { ...current };
-      for (const { heightRatio, paneId } of heights) {
-        if (next[paneId] === heightRatio) continue;
-        next[paneId] = heightRatio;
-        changed = true;
+  const handleNativePaneHeightsChange = useCallback(
+    (heights: readonly { heightRatio: number; paneId: string }[]) => {
+      const target = createNativePaneRatioTarget(heights);
+      if (Object.keys(target).length > 0) {
+        setNativePaneDividerReleaseHold(
+          createNativeReleaseHold({
+            kind: 'paneDividerResize',
+            target,
+            token: createNextNativeReleaseHoldToken(),
+          }),
+        );
       }
-      return changed ? next : current;
-    });
-  }, []);
+      setNativePaneHeightOverrides((current) => {
+        let changed = false;
+        const next = { ...current };
+        for (const { heightRatio, paneId } of heights) {
+          if (next[paneId] === heightRatio) continue;
+          next[paneId] = heightRatio;
+          changed = true;
+        }
+        return changed ? next : current;
+      });
+    },
+    [createNextNativeReleaseHoldToken],
+  );
 
   const nativePaneMaximizeStateRef = useRef<PaneMaximizeState>(IDLE_PANE_MAXIMIZE_STATE);
   // Inside the canvas a maximize is atomic now: every consumer of pane geometry
   // reads it through a derived value, so the commit paints all-old and the
   // propagation after it paints all-new, both self-consistent. The legend cannot
   // join that channel - it is a React Native view outside the canvas, and it
-  // drops a pane's rows the moment the pane's height reaches zero - so it is
-  // held on the frame it was drawn at until the layout agrees with the ratios
-  // that were asked for.
-  // A counter, not a flag: a second toggle while the first is still holding has
-  // to re-arm the ceiling below, and setting a boolean that is already true does
-  // not re-run the effect that owns it.
-  const [nativeMaximizeHoldId, setNativeMaximizeHoldId] = useState(0);
-  const nativeMaximizeHolding = nativeMaximizeHoldId > 0;
-  const nativeMaximizeTargetRatiosRef = useRef<Readonly<Record<string, number>> | null>(null);
-  const nativeMaximizeReleaseRef = useRef<number | null>(null);
-  const nativeMaximizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // drops a pane's rows the moment the pane's height reaches zero - so it uses
+  // the same release-hold controller as divider/range gestures.
+  const nativeMaximizeHolding = nativeMaximizeReleaseHold !== null;
   const nativeMaximizeFrameRef = useRef<NativeChartFrame | null>(null);
-
-  const cancelNativeMaximizeRelease = useCallback(() => {
-    if (nativeMaximizeReleaseRef.current !== null) {
-      cancelAnimationFrame(nativeMaximizeReleaseRef.current);
-      nativeMaximizeReleaseRef.current = null;
-    }
-    if (nativeMaximizeTimeoutRef.current !== null) {
-      clearTimeout(nativeMaximizeTimeoutRef.current);
-      nativeMaximizeTimeoutRef.current = null;
-    }
-  }, []);
-
-  const endNativeMaximizeTransition = useCallback(() => {
-    cancelNativeMaximizeRelease();
-    nativeMaximizeTargetRatiosRef.current = null;
-    setNativeMaximizeHoldId(0);
-  }, [cancelNativeMaximizeRelease]);
 
   const handleNativeTogglePaneMaximize = useCallback(
     (paneId: string) => {
@@ -546,14 +552,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!toggled) return;
       nativePaneMaximizeStateRef.current = toggled.state;
 
-      // Tapping again mid-transition must not let the old release end the hold
-      // this one is about to start.
-      cancelNativeMaximizeRelease();
-      nativeMaximizeTargetRatiosRef.current = toggled.heightRatios;
-      setNativeMaximizeHoldId((current) => current + 1);
+      setNativeMaximizeReleaseHold(
+        createNativeReleaseHold({
+          kind: 'paneMaximizeLegend',
+          target: toggled.heightRatios,
+          token: createNextNativeReleaseHoldToken(),
+        }),
+      );
       setNativePaneHeightOverrides((current) => ({ ...current, ...toggled.heightRatios }));
     },
-    [cancelNativeMaximizeRelease],
+    [createNextNativeReleaseHoldToken],
   );
 
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
@@ -723,17 +731,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativePaneSnapshots(next);
   }, []);
   const nativePaneSnapshotFrameRef = useRef<NativeChartFrame | null>(null);
-  const nativePaneSnapshotReleaseRef = useRef<number | null>(null);
-  const cancelNativePaneSnapshotRelease = useCallback(() => {
-    if (nativePaneSnapshotReleaseRef.current === null) return;
-    cancelAnimationFrame(nativePaneSnapshotReleaseRef.current);
-    nativePaneSnapshotReleaseRef.current = null;
-  }, []);
+  const clearNativePaneDividerReleaseHold = useCallback(() => {
+    setNativePaneDividerReleaseHold(null);
+    paneDividerBands.value = [];
+    replaceNativePaneSnapshots([]);
+  }, [paneDividerBands, replaceNativePaneSnapshots]);
 
   const handleNativePaneDividerResizeStart = useCallback(() => {
     // Grabbing again before the last release landed must not let that release
     // wipe the bitmaps this drag just captured.
-    cancelNativePaneSnapshotRelease();
+    setNativePaneDividerReleaseHold(null);
     const canvas = canvasRef.current;
     const currentFrame = nativePaneSnapshotFrameRef.current;
     if (!canvas || !currentFrame) return;
@@ -749,31 +756,24 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     } catch {
       replaceNativePaneSnapshots([]);
     }
-  }, [canvasRef, cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots]);
+  }, [canvasRef, replaceNativePaneSnapshots]);
 
-  // Held one tick past the commit so the live chart has drawn the new heights
-  // before the bitmaps go, or the release flashes the pre-drag layout.
-  const handleNativePaneDividerResizeEnd = useCallback(() => {
-    cancelNativePaneSnapshotRelease();
-    nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
-      nativePaneSnapshotReleaseRef.current = requestAnimationFrame(() => {
-        nativePaneSnapshotReleaseRef.current = null;
-        // Cleared with the bitmaps, not at finalize: the bands still place them
-        // for the two frames the live chart needs to draw the committed heights.
-        // Leaving them set displaces every legend permanently, since the frame
-        // has by then moved the panes too.
-        paneDividerBands.value = [];
-        replaceNativePaneSnapshots([]);
-      });
-    });
-  }, [cancelNativePaneSnapshotRelease, paneDividerBands, replaceNativePaneSnapshots]);
+  // Success releases through nativePaneDividerReleaseHold, after the committed
+  // frame confirms the target ratios. Failed/cancelled gestures have no commit
+  // to wait for, so the preview can disappear immediately.
+  const handleNativePaneDividerResizeEnd = useCallback(
+    (success = true) => {
+      if (success) return;
+      clearNativePaneDividerReleaseHold();
+    },
+    [clearNativePaneDividerReleaseHold],
+  );
 
   useEffect(
     () => () => {
-      cancelNativePaneSnapshotRelease();
-      replaceNativePaneSnapshots([]);
+      clearNativePaneDividerReleaseHold();
     },
-    [cancelNativePaneSnapshotRelease, replaceNativePaneSnapshots],
+    [clearNativePaneDividerReleaseHold],
   );
 
   // Imperative overrides layer over the prop, mirroring imperativeTheme. Reset
@@ -916,44 +916,39 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
 
   nativePaneSnapshotFrameRef.current = frame;
 
+  useLayoutEffect(() => {
+    if (!frame || !nativePaneDividerReleaseHold) return;
+    const resolution = resolveNativeReleaseHold({
+      caughtUp: nativePaneRatiosCaughtUp({
+        panes: frame.panes,
+        ratios: nativePaneDividerReleaseHold.target,
+      }),
+      hold: nativePaneDividerReleaseHold,
+    });
+    if (resolution.hold === nativePaneDividerReleaseHold) return;
+    setNativePaneDividerReleaseHold(resolution.hold);
+    if (!resolution.released) return;
+    paneDividerBands.value = [];
+    replaceNativePaneSnapshots([]);
+  }, [frame, nativePaneDividerReleaseHold, paneDividerBands, replaceNativePaneSnapshots]);
+
   // Held while the transition runs, so the legend stays on the geometry it was
   // last drawn at rather than dropping a collapsing pane's rows a commit early.
   if (!nativeMaximizeHolding && frame) nativeMaximizeFrameRef.current = frame;
   const nativeLegendFrame = nativeMaximizeHolding ? (nativeMaximizeFrameRef.current ?? frame) : frame;
 
   useLayoutEffect(() => {
-    if (!nativeMaximizeHoldId) return;
-    const targetRatios = nativeMaximizeTargetRatiosRef.current;
-    if (!frame || !targetRatios) {
-      endNativeMaximizeTransition();
-      return;
-    }
-    // Normally already true on the first run - a plain toggle applies in one
-    // commit - so the release below comes down to waiting out one Reanimated
-    // propagation. The check is what covers the transitions that take more than
-    // one commit, and what keeps a bar tick's re-frame from releasing early.
-    if (!nativePaneHeightsMatchRatios(frame.panes, targetRatios)) return;
-    if (nativeMaximizeReleaseRef.current !== null) return;
-    // One frame, not two. The canvas repaints on the propagation after this
-    // commit, so releasing at the frame after that would leave the legend a
-    // frame behind panes that have already moved - which used to be hidden
-    // under the bitmap and is not any more.
-    nativeMaximizeReleaseRef.current = requestAnimationFrame(() => {
-      nativeMaximizeReleaseRef.current = null;
-      endNativeMaximizeTransition();
+    if (!frame || !nativeMaximizeReleaseHold) return;
+    const resolution = resolveNativeReleaseHold({
+      caughtUp: nativePaneRatiosCaughtUp({
+        panes: frame.panes,
+        ratios: nativeMaximizeReleaseHold.target,
+      }),
+      hold: nativeMaximizeReleaseHold,
     });
-  }, [endNativeMaximizeTransition, frame, nativeMaximizeHoldId]);
-
-  useEffect(() => {
-    if (!nativeMaximizeHoldId || nativeMaximizeTimeoutRef.current !== null) return;
-    // Ceiling: a layout that never reaches its ratios must not freeze the legend.
-    nativeMaximizeTimeoutRef.current = setTimeout(() => {
-      nativeMaximizeTimeoutRef.current = null;
-      endNativeMaximizeTransition();
-    }, NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS);
-  }, [endNativeMaximizeTransition, nativeMaximizeHoldId]);
-
-  useEffect(() => cancelNativeMaximizeRelease, [cancelNativeMaximizeRelease]);
+    if (resolution.hold === nativeMaximizeReleaseHold) return;
+    setNativeMaximizeReleaseHold(resolution.hold);
+  }, [frame, nativeMaximizeReleaseHold]);
 
   const nativeBarsReadyForRequestedData = nativeBarsMatchRequestedData({
     barsContext,
@@ -1913,41 +1908,62 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // linger over an already-reset chart.
   // Dragging an indicator pane's axis pins that pane's range, the same trade as
   // web: the user has said what they want to see, so auto-scale stops moving it.
+  const handleNativeIndicatorPaneScaleStart = useCallback(
+    (paneId: string) => {
+      setNativePaneRangeReleaseHold((current) => {
+        if (!current?.target[paneId]) return current;
+        const { [paneId]: _releasedPane, ...remaining } = current.target;
+        return Object.keys(remaining).length === 0
+          ? null
+          : createNativeReleaseHold({
+              kind: 'paneRangeOverride',
+              target: remaining,
+              token: createNextNativeReleaseHoldToken(),
+            });
+      });
+      const currentOverride = paneRangeOverrides.value[paneId];
+      if (currentOverride) {
+        const nextOverrides = omitReleasedNativePaneRangeOverrides({
+          current: paneRangeOverrides.value,
+          released: { [paneId]: currentOverride },
+        });
+        paneRangeOverrides.value = nextOverrides;
+      }
+    },
+    [createNextNativeReleaseHoldToken, paneRangeOverrides],
+  );
   const handleNativeIndicatorPaneScale = useCallback(
     (paneId: string, yMin: number, yMax: number) => {
+      const target = { [paneId]: { yMin, yMax } };
+      setNativePaneRangeReleaseHold((current) =>
+        createNativeReleaseHold({
+          kind: 'paneRangeOverride',
+          target: { ...(current?.target ?? {}), ...target },
+          token: createNextNativeReleaseHoldToken(),
+        }),
+      );
       indicatorManager?.setIndicatorPaneManualRange(paneId, yMin, yMax);
     },
-    [indicatorManager],
+    [createNextNativeReleaseHoldToken, indicatorManager],
   );
 
-  // The override is what the layers drew from during the drag; the frame catches
-  // up a render later. Dropping it on commit meant those in-between frames fell
-  // back to the pre-drag range and the pane visibly snapped back before
-  // settling, so it is held until the frame agrees and only then released.
-  useEffect(() => {
-    if (!frame) return;
-    if (!resolveSettledNativePaneRangeOverrides({ overrides: paneRangeOverrides.value, panes: frame.panes }).settled) {
-      return;
-    }
-
-    // Hand the pane back a frame late, for the same reason the order drag does.
-    // These layers read the override from a shared value but fall back to the
-    // pane from their closure. Clearing the shared value re-evaluates them on
-    // the UI thread at once, while the closure carrying the committed range only
-    // reaches it on Reanimated's next propagation - so the pane drew one frame
-    // at its PRE-drag scale before the new one landed. That is the flap.
-    //
-    // Re-resolved inside the frame rather than reusing what was computed above,
-    // so a drag that started in the meantime keeps its own override.
-    const handle = requestAnimationFrame(() => {
-      const { remaining, settled } = resolveSettledNativePaneRangeOverrides({
-        overrides: paneRangeOverrides.value,
+  useLayoutEffect(() => {
+    if (!frame || !nativePaneRangeReleaseHold) return;
+    const resolution = resolveNativeReleaseHold({
+      caughtUp: nativePaneRangeOverridesCaughtUp({
+        overrides: nativePaneRangeReleaseHold.target,
         panes: frame.panes,
-      });
-      if (settled) paneRangeOverrides.value = remaining;
+      }),
+      hold: nativePaneRangeReleaseHold,
     });
-    return () => cancelAnimationFrame(handle);
-  }, [frame, paneRangeOverrides]);
+    if (resolution.hold === nativePaneRangeReleaseHold) return;
+    setNativePaneRangeReleaseHold(resolution.hold);
+    if (!resolution.released) return;
+    paneRangeOverrides.value = omitReleasedNativePaneRangeOverrides({
+      current: paneRangeOverrides.value,
+      released: nativePaneRangeReleaseHold.target,
+    });
+  }, [frame, nativePaneRangeReleaseHold, paneRangeOverrides]);
 
   const handleNativePriceAxisResetTap = useCallback(() => {
     if (!hasDataViewport) return;
@@ -2013,6 +2029,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     overlayActionTargets: nativeOverlayActionTargets,
     onDrawingTap: handleNativeUserDrawingTap,
     onIndicatorPaneScale: handleNativeIndicatorPaneScale,
+    onIndicatorPaneScaleStart: handleNativeIndicatorPaneScaleStart,
     onPaneHeightsChange: handleNativePaneHeightsChange,
     onTogglePaneMaximize: handleNativeTogglePaneMaximize,
     onPaneDividerResizeStart: handleNativePaneDividerResizeStart,

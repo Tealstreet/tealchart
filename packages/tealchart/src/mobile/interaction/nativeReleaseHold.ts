@@ -86,6 +86,29 @@ export function nativePaneRangeOverridesCaughtUp({
   return resolveSettledNativePaneRangeOverrides({ overrides, panes }).settled;
 }
 
+export function nativePaneRangesEqual(
+  left: { yMin: number; yMax: number } | undefined,
+  right: { yMin: number; yMax: number } | undefined,
+): boolean {
+  if (!left || !right) return left === right;
+  return left.yMin === right.yMin && left.yMax === right.yMax;
+}
+
+export function omitReleasedNativePaneRangeOverrides({
+  current,
+  released,
+}: {
+  current: NativePaneRangeOverrides;
+  released: NativePaneRangeOverrides;
+}): NativePaneRangeOverrides {
+  const next: NativePaneRangeOverrides = {};
+  for (const paneId of Object.keys(current)) {
+    if (nativePaneRangesEqual(current[paneId], released[paneId])) continue;
+    next[paneId] = current[paneId]!;
+  }
+  return next;
+}
+
 export function createNativePaneRatioTarget(heights: readonly { heightRatio: number; paneId: string }[]): Readonly<Record<string, number>> {
   const target: Record<string, number> = {};
   for (const { heightRatio, paneId } of heights) target[paneId] = heightRatio;
