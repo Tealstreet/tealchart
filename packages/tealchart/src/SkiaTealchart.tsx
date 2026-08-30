@@ -68,12 +68,15 @@ import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
 import {
+  cancelNativePresentationRelease,
   createNativePaneRatioTarget,
+  createNativePresentationReleaseScheduler,
   createNativeReleaseHold,
   nativePaneRangeOverridesCaughtUp,
   nativePaneRatiosCaughtUp,
   omitReleasedNativePaneRangeOverrides,
   resolveNativeReleaseHold,
+  scheduleNativePresentationRelease,
 } from './mobile/interaction/nativeReleaseHold';
 import {
   NATIVE_RESET_VIEW_DISMISS_MS,
@@ -171,6 +174,7 @@ const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
+const NATIVE_PANE_DIVIDER_PRESENTATION_RELEASE_FRAMES = 2;
 const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
 const NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT = 9;
 
@@ -516,6 +520,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         setNativePaneDividerReleaseHold(
           createNativeReleaseHold({
             kind: 'paneDividerResize',
+            releaseFrames: 0,
             target,
             token: createNextNativeReleaseHoldToken(),
           }),
@@ -736,6 +741,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     setNativeSelectedTradeLine(null);
   }, []);
   const nativePaneSnapshotsRef = useRef<readonly NativePaneSnapshot[]>([]);
+  const nativePaneDividerPresentationReleaseRef = useRef(createNativePresentationReleaseScheduler());
   const replaceNativePaneSnapshots = useCallback((next: readonly NativePaneSnapshot[]) => {
     for (const snapshot of nativePaneSnapshotsRef.current) snapshot.image.dispose();
     nativePaneSnapshotsRef.current = next;
@@ -743,6 +749,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   }, []);
   const nativePaneSnapshotFrameRef = useRef<NativeChartFrame | null>(null);
   const clearNativePaneDividerReleaseHold = useCallback(() => {
+    cancelNativePresentationRelease(nativePaneDividerPresentationReleaseRef.current);
     setNativePaneDividerReleaseHold(null);
     paneDividerBands.value = [];
     replaceNativePaneSnapshots([]);
@@ -751,6 +758,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const handleNativePaneDividerResizeStart = useCallback(() => {
     // Grabbing again before the last release landed must not let that release
     // wipe the bitmaps this drag just captured.
+    cancelNativePresentationRelease(nativePaneDividerPresentationReleaseRef.current);
     setNativePaneDividerReleaseHold(null);
     const canvas = canvasRef.current;
     const currentFrame = nativePaneSnapshotFrameRef.current;
@@ -939,8 +947,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (resolution.hold === nativePaneDividerReleaseHold) return;
     setNativePaneDividerReleaseHold(resolution.hold);
     if (!resolution.released) return;
-    paneDividerBands.value = [];
-    replaceNativePaneSnapshots([]);
+    scheduleNativePresentationRelease({
+      frames: NATIVE_PANE_DIVIDER_PRESENTATION_RELEASE_FRAMES,
+      release: () => {
+        paneDividerBands.value = [];
+        replaceNativePaneSnapshots([]);
+      },
+      scheduler: nativePaneDividerPresentationReleaseRef.current,
+      token: nativePaneDividerReleaseHold.token,
+    });
   }, [frame, nativePaneDividerReleaseHold, paneDividerBands, replaceNativePaneSnapshots]);
 
   // Held while the transition runs, so the legend stays on the geometry it was

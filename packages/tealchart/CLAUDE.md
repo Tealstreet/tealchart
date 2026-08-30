@@ -51,13 +51,17 @@ buys nothing, because the gesture layer never sees touches outside it.
 override, or ownership state directly on gesture finalize when that state masks a
 React/Skia propagation seam. Commit the target first, then release the visual
 hold through `mobile/interaction/nativeReleaseHold.ts` after the committed frame
-reports that the target is visible. This is the single owner for release-hold
-timing across viewport ownership, pane divider resize snapshots, pane maximize
-legend freezes, and pane-range overrides. Do not add ad hoc
-`requestAnimationFrame`, timeout, or effect-based release gates as the normal
-release path for new mobile visual holds; add a named hold kind and a caught-up
-predicate instead. A timeout may exist only as a documented ceiling for a hold
-that would otherwise be able to freeze forever if the target disappears.
+reports that the target is visible. If clearing the hold can expose a stale
+Skia/Reanimated presentation, the same module must then schedule the clear on
+the native presentation clock. React render/layout-effect passes are not
+presentation frames. This is the single owner for release-hold timing across
+viewport ownership, pane divider resize snapshots, pane maximize legend freezes,
+and pane-range overrides. Do not add ad hoc `requestAnimationFrame`, timeout, or
+effect-based release gates as the normal release path for new mobile visual
+holds; add a named hold kind, a caught-up predicate, and if needed a centralized
+presentation release instead. A timeout may exist only as a documented ceiling
+for a hold that would otherwise be able to freeze forever if the target
+disappears.
 
 **Icon rule:** There is exactly one icon language, and it is already defined. Never
 use emoji, system glyphs, font icons, or a bespoke inline SVG for chrome.
