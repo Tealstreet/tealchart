@@ -50,6 +50,7 @@ const NATIVE_BRACKET_PREVIEW_HANDOFF_TIMEOUT_MS = 6000;
 
 export interface NativeOemsDragHandoff {
   objectId: string;
+  seq: number;
 }
 
 export interface NativeOemsBracketDragHandoff {
@@ -113,6 +114,41 @@ export function shouldReleaseNativeOrderDragOnSettle({
   return !dragActive;
 }
 
+export function shouldApplyNativeOrderPreviewRelease({
+  activeObjectId,
+  dragActive,
+  handoff,
+  latestSeq,
+}: {
+  activeObjectId: string;
+  dragActive: boolean;
+  handoff: NativeOemsDragHandoff;
+  latestSeq: number;
+}): boolean {
+  return !dragActive && latestSeq === handoff.seq && activeObjectId === handoff.objectId;
+}
+
+export function shouldApplyNativeBracketPreviewRelease({
+  activeObjectId,
+  activeObjectType,
+  dragActive,
+  handoff,
+  latestSeq,
+}: {
+  activeObjectId: string;
+  activeObjectType: NativeTradeLineObjectType | '';
+  dragActive: boolean;
+  handoff: NativeOemsBracketDragHandoff;
+  latestSeq: number;
+}): boolean {
+  return (
+    !dragActive &&
+    latestSeq === handoff.seq &&
+    activeObjectId === handoff.objectId &&
+    activeObjectType === handoff.objectType
+  );
+}
+
 export interface NativeOemsLineSnapshot {
   orderLines: readonly OrderLineRenderData[];
   positionLines: readonly PositionLineRenderData[];
@@ -174,7 +210,7 @@ export function useNativeOemsLineRuntime({
   const latestOrderLinesRef = useRef<OrderLineRenderData[]>([]);
   const latestPositionLinesRef = useRef<PositionLineRenderData[]>([]);
   // Set only between an order commit and the projection carrying its price.
-  const orderHandoffRef = useRef<{ objectId: string } | null>(null);
+  const orderHandoffRef = useRef<NativeOemsDragHandoff | null>(null);
   // Set only between a bracket commit and the projection carrying its price.
   const bracketHandoffRef = useRef<{
     objectId: string;
@@ -190,6 +226,7 @@ export function useNativeOemsLineRuntime({
     releaseHoldTokenRef.current += 1;
     return releaseHoldTokenRef.current;
   }, []);
+  const orderHandoffSeqRef = useRef(0);
   const bracketHandoffSeqRef = useRef(0);
   const rawLineSnapshot = getTealchartApiLineRenderSnapshot(chartApi);
 
@@ -227,6 +264,7 @@ export function useNativeOemsLineRuntime({
 
   const clearNativeOrderDrag = useCallback(() => {
     orderHandoffRef.current = null;
+    orderHandoffSeqRef.current += 1;
     setOrderPreviewReleaseHold(null);
     clearNativeOrderDragState(orderDragState);
   }, [orderDragState]);
@@ -250,6 +288,7 @@ export function useNativeOemsLineRuntime({
         clearNativeOrderDragState(orderDragState);
         return;
       }
+      orderHandoffSeqRef.current = handoff.seq;
       setOrderPreviewReleaseHold(
         createNativeReleaseHold({
           kind: 'oemsOrderPreview',
@@ -265,8 +304,16 @@ export function useNativeOemsLineRuntime({
     if (!orderPreviewReleaseHold) return;
     const resolution = resolveNativeReleaseHold({ caughtUp: true, hold: orderPreviewReleaseHold });
     if (resolution.hold === orderPreviewReleaseHold) return;
-    setOrderPreviewReleaseHold(resolution.hold);
-    if (resolution.released) {
+    setOrderPreviewReleaseHold((current) => (current?.token === orderPreviewReleaseHold.token ? resolution.hold : current));
+    if (
+      resolution.released &&
+      shouldApplyNativeOrderPreviewRelease({
+        activeObjectId: orderDragState.activeObjectId.value,
+        dragActive: orderDragState.active.value,
+        handoff: orderPreviewReleaseHold.target,
+        latestSeq: orderHandoffSeqRef.current,
+      })
+    ) {
       clearNativeOrderDragState(orderDragState);
     }
   }, [orderDragState, orderPreviewReleaseHold]);
@@ -295,13 +342,25 @@ export function useNativeOemsLineRuntime({
     if (!bracketPreviewReleaseHold) return;
     const resolution = resolveNativeReleaseHold({ caughtUp: true, hold: bracketPreviewReleaseHold });
     if (resolution.hold === bracketPreviewReleaseHold) return;
-    setBracketPreviewReleaseHold(resolution.hold);
-    if (resolution.released) {
+    setBracketPreviewReleaseHold((current) =>
+      current?.token === bracketPreviewReleaseHold.token ? resolution.hold : current,
+    );
+    if (
+      resolution.released &&
+      shouldApplyNativeBracketPreviewRelease({
+        activeObjectId: bracketDragInteractionState.activeObjectId.value,
+        activeObjectType: bracketDragInteractionState.activeObjectType.value,
+        dragActive: bracketDragInteractionState.active.value,
+        handoff: bracketPreviewReleaseHold.target,
+        latestSeq: bracketHandoffSeqRef.current,
+      })
+    ) {
       clearNativeBracketDragState(bracketDragInteractionState);
     }
   }, [bracketDragInteractionState, bracketPreviewReleaseHold]);
 
   const clearNativeBracketDrag = useCallback(() => {
+    bracketHandoffSeqRef.current += 1;
     setBracketPreviewReleaseHold(null);
     clearNativeBracketDragState(bracketDragInteractionState);
   }, [bracketDragInteractionState]);
@@ -317,7 +376,9 @@ export function useNativeOemsLineRuntime({
       if (result.clearDrag) {
         clearNativeOrderDrag();
       } else {
-        orderHandoffRef.current = { objectId };
+        const seq = orderHandoffSeqRef.current + 1;
+        orderHandoffSeqRef.current = seq;
+        orderHandoffRef.current = { objectId, seq };
       }
       if (result.forceUpdate) {
         forceUpdate();

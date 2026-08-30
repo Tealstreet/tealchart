@@ -170,6 +170,7 @@ const EMPTY_NATIVE_USER_DRAWING_ANCHORS: NonNullable<UserDrawingState['draft']>[
 const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
+const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
 const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
 const NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT = 9;
 
@@ -543,6 +544,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // the same release-hold controller as divider/range gestures.
   const nativeMaximizeHolding = nativeMaximizeReleaseHold !== null;
   const nativeMaximizeFrameRef = useRef<NativeChartFrame | null>(null);
+  const nativeMaximizeHoldTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelNativeMaximizeHoldTimeout = useCallback(() => {
+    if (nativeMaximizeHoldTimeoutRef.current === null) return;
+    clearTimeout(nativeMaximizeHoldTimeoutRef.current);
+    nativeMaximizeHoldTimeoutRef.current = null;
+  }, []);
 
   const handleNativeTogglePaneMaximize = useCallback(
     (paneId: string) => {
@@ -552,6 +560,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       if (!toggled) return;
       nativePaneMaximizeStateRef.current = toggled.state;
 
+      cancelNativeMaximizeHoldTimeout();
       setNativeMaximizeReleaseHold(
         createNativeReleaseHold({
           kind: 'paneMaximizeLegend',
@@ -561,7 +570,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       );
       setNativePaneHeightOverrides((current) => ({ ...current, ...toggled.heightRatios }));
     },
-    [createNextNativeReleaseHoldToken],
+    [cancelNativeMaximizeHoldTimeout, createNextNativeReleaseHoldToken],
   );
 
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
@@ -599,9 +608,17 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       panes.every((pane) => savedHeightRatios[pane.id] !== undefined);
     if (samePanes) return;
     nativePaneMaximizeStateRef.current = IDLE_PANE_MAXIMIZE_STATE;
+    cancelNativeMaximizeHoldTimeout();
+    setNativeMaximizeReleaseHold(
+      createNativeReleaseHold({
+        kind: 'paneMaximizeLegend',
+        target: savedHeightRatios,
+        token: createNextNativeReleaseHoldToken(),
+      }),
+    );
     setNativePaneHeightOverrides((current) => ({ ...current, ...savedHeightRatios }));
     // Keyed on the signature: the layout object itself is minted fresh per call.
-  }, [nativePaneLayoutSignature]);
+  }, [cancelNativeMaximizeHoldTimeout, createNextNativeReleaseHoldToken, nativePaneLayoutSignature]);
 
   // Both counters are read every render; the manager advances them only when
   // the thing each memo actually reads has moved.
@@ -941,8 +958,27 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       hold: nativeMaximizeReleaseHold,
     });
     if (resolution.hold === nativeMaximizeReleaseHold) return;
+    if (resolution.released) cancelNativeMaximizeHoldTimeout();
     setNativeMaximizeReleaseHold(resolution.hold);
-  }, [frame, nativeMaximizeReleaseHold]);
+  }, [cancelNativeMaximizeHoldTimeout, frame, nativeMaximizeReleaseHold]);
+
+  useEffect(() => {
+    if (!nativeMaximizeReleaseHold) {
+      cancelNativeMaximizeHoldTimeout();
+      return;
+    }
+    cancelNativeMaximizeHoldTimeout();
+    const token = nativeMaximizeReleaseHold.token;
+    const timeout = setTimeout(() => {
+      if (nativeMaximizeHoldTimeoutRef.current === timeout) nativeMaximizeHoldTimeoutRef.current = null;
+      setNativeMaximizeReleaseHold((current) => (current?.token === token ? null : current));
+    }, NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS);
+    nativeMaximizeHoldTimeoutRef.current = timeout;
+    return () => {
+      if (nativeMaximizeHoldTimeoutRef.current === timeout) nativeMaximizeHoldTimeoutRef.current = null;
+      clearTimeout(timeout);
+    };
+  }, [cancelNativeMaximizeHoldTimeout, nativeMaximizeReleaseHold]);
 
   const nativeBarsReadyForRequestedData = nativeBarsMatchRequestedData({
     barsContext,
