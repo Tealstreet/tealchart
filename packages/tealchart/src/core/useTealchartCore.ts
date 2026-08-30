@@ -27,6 +27,7 @@ export interface UseTealchartCoreOptions {
   symbol: string;
   interval?: string;
   indicatorManager?: IIndicatorManager;
+  realtimeUpdateThrottleMs?: number;
   onSymbolChange?: (symbol: string) => void;
   onIntervalChange?: (interval: string) => void;
 }
@@ -207,6 +208,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       symbol: options.symbol,
       interval: options.interval,
       indicatorManager: options.indicatorManager,
+      realtimeUpdateThrottleMs: options.realtimeUpdateThrottleMs,
       scheduleRender: () => {},
       onBarsChanged: (newBars, context) => {
         dispatchCoreState({ type: 'barsChanged', bars: newBars, context });
@@ -234,7 +236,7 @@ export function useTealchartCore(options: UseTealchartCoreOptions): UseTealchart
       instance.dispose();
       coreRef.current = null;
     };
-  }, [enabled, options.datafeed]);
+  }, [enabled, options.datafeed, options.realtimeUpdateThrottleMs]);
 
   // Handle symbol prop changes
   useEffect(() => {

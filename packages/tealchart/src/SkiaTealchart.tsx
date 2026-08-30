@@ -238,6 +238,7 @@ export interface SkiaTealchartProps {
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
   onUserDrawingCommand?: UserDrawingCommandEventListener;
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
+  realtimeUpdateThrottleMs?: number;
   resizeFreeze?: boolean;
 }
 
@@ -274,6 +275,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onTealscriptError,
     onUserDrawingCommand,
     onUserDrawingStateChange,
+    realtimeUpdateThrottleMs,
     resizeFreeze = false,
     chartKey: propChartKey,
     uiPreferencesStorage,
@@ -447,6 +449,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onTealscriptError,
     propInterval,
     propSymbol,
+    realtimeUpdateThrottleMs,
     theme,
   });
   const [nativeDisplayedInterval, setNativeDisplayedInterval] = useState(interval);
