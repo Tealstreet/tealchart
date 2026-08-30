@@ -18,12 +18,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 
 import type { OemsActionSettlement } from '../../interaction/oemsActionManager';
 import { OemsActionManager } from '../../interaction/oemsActionManager';
-import {
-  getOemsOrderLineState,
-  getOemsOrderObjectId,
-  getOemsPositionLineState,
-  getOemsPositionObjectId,
-} from '../../interaction/oemsLineState';
 import { getTealchartApiLineRenderSnapshot } from '../../TealchartApi';
 import { reuseNativeRenderList } from '../utils/nativeLineSnapshotReuse';
 import {

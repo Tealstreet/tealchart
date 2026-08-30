@@ -582,7 +582,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeIndicatorPaneLayout = useMemo(() => {
     const { base, overrides } = nativePaneLayoutInputRef.current;
     return base ? applyNativePaneHeightOverrides(base, overrides) : base;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nativePaneLayoutSignature]);
   // The maximize toggle runs off a gesture callback, so it reads the panes from
   // a ref rather than closing over a layout that re-renders under it.
@@ -602,7 +601,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativePaneMaximizeStateRef.current = IDLE_PANE_MAXIMIZE_STATE;
     setNativePaneHeightOverrides((current) => ({ ...current, ...savedHeightRatios }));
     // Keyed on the signature: the layout object itself is minted fresh per call.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nativePaneLayoutSignature]);
 
   // Both counters are read every render; the manager advances them only when
@@ -611,7 +609,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeIndicatorsRevision = indicatorManager?.getIndicatorsRevision() ?? 0;
   const nativeIndicatorPlots = useMemo<readonly PlotOutput[]>(
     () => indicatorManager?.getPlots() ?? EMPTY_NATIVE_INDICATOR_PLOTS,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [indicatorManager, nativeIndicatorPlotsRevision],
   );
   const nativeIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeIndicatorPaneInfo>>>(() => {
@@ -630,7 +627,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     return result;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [indicatorManager, nativeIndicatorsRevision, nativeIndicatorPaneLayout]);
   // Keyed on the indicator revision, never on the pane layout: hiding the only
   // indicator in a pane leaves the layout untouched, so the eye icon and the
@@ -643,7 +639,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         isVisible: indicator.isVisible,
         name: indicator.indicator.name,
       })) ?? [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [indicatorManager, nativeIndicatorsRevision],
   );
   const nativeLegendIndicatorPaneInfo = useMemo<Readonly<Record<string, NativeLegendIndicatorPaneInfo>>>(() => {
@@ -664,7 +659,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     }
 
     return result;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [indicatorManager, nativeIndicatorsRevision, nativeIndicatorPaneLayout]);
   const handleNativeToggleIndicator = useCallback(
     (indicatorId: string) => {
@@ -1265,7 +1259,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         volumeHeight: VOLUME_HEIGHT_RATIO,
       }),
     // Every input, or a save quietly persists a stale snapshot.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       hasDataViewport,
       indicatorManager,
