@@ -25,12 +25,13 @@ describe('nativePaneDividerSnapshotBridgeVisible', () => {
     expect(nativePaneDividerSnapshotBridgeVisible({ bands, frame: frame(94, 50), target })).toBe(true);
   });
 
-  it('bridges a committed divider until the frame leaves the drag-start geometry', () => {
+  it('bridges a committed divider until the frame reaches the target geometry', () => {
     const start = frame(84, 60);
     const target = resolveNativePaneDividerAtY(start, start.mainPane.bottom)!;
     const bands = resolveNativePaneDividerBands({ target, translationY: 10 });
 
     expect(nativePaneDividerSnapshotBridgeVisible({ bands, frame: start, target: null })).toBe(true);
+    expect(nativePaneDividerSnapshotBridgeVisible({ bands, frame: frame(90, 54), target: null })).toBe(true);
     expect(nativePaneDividerSnapshotBridgeVisible({ bands, frame: frame(94, 50), target: null })).toBe(false);
   });
 });

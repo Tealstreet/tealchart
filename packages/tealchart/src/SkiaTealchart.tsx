@@ -106,6 +106,7 @@ import {
   NativePaneDividerResizeLayer,
   nativePaneDividerSnapshotBridgeVisible,
 } from './mobile/render/NativePaneDividerResizeLayer';
+import { resolveSettledNativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
@@ -1938,6 +1939,28 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     },
     [indicatorManager],
   );
+
+  // The override is what the layers draw during and immediately after a native
+  // indicator-pane range gesture. The committed frame catches up through React.
+  // Dropping the override before the frame reaches the committed target exposes
+  // an intermediate/pre-drag range and creates the release flap.
+  useEffect(() => {
+    if (!frame) return;
+    if (!resolveSettledNativePaneRangeOverrides({ overrides: paneRangeOverrides.value, panes: frame.panes }).settled) {
+      return;
+    }
+
+    // Clear one frame after detecting catch-up so Reanimated layer closures have
+    // the same frame that made the override safe to retire.
+    const handle = requestAnimationFrame(() => {
+      const { remaining, settled } = resolveSettledNativePaneRangeOverrides({
+        overrides: paneRangeOverrides.value,
+        panes: frame.panes,
+      });
+      if (settled) paneRangeOverrides.value = remaining;
+    });
+    return () => cancelAnimationFrame(handle);
+  }, [frame, paneRangeOverrides]);
 
   const handleNativePriceAxisResetTap = useCallback(() => {
     if (!hasDataViewport) return;

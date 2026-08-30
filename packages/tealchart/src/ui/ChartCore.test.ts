@@ -11,7 +11,7 @@ import type { Bar, OrderLineRenderData, PositionLineRenderData, PriceLineLabelBo
 import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../constants';
+import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR, PRICE_AXIS_TAG_BACKGROUND_ALPHA } from '../constants';
 import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
@@ -1178,7 +1178,7 @@ describe('ChartCore viewport management', () => {
     });
     expect(slBound.label?.secondaryText).toBeUndefined();
     const slRefs = manager.cachedLineGroups.get('order-1-sl')?.getAttr('contentRefs') as LineContentRefsProbe;
-    expect(slRefs.priceAxisRect?.fill()).toBe('#f97316');
+    expect(slRefs.priceAxisRect?.fill()).toBe(`rgba(249, 115, 22, ${PRICE_AXIS_TAG_BACKGROUND_ALPHA})`);
 
     core.dispose();
   });
@@ -1295,7 +1295,7 @@ describe('ChartCore viewport management', () => {
     expect(manager.cachedLineGroups.has('position-1-sl')).toBe(true);
     const pendingRefs = manager.cachedLineGroups.get('position-1-sl')?.getAttr('contentRefs') as LineContentRefsProbe;
     const pendingBound = manager.cachedLineGroups.get('position-1-sl')?.getAttr('boundData') as PriceLineLabelBounds;
-    expect(pendingRefs.priceAxisRect?.fill()).toBe('#f97316');
+    expect(pendingRefs.priceAxisRect?.fill()).toBe(`rgba(249, 115, 22, ${PRICE_AXIS_TAG_BACKGROUND_ALPHA})`);
     expect(pendingBound.label).toMatchObject({
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
       filled: true,

@@ -20,6 +20,19 @@ export interface NativePaneSnapshot {
   top: number;
 }
 
+const PANE_DIVIDER_FRAME_EPSILON = 0.5;
+
+function paneDividerFrameMatchesBandTarget(
+  pane: { height: number; top: number },
+  band: NativePaneDividerBand,
+): boolean {
+  'worklet';
+  return (
+    Math.abs(pane.top - band.top) <= PANE_DIVIDER_FRAME_EPSILON &&
+    Math.abs(pane.height - band.height) <= PANE_DIVIDER_FRAME_EPSILON
+  );
+}
+
 export function nativePaneDividerSnapshotBridgeVisible({
   bands,
   frame,
@@ -33,13 +46,17 @@ export function nativePaneDividerSnapshotBridgeVisible({
   if (target) return true;
   if (bands.length === 0) return false;
 
+  // After the drag commits, the stretched pane bitmaps are the source of truth
+  // until the React frame reaches the same target geometry. Releasing on any
+  // frame that merely differs from the drag-start geometry exposes intermediate
+  // layouts and creates the release flap.
   for (let index = 0; index < bands.length; index += 1) {
     const band = bands[index]!;
     const pane = frame.panes.find((entry) => entry.id === band.paneId);
     if (!pane) return false;
-    if (pane.top !== band.srcTop || pane.height !== band.srcHeight) return false;
+    if (!paneDividerFrameMatchesBandTarget(pane, band)) return true;
   }
-  return true;
+  return false;
 }
 
 /**
