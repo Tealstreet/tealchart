@@ -1,5 +1,6 @@
 import type { NativePaneFrame } from '../render/nativeChartFrame';
 import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
+import type { NativePaneDividerBand } from './nativePaneDivider';
 
 import { resolveSettledNativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import { nativePaneHeightsMatchRatios } from '../utils/nativePaneLayoutOverrides';
@@ -186,4 +187,20 @@ export function nativePaneRatiosCaughtUp({
 }): boolean {
   const targetPanes = panes.filter((pane) => ratios[pane.id] !== undefined);
   return nativePaneHeightsMatchRatios(targetPanes, ratios);
+}
+
+export function nativePaneDividerBandsCaughtUp({
+  bands,
+  panes,
+}: {
+  bands: readonly Pick<NativePaneDividerBand, 'height' | 'paneId' | 'top'>[];
+  panes: readonly { height: number; id: string; top: number }[];
+}): boolean {
+  if (bands.length === 0) return false;
+  const tolerance = 1;
+  return bands.every((band) => {
+    const pane = panes.find((candidate) => candidate.id === band.paneId);
+    if (!pane) return false;
+    return Math.abs(pane.top - band.top) <= tolerance && Math.abs(pane.height - band.height) <= tolerance;
+  });
 }

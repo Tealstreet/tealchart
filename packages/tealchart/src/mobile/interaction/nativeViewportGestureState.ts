@@ -29,6 +29,20 @@ export interface NativePriceAutoScaleSharedValues {
   bars: SharedValue<NativeAutoScaleBar[]>;
 }
 
+export type NativeViewportGestureOwner =
+  | 'none'
+  | 'axisPinch'
+  | 'indicatorPanePan'
+  | 'indicatorPriceScale'
+  | 'pan'
+  | 'paneDivider'
+  | 'priceScale'
+  | 'timeScale';
+
+export interface NativeViewportGestureOwnerState {
+  owner: SharedValue<NativeViewportGestureOwner>;
+}
+
 export interface NativeChartPanGestureState {
   /**
    * Set when a pan starts inside an indicator pane. A drag there is two
@@ -39,6 +53,13 @@ export interface NativeChartPanGestureState {
   indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
   /** Divider being dragged, if the touch landed on a pane boundary. */
   paneDividerTarget: SharedValue<NativePaneDividerTarget | null>;
+  /**
+   * Set once a divider release has frozen the preview at its final band geometry.
+   * Some Android recognizer sequences still deliver pan updates around end/finalize;
+   * those updates must not mutate the release preview while React commits the real
+   * pane heights underneath it.
+   */
+  paneDividerReleaseLocked: SharedValue<boolean>;
   active: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   startViewport: NativeViewportSharedValues;
@@ -234,16 +255,45 @@ export function resetNativeViewportGestureActiveFlags({
   pinchActive,
   priceScaleActive,
   timeScaleActive,
+  viewportGestureOwner,
 }: {
   panActive: SharedValue<boolean>;
   pinchActive: SharedValue<boolean>;
   priceScaleActive: SharedValue<boolean>;
   timeScaleActive: SharedValue<boolean>;
+  viewportGestureOwner?: NativeViewportGestureOwnerState;
 }): void {
   panActive.value = false;
   pinchActive.value = false;
   priceScaleActive.value = false;
   timeScaleActive.value = false;
+  if (viewportGestureOwner) viewportGestureOwner.owner.value = 'none';
+}
+
+export function claimNativeViewportGestureOwner(
+  state: NativeViewportGestureOwnerState,
+  owner: NativeViewportGestureOwner,
+): boolean {
+  'worklet';
+  if (state.owner.value !== 'none' && state.owner.value !== owner) return false;
+  state.owner.value = owner;
+  return true;
+}
+
+export function clearNativeViewportGestureOwner(
+  state: NativeViewportGestureOwnerState,
+  owner: NativeViewportGestureOwner,
+): void {
+  'worklet';
+  if (state.owner.value === owner) state.owner.value = 'none';
+}
+
+export function forceNativeViewportGestureOwner(
+  state: NativeViewportGestureOwnerState,
+  owner: NativeViewportGestureOwner,
+): void {
+  'worklet';
+  state.owner.value = owner;
 }
 
 export function syncNativeViewportGestureMetrics({
@@ -271,7 +321,9 @@ export function getNativeViewportGestureCommit(
 ): Viewport | null {
   'worklet';
   if (!active.value) return null;
-  return getNativeSharedViewport(sharedViewport);
+  const viewport = getNativeSharedViewport(sharedViewport);
+  active.value = false;
+  return viewport;
 }
 
 export function beginNativeChartPanGestureState(state: NativeChartPanGestureState): void {
