@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   createNativePaneGeometrySignature,
-  createNativePaneRatioTarget,
   createNativeReleaseHold,
   nativePaneDividerBandsCaughtUp,
   nativePaneRangeOverridesCaughtUp,
@@ -110,25 +109,17 @@ describe('native release-hold caught-up predicates', () => {
     ).toBe(false);
   });
 
-  it('matches pane divider targets after layout reaches the committed ratios', () => {
-    const target = createNativePaneRatioTarget([
-      { paneId: 'main', heightRatio: 0.75 },
-      { paneId: 'macd', heightRatio: 0.25 },
-    ]);
+  it('matches pane ratio targets after layout reaches the committed ratios', () => {
+    const ratios = { macd: 0.25, main: 0.75 };
 
-    expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 70), pane('macd', 30)], ratios: target })).toBe(false);
-    expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 75), pane('macd', 25)], ratios: target })).toBe(true);
+    expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 70), pane('macd', 30)], ratios })).toBe(false);
+    expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 75), pane('macd', 25)], ratios })).toBe(true);
   });
 
-  it('matches pane divider targets against only the panes in the target map', () => {
-    const target = createNativePaneRatioTarget([
-      { paneId: 'main', heightRatio: 0.75 },
-      { paneId: 'macd', heightRatio: 0.25 },
-    ]);
+  it('matches pane ratio targets against only the panes the target names', () => {
+    const ratios = { macd: 0.25, main: 0.75 };
 
-    expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 75), pane('macd', 25), pane('rsi', 40)], ratios: target })).toBe(
-      true,
-    );
+    expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 75), pane('macd', 25), pane('rsi', 40)], ratios })).toBe(true);
   });
 
   it('matches pane divider release bands only after committed pane pixels catch up', () => {

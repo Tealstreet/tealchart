@@ -22,8 +22,6 @@ export interface NativeViewportGestureMetrics {
   pricePerPixel: SharedValue<number>;
 }
 
-export type NativeGestureDebugEventHandler = (message: string) => void;
-
 export interface NativePriceAutoScaleSharedValues {
   active: SharedValue<boolean>;
   bars: SharedValue<NativeAutoScaleBar[]>;

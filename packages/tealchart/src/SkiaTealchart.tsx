@@ -1,7 +1,7 @@
 import type { SkImage } from '@shopify/react-native-skia';
 import type { PlotOutput, WorkerError } from '@tealstreet/tealscript';
 import type { ReactNode } from 'react';
-import type { GestureResponderEvent, LayoutRectangle } from 'react-native';
+import type { LayoutRectangle } from 'react-native';
 import type {
   UserDrawingCommandEventListener,
   UserDrawingSelectedActionSurfaceCommand,
@@ -13,7 +13,6 @@ import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativePaneDividerBand } from './mobile/interaction/nativePaneDivider';
 import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
-import type { NativeGestureDebugOverlayHandle } from './mobile/render/NativeGestureDebugOverlay';
 import type {
   NativeLegendActionCommand,
   NativeLegendActionHitTarget,
@@ -56,7 +55,7 @@ import React, {
 } from 'react';
 
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 
@@ -69,10 +68,8 @@ import {
 import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
-import { NativeGestureDebugOverlay } from './mobile/render/NativeGestureDebugOverlay';
 import {
   createNativePaneGeometrySignature,
-  createNativePaneRatioTarget,
   createNativeReleaseHold,
   nativePaneDividerBandsCaughtUp,
   nativePaneRangeOverridesCaughtUp,
@@ -115,8 +112,6 @@ import {
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
 import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
-import { getNativePaneAtY } from './mobile/render/nativeChartFrame';
-import { resolveNativePaneDividerAtY } from './mobile/interaction/nativePaneDivider';
 import type { NativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
@@ -184,12 +179,6 @@ const NATIVE_PANE_DIVIDER_HOLD_CEILING_MS = 1200;
 // Freeing the bitmaps trails the settle fence, so disposal can never uncover a
 // preview that is still drawing.
 const NATIVE_PANE_DIVIDER_DISPOSE_MS = 600;
-const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
-
-interface NativePaneDividerReleaseTarget {
-  bands: readonly NativePaneDividerBand[];
-  ratios: Readonly<Record<string, number>>;
-}
 
 interface NativeResizeSnapshot {
   height: number;
@@ -199,35 +188,6 @@ interface NativeResizeSnapshot {
 
 function disposeNativeResizeSnapshot(snapshot: NativeResizeSnapshot | null): void {
   snapshot?.image.dispose();
-}
-
-function formatNativeDebugNumber(value: number | null | undefined): string {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return 'n/a';
-  return `${Math.round(value)}`;
-}
-
-function formatNativeDebugRange(start: number | null | undefined, end: number | null | undefined): string {
-  return `${formatNativeDebugNumber(start)}-${formatNativeDebugNumber(end)}`;
-}
-
-function formatNativePaneRatioDebug(ratios: Readonly<Record<string, number>>): string {
-  return Object.entries(ratios)
-    .map(([paneId, ratio]) => `${paneId}:${ratio.toFixed(3)}`)
-    .join(',');
-}
-
-/** Per-band top/height gap against the committed frame - what caughtUp measures. */
-function formatNativePaneDividerBandDeltaDebug(
-  bands: readonly NativePaneDividerBand[],
-  panes: readonly { height: number; id: string; top: number }[],
-): string {
-  return bands
-    .map((band, index) => {
-      const pane = panes.find((candidate) => candidate.id === band.paneId);
-      if (!pane) return `${index}:gone`;
-      return `${index}:${formatNativeDebugNumber(pane.top - band.top)}/${formatNativeDebugNumber(pane.height - band.height)}`;
-    })
-    .join('|');
 }
 
 /**
@@ -527,13 +487,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     const nextWidth = createNativeInitialPriceAxisWidth();
     setNativePriceAxisWidth((current) => Math.max(current, nextWidth));
   }, [createNativeInitialPriceAxisWidth]);
-  // The overlay's append callback is defined further down, after the gesture
-  // runtime it reads flags from. Render-side handoff probes above that point
-  // reach it through this sink; on-device is the only place these are readable.
-  const nativeGestureDebugSinkRef = useRef<((message: string) => void) | null>(null);
-  const emitNativeChartDebugEntry = useCallback((message: string) => {
-    nativeGestureDebugSinkRef.current?.(message);
-  }, []);
   const nativeReleaseHoldTokenRef = useRef(0);
   const createNextNativeReleaseHoldToken = useCallback(() => {
     nativeReleaseHoldTokenRef.current += 1;
@@ -542,7 +495,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativePaneRangeReleaseHold, setNativePaneRangeReleaseHold] =
     useState<NativeReleaseHold<NativePaneRangeOverrides> | null>(null);
   const [nativePaneDividerReleaseHold, setNativePaneDividerReleaseHold] =
-    useState<NativeReleaseHold<NativePaneDividerReleaseTarget> | null>(null);
+    useState<NativeReleaseHold<readonly NativePaneDividerBand[]> | null>(null);
   // Pane geometry the divider preview is waiting to see painted, not merely
   // committed. Null once the canvas has echoed it back.
   const [nativePaneDividerPresentationTarget, setNativePaneDividerPresentationTarget] = useState<string | null>(null);
@@ -553,14 +506,12 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativePaneHeightOverrides, setNativePaneHeightOverrides] = useState<Readonly<Record<string, number>>>({});
   const handleNativePaneHeightsChange = useCallback(
     (heights: readonly { heightRatio: number; paneId: string }[], bands: readonly NativePaneDividerBand[]) => {
-      const target = createNativePaneRatioTarget(heights);
-      if (Object.keys(target).length > 0) {
-        emitNativeChartDebugEntry(`divider commit ${formatNativePaneRatioDebug(target)}`);
+      if (heights.length > 0) {
         setNativePaneDividerReleaseHold(
           createNativeReleaseHold({
             kind: 'paneDividerResize',
             releaseFrames: 0,
-            target: { bands, ratios: target },
+            target: bands,
             token: createNextNativeReleaseHoldToken(),
           }),
         );
@@ -576,7 +527,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         return changed ? next : current;
       });
     },
-    [createNextNativeReleaseHoldToken, emitNativeChartDebugEntry],
+    [createNextNativeReleaseHoldToken],
   );
 
   const nativePaneMaximizeStateRef = useRef<PaneMaximizeState>(IDLE_PANE_MAXIMIZE_STATE);
@@ -819,23 +770,20 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         captured.push({ height: pane.height, image, paneId: pane.id, top: pane.top });
       }
       replaceNativePaneSnapshots(captured);
-      emitNativeChartDebugEntry(`divider capture n=${captured.length}`);
     } catch {
       replaceNativePaneSnapshots([]);
-      emitNativeChartDebugEntry('divider capture failed');
     }
-  }, [canvasRef, emitNativeChartDebugEntry, replaceNativePaneSnapshots]);
+  }, [canvasRef, replaceNativePaneSnapshots]);
 
   // Success releases through nativePaneDividerReleaseHold, after the committed
-  // frame confirms the target ratios. Failed/cancelled gestures have no commit
+  // frame confirms the dragged bands. Failed/cancelled gestures have no commit
   // to wait for, so the preview can disappear immediately.
   const handleNativePaneDividerResizeEnd = useCallback(
     (success = true) => {
       if (success) return;
-      emitNativeChartDebugEntry('divider abort');
       clearNativePaneDividerReleaseHold();
     },
-    [clearNativePaneDividerReleaseHold, emitNativeChartDebugEntry],
+    [clearNativePaneDividerReleaseHold],
   );
 
   useEffect(
@@ -1004,36 +952,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativePaneDividerFrameCallback.setActive(nativePaneDividerSettling);
   }, [nativePaneDividerFrameCallback, nativePaneDividerSettling]);
 
-  // Disposal only, and deliberately later than the hide: the images are freed a
-  // whole settle after the bitmap stopped drawing, so this can never uncover it.
-  useEffect(() => {
-    if (nativePaneDividerPresentationTarget === null) return;
-    if (nativePaneDividerPresentationTarget !== nativePaneGeometrySignature) return;
-    const timeout = setTimeout(() => {
-      emitNativeChartDebugEntry('divider disposed');
-      setNativePaneDividerPresentationTarget(null);
-      replaceNativePaneSnapshots([]);
-    }, NATIVE_PANE_DIVIDER_DISPOSE_MS);
-    return () => clearTimeout(timeout);
-  }, [
-    emitNativeChartDebugEntry,
-    nativePaneDividerPresentationTarget,
-    nativePaneGeometrySignature,
-    replaceNativePaneSnapshots,
-  ]);
-
-  // The target-band check is a committed-state gate. Once the live frame's pane
-  // pixels match the final dragged bands, the frozen pre-drag bitmap must go
-  // away immediately; holding it longer is itself the visible stale-state flap.
+  // Committed-state gate: the frame's pane pixels now match the final dragged
+  // bands. That is the commit, not the paint, so it hands the preview a
+  // retirement condition rather than retiring it.
   useEffect(() => {
     if (!frame || !nativePaneDividerReleaseHold) return;
     const caughtUp = nativePaneDividerBandsCaughtUp({
-      bands: nativePaneDividerReleaseHold.target.bands,
+      bands: nativePaneDividerReleaseHold.target,
       panes: frame.panes,
     });
-    emitNativeChartDebugEntry(
-      `divider check caught=${caughtUp ? 'y' : 'n'} d=${formatNativePaneDividerBandDeltaDebug(nativePaneDividerReleaseHold.target.bands, frame.panes)}`,
-    );
     const resolution = resolveNativeReleaseHold({
       caughtUp,
       hold: nativePaneDividerReleaseHold,
@@ -1041,25 +968,36 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     if (resolution.hold === nativePaneDividerReleaseHold) return;
     setNativePaneDividerReleaseHold(resolution.hold);
     if (!resolution.released) return;
-    // Hands the preview its retirement condition. The bitmap hides itself in
-    // the draw pass once the canvas paints this geometry; JS only disposes.
-    emitNativeChartDebugEntry('divider settled');
     nativePaneDividerSettleFrames.value = 0;
     setNativePaneDividerPresentationTarget(nativePaneGeometrySignature);
-  }, [emitNativeChartDebugEntry, frame, nativePaneDividerReleaseHold, nativePaneGeometrySignature]);
+  }, [frame, nativePaneDividerReleaseHold, nativePaneGeometrySignature]);
+
+  // Disposal only, and deliberately later than the hide: the images are freed a
+  // whole settle after the bitmap stopped drawing, so this can never uncover it.
+  useEffect(() => {
+    if (nativePaneDividerPresentationTarget === null) return;
+    if (nativePaneDividerPresentationTarget !== nativePaneGeometrySignature) return;
+    const timeout = setTimeout(() => {
+      setNativePaneDividerPresentationTarget(null);
+      replaceNativePaneSnapshots([]);
+    }, NATIVE_PANE_DIVIDER_DISPOSE_MS);
+    return () => clearTimeout(timeout);
+  }, [
+    nativePaneDividerPresentationTarget,
+    nativePaneGeometrySignature,
+    replaceNativePaneSnapshots,
+  ]);
 
   // Documented ceiling, not the release path: a pane that vanishes mid-release
   // never lands its bands, and the stretched bitmap would cover the chart forever.
   useEffect(() => {
     if (!nativePaneDividerReleaseHold && nativePaneDividerPresentationTarget === null) return;
     const timeout = setTimeout(() => {
-      emitNativeChartDebugEntry('divider ceiling');
       clearNativePaneDividerReleaseHold();
     }, NATIVE_PANE_DIVIDER_HOLD_CEILING_MS);
     return () => clearTimeout(timeout);
   }, [
     clearNativePaneDividerReleaseHold,
-    emitNativeChartDebugEntry,
     nativePaneDividerPresentationTarget,
     nativePaneDividerReleaseHold,
   ]);
@@ -1160,11 +1098,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     isLoading,
     symbol,
   });
-  // Full-chart render transition holds are only for viewport/data interactions.
-  // Pane-divider resize owns its own pane bitmap presentation. Feeding it into
-  // the generic native interaction gate can preserve a pre-resize full-chart
-  // projection underneath the divider overlay, which shows up as release flap.
-  const nativeRenderTransitionInteractionActive = nativeViewportGestureActive;
   const shouldHoldNativeRenderSnapshot = shouldHoldNativeRenderSnapshotForTransition({
     barsContext,
     barsLength: bars.length,
@@ -1176,7 +1109,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     previousProjectionReady: Boolean(nativeRenderSnapshotRef.current.projection),
     projectionReady: Boolean(projection),
     symbol,
-    nativeInteractionActive: nativeRenderTransitionInteractionActive,
+    viewportGestureActive: nativeViewportGestureActive,
   });
   const nativeRenderSnapshot = shouldHoldNativeRenderSnapshot
     ? nativeRenderSnapshotRef.current
@@ -1194,7 +1127,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const useStaticNativeRenderProjection = shouldUseNativeStaticRenderProjectionForTransition({
     dataLoadRenderBlocked,
     holdingSnapshot: shouldHoldNativeRenderSnapshot,
-    nativeInteractionActive: nativeRenderTransitionInteractionActive,
+    viewportGestureActive: nativeViewportGestureActive,
   });
   const staticNativeRenderProjection = useStaticNativeRenderProjection ? nativeRenderProjection : null;
   // Shared, not React state: revealing the button and dismissing it 2.5s later
@@ -2005,59 +1938,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     topBarLayout,
   ]);
   const nativeOverlayActionTargets = useMemo(() => [], []);
-  const nativeGestureDebugOverlayRef = useRef<NativeGestureDebugOverlayHandle | null>(null);
-  const appendNativeGestureDebugEntry = useCallback(
-    (message: string) => {
-      if (!NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY) return;
-      const owner = viewportGestureOwner.owner.value;
-      const active = `${panActive.value ? 'p' : '-'}${pinchActive.value ? 'z' : '-'}${priceScaleActive.value ? 'y' : '-'}${timeScaleActive.value ? 'x' : '-'}`;
-      nativeGestureDebugOverlayRef.current?.append(`${owner}/${active} ${message}`);
-    },
-    [panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner],
-  );
-  nativeGestureDebugSinkRef.current = appendNativeGestureDebugEntry;
-  const resolveNativeGestureDebugHit = useCallback(
-    (x: number, y: number): string => {
-      if (!frame) return 'no-frame';
-      if (isNativeGestureControlPoint(nativeGestureControlZones, x, y)) return 'reserved';
-      const divider = resolveNativePaneDividerAtY(frame, y);
-      if (divider) return `divider#${divider.dividerIndex}@${formatNativeDebugNumber(divider.y)}`;
-      if (y >= frame.timeAxisTop && y <= frame.timeAxisBottom) {
-        return `timeAxis y=${formatNativeDebugRange(frame.timeAxisTop, frame.timeAxisBottom)}`;
-      }
-      if (x >= frame.priceAxisHitLeft && x <= frame.priceAxisRight) {
-        const pane = getNativePaneAtY(frame, y);
-        return `priceAxis ${pane?.id ?? 'none'}`;
-      }
-      const pane = getNativePaneAtY(frame, y);
-      return pane ? `pane ${pane.id}:${pane.type}` : 'outside';
-    },
-    [frame, nativeGestureControlZones],
-  );
-  const appendNativeRawTouchDebugEntry = useCallback(
-    (phase: 'start' | 'move' | 'end' | 'cancel', event: GestureResponderEvent) => {
-      if (!NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY) return;
-      const nativeEvent = event.nativeEvent as typeof event.nativeEvent & {
-        touches?: readonly unknown[];
-        changedTouches?: readonly unknown[];
-      };
-      const x = nativeEvent.locationX;
-      const y = nativeEvent.locationY;
-      appendNativeGestureDebugEntry(
-        `raw ${phase} hit=${resolveNativeGestureDebugHit(x, y)} loc=${formatNativeDebugNumber(x)},${formatNativeDebugNumber(y)} page=${formatNativeDebugNumber(nativeEvent.pageX)},${formatNativeDebugNumber(nativeEvent.pageY)} touches=${nativeEvent.touches?.length ?? 'n/a'} changed=${nativeEvent.changedTouches?.length ?? 'n/a'}`,
-      );
-    },
-    [appendNativeGestureDebugEntry, resolveNativeGestureDebugHit],
-  );
-  const nativeGestureDebugSummary = useMemo(() => {
-    if (!NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY) return [];
-    if (!frame) return ['frame: none'];
-    const dividerYs = frame.panes.slice(0, -1).map((pane) => formatNativeDebugNumber(pane.bottom));
-    return [
-      `f ${formatNativeDebugNumber(frame.dimensions.width)}x${formatNativeDebugNumber(frame.dimensions.height)} p=${frame.panes.length} div=${dividerYs.length > 0 ? dividerYs.join(',') : 'none'}`,
-      `snap=${nativePaneSnapshots.length} hold=${nativePaneDividerReleaseHold ? 'y' : 'n'} set=${nativePaneDividerPresentationTarget ? 'y' : 'n'} main=${formatNativeDebugRange(frame.mainPane.top, frame.mainPane.bottom)}`,
-    ];
-  }, [frame, nativePaneDividerPresentationTarget, nativePaneDividerReleaseHold, nativePaneSnapshots.length]);
   // Same outcome as the reset button, different input. The button also hides
   // itself on use; do that here too so a reveal from an earlier tap does not
   // linger over an already-reset chart.
@@ -2178,7 +2058,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     hasDataViewport,
     intervalMs: intervalToMs(nativeRenderInterval),
     leftToolRailLayout,
-    onDebugGestureEvent: appendNativeGestureDebugEntry,
     orderDragState,
     orderDragZones,
     overlayActionTargets: nativeOverlayActionTargets,
@@ -2517,13 +2396,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           onClose={() => setNativeObjectTreeOpen(false)}
           onDispatch={dispatchNativeUserDrawingObjectTreeAction}
           textColor={chromeTheme.textColor}
-        />
-      ) : null}
-      {NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY ? (
-        <NativeGestureDebugOverlay
-          ref={nativeGestureDebugOverlayRef}
-          summary={nativeGestureDebugSummary}
-          title="TEALCHART DEBUG v9"
         />
       ) : null}
     </View>

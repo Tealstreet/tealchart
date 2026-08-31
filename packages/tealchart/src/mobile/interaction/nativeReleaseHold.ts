@@ -110,12 +110,6 @@ export function omitReleasedNativePaneRangeOverrides({
   return next;
 }
 
-export function createNativePaneRatioTarget(heights: readonly { heightRatio: number; paneId: string }[]): Readonly<Record<string, number>> {
-  const target: Record<string, number> = {};
-  for (const { heightRatio, paneId } of heights) target[paneId] = heightRatio;
-  return target;
-}
-
 export function nativePaneRatiosCaughtUp({
   panes,
   ratios,
