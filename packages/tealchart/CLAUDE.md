@@ -542,6 +542,14 @@ commit's effect flush and the hide in the flush after it, so the paths are alway
 registered first. The echo is still here but demoted to disposing the images,
 where being late costs memory and nothing on screen.
 
+**Pane height overrides are shares of a layout, not of a pane.** A divider drag
+writes a ratio for the panes on both sides of it, and `computePaneGeometry`
+multiplies by them without normalising - so a surviving `main: 0.154` whose
+partner pane was deleted lays the main pane out at 15% of the plot and leaves the
+rest blank. `pruneNativePaneHeightOverrides` drops the whole set the moment any
+pane it named is gone; partial pruning would keep a share of a layout that no
+longer exists.
+
 **The Android debug overlay is an instrument, and it was changing what it
 measured.** Its entries were chart state, so every append re-rendered the whole
 chart - and a divider drag logs once per gesture update, which put a full chart

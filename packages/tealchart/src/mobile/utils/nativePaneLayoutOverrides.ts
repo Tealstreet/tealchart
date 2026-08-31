@@ -80,3 +80,23 @@ export function nativePaneHeightsMatchRatios(
     return Math.abs(pane.height / totalHeight - target / totalRatio) <= 0.01;
   });
 }
+
+/**
+ * Drops dragged pane heights once the panes they balanced are not all present.
+ *
+ * A divider drag writes a ratio per pane on both sides of it, and those ratios
+ * only mean anything together - `computePaneGeometry` multiplies by them without
+ * normalising, so one surviving 0.154 lays the main pane out at 15% of the plot
+ * and leaves the rest blank. Deleting the indicator under a dragged divider did
+ * exactly that. Partial pruning would not help: what is left is still a share of
+ * a layout that no longer exists.
+ */
+export function pruneNativePaneHeightOverrides(
+  overrides: NativePaneHeightOverrides,
+  paneIds: readonly string[],
+): NativePaneHeightOverrides {
+  const overriddenIds = Object.keys(overrides);
+  if (overriddenIds.length === 0) return overrides;
+  const present = new Set(paneIds);
+  return overriddenIds.every((paneId) => present.has(paneId)) ? overrides : {};
+}
