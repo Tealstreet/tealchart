@@ -20,11 +20,6 @@ export function useAnimatedReaction<T>(prepare: () => T, react: (prepared: T, pr
   react(prepare(), null);
 }
 
-/** No thread boundary under test, so the worklet side calls straight through. */
-export function runOnJS<TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => TReturn) {
-  return fn;
-}
-
 export function withTiming<T>(value: T) {
   return value;
 }

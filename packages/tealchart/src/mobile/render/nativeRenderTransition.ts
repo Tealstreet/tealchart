@@ -77,7 +77,7 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   hasDataViewport,
   interval,
   isLoading,
-  nativeInteractionActive = false,
+  viewportGestureActive = false,
   previousBarsLength,
   previousHasDataViewport,
   previousProjectionReady,
@@ -89,8 +89,8 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   hasDataViewport: boolean;
   interval: string;
   isLoading: boolean;
-  /** A live native interaction drives presentation from shared values/bitmaps; freezing it mid-gesture reads as the chart jumping back. */
-  nativeInteractionActive?: boolean;
+  /** A live pan or pinch drives the canvas from shared values; freezing it mid-drag reads as the chart jumping back a few frames. */
+  viewportGestureActive?: boolean;
   previousBarsLength: number;
   previousHasDataViewport: boolean;
   previousProjectionReady: boolean;
@@ -102,7 +102,7 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   if (barsLength === 0 || !hasDataViewport || !projectionReady) return true;
   // Only the loading clause gives way to a gesture. The others mean the data on
   // hand belongs to nothing the chart can draw, and holding is still right.
-  if (isLoading && !nativeInteractionActive) return true;
+  if (isLoading && !viewportGestureActive) return true;
 
   const barsMatchRequestedData = nativeBarsMatchRequestedData({
     barsContext,
@@ -118,13 +118,13 @@ export function shouldHoldNativeRenderSnapshotForTransition({
 export function shouldUseNativeStaticRenderProjectionForTransition({
   dataLoadRenderBlocked,
   holdingSnapshot,
-  nativeInteractionActive = false,
+  viewportGestureActive = false,
 }: {
   dataLoadRenderBlocked: boolean;
   holdingSnapshot: boolean;
-  /** A live native interaction drives presentation, so a data-load block must not freeze it onto the JS-side projection. */
-  nativeInteractionActive?: boolean;
+  /** A live gesture drives the canvas from shared values, so a data-load block must not freeze it onto the JS-side projection. */
+  viewportGestureActive?: boolean;
 }): boolean {
   if (holdingSnapshot) return true;
-  return dataLoadRenderBlocked && !nativeInteractionActive;
+  return dataLoadRenderBlocked && !viewportGestureActive;
 }

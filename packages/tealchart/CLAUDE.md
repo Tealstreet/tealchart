@@ -52,11 +52,11 @@ override, or ownership state directly on gesture finalize when that state masks 
 React/Skia propagation seam. Commit the target first, then release the visual
 hold through `mobile/interaction/nativeReleaseHold.ts` after the committed frame
 reports that the target is visible. **A commit is not a paint.** If clearing the
-hold can expose the commit's all-old frame, wait for the canvas to echo the
-committed geometry back - `createNativePaneGeometrySignature` through
-`nativePresentedPaneGeometry` - and release on that. React render and
-layout-effect passes are not presentation frames, and neither is an animation
-frame counted from one. This is the single owner for release-hold timing across
+hold can expose the commit's all-old frame, the hold has to outlive the repaint
+as well, and that is decided inside the canvas rather than here - see **One
+commit, two channels**. React render and layout-effect passes are not
+presentation frames, and neither is an animation frame counted from one. This is
+the single owner for release-hold timing across
 viewport ownership, pane divider resize snapshots, pane maximize legend freezes,
 and pane-range overrides. Do not add ad hoc `requestAnimationFrame`, timeout, or
 effect-based release gates as the normal release path for new mobile visual
@@ -501,76 +501,47 @@ grab rather than per tap. Do not move it back out to a sibling canvas, and do no
 reach for a covering bitmap for anything that could instead ride the derived
 channel.
 
-A gate that observed the propagation was tried, reverted, and is now back in a
-shape that costs nothing. Echoing pane geometry through a `useDerivedValue` and
-releasing on the echo is sound in principle. The reverted attempt paid for it by
-mounting the echo as an unmemoized `<Canvas>` child, which re-rendered on every
-parent render - every bar tick - invalidating the Skia scene graph and repainting
-each time. The chart became slow enough that double taps started missing the 200ms
-inter-tap window, so the maximize worked about half the time.
+A gate that observed the propagation was tried and reverted. Echoing pane
+geometry through a `useDerivedValue` and releasing on the echo is sound in
+principle; the attempt paid for it by mounting the echo as an unmemoized
+`<Canvas>` child, which re-rendered on every parent render - every bar tick -
+invalidating the Skia scene graph and repainting each time. The chart became slow
+enough that double taps started missing the 200ms inter-tap window, so the
+maximize worked about half the time. If you try it again, `memo` is not optional,
+and the thing to measure is repaints per tick.
 
-What was wrong there was the node, not the echo. `nativePresentedPaneGeometry` in
-`SkiaTealchart` is a `useDerivedValue` closed over
-`createNativePaneGeometrySignature(frame.panes)` that **draws nothing** - it is not
-a Skia element and has no reconciler root to invalidate, so it cannot cost a
-repaint. Ordering holds without one: Reanimated restarts a derived value's mapper
-from a `useEffect`, effects run children before parents, and mappers run in
-registration order, so the mirror lands in the same run as the plot paths it is
-reporting on. A `useAnimatedReaction` carries it back to JS. If you touch this,
-the thing to measure is still repaints per tick, and the rule is that an echo may
-observe the canvas but must never draw into it.
-
-**JS cannot retire a preview that covers the canvas, and three builds proved it.**
-The pane divider's bitmap was retired from JS on the React commit, which is the
-all-old frame, so Android showed the pre-drag layout until the propagation
-landed - iOS never did, being one paint wide there and several here. An extra
-animation frame, then a single-commit clear, then this echo releasing on the
-mapper run: each was closer and none was right, because JS can only guess at
-frames after the commit and a slow one makes the guess wrong. The last of them
-worked about 60% of the time, and the ceiling was observed firing *after* the
-clear with the canvas still on the old layout.
-
-**A preview drawn inside the canvas must retire inside the canvas**, and it must
-outlive the rebuild it is covering. `NativePaneDividerResizeLayer` takes the
-committed geometry signature and the signature the released drag asked for as
-plain props, reads both through the band's own `useDerivedValue`, and collapses
-the bitmap to zero height once they agree **and** a fixed number of presented
-frames have gone by, counted on the UI thread with `useFrameCallback`.
-
-That count is the one tuned number in this drag, and it is a fence rather than a
-mechanism. A pane-geometry commit rebuilds every plot path in the canvas, and on
-Android that has been measured at roughly a quarter of a second with the frames
-on the pre-drag layout throughout. Retiring the bitmap before then uncovers them.
-Four attempts to find the exact moment all failed, each closer than the last: an
-extra animation frame, a single-commit clear, a JS echo of the committed
-geometry, then the signature comparison on its own. Every one of them is JS or a
-mapper trying to observe a repaint neither can see. Reanimated *could* order it -
+**Nothing outside the canvas can retire a preview that covers it.** The pane
+divider's bitmap was retired from JS on the React commit - the all-old frame - so
+Android showed the pre-drag layout until the repaint landed, while iOS never did,
+the seam being one paint wide there and many here. Four attempts to name the
+moment the repaint lands each got closer and none was right: an extra animation
+frame, a single-commit clear, a JS echo of the committed geometry, then comparing
+the committed signature inside the draw pass. They all reduce to JS or a mapper
+trying to observe a repaint neither can see. Reanimated *could* order it, since
 mappers are sorted topologically on declared shared-value outputs - but the plot
 paths declare only themselves, and `useDerivedValue` cannot declare another
-output. So the fence waits longer than the rebuild takes instead of guessing when
-it ends. Being late costs a stretched bitmap for a few more frames; being early
-is the flap. iOS pays nothing visible: its paths land in one frame, and the
-bitmap covering them already sits at the committed geometry.
+output.
 
-Disposal trails the fence, and the ceiling trails disposal, so neither can
-uncover a preview that is still drawing.
+**So the preview outlives the repaint instead of chasing it.**
+`NativePaneDividerResizeLayer` takes the committed geometry signature and the one
+the released drag asked for as plain props, reads both through the band's own
+`useDerivedValue`, and collapses the bitmap to zero height once they agree **and**
+a fixed number of presented frames have passed, counted on the UI thread with
+`useFrameCallback`. That count is the one tuned number in this drag and it is a
+fence, not a mechanism: a pane-geometry commit rebuilds every plot path in the
+canvas, measured at roughly a quarter of a second on Android with the frames on
+the pre-drag layout throughout, so the fence is sized to outlast it. Being late
+costs a stretched bitmap for a few more frames; being early is the flap. iOS pays
+nothing visible - its paths land in one frame, and the bitmap covering them is
+already at the committed geometry. Disposal trails the fence and the ceiling
+trails disposal, so neither can uncover a preview that is still drawing.
 
-**Pane height overrides are shares of a layout, not of a pane.** A divider drag
-writes a ratio for the panes on both sides of it, and `computePaneGeometry`
-multiplies by them without normalising - so a surviving `main: 0.154` whose
-partner pane was deleted lays the main pane out at 15% of the plot and leaves the
-rest blank. `pruneNativePaneHeightOverrides` drops the whole set the moment any
-pane it named is gone; partial pruning would keep a share of a layout that no
-longer exists.
-
-**The Android debug overlay is an instrument, and it was changing what it
-measured.** Its entries were chart state, so every append re-rendered the whole
-chart - and a divider drag logs once per gesture update, which put a full chart
-render on every frame of the drag being measured. It never mounts on iOS, so the
-one platform that showed the flap was also the only one paying for the log. It
-owns its own state now (`NativeGestureDebugOverlay`, appends through a ref) and
-touches nothing above it. Any future on-device instrument here has the same
-obligation: it may read chart state, never hold it.
+**An on-device instrument here may read chart state and must never hold it.** The
+Android gesture overlay used to keep its log in chart state, so every append
+re-rendered the whole chart - and a divider drag logs once per gesture update,
+which put a full chart render on every frame of the drag being measured. It never
+mounted on iOS, so the one platform showing the flap was the only one paying for
+the log, and no timing read through it was sound.
 
 **What is left is the legend**, and it cannot be fixed this way: it is a React
 Native view outside the canvas, and it drops a pane's rows the moment that pane's

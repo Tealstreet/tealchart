@@ -254,18 +254,18 @@ describe('native render transition during a live gesture', () => {
 
   it('keeps drawing live while a native interaction loads more history', () => {
     expect(shouldHoldNativeRenderSnapshotForTransition(holdInput)).toBe(true);
-    expect(shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, nativeInteractionActive: true })).toBe(false);
+    expect(shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, viewportGestureActive: true })).toBe(false);
   });
 
   it('still holds when the bars on hand cannot be drawn, gesture or not', () => {
     expect(
-      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, barsLength: 0, nativeInteractionActive: true }),
+      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, barsLength: 0, viewportGestureActive: true }),
     ).toBe(true);
     expect(
-      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, hasDataViewport: false, nativeInteractionActive: true }),
+      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, hasDataViewport: false, viewportGestureActive: true }),
     ).toBe(true);
     expect(
-      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, projectionReady: false, nativeInteractionActive: true }),
+      shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, projectionReady: false, viewportGestureActive: true }),
     ).toBe(true);
   });
 
@@ -277,7 +277,7 @@ describe('native render transition during a live gesture', () => {
       shouldUseNativeStaticRenderProjectionForTransition({
         dataLoadRenderBlocked: true,
         holdingSnapshot: false,
-        nativeInteractionActive: true,
+        viewportGestureActive: true,
       }),
     ).toBe(false);
     // A held snapshot outranks the gesture: there is nothing live to draw.
@@ -285,7 +285,7 @@ describe('native render transition during a live gesture', () => {
       shouldUseNativeStaticRenderProjectionForTransition({
         dataLoadRenderBlocked: false,
         holdingSnapshot: true,
-        nativeInteractionActive: true,
+        viewportGestureActive: true,
       }),
     ).toBe(true);
   });
@@ -296,7 +296,7 @@ describe('native render transition during a live gesture', () => {
         ...holdInput,
         isLoading: false,
         barsContext: { interval: '15', requestId: 1, source: 'history' as const, symbol: 'ETHUSDT' },
-        nativeInteractionActive: true,
+        viewportGestureActive: true,
       }),
     ).toBe(true);
   });
