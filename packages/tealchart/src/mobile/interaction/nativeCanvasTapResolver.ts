@@ -84,7 +84,6 @@ export interface NativeCanvasTapContext {
   hasContextMenu: boolean;
   orderDragZones: readonly NativeOrderDragZone[];
   pricePrecision: number;
-  priceLabelMinWidth?: number;
   sharedViewport: NativeViewportSharedValues;
   tradeLabelHeight: number;
   tradeLineActionZones: readonly NativeTradeLineActionZone[];
@@ -147,7 +146,6 @@ export function resolveNativeCanvasTap(
       frame: ctx.frame,
       crosshairY: ctx.crosshairY,
       pricePrecision: ctx.pricePrecision,
-      priceLabelMinWidth: ctx.priceLabelMinWidth ?? 0,
       sharedViewport: ctx.sharedViewport,
       x: point.x,
       y: point.y,

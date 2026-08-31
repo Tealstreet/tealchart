@@ -42,8 +42,6 @@ export interface EventManagerCallbacks {
   onCrossHairVisibilityChange?: (visible: boolean) => void;
   /** Snap a raw crosshair point to canonical render/callback coordinates. */
   snapCrosshairPoint?: (x: number, y: number) => { x: number; y: number };
-  /** Called when per-hover crosshair measurements should be cleared. */
-  onCrosshairMeasureReset?: () => void;
   /** Called on mouse down (for hotkey integration) */
   onMouseDown?: () => void;
   /** Called on mouse up (for hotkey integration) */
@@ -303,6 +301,7 @@ export class EventManager {
     null;
   private isTouchDragging = false;
   private touchCrosshairLocked = false;
+  private crosshairPinned = false;
   private touchCrosshairPosition = { x: 0, y: 0 };
   private pinchStartDistance = 0;
   private pinchStartViewport: Viewport | null = null;
@@ -380,6 +379,24 @@ export class EventManager {
    */
   getCrosshair(): Readonly<CrosshairState> {
     return { ...this.crosshair };
+  }
+
+  /**
+   * Hold the crosshair where it is while a host-rendered menu covers the chart.
+   * The quick-order popover is portaled to the body, so reaching it is a mouse
+   * leave - and hiding the crosshair takes the "+" button that opened it with
+   * it. Pinned, the button is still there when the menu closes.
+   */
+  setCrosshairPinned(pinned: boolean): void {
+    this.crosshairPinned = pinned;
+  }
+
+  hideCrosshair(): void {
+    if (!this.crosshair.visible) return;
+    this.crosshair.visible = false;
+    this.touchCrosshairLocked = false;
+    this.callbacks.onCrossHairVisibilityChange?.(false);
+    this.scheduleRender();
   }
 
   /**
@@ -476,9 +493,6 @@ export class EventManager {
     }
     if (wasVisible !== shouldShowCrosshair) {
       this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
-      if (!shouldShowCrosshair) {
-        this.callbacks.onCrosshairMeasureReset?.();
-      }
     }
   }
 
@@ -1160,12 +1174,12 @@ export class EventManager {
   }
 
   private processMouseLeave(): void {
+    if (this.crosshairPinned) return;
     if (!this.state.isDragging) {
       const wasVisible = this.crosshair.visible;
       this.crosshair.visible = false;
       if (wasVisible) {
         this.callbacks.onCrossHairVisibilityChange?.(false);
-        this.callbacks.onCrosshairMeasureReset?.();
       }
       this.callbacks.onPaneDividerHover?.(null);
       this.scheduleRender();
@@ -1179,6 +1193,7 @@ export class EventManager {
   private handleDocumentMouseMove(e: MouseEvent): void {
     // Skip if dragging (drag continues via window listeners)
     if (this.state.isDragging) return;
+    if (this.crosshairPinned) return;
     // Skip if crosshair not visible (nothing to hide)
     if (!this.crosshair.visible) return;
     // Don't overwrite a higher-priority pending event (move, drag, touchmove)
@@ -1194,6 +1209,7 @@ export class EventManager {
 
   private processDocumentMouseMove(): void {
     if (this.state.isDragging) return;
+    if (this.crosshairPinned) return;
     if (!this.crosshair.visible) return;
 
     const rect = this.container.getBoundingClientRect();
@@ -1208,7 +1224,6 @@ export class EventManager {
       this.crosshair.visible = false;
       this.state.isOverPriceAxis = false;
       this.callbacks.onCrossHairVisibilityChange?.(false);
-      this.callbacks.onCrosshairMeasureReset?.();
       this.scheduleRender();
       this.callbacks.onCursorChange?.('crosshair');
     }
@@ -1611,7 +1626,6 @@ export class EventManager {
       if (this.touchCrosshairLocked) {
         this.touchCrosshairLocked = false;
         this.crosshair.visible = false;
-        this.callbacks.onCrosshairMeasureReset?.();
       } else {
         const point = this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y };
         this.touchCrosshairLocked = true;

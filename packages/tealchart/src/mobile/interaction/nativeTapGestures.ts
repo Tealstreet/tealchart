@@ -149,7 +149,6 @@ export function createNativeCanvasTapGesture({
           hasContextMenu,
           orderDragZones: orderDragZones.value,
           pricePrecision,
-          priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
           sharedViewport,
           tradeLabelHeight,
           tradeLineActionZones: tradeLineActionZones.value,
@@ -177,7 +176,6 @@ export function createNativeCanvasTapGesture({
           snappedY,
           pricePrecision,
           resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshair.y.value, pricePrecision),
-          crosshair.priceLabelMaxWidth?.value ?? 0,
         );
         runOnJS(onContextMenuTap)(time, price, layout.centerX, layout.centerY);
         return;
@@ -333,7 +331,6 @@ export function createNativePaneMaximizeTapGesture({
             hasContextMenu,
             orderDragZones: orderDragZones.value,
             pricePrecision,
-            priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
             sharedViewport,
             tradeLabelHeight,
             tradeLineActionZones: tradeLineActionZones.value,
@@ -441,7 +438,6 @@ export function createNativeResetViewTapGesture({
             frame,
             crosshairY: crosshair.y.value,
             pricePrecision,
-            priceLabelMinWidth: crosshair.priceLabelMaxWidth?.value ?? 0,
             sharedViewport,
             x: touch.x,
             y: touch.y,
