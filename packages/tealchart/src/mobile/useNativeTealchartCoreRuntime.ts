@@ -18,6 +18,7 @@ export interface NativeTealchartCoreRuntimeInput {
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
   propInterval: string;
   propSymbol: string;
+  realtimeUpdateThrottleMs?: number;
   theme: ChartThemeInput;
 }
 
@@ -29,6 +30,7 @@ export function useNativeTealchartCoreRuntime({
   onTealscriptError,
   propInterval,
   propSymbol,
+  realtimeUpdateThrottleMs,
   theme,
 }: NativeTealchartCoreRuntimeInput) {
   const [, forceUpdate] = useReducer((value: number) => value + 1, 0);
@@ -50,6 +52,7 @@ export function useNativeTealchartCoreRuntime({
     symbol: propSymbol,
     interval: propInterval,
     indicatorManager: indicatorManagerRef.current as unknown as IIndicatorManager,
+    realtimeUpdateThrottleMs,
     onSymbolChange,
     onIntervalChange,
   });

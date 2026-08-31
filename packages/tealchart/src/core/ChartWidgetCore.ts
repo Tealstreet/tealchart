@@ -82,6 +82,7 @@ export interface ChartWidgetCoreOptions {
 
   // Platform-specific injections
   indicatorManager?: IIndicatorManager;
+  realtimeUpdateThrottleMs?: number;
   scheduleRender?: () => void;
 
   // Callbacks
@@ -136,6 +137,10 @@ export class ChartWidgetCore {
   protected _loadBarsRequestId = 0;
   protected _resolveSymbolRequestId = 0;
   protected _disposed = false;
+  protected _lastRealtimeUpdateEmittedAt = 0;
+  protected _pendingRealtimeUpdateTimer: ReturnType<typeof setTimeout> | null = null;
+  protected _hasPendingRealtimeUpdate = false;
+  protected _realtimeUpdateThrottleMs: number;
 
   // Subscription tracking
   protected _barSubscriptionGuid: string | null = null;
@@ -169,6 +174,10 @@ export class ChartWidgetCore {
     this._onIntervalChange = options.onIntervalChange;
     this._scheduleRender = options.scheduleRender || (() => {});
     this._indicatorManager = options.indicatorManager || null;
+    this._realtimeUpdateThrottleMs =
+      Number.isFinite(options.realtimeUpdateThrottleMs) && options.realtimeUpdateThrottleMs! > 0
+        ? options.realtimeUpdateThrottleMs!
+        : 0;
 
     this._paneManager = new PaneManager();
     this._eventEmitter = new EventEmitter();
@@ -357,6 +366,7 @@ export class ChartWidgetCore {
     if (this._symbolInfoSymbol !== this._symbol) return;
 
     const requestId = ++this._loadBarsRequestId;
+    this._clearPendingRealtimeUpdate();
     this._setLoadingMoreBars(false);
     this._clearQueuedLeftHistoryBackfill();
     const requestSymbol = this._symbol;
@@ -577,13 +587,29 @@ export class ChartWidgetCore {
         }
         this._bars[this._bars.length - 1] = bar;
       } else if (bar.time > lastBar.time) {
+        if (this._hasPendingRealtimeUpdate) {
+          this._emitRealtimeUpdate();
+        }
         this._bars.push(bar);
       } else {
         return;
       }
     }
 
-    // Notify indicator manager
+    this._queueRealtimeUpdate();
+  }
+
+  protected _emitRealtimeUpdate(): void {
+    if (this._disposed) return;
+    this._hasPendingRealtimeUpdate = false;
+    if (this._pendingRealtimeUpdateTimer !== null) {
+      clearTimeout(this._pendingRealtimeUpdateTimer);
+      this._pendingRealtimeUpdateTimer = null;
+    }
+
+    const bar = this._bars[this._bars.length - 1];
+    if (!bar) return;
+
     if (this._indicatorManager?.updateBar) {
       this._indicatorManager.updateBar(bar);
     } else {
@@ -592,6 +618,37 @@ export class ChartWidgetCore {
 
     this._emitBarsChanged('realtime');
     this._scheduleRender();
+    this._lastRealtimeUpdateEmittedAt = Date.now();
+  }
+
+  protected _queueRealtimeUpdate(): void {
+    if (this._disposed) return;
+    if (this._realtimeUpdateThrottleMs <= 0) {
+      this._emitRealtimeUpdate();
+      return;
+    }
+
+    this._hasPendingRealtimeUpdate = true;
+    const elapsedMs = Date.now() - this._lastRealtimeUpdateEmittedAt;
+    if (elapsedMs >= this._realtimeUpdateThrottleMs) {
+      this._emitRealtimeUpdate();
+      return;
+    }
+
+    if (this._pendingRealtimeUpdateTimer !== null) return;
+    this._pendingRealtimeUpdateTimer = setTimeout(() => {
+      this._pendingRealtimeUpdateTimer = null;
+      if (!this._hasPendingRealtimeUpdate) return;
+      this._emitRealtimeUpdate();
+    }, this._realtimeUpdateThrottleMs - elapsedMs);
+  }
+
+  protected _clearPendingRealtimeUpdate(): void {
+    this._hasPendingRealtimeUpdate = false;
+    if (this._pendingRealtimeUpdateTimer !== null) {
+      clearTimeout(this._pendingRealtimeUpdateTimer);
+      this._pendingRealtimeUpdateTimer = null;
+    }
   }
 
   // ============================================================================
@@ -607,6 +664,7 @@ export class ChartWidgetCore {
       this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
       this._barSubscriptionGuid = null;
     }
+    this._clearPendingRealtimeUpdate();
 
     this._symbol = symbol;
     this._onSymbolChange?.(symbol);
@@ -629,6 +687,7 @@ export class ChartWidgetCore {
       this._datafeed.unsubscribeBars(this._barSubscriptionGuid);
       this._barSubscriptionGuid = null;
     }
+    this._clearPendingRealtimeUpdate();
 
     this._interval = normalizedInterval;
     this._onIntervalChange?.(normalizedInterval);
@@ -709,6 +768,7 @@ export class ChartWidgetCore {
     this._disposed = true;
     this._loadBarsRequestId += 1;
     this._clearQueuedLeftHistoryBackfill();
+    this._clearPendingRealtimeUpdate();
     const subscriptionGuid = this._barSubscriptionGuid;
     this._barSubscriptionGuid = null;
     if (subscriptionGuid) {

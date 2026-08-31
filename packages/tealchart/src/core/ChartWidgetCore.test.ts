@@ -1,9 +1,13 @@
 import type { DatafeedBar, IBasicDataFeed, LibrarySymbolInfo, PeriodParams, ResolutionString } from '../types';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ChartWidgetCore } from './ChartWidgetCore';
 import { MAX_HISTORY_BACKFILL_BAR_COUNT } from './historyBackfill';
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 interface PendingHistoryRequest {
   periodParams: PeriodParams;
@@ -276,6 +280,153 @@ describe('ChartWidgetCore data identity', () => {
     ]);
     expect(core.getBars()).toHaveLength(3);
     expect(core.getBars().at(-1)).toMatchObject({ time: bucketOpen, close: 125 });
+  });
+
+  it('coalesces realtime notifications while keeping the latest bar', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000);
+
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const emitted: Array<{ lastClose: number; source: string }> = [];
+    const updatedBars: number[] = [];
+    const scheduleRender = vi.fn();
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '5',
+      realtimeUpdateThrottleMs: 250,
+      scheduleRender,
+      indicatorManager: {
+        setBars: (bars) => {
+          updatedBars.push(bars.at(-1)?.close ?? 0);
+        },
+        updateBar: (bar) => {
+          updatedBars.push(bar.close);
+        },
+        getPlots: () => [],
+      },
+      onBarsChanged: (bars, context) => {
+        emitted.push({
+          lastClose: bars.at(-1)?.close ?? 0,
+          source: context.source,
+        });
+      },
+    });
+    const bars = makeBars(1_700_000_000_000, 5 * 60_000, 3);
+
+    core.initialize();
+    historyRequests[0]!.onResult(bars);
+    expect(emitted).toEqual([{ lastClose: 103, source: 'history' }]);
+
+    subscriptions[0]!.onTick({ ...bars.at(-1)!, close: 125 });
+    expect(emitted).toEqual([
+      { lastClose: 103, source: 'history' },
+      { lastClose: 125, source: 'realtime' },
+    ]);
+
+    vi.setSystemTime(1_100);
+    subscriptions[0]!.onTick({ ...bars.at(-1)!, close: 126 });
+    vi.setSystemTime(1_150);
+    subscriptions[0]!.onTick({ ...bars.at(-1)!, close: 127 });
+
+    expect(core.getBars().at(-1)).toMatchObject({ close: 127 });
+    expect(emitted).toEqual([
+      { lastClose: 103, source: 'history' },
+      { lastClose: 125, source: 'realtime' },
+    ]);
+
+    vi.advanceTimersByTime(150);
+
+    expect(emitted).toEqual([
+      { lastClose: 103, source: 'history' },
+      { lastClose: 125, source: 'realtime' },
+      { lastClose: 127, source: 'realtime' },
+    ]);
+    expect(updatedBars).toEqual([103, 125, 127]);
+    expect(scheduleRender).toHaveBeenCalledTimes(3);
+  });
+
+  it('flushes a pending realtime candle before queuing a newer candle', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000);
+
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const emitted: Array<{ lastClose: number; lastTime: number; source: string }> = [];
+    const updatedBars: Array<{ close: number; time: number }> = [];
+    const scheduleRender = vi.fn();
+    const core = new ChartWidgetCore({
+      datafeed,
+      symbol: 'BTC',
+      interval: '5',
+      realtimeUpdateThrottleMs: 250,
+      scheduleRender,
+      indicatorManager: {
+        setBars: (bars) => {
+          const lastBar = bars.at(-1);
+          if (lastBar) updatedBars.push({ close: lastBar.close, time: lastBar.time });
+        },
+        updateBar: (bar) => {
+          updatedBars.push({ close: bar.close, time: bar.time });
+        },
+        getPlots: () => [],
+      },
+      onBarsChanged: (bars, context) => {
+        const lastBar = bars.at(-1);
+        if (!lastBar) return;
+        emitted.push({
+          lastClose: lastBar.close,
+          lastTime: lastBar.time,
+          source: context.source,
+        });
+      },
+    });
+    const bars = makeBars(1_700_000_000_000, 5 * 60_000, 3);
+
+    core.initialize();
+    historyRequests[0]!.onResult(bars);
+    const sameCandleTime = core.getBars().at(-1)!.time;
+    const nextCandleTime = sameCandleTime + 5 * 60_000;
+    subscriptions[0]!.onTick({ ...bars.at(-1)!, close: 125 });
+
+    vi.setSystemTime(1_100);
+    subscriptions[0]!.onTick({ ...bars.at(-1)!, close: 126 });
+    vi.setSystemTime(1_150);
+    subscriptions[0]!.onTick({
+      ...bars.at(-1)!,
+      close: 130,
+      high: 130,
+      low: 130,
+      open: 130,
+      time: nextCandleTime,
+    });
+
+    expect(emitted).toEqual([
+      { lastClose: 103, lastTime: sameCandleTime, source: 'history' },
+      { lastClose: 125, lastTime: sameCandleTime, source: 'realtime' },
+      { lastClose: 126, lastTime: sameCandleTime, source: 'realtime' },
+    ]);
+    expect(updatedBars).toEqual([
+      { close: 103, time: sameCandleTime },
+      { close: 125, time: sameCandleTime },
+      { close: 126, time: sameCandleTime },
+    ]);
+    expect(core.getBars().at(-1)).toMatchObject({ close: 130, time: nextCandleTime });
+
+    vi.advanceTimersByTime(250);
+
+    expect(emitted).toEqual([
+      { lastClose: 103, lastTime: sameCandleTime, source: 'history' },
+      { lastClose: 125, lastTime: sameCandleTime, source: 'realtime' },
+      { lastClose: 126, lastTime: sameCandleTime, source: 'realtime' },
+      { lastClose: 130, lastTime: nextCandleTime, source: 'realtime' },
+    ]);
+    expect(updatedBars).toEqual([
+      { close: 103, time: sameCandleTime },
+      { close: 125, time: sameCandleTime },
+      { close: 126, time: sameCandleTime },
+      { close: 130, time: nextCandleTime },
+    ]);
+    expect(scheduleRender).toHaveBeenCalledTimes(4);
   });
 
   it('does not emit or subscribe when disposed before history resolves', () => {
