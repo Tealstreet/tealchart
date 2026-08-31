@@ -252,7 +252,7 @@ describe('native render transition during a live gesture', () => {
     symbol: 'BTCUSDT',
   };
 
-  it('keeps drawing live while a pan loads more history', () => {
+  it('keeps drawing live while a native interaction loads more history', () => {
     expect(shouldHoldNativeRenderSnapshotForTransition(holdInput)).toBe(true);
     expect(shouldHoldNativeRenderSnapshotForTransition({ ...holdInput, viewportGestureActive: true })).toBe(false);
   });

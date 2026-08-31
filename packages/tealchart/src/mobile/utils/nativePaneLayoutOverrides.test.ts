@@ -6,6 +6,7 @@ import {
   applyNativePaneHeightOverrides,
   createNativePaneLayoutSignature,
   nativePaneHeightsMatchRatios,
+  pruneNativePaneHeightOverrides,
 } from './nativePaneLayoutOverrides';
 
 function createLayout(mainRatio = 0.75, indicatorRatio = 0.25): UnifiedPaneLayout {
@@ -119,5 +120,30 @@ describe('nativePaneHeightsMatchRatios', () => {
   it('ignores panes the ratios say nothing about, and refuses a frame with no height', () => {
     expect(nativePaneHeightsMatchRatios([{ id: 'main', height: 100 }], { pane_9: 0.5 })).toBe(true);
     expect(nativePaneHeightsMatchRatios([{ id: 'main', height: 0 }], { main: 1 })).toBe(false);
+  });
+});
+
+describe('pruneNativePaneHeightOverrides', () => {
+  it('keeps dragged heights while every pane they balanced is present', () => {
+    const overrides = { main: 0.4, pane_1: 0.6 };
+
+    expect(pruneNativePaneHeightOverrides(overrides, ['main', 'pane_1'])).toBe(overrides);
+  });
+
+  it('keeps them when an unrelated pane is added', () => {
+    const overrides = { main: 0.4, pane_1: 0.6 };
+
+    expect(pruneNativePaneHeightOverrides(overrides, ['main', 'pane_1', 'pane_2'])).toBe(overrides);
+  });
+
+  it('drops them all when a pane they balanced is deleted', () => {
+    // A lone 0.154 lays the main pane out at 15% of the plot and blanks the rest.
+    expect(pruneNativePaneHeightOverrides({ main: 0.154, pane_1: 0.846 }, ['main'])).toEqual({});
+  });
+
+  it('leaves an empty set alone', () => {
+    const overrides = {};
+
+    expect(pruneNativePaneHeightOverrides(overrides, ['main'])).toBe(overrides);
   });
 });

@@ -179,14 +179,21 @@ describe('native viewport sync', () => {
     expect(committed).toEqual({
       hasManualViewport: true,
       nativeViewportOwned: true,
-      pendingNativeViewportCommit: viewport,
+      releaseHoldToken: 1,
+      viewportReleaseHold: {
+        kind: 'viewport',
+        releaseFramesRemaining: 0,
+        target: viewport,
+        token: 1,
+      },
     });
     expect(shouldApplyNativeAutoViewport(committed, viewport)).toBe(false);
 
     expect(cancelNativeViewportOwnership(committed)).toEqual({
       hasManualViewport: true,
       nativeViewportOwned: false,
-      pendingNativeViewportCommit: null,
+      releaseHoldToken: 1,
+      viewportReleaseHold: null,
     });
   });
 
@@ -215,7 +222,7 @@ describe('native viewport sync', () => {
 
     expect(result.type).toBe('confirmed');
     expect(result.state.nativeViewportOwned).toBe(false);
-    expect(result.state.pendingNativeViewportCommit).toBeNull();
+    expect(result.state.viewportReleaseHold).toBeNull();
     expect(readSharedViewport(live)).toEqual(viewport);
     expect(readSharedViewport(panStart)).toEqual(viewport);
   });

@@ -7,7 +7,11 @@ import type {
   NativeOrderDragInteractionState,
   NativeTradeLineBracketType,
 } from './nativeOemsDragState';
-import type { NativePriceAutoScaleSharedValues, NativeViewportGestureMetrics } from './nativeViewportGestureState';
+import type {
+  NativePriceAutoScaleSharedValues,
+  NativeViewportGestureMetrics,
+  NativeViewportGestureOwnerState,
+} from './nativeViewportGestureState';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -85,6 +89,12 @@ function gestureMetrics(): NativeViewportGestureMetrics {
     contentWidth: shared(10_000),
     timePerPixel: shared(999),
     pricePerPixel: shared(999),
+  };
+}
+
+function viewportGestureOwner(owner: NativeViewportGestureOwnerState['owner']['value'] = 'none'): NativeViewportGestureOwnerState {
+  return {
+    owner: shared(owner),
   };
 }
 
@@ -457,6 +467,7 @@ describe('native gesture activation', () => {
         active: panActive,
         indicatorPaneTarget: shared(null),
         paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -513,6 +524,7 @@ describe('native gesture activation', () => {
         active: panActive,
         indicatorPaneTarget: shared(null),
         paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -559,6 +571,7 @@ describe('native gesture activation', () => {
         active: panActive,
         indicatorPaneTarget: shared(null),
         paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -774,6 +787,7 @@ describe('native gesture activation', () => {
         active: panActive,
         indicatorPaneTarget: shared(null),
         paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -1044,6 +1058,7 @@ describe('native gesture activation', () => {
         active: panActive,
         indicatorPaneTarget: shared(null),
         paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
         sharedViewport: viewport,
         startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
         metrics: gestureMetrics(),
@@ -1137,6 +1152,128 @@ describe('native gesture activation', () => {
       priceMax:
         viewportValue.priceMax + 10 * ((viewportValue.priceMax - viewportValue.priceMin) / frame.mainPane.height),
     });
+  });
+
+  it('initializes owned viewport gestures from update when a platform delivers update before begin', () => {
+    const owner = viewportGestureOwner();
+    const panActive = shared(false);
+    const priceScaleActive = shared(false);
+    const timeScaleActive = shared(false);
+    const panViewport = sharedViewport(viewportValue);
+    const priceViewport = sharedViewport(viewportValue);
+    const timeViewport = sharedViewport(viewportValue);
+    const tradeLineRows = shared([]);
+    const tradeLineActionZones = shared([]);
+    const orderDragZones = shared([]);
+    const beginPanInteraction = vi.fn();
+    const beginPriceInteraction = vi.fn();
+    const beginTimeInteraction = vi.fn();
+
+    const chartPanGesture = createNativeChartPanGesture({
+      beginNativeViewportInteraction: beginPanInteraction,
+      cancelNativeViewportInteraction: () => {},
+      chartPanGestureState: {
+        active: panActive,
+        indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
+        sharedViewport: panViewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeTimePerPixel: shared(0),
+        activePricePerPixel: shared(0),
+      },
+      commitPanViewport: () => {},
+      frame,
+      orderDragZones,
+      panActive,
+      sharedViewport: panViewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones,
+      tradeLineRows,
+      viewportGestureOwner: owner,
+    }) as any;
+
+    const panDown = mockStateManager();
+    chartPanGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: 60 }], allTouches: [{ x: 80, y: 60 }] },
+      panDown,
+    );
+    expect(panDown.failed).toBe(false);
+    expect(owner.owner.value).toBe('pan');
+    chartPanGesture.handlers.onUpdate({ translationX: 0, translationY: 10 });
+    expect(panActive.value).toBe(true);
+    expect(beginPanInteraction).toHaveBeenCalledTimes(1);
+    expect(readViewport(panViewport).priceMin).not.toBe(viewportValue.priceMin);
+    chartPanGesture.handlers.onBegin({ x: 80, y: 60 });
+    expect(beginPanInteraction).toHaveBeenCalledTimes(1);
+    chartPanGesture.handlers.onEnd({ translationX: 0, translationY: 10 });
+    chartPanGesture.handlers.onFinalize({}, true);
+
+    const priceScaleGesture = createNativePriceScaleGesture({
+      beginNativeViewportInteraction: beginPriceInteraction,
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      frame,
+      priceScaleActive,
+      priceScaleGestureState: {
+        active: priceScaleActive,
+        sharedViewport: priceViewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorPrice: shared(0),
+        indicatorPaneTarget: shared(null),
+      },
+      sharedViewport: priceViewport,
+      viewportGestureOwner: owner,
+    }) as any;
+    const priceDown = mockStateManager();
+    priceScaleGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: frame.priceAxisHitLeft + 10, y: 80 }], allTouches: [{ x: frame.priceAxisHitLeft + 10, y: 80 }] },
+      priceDown,
+    );
+    expect(priceDown.failed).toBe(false);
+    expect(owner.owner.value).toBe('priceScale');
+    priceScaleGesture.handlers.onUpdate({ y: 80, translationY: 10 });
+    expect(priceScaleActive.value).toBe(true);
+    expect(beginPriceInteraction).toHaveBeenCalledTimes(1);
+    expect(readViewport(priceViewport).priceMin).not.toBe(viewportValue.priceMin);
+    priceScaleGesture.handlers.onBegin({ y: 80 });
+    expect(beginPriceInteraction).toHaveBeenCalledTimes(1);
+    priceScaleGesture.handlers.onEnd({ translationY: 10 });
+    priceScaleGesture.handlers.onFinalize({}, true);
+
+    const timeScaleGesture = createNativeTimeScaleGesture({
+      beginNativeViewportInteraction: beginTimeInteraction,
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      frame,
+      sharedViewport: timeViewport,
+      timeScaleActive,
+      timeScaleGestureState: {
+        active: timeScaleActive,
+        sharedViewport: timeViewport,
+        startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+      },
+      viewportGestureOwner: owner,
+    }) as any;
+    const timeDown = mockStateManager();
+    timeScaleGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 80, y: frame.timeAxisTop + 10 }], allTouches: [{ x: 80, y: frame.timeAxisTop + 10 }] },
+      timeDown,
+    );
+    expect(timeDown.failed).toBe(false);
+    expect(owner.owner.value).toBe('timeScale');
+    timeScaleGesture.handlers.onUpdate({ translationX: 10 });
+    expect(timeScaleActive.value).toBe(true);
+    expect(beginTimeInteraction).toHaveBeenCalledTimes(1);
+    expect(readViewport(timeViewport).startTime).not.toBe(viewportValue.startTime);
+    timeScaleGesture.handlers.onBegin({});
+    expect(beginTimeInteraction).toHaveBeenCalledTimes(1);
   });
 
   it('updates chart viewport from independent two-finger axis components', () => {
@@ -1319,6 +1456,7 @@ describe('native gesture activation', () => {
         active: panActive,
         indicatorPaneTarget: shared(null),
         paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
         sharedViewport: viewport,
         startViewport: panStartViewport,
         metrics: gestureMetrics(),
@@ -1856,5 +1994,274 @@ describe('canvas tap vs pane maximize double tap', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(crosshair.visible.value).toBe(false);
+  });
+
+  it('stops an active price-axis scale when Android adds a second touch to the stream', () => {
+    const owner = viewportGestureOwner('priceScale');
+    const priceScaleActive = shared(true);
+    const gesture = createNativePriceScaleGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      frame,
+      priceScaleActive,
+      priceScaleGestureState: {
+        active: priceScaleActive,
+        sharedViewport: sharedViewport(viewportValue),
+        startViewport: sharedViewport(viewportValue),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorPrice: shared(0),
+        indicatorPaneTarget: shared(null),
+      },
+      sharedViewport: sharedViewport(viewportValue),
+      viewportGestureOwner: owner,
+    }) as any;
+    const manager = mockStateManager();
+
+    gesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 90, y: 80 }],
+        allTouches: [
+          { x: frame.priceAxisHitLeft + 5, y: 80 },
+          { x: 90, y: 80 },
+        ],
+      },
+      manager,
+    );
+
+    expect(manager.failed).toBe(true);
+    expect(priceScaleActive.value).toBe(false);
+    expect(owner.owner.value).toBe('none');
+  });
+
+  it('stops an active time-axis scale when Android adds a second touch to the stream', () => {
+    const owner = viewportGestureOwner('timeScale');
+    const timeScaleActive = shared(true);
+    const gesture = createNativeTimeScaleGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      frame,
+      sharedViewport: sharedViewport(viewportValue),
+      timeScaleActive,
+      timeScaleGestureState: {
+        active: timeScaleActive,
+        sharedViewport: sharedViewport(viewportValue),
+        startViewport: sharedViewport(viewportValue),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+      },
+      viewportGestureOwner: owner,
+    }) as any;
+    const manager = mockStateManager();
+
+    gesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 100, y: 80 }],
+        allTouches: [
+          { x: 100, y: frame.timeAxisTop + 5 },
+          { x: 100, y: 80 },
+        ],
+      },
+      manager,
+    );
+
+    expect(manager.failed).toBe(true);
+    expect(timeScaleActive.value).toBe(false);
+    expect(owner.owner.value).toBe('none');
+  });
+
+  it('lets two-finger pinch take ownership from an active one-finger axis gesture', () => {
+    const owner = viewportGestureOwner('priceScale');
+    const priceScaleActive = shared(true);
+    const pinchActive = shared(false);
+    const beginNativeViewportInteraction = vi.fn();
+    const gesture = createNativeChartAxisPinchGesture({
+      beginNativeViewportInteraction,
+      bracketDragActive: shared(false),
+      bracketDragInteractionState: createBracketDragState(),
+      cancelNativeViewportInteraction: () => {},
+      chartAxisPinchGestureState: {
+        active: pinchActive,
+        sharedViewport: sharedViewport(viewportValue),
+        startViewport: sharedViewport(viewportValue),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorTime: shared(0),
+        activeAnchorPrice: shared(0),
+        activeStartSpanX: shared(0),
+        activeStartSpanY: shared(0),
+      },
+      commitPanViewport: () => {},
+      frame,
+      orderDragState: createOrderDragState(),
+      orderDragZones: shared([]),
+      panActive: shared(false),
+      pinchActive,
+      priceScaleActive,
+      sharedViewport: sharedViewport(viewportValue),
+      timeScaleActive: shared(false),
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+      viewportGestureOwner: owner,
+    }) as any;
+    const manager = mockStateManager();
+
+    gesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: 130, y: 90 }],
+        allTouches: [
+          { x: 70, y: 70 },
+          { x: 130, y: 90 },
+        ],
+      },
+      manager,
+    );
+
+    expect(manager.activated).toBe(true);
+    expect(priceScaleActive.value).toBe(false);
+    expect(pinchActive.value).toBe(true);
+    expect(owner.owner.value).toBe('axisPinch');
+    expect(beginNativeViewportInteraction).not.toHaveBeenCalled();
+  });
+
+  it('prevents axis gestures from starting while a pane divider owns the stream', () => {
+    const owner = viewportGestureOwner();
+    const panActive = shared(false);
+    const priceScaleActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const panGesture = createNativeChartPanGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      chartPanGestureState: {
+        active: panActive,
+        indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
+        sharedViewport: viewport,
+        startViewport: sharedViewport(viewportValue),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeTimePerPixel: shared(0),
+        activePricePerPixel: shared(0),
+      },
+      commitPanViewport: () => {},
+      frame: multiPaneFrame,
+      onPaneHeightsChange: () => {},
+      orderDragZones: shared([]),
+      panActive,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+      viewportGestureOwner: owner,
+    }) as any;
+    const priceScaleGesture = createNativePriceScaleGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      commitPanViewport: () => {},
+      frame: multiPaneFrame,
+      priceScaleActive,
+      priceScaleGestureState: {
+        active: priceScaleActive,
+        sharedViewport: viewport,
+        startViewport: sharedViewport(viewportValue),
+        priceAutoScale: priceAutoScale(),
+        activeAnchorPrice: shared(0),
+        indicatorPaneTarget: shared(null),
+      },
+      sharedViewport: viewport,
+      viewportGestureOwner: owner,
+    }) as any;
+
+    panGesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 100, y: multiPaneFrame.mainPane.bottom }], allTouches: [{ x: 100, y: multiPaneFrame.mainPane.bottom }] },
+      mockStateManager(),
+    );
+    expect(owner.owner.value).toBe('paneDivider');
+
+    const manager = mockStateManager();
+    priceScaleGesture.handlers.onTouchesDown(
+      {
+        changedTouches: [{ x: multiPaneFrame.priceAxisHitLeft + 5, y: multiPaneFrame.mainPane.bottom }],
+        allTouches: [{ x: multiPaneFrame.priceAxisHitLeft + 5, y: multiPaneFrame.mainPane.bottom }],
+      },
+      manager,
+    );
+
+    expect(manager.failed).toBe(true);
+    expect(owner.owner.value).toBe('paneDivider');
+  });
+
+  it('routes near-divider touches to pane divider ownership before generic pan', () => {
+    const owner = viewportGestureOwner();
+    const panActive = shared(false);
+    const viewport = sharedViewport(viewportValue);
+    const onPaneDividerResizeStart = vi.fn();
+    const onPaneHeightsChange = vi.fn();
+    const paneDividerBands = shared([]);
+    const gesture = createNativeChartPanGesture({
+      beginNativeViewportInteraction: () => {},
+      cancelNativeViewportInteraction: () => {},
+      chartPanGestureState: {
+        active: panActive,
+        indicatorPaneTarget: shared(null),
+        paneDividerTarget: shared(null),
+        paneDividerReleaseLocked: shared(false),
+        sharedViewport: viewport,
+        startViewport: sharedViewport(viewportValue),
+        metrics: gestureMetrics(),
+        priceAutoScale: priceAutoScale(),
+        activeTimePerPixel: shared(0),
+        activePricePerPixel: shared(0),
+      },
+      commitPanViewport: () => {},
+      frame: multiPaneFrame,
+      onPaneDividerResizeStart,
+      onPaneHeightsChange,
+      orderDragZones: shared([]),
+      paneDividerBands,
+      panActive,
+      sharedViewport: viewport,
+      tradeLabelHeight: 18,
+      tradeLineActionZones: shared([]),
+      tradeLineRows: shared([]),
+      viewportGestureOwner: owner,
+    }) as any;
+    const manager = mockStateManager();
+    const y = multiPaneFrame.mainPane.bottom + 6;
+
+    gesture.handlers.onTouchesDown(
+      { changedTouches: [{ x: 128, y }], allTouches: [{ x: 128, y }] },
+      manager,
+    );
+    gesture.handlers.onBegin({ x: 128, y });
+    gesture.handlers.onUpdate({ translationX: -55, translationY: -112 });
+    gesture.handlers.onEnd({ translationX: -55, translationY: -112 });
+
+    expect(manager.failed).toBe(false);
+    expect(owner.owner.value).toBe('paneDivider');
+    expect(onPaneDividerResizeStart).toHaveBeenCalledTimes(1);
+    expect(onPaneHeightsChange).toHaveBeenCalledTimes(1);
+    expect(onPaneHeightsChange.mock.calls[0]?.[0]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ paneId: 'main' }),
+        expect.objectContaining({ paneId: 'pane_1' }),
+      ]),
+    );
+    expect(panActive.value).toBe(false);
+    const releaseBands = paneDividerBands.value;
+    expect(releaseBands.length).toBeGreaterThan(0);
+
+    // Android can deliver extra pan updates around release. Once onEnd freezes
+    // the final preview bands, those late updates must not yank the bitmap
+    // layer away from the committed pane-height target.
+    gesture.handlers.onUpdate({ translationX: -55, translationY: 40 });
+    expect(paneDividerBands.value).toBe(releaseBands);
+
+    gesture.handlers.onFinalize({}, true);
+    expect(owner.owner.value).toBe('none');
   });
 });
