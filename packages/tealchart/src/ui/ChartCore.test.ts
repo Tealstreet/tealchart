@@ -12,6 +12,7 @@ import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../constants';
+import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
@@ -2028,6 +2029,50 @@ describe('ChartCore viewport management', () => {
     eventManager.callbacks.onCrosshairRender?.();
 
     expect(fillText.mock.calls.some((call) => String(call[0]).match(/^\d{2},\d{3}\.\d$/))).toBe(true);
+
+    core.dispose();
+  });
+
+  // The gesture tags - the crosshair's price and a TP/SL grabber's preview -
+  // are the whole lane with the text centred, never a fit to their own text.
+  it('draws the crosshair price tag at one lane-anchored width, text centred', async () => {
+    const fillText = vi.fn();
+    const roundRect = vi.fn();
+    stubCanvasContext({ fillText, roundRect });
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+      renderOptions: { pricePrecision: 0 },
+    });
+
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 1, priceMax: 900000 });
+    const eventManager = eventManagerInstances[0];
+
+    const priceTagOf = (calls: unknown[][]) => {
+      const call = calls.filter((entry) => Number(entry[0]) > 700 && Number(entry[3]) === 18).at(-1);
+      return call ? { x: Number(call[0]), width: Number(call[2]) } : null;
+    };
+
+    eventManager.callbacks.onCrossHairMoved?.(700, 120);
+    eventManager.callbacks.onCrosshairRender?.();
+    const wide = priceTagOf(roundRect.mock.calls);
+    const wideText = fillText.mock.calls.at(-1);
+
+    roundRect.mockClear();
+    fillText.mockClear();
+    eventManager.callbacks.onCrossHairMoved?.(700, 520);
+    eventManager.callbacks.onCrosshairRender?.();
+    const narrow = priceTagOf(roundRect.mock.calls);
+
+    expect(wide).not.toBeNull();
+    // A six-digit price and a one-digit price get the same tag: it is the lane,
+    // not a fit to the text.
+    expect(narrow).toEqual(wide);
+    expect(wide!.x + wide!.width).toBe(800 - PRICE_AXIS_RIGHT_PADDING);
+    expect(Number(wideText?.[1])).toBe(wide!.x + wide!.width / 2);
 
     core.dispose();
   });

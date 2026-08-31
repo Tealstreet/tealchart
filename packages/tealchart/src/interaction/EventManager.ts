@@ -42,8 +42,6 @@ export interface EventManagerCallbacks {
   onCrossHairVisibilityChange?: (visible: boolean) => void;
   /** Snap a raw crosshair point to canonical render/callback coordinates. */
   snapCrosshairPoint?: (x: number, y: number) => { x: number; y: number };
-  /** Called when per-hover crosshair measurements should be cleared. */
-  onCrosshairMeasureReset?: () => void;
   /** Called on mouse down (for hotkey integration) */
   onMouseDown?: () => void;
   /** Called on mouse up (for hotkey integration) */
@@ -398,7 +396,6 @@ export class EventManager {
     this.crosshair.visible = false;
     this.touchCrosshairLocked = false;
     this.callbacks.onCrossHairVisibilityChange?.(false);
-    this.callbacks.onCrosshairMeasureReset?.();
     this.scheduleRender();
   }
 
@@ -496,9 +493,6 @@ export class EventManager {
     }
     if (wasVisible !== shouldShowCrosshair) {
       this.callbacks.onCrossHairVisibilityChange?.(shouldShowCrosshair);
-      if (!shouldShowCrosshair) {
-        this.callbacks.onCrosshairMeasureReset?.();
-      }
     }
   }
 
@@ -1186,7 +1180,6 @@ export class EventManager {
       this.crosshair.visible = false;
       if (wasVisible) {
         this.callbacks.onCrossHairVisibilityChange?.(false);
-        this.callbacks.onCrosshairMeasureReset?.();
       }
       this.callbacks.onPaneDividerHover?.(null);
       this.scheduleRender();
@@ -1231,7 +1224,6 @@ export class EventManager {
       this.crosshair.visible = false;
       this.state.isOverPriceAxis = false;
       this.callbacks.onCrossHairVisibilityChange?.(false);
-      this.callbacks.onCrosshairMeasureReset?.();
       this.scheduleRender();
       this.callbacks.onCursorChange?.('crosshair');
     }
@@ -1634,7 +1626,6 @@ export class EventManager {
       if (this.touchCrosshairLocked) {
         this.touchCrosshairLocked = false;
         this.crosshair.visible = false;
-        this.callbacks.onCrosshairMeasureReset?.();
       } else {
         const point = this.callbacks.snapCrosshairPoint?.(x, y) ?? { x, y };
         this.touchCrosshairLocked = true;

@@ -68,3 +68,31 @@ export function resolvePriceLineAxisTagDomain(source: PriceAxisTagSemanticSource
   if (source.type === 'order' || source.type === 'position') return 'trade';
   return 'other';
 }
+
+export interface PriceAxisLaneTagLayout {
+  x: number;
+  width: number;
+  centerX: number;
+}
+
+/**
+ * The whole price-axis lane, for tags that belong to a gesture rather than to
+ * an order - the crosshair's price, and the preview a TP/SL grabber drags.
+ *
+ * These are a different class from an order's tag and deliberately do not use
+ * `PriceAxisTagWidthCache`, nor a width measured from their own text. The price
+ * under a finger changes digits constantly, and either of those would have the
+ * tag resizing the whole time it is being read. The lane is already grow-only,
+ * so sizing to it is stable by construction, and the text is centred in it.
+ */
+export function resolveWebPriceAxisLaneTagLayout(
+  chartWidth: number,
+  marginRight: number,
+  rightPadding: number,
+): PriceAxisLaneTagLayout {
+  const right = chartWidth - rightPadding;
+  const x = chartWidth - marginRight;
+  const width = Math.max(0, right - x);
+
+  return { x, width, centerX: x + width / 2 };
+}

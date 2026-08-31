@@ -128,7 +128,6 @@ export function useNativeSkiaInteractionRuntime({
   const crosshairY = useSharedValue(0);
   const crosshairDragOriginX = useSharedValue(0);
   const crosshairDragOriginY = useSharedValue(0);
-  const crosshairPriceLabelMaxWidth = useSharedValue(0);
 
   const sharedViewport = useMemo<NativeViewportSharedValues>(
     () => ({
@@ -171,9 +170,8 @@ export function useNativeSkiaInteractionRuntime({
       y: crosshairY,
       dragOriginX: crosshairDragOriginX,
       dragOriginY: crosshairDragOriginY,
-      priceLabelMaxWidth: crosshairPriceLabelMaxWidth,
     }),
-    [crosshairDragOriginX, crosshairDragOriginY, crosshairPriceLabelMaxWidth, crosshairVisible, crosshairX, crosshairY],
+    [crosshairDragOriginX, crosshairDragOriginY, crosshairVisible, crosshairX, crosshairY],
   );
   const orderDragState = useMemo<NativeOrderDragInteractionState>(
     () => ({
