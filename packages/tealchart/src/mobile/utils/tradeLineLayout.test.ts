@@ -700,7 +700,8 @@ describe('native trade line layout', () => {
     expect(geometry?.dragZone).toBeNull();
   });
 
-  it('exports stable trade-line rows for native worklet collision resolution', () => {
+  // The dashes between them are not a control - see `createNativeTradeLineRows`.
+  it('exports one row per label box, leaving the line between them untouchable', () => {
     const geometries = buildNativeTradeLineGeometries(
       [createOrderLine({ id: 'order-a', price: 100 })],
       [createPositionLine({ id: 'position-b', price: 101 })],
@@ -715,8 +716,10 @@ describe('native trade line layout', () => {
     );
 
     expect(createNativeTradeLineRows(geometries)).toEqual([
-      { objectId: 'order-a', objectType: 'order', price: 100, x1: 54, x2: 386 },
-      { objectId: 'position-b', objectType: 'position', price: 101, x1: 54, x2: 386 },
+      { objectId: 'order-a', objectType: 'order', price: 100, x1: 156, x2: 332 },
+      { objectId: 'order-a', objectType: 'order', price: 100, x1: 336, x2: 386 },
+      { objectId: 'position-b', objectType: 'position', price: 101, x1: 82, x2: 332 },
+      { objectId: 'position-b', objectType: 'position', price: 101, x1: 336, x2: 386 },
     ]);
   });
 });
