@@ -27,11 +27,6 @@ export interface NativeReleaseHoldResolution<TTarget> {
   released: boolean;
 }
 
-export interface NativePresentationReleaseScheduler {
-  frameId: ReturnType<typeof requestAnimationFrame> | null;
-  token: number | null;
-}
-
 export const NATIVE_RELEASE_HOLD_DEFAULT_RELEASE_FRAMES = 1;
 
 export function createNativeReleaseHold<TTarget>({
@@ -56,10 +51,9 @@ export function createNativeReleaseHold<TTarget>({
 /**
  * Retires a visual hold only after its committed target is visible in the frame.
  *
- * This is the committed-state gate. Its optional release-frame counter is only
- * for callers whose follow-up work is safe to tie to JS frame observation. When
- * clearing native preview state can expose a stale Skia/Reanimated presentation,
- * use scheduleNativePresentationRelease after this gate releases.
+ * This is the committed-state gate, and a commit is not a paint. A hold whose
+ * preview would otherwise expose the commit's all-old frame must then wait for
+ * createNativePaneGeometrySignature to echo back through the canvas.
  */
 export function resolveNativeReleaseHold<TTarget>({
   caughtUp,
@@ -80,62 +74,6 @@ export function resolveNativeReleaseHold<TTarget>({
     };
   }
   return { hold: null, released: true };
-}
-
-export function createNativePresentationReleaseScheduler(): NativePresentationReleaseScheduler {
-  return {
-    frameId: null,
-    token: null,
-  };
-}
-
-export function cancelNativePresentationRelease(scheduler: NativePresentationReleaseScheduler): void {
-  if (scheduler.frameId !== null) cancelAnimationFrame(scheduler.frameId);
-  scheduler.frameId = null;
-  scheduler.token = null;
-}
-
-/**
- * Release after real presentation frames, not React render/layout-effect passes.
- *
- * A committed frame can be visible to JS before Skia/Reanimated has presented
- * closures built from it. Dropping a bitmap/shared preview in that seam exposes
- * the pre-gesture canvas. This scheduler is the central handoff primitive for
- * those cases: resolveNativeReleaseHold still decides when the committed target
- * is ready, then this waits for the native presentation clock before clearing
- * preview state.
- */
-export function scheduleNativePresentationRelease({
-  frames,
-  release,
-  scheduler,
-  token,
-}: {
-  frames: number;
-  release: () => void;
-  scheduler: NativePresentationReleaseScheduler;
-  token: number;
-}): void {
-  cancelNativePresentationRelease(scheduler);
-  const releaseFrames = Math.max(0, Math.floor(frames));
-  if (releaseFrames === 0) {
-    release();
-    return;
-  }
-  scheduler.token = token;
-  let remaining = releaseFrames;
-  const step = () => {
-    if (scheduler.token !== token) return;
-    if (remaining <= 1) {
-      scheduler.frameId = null;
-      scheduler.token = null;
-      release();
-      return;
-    }
-    remaining -= 1;
-    scheduler.frameId = requestAnimationFrame(step);
-  };
-  scheduler.frameId = requestAnimationFrame(step);
 }
 
 export function nativePaneRangeOverridesCaughtUp({
@@ -203,4 +141,18 @@ export function nativePaneDividerBandsCaughtUp({
     if (!pane) return false;
     return Math.abs(pane.top - band.top) <= tolerance && Math.abs(pane.height - band.height) <= tolerance;
   });
+}
+
+/**
+ * Identity of the pane geometry a frame paints.
+ *
+ * Compared on both sides of the Skia propagation seam: React holds the
+ * committed frame's signature, and a mirrored derived value reports the same
+ * string once Reanimated has rebuilt the canvas mappers on it. Rounded because
+ * this is an identity, not a measurement - sub-pixel drift would never match.
+ */
+export function createNativePaneGeometrySignature(
+  panes: readonly { height: number; id: string; top: number }[],
+): string {
+  return panes.map((pane) => `${pane.id}:${Math.round(pane.top)}:${Math.round(pane.height)}`).join('|');
 }

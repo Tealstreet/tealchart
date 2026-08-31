@@ -3,8 +3,7 @@ import type { NativePaneFrame } from '../render/nativeChartFrame';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  cancelNativePresentationRelease,
-  createNativePresentationReleaseScheduler,
+  createNativePaneGeometrySignature,
   createNativePaneRatioTarget,
   createNativeReleaseHold,
   nativePaneDividerBandsCaughtUp,
@@ -12,7 +11,6 @@ import {
   nativePaneRatiosCaughtUp,
   omitReleasedNativePaneRangeOverrides,
   resolveNativeReleaseHold,
-  scheduleNativePresentationRelease,
 } from './nativeReleaseHold';
 
 function pane(id: string, height: number, yMin = 0, yMax = 1): NativePaneFrame {
@@ -63,68 +61,24 @@ describe('resolveNativeReleaseHold', () => {
   });
 });
 
-describe('scheduleNativePresentationRelease', () => {
-  function animationFrameHarness() {
-    let nextId = 1;
-    const callbacks = new Map<number, FrameRequestCallback>();
-    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
-      const id = nextId;
-      nextId += 1;
-      callbacks.set(id, callback);
-      return id;
-    });
-    vi.stubGlobal('cancelAnimationFrame', (id: number) => {
-      callbacks.delete(id);
-    });
-    return {
-      flushOne() {
-        const [id, callback] = callbacks.entries().next().value ?? [];
-        if (!id || !callback) return false;
-        callbacks.delete(id);
-        callback(performance.now());
-        return true;
-      },
-    };
-  }
-
-  it('releases after real animation frames, not synchronously when the hold catches up', () => {
-    const frames = animationFrameHarness();
-    const scheduler = createNativePresentationReleaseScheduler();
-    const release = vi.fn();
-
-    scheduleNativePresentationRelease({ frames: 2, release, scheduler, token: 1 });
-
-    expect(release).not.toHaveBeenCalled();
-    frames.flushOne();
-    expect(release).not.toHaveBeenCalled();
-    frames.flushOne();
-    expect(release).toHaveBeenCalledTimes(1);
+describe('createNativePaneGeometrySignature', () => {
+  it('matches itself across sub-pixel drift so an echo can be compared by value', () => {
+    expect(createNativePaneGeometrySignature([{ height: 144.4, id: 'main', top: 36.2 }])).toBe(
+      createNativePaneGeometrySignature([{ height: 144, id: 'main', top: 36 }]),
+    );
   });
 
-  it('cancels a stale scheduled release when a new interaction takes ownership', () => {
-    const frames = animationFrameHarness();
-    const scheduler = createNativePresentationReleaseScheduler();
-    const release = vi.fn();
+  it('changes when a divider moves', () => {
+    const before = createNativePaneGeometrySignature([
+      { height: 185, id: 'main', top: 36 },
+      { height: 33, id: 'macd', top: 221 },
+    ]);
+    const after = createNativePaneGeometrySignature([
+      { height: 73, id: 'main', top: 36 },
+      { height: 145, id: 'macd', top: 109 },
+    ]);
 
-    scheduleNativePresentationRelease({ frames: 2, release, scheduler, token: 1 });
-    cancelNativePresentationRelease(scheduler);
-    frames.flushOne();
-
-    expect(release).not.toHaveBeenCalled();
-  });
-
-  it('replaces an older release with the newest token', () => {
-    const frames = animationFrameHarness();
-    const scheduler = createNativePresentationReleaseScheduler();
-    const first = vi.fn();
-    const second = vi.fn();
-
-    scheduleNativePresentationRelease({ frames: 2, release: first, scheduler, token: 1 });
-    scheduleNativePresentationRelease({ frames: 1, release: second, scheduler, token: 2 });
-    frames.flushOne();
-
-    expect(first).not.toHaveBeenCalled();
-    expect(second).toHaveBeenCalledTimes(1);
+    expect(before).not.toBe(after);
   });
 });
 
