@@ -23,6 +23,7 @@ import { runOnJS } from 'react-native-worklets';
 import { getNativePaneAtY, getNativePriceAxisPaneAt } from '../render/nativeChartFrame';
 import { resolveNativePaneDividerAtY, resolveNativePaneDividerBands, resolveNativePaneDividerHeights } from './nativePaneDivider';
 import {
+  createNativePaneRangeOverride,
   resolveNativeIndicatorPaneTranslateRange,
 } from '../render/nativePaneRangeOverride';
 import { isNativeReservedControlPoint } from './nativeGestureControlZones';
@@ -353,7 +354,15 @@ export function createNativeChartPanGesture({
       });
       chartPanGestureState.indicatorPaneTarget.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
       if (paneRangeOverrides) {
-        paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
+        paneRangeOverrides.value = {
+          ...paneRangeOverrides.value,
+          [pane.id]: createNativePaneRangeOverride({
+            committed: false,
+            range: next,
+            startYMax: pane.startYMax,
+            startYMin: pane.startYMin,
+          }),
+        };
       }
     })
     .onEnd((event) => {
@@ -379,6 +388,20 @@ export function createNativeChartPanGesture({
       const pane = chartPanGestureState.indicatorPaneTarget.value;
       if (pane && onIndicatorPaneScale && pane.yMin !== pane.startYMin) {
         if (!nativeViewportOwnerIs(viewportGestureOwner, 'indicatorPanePan')) return;
+        // Committed, not cleared. The override stays on the shared channel as a
+        // bridge until the frame carries the range, because dropping it here
+        // wakes the plot worklets before their new closures arrive.
+        if (paneRangeOverrides) {
+          paneRangeOverrides.value = {
+            ...paneRangeOverrides.value,
+            [pane.id]: createNativePaneRangeOverride({
+              committed: true,
+              range: pane,
+              startYMax: pane.startYMax,
+              startYMin: pane.startYMin,
+            }),
+          };
+        }
         runOnJS(onIndicatorPaneScale)(pane.id, pane.yMin, pane.yMax);
       }
       const nextViewport = getNativeViewportGestureCommit(panActive, sharedViewport);
@@ -675,7 +698,15 @@ export function createNativePriceScaleGesture({
         });
         indicatorPane.value = { ...pane, yMin: next.yMin, yMax: next.yMax };
         if (paneRangeOverrides) {
-          paneRangeOverrides.value = { ...paneRangeOverrides.value, [pane.id]: next };
+          paneRangeOverrides.value = {
+            ...paneRangeOverrides.value,
+            [pane.id]: createNativePaneRangeOverride({
+              committed: false,
+              range: next,
+              startYMax: pane.startYMax,
+              startYMin: pane.startYMin,
+            }),
+          };
         }
         return;
       }
@@ -691,6 +722,19 @@ export function createNativePriceScaleGesture({
       const pane = indicatorPane.value;
       if (pane) {
         if (!nativeViewportOwnerIs(viewportGestureOwner, 'indicatorPriceScale')) return;
+        // Same bridge as the pane pan: committed here, retired by the draw pass
+        // once the frame carries the range.
+        if (paneRangeOverrides) {
+          paneRangeOverrides.value = {
+            ...paneRangeOverrides.value,
+            [pane.id]: createNativePaneRangeOverride({
+              committed: true,
+              range: pane,
+              startYMax: pane.startYMax,
+              startYMin: pane.startYMin,
+            }),
+          };
+        }
         if (onIndicatorPaneScale) runOnJS(onIndicatorPaneScale)(pane.id, pane.yMin, pane.yMax);
         indicatorPane.value = null;
         clearNativeViewportOwner(viewportGestureOwner, 'indicatorPriceScale');
