@@ -2,9 +2,9 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Viewport } from '../../types';
 import type { TimeRangeClampAnchor } from '../../viewport/timeRangeConstraints';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
+import type { NativePaneDividerTarget } from './nativePaneDivider';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
 import type { NativeAutoScaleBar } from './nativeAutoScale';
-import type { NativePaneDividerTarget } from './nativePaneDivider';
 
 import { clampViewportTimeRange } from '../../viewport/timeRangeConstraints';
 import { applyNativePriceAutoScale } from './nativeAutoScale';
@@ -22,27 +22,23 @@ export interface NativeViewportGestureMetrics {
   pricePerPixel: SharedValue<number>;
 }
 
-export type NativeGestureDebugEventHandler = (message: string) => void;
-
 export interface NativePriceAutoScaleSharedValues {
   active: SharedValue<boolean>;
   bars: SharedValue<NativeAutoScaleBar[]>;
 }
 
-/**
- * UI-thread gesture transaction flags.
- *
- * Android can deliver begin/update/finalize callbacks after a touch sequence
- * was failed or after an end callback already handed the committed value to JS.
- * These flags make the worklet state explicit:
- *
- * - accepted: the touch-down hit-test claimed this gesture.
- * - committed: the gesture handed off its final value; finalize must not roll
- *   the shared preview back after this point even when RNGH reports failure.
- */
-export interface NativeViewportGestureTransactionState {
-  accepted: SharedValue<boolean>;
-  committed: SharedValue<boolean>;
+export type NativeViewportGestureOwner =
+  | 'none'
+  | 'axisPinch'
+  | 'indicatorPanePan'
+  | 'indicatorPriceScale'
+  | 'pan'
+  | 'paneDivider'
+  | 'priceScale'
+  | 'timeScale';
+
+export interface NativeViewportGestureOwnerState {
+  owner: SharedValue<NativeViewportGestureOwner>;
 }
 
 export interface NativeChartPanGestureState {
@@ -55,6 +51,13 @@ export interface NativeChartPanGestureState {
   indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
   /** Divider being dragged, if the touch landed on a pane boundary. */
   paneDividerTarget: SharedValue<NativePaneDividerTarget | null>;
+  /**
+   * Set once a divider release has frozen the preview at its final band geometry.
+   * Some Android recognizer sequences still deliver pan updates around end/finalize;
+   * those updates must not mutate the release preview while React commits the real
+   * pane heights underneath it.
+   */
+  paneDividerReleaseLocked: SharedValue<boolean>;
   active: SharedValue<boolean>;
   sharedViewport: NativeViewportSharedValues;
   startViewport: NativeViewportSharedValues;
@@ -62,7 +65,6 @@ export interface NativeChartPanGestureState {
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeTimePerPixel: SharedValue<number>;
   activePricePerPixel: SharedValue<number>;
-  transaction?: NativeViewportGestureTransactionState;
 }
 
 export interface NativeChartAxisPinchGestureState {
@@ -75,7 +77,6 @@ export interface NativeChartAxisPinchGestureState {
   activeAnchorPrice: SharedValue<number>;
   activeStartSpanX: SharedValue<number>;
   activeStartSpanY: SharedValue<number>;
-  transaction?: NativeViewportGestureTransactionState;
 }
 
 /**
@@ -102,7 +103,6 @@ export interface NativePriceScaleGestureState {
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeAnchorPrice: SharedValue<number>;
   indicatorPaneTarget: SharedValue<NativeIndicatorPaneScaleTarget | null>;
-  transaction?: NativeViewportGestureTransactionState;
 }
 
 export interface NativeTimeScaleGestureState {
@@ -112,7 +112,6 @@ export interface NativeTimeScaleGestureState {
   metrics: NativeViewportGestureMetrics;
   priceAutoScale: NativePriceAutoScaleSharedValues;
   activeAnchorTime: SharedValue<number>;
-  transaction?: NativeViewportGestureTransactionState;
 }
 
 export interface NativePriceScaleHitGeometry {
@@ -254,55 +253,45 @@ export function resetNativeViewportGestureActiveFlags({
   pinchActive,
   priceScaleActive,
   timeScaleActive,
+  viewportGestureOwner,
 }: {
   panActive: SharedValue<boolean>;
   pinchActive: SharedValue<boolean>;
   priceScaleActive: SharedValue<boolean>;
   timeScaleActive: SharedValue<boolean>;
+  viewportGestureOwner?: NativeViewportGestureOwnerState;
 }): void {
   panActive.value = false;
   pinchActive.value = false;
   priceScaleActive.value = false;
   timeScaleActive.value = false;
+  if (viewportGestureOwner) viewportGestureOwner.owner.value = 'none';
 }
 
-export function resetNativeViewportGestureTransaction(
-  transaction: NativeViewportGestureTransactionState | undefined,
-): void {
-  'worklet';
-  if (!transaction) return;
-  transaction.accepted.value = false;
-  transaction.committed.value = false;
-}
-
-export function acceptNativeViewportGestureTransaction(
-  transaction: NativeViewportGestureTransactionState | undefined,
-): void {
-  'worklet';
-  if (!transaction) return;
-  transaction.accepted.value = true;
-}
-
-export function commitNativeViewportGestureTransaction(
-  transaction: NativeViewportGestureTransactionState | undefined,
-): void {
-  'worklet';
-  if (!transaction) return;
-  transaction.committed.value = true;
-}
-
-export function nativeViewportGestureTransactionAccepted(
-  transaction: NativeViewportGestureTransactionState | undefined,
+export function claimNativeViewportGestureOwner(
+  state: NativeViewportGestureOwnerState,
+  owner: NativeViewportGestureOwner,
 ): boolean {
   'worklet';
-  return transaction ? transaction.accepted.value : true;
+  if (state.owner.value !== 'none' && state.owner.value !== owner) return false;
+  state.owner.value = owner;
+  return true;
 }
 
-export function nativeViewportGestureTransactionCommitted(
-  transaction: NativeViewportGestureTransactionState | undefined,
-): boolean {
+export function clearNativeViewportGestureOwner(
+  state: NativeViewportGestureOwnerState,
+  owner: NativeViewportGestureOwner,
+): void {
   'worklet';
-  return transaction ? transaction.committed.value : false;
+  if (state.owner.value === owner) state.owner.value = 'none';
+}
+
+export function forceNativeViewportGestureOwner(
+  state: NativeViewportGestureOwnerState,
+  owner: NativeViewportGestureOwner,
+): void {
+  'worklet';
+  state.owner.value = owner;
 }
 
 export function syncNativeViewportGestureMetrics({
@@ -330,7 +319,9 @@ export function getNativeViewportGestureCommit(
 ): Viewport | null {
   'worklet';
   if (!active.value) return null;
-  return getNativeSharedViewport(sharedViewport);
+  const viewport = getNativeSharedViewport(sharedViewport);
+  active.value = false;
+  return viewport;
 }
 
 export function beginNativeChartPanGestureState(state: NativeChartPanGestureState): void {

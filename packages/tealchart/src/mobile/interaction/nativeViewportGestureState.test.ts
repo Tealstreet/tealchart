@@ -12,10 +12,9 @@ import type {
 
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../../viewport/timeRangeConstraints';
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../../viewport/timeRangeConstraints';
 import {
-  acceptNativeViewportGestureTransaction,
   beginNativeChartAxisPinchGestureState,
   beginNativeChartPanGestureState,
   beginNativePriceScaleGestureState,
@@ -23,17 +22,13 @@ import {
   canBeginNativePriceScaleGesture,
   canBeginNativeTimeScaleGesture,
   cancelNativeViewportGestureState,
-  commitNativeViewportGestureTransaction,
   finalizeNativeViewportGestureState,
   getNativeChartAxisPinchGeometry,
   getNativeChartAxisPinchRatios,
   getNativePriceScaleHitGeometry,
   getNativeTimeScaleHitGeometry,
   getNativeViewportGestureCommit,
-  nativeViewportGestureTransactionAccepted,
-  nativeViewportGestureTransactionCommitted,
   resetNativeViewportGestureActiveFlags,
-  resetNativeViewportGestureTransaction,
   resolveNativeAxisPinchScale,
   syncNativeViewportGestureMetrics,
   updateNativeChartAxisPinchGestureState,
@@ -167,13 +162,28 @@ describe('native viewport gesture state', () => {
     expect(readViewport(sharedLive)).toEqual(readViewport(start));
   });
 
-  it('reads a commit viewport only while the gesture is active', () => {
+  it('commits a viewport once and retires the active flag before finalize can roll it back', () => {
     const sharedLive = sharedViewport(viewport);
+    const start = sharedViewport({ startTime: 900, endTime: 1_900, priceMin: 95, priceMax: 195 });
     const active = shared(true);
 
     expect(getNativeViewportGestureCommit(active, sharedLive)).toEqual(viewport);
+    expect(active.value).toBe(false);
 
-    active.value = false;
+    sharedLive.startTime.value = 800;
+    expect(
+      finalizeNativeViewportGestureState({
+        active,
+        sharedViewport: sharedLive,
+        startViewport: start,
+        success: false,
+      }),
+    ).toBe(false);
+    expect(readViewport(sharedLive)).toEqual({
+      ...viewport,
+      startTime: 800,
+    });
+
     expect(getNativeViewportGestureCommit(active, sharedLive)).toBeNull();
   });
 
@@ -220,24 +230,6 @@ describe('native viewport gesture state', () => {
     ).toBe(false);
     expect(active.value).toBe(true);
     expect(readViewport(sharedLive)).toEqual(viewport);
-  });
-
-  it('tracks accepted and committed gesture transactions on the UI thread', () => {
-    const transaction = { accepted: shared(false), committed: shared(false) };
-
-    resetNativeViewportGestureTransaction(transaction);
-    expect(nativeViewportGestureTransactionAccepted(transaction)).toBe(false);
-    expect(nativeViewportGestureTransactionCommitted(transaction)).toBe(false);
-
-    acceptNativeViewportGestureTransaction(transaction);
-    expect(nativeViewportGestureTransactionAccepted(transaction)).toBe(true);
-
-    commitNativeViewportGestureTransaction(transaction);
-    expect(nativeViewportGestureTransactionCommitted(transaction)).toBe(true);
-
-    resetNativeViewportGestureTransaction(transaction);
-    expect(nativeViewportGestureTransactionAccepted(transaction)).toBe(false);
-    expect(nativeViewportGestureTransactionCommitted(transaction)).toBe(false);
   });
 
   it('scales prices around the touched anchor', () => {

@@ -77,25 +77,25 @@ export function shouldHoldNativeRenderSnapshotForTransition({
   hasDataViewport,
   interval,
   isLoading,
+  viewportGestureActive = false,
   previousBarsLength,
   previousHasDataViewport,
   previousProjectionReady,
   projectionReady,
   symbol,
-  viewportGestureActive = false,
 }: {
   barsContext: ChartWidgetBarsChangedContext | null;
   barsLength: number;
   hasDataViewport: boolean;
   interval: string;
   isLoading: boolean;
+  /** A live pan or pinch drives the canvas from shared values; freezing it mid-drag reads as the chart jumping back a few frames. */
+  viewportGestureActive?: boolean;
   previousBarsLength: number;
   previousHasDataViewport: boolean;
   previousProjectionReady: boolean;
   projectionReady: boolean;
   symbol: string;
-  /** A live pan or pinch drives the canvas from shared values; freezing it mid-drag reads as the chart jumping back a few frames. */
-  viewportGestureActive?: boolean;
 }): boolean {
   const canHoldPreviousSnapshot = previousBarsLength > 0 && previousHasDataViewport && previousProjectionReady;
   if (!canHoldPreviousSnapshot) return false;
