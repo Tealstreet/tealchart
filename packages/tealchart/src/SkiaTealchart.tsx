@@ -58,7 +58,7 @@ import React, {
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
 import { Platform, StyleSheet, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { useSharedValue } from 'react-native-reanimated';
+import { useFrameCallback, useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
 import {
@@ -177,10 +177,13 @@ const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
-// Ceiling for a divider preview whose committed bands or presented geometry
-// never arrive. Without it a pane that disappears mid-release freezes its
-// stretched bitmap over the chart.
-const NATIVE_PANE_DIVIDER_HOLD_CEILING_MS = 300;
+// Ceiling for a divider preview whose committed bands never arrive. Without it
+// a pane that disappears mid-release freezes its stretched bitmap over the
+// chart. It must outlast the settle fence, or it becomes the release path.
+const NATIVE_PANE_DIVIDER_HOLD_CEILING_MS = 1200;
+// Freeing the bitmaps trails the settle fence, so disposal can never uncover a
+// preview that is still drawing.
+const NATIVE_PANE_DIVIDER_DISPOSE_MS = 600;
 const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
 
 interface NativePaneDividerReleaseTarget {
@@ -987,16 +990,31 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // run as the plot paths rebuilding. Nothing here decides when the preview
   // disappears - the draw pass does.
   const nativePaneGeometrySignature = frame ? createNativePaneGeometrySignature(frame.panes) : '';
-  // Disposal only - the bitmap hid itself in the draw pass a commit ago, so
-  // freeing the images here can only be late, never early. This was a
-  // useAnimatedReaction, and it fired once before the render that stored the
-  // target, missed, and never fired again; the ceiling did every disposal.
+  // Presented frames since the release settled. The preview counts these on the
+  // UI thread to outlive the path rebuild; see the fence in
+  // NativePaneDividerResizeLayer for why it is a count and not a signal.
+  const nativePaneDividerSettleFrames = useSharedValue(0);
+  const nativePaneDividerSettling = nativePaneDividerPresentationTarget !== null;
+  const nativePaneDividerFrameCallback = useFrameCallback(() => {
+    nativePaneDividerSettleFrames.value += 1;
+  }, false);
+  useEffect(() => {
+    // The mock in src/test has no handle; the counter is a device concern.
+    if (!nativePaneDividerFrameCallback?.setActive) return;
+    nativePaneDividerFrameCallback.setActive(nativePaneDividerSettling);
+  }, [nativePaneDividerFrameCallback, nativePaneDividerSettling]);
+
+  // Disposal only, and deliberately later than the hide: the images are freed a
+  // whole settle after the bitmap stopped drawing, so this can never uncover it.
   useEffect(() => {
     if (nativePaneDividerPresentationTarget === null) return;
     if (nativePaneDividerPresentationTarget !== nativePaneGeometrySignature) return;
-    emitNativeChartDebugEntry('divider disposed');
-    setNativePaneDividerPresentationTarget(null);
-    replaceNativePaneSnapshots([]);
+    const timeout = setTimeout(() => {
+      emitNativeChartDebugEntry('divider disposed');
+      setNativePaneDividerPresentationTarget(null);
+      replaceNativePaneSnapshots([]);
+    }, NATIVE_PANE_DIVIDER_DISPOSE_MS);
+    return () => clearTimeout(timeout);
   }, [
     emitNativeChartDebugEntry,
     nativePaneDividerPresentationTarget,
@@ -1026,6 +1044,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     // Hands the preview its retirement condition. The bitmap hides itself in
     // the draw pass once the canvas paints this geometry; JS only disposes.
     emitNativeChartDebugEntry('divider settled');
+    nativePaneDividerSettleFrames.value = 0;
     setNativePaneDividerPresentationTarget(nativePaneGeometrySignature);
   }, [emitNativeChartDebugEntry, frame, nativePaneDividerReleaseHold, nativePaneGeometrySignature]);
 
@@ -2320,6 +2339,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                   backgroundColor={backgroundColor}
                   bands={paneDividerBands}
                   paneGeometry={nativePaneGeometrySignature}
+                  settleFrames={nativePaneDividerSettleFrames}
                   settledGeometry={nativePaneDividerPresentationTarget}
                   snapshots={nativePaneSnapshots}
                   target={chartPanGestureState.paneDividerTarget}
@@ -2503,7 +2523,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <NativeGestureDebugOverlay
           ref={nativeGestureDebugOverlayRef}
           summary={nativeGestureDebugSummary}
-          title="TEALCHART DEBUG v8"
+          title="TEALCHART DEBUG v9"
         />
       ) : null}
     </View>

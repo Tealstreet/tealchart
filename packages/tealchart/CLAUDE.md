@@ -530,17 +530,30 @@ frames after the commit and a slow one makes the guess wrong. The last of them
 worked about 60% of the time, and the ceiling was observed firing *after* the
 clear with the canvas still on the old layout.
 
-**A preview drawn inside the canvas must retire inside the canvas.**
-`NativePaneDividerResizeLayer` takes the committed geometry signature and the
-signature the released drag asked for as plain props and reads both through the
-band's own `useDerivedValue`, collapsing the bitmap to zero height when they
-agree. That is the same channel the plot paths take, so the hide and the rebuild
-land in one mapper run and Skia records one picture from it - the bitmap cannot
-vanish on a frame where the paths behind it still draw the pre-drag layout.
-Ordering is structural rather than timed: the paths' mappers restart in the
-commit's effect flush and the hide in the flush after it, so the paths are always
-registered first. The echo is still here but demoted to disposing the images,
-where being late costs memory and nothing on screen.
+**A preview drawn inside the canvas must retire inside the canvas**, and it must
+outlive the rebuild it is covering. `NativePaneDividerResizeLayer` takes the
+committed geometry signature and the signature the released drag asked for as
+plain props, reads both through the band's own `useDerivedValue`, and collapses
+the bitmap to zero height once they agree **and** a fixed number of presented
+frames have gone by, counted on the UI thread with `useFrameCallback`.
+
+That count is the one tuned number in this drag, and it is a fence rather than a
+mechanism. A pane-geometry commit rebuilds every plot path in the canvas, and on
+Android that has been measured at roughly a quarter of a second with the frames
+on the pre-drag layout throughout. Retiring the bitmap before then uncovers them.
+Four attempts to find the exact moment all failed, each closer than the last: an
+extra animation frame, a single-commit clear, a JS echo of the committed
+geometry, then the signature comparison on its own. Every one of them is JS or a
+mapper trying to observe a repaint neither can see. Reanimated *could* order it -
+mappers are sorted topologically on declared shared-value outputs - but the plot
+paths declare only themselves, and `useDerivedValue` cannot declare another
+output. So the fence waits longer than the rebuild takes instead of guessing when
+it ends. Being late costs a stretched bitmap for a few more frames; being early
+is the flap. iOS pays nothing visible: its paths land in one frame, and the
+bitmap covering them already sits at the committed geometry.
+
+Disposal trails the fence, and the ceiling trails disposal, so neither can
+uncover a preview that is still drawing.
 
 **Pane height overrides are shares of a layout, not of a pane.** A divider drag
 writes a ratio for the panes on both sides of it, and `computePaneGeometry`
