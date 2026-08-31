@@ -176,7 +176,7 @@ const EMPTY_NATIVE_PRICE_LINES: PriceLine[] = [];
 const EMPTY_NATIVE_INDICATOR_PLOTS: readonly PlotOutput[] = [];
 const RESIZE_SNAPSHOT_RELEASE_HOLD_MS = 30;
 const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
-const NATIVE_PANE_DIVIDER_PRESENTATION_RELEASE_FRAMES = 0;
+const NATIVE_PANE_DIVIDER_PRESENTATION_RELEASE_FRAMES = 2;
 // Ceiling for a divider hold whose committed bands never arrive. Without it a
 // pane that disappears mid-release freezes its stretched bitmap over the chart.
 const NATIVE_PANE_DIVIDER_HOLD_CEILING_MS = 300;
@@ -1001,13 +1001,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       frames: NATIVE_PANE_DIVIDER_PRESENTATION_RELEASE_FRAMES,
       release: () => {
         emitNativeChartDebugEntry('divider cleared');
-        paneDividerBands.value = [];
+        // Retiring the bitmaps is one React commit. Zeroing the bands here too
+        // would land on the UI thread out of step with that commit, and the
+        // next divider grab re-seeds them at touch-down anyway.
         replaceNativePaneSnapshots([]);
       },
       scheduler: nativePaneDividerPresentationReleaseRef.current,
       token: nativePaneDividerReleaseHold.token,
     });
-  }, [emitNativeChartDebugEntry, frame, nativePaneDividerReleaseHold, paneDividerBands, replaceNativePaneSnapshots]);
+  }, [emitNativeChartDebugEntry, frame, nativePaneDividerReleaseHold, replaceNativePaneSnapshots]);
 
   // Documented ceiling, not the release path: a pane that vanishes mid-release
   // never lands its bands, and the stretched bitmap would cover the chart forever.
@@ -2017,9 +2019,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     const dividerYs = frame.panes.slice(0, -1).map((pane) => formatNativeDebugNumber(pane.bottom));
     return [
       `f ${formatNativeDebugNumber(frame.dimensions.width)}x${formatNativeDebugNumber(frame.dimensions.height)} p=${frame.panes.length} div=${dividerYs.length > 0 ? dividerYs.join(',') : 'none'}`,
-      `tAxis ${formatNativeDebugRange(frame.timeAxisTop, frame.timeAxisBottom)} pAxis ${formatNativeDebugRange(frame.priceAxisHitLeft, frame.priceAxisRight)}`,
+      `snap=${nativePaneSnapshots.length} hold=${nativePaneDividerReleaseHold ? 'y' : 'n'} main=${formatNativeDebugRange(frame.mainPane.top, frame.mainPane.bottom)}`,
     ];
-  }, [frame]);
+  }, [frame, nativePaneDividerReleaseHold, nativePaneSnapshots.length]);
   // Same outcome as the reset button, different input. The button also hides
   // itself on use; do that here too so a reveal from an earlier tap does not
   // linger over an already-reset chart.
@@ -2480,7 +2482,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       ) : null}
       {NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY ? (
         <View pointerEvents="none" style={styles.nativeGestureDebugOverlay}>
-          <Text style={styles.nativeGestureDebugTitle}>TEALCHART DEBUG v3</Text>
+          <Text style={styles.nativeGestureDebugTitle}>TEALCHART DEBUG v4</Text>
           {nativeGestureDebugSummary.map((line) => (
             <Text key={line} style={styles.nativeGestureDebugText}>
               {line}
