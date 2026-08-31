@@ -173,6 +173,46 @@ src/
 > only React-adjacent code is `react/VanillaChartReact.tsx`,
 > `SkiaTealchart.tsx`, and `state/ChartApiContext.tsx`.
 
+## Native Skia Runtime Rules
+
+The native chart is React Native at the shell, but the chart runtime is not a
+React lifecycle control loop. Treat Skia/Reanimated gesture, viewport, pane,
+crosshair, and axis state like web's imperative canvas runtime:
+
+- React lifecycle hooks may mount/unmount resources, subscribe/unsubscribe,
+  push host props into shared values, and perform non-correctness cleanup.
+- React lifecycle hooks must not decide when an active chart interaction
+  preview is released. Gesture preview release is chart correctness state and
+  belongs in explicit runtime state machines keyed by the interaction that
+  produced the preview.
+- Gesture handlers follow this protocol: hit-test/accept on touch-down, mutate
+  shared preview on update, record a committed target on end, and make finalize
+  cleanup-only after a commit. Android may report `finalize(success=false)`
+  after a committed end; that must never roll shared values back to the
+  gesture-start state.
+- Secondary-pane range drags and pane divider drags are not special cases. They
+  need the same begin/update/commit/observe/release semantics as the primary
+  viewport. Do not patch them with `requestAnimationFrame`, `setTimeout`, or
+  layout-effect timing guesses.
+- Shared values are the transport for live preview state. React state/frame
+  updates are the committed model catching up. Render helpers must be able to
+  bridge that handoff deterministically from current frame data rather than by
+  waiting “a frame or two.”
+
+`src/mobile/interaction/nativeLifecycleBoundary.test.ts` enforces the strictest
+part of this rule for the core gesture/preview modules. If a future change needs
+a lifecycle hook in one of those files, the architecture is probably drifting;
+move the policy into a runtime helper instead.
+
+The pane divider's release preview is the one sanctioned exception, and it is
+sanctioned because it was earned rather than assumed: four release-timing
+attempts failed before it, and the reason no state machine can decide this one
+is written up under **One commit, two channels**. Its fence is a presented-frame
+count read inside the draw pass, not a lifecycle hook, and the `setTimeout`s
+beside it are a disposal delay and a freeze ceiling - neither is the release
+path. Do not read it as licence for the next one.
+
+
 ## State Management
 
 Uses Nanostores-backed, chart-keyed stores for chart state and UI preference persistence:
