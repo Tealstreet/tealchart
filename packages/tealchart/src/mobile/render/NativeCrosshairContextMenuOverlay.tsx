@@ -166,7 +166,7 @@ export function NativeCrosshairContextMenuOverlayImpl({
   };
 
   return (
-    <Pressable pointerEvents="auto" style={styles.overlay} onPress={onClose}>
+    <Pressable pointerEvents="auto" style={styles.overlay} onPress={() => onClose()}>
       <View
         style={
           // Host content owns everything inside the box, chrome included.

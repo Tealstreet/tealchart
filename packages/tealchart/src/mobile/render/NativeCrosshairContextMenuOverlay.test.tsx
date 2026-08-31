@@ -152,6 +152,30 @@ describe('NativeCrosshairContextMenuOverlay host content', () => {
     expect(texts.map((text) => text.props.children)).toContain('Quick order');
   });
 
+  // The backdrop is a Pressable, so handing it `onClose` directly would pass a
+  // gesture event where the close options go.
+  it('dismisses with no arguments so close options cannot come from a press event', () => {
+    const onClose = vi.fn();
+    const overlay = NativeCrosshairContextMenuOverlayImpl({
+      backgroundColor: '#131722',
+      dimensions: { width: 390, height: 480 },
+      menu: {
+        anchorX: 300,
+        anchorY: 100,
+        content: React.createElement(Text, null, 'Quick order'),
+        items: [],
+      },
+      onClose,
+      renderOptions: { gridColor: '#363a45' },
+      textColor: '#d1d4dc',
+    });
+    const backdrop = collectElementsByType(overlay, Pressable)[0];
+
+    backdrop.props.onPress?.({ nativeEvent: { locationX: 1 } } as never);
+
+    expect(onClose).toHaveBeenCalledWith();
+  });
+
   it('uses host content size hints before native layout measurement arrives', () => {
     const overlay = NativeCrosshairContextMenuOverlayImpl({
       backgroundColor: '#131722',

@@ -9,7 +9,6 @@ export interface NativeCrosshairSharedValues {
   y: SharedValue<number>;
   dragOriginX: SharedValue<number>;
   dragOriginY: SharedValue<number>;
-  priceLabelMaxWidth?: SharedValue<number>;
 }
 
 function getNativeCrosshairMaxX(frame: NativeChartFrame): number {
@@ -44,7 +43,6 @@ export function showNativeCrosshair(
 export function hideNativeCrosshair(crosshair: NativeCrosshairSharedValues): void {
   'worklet';
   crosshair.visible.value = false;
-  if (crosshair.priceLabelMaxWidth) crosshair.priceLabelMaxWidth.value = 0;
 }
 
 export function toggleNativeCrosshair(

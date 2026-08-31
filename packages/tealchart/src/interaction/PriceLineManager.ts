@@ -37,6 +37,13 @@ export interface PriceLineManagerOptions {
   yToPrice: (y: number) => number;
   /** Convert price to Y coordinate */
   priceToY: (price: number) => number;
+  /** Render a price the way the axis tags render it, at the tick's decimals. */
+  formatPrice?: (price: number) => string;
+  /**
+   * Widen a line's axis tag to fit text and report the width to use. Grow-only,
+   * and shared with the render pass, so a tag never narrows again.
+   */
+  growPriceAxisTagWidth?: (bound: PriceLineLabelBounds, text: string) => number;
   /** Callback when order is moved via drag (final) */
   onOrderMove?: (orderId: string, newPrice: number) => void;
   /** Callback while order is being dragged */
@@ -603,6 +610,30 @@ export class PriceLineManager {
     });
   }
 
+  /**
+   * Nothing may rebuild the layer while a line is being dragged - a rebuild
+   * destroys the node Konva is dragging - so the drag writes its own price into
+   * its tag. The width goes through the shared grow-only cache, which both
+   * widens the tag now and keeps it wide once the amend lands and the render
+   * pass takes the tag back.
+   */
+  private updateDragPriceAxisLabel(group: Konva.Group, bound: PriceLineLabelBounds, price: number): void {
+    const formatPrice = this.options.formatPrice;
+    if (!formatPrice) return;
+    const refs = group.getAttr('contentRefs') as CachedLineContentRefs | undefined;
+    if (!refs?.priceAxisPrimaryText) return;
+
+    const text = formatPrice(price);
+    if (refs.priceAxisPrimaryText.text() === text) return;
+    refs.priceAxisPrimaryText.text(text);
+
+    const width = Math.max(bound.width, this.options.growPriceAxisTagWidth?.(bound, text) ?? 0);
+    const paddingX = getPriceAxisTagPaddingX(bound);
+    refs.priceAxisRect?.width(width);
+    refs.priceAxisPrimaryText.width(Math.max(0, width - paddingX * 2));
+    refs.priceAxisSecondaryText?.width(Math.max(0, width - paddingX * 2));
+  }
+
   private updatePriceAxisLabelPosition(
     group: Konva.Group,
     bound: PriceLineLabelBounds,
@@ -1134,7 +1165,9 @@ export class PriceLineManager {
         activeDrag.group.setAttr('lineY', movingY);
         dragRect.y(dragStartY);
         const currentBound = this.getCurrentBound(activeDrag.group, bound);
-        this.options.onOrderMoving?.(currentBound.lineId, yToPrice(movingY));
+        const movingPrice = yToPrice(movingY);
+        this.updateDragPriceAxisLabel(activeDrag.group, currentBound, movingPrice);
+        this.options.onOrderMoving?.(currentBound.lineId, movingPrice);
         this.applyFloatingLineOrder();
         this.layer.batchDraw();
       });

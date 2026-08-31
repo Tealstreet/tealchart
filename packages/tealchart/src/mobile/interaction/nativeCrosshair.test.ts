@@ -24,7 +24,6 @@ function createCrosshair(): NativeCrosshairSharedValues {
     y: shared(0),
     dragOriginX: shared(0),
     dragOriginY: shared(0),
-    priceLabelMaxWidth: shared(0),
   };
 }
 
@@ -102,10 +101,8 @@ describe('native crosshair state', () => {
     expect(crosshair.visible.value).toBe(false);
 
     showNativeCrosshair(crosshair, frame, 90, 70);
-    crosshair.priceLabelMaxWidth!.value = 84;
     hideNativeCrosshair(crosshair);
     expect(crosshair.visible.value).toBe(false);
-    expect(crosshair.priceLabelMaxWidth!.value).toBe(0);
   });
 
   it('moves from the crosshair origin by drag translation and clamps to the main pane', () => {

@@ -502,6 +502,52 @@ describe('PriceLineManager order dragging', () => {
     );
   });
 
+  // Nothing may rebuild the layer while a line is being dragged, so the tag
+  // would otherwise sit at the price the drag started from until it was dropped.
+  it('writes the dragged price into its own axis tag, and never lets the tag narrow', () => {
+    const formatPrice = (price: number) => price.toFixed(2);
+    const grown = new Map<string, number>();
+    const growPriceAxisTagWidth = vi.fn((bound: PriceLineLabelBounds, text: string) => {
+      const width = text.length * 7 + 8;
+      const next = Math.max(grown.get(bound.lineId) ?? 0, width);
+      grown.set(bound.lineId, next);
+      return next;
+    });
+
+    withManager(
+      (manager) => {
+        manager.update([draggableOrderBound(undefined)]);
+
+        const group = (manager as unknown as PriceLineManagerProbe).cachedLineGroups.get('order-1');
+        const refs = group?.getAttr('contentRefs') as
+          | { priceAxisRect?: Konva.Rect; priceAxisPrimaryText?: Konva.Text }
+          | undefined;
+        const handle = dragHandle(manager);
+        const stage = handle.getStage();
+        const getPointerPosition = vi.spyOn(stage!, 'getPointerPosition');
+
+        getPointerPosition.mockReturnValue({ x: 120, y: 100 });
+        handle.fire('dragstart');
+
+        getPointerPosition.mockReturnValue({ x: 120, y: 123_456_789 });
+        handle.fire('dragmove');
+
+        expect(refs?.priceAxisPrimaryText?.text()).toBe('123456789.00');
+        const widestTag = refs?.priceAxisRect?.width() ?? 0;
+        expect(widestTag).toBe('123456789.00'.length * 7 + 8);
+
+        getPointerPosition.mockReturnValue({ x: 120, y: 9 });
+        handle.fire('dragmove');
+
+        expect(refs?.priceAxisPrimaryText?.text()).toBe('9.00');
+        expect(refs?.priceAxisRect?.width()).toBe(widestTag);
+
+        handle.fire('dragend');
+      },
+      { formatPrice, growPriceAxisTagWidth },
+    );
+  });
+
   it('uses stage pointer deltas for order drags so parent translation cannot offset the price', () => {
     const onOrderMove = vi.fn();
 

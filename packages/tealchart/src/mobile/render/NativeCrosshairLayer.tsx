@@ -82,18 +82,9 @@ export function NativeCrosshairLayerImpl({
     () => hasContextMenu && isNativeCrosshairOverMainPane(frame, snappedY.value),
   );
   const contextMenuOpacity = useDerivedValue(() => (contextMenuVisible.value ? 1 : 0));
-  const priceLabel = useDerivedValue(() => {
-    const nextLabel = resolveNativeCrosshairPriceLabelLayout(
-      frame,
-      pricePrecision,
-      priceText.value,
-      crosshair.priceLabelMaxWidth?.value ?? 0,
-    );
-    if (crosshair.priceLabelMaxWidth && nextLabel.width > crosshair.priceLabelMaxWidth.value) {
-      crosshair.priceLabelMaxWidth.value = nextLabel.width;
-    }
-    return nextLabel;
-  });
+  const priceLabel = useDerivedValue(() =>
+    resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceText.value),
+  );
   const priceLabelX = useDerivedValue(() => priceLabel.value.x);
   const priceLabelWidth = useDerivedValue(() => priceLabel.value.width);
   const priceTextX = useDerivedValue(() => priceLabel.value.textX);
@@ -101,13 +92,8 @@ export function NativeCrosshairLayerImpl({
     x: contextMenuVisible.value
       ? Math.max(
           frame.contentLeft,
-          resolveNativeCrosshairContextMenuButtonLayout(
-            frame,
-            snappedY.value,
-            pricePrecision,
-            priceText.value,
-            crosshair.priceLabelMaxWidth?.value ?? 0,
-          ).centerX -
+          resolveNativeCrosshairContextMenuButtonLayout(frame, snappedY.value, pricePrecision, priceText.value)
+            .centerX -
             NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RADIUS -
             NATIVE_CROSSHAIR_BUTTON_LINE_GAP,
         )
@@ -127,13 +113,7 @@ export function NativeCrosshairLayerImpl({
     return formatNativeTimeAxisLabelWorklet(nativeCrosshairXToTime(snappedX.value, sharedViewport, frame), timeStep);
   });
   const contextButtonLayout = useDerivedValue(() =>
-    resolveNativeCrosshairContextMenuButtonLayout(
-      frame,
-      snappedY.value,
-      pricePrecision,
-      priceText.value,
-      crosshair.priceLabelMaxWidth?.value ?? 0,
-    ),
+    resolveNativeCrosshairContextMenuButtonLayout(frame, snappedY.value, pricePrecision, priceText.value),
   );
   const contextButtonX = useDerivedValue(() => contextButtonLayout.value.centerX - contextButtonLayout.value.radius);
   const contextButtonY = useDerivedValue(() => contextButtonLayout.value.centerY - contextButtonLayout.value.radius);

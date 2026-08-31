@@ -12,6 +12,7 @@ import Konva from 'konva';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR } from '../constants';
+import { PRICE_AXIS_RIGHT_PADDING } from '../types';
 import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
@@ -32,17 +33,38 @@ interface EventManagerCallbackProbe {
 }
 
 const eventManagerInstances = vi.hoisted(
-  () => [] as Array<{ callbacks: EventManagerCallbackProbe; isDragging: boolean; activeCursor: string | null }>,
+  () =>
+    [] as Array<{
+      callbacks: EventManagerCallbackProbe;
+      isDragging: boolean;
+      activeCursor: string | null;
+      crosshairPinned: boolean;
+      crosshairHiddenCount: number;
+    }>,
 );
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
-    private instance: { callbacks: EventManagerCallbackProbe; isDragging: boolean; activeCursor: string | null };
+    private instance: (typeof eventManagerInstances)[number];
 
     constructor(_container: HTMLElement, callbacks: EventManagerCallbackProbe) {
-      this.instance = { callbacks, isDragging: false, activeCursor: null };
+      this.instance = {
+        callbacks,
+        isDragging: false,
+        activeCursor: null,
+        crosshairPinned: false,
+        crosshairHiddenCount: 0,
+      };
       eventManagerInstances.push(this.instance);
+    }
+
+    setCrosshairPinned(pinned: boolean) {
+      this.instance.crosshairPinned = pinned;
+    }
+
+    hideCrosshair() {
+      this.instance.crosshairHiddenCount += 1;
     }
 
     getIsDragging() {
@@ -2011,6 +2033,50 @@ describe('ChartCore viewport management', () => {
     core.dispose();
   });
 
+  // The gesture tags - the crosshair's price and a TP/SL grabber's preview -
+  // are the whole lane with the text centred, never a fit to their own text.
+  it('draws the crosshair price tag at one lane-anchored width, text centred', async () => {
+    const fillText = vi.fn();
+    const roundRect = vi.fn();
+    stubCanvasContext({ fillText, roundRect });
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      onContextMenu: vi.fn(),
+      renderOptions: { pricePrecision: 0 },
+    });
+
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 1, priceMax: 900000 });
+    const eventManager = eventManagerInstances[0];
+
+    const priceTagOf = (calls: unknown[][]) => {
+      const call = calls.filter((entry) => Number(entry[0]) > 700 && Number(entry[3]) === 18).at(-1);
+      return call ? { x: Number(call[0]), width: Number(call[2]) } : null;
+    };
+
+    eventManager.callbacks.onCrossHairMoved?.(700, 120);
+    eventManager.callbacks.onCrosshairRender?.();
+    const wide = priceTagOf(roundRect.mock.calls);
+    const wideText = fillText.mock.calls.at(-1);
+
+    roundRect.mockClear();
+    fillText.mockClear();
+    eventManager.callbacks.onCrossHairMoved?.(700, 520);
+    eventManager.callbacks.onCrosshairRender?.();
+    const narrow = priceTagOf(roundRect.mock.calls);
+
+    expect(wide).not.toBeNull();
+    // A six-digit price and a one-digit price get the same tag: it is the lane,
+    // not a fit to the text.
+    expect(narrow).toEqual(wide);
+    expect(wide!.x + wide!.width).toBe(800 - PRICE_AXIS_RIGHT_PADDING);
+    expect(Number(wideText?.[1])).toBe(wide!.x + wide!.width / 2);
+
+    core.dispose();
+  });
+
   it('ceil-measures the crosshair price-axis label so decimal text is not clipped', async () => {
     const fillText = vi.fn();
     const roundRect = vi.fn();
@@ -2375,6 +2441,65 @@ describe('ChartCore host-rendered context menu', () => {
 
     expect(onContextMenu).toHaveBeenCalledWith(20, 10);
     expect(document.body.textContent).toContain('Fallback action');
+
+    core.dispose();
+  });
+
+  // The popover is portaled to the body, so reaching it leaves the chart and
+  // takes the crosshair - and the "+" button drawn on it - with it.
+  it('holds the crosshair while the host menu is up', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderContextMenu: () => document.createElement('div'),
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    (
+      core as unknown as {
+        handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+      }
+    ).handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    expect(eventManagerInstances.at(-1)?.crosshairPinned).toBe(true);
+
+    core.dispose();
+  });
+
+  it('keeps the crosshair when the host closes after submitting, and drops it on a dismissal', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const closeRef: { current: ((options?: { retainCrosshair?: boolean }) => void) | null } = { current: null };
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderContextMenu: (context) => {
+        closeRef.current = context.close;
+        return document.createElement('div');
+      },
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    const openMenu = () =>
+      (
+        core as unknown as {
+          handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+        }
+      ).handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    openMenu();
+    closeRef.current?.({ retainCrosshair: true });
+
+    const eventManager = eventManagerInstances.at(-1);
+    expect(eventManager?.crosshairPinned).toBe(false);
+    expect(eventManager?.crosshairHiddenCount).toBe(0);
+
+    openMenu();
+    closeRef.current?.();
+
+    expect(eventManager?.crosshairHiddenCount).toBe(1);
 
     core.dispose();
   });

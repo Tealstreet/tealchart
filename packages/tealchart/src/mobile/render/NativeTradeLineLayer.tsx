@@ -8,7 +8,7 @@ import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { DashPathEffect, Group, Skia, Line as SkiaLine } from '@shopify/react-native-skia';
-import { useDerivedValue } from 'react-native-reanimated';
+import { runOnJS, useAnimatedReaction, useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
 import { resolvePriceAxisTagStyle } from '../../utils/priceAxisTagStyle';
 import {
@@ -282,6 +282,7 @@ export function AnimatedTradeLineDragTag({
   dragState,
   frame,
   geometry,
+  onDragPriceLabelWidth,
   pricePrecision,
   sharedViewport,
   tradeAxisTagHeight,
@@ -295,6 +296,8 @@ export function AnimatedTradeLineDragTag({
   dragState: NativeOrderDragSharedValues;
   frame: NativeChartFrame;
   geometry: NativeTradeLineGeometry;
+  /** Reports the widest price the drag passed through, once, when it ends. */
+  onDragPriceLabelWidth?: (objectId: string, width: number) => void;
   pricePrecision: number;
   sharedViewport: NativeViewportSharedValues;
   tradeAxisTagHeight: number;
@@ -314,9 +317,30 @@ export function AnimatedTradeLineDragTag({
     ),
   );
   const text = useDerivedValue(() => formatNativeTradeLinePriceWorklet(dragState.activePrice.value, pricePrecision));
+  // The tag grows to the widest price the drag has reached and stays there.
+  // Measured per frame it shrank whenever a digit dropped, so the tag pumped
+  // in and out under the finger.
+  const draggedMaxWidth = useSharedValue(0);
+  useAnimatedReaction(
+    () => (dragState.activeObjectId.value === geometry.objectId ? text.value : null),
+    (current, previous) => {
+      if (current === null) {
+        // One report per drag, on release, so the width the drag reached
+        // outlives it in the cache the committed layout measures through.
+        if (previous !== null && draggedMaxWidth.value > 0 && onDragPriceLabelWidth) {
+          runOnJS(onDragPriceLabelWidth)(geometry.objectId, draggedMaxWidth.value);
+        }
+        draggedMaxWidth.value = 0;
+        return;
+      }
+      const measured = Math.ceil(current.length * characterWidth) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2;
+      if (measured > draggedMaxWidth.value) draggedMaxWidth.value = measured;
+    },
+  );
   const width = useDerivedValue(() =>
     Math.max(
       geometry.priceLabelWidth,
+      draggedMaxWidth.value,
       Math.ceil(text.value.length * characterWidth) + NATIVE_TRADE_LINE_PRICE_LABEL_PADDING_X * 2,
     ),
   );

@@ -25,6 +25,7 @@ export function NativeChartTradeLinesLayerImpl({
   getOrderObjectId,
   getPositionObjectId,
   lineSnapshot,
+  onDragPriceLabelWidth,
   orderDragState,
   pricePrecision,
   nowMs,
@@ -48,6 +49,7 @@ export function NativeChartTradeLinesLayerImpl({
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
   };
+  onDragPriceLabelWidth?: (objectId: string, width: number) => void;
   orderDragState: NativeOrderDragSharedValues;
   pricePrecision: number;
   nowMs: SharedValue<number>;
@@ -144,6 +146,7 @@ export function NativeChartTradeLinesLayerImpl({
             dragState={orderDragState}
             frame={frame}
             geometry={geometry}
+            onDragPriceLabelWidth={onDragPriceLabelWidth}
             pricePrecision={pricePrecision}
             sharedViewport={sharedViewport}
             tradeAxisTagHeight={resolvedTradeAxisTagHeight}
