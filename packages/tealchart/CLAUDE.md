@@ -520,14 +520,27 @@ reporting on. A `useAnimatedReaction` carries it back to JS. If you touch this,
 the thing to measure is still repaints per tick, and the rule is that an echo may
 observe the canvas but must never draw into it.
 
-That echo is what the pane divider releases its preview on. The release used to
-fire on the React commit - the all-old frame - so Android showed the pre-drag
-layout for the whole propagation before settling. iOS never did, which is what a
-seam one paint wide on one platform and several on the other looks like. Two
-fixes aimed at release *timing* (an extra animation frame, then making the clear
-a single commit) changed nothing, for the reason recorded above: at the release
-both orderings look identical. Only moving the release onto the paint channel
-fixed it.
+**JS cannot retire a preview that covers the canvas, and three builds proved it.**
+The pane divider's bitmap was retired from JS on the React commit, which is the
+all-old frame, so Android showed the pre-drag layout until the propagation
+landed - iOS never did, being one paint wide there and several here. An extra
+animation frame, then a single-commit clear, then this echo releasing on the
+mapper run: each was closer and none was right, because JS can only guess at
+frames after the commit and a slow one makes the guess wrong. The last of them
+worked about 60% of the time, and the ceiling was observed firing *after* the
+clear with the canvas still on the old layout.
+
+**A preview drawn inside the canvas must retire inside the canvas.**
+`NativePaneDividerResizeLayer` takes the committed geometry signature and the
+signature the released drag asked for as plain props and reads both through the
+band's own `useDerivedValue`, collapsing the bitmap to zero height when they
+agree. That is the same channel the plot paths take, so the hide and the rebuild
+land in one mapper run and Skia records one picture from it - the bitmap cannot
+vanish on a frame where the paths behind it still draw the pre-drag layout.
+Ordering is structural rather than timed: the paths' mappers restart in the
+commit's effect flush and the hide in the flush after it, so the paths are always
+registered first. The echo is still here but demoted to disposing the images,
+where being late costs memory and nothing on screen.
 
 **The Android debug overlay is an instrument, and it was changing what it
 measured.** Its entries were chart state, so every append re-rendered the whole
