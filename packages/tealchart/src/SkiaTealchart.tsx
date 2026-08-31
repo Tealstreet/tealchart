@@ -72,9 +72,7 @@ import {
   createNativePaneGeometrySignature,
   createNativeReleaseHold,
   nativePaneDividerBandsCaughtUp,
-  nativePaneRangeOverridesCaughtUp,
   nativePaneRatiosCaughtUp,
-  omitReleasedNativePaneRangeOverrides,
   resolveNativeReleaseHold,
 } from './mobile/interaction/nativeReleaseHold';
 import {
@@ -112,7 +110,6 @@ import {
   NativeLeftToolRailOverlay,
 } from './mobile/render/NativeLeftToolRailOverlay';
 import { NativePaneDividerResizeLayer } from './mobile/render/NativePaneDividerResizeLayer';
-import type { NativePaneRangeOverrides } from './mobile/render/nativePaneRangeOverride';
 import { normalizeNativePricePrecisionToTickSizeWorklet } from './mobile/render/nativePriceFormat';
 import {
   nativeBarsMatchRequestedData,
@@ -495,8 +492,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     nativeReleaseHoldTokenRef.current += 1;
     return nativeReleaseHoldTokenRef.current;
   }, []);
-  const [nativePaneRangeReleaseHold, setNativePaneRangeReleaseHold] =
-    useState<NativeReleaseHold<NativePaneRangeOverrides> | null>(null);
   const [nativePaneDividerReleaseHold, setNativePaneDividerReleaseHold] =
     useState<NativeReleaseHold<readonly NativePaneDividerBand[]> | null>(null);
   // Pane geometry the divider preview is waiting to see painted, not merely
@@ -1946,62 +1941,15 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // linger over an already-reset chart.
   // Dragging an indicator pane's axis pins that pane's range, the same trade as
   // web: the user has said what they want to see, so auto-scale stops moving it.
-  const handleNativeIndicatorPaneScaleStart = useCallback(
-    (paneId: string) => {
-      setNativePaneRangeReleaseHold((current) => {
-        if (!current?.target[paneId]) return current;
-        const { [paneId]: _releasedPane, ...remaining } = current.target;
-        return Object.keys(remaining).length === 0
-          ? null
-          : createNativeReleaseHold({
-              kind: 'paneRangeOverride',
-              target: remaining,
-              token: createNextNativeReleaseHoldToken(),
-            });
-      });
-      const currentOverride = paneRangeOverrides.value[paneId];
-      if (currentOverride) {
-        const nextOverrides = omitReleasedNativePaneRangeOverrides({
-          current: paneRangeOverrides.value,
-          released: { [paneId]: currentOverride },
-        });
-        paneRangeOverrides.value = nextOverrides;
-      }
-    },
-    [createNextNativeReleaseHoldToken, paneRangeOverrides],
-  );
+  // A new drag on a pane simply overwrites its override on the next update;
+  // nothing needs clearing first, and clearing would be the flap.
+  const handleNativeIndicatorPaneScaleStart = useCallback(() => {}, []);
   const handleNativeIndicatorPaneScale = useCallback(
     (paneId: string, yMin: number, yMax: number) => {
-      const target = { [paneId]: { yMin, yMax } };
-      setNativePaneRangeReleaseHold((current) =>
-        createNativeReleaseHold({
-          kind: 'paneRangeOverride',
-          target: { ...(current?.target ?? {}), ...target },
-          token: createNextNativeReleaseHoldToken(),
-        }),
-      );
       indicatorManager?.setIndicatorPaneManualRange(paneId, yMin, yMax);
     },
-    [createNextNativeReleaseHoldToken, indicatorManager],
+    [indicatorManager],
   );
-
-  useLayoutEffect(() => {
-    if (!frame || !nativePaneRangeReleaseHold) return;
-    const resolution = resolveNativeReleaseHold({
-      caughtUp: nativePaneRangeOverridesCaughtUp({
-        overrides: nativePaneRangeReleaseHold.target,
-        panes: frame.panes,
-      }),
-      hold: nativePaneRangeReleaseHold,
-    });
-    if (resolution.hold === nativePaneRangeReleaseHold) return;
-    setNativePaneRangeReleaseHold(resolution.hold);
-    if (!resolution.released) return;
-    paneRangeOverrides.value = omitReleasedNativePaneRangeOverrides({
-      current: paneRangeOverrides.value,
-      released: nativePaneRangeReleaseHold.target,
-    });
-  }, [frame, nativePaneRangeReleaseHold, paneRangeOverrides]);
 
   const handleNativePriceAxisResetTap = useCallback(() => {
     if (!hasDataViewport) return;
