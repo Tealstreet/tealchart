@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { OemsActionManager } from '../../interaction/oemsActionManager';
 import {
+  shouldApplyNativeBracketPreviewRelease,
+  shouldApplyNativeOrderPreviewRelease,
   shouldReleaseNativeOrderDragForSnapshot,
   shouldReleaseNativeOrderDragOnSettle,
 } from './useNativeOemsLineRuntime';
@@ -14,7 +16,7 @@ describe('shouldReleaseNativeOrderDragForSnapshot', () => {
     expect(
       shouldReleaseNativeOrderDragForSnapshot({
         dragActive: true,
-        handoff: { objectId: 'order_1' },
+        handoff: { objectId: 'order_1', seq: 1 },
         hasAction: never,
         pendingObserved: true,
       }),
@@ -25,7 +27,7 @@ describe('shouldReleaseNativeOrderDragForSnapshot', () => {
     expect(
       shouldReleaseNativeOrderDragForSnapshot({
         dragActive: false,
-        handoff: { objectId: 'order_1' },
+        handoff: { objectId: 'order_1', seq: 1 },
         hasAction: always,
         pendingObserved: true,
       }),
@@ -36,7 +38,7 @@ describe('shouldReleaseNativeOrderDragForSnapshot', () => {
     expect(
       shouldReleaseNativeOrderDragForSnapshot({
         dragActive: false,
-        handoff: { objectId: 'order_1' },
+        handoff: { objectId: 'order_1', seq: 1 },
         hasAction: always,
         pendingObserved: false,
       }),
@@ -51,7 +53,7 @@ describe('shouldReleaseNativeOrderDragForSnapshot', () => {
     expect(
       shouldReleaseNativeOrderDragForSnapshot({
         dragActive: false,
-        handoff: { objectId: 'order_1' },
+        handoff: { objectId: 'order_1', seq: 1 },
         hasAction: never,
         pendingObserved: false,
       }),
@@ -79,7 +81,7 @@ describe('shouldReleaseNativeOrderDragForSnapshot', () => {
 // the effect does not re-run and the question is never put. Retiring on the settle
 // is what closes that, so the settle path gets its own coverage here.
 describe('shouldReleaseNativeOrderDragOnSettle', () => {
-  const handoff = { objectId: 'order_1' };
+  const handoff = { objectId: 'order_1', seq: 1 };
 
   it('lets go when the action this drag started settles', () => {
     expect(
@@ -114,6 +116,48 @@ describe('shouldReleaseNativeOrderDragOnSettle', () => {
   });
 });
 
+describe('resolved oems preview release guards', () => {
+  it('does not let an old order release clear a newer same-order preview', () => {
+    expect(
+      shouldApplyNativeOrderPreviewRelease({
+        activeObjectId: 'order_1',
+        dragActive: false,
+        handoff: { objectId: 'order_1', seq: 1 },
+        latestSeq: 2,
+      }),
+    ).toBe(false);
+    expect(
+      shouldApplyNativeOrderPreviewRelease({
+        activeObjectId: 'order_1',
+        dragActive: false,
+        handoff: { objectId: 'order_1', seq: 2 },
+        latestSeq: 2,
+      }),
+    ).toBe(true);
+  });
+
+  it('does not let an old bracket release clear a newer same-line preview', () => {
+    expect(
+      shouldApplyNativeBracketPreviewRelease({
+        activeObjectId: 'position_1',
+        activeObjectType: 'position',
+        dragActive: false,
+        handoff: { objectId: 'position_1', objectType: 'position', seq: 1 },
+        latestSeq: 2,
+      }),
+    ).toBe(false);
+    expect(
+      shouldApplyNativeBracketPreviewRelease({
+        activeObjectId: 'position_1',
+        activeObjectType: 'position',
+        dragActive: false,
+        handoff: { objectId: 'position_1', objectType: 'position', seq: 2 },
+        latestSeq: 2,
+      }),
+    ).toBe(true);
+  });
+});
+
 // The other half: the signal has to actually fire on a cancel. A host cancel
 // resolves the awaited callback with `false`, which fails the action rather than
 // confirming it - and a failed action settles exactly like a confirmed one.
@@ -139,4 +183,3 @@ describe('a cancelled order move settles', () => {
     expect(manager.getAction('order', 'order_1')).toBeNull();
   });
 });
-

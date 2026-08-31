@@ -16,6 +16,7 @@ import { DEFAULT_USER_DRAWING_STYLE } from '../drawings';
 import { DIRTY } from '../rendering/RenderScheduler';
 import { clearChartStoreCache } from '../state/chartState';
 import { TealchartRenderer } from '../TealchartRenderer';
+import { withPriceAxisTagBackgroundAlpha } from '../utils/priceAxisTagStyle';
 
 interface EventManagerCallbackProbe {
   onDrawingDragStart?: (x: number, y: number, source: 'mouse' | 'touch') => boolean;
@@ -1178,7 +1179,7 @@ describe('ChartCore viewport management', () => {
     });
     expect(slBound.label?.secondaryText).toBeUndefined();
     const slRefs = manager.cachedLineGroups.get('order-1-sl')?.getAttr('contentRefs') as LineContentRefsProbe;
-    expect(slRefs.priceAxisRect?.fill()).toBe('#f97316');
+    expect(slRefs.priceAxisRect?.fill()).toBe(withPriceAxisTagBackgroundAlpha('#f97316'));
 
     core.dispose();
   });
@@ -1295,7 +1296,7 @@ describe('ChartCore viewport management', () => {
     expect(manager.cachedLineGroups.has('position-1-sl')).toBe(true);
     const pendingRefs = manager.cachedLineGroups.get('position-1-sl')?.getAttr('contentRefs') as LineContentRefsProbe;
     const pendingBound = manager.cachedLineGroups.get('position-1-sl')?.getAttr('boundData') as PriceLineLabelBounds;
-    expect(pendingRefs.priceAxisRect?.fill()).toBe('#f97316');
+    expect(pendingRefs.priceAxisRect?.fill()).toBe(withPriceAxisTagBackgroundAlpha('#f97316'));
     expect(pendingBound.label).toMatchObject({
       textColor: DEFAULT_TRADE_LINE_FILLED_SEGMENT_TEXT_COLOR,
       filled: true,
