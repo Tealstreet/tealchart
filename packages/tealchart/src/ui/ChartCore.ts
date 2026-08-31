@@ -77,6 +77,7 @@ import { computePaneGeometry, computeTradingLineLabelMinX, WEB_CHART_CHROME_METR
 import { DIRTY } from '../rendering/RenderScheduler';
 import { WebCanvasContext } from '../rendering/WebCanvasContext';
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
+import { resolveWebPriceAxisLaneTagLayout } from '../utils/priceAxisTagSizing';
 import { TealchartRenderer } from '../TealchartRenderer';
 import {
   Awaitable,
@@ -414,6 +415,7 @@ interface CrosshairPlusButtonBounds {
 }
 
 const CROSSHAIR_PRICE_LABEL_HEIGHT = 18;
+const BRACKET_PREVIEW_LABEL_PADDING_X = 8;
 const CROSSHAIR_PRICE_LABEL_HORIZONTAL_PADDING = 12;
 const CROSSHAIR_PRICE_LABEL_WIDTH_GUARD = 2;
 const CROSSHAIR_PLUS_BUTTON_RADIUS = 9;
@@ -441,7 +443,6 @@ export class ChartCore {
   private contextMenuCloseTimer: ReturnType<typeof setTimeout> | null = null;
   // + button drawn on crosshair canvas — hit-test bounds for click detection
   private _plusButtonBounds: CrosshairPlusButtonBounds | null = null;
-  private crosshairPriceLabelMaxWidth = 0;
   private contextMenuResizeObserver: ResizeObserver | null = null;
   private contextMenuIsCustom = false;
   // Bound handler for + button click — stored so it can be removed on dispose
@@ -491,6 +492,8 @@ export class ChartCore {
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
   private paneHeightOverrides = new Map<string, number>();
   private crosshair: EventCrosshairState = { visible: false, x: 0, y: 0 };
+  /** Widest crosshair price seen, an input to the axis width and nothing else. */
+  private crosshairPriceLabelMeasuredWidth = 0;
   private hoveredPaneDivider: PaneDividerInfo | null = null;
   private showResetButton = false;
   private resetButtonTimer: ReturnType<typeof setTimeout> | null = null;
@@ -778,9 +781,6 @@ export class ChartCore {
         }
       },
       snapCrosshairPoint: (x, y) => this.resolveSnappedCrosshairPoint(x, y),
-      onCrosshairMeasureReset: () => {
-        this.crosshairPriceLabelMaxWidth = 0;
-      },
       onCrossHairMoved: (x, y, options) => {
         this.crosshair = { visible: true, x, y };
         // Preview the in-progress click-placed drawing following the cursor between clicks.
@@ -2529,20 +2529,22 @@ export class ChartCore {
       const priceText = getNumberFormatter(decimals).format(safeNum(value, 0, 'crosshairPrice'));
       const font = this.renderer.getFont();
       ctx.font = `11px ${font}`;
-      const measuredPriceLabelWidth =
+      const lane = resolveWebPriceAxisLaneTagLayout(width, this.margins.right, PRICE_AXIS_RIGHT_PADDING);
+      // Recorded so the axis can widen to hold it, not so the tag can. A tag
+      // that sizes to its own text moves the "+" button anchored beside it
+      // every time the price crosses a digit.
+      this.crosshairPriceLabelMeasuredWidth = Math.max(
+        this.crosshairPriceLabelMeasuredWidth,
         Math.ceil(ctx.measureText(priceText).width) +
-        CROSSHAIR_PRICE_LABEL_HORIZONTAL_PADDING +
-        CROSSHAIR_PRICE_LABEL_WIDTH_GUARD;
-      this.crosshairPriceLabelMaxWidth = Math.max(this.crosshairPriceLabelMaxWidth, measuredPriceLabelWidth);
-      const priceLabelWidth = Math.ceil(Math.max(
-        this.crosshairPriceLabelMaxWidth,
-        ...this.labelBoundsCache.map((bound) => bound.width),
-      ));
-      const priceLabelRight = width - PRICE_AXIS_RIGHT_PADDING;
+          CROSSHAIR_PRICE_LABEL_HORIZONTAL_PADDING +
+          CROSSHAIR_PRICE_LABEL_WIDTH_GUARD,
+      );
+      const priceLabelWidth = Math.max(lane.width, this.crosshairPriceLabelMeasuredWidth);
+      const priceLabelX = lane.x + lane.width - priceLabelWidth;
       priceLabel = {
         text: priceText,
-        textX: priceLabelRight - priceLabelWidth / 2,
-        x: priceLabelRight - priceLabelWidth,
+        textX: priceLabelX + priceLabelWidth / 2,
+        x: priceLabelX,
         y: y - CROSSHAIR_PRICE_LABEL_HEIGHT / 2,
         width: priceLabelWidth,
         height: CROSSHAIR_PRICE_LABEL_HEIGHT,
@@ -3228,9 +3230,11 @@ export class ChartCore {
     }
     const priceText = getNumberFormatter(decimals).format(price);
     const labelHeight = 18;
-    const labelPaddingX = 8;
-    const labelWidth = Math.max(this.margins.right - 8, ctx.measureText(priceText).width + labelPaddingX * 2);
-    const labelX = this.options.width - labelWidth - 4;
+    // The lane, not a fit to the price - the same rule the crosshair's tag
+    // follows, and for the same reason: this tag is read while it moves.
+    const lane = resolveWebPriceAxisLaneTagLayout(this.options.width, this.margins.right, PRICE_AXIS_RIGHT_PADDING);
+    const labelWidth = Math.max(lane.width, ctx.measureText(priceText).width + BRACKET_PREVIEW_LABEL_PADDING_X * 2);
+    const labelX = lane.x + lane.width - labelWidth;
     const minY = this.margins.top;
     const maxY = this.options.height - this.margins.bottom - labelHeight;
     const labelY = Math.max(minY, Math.min(maxY, y - labelHeight / 2));
@@ -3297,7 +3301,14 @@ export class ChartCore {
       this.labelBoundsCache.length > 0
         ? Math.ceil(Math.max(...this.labelBoundsCache.map((bound) => bound.width + PRICE_AXIS_RIGHT_PADDING)))
         : 0;
-    const nextRight = Math.ceil(Math.max(this.margins.right, measuredValueAxisWidth, measuredLineAxisWidth));
+    const nextRight = Math.ceil(
+      Math.max(
+        this.margins.right,
+        measuredValueAxisWidth,
+        measuredLineAxisWidth,
+        this.crosshairPriceLabelMeasuredWidth + PRICE_AXIS_RIGHT_PADDING,
+      ),
+    );
     if (!Number.isFinite(nextRight) || nextRight <= this.margins.right) return;
 
     this.margins = { ...this.margins, right: nextRight };

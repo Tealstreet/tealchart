@@ -52,11 +52,18 @@ function getNativeCrosshairPriceLabelCapacityText(pricePrecision: number): strin
   return `999,999.${decimalText}`;
 }
 
+/**
+ * The whole lane, with the text centred in it.
+ *
+ * This tag belongs to a gesture, not to an order, so it must not carry the
+ * grow-only width the real order tags do - the axis lane is already grow-only
+ * and sizing to it is what keeps the tag, and the "+" button anchored off it,
+ * from moving as the price under the finger changes digits.
+ */
 export function resolveNativeCrosshairPriceLabelLayout(
   frame: NativeChartFrame,
   pricePrecision: number,
   labelText = getNativeCrosshairPriceLabelCapacityText(pricePrecision),
-  minWidth = 0,
 ): NativeCrosshairPriceLabelLayout {
   'worklet';
   const laneLeft = frame.priceAxisLeft + NATIVE_PRICE_AXIS_LANE_LEFT_INSET;
@@ -64,7 +71,7 @@ export function resolveNativeCrosshairPriceLabelLayout(
   const laneWidth = Math.max(0, laneRight - laneLeft);
   const measuredWidth =
     Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH) + NATIVE_PRICE_AXIS_TAG_PADDING_X * 2;
-  const width = Math.max(0, Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, laneWidth, measuredWidth, minWidth));
+  const width = Math.max(0, Math.max(NATIVE_PRICE_AXIS_TAG_MIN_WIDTH, laneWidth, measuredWidth));
   const x = laneRight - width;
   const textWidth = Math.ceil(labelText.length * NATIVE_CROSSHAIR_PRICE_LABEL_CHARACTER_WIDTH);
 
@@ -190,10 +197,9 @@ export function resolveNativeCrosshairContextMenuButtonLayout(
   crosshairY: number,
   pricePrecision = 2,
   priceLabelText?: string,
-  minPriceLabelWidth = 0,
 ): NativeCrosshairContextMenuButtonLayout {
   'worklet';
-  const priceLabel = resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceLabelText, minPriceLabelWidth);
+  const priceLabel = resolveNativeCrosshairPriceLabelLayout(frame, pricePrecision, priceLabelText);
   return {
     centerX: priceLabel.x - NATIVE_CROSSHAIR_CONTEXT_MENU_BUTTON_RIGHT_OFFSET,
     centerY: Math.min(Math.max(crosshairY, frame.mainPane.top), frame.mainPane.bottom),
@@ -206,7 +212,6 @@ export function isNativeCrosshairContextMenuButtonTap({
   frame,
   crosshairY,
   pricePrecision,
-  priceLabelMinWidth = 0,
   sharedViewport,
   x,
   y,
@@ -214,7 +219,6 @@ export function isNativeCrosshairContextMenuButtonTap({
   frame: NativeChartFrame;
   crosshairY: number;
   pricePrecision?: number;
-  priceLabelMinWidth?: number;
   sharedViewport?: NativeViewportSharedValues;
   x: number;
   y: number;
@@ -226,13 +230,7 @@ export function isNativeCrosshairContextMenuButtonTap({
   const priceLabelText = sharedViewport
     ? resolveNativeCrosshairPriceLabelText(frame, sharedViewport, crosshairY, pricePrecision ?? 2)
     : undefined;
-  const layout = resolveNativeCrosshairContextMenuButtonLayout(
-    frame,
-    crosshairY,
-    pricePrecision,
-    priceLabelText,
-    priceLabelMinWidth,
-  );
+  const layout = resolveNativeCrosshairContextMenuButtonLayout(frame, crosshairY, pricePrecision, priceLabelText);
   const dx = x - layout.centerX;
   const dy = y - layout.centerY;
   return dx * dx + dy * dy <= layout.hitRadius * layout.hitRadius;
