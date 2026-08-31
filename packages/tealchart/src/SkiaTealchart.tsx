@@ -32,6 +32,7 @@ import type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadInt
 import type { TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
 import type {
   ContextMenuCallback,
+  ContextMenuCloseOptions,
   ContextMenuRenderContext,
   IBasicDataFeed,
   NativeContextMenuRenderResult,
@@ -1150,13 +1151,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const hasNativeContextMenu = Boolean(activeContextMenu) || Boolean(renderContextMenu);
   const contextMenuViewportWidth = frame?.dimensions.width;
   const contextMenuViewportHeight = frame?.dimensions.height;
-  const closeNativeContextMenu = useCallback(() => {
-    setNativeContextMenu((current) => {
-      if (current?.content) onContextMenuClose?.();
-      return null;
-    });
-    crosshair.visible.value = false;
-  }, [crosshair, onContextMenuClose]);
+  const closeNativeContextMenu = useCallback(
+    (options?: ContextMenuCloseOptions) => {
+      setNativeContextMenu((current) => {
+        if (current?.content) onContextMenuClose?.();
+        return null;
+      });
+      if (!options?.retainCrosshair) crosshair.visible.value = false;
+    },
+    [crosshair, onContextMenuClose],
+  );
   const handleNativeContextMenuTap = useCallback(
     (time: number, price: number, anchorX: number, anchorY: number) => {
       const hostMenu = resolveNativeContextMenuRenderResult(
@@ -2114,10 +2118,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     <View style={[styles.container, { backgroundColor }]} onLayout={onLayout}>
       {liveChartMounted ? (
         <View
-          onTouchCancel={(event) => appendNativeRawTouchDebugEntry('cancel', event)}
-          onTouchEnd={(event) => appendNativeRawTouchDebugEntry('end', event)}
-          onTouchMove={(event) => appendNativeRawTouchDebugEntry('move', event)}
-          onTouchStart={(event) => appendNativeRawTouchDebugEntry('start', event)}
           pointerEvents={resizeSnapshotVisible ? 'none' : 'auto'}
           style={styles.liveChartLayer}
         >
