@@ -13,6 +13,7 @@ import type { BuiltinIndicator } from './indicators/builtinIndicators';
 import type { NativeGestureControlZone } from './mobile/interaction/nativeGestureControlZones';
 import type { NativePaneDividerBand } from './mobile/interaction/nativePaneDivider';
 import type { NativeChartFrame } from './mobile/render/nativeChartFrame';
+import type { NativeGestureDebugOverlayHandle } from './mobile/render/NativeGestureDebugOverlay';
 import type {
   NativeLegendActionCommand,
   NativeLegendActionHitTarget,
@@ -55,7 +56,7 @@ import React, {
 } from 'react';
 
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useAnimatedReaction, useDerivedValue, useSharedValue } from 'react-native-reanimated';
 
@@ -68,6 +69,7 @@ import {
 import { EventEmitter } from './events/EventEmitter';
 import { getIndicatorById } from './indicators/builtinIndicators';
 import { isNativeGestureControlPoint } from './mobile/interaction/nativeGestureControlZones';
+import { NativeGestureDebugOverlay } from './mobile/render/NativeGestureDebugOverlay';
 import {
   createNativePaneGeometrySignature,
   createNativePaneRatioTarget,
@@ -179,12 +181,6 @@ const NATIVE_PANE_MAXIMIZE_HOLD_CEILING_MS = 250;
 // stretched bitmap over the chart.
 const NATIVE_PANE_DIVIDER_HOLD_CEILING_MS = 300;
 const NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY = Platform.OS === 'android';
-const NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT = 10;
-
-interface NativeGestureDebugEntry {
-  id: number;
-  message: string;
-}
 
 interface NativePaneDividerReleaseTarget {
   bands: readonly NativePaneDividerBand[];
@@ -1990,19 +1986,13 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     topBarLayout,
   ]);
   const nativeOverlayActionTargets = useMemo(() => [], []);
-  const [nativeGestureDebugEntries, setNativeGestureDebugEntries] = useState<readonly NativeGestureDebugEntry[]>([]);
-  const nativeGestureDebugSequenceRef = useRef(0);
+  const nativeGestureDebugOverlayRef = useRef<NativeGestureDebugOverlayHandle | null>(null);
   const appendNativeGestureDebugEntry = useCallback(
     (message: string) => {
       if (!NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY) return;
       const owner = viewportGestureOwner.owner.value;
       const active = `${panActive.value ? 'p' : '-'}${pinchActive.value ? 'z' : '-'}${priceScaleActive.value ? 'y' : '-'}${timeScaleActive.value ? 'x' : '-'}`;
-      const nextEntry = {
-        id: nativeGestureDebugSequenceRef.current + 1,
-        message: `${owner}/${active} ${message}`,
-      };
-      nativeGestureDebugSequenceRef.current = nextEntry.id;
-      setNativeGestureDebugEntries((current) => [nextEntry, ...current].slice(0, NATIVE_ANDROID_GESTURE_DEBUG_LINE_LIMIT));
+      nativeGestureDebugOverlayRef.current?.append(`${owner}/${active} ${message}`);
     },
     [panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner],
   );
@@ -2508,19 +2498,11 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         />
       ) : null}
       {NATIVE_ANDROID_GESTURE_DEBUG_OVERLAY ? (
-        <View pointerEvents="none" style={styles.nativeGestureDebugOverlay}>
-          <Text style={styles.nativeGestureDebugTitle}>TEALCHART DEBUG v5</Text>
-          {nativeGestureDebugSummary.map((line) => (
-            <Text key={line} style={styles.nativeGestureDebugText}>
-              {line}
-            </Text>
-          ))}
-          {nativeGestureDebugEntries.map((entry) => (
-            <Text key={entry.id} style={styles.nativeGestureDebugText}>
-              {entry.message}
-            </Text>
-          ))}
-        </View>
+        <NativeGestureDebugOverlay
+          ref={nativeGestureDebugOverlayRef}
+          summary={nativeGestureDebugSummary}
+          title="TEALCHART DEBUG v6"
+        />
       ) : null}
     </View>
   );
@@ -2553,31 +2535,5 @@ const styles = StyleSheet.create({
   },
   hiddenSnapshotLayer: {
     opacity: 0,
-  },
-  nativeGestureDebugOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
-    borderColor: 'rgba(0, 224, 255, 0.9)',
-    borderRadius: 6,
-    borderWidth: 1,
-    left: 4,
-    maxWidth: '54%',
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-    position: 'absolute',
-    top: 42,
-    zIndex: 10_000,
-  },
-  nativeGestureDebugText: {
-    color: '#00e0ff',
-    fontFamily: Platform.select({ android: 'monospace', default: undefined }),
-    fontSize: 8,
-    lineHeight: 10,
-  },
-  nativeGestureDebugTitle: {
-    color: '#ffffff',
-    fontFamily: Platform.select({ android: 'monospace', default: undefined }),
-    fontSize: 8,
-    fontWeight: '700',
-    lineHeight: 10,
   },
 });

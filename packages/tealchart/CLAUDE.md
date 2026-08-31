@@ -529,6 +529,15 @@ a single commit) changed nothing, for the reason recorded above: at the release
 both orderings look identical. Only moving the release onto the paint channel
 fixed it.
 
+**The Android debug overlay is an instrument, and it was changing what it
+measured.** Its entries were chart state, so every append re-rendered the whole
+chart - and a divider drag logs once per gesture update, which put a full chart
+render on every frame of the drag being measured. It never mounts on iOS, so the
+one platform that showed the flap was also the only one paying for the log. It
+owns its own state now (`NativeGestureDebugOverlay`, appends through a ref) and
+touches nothing above it. Any future on-device instrument here has the same
+obligation: it may read chart state, never hold it.
+
 **What is left is the legend**, and it cannot be fixed this way: it is a React
 Native view outside the canvas, and it drops a pane's rows the moment that pane's
 height reaches zero. So it is held on the frame it was last drawn at until the
