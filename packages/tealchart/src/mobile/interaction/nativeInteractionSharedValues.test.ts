@@ -29,6 +29,8 @@ describe('native interaction shared values', () => {
         objectId: 'order-1',
         price: 100,
         leftLineStartX: 10,
+        labelX: 20,
+        labelWidth: 60,
         priceLabelX: 90,
         priceLabelWidth: 50,
         dragZone: { objectId: 'order-1', price: 100, x1: 10, x2: 80 },
@@ -54,6 +56,8 @@ describe('native interaction shared values', () => {
         objectId: 'position-1',
         price: 110,
         leftLineStartX: 12,
+        labelX: 22,
+        labelWidth: 60,
         priceLabelX: 92,
         priceLabelWidth: 50,
         actionZones: [],
@@ -70,8 +74,10 @@ describe('native interaction shared values', () => {
     expect(orderDragZones.value).toEqual([{ objectId: 'order-1', price: 100, x1: 10, x2: 80 }]);
     expect(actionZones.value).toHaveLength(1);
     expect(rows.value).toEqual([
-      { objectType: 'order', objectId: 'order-1', price: 100, x1: 10, x2: 140 },
-      { objectType: 'position', objectId: 'position-1', price: 110, x1: 12, x2: 142 },
+      { objectType: 'order', objectId: 'order-1', price: 100, x1: 20, x2: 80 },
+      { objectType: 'order', objectId: 'order-1', price: 100, x1: 90, x2: 140 },
+      { objectType: 'position', objectId: 'position-1', price: 110, x1: 22, x2: 82 },
+      { objectType: 'position', objectId: 'position-1', price: 110, x1: 92, x2: 142 },
     ]);
   });
 
@@ -84,6 +90,8 @@ describe('native interaction shared values', () => {
       objectId: 'order-1',
       price: 100,
       leftLineStartX: 10,
+      labelX: 20,
+      labelWidth: 60,
       priceLabelX: 90,
       priceLabelWidth: 50,
       dragZone: { objectId: 'order-1', price: 100, x1: 40, x2: 80 },
@@ -97,11 +105,14 @@ describe('native interaction shared values', () => {
       orderDragZones,
       actionZones,
       rows,
-      geometries: [{ ...baseGeometry, leftLineStartX: 24, priceLabelX: 104 }],
+      geometries: [{ ...baseGeometry, leftLineStartX: 24, labelX: 34, priceLabelX: 104 }],
     });
 
     expect(rows.value).not.toBe(firstRows);
-    expect(rows.value).toEqual([{ objectType: 'order', objectId: 'order-1', price: 100, x1: 24, x2: 154 }]);
+    expect(rows.value).toEqual([
+      { objectType: 'order', objectId: 'order-1', price: 100, x1: 34, x2: 94 },
+      { objectType: 'order', objectId: 'order-1', price: 100, x1: 104, x2: 154 },
+    ]);
   });
 
   it('refreshes action zones when bracket preview metadata changes', () => {

@@ -99,6 +99,34 @@ describe('resolveNativeCanvasTap', () => {
     expect(resolveNativeCanvasTap(EMPTY_PLOT, context()).kind).toBe('crosshair');
   });
 
+  // The rows are the label boxes now, so the dashes between them are plot space
+  // like any other. Tapping there used to select the order and swallow the tap,
+  // and the crosshair never appeared.
+  it('gives the dashes between an order label and its axis tag to the crosshair', () => {
+    const outcome = resolveNativeCanvasTap(
+      { x: 60, y: CENTER_Y },
+      context({
+        tradeLineRows: [
+          { objectType: 'order', objectId: 'order-1', price: priceAt(CENTER_Y), x1: 20, x2: 50 },
+          { objectType: 'order', objectId: 'order-1', price: priceAt(CENTER_Y), x1: 150, x2: 170 },
+        ],
+      }),
+    );
+
+    expect(outcome.kind).toBe('crosshair');
+  });
+
+  it('still gives a tap on the label box itself to the order', () => {
+    const outcome = resolveNativeCanvasTap(
+      { x: 35, y: CENTER_Y },
+      context({
+        tradeLineRows: [{ objectType: 'order', objectId: 'order-1', price: priceAt(CENTER_Y), x1: 20, x2: 50 }],
+      }),
+    );
+
+    expect(outcome).toEqual({ kind: 'tradeLineSelect', objectType: 'order', objectId: 'order-1' });
+  });
+
   it('does not let off-center bottom taps reveal the reset view button', () => {
     expect(resolveNativeCanvasTap({ x: 60, y: 100 }, context()).kind).toBe('crosshair');
     expect(resolveNativeCanvasTap({ x: 110, y: 100 }, context()).kind).toBe('none');

@@ -750,14 +750,27 @@ export function createNativeOrderDragZones(geometries: readonly NativeTradeLineG
   );
 }
 
+/**
+ * The label boxes, not the line.
+ *
+ * A row spanning the whole line meant a tap anywhere along the dashes belonged
+ * to that order, so the crosshair never toggled and a pan starting there began
+ * no gesture at all. The dashes are decoration - the label body and the
+ * price-axis tag are the controls, and each gets its own span.
+ */
 export function createNativeTradeLineRows(geometries: readonly NativeTradeLineGeometry[]): NativeTradeLineRow[] {
-  return geometries.map((geometry) => ({
-    objectType: geometry.objectType,
-    objectId: geometry.objectId,
-    price: geometry.price,
-    x1: geometry.leftLineStartX,
-    x2: geometry.priceLabelX + geometry.priceLabelWidth,
-  }));
+  return geometries.flatMap((geometry) => {
+    const rows: NativeTradeLineRow[] = [];
+    const push = (x1: number, x2: number) => {
+      if (x2 <= x1) return;
+      rows.push({ objectType: geometry.objectType, objectId: geometry.objectId, price: geometry.price, x1, x2 });
+    };
+
+    push(geometry.labelX, geometry.labelX + geometry.labelWidth);
+    push(geometry.priceLabelX, geometry.priceLabelX + geometry.priceLabelWidth);
+
+    return rows;
+  });
 }
 
 export function layoutNativeTradeLine(input: NativeTradeLineLayoutInput): NativeTradeLineLayout {
