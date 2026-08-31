@@ -51,10 +51,12 @@ buys nothing, because the gesture layer never sees touches outside it.
 override, or ownership state directly on gesture finalize when that state masks a
 React/Skia propagation seam. Commit the target first, then release the visual
 hold through `mobile/interaction/nativeReleaseHold.ts` after the committed frame
-reports that the target is visible. If clearing the hold can expose a stale
-Skia/Reanimated presentation, the same module must then schedule the clear on
-the native presentation clock. React render/layout-effect passes are not
-presentation frames. This is the single owner for release-hold timing across
+reports that the target is visible. **A commit is not a paint.** If clearing the
+hold can expose the commit's all-old frame, wait for the canvas to echo the
+committed geometry back - `createNativePaneGeometrySignature` through
+`nativePresentedPaneGeometry` - and release on that. React render and
+layout-effect passes are not presentation frames, and neither is an animation
+frame counted from one. This is the single owner for release-hold timing across
 viewport ownership, pane divider resize snapshots, pane maximize legend freezes,
 and pane-range overrides. Do not add ad hoc `requestAnimationFrame`, timeout, or
 effect-based release gates as the normal release path for new mobile visual
@@ -483,23 +485,49 @@ data load, where the static branches are on screen.)
 
 Two attempts to hide the seam failed first, and both are worth knowing about.
 
-A covering bitmap could never have worked. It lived in a sibling `<Canvas>` - its
-own reconciler root, its own `CAMetalLayer`, its own drawable present - and its
-visibility was an `opacity` toggle on a React Native view, a third pipeline again.
+A covering bitmap could never have worked *as a sibling `<Canvas>`* - its own
+reconciler root, its own `CAMetalLayer`, its own drawable present - with its
+visibility an `opacity` toggle on a React Native view, a third pipeline again.
 Nothing ordered the three. At the *release* both orderings look identical, which
 is why two fixes aimed there changed nothing; at the *start* both orderings expose
 the live chart underneath. It also cost a `makeImageSnapshot` per tap, which is a
 full offscreen GPU render run synchronously on the JS thread.
 
-A gate that observed the propagation was tried and reverted. Echoing pane geometry
-back through a `useDerivedValue` and releasing on the echo is sound in principle,
-but the echo has to live inside the canvas to share the plot paths' reconciler
-root - and every `<Canvas>` child here is wrapped in `memo` for a reason. An
-unmemoized one re-renders on every parent render, which is every bar tick, and
-each of those invalidates the Skia scene graph and repaints. The chart became slow
-enough that double taps started missing the 200ms inter-tap window, so the
-maximize worked about half the time. If you try something like it again, `memo` is
-not optional, and the thing to measure is repaints per tick, not the flap.
+The pane divider still uses one, because that drag cannot re-lay-out per frame -
+that is what made it crawl. It is not the reverted shape: the bands are a child of
+the *same* `<Canvas>` as the plot paths, so there is one reconciler root and one
+present, and no view opacity in the picture. The snapshot is paid once per divider
+grab rather than per tap. Do not move it back out to a sibling canvas, and do not
+reach for a covering bitmap for anything that could instead ride the derived
+channel.
+
+A gate that observed the propagation was tried, reverted, and is now back in a
+shape that costs nothing. Echoing pane geometry through a `useDerivedValue` and
+releasing on the echo is sound in principle. The reverted attempt paid for it by
+mounting the echo as an unmemoized `<Canvas>` child, which re-rendered on every
+parent render - every bar tick - invalidating the Skia scene graph and repainting
+each time. The chart became slow enough that double taps started missing the 200ms
+inter-tap window, so the maximize worked about half the time.
+
+What was wrong there was the node, not the echo. `nativePresentedPaneGeometry` in
+`SkiaTealchart` is a `useDerivedValue` closed over
+`createNativePaneGeometrySignature(frame.panes)` that **draws nothing** - it is not
+a Skia element and has no reconciler root to invalidate, so it cannot cost a
+repaint. Ordering holds without one: Reanimated restarts a derived value's mapper
+from a `useEffect`, effects run children before parents, and mappers run in
+registration order, so the mirror lands in the same run as the plot paths it is
+reporting on. A `useAnimatedReaction` carries it back to JS. If you touch this,
+the thing to measure is still repaints per tick, and the rule is that an echo may
+observe the canvas but must never draw into it.
+
+That echo is what the pane divider releases its preview on. The release used to
+fire on the React commit - the all-old frame - so Android showed the pre-drag
+layout for the whole propagation before settling. iOS never did, which is what a
+seam one paint wide on one platform and several on the other looks like. Two
+fixes aimed at release *timing* (an extra animation frame, then making the clear
+a single commit) changed nothing, for the reason recorded above: at the release
+both orderings look identical. Only moving the release onto the paint channel
+fixed it.
 
 **What is left is the legend**, and it cannot be fixed this way: it is a React
 Native view outside the canvas, and it drops a pane's rows the moment that pane's
