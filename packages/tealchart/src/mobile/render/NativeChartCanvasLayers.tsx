@@ -48,6 +48,7 @@ export interface NativeChartCanvasLayersProps {
   indicatorPlots: readonly PlotOutput[];
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
+  onDragPriceLabelWidth?: (objectId: string, width: number) => void;
   lineSnapshot: {
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
@@ -94,6 +95,7 @@ export function NativeChartCanvasLayersImpl({
   paneRangeOverrides,
   indicatorTotalBarCount,
   lineSnapshot,
+  onDragPriceLabelWidth,
   options,
   plotOpacity,
   orderDragState,
@@ -225,6 +227,7 @@ export function NativeChartCanvasLayersImpl({
             getOrderObjectId={getOrderObjectId}
             getPositionObjectId={getPositionObjectId}
             lineSnapshot={lineSnapshot}
+            onDragPriceLabelWidth={onDragPriceLabelWidth}
             orderDragState={orderDragState}
             pricePrecision={pricePrecision}
             nowMs={nowMs}

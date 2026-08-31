@@ -241,7 +241,13 @@ function getPriceLineSecondaryLabelText(line: PriceLine): string {
   return line.label.secondaryText ?? '';
 }
 
-function getWebPriceLineAxisTagFont(line: PriceLine | PriceLineLabelBounds, fontFamily: string): string {
+export interface PriceAxisTagWidthCacheKeySource {
+  id: string;
+  type?: PriceLine['type'];
+  targetPaneId?: string;
+}
+
+function getWebPriceLineAxisTagFont(line: PriceLine | PriceLineLabelBounds | PriceAxisTagWidthCacheKeySource, fontFamily: string): string {
   const domain = resolvePriceLineAxisTagDomain(line);
   return `${WEB_PRICE_AXIS_TAG_SIZING[domain].fontSize}px ${fontFamily}`;
 }
@@ -253,7 +259,7 @@ function getWebPriceLineAxisTagHeight(line: PriceLine | PriceLineLabelBounds, ha
   );
 }
 
-function getWebPriceLineAxisTagPaddingX(line: PriceLine | PriceLineLabelBounds): number {
+function getWebPriceLineAxisTagPaddingX(line: PriceLine | PriceLineLabelBounds | PriceAxisTagWidthCacheKeySource): number {
   return WEB_PRICE_AXIS_TAG_SIZING[resolvePriceLineAxisTagDomain(line)].paddingX;
 }
 
@@ -370,9 +376,30 @@ export class TealchartRenderer {
     };
   }
 
+  private priceLineAxisTagWidthCacheKey(line: PriceAxisTagWidthCacheKeySource): string {
+    return `${line.targetPaneId ?? 'main'}:${resolvePriceLineAxisTagDomain(line)}:${line.id}`;
+  }
+
   private measureGrowOnlyPriceLineAxisLabelWidth(line: PriceLine, font: string): number {
-    const cacheKey = `${line.targetPaneId ?? 'main'}:${resolvePriceLineAxisTagDomain(line)}:${line.id}`;
-    return this.priceLineAxisTagWidthCache.resolve(cacheKey, measurePriceLineAxisLabelWidth(this.ctx, line, font));
+    return this.priceLineAxisTagWidthCache.resolve(
+      this.priceLineAxisTagWidthCacheKey(line),
+      measurePriceLineAxisLabelWidth(this.ctx, line, font),
+    );
+  }
+
+  /**
+   * Grow a line's axis tag to fit text the line does not carry yet - the price
+   * under a finger mid-drag. It goes through the same cache the render pass
+   * reads, so the tag the drag settles into is never narrower than the widest
+   * price it passed through.
+   */
+  growPriceLineAxisLabelWidth(line: PriceAxisTagWidthCacheKeySource, text: string): number {
+    const width = Math.ceil(
+      getCachedTextWidth(this.ctx, text, getWebPriceLineAxisTagFont(line, this.font)) +
+        getWebPriceLineAxisTagPaddingX(line) * 2 +
+        PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X,
+    );
+    return this.priceLineAxisTagWidthCache.resolve(this.priceLineAxisTagWidthCacheKey(line), width);
   }
 
   /**
