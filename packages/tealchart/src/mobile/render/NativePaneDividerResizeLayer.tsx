@@ -3,6 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { NativePaneDividerBand, NativePaneDividerTarget } from '../interaction/nativePaneDivider';
 
 import { Image as SkiaImage, Rect, Line as SkiaLine } from '@shopify/react-native-skia';
+import { memo } from 'react';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import {
@@ -25,22 +26,39 @@ export interface NativePaneSnapshot {
  * Everything here is driven by shared values, so a divider drag costs no React
  * render and no chart re-layout — which is the whole point. Committing the real
  * heights per frame is correct and unusably slow.
+ *
+ * The bitmap also retires itself, and that is not a nicety. `paneGeometry` and
+ * `settledGeometry` are plain props read through a derived value, which is the
+ * same channel every plot path takes: a new committed frame restarts this
+ * mapper in the same effect flush as theirs, so both land in one mapper run and
+ * Skia records one picture from it. The bitmap therefore cannot vanish on a
+ * frame where the paths behind it are still drawing the pre-drag layout. Every
+ * attempt to retire it from JS instead was a race, because JS cannot observe
+ * that run - it can only guess at frames after the commit and be wrong on a
+ * slow one.
  */
 function NativePaneDividerBandImage({
   backgroundColor,
   bands,
   image,
   index,
+  paneGeometry,
+  settledGeometry,
   width,
 }: {
   backgroundColor: string;
   bands: SharedValue<NativePaneDividerBand[]>;
   image: SkImage;
   index: number;
+  paneGeometry: string;
+  settledGeometry: string | null;
   width: number;
 }) {
   const y = useDerivedValue(() => bands.value[index]?.top ?? 0);
-  const height = useDerivedValue(() => Math.max(bands.value[index]?.height ?? 0, 0));
+  const height = useDerivedValue(() => {
+    if (settledGeometry !== null && settledGeometry === paneGeometry) return 0;
+    return Math.max(bands.value[index]?.height ?? 0, 0);
+  });
 
   return (
     <>
@@ -100,15 +118,23 @@ function NativePaneDividerHighlight({
   );
 }
 
-export function NativePaneDividerResizeLayer({
+/** Memoized because every `<Canvas>` child is: an unmemoized one repaints the
+ * scene graph on each parent render, which is every bar tick. */
+export const NativePaneDividerResizeLayer = memo(function NativePaneDividerResizeLayer({
   backgroundColor,
   bands,
+  paneGeometry,
+  settledGeometry,
   snapshots,
   target,
   width,
 }: {
   backgroundColor: string;
   bands: SharedValue<NativePaneDividerBand[]>;
+  /** Signature of the pane geometry the committed frame paints. */
+  paneGeometry: string;
+  /** Signature the released drag asked for, or null while one is in flight. */
+  settledGeometry: string | null;
   snapshots: readonly NativePaneSnapshot[];
   target: SharedValue<NativePaneDividerTarget | null>;
   width: number;
@@ -122,10 +148,12 @@ export function NativePaneDividerResizeLayer({
           bands={bands}
           image={snapshot.image}
           index={index}
+          paneGeometry={paneGeometry}
+          settledGeometry={settledGeometry}
           width={width}
         />
       ))}
       <NativePaneDividerHighlight bands={bands} target={target} width={width} />
     </>
   );
-}
+})
