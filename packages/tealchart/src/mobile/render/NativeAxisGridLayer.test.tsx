@@ -11,7 +11,7 @@ vi.mock('react', async (importOriginal) => {
   return { ...actual, useMemo: <T,>(factory: () => T) => factory() };
 });
 
-import { getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
+import { createNativeLeftAlignedAxisTextX, getNativeAxisTextCharacterCapacity } from '../utils/axisTickLayout';
 import { createNativePriceAxisLane } from '../utils/nativePriceAxisLane';
 import { NativeIndicatorPaneAxisLayerImpl } from './NativeIndicatorPaneAxisLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
@@ -92,11 +92,7 @@ describe('native axis grid layers', () => {
 
     expect(rows.map((row) => row.labelText)).toEqual(['63,000', '63,100', '63,200', '63,300']);
     expect(rows.every((row) => row.labelX >= frame.priceAxisLeft)).toBe(true);
-    expect(
-      rows.every(
-        (row) => row.labelX === priceLabelLeft + (priceLabelMaxWidth - row.labelText.length * characterWidth) / 2,
-      ),
-    ).toBe(true);
+    expect(rows.every((row) => row.labelX === createNativeLeftAlignedAxisTextX(priceLabelLeft))).toBe(true);
     expect(rows.every((row) => row.labelY >= frame.mainPane.top)).toBe(true);
     expect(rows.every((row) => row.lineStart.y === row.lineEnd.y)).toBe(true);
     expect(rows.every((row) => row.lineEnd.x === frame.priceAxisRight)).toBe(true);

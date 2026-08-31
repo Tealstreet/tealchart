@@ -24,6 +24,8 @@ import type {
   NativePriceAutoScaleSharedValues,
   NativePriceScaleGestureState,
   NativeTimeScaleGestureState,
+  NativeViewportGestureOwner,
+  NativeViewportGestureOwnerState,
   NativeViewportGestureMetrics,
 } from './nativeViewportGestureState';
 
@@ -55,6 +57,7 @@ export interface NativeSkiaInteractionRuntime {
   timeScaleGestureState: NativeTimeScaleGestureState;
   tradeLineActionZones: ReturnType<typeof useSharedValue<NativeTradeLineActionZone[]>>;
   tradeLineRows: ReturnType<typeof useSharedValue<NativeTradeLineRow[]>>;
+  viewportGestureOwner: NativeViewportGestureOwnerState;
   viewportSyncEpoch: ReturnType<typeof useSharedValue<number>>;
 }
 
@@ -118,6 +121,7 @@ export function useNativeSkiaInteractionRuntime({
   const priceAutoScaleActive = useSharedValue(autoScaleEnabled);
   const priceAutoScaleBars = useSharedValue<NativeAutoScaleBar[]>([]);
   const timeScaleActive = useSharedValue(false);
+  const viewportGestureOwnerValue = useSharedValue<NativeViewportGestureOwner>('none');
   const viewportSyncEpoch = useSharedValue(0);
   const crosshairVisible = useSharedValue(false);
   const crosshairX = useSharedValue(0);
@@ -228,6 +232,7 @@ export function useNativeSkiaInteractionRuntime({
   );
   const panIndicatorPaneTarget = useSharedValue<NativeIndicatorPaneScaleTarget | null>(null);
   const panPaneDividerTarget = useSharedValue<NativePaneDividerTarget | null>(null);
+  const panPaneDividerReleaseLocked = useSharedValue(false);
   const paneRangeOverrides = useSharedValue<NativePaneRangeOverrides>({});
   const paneDividerBands = useSharedValue<NativePaneDividerBand[]>([]);
   const chartPanGestureState = useMemo<NativeChartPanGestureState>(
@@ -235,6 +240,7 @@ export function useNativeSkiaInteractionRuntime({
       active: panActive,
       indicatorPaneTarget: panIndicatorPaneTarget,
       paneDividerTarget: panPaneDividerTarget,
+      paneDividerReleaseLocked: panPaneDividerReleaseLocked,
       sharedViewport,
       startViewport: panStartViewport,
       metrics: panMetrics,
@@ -248,6 +254,7 @@ export function useNativeSkiaInteractionRuntime({
       panActive,
       panIndicatorPaneTarget,
       panPaneDividerTarget,
+      panPaneDividerReleaseLocked,
       panMetrics,
       panStartViewport,
       priceAutoScale,
@@ -308,6 +315,12 @@ export function useNativeSkiaInteractionRuntime({
     }),
     [activeTimeScaleAnchorTime, panMetrics, panStartViewport, priceAutoScale, sharedViewport, timeScaleActive],
   );
+  const viewportGestureOwner = useMemo<NativeViewportGestureOwnerState>(
+    () => ({
+      owner: viewportGestureOwnerValue,
+    }),
+    [viewportGestureOwnerValue],
+  );
 
   return {
     bracketDragActive,
@@ -333,6 +346,7 @@ export function useNativeSkiaInteractionRuntime({
     timeScaleGestureState,
     tradeLineActionZones,
     tradeLineRows,
+    viewportGestureOwner,
     viewportSyncEpoch,
   };
 }

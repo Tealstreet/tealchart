@@ -47,6 +47,33 @@ web chrome has always worked this way.
 Grow small targets inward with hit slop only. Slop pushed past the canvas edge
 buys nothing, because the gesture layer never sees touches outside it.
 
+**Native gesture release rule:** Mobile Skia gestures must not clear preview,
+override, or ownership state directly on gesture finalize when that state masks a
+React/Skia propagation seam. Commit the target first, then release the visual
+hold through `mobile/interaction/nativeReleaseHold.ts` after the committed frame
+reports that the target is visible. **A commit is not a paint.** If clearing the
+hold can expose the commit's all-old frame, the hold has to outlive the repaint
+as well, and that is decided inside the canvas rather than here - see **One
+commit, two channels**. React render and layout-effect passes are not
+presentation frames, and neither is an animation frame counted from one. This is
+the single owner for release-hold timing across
+viewport ownership, pane divider resize snapshots, pane maximize legend freezes,
+and pane-range overrides. Do not add ad hoc `requestAnimationFrame`, timeout, or
+effect-based release gates as the normal release path for new mobile visual
+holds; add a named hold kind, a caught-up predicate, and if needed a centralized
+presentation release instead. A timeout may exist only as a documented ceiling
+for a hold that would otherwise be able to freeze forever if the target
+disappears.
+
+**Native viewport gesture ownership rule:** `Gesture.Simultaneous` is event
+composition, not ownership. Any native gesture that mutates the shared viewport,
+pane divider bands, or indicator pane range must claim the shared
+`NativeViewportGestureOwnerState` before it begins mutating, and must clear that
+owner on finalize or forced reset. Two-finger pinch may take over from a
+one-finger viewport pan/axis scale by clearing that active flag first; divider
+and indicator-pane owners are exclusive. Do not rely on callback order between
+pan, pinch, price-axis scale, and time-axis scale to decide who wins.
+
 **Icon rule:** There is exactly one icon language, and it is already defined. Never
 use emoji, system glyphs, font icons, or a bespoke inline SVG for chrome.
 
@@ -145,6 +172,46 @@ src/
 > uses root `SkiaTealchart.tsx` plus passive helpers under `mobile/`. The
 > only React-adjacent code is `react/VanillaChartReact.tsx`,
 > `SkiaTealchart.tsx`, and `state/ChartApiContext.tsx`.
+
+## Native Skia Runtime Rules
+
+The native chart is React Native at the shell, but the chart runtime is not a
+React lifecycle control loop. Treat Skia/Reanimated gesture, viewport, pane,
+crosshair, and axis state like web's imperative canvas runtime:
+
+- React lifecycle hooks may mount/unmount resources, subscribe/unsubscribe,
+  push host props into shared values, and perform non-correctness cleanup.
+- React lifecycle hooks must not decide when an active chart interaction
+  preview is released. Gesture preview release is chart correctness state and
+  belongs in explicit runtime state machines keyed by the interaction that
+  produced the preview.
+- Gesture handlers follow this protocol: hit-test/accept on touch-down, mutate
+  shared preview on update, record a committed target on end, and make finalize
+  cleanup-only after a commit. Android may report `finalize(success=false)`
+  after a committed end; that must never roll shared values back to the
+  gesture-start state.
+- Secondary-pane range drags and pane divider drags are not special cases. They
+  need the same begin/update/commit/observe/release semantics as the primary
+  viewport. Do not patch them with `requestAnimationFrame`, `setTimeout`, or
+  layout-effect timing guesses.
+- Shared values are the transport for live preview state. React state/frame
+  updates are the committed model catching up. Render helpers must be able to
+  bridge that handoff deterministically from current frame data rather than by
+  waiting “a frame or two.”
+
+`src/mobile/interaction/nativeLifecycleBoundary.test.ts` enforces the strictest
+part of this rule for the core gesture/preview modules. If a future change needs
+a lifecycle hook in one of those files, the architecture is probably drifting;
+move the policy into a runtime helper instead.
+
+The pane divider's release preview is the one sanctioned exception, and it is
+sanctioned because it was earned rather than assumed: four release-timing
+attempts failed before it, and the reason no state machine can decide this one
+is written up under **One commit, two channels**. Its fence is a presented-frame
+count read inside the draw pass, not a lifecycle hook, and the `setTimeout`s
+beside it are a disposal delay and a freeze ceiling - neither is the release
+path. Do not read it as licence for the next one.
+
 
 ## State Management
 
@@ -420,11 +487,13 @@ shared value to hand back over:
 | `paneRangeOverrides[paneId]` | `pane.yMin` / `pane.yMax` |
 | `bracketDragState.activeObjectId` | the line's optimistic `brackets` |
 
-Every one of them retires on a `requestAnimationFrame`, never inline. Indicator
+Every one of them retires through `mobile/interaction/nativeReleaseHold.ts`,
+never inline and never through a private `requestAnimationFrame` gate. Indicator
 pane range is the one that is easy to miss, because the hold-until-the-frame-
 agrees logic looks like it already solves this — it makes the override survive
-the *commit*, but the release itself was still a frame early, so dragging or
-scaling a MACD pane snapped back to its pre-drag scale for one frame.
+the *commit*, but the release itself can still be a frame early if it is not
+routed through the shared hold controller. That is what makes dragging or
+scaling a MACD pane snap back to its pre-drag scale for one frame.
 
 ## Worklets do not hoist
 
@@ -456,23 +525,63 @@ data load, where the static branches are on screen.)
 
 Two attempts to hide the seam failed first, and both are worth knowing about.
 
-A covering bitmap could never have worked. It lived in a sibling `<Canvas>` - its
-own reconciler root, its own `CAMetalLayer`, its own drawable present - and its
-visibility was an `opacity` toggle on a React Native view, a third pipeline again.
+A covering bitmap could never have worked *as a sibling `<Canvas>`* - its own
+reconciler root, its own `CAMetalLayer`, its own drawable present - with its
+visibility an `opacity` toggle on a React Native view, a third pipeline again.
 Nothing ordered the three. At the *release* both orderings look identical, which
 is why two fixes aimed there changed nothing; at the *start* both orderings expose
 the live chart underneath. It also cost a `makeImageSnapshot` per tap, which is a
 full offscreen GPU render run synchronously on the JS thread.
 
-A gate that observed the propagation was tried and reverted. Echoing pane geometry
-back through a `useDerivedValue` and releasing on the echo is sound in principle,
-but the echo has to live inside the canvas to share the plot paths' reconciler
-root - and every `<Canvas>` child here is wrapped in `memo` for a reason. An
-unmemoized one re-renders on every parent render, which is every bar tick, and
-each of those invalidates the Skia scene graph and repaints. The chart became slow
+The pane divider still uses one, because that drag cannot re-lay-out per frame -
+that is what made it crawl. It is not the reverted shape: the bands are a child of
+the *same* `<Canvas>` as the plot paths, so there is one reconciler root and one
+present, and no view opacity in the picture. The snapshot is paid once per divider
+grab rather than per tap. Do not move it back out to a sibling canvas, and do not
+reach for a covering bitmap for anything that could instead ride the derived
+channel.
+
+A gate that observed the propagation was tried and reverted. Echoing pane
+geometry through a `useDerivedValue` and releasing on the echo is sound in
+principle; the attempt paid for it by mounting the echo as an unmemoized
+`<Canvas>` child, which re-rendered on every parent render - every bar tick -
+invalidating the Skia scene graph and repainting each time. The chart became slow
 enough that double taps started missing the 200ms inter-tap window, so the
-maximize worked about half the time. If you try something like it again, `memo` is
-not optional, and the thing to measure is repaints per tick, not the flap.
+maximize worked about half the time. If you try it again, `memo` is not optional,
+and the thing to measure is repaints per tick.
+
+**Nothing outside the canvas can retire a preview that covers it.** The pane
+divider's bitmap was retired from JS on the React commit - the all-old frame - so
+Android showed the pre-drag layout until the repaint landed, while iOS never did,
+the seam being one paint wide there and many here. Four attempts to name the
+moment the repaint lands each got closer and none was right: an extra animation
+frame, a single-commit clear, a JS echo of the committed geometry, then comparing
+the committed signature inside the draw pass. They all reduce to JS or a mapper
+trying to observe a repaint neither can see. Reanimated *could* order it, since
+mappers are sorted topologically on declared shared-value outputs - but the plot
+paths declare only themselves, and `useDerivedValue` cannot declare another
+output.
+
+**So the preview outlives the repaint instead of chasing it.**
+`NativePaneDividerResizeLayer` takes the committed geometry signature and the one
+the released drag asked for as plain props, reads both through the band's own
+`useDerivedValue`, and collapses the bitmap to zero height once they agree **and**
+a fixed number of presented frames have passed, counted on the UI thread with
+`useFrameCallback`. That count is the one tuned number in this drag and it is a
+fence, not a mechanism: a pane-geometry commit rebuilds every plot path in the
+canvas, measured at roughly a quarter of a second on Android with the frames on
+the pre-drag layout throughout, so the fence is sized to outlast it. Being late
+costs a stretched bitmap for a few more frames; being early is the flap. iOS pays
+nothing visible - its paths land in one frame, and the bitmap covering them is
+already at the committed geometry. Disposal trails the fence and the ceiling
+trails disposal, so neither can uncover a preview that is still drawing.
+
+**An on-device instrument here may read chart state and must never hold it.** The
+Android gesture overlay used to keep its log in chart state, so every append
+re-rendered the whole chart - and a divider drag logs once per gesture update,
+which put a full chart render on every frame of the drag being measured. It never
+mounted on iOS, so the one platform showing the flap was the only one paying for
+the log, and no timing read through it was sound.
 
 **What is left is the legend**, and it cannot be fixed this way: it is a React
 Native view outside the canvas, and it drops a pane's rows the moment that pane's
