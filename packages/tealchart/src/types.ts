@@ -606,6 +606,15 @@ export type ContextMenuCallback = (unixTime: number, price: number) => ContextMe
  * the chart placed the menu in - page coordinates on web, chart coordinates on
  * native - and owns everything inside it.
  */
+/**
+ * `retainCrosshair` is for a host menu that completed its action rather than
+ * being dismissed - submitting a quick order leaves the crosshair, and its "+"
+ * button, exactly where it was so the next order is one tap away.
+ */
+export interface ContextMenuCloseOptions {
+  retainCrosshair?: boolean;
+}
+
 export interface ContextMenuRenderContext {
   unixTime: number;
   price: number;
@@ -613,7 +622,7 @@ export interface ContextMenuRenderContext {
   anchorY: number;
   viewportWidth?: number;
   viewportHeight?: number;
-  close: () => void;
+  close: (options?: ContextMenuCloseOptions) => void;
 }
 
 /**

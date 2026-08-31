@@ -83,6 +83,7 @@ import {
   Bar,
   ChartMargins,
   ChartPane,
+  ContextMenuCloseOptions,
   ContextMenuItem,
   ContextMenuRenderContext,
   DEFAULT_MARGINS,
@@ -1683,14 +1684,16 @@ export class ChartCore {
         : (this.options.renderContextMenu?.({
             anchorX: screenX,
             anchorY: screenY,
-            close: () => this.closeContextMenu(),
+            close: (closeOptions) => this.closeContextMenu(closeOptions),
             price,
             unixTime: time,
           }) ?? null);
     const items = custom
       ? []
       : ((drawingItems && drawingItems.length > 0 ? drawingItems : this.options.onContextMenu?.(time, price)) ?? []);
-    this.closeContextMenu();
+    // Replacing a menu, not dismissing one - the crosshair this menu is
+    // anchored to has to survive the swap.
+    this.closeContextMenu({ retainCrosshair: true });
     if (!custom && items.length === 0) return;
 
     // Create menu
@@ -1719,6 +1722,7 @@ export class ChartCore {
       // its root container, and a click that never reaches it is a dead button.
       // Outside-click dismissal reads `contains`, not propagation, so it holds.
       this.contextMenuIsCustom = true;
+      this.eventManager.setCrosshairPinned(true);
       this.contextMenu.appendChild(custom);
     } else {
       this.contextMenu.addEventListener('click', (event) => event.stopPropagation());
@@ -1792,7 +1796,7 @@ export class ChartCore {
     });
   }
 
-  private closeContextMenu(): void {
+  private closeContextMenu(options?: ContextMenuCloseOptions): void {
     const hadCustomMenu = this.contextMenuIsCustom;
     this.contextMenuIsCustom = false;
     if (this.contextMenuCloseTimer) {
@@ -1807,7 +1811,12 @@ export class ChartCore {
     this.contextMenuResizeObserver = null;
     this.contextMenu?.remove();
     this.contextMenu = null;
-    if (hadCustomMenu) this.options.onContextMenuClose?.();
+    if (!hadCustomMenu) return;
+    this.eventManager.setCrosshairPinned(false);
+    // A dismissal drops the crosshair the way leaving the chart would have;
+    // a completed quick order keeps it, so its "+" is ready for the next one.
+    if (!options?.retainCrosshair) this.eventManager.hideCrosshair();
+    this.options.onContextMenuClose?.();
   }
 
   // ============================================================================

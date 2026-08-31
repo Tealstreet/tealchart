@@ -32,17 +32,38 @@ interface EventManagerCallbackProbe {
 }
 
 const eventManagerInstances = vi.hoisted(
-  () => [] as Array<{ callbacks: EventManagerCallbackProbe; isDragging: boolean; activeCursor: string | null }>,
+  () =>
+    [] as Array<{
+      callbacks: EventManagerCallbackProbe;
+      isDragging: boolean;
+      activeCursor: string | null;
+      crosshairPinned: boolean;
+      crosshairHiddenCount: number;
+    }>,
 );
 
 // Mock EventManager (survives mockReset)
 vi.mock('../interaction/EventManager', () => ({
   EventManager: class {
-    private instance: { callbacks: EventManagerCallbackProbe; isDragging: boolean; activeCursor: string | null };
+    private instance: (typeof eventManagerInstances)[number];
 
     constructor(_container: HTMLElement, callbacks: EventManagerCallbackProbe) {
-      this.instance = { callbacks, isDragging: false, activeCursor: null };
+      this.instance = {
+        callbacks,
+        isDragging: false,
+        activeCursor: null,
+        crosshairPinned: false,
+        crosshairHiddenCount: 0,
+      };
       eventManagerInstances.push(this.instance);
+    }
+
+    setCrosshairPinned(pinned: boolean) {
+      this.instance.crosshairPinned = pinned;
+    }
+
+    hideCrosshair() {
+      this.instance.crosshairHiddenCount += 1;
     }
 
     getIsDragging() {
@@ -2375,6 +2396,65 @@ describe('ChartCore host-rendered context menu', () => {
 
     expect(onContextMenu).toHaveBeenCalledWith(20, 10);
     expect(document.body.textContent).toContain('Fallback action');
+
+    core.dispose();
+  });
+
+  // The popover is portaled to the body, so reaching it leaves the chart and
+  // takes the crosshair - and the "+" button drawn on it - with it.
+  it('holds the crosshair while the host menu is up', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderContextMenu: () => document.createElement('div'),
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    (
+      core as unknown as {
+        handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+      }
+    ).handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    expect(eventManagerInstances.at(-1)?.crosshairPinned).toBe(true);
+
+    core.dispose();
+  });
+
+  it('keeps the crosshair when the host closes after submitting, and drops it on a dismissal', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const closeRef: { current: ((options?: { retainCrosshair?: boolean }) => void) | null } = { current: null };
+    const core = new ChartCore({
+      container,
+      width: 800,
+      height: 600,
+      renderContextMenu: (context) => {
+        closeRef.current = context.close;
+        return document.createElement('div');
+      },
+    });
+    core.setViewport({ startTime: 0, endTime: 100, priceMin: 0, priceMax: 100 });
+
+    const openMenu = () =>
+      (
+        core as unknown as {
+          handleContextMenu(x: number, y: number, price: number, time: number, placement?: string): void;
+        }
+      ).handleContextMenu(100, 100, 10, 20, 'crosshairButton');
+
+    openMenu();
+    closeRef.current?.({ retainCrosshair: true });
+
+    const eventManager = eventManagerInstances.at(-1);
+    expect(eventManager?.crosshairPinned).toBe(false);
+    expect(eventManager?.crosshairHiddenCount).toBe(0);
+
+    openMenu();
+    closeRef.current?.();
+
+    expect(eventManager?.crosshairHiddenCount).toBe(1);
 
     core.dispose();
   });
