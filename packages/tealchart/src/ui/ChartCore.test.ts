@@ -2035,6 +2035,19 @@ describe('ChartCore viewport management', () => {
 
   // The gesture tags - the crosshair's price and a TP/SL grabber's preview -
   // are the whole lane with the text centred, never a fit to their own text.
+  // Konva leaves a layer's hit graph stale while anything on it is dragged, so
+  // the crosshair's hit test read the pre-drag graph, found nothing under the
+  // cursor and stayed visible - flashing the moment the release lifted the gate
+  // that had been hiding it.
+  it('keeps Konva hit testing live through a trading-line drag', async () => {
+    const { ChartCore } = await import('./ChartCore');
+    const core = new ChartCore({ container, width: 800, height: 600 });
+
+    expect(Konva.hitOnDragEnabled).toBe(true);
+
+    core.dispose();
+  });
+
   it('draws the crosshair price tag at one lane-anchored width, text centred', async () => {
     const fillText = vi.fn();
     const roundRect = vi.fn();

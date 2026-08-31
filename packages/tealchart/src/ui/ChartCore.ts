@@ -1133,6 +1133,17 @@ export class ChartCore {
   }
 
   private initKonvaInteractiveLines(): void {
+    // Konva stops redrawing a layer's hit graph while anything on it is being
+    // dragged, so every hit test taken during a trading-line drag reads the
+    // graph as it was before the drag started. The crosshair's own hit test is
+    // one of those: it found nothing under the cursor, concluded the pointer
+    // was over empty plot, and stayed visible for the whole drag - hidden only
+    // by the gate ChartCore applies while a line is dragging. Releasing lifted
+    // that gate a frame before any mouse move could correct it, and the
+    // crosshair flashed. The layer holds a handful of trading lines, so keeping
+    // its hit graph live through a drag is cheap.
+    Konva.hitOnDragEnabled = true;
+
     const konvaContainer = div({
       style: {
         position: 'absolute',
