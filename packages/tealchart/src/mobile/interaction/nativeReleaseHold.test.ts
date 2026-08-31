@@ -6,9 +6,7 @@ import {
   createNativePaneGeometrySignature,
   createNativeReleaseHold,
   nativePaneDividerBandsCaughtUp,
-  nativePaneRangeOverridesCaughtUp,
   nativePaneRatiosCaughtUp,
-  omitReleasedNativePaneRangeOverrides,
   resolveNativeReleaseHold,
 } from './nativeReleaseHold';
 
@@ -28,7 +26,7 @@ describe('resolveNativeReleaseHold', () => {
   });
 
   it('waits out the configured release frames after the target catches up', () => {
-    const hold = createNativeReleaseHold({ kind: 'paneRangeOverride', target: { macd: { yMin: -1, yMax: 1 } }, token: 7 });
+    const hold = createNativeReleaseHold({ kind: 'paneMaximizeLegend', target: { macd: 0.25 }, token: 7 });
 
     const first = resolveNativeReleaseHold({ hold, caughtUp: true });
     expect(first).toEqual({
@@ -50,7 +48,7 @@ describe('resolveNativeReleaseHold', () => {
 
   it('retires independent domain holds without sharing release state', () => {
     const divider = createNativeReleaseHold({ kind: 'paneDividerResize', target: { main: 0.7, macd: 0.3 }, token: 1 });
-    const range = createNativeReleaseHold({ kind: 'paneRangeOverride', target: { macd: { yMin: -5, yMax: 5 } }, token: 2 });
+    const range = createNativeReleaseHold({ kind: 'paneMaximizeLegend', target: { macd: 0.25 }, token: 2 });
 
     const nextDivider = resolveNativeReleaseHold({ hold: divider, caughtUp: true });
     const nextRange = resolveNativeReleaseHold({ hold: range, caughtUp: false });
@@ -82,33 +80,6 @@ describe('createNativePaneGeometrySignature', () => {
 });
 
 describe('native release-hold caught-up predicates', () => {
-  it('matches pane range overrides only when the frame carries the committed range', () => {
-    expect(
-      nativePaneRangeOverridesCaughtUp({
-        overrides: { macd: { yMin: -5, yMax: 5 } },
-        panes: [pane('macd', 100, -1, 1)],
-      }),
-    ).toBe(false);
-    expect(
-      nativePaneRangeOverridesCaughtUp({
-        overrides: { macd: { yMin: -5, yMax: 5 } },
-        panes: [pane('macd', 100, -5, 5)],
-      }),
-    ).toBe(true);
-  });
-
-  it('requires every held pane range override to catch up before release', () => {
-    expect(
-      nativePaneRangeOverridesCaughtUp({
-        overrides: {
-          macd: { yMin: -5, yMax: 5 },
-          rsi: { yMin: 20, yMax: 80 },
-        },
-        panes: [pane('macd', 100, -5, 5), pane('rsi', 100, 10, 90)],
-      }),
-    ).toBe(false);
-  });
-
   it('matches pane ratio targets after layout reaches the committed ratios', () => {
     const ratios = { macd: 0.25, main: 0.75 };
 
@@ -146,20 +117,5 @@ describe('native release-hold caught-up predicates', () => {
         ],
       }),
     ).toBe(true);
-  });
-
-  it('only removes released pane-range overrides that still match the hold target', () => {
-    expect(
-      omitReleasedNativePaneRangeOverrides({
-        current: {
-          macd: { yMin: -5, yMax: 5 },
-          rsi: { yMin: 20, yMax: 80 },
-        },
-        released: {
-          macd: { yMin: -5, yMax: 5 },
-          rsi: { yMin: 10, yMax: 90 },
-        },
-      }),
-    ).toEqual({ rsi: { yMin: 20, yMax: 80 } });
   });
 });

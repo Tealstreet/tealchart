@@ -1,8 +1,5 @@
-import type { NativePaneFrame } from '../render/nativeChartFrame';
-import type { NativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import type { NativePaneDividerBand } from './nativePaneDivider';
 
-import { resolveSettledNativePaneRangeOverrides } from '../render/nativePaneRangeOverride';
 import { nativePaneHeightsMatchRatios } from '../utils/nativePaneLayoutOverrides';
 
 export type NativeReleaseHoldKind =
@@ -11,7 +8,6 @@ export type NativeReleaseHoldKind =
   | 'oemsOrderPreview'
   | 'paneDividerResize'
   | 'paneMaximizeLegend'
-  | 'paneRangeOverride'
   | 'resizeSnapshot'
   | 'viewport';
 
@@ -74,40 +70,6 @@ export function resolveNativeReleaseHold<TTarget>({
     };
   }
   return { hold: null, released: true };
-}
-
-export function nativePaneRangeOverridesCaughtUp({
-  overrides,
-  panes,
-}: {
-  overrides: NativePaneRangeOverrides;
-  panes: readonly NativePaneFrame[];
-}): boolean {
-  if (Object.keys(overrides).length === 0) return true;
-  return Object.keys(resolveSettledNativePaneRangeOverrides({ overrides, panes }).remaining).length === 0;
-}
-
-export function nativePaneRangesEqual(
-  left: { yMin: number; yMax: number } | undefined,
-  right: { yMin: number; yMax: number } | undefined,
-): boolean {
-  if (!left || !right) return left === right;
-  return left.yMin === right.yMin && left.yMax === right.yMax;
-}
-
-export function omitReleasedNativePaneRangeOverrides({
-  current,
-  released,
-}: {
-  current: NativePaneRangeOverrides;
-  released: NativePaneRangeOverrides;
-}): NativePaneRangeOverrides {
-  const next: NativePaneRangeOverrides = {};
-  for (const paneId of Object.keys(current)) {
-    if (nativePaneRangesEqual(current[paneId], released[paneId])) continue;
-    next[paneId] = current[paneId]!;
-  }
-  return next;
 }
 
 export function nativePaneRatiosCaughtUp({

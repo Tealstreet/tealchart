@@ -487,13 +487,27 @@ shared value to hand back over:
 | `paneRangeOverrides[paneId]` | `pane.yMin` / `pane.yMax` |
 | `bracketDragState.activeObjectId` | the line's optimistic `brackets` |
 
-Every one of them retires through `mobile/interaction/nativeReleaseHold.ts`,
-never inline and never through a private `requestAnimationFrame` gate. Indicator
-pane range is the one that is easy to miss, because the hold-until-the-frame-
-agrees logic looks like it already solves this — it makes the override survive
-the *commit*, but the release itself can still be a frame early if it is not
-routed through the shared hold controller. That is what makes dragging or
-scaling a MACD pane snap back to its pre-drag scale for one frame.
+These retire through `mobile/interaction/nativeReleaseHold.ts`, never inline and
+never through a private `requestAnimationFrame` gate.
+
+**Indicator pane range is the exception, and the reason is worth reading before
+you route the next one through the hold controller.** A hold cannot fix it,
+because the flap is not the hold releasing early — it is the *write* that
+releasing performs. Clearing `paneRangeOverrides[paneId]` from JS marks every
+plot worklet that reads it dirty, and those worklets still hold the pre-drag
+`pane.yMin`/`yMax` in their closures until Reanimated restarts them, so the run
+triggered by the clear draws the pre-drag range. A `useLayoutEffect` made it
+worse by firing before the restarts were even queued. Dragging a MACD pane
+snapped back to its pre-drag scale on release, on both platforms.
+
+So the override is never cleared. It is written `committed: true` on release,
+carrying the range the drag started from, and `shouldApplyNativePaneRangeOverride`
+decides inside the worklet whether it still applies: while the pane is still on
+the drag-start range it does, once the pane carries the committed range the two
+agree and it makes no difference, and once auto-scale moves the pane elsewhere it
+goes inert. The preview retires in the draw pass, so nothing has to be cleared
+and no run can be woken early. Same principle as the pane divider's bitmap, one
+layer down.
 
 ## Worklets do not hoist
 
