@@ -24,6 +24,7 @@ import type {
   NativeGestureDebugEventHandler,
   NativePriceScaleGestureState,
   NativeTimeScaleGestureState,
+  NativeViewportGestureOwnerState,
 } from './nativeViewportGestureState';
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -87,7 +88,7 @@ export interface NativeChartGestureRuntimeInput {
   onIndicatorPaneScaleStart?: (paneId: string) => void;
   onPaneDividerResizeEnd?: (success: boolean) => void;
   onPaneDividerResizeStart?: () => void;
-  onPaneHeightsChange?: (heights: NativePaneHeight[]) => void;
+  onPaneHeightsChange?: (heights: NativePaneHeight[], bands: NativePaneDividerBand[]) => void;
   paneDividerBands?: SharedValue<NativePaneDividerBand[]>;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   onDrawingEditDragBegin: (x: number, y: number) => void;
@@ -120,6 +121,7 @@ export interface NativeChartGestureRuntimeInput {
   tradeLabelHeight: number;
   tradeLineActionZones: SharedValue<NativeTradeLineActionZone[]>;
   tradeLineRows: SharedValue<NativeTradeLineRow[]>;
+  viewportGestureOwner: NativeViewportGestureOwnerState;
 }
 
 export interface NativeChartGestureRuntime {
@@ -137,7 +139,7 @@ export function resolveNativeCrosshairInteractionFrame({
 }
 
 const noopNativeIndicatorPaneScale = (_paneId: string, _yMin: number, _yMax: number) => undefined;
-const noopNativePaneHeightsChange = (_heights: NativePaneHeight[]) => undefined;
+const noopNativePaneHeightsChange = (_heights: NativePaneHeight[], _bands: NativePaneDividerBand[]) => undefined;
 const noopNativePaneDividerResize = () => undefined;
 
 function useLatestNativeCallback<T extends (...args: never[]) => void>(callback: T): T {
@@ -213,6 +215,7 @@ export function useNativeChartGestureRuntime({
   tradeLabelHeight,
   tradeLineActionZones,
   tradeLineRows,
+  viewportGestureOwner,
 }: NativeChartGestureRuntimeInput): NativeChartGestureRuntime {
   const stableBeginNativeViewportInteraction = useLatestNativeCallback(beginNativeViewportInteraction);
   const stableCancelNativeViewportInteraction = useLatestNativeCallback(cancelNativeViewportInteraction);
@@ -302,6 +305,7 @@ export function useNativeChartGestureRuntime({
       tradeLabelHeight,
       tradeLineActionZones,
       tradeLineRows,
+      viewportGestureOwner,
     });
   }, [
     chartPanGestureState,
@@ -324,6 +328,7 @@ export function useNativeChartGestureRuntime({
     tradeLabelHeight,
     tradeLineActionZones,
     tradeLineRows,
+    viewportGestureOwner,
   ]);
 
   // One gesture owns the canvas tap. It replaces the crosshair tap, the
@@ -533,6 +538,7 @@ export function useNativeChartGestureRuntime({
       tradeLabelHeight,
       tradeLineActionZones,
       tradeLineRows,
+      viewportGestureOwner,
     });
   }, [
     bracketDragActive,
@@ -555,6 +561,7 @@ export function useNativeChartGestureRuntime({
     tradeLabelHeight,
     tradeLineActionZones,
     tradeLineRows,
+    viewportGestureOwner,
   ]);
 
   const bracketDragGesture = useMemo<GestureType>(() => {
@@ -689,6 +696,7 @@ export function useNativeChartGestureRuntime({
       priceScaleActive,
       priceScaleGestureState,
       sharedViewport,
+      viewportGestureOwner,
     });
   }, [
     chartInteractionFrame,
@@ -704,6 +712,7 @@ export function useNativeChartGestureRuntime({
     stableOnDebugGestureEvent,
     stableOnIndicatorPaneScale,
     stableOnIndicatorPaneScaleStart,
+    viewportGestureOwner,
   ]);
 
   const timeScaleGesture = useMemo<GestureType>(() => {
@@ -718,6 +727,7 @@ export function useNativeChartGestureRuntime({
       sharedViewport,
       timeScaleActive,
       timeScaleGestureState,
+      viewportGestureOwner,
     });
   }, [
     chartInteractionFrame,
@@ -730,6 +740,7 @@ export function useNativeChartGestureRuntime({
     stableOnDebugGestureEvent,
     timeScaleActive,
     timeScaleGestureState,
+    viewportGestureOwner,
   ]);
 
   const nativeChartGesture = useMemo(

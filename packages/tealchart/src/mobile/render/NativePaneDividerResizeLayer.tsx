@@ -27,11 +27,13 @@ export interface NativePaneSnapshot {
  * heights per frame is correct and unusably slow.
  */
 function NativePaneDividerBandImage({
+  backgroundColor,
   bands,
   image,
   index,
   width,
 }: {
+  backgroundColor: string;
   bands: SharedValue<NativePaneDividerBand[]>;
   image: SkImage;
   index: number;
@@ -40,7 +42,12 @@ function NativePaneDividerBandImage({
   const y = useDerivedValue(() => bands.value[index]?.top ?? 0);
   const height = useDerivedValue(() => Math.max(bands.value[index]?.height ?? 0, 0));
 
-  return <SkiaImage fit="fill" height={height} image={image} width={width} x={0} y={y} />;
+  return (
+    <>
+      <Rect color={backgroundColor} height={height} width={width} x={0} y={y} />
+      <SkiaImage fit="fill" height={height} image={image} width={width} x={0} y={y} />
+    </>
+  );
 }
 
 /**
@@ -94,11 +101,13 @@ function NativePaneDividerHighlight({
 }
 
 export function NativePaneDividerResizeLayer({
+  backgroundColor,
   bands,
   snapshots,
   target,
   width,
 }: {
+  backgroundColor: string;
   bands: SharedValue<NativePaneDividerBand[]>;
   snapshots: readonly NativePaneSnapshot[];
   target: SharedValue<NativePaneDividerTarget | null>;
@@ -109,6 +118,7 @@ export function NativePaneDividerResizeLayer({
       {snapshots.map((snapshot, index) => (
         <NativePaneDividerBandImage
           key={snapshot.paneId}
+          backgroundColor={backgroundColor}
           bands={bands}
           image={snapshot.image}
           index={index}

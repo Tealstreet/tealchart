@@ -63,6 +63,15 @@ presentation release instead. A timeout may exist only as a documented ceiling
 for a hold that would otherwise be able to freeze forever if the target
 disappears.
 
+**Native viewport gesture ownership rule:** `Gesture.Simultaneous` is event
+composition, not ownership. Any native gesture that mutates the shared viewport,
+pane divider bands, or indicator pane range must claim the shared
+`NativeViewportGestureOwnerState` before it begins mutating, and must clear that
+owner on finalize or forced reset. Two-finger pinch may take over from a
+one-finger viewport pan/axis scale by clearing that active flag first; divider
+and indicator-pane owners are exclusive. Do not rely on callback order between
+pan, pinch, price-axis scale, and time-axis scale to decide who wins.
+
 **Icon rule:** There is exactly one icon language, and it is already defined. Never
 use emoji, system glyphs, font icons, or a bespoke inline SVG for chrome.
 

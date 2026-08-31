@@ -4,7 +4,11 @@ import type { Bar, Viewport, ViewScaleState } from '../../types';
 import type { NativeChartFrame } from '../render/nativeChartFrame';
 import type { NativeChartProjection } from '../render/nativeProjection';
 import type { NativeViewportSharedValues } from '../render/nativeSharedViewport';
-import type { NativePriceAutoScaleSharedValues, NativeViewportGestureMetrics } from './nativeViewportGestureState';
+import type {
+  NativePriceAutoScaleSharedValues,
+  NativeViewportGestureMetrics,
+  NativeViewportGestureOwnerState,
+} from './nativeViewportGestureState';
 import type { NativeViewportOwnershipState } from './nativeViewportSync';
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -58,6 +62,7 @@ export interface NativeViewportRuntimeInput {
   sharedViewport: NativeViewportSharedValues;
   symbol: string;
   timeScaleActive: SharedValue<boolean>;
+  viewportGestureOwner: NativeViewportGestureOwnerState;
   viewportSyncEpoch: SharedValue<number>;
 }
 
@@ -259,6 +264,7 @@ export function useNativeViewportRuntime({
   sharedViewport,
   symbol,
   timeScaleActive,
+  viewportGestureOwner,
   viewportSyncEpoch,
 }: NativeViewportRuntimeInput): NativeViewportRuntime {
   const [settledViewport, setSettledViewport] = useState<Viewport | null>(null);
@@ -394,7 +400,7 @@ export function useNativeViewportRuntime({
     // for; letting it fire on the next one would frame that market with another
     // layout's window and claim it as a manual viewport.
     pendingRestorePriceFitRef.current = null;
-    resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
+    resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
 
     // A hand-scaled price axis belongs to the market it was scaled on, so a new
     // market gets a clean slate and auto-scale back. An interval switch is the
@@ -451,6 +457,7 @@ export function useNativeViewportRuntime({
     symbol,
     timeScaleActive,
     viewport,
+    viewportGestureOwner,
   ]);
 
   useLayoutEffect(() => {
@@ -610,9 +617,9 @@ export function useNativeViewportRuntime({
     });
     setViewportOwnership(result.state);
     if (result.type === 'confirmed') {
-      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
+      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
     }
-  }, [panActive, panStartViewport, pinchActive, priceScaleActive, sharedViewport, timeScaleActive, viewport]);
+  }, [panActive, panStartViewport, pinchActive, priceScaleActive, sharedViewport, timeScaleActive, viewport, viewportGestureOwner]);
 
   useEffect(() => {
     if (!projection) return;
@@ -695,7 +702,7 @@ export function useNativeViewportRuntime({
     setSettledViewport(autoViewport);
     syncNativeSharedViewportIfChanged(sharedViewport, autoViewport);
     syncNativeSharedViewportIfChanged(panStartViewport, autoViewport);
-    resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
+    resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
     onViewportChange?.(autoViewport);
   }, [
     autoViewport,
@@ -707,6 +714,7 @@ export function useNativeViewportRuntime({
     priceScaleActive,
     sharedViewport,
     timeScaleActive,
+    viewportGestureOwner,
   ]);
 
   const applyNativeViewport = useCallback(
@@ -740,7 +748,7 @@ export function useNativeViewportRuntime({
       setSettledViewport(viewportToApply);
       syncNativeSharedViewportIfChanged(sharedViewport, viewportToApply);
       syncNativeSharedViewportIfChanged(panStartViewport, viewportToApply);
-      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive });
+      resetNativeViewportGestureActiveFlags({ panActive, pinchActive, priceScaleActive, timeScaleActive, viewportGestureOwner });
       onViewportChange?.(viewportToApply);
 
       // A saved layout carries absolute times, so it can outrun the loaded page
@@ -765,6 +773,7 @@ export function useNativeViewportRuntime({
       priceScaleActive,
       sharedViewport,
       timeScaleActive,
+      viewportGestureOwner,
     ],
   );
 

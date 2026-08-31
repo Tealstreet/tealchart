@@ -7,6 +7,7 @@ import {
   createNativePresentationReleaseScheduler,
   createNativePaneRatioTarget,
   createNativeReleaseHold,
+  nativePaneDividerBandsCaughtUp,
   nativePaneRangeOverridesCaughtUp,
   nativePaneRatiosCaughtUp,
   omitReleasedNativePaneRangeOverrides,
@@ -174,6 +175,32 @@ describe('native release-hold caught-up predicates', () => {
     expect(nativePaneRatiosCaughtUp({ panes: [pane('main', 75), pane('macd', 25), pane('rsi', 40)], ratios: target })).toBe(
       true,
     );
+  });
+
+  it('matches pane divider release bands only after committed pane pixels catch up', () => {
+    const bands = [
+      { height: 144, paneId: 'main', top: 20 },
+      { height: 110, paneId: 'macd', top: 164 },
+    ];
+
+    expect(
+      nativePaneDividerBandsCaughtUp({
+        bands,
+        panes: [
+          { id: 'main', height: 200, top: 20 },
+          { id: 'macd', height: 54, top: 220 },
+        ],
+      }),
+    ).toBe(false);
+    expect(
+      nativePaneDividerBandsCaughtUp({
+        bands,
+        panes: [
+          { id: 'main', height: 144, top: 20 },
+          { id: 'macd', height: 110, top: 164 },
+        ],
+      }),
+    ).toBe(true);
   });
 
   it('only removes released pane-range overrides that still match the hold target', () => {
