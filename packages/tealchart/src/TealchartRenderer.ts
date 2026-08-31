@@ -202,7 +202,7 @@ type PriceLineRenderPart = 'all' | 'content' | 'labels';
 const PRICE_AXIS_LABEL_TEXT_MEASUREMENT_SLACK_X = 4;
 const INDICATOR_OUTPUT_AXIS_TAG_HEIGHT = WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.height;
 const INDICATOR_OUTPUT_AXIS_TAG_GAP = 1;
-const INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 46;
+const INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH = 34;
 
 // Cached number formatters by decimal places
 const numberFormatterCache = new Map<number, Intl.NumberFormat>();
