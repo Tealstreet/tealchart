@@ -13,6 +13,12 @@ import {
   PANE_DIVIDER_HIGHLIGHT_LINE_WIDTH,
 } from '../../constants';
 
+/**
+ * Presented frames the preview outlives its commit by. Sized to cover the
+ * Android path rebuild (~250ms measured) rather than to hit the moment it ends.
+ */
+const NATIVE_PANE_DIVIDER_SETTLE_FRAMES = 18;
+
 export interface NativePaneSnapshot {
   height: number;
   image: SkImage;
@@ -27,15 +33,25 @@ export interface NativePaneSnapshot {
  * render and no chart re-layout — which is the whole point. Committing the real
  * heights per frame is correct and unusably slow.
  *
- * The bitmap also retires itself, and that is not a nicety. `paneGeometry` and
- * `settledGeometry` are plain props read through a derived value, which is the
- * same channel every plot path takes: a new committed frame restarts this
- * mapper in the same effect flush as theirs, so both land in one mapper run and
- * Skia records one picture from it. The bitmap therefore cannot vanish on a
- * frame where the paths behind it are still drawing the pre-drag layout. Every
- * attempt to retire it from JS instead was a race, because JS cannot observe
- * that run - it can only guess at frames after the commit and be wrong on a
- * slow one.
+ * The bitmap retires itself in the draw pass, and it waits out a fixed number
+ * of presented frames to do it. That count is a fence, not a mechanism, and it
+ * is the one piece of this drag that is tuned rather than derived.
+ *
+ * What it is fencing: a pane-geometry commit rebuilds every plot path in the
+ * canvas, and on Android that work has been measured at roughly a quarter of a
+ * second - the frames stay on the pre-drag layout throughout. Retiring the
+ * bitmap any earlier uncovers them. Four attempts to find the exact moment
+ * failed, each closer than the last: an extra animation frame, a single-commit
+ * clear, a JS echo of the committed geometry, then this comparison alone. They
+ * all reduce to JS or a mapper trying to observe a repaint neither of them can
+ * see. Reanimated could order this for us if the paths declared their rebuild
+ * as a shared-value output, since mappers are sorted topologically on those -
+ * they do not, and `useDerivedValue` cannot declare one.
+ *
+ * So the count waits longer than the repaint takes rather than guessing when it
+ * lands. Being late costs a stretched bitmap for a few more frames; being early
+ * is the flap. iOS pays nothing visible for it - its paths land in one frame,
+ * and the bitmap it holds is already at the committed geometry.
  */
 function NativePaneDividerBandImage({
   backgroundColor,
@@ -43,6 +59,7 @@ function NativePaneDividerBandImage({
   image,
   index,
   paneGeometry,
+  settleFrames,
   settledGeometry,
   width,
 }: {
@@ -51,12 +68,14 @@ function NativePaneDividerBandImage({
   image: SkImage;
   index: number;
   paneGeometry: string;
+  settleFrames: SharedValue<number>;
   settledGeometry: string | null;
   width: number;
 }) {
   const y = useDerivedValue(() => bands.value[index]?.top ?? 0);
   const height = useDerivedValue(() => {
-    if (settledGeometry !== null && settledGeometry === paneGeometry) return 0;
+    const settled = settledGeometry !== null && settledGeometry === paneGeometry;
+    if (settled && settleFrames.value >= NATIVE_PANE_DIVIDER_SETTLE_FRAMES) return 0;
     return Math.max(bands.value[index]?.height ?? 0, 0);
   });
 
@@ -124,6 +143,7 @@ export const NativePaneDividerResizeLayer = memo(function NativePaneDividerResiz
   backgroundColor,
   bands,
   paneGeometry,
+  settleFrames,
   settledGeometry,
   snapshots,
   target,
@@ -133,6 +153,8 @@ export const NativePaneDividerResizeLayer = memo(function NativePaneDividerResiz
   bands: SharedValue<NativePaneDividerBand[]>;
   /** Signature of the pane geometry the committed frame paints. */
   paneGeometry: string;
+  /** Presented frames since the release settled, counted on the UI thread. */
+  settleFrames: SharedValue<number>;
   /** Signature the released drag asked for, or null while one is in flight. */
   settledGeometry: string | null;
   snapshots: readonly NativePaneSnapshot[];
@@ -149,6 +171,7 @@ export const NativePaneDividerResizeLayer = memo(function NativePaneDividerResiz
           image={snapshot.image}
           index={index}
           paneGeometry={paneGeometry}
+          settleFrames={settleFrames}
           settledGeometry={settledGeometry}
           width={width}
         />
