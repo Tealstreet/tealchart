@@ -39,15 +39,18 @@ export class PriceAxisTagWidthCache {
 export const WEB_PRICE_AXIS_TAG_SIZING: Record<PriceAxisTagDomain, PriceAxisTagDomainSizing> = {
   lastTrade: { fontSize: 11, height: 20, paddingX: 4 },
   trade: { fontSize: 11, height: 17, paddingX: 4 },
-  indicatorOutput: { fontSize: 11, height: 16, paddingX: 4 },
+  indicatorOutput: { fontSize: 10, height: 12, paddingX: 4 },
   other: { fontSize: 11, height: 18, paddingX: 4 },
 };
 
 export const WEB_PRICE_AXIS_TAG_SECONDARY_TEXT_EXTRA_HEIGHT = 6;
 
+// Indicator readouts, not prices. They are dense - one per plot, per pane - and
+// they sit beside the real price tags rather than competing with them, so they
+// take the same smaller type native already gives them.
 export const WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING: PriceAxisTagDomainSizing = {
-  fontSize: 11,
-  height: 16,
+  fontSize: 10,
+  height: 12,
   paddingX: 4,
 };
 

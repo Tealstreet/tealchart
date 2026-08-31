@@ -716,7 +716,13 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(lineTo).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY);
       expect(setLineDash).toHaveBeenCalledWith([2, 3]);
       expect(stroke).toHaveBeenCalled();
-      expect(roundRect).toHaveBeenCalledWith(opts.width - opts.margins.right, trackY - 8, labelWidth, 16, 2);
+      expect(roundRect).toHaveBeenCalledWith(
+        opts.width - opts.margins.right,
+        trackY - WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.height / 2,
+        labelWidth,
+        WEB_PLOT_TRACK_PRICE_AXIS_TAG_SIZING.height,
+        2,
+      );
       expect(fillText).toHaveBeenCalledWith('120', expect.any(Number), trackY);
       expect(ctx.strokeStyle).toBe('#333333');
     });
@@ -3835,7 +3841,9 @@ describe('value axis label layout', () => {
     expect(outputLabels.map((label) => label.borderColor)).toEqual(['#2196F3', '#ff9900']);
     expect(outputLabels.every((label) => label.backgroundColor === 'rgba(17, 20, 24, 0.88)')).toBe(true);
     expect(outputLabels.every((label) => label.textAlign === 'center')).toBe(true);
-    expect(outputLabels.every((label) => label.labelWidth === outputLabels[0]!.labelWidth)).toBe(true);
+    // Each tag is measured from its own text, the way native sizes them - the
+    // wider readout gets the wider tag.
+    expect(outputLabels[1]!.labelWidth).toBeGreaterThan(outputLabels[0]!.labelWidth);
     expect(outputLabels.every((label) => label.x === label.labelX + label.labelWidth / 2)).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.valueY))).toBe(true);
     expect(outputLabels.every((label) => Number.isFinite(label.sourceX))).toBe(true);
