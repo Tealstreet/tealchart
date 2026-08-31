@@ -660,6 +660,9 @@ export class ChartCore {
               this.getUnifiedLayout(),
             ),
           onOrderMove: (orderId, newPrice) => this.handleOrderMove(orderId, newPrice),
+          formatPrice: (price) => this.formatAxisTagPrice(price),
+          growPriceAxisTagWidth: (bound, text) =>
+            this.renderer.growPriceLineAxisLabelWidth({ id: bound.lineId, type: bound.type }, text),
           onOrderMoving: (orderId, newPrice) => this.options.onOrderMoving?.(orderId, newPrice),
           onOrderCancel: (orderId) => this.handleOrderCancel(orderId),
           onPositionClose: (positionId) => this.handlePositionClose(positionId),
@@ -2296,23 +2299,7 @@ export class ChartCore {
     const vp = this.viewport;
     const layout = this.getUnifiedLayout();
 
-    // Create price formatter
-    let decimals: number;
-    const pricePrecision = this.options.renderOptions?.pricePrecision;
-    if (pricePrecision && pricePrecision > 0) {
-      decimals = getDecimalPlacesFromPrecision(pricePrecision);
-    } else {
-      const priceRange = vp.priceMax - vp.priceMin;
-      if (priceRange >= 10) decimals = 0;
-      else if (priceRange >= 1) decimals = 1;
-      else if (priceRange >= 0.1) decimals = 2;
-      else if (priceRange >= 0.01) decimals = 3;
-      else if (priceRange >= 0.001) decimals = 4;
-      else if (priceRange >= 0.0001) decimals = 5;
-      else decimals = 6;
-    }
-    const numberFormatter = getNumberFormatter(decimals);
-    const formatPrice = (price: number) => numberFormatter.format(price);
+    const formatPrice = (price: number) => this.formatAxisTagPrice(price);
 
     // Get latest bar for last-trade line
     const latestBar = this.bars.length > 0 ? this.bars[this.bars.length - 1] : null;
@@ -3278,6 +3265,30 @@ export class ChartCore {
       visible: false,
       color: '',
     });
+  }
+
+  /**
+   * The tick's decimals when the host gave a precision, otherwise as many as
+   * the visible range needs. Shared by the rendered line labels and by the
+   * live price a drag writes into its own tag.
+   */
+  private formatAxisTagPrice(price: number): string {
+    const pricePrecision = this.options.renderOptions?.pricePrecision;
+    let decimals: number;
+    if (pricePrecision && pricePrecision > 0) {
+      decimals = getDecimalPlacesFromPrecision(pricePrecision);
+    } else {
+      const vp = this.viewport ?? TealchartRenderer.calculateViewport(this.bars);
+      const priceRange = vp.priceMax - vp.priceMin;
+      if (priceRange >= 10) decimals = 0;
+      else if (priceRange >= 1) decimals = 1;
+      else if (priceRange >= 0.1) decimals = 2;
+      else if (priceRange >= 0.01) decimals = 3;
+      else if (priceRange >= 0.001) decimals = 4;
+      else if (priceRange >= 0.0001) decimals = 5;
+      else decimals = 6;
+    }
+    return getNumberFormatter(decimals).format(price);
   }
 
   private growPriceAxisWidthFromMeasuredLabels(): void {

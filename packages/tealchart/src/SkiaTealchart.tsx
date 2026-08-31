@@ -1680,6 +1680,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     backgroundColor,
     chromeTheme,
     gridColor,
+    growTradeLineDragPriceLabelWidth,
     leftToolRailLayout,
     measuredPriceAxisWidth,
     nativeMutedTextColor,
@@ -2142,6 +2143,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
+                onDragPriceLabelWidth={growTradeLineDragPriceLabelWidth}
                 options={options}
                 plotOpacity={nativeCanvasLoading ? LOADING_OPACITY : 1}
                 orderDragState={orderDragState}

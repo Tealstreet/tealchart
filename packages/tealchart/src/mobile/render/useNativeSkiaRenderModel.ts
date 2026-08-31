@@ -142,6 +142,7 @@ export interface NativeSkiaRenderModel {
   gridColor: string;
   leftToolRailLayout: NativeLeftToolRailLayout | null;
   measuredPriceAxisWidth: number;
+  growTradeLineDragPriceLabelWidth: (objectId: string, width: number) => void;
   nativeMutedTextColor: string;
   nativePriceLines: readonly NativeRenderablePriceLine[];
   plotPrimitiveClip: SharedValue<NativePrimitiveClip>;
@@ -412,11 +413,19 @@ export function useNativeSkiaRenderModel({
     });
   }, [axisFont, frame, nativePriceLines, pricePrecision, projection, tradeLineGeometries]);
 
+  // A drag reports the widest price it reached, once, when it ends. Feeding it
+  // to the same grow-only cache the committed layout measures through is what
+  // stops the tag narrowing again after the amend lands.
+  const growTradeLineDragPriceLabelWidth = useRef((objectId: string, width: number) => {
+    tradeLineAxisTagWidthCache.resolve(`order:${objectId}`, width);
+  }).current;
+
   return {
     axisFont,
     backgroundColor,
     chromeTheme,
     gridColor,
+    growTradeLineDragPriceLabelWidth,
     leftToolRailLayout,
     measuredPriceAxisWidth,
     nativeMutedTextColor,

@@ -4052,6 +4052,32 @@ describe('value axis label layout', () => {
     expect(narrow.width).toBe(wide.width);
   });
 
+  // A drag writes its live price straight into the tag, so the width it reached
+  // has to survive the amend the drag settles into.
+  it('grows a price line axis tag to fit a price the line does not carry yet', () => {
+    const renderer = new TealchartRenderer(createMockCtx(), { height: 400, width: 800 }, { bottom: 32, right: 76, top: 24 });
+    const layout: UnifiedPaneLayout = {
+      timeAxisHeight: TIME_AXIS_HEIGHT,
+      panes: [{ id: 'main', type: 'main', heightRatio: 1, yMin: 78_000, yMax: 88_000, fixedRange: false }],
+    };
+    const viewport = { startTime: 0, endTime: 60_000, priceMin: 78_000, priceMax: 88_000 };
+    const line = {
+      id: 'order-1',
+      type: 'order' as const,
+      price: 79_500,
+      color: '#16a7dc',
+      label: { primaryText: '79,500.0' },
+      lineStyle: 'dotted' as const,
+    };
+
+    const before = renderer.computePriceLineLabelBoundsWithLayout([line], viewport, layout)[0]!;
+    const dragged = renderer.growPriceLineAxisLabelWidth({ id: 'order-1', type: 'order' }, '123,456,789.0000');
+    const after = renderer.computePriceLineLabelBoundsWithLayout([line], viewport, layout)[0]!;
+
+    expect(dragged).toBeGreaterThan(before.width);
+    expect(after.width).toBe(dragged);
+  });
+
   it('keeps web indicator output axis tag widths grow-only per output id', () => {
     const renderer = new TealchartRenderer(
       createMockCtx(),
