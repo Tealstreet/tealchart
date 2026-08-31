@@ -58,7 +58,7 @@ import React, {
 import { Canvas, Skia, Image as SkiaImage, useCanvasRef } from '@shopify/react-native-skia';
 import { Platform, StyleSheet, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS, useAnimatedReaction, useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 
 import { LOADING_OPACITY } from './constants';
 import {
@@ -147,6 +147,7 @@ import { resolveNativeLeftToolRailToggleHitRect } from './mobile/utils/leftToolR
 import {
   applyNativePaneHeightOverrides,
   createNativePaneLayoutSignature,
+  pruneNativePaneHeightOverrides,
 } from './mobile/utils/nativePaneLayoutOverrides';
 import { createNativePriceAxisLaneWidth } from './mobile/utils/nativePriceAxisLane';
 import {
@@ -542,8 +543,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // Pane geometry the divider preview is waiting to see painted, not merely
   // committed. Null once the canvas has echoed it back.
   const [nativePaneDividerPresentationTarget, setNativePaneDividerPresentationTarget] = useState<string | null>(null);
-  const nativePaneDividerPresentationTargetRef = useRef(nativePaneDividerPresentationTarget);
-  nativePaneDividerPresentationTargetRef.current = nativePaneDividerPresentationTarget;
   const [nativeMaximizeReleaseHold, setNativeMaximizeReleaseHold] =
     useState<NativeReleaseHold<Readonly<Record<string, number>>> | null>(null);
   // Pane heights the user set by dragging a divider. Chart-owned, exactly as web
@@ -616,6 +615,14 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
 
   const nativeIndicatorPaneLayoutBase = indicatorManager?.getUnifiedLayout();
+  const nativePaneLayoutBaseIds = (nativeIndicatorPaneLayoutBase?.panes ?? []).map((pane) => pane.id).join('|');
+  // Deleting the indicator under a dragged divider used to leave its half of the
+  // ratio behind, and pane heights are absolute shares - the main pane laid out
+  // at 15% of the plot with the rest blank.
+  useEffect(() => {
+    const paneIds = nativePaneLayoutBaseIds === '' ? [] : nativePaneLayoutBaseIds.split('|');
+    setNativePaneHeightOverrides((current) => pruneNativePaneHeightOverrides(current, paneIds));
+  }, [nativePaneLayoutBaseIds]);
   // Keyed on the signature, never on the layout object: the manager mints a new
   // wrapper per call, so once a divider drag leaves height overrides behind an
   // object-keyed memo hands back a new layout every render, and the frame and
@@ -980,26 +987,22 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   // run as the plot paths rebuilding. Nothing here decides when the preview
   // disappears - the draw pass does.
   const nativePaneGeometrySignature = frame ? createNativePaneGeometrySignature(frame.panes) : '';
-  // Disposal only. The bitmap is already invisible by the time this lands, so
-  // being a frame or ten late costs a little memory and nothing on screen.
-  const nativePresentedPaneGeometry = useDerivedValue(() => nativePaneGeometrySignature);
-  const handleNativePaneGeometryPresented = useCallback(
-    (presented: string) => {
-      if (nativePaneDividerPresentationTargetRef.current !== presented) return;
-      nativePaneDividerPresentationTargetRef.current = null;
-      setNativePaneDividerPresentationTarget(null);
-      emitNativeChartDebugEntry('divider disposed');
-      replaceNativePaneSnapshots([]);
-    },
-    [emitNativeChartDebugEntry, replaceNativePaneSnapshots],
-  );
-  useAnimatedReaction(
-    () => nativePresentedPaneGeometry.value,
-    (presented, previous) => {
-      if (presented === previous) return;
-      runOnJS(handleNativePaneGeometryPresented)(presented);
-    },
-  );
+  // Disposal only - the bitmap hid itself in the draw pass a commit ago, so
+  // freeing the images here can only be late, never early. This was a
+  // useAnimatedReaction, and it fired once before the render that stored the
+  // target, missed, and never fired again; the ceiling did every disposal.
+  useEffect(() => {
+    if (nativePaneDividerPresentationTarget === null) return;
+    if (nativePaneDividerPresentationTarget !== nativePaneGeometrySignature) return;
+    emitNativeChartDebugEntry('divider disposed');
+    setNativePaneDividerPresentationTarget(null);
+    replaceNativePaneSnapshots([]);
+  }, [
+    emitNativeChartDebugEntry,
+    nativePaneDividerPresentationTarget,
+    nativePaneGeometrySignature,
+    replaceNativePaneSnapshots,
+  ]);
 
   // The target-band check is a committed-state gate. Once the live frame's pane
   // pixels match the final dragged bands, the frozen pre-drag bitmap must go
@@ -2500,7 +2503,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
         <NativeGestureDebugOverlay
           ref={nativeGestureDebugOverlayRef}
           summary={nativeGestureDebugSummary}
-          title="TEALCHART DEBUG v7"
+          title="TEALCHART DEBUG v8"
         />
       ) : null}
     </View>
