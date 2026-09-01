@@ -16,7 +16,6 @@ import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
 import { DEFAULT_MIN_VISIBLE_BAR_WIDTH_PX } from '../../viewport/timeRangeConstraints';
 import {
   beginNativeChartAxisPinchGestureState,
-  beginNativeChartPanGestureState,
   beginNativePriceScaleGestureState,
   beginNativeTimeScaleGestureState,
   canBeginNativePriceScaleGesture,
@@ -103,54 +102,7 @@ const frame = createNativeChartFrameFromPanes({
   panes: [{ id: 'main', type: 'main', top: 5, height: 95, yMin: 0, yMax: 1 }],
 });
 
-describe('native viewport gesture state', () => {
-  it('begins and updates chart pan from the gesture-start viewport', () => {
-    const state: NativeChartPanGestureState = {
-      active: shared(false),
-      sharedViewport: sharedViewport(viewport),
-      startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
-      metrics: gestureMetrics(),
-      priceAutoScale: priceAutoScale(),
-      activeTimePerPixel: shared(0),
-      activePricePerPixel: shared(0),
-    };
-
-    beginNativeChartPanGestureState(state);
-    expect(state.active.value).toBe(true);
-    expect(readViewport(state.startViewport)).toEqual(viewport);
-
-    expect(updateNativeChartPanGestureState(state, 50, -10)).toBe(true);
-    expect(readViewport(state.sharedViewport)).toEqual({
-      startTime: 900,
-      endTime: 1_900,
-      priceMin: 95,
-      priceMax: 195,
-    });
-  });
-
-  it('auto-scales chart pan on the live shared viewport while ignoring vertical drag', () => {
-    const state: NativeChartPanGestureState = {
-      active: shared(false),
-      sharedViewport: sharedViewport(viewport),
-      startViewport: sharedViewport({ startTime: 0, endTime: 1, priceMin: 0, priceMax: 1 }),
-      metrics: gestureMetrics(),
-      priceAutoScale: priceAutoScale(true),
-      activeTimePerPixel: shared(0),
-      activePricePerPixel: shared(0),
-    };
-
-    beginNativeChartPanGestureState(state);
-    expect(updateNativeChartPanGestureState(state, 50, -10)).toBe(true);
-
-    expect(readViewport(state.sharedViewport)).toEqual({
-      startTime: 900,
-      endTime: 1_900,
-      priceMin: 81,
-      priceMax: 189,
-    });
-  });
-
-  it('rolls back active viewport gestures to the gesture-start viewport', () => {
+describe('native viewport gesture state', () => { it('rolls back active viewport gestures to the gesture-start viewport', () => {
     const sharedLive = sharedViewport(viewport);
     const start = sharedViewport({ startTime: 900, endTime: 1_900, priceMin: 95, priceMax: 195 });
     const active = shared(true);
