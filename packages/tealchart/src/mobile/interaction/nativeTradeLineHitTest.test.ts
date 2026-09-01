@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { SharedValue } from 'react-native-reanimated';
 
 import { createNativeChartFrameFromPanes } from '../render/nativeChartFrame';
+import { getNativePriceAxisTagFloor } from '../render/nativeSharedViewport';
 import type {
   NativeBracketDragSharedValues,
   NativeOrderDragSharedValues,
@@ -468,6 +469,85 @@ describe('native trade-line hit testing', () => {
 
     expect(resolveWith().map((tag) => tag.id).sort()).toEqual(['order:order-1', 'order:order-2']);
     expect(resolveWith('order-1').map((tag) => tag.id)).toEqual(['order:order-2']);
+  });
+
+  // Native resolved indicator readouts in a second stack that never saw this
+  // one, so a Bollinger tag and an order tag at the same price simply overlapped.
+  // Web has shared the pass since 0f25f98a.
+  describe('main-pane indicator readouts', () => {
+    const outputSource = (id: string, price: number) => ({
+      sourceType: 'indicatorOutput' as const,
+      tagId: id,
+      objectId: id,
+      price,
+      height: 11,
+    });
+    const lastTradeSource = (price: number) => ({
+      sourceType: 'priceLine' as const,
+      tagId: 'priceLine:last-trade',
+      objectId: 'last-trade',
+      price,
+      height: 18,
+      fixed: true,
+    });
+    const resolve = (sources: NativePriceAxisTagSource[]) =>
+      resolveNativePriceAxisTagCenters({
+        priceAxisTagSources: sources,
+        sharedViewport,
+        frame,
+        orderDragState: orderDragState(),
+        bracketDragState: bracketDragState(),
+        priceAxisTagHeight: 22,
+      });
+    const centerOf = (resolved: ReturnType<typeof resolve>, id: string) =>
+      resolved.find((tag) => tag.id === id)?.centerY;
+
+    it('moves a readout off a fixed last-trade tag without moving the anchor', () => {
+      const alone = resolve([lastTradeSource(50)]);
+      const together = resolve([lastTradeSource(50), outputSource('main:indicator-output:bb:basis', 50)]);
+
+      expect(centerOf(together, 'priceLine:last-trade')).toBe(centerOf(alone, 'priceLine:last-trade'));
+      expect(centerOf(together, 'main:indicator-output:bb:basis')).not.toBe(
+        centerOf(alone, 'priceLine:last-trade'),
+      );
+    });
+
+    // An order outranks a readout - priority 90 against 0 - so the order holds
+    // its line and the readout gives way. Web flattens every non-fixed tag to
+    // one priority and lets either move; native is deliberately stricter.
+    it('gives way to an order tag at the same price rather than moving it', () => {
+      const order = {
+        sourceType: 'order' as const,
+        tagId: 'order:order-1',
+        objectId: 'order-1',
+        price: 50,
+        height: 17,
+        priority: 90,
+      };
+      const alone = resolve([order]);
+      const together = resolve([order, outputSource('main:indicator-output:bb:basis', 50)]);
+
+      const orderCenter = centerOf(together, 'order:order-1');
+      const outputCenter = centerOf(together, 'main:indicator-output:bb:basis');
+
+      expect(orderCenter).toBe(centerOf(alone, 'order:order-1'));
+      expect(outputCenter).toBeDefined();
+      expect(Math.abs(outputCenter! - orderCenter!)).toBeGreaterThanOrEqual(17 / 2 + 11 / 2);
+    });
+
+    // The stack's floor is the time axis, not the pane's bottom edge, so a
+    // readout at the low of the range cannot ride down onto the axis.
+    it('keeps a readout off the time axis', () => {
+      const resolved = resolve([outputSource('main:indicator-output:bb:lower', 0)]);
+      const centerY = centerOf(resolved, 'main:indicator-output:bb:lower');
+
+      expect(centerY).toBeDefined();
+      expect(centerY! + 11 / 2).toBeLessThanOrEqual(getNativePriceAxisTagFloor(frame));
+    });
+
+    it('drops a readout whose value has left the viewport', () => {
+      expect(resolve([outputSource('main:indicator-output:bb:upper', 400)])).toEqual([]);
+    });
   });
 
   it('never adds a bracket drag source to the stack', () => {

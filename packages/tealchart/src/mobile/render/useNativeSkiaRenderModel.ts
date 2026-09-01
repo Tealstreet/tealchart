@@ -1,5 +1,7 @@
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { Skia } from '@shopify/react-native-skia';
 import type { SharedValue } from 'react-native-reanimated';
+import type { IndicatorOutputPaneInfo } from '../../rendering/indicatorOutputAxisLabels';
 import type { UserDrawingCommandAvailability, UserDrawingRecentToolByCategory, UserDrawingTool } from '../../drawings';
 import type { ChartChromeTheme } from '../../chromeTheme';
 import type {
@@ -35,7 +37,11 @@ import {
   createNativePriceAxisLaneWidth,
   measureNativePriceAxisTagWidth,
 } from '../utils/nativePriceAxisLane';
-import { createNativePriceAxisTagSources, getNativePriceLineTagId } from '../utils/priceAxisTagSources';
+import {
+  createNativeIndicatorOutputTagSources,
+  createNativePriceAxisTagSources,
+  getNativePriceLineTagId,
+} from '../utils/priceAxisTagSources';
 import { getNativeCountdownLayoutText, getNativePriceLineMeasurementText } from '../utils/priceAxisTagLayout';
 import { createNativeTopBarLayout, createNativeTopBarTimeframes } from '../utils/topBarLayout';
 import {
@@ -114,6 +120,8 @@ export interface NativeSkiaRenderModelInput {
   layoutSelectorEnabled?: boolean;
   marginsBottom: number;
   indicatorsEnabled?: boolean;
+  indicatorPaneInfo?: Readonly<Record<string, IndicatorOutputPaneInfo>>;
+  indicatorPlots?: readonly PlotOutput[];
   options: RenderOptions;
   priceAxisTagHeight: number;
   priceLines?: PriceLine[];
@@ -162,6 +170,8 @@ export function useNativeSkiaRenderModel({
   frame,
   interval,
   indicatorsEnabled,
+  indicatorPaneInfo,
+  indicatorPlots,
   leftToolRailCollapsed,
   layoutName,
   layoutSelectorEnabled,
@@ -372,9 +382,10 @@ export function useNativeSkiaRenderModel({
       })),
     [axisFont, bracketPriceLines, extraPriceLines, lastTradeLine, priceLineAxisTagWidthCache],
   );
+  const showIndicatorOutputAxisLabels = options.showIndicatorOutputAxisLabels;
   const priceAxisTagSources = useMemo<NativePriceAxisTagSource[]>(
-    () =>
-      createNativePriceAxisTagSources({
+    () => [
+      ...createNativePriceAxisTagSources({
         extraPriceLines,
         bracketPriceLines,
         lastTradeLine,
@@ -384,14 +395,31 @@ export function useNativeSkiaRenderModel({
         selectedTradeLine,
         tradeLineTagHeight: resolvedTradeAxisTagHeight,
       }),
+      // Only while the readouts are actually drawn. Publishing them with the
+      // setting off would have the trade tags de-overlapping around tags
+      // nobody can see.
+      ...(showIndicatorOutputAxisLabels === false
+        ? []
+        : createNativeIndicatorOutputTagSources({
+            panes: frame?.panes ?? [],
+            indicatorPaneInfo,
+            plots: indicatorPlots,
+            totalBarCount: bars.length,
+          })),
+    ],
     [
+      bars.length,
       bracketPriceLines,
       extraPriceLines,
+      frame,
+      indicatorPaneInfo,
+      indicatorPlots,
       lastTradeLine,
       lineSnapshot.orderLines,
       lineSnapshot.positionLines,
       priceAxisTagHeight,
       selectedTradeLine,
+      showIndicatorOutputAxisLabels,
       resolvedTradeAxisTagHeight,
     ],
   );
