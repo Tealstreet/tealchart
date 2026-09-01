@@ -275,6 +275,8 @@ export interface TealchartWidgetUIOptions {
     point: DrawingScreenPoint,
     spacesByPaneId: ReadonlyMap<string, DrawingCoordinateSpace>,
   ) => void;
+  /** Called while a pane divider is dragged, with the ratios it produced */
+  onPaneHeightsChange?: (heights: { paneId: string; heightRatio: number }[]) => void;
   /** Layout selector callbacks — if provided, layout selector is shown in the top bar */
   layoutCallbacks?: LayoutSelectorCallbacks;
 }
@@ -601,7 +603,10 @@ export class TealchartWidgetUI {
       onResetViewport: this.options.onResetViewport,
       isAutoScale: this.options.isAutoScale,
       onPaneDoubleClick: this.options.onPaneDoubleClick,
-      onPaneHeightsChange: () => this.updateIndicatorPaneLegends(),
+      onPaneHeightsChange: (heights) => {
+        this.options.onPaneHeightsChange?.(heights);
+        this.updateIndicatorPaneLegends();
+      },
     });
   }
 
