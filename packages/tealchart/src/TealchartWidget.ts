@@ -1489,6 +1489,10 @@ export class TealchartWidget implements ITealchartWebWidget {
       onUserDrawingTextEditCommit: () => this.commitUserDrawingTextEdit(),
       onUserDrawingTextEditCancel: () => this.cancelUserDrawingTextEdit(),
       onPaneDoubleClick: (paneId, point, spacesByPaneId) => this._handlePaneDoubleClick(paneId, point, spacesByPaneId),
+      onPaneHeightsChange: (heights) => {
+        this._paneManager.setPaneHeightRatios(heights);
+        this._scheduler.markDirty(DIRTY.LAYOUT);
+      },
       layoutCallbacks: this._options.save_load_adapter
         ? {
             getAllLayouts: () => {

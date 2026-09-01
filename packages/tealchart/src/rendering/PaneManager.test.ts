@@ -479,6 +479,55 @@ describe('PaneManager', () => {
     });
   });
 
+  // The drag used to keep its heights in ChartCore, layered over whatever this
+  // manager reported, so a maximize changed the ratios here and the stale drag
+  // heights overwrote them every render - double-click did nothing until a
+  // reload.
+  describe('setPaneHeightRatios', () => {
+    it('lets a maximize toggle heights a divider drag produced', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const paneId = pm.getIndicatorPanes()[0]!.id;
+      pm.setPaneHeightRatios([
+        { paneId: 'main', heightRatio: 0.55 },
+        { paneId, heightRatio: 0.45 },
+      ]);
+
+      pm.toggleMaximizePane(paneId);
+
+      expect(pm.getMaximizedPaneId()).toBe(paneId);
+      expect(pm.getIndicatorPanes()[0]!.heightRatio).toBeGreaterThan(0.9);
+      expect(pm.getMainPane().heightRatio).toBeLessThan(0.1);
+    });
+
+    it('restores the dragged heights, not the defaults', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const paneId = pm.getIndicatorPanes()[0]!.id;
+      pm.setPaneHeightRatios([
+        { paneId: 'main', heightRatio: 0.55 },
+        { paneId, heightRatio: 0.45 },
+      ]);
+
+      pm.toggleMaximizePane(paneId);
+      pm.toggleMaximizePane(paneId);
+
+      expect(pm.getMaximizedPaneId()).toBeNull();
+      expect(pm.getMainPane().heightRatio).toBeCloseTo(0.55, 5);
+      expect(pm.getIndicatorPanes()[0]!.heightRatio).toBeCloseTo(0.45, 5);
+    });
+
+    it('ignores unknown panes and non-positive ratios', () => {
+      pm.addIndicator({ indicatorId: 'macd_1', overlay: false });
+      const before = pm.getMainPane().heightRatio;
+      pm.setPaneHeightRatios([
+        { paneId: 'nope', heightRatio: 0.5 },
+        { paneId: 'main', heightRatio: 0 },
+        { paneId: 'main', heightRatio: Number.NaN },
+      ]);
+
+      expect(pm.getMainPane().heightRatio).toBe(before);
+    });
+  });
+
   describe('getLayout (legacy)', () => {
     it('returns legacy PaneLayout format', () => {
       pm.addIndicator({ indicatorId: 'rsi_1', overlay: false });
