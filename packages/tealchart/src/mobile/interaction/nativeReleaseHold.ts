@@ -4,8 +4,6 @@ import { nativePaneHeightsMatchRatios } from '../utils/nativePaneLayoutOverrides
 
 export type NativeReleaseHoldKind =
   | 'dataLoadRender'
-  | 'oemsBracketPreview'
-  | 'oemsOrderPreview'
   | 'paneDividerResize'
   | 'paneMaximizeLegend'
   | 'resizeSnapshot'

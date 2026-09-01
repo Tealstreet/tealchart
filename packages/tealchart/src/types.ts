@@ -1502,6 +1502,9 @@ export interface PositionLineCallbacks {
 export interface InternalOrderLineAdapter extends FullOrderLineAdapter {
   _getRenderData(): OrderLineRenderData;
   _getCallbacks(): OrderLineCallbacks;
+  /** Creation order, so a removal can tell a replacement from an unrelated
+   *  line already on the book. */
+  _getCreatedSeq(): number;
   // TradingView API compatibility (no-op)
   setBodyFont(font: string): this;
   setQuantityFont(font: string): this;
