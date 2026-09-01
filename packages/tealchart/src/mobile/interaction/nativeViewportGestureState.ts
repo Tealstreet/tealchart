@@ -324,14 +324,6 @@ export function getNativeViewportGestureCommit(
   return viewport;
 }
 
-export function beginNativeChartPanGestureState(state: NativeChartPanGestureState): void {
-  'worklet';
-  state.active.value = true;
-  syncNativeSharedViewport(state.startViewport, getNativeSharedViewport(state.sharedViewport));
-  state.activeTimePerPixel.value = state.metrics.timePerPixel.value;
-  state.activePricePerPixel.value = state.metrics.pricePerPixel.value;
-}
-
 export function beginNativeChartPanGestureStateFromFrame(
   state: NativeChartPanGestureState,
   frame: NativeChartFrame,

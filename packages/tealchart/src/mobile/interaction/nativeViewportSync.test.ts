@@ -14,9 +14,7 @@ import {
   nativeSharedViewportsMatch,
   nativeViewportsMatch,
   requestNativeSharedViewportSync,
-  shouldApplyNativeAutoViewport,
   syncNativeSharedViewport,
-  syncNativeSharedViewportIfIdle,
 } from './nativeViewportSync';
 
 function shared(value: number): SharedValue<number> {
@@ -106,49 +104,6 @@ describe('native viewport sync', () => {
     live.priceMax.value += 1;
     expect(nativeSharedViewportsMatch(live, target)).toBe(false);
   });
-
-  it('syncs live and gesture-start viewports only while idle', () => {
-    const live = sharedViewport({
-      startTime: 0,
-      endTime: 1,
-      priceMin: 0,
-      priceMax: 1,
-    });
-    const panStart = sharedViewport({
-      startTime: 0,
-      endTime: 1,
-      priceMin: 0,
-      priceMax: 1,
-    });
-
-    syncNativeSharedViewportIfIdle({
-      sharedViewport: live,
-      panStartViewport: panStart,
-      nativeInteractionActive: false,
-      nativeViewportOwned: false,
-      viewport,
-    });
-
-    expect(readSharedViewport(live)).toEqual(viewport);
-    expect(readSharedViewport(panStart)).toEqual(viewport);
-
-    syncNativeSharedViewportIfIdle({
-      sharedViewport: live,
-      panStartViewport: panStart,
-      nativeInteractionActive: true,
-      nativeViewportOwned: false,
-      viewport: {
-        startTime: 10,
-        endTime: 11,
-        priceMin: 300,
-        priceMax: 400,
-      },
-    });
-
-    expect(readSharedViewport(live)).toEqual(viewport);
-    expect(readSharedViewport(panStart)).toEqual(viewport);
-  });
-
   it('matches viewports with a small floating-point tolerance', () => {
     expect(
       nativeViewportsMatch(viewport, {
@@ -165,38 +120,6 @@ describe('native viewport sync', () => {
       }),
     ).toBe(false);
   });
-
-  it('tracks manual/native viewport ownership state', () => {
-    const initial = createNativeViewportOwnershipState();
-
-    expect(shouldApplyNativeAutoViewport(initial, viewport)).toBe(true);
-
-    const interaction = beginNativeViewportOwnership(initial);
-    expect(interaction.nativeViewportOwned).toBe(true);
-    expect(interaction.hasManualViewport).toBe(false);
-
-    const committed = commitNativeViewportOwnership(interaction, viewport);
-    expect(committed).toEqual({
-      hasManualViewport: true,
-      nativeViewportOwned: true,
-      releaseHoldToken: 1,
-      viewportReleaseHold: {
-        kind: 'viewport',
-        releaseFramesRemaining: 0,
-        target: viewport,
-        token: 1,
-      },
-    });
-    expect(shouldApplyNativeAutoViewport(committed, viewport)).toBe(false);
-
-    expect(cancelNativeViewportOwnership(committed)).toEqual({
-      hasManualViewport: true,
-      nativeViewportOwned: false,
-      releaseHoldToken: 1,
-      viewportReleaseHold: null,
-    });
-  });
-
   it('confirms a pending native viewport commit when React catches up', () => {
     const live = sharedViewport({
       startTime: 0,

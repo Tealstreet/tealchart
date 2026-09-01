@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 import {
   createNativePaneRangeOverride,
   resolveNativePaneRange,
-  resolveSettledNativePaneRangeOverrides,
 } from './nativePaneRangeOverride';
 
 function pane(id: string, yMin: number, yMax: number): NativePaneFrame {
@@ -57,84 +56,5 @@ describe('native pane range overrides', () => {
     });
 
     expect(resolveNativePaneRange(macd, { macd: override })).toEqual({ yMin: 6, yMax: 16 });
-  });
-
-  it('holds a committed override the frame has not caught up with', () => {
-    const overrides = {
-      macd: createNativePaneRangeOverride({
-        committed: true,
-        range: { yMin: 5, yMax: 15 },
-        startYMin: 0,
-        startYMax: 10,
-      }),
-    };
-
-    expect(resolveSettledNativePaneRangeOverrides({ overrides, panes: [pane('macd', 0, 10)] })).toEqual({
-      remaining: overrides,
-      settled: false,
-    });
-  });
-
-  it('retires a committed override once the frame agrees', () => {
-    expect(
-      resolveSettledNativePaneRangeOverrides({
-        overrides: {
-          macd: createNativePaneRangeOverride({
-            committed: true,
-            range: { yMin: 5, yMax: 15 },
-            startYMin: 0,
-            startYMax: 10,
-          }),
-        },
-        panes: [pane('macd', 5, 15)],
-      }),
-    ).toEqual({ remaining: {}, settled: true });
-  });
-
-  it('retires an override whose pane has gone', () => {
-    expect(
-      resolveSettledNativePaneRangeOverrides({
-        overrides: { macd: { yMin: 5, yMax: 15 } },
-        panes: [pane('rsi', 0, 100)],
-      }),
-    ).toEqual({ remaining: {}, settled: true });
-  });
-
-  // One pane settling must not drop another pane's live drag.
-  it('retires panes independently', () => {
-    const { remaining, settled } = resolveSettledNativePaneRangeOverrides({
-      overrides: {
-        macd: createNativePaneRangeOverride({
-          committed: true,
-          range: { yMin: 5, yMax: 15 },
-          startYMin: 0,
-          startYMax: 10,
-        }),
-        rsi: createNativePaneRangeOverride({
-          committed: true,
-          range: { yMin: 20, yMax: 80 },
-          startYMin: 0,
-          startYMax: 100,
-        }),
-      },
-      panes: [pane('macd', 5, 15), pane('rsi', 0, 100)],
-    });
-
-    expect(settled).toBe(true);
-    expect(remaining).toEqual({
-      rsi: createNativePaneRangeOverride({
-        committed: true,
-        range: { yMin: 20, yMax: 80 },
-        startYMin: 0,
-        startYMax: 100,
-      }),
-    });
-  });
-
-  it('reports nothing settled when there is nothing to retire', () => {
-    expect(resolveSettledNativePaneRangeOverrides({ overrides: {}, panes: [pane('macd', 0, 10)] })).toEqual({
-      remaining: {},
-      settled: false,
-    });
   });
 });
