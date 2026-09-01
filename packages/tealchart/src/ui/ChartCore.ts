@@ -490,7 +490,6 @@ export class ChartCore {
   private paneYOverrides = new Map<string, { yMin: number; yMax: number }>();
   /** Auto-scale computed Y ranges from AutoScaleManager (set by TealchartWidget each render) */
   private autoScalePaneYRanges = new Map<string, { yMin: number; yMax: number }>();
-  private paneHeightOverrides = new Map<string, number>();
   private crosshair: EventCrosshairState = { visible: false, x: 0, y: 0 };
   /** Widest crosshair price seen, an input to the axis width and nothing else. */
   private crosshairPriceLabelMeasuredWidth = 0;
@@ -733,9 +732,9 @@ export class ChartCore {
         if (changed) this.renderCrosshairOverlay();
       },
       onPaneHeightsChange: (heights) => {
-        for (const { paneId, heightRatio } of heights) {
-          this.paneHeightOverrides.set(paneId, heightRatio);
-        }
+        // The widget owns pane heights; it writes them into the pane manager
+        // and pushes the layout back. Keeping a second copy here is what made a
+        // maximize invisible behind the heights a drag had left.
         this.options.onPaneHeightsChange?.(heights);
         this.scheduleRender();
       },
@@ -1445,7 +1444,6 @@ export class ChartCore {
   resetViewport(): void {
     this.viewport = TealchartRenderer.calculateViewport(this.bars);
     this.paneYOverrides.clear();
-    this.paneHeightOverrides.clear();
     this.options.onResetViewport?.();
     this.options.onViewportChange?.(this.viewport);
     this.scheduleRender();
@@ -1458,16 +1456,6 @@ export class ChartCore {
    */
   setPaneYRanges(ranges: Map<string, { yMin: number; yMax: number }>): void {
     this.autoScalePaneYRanges = ranges;
-    // No scheduleRender — paint() is called by the widget after pushing state
-  }
-
-  /**
-   * Set pane heights (for loading persisted values)
-   */
-  setPaneHeights(heights: { paneId: string; heightRatio: number }[]): void {
-    for (const { paneId, heightRatio } of heights) {
-      this.paneHeightOverrides.set(paneId, heightRatio);
-    }
     // No scheduleRender — paint() is called by the widget after pushing state
   }
 
@@ -1848,7 +1836,6 @@ export class ChartCore {
       panes: baseLayout.panes.map((pane) => {
         const yOverride = this.paneYOverrides.get(pane.id);
         const autoScaleRange = this.autoScalePaneYRanges.get(pane.id);
-        const heightOverride = this.paneHeightOverrides.get(pane.id);
 
         let yProps = {};
         if (yOverride) {
@@ -1863,7 +1850,6 @@ export class ChartCore {
         return {
           ...pane,
           ...yProps,
-          ...(heightOverride !== undefined ? { heightRatio: heightOverride } : {}),
         };
       }),
     };
