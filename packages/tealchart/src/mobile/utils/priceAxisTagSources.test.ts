@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { OrderLineRenderData, PositionLineRenderData, PriceLine } from '../../types';
 
 import {
+  createNativeIndicatorOutputTagSources,
   createNativePriceAxisTagSources,
   DEFAULT_NATIVE_PRICE_AXIS_TAG_HEIGHT,
   DEFAULT_NATIVE_PRICE_AXIS_TWO_LINE_TAG_HEIGHT,
@@ -148,5 +150,87 @@ describe('native price axis tag sources', () => {
         priority: undefined,
       },
     ]);
+  });
+});
+
+describe('native indicator output tag sources', () => {
+  const panes = [
+    { id: 'main', type: 'main' },
+    { id: 'pane_1', type: 'indicator', indicatorIds: ['macd'] },
+  ];
+
+  function plot(overrides: Partial<PlotOutput>): PlotOutput {
+    return {
+      id: 'plot',
+      title: 'Plot',
+      type: 'plot',
+      values: [],
+      color: '#2196F3',
+      ...overrides,
+    };
+  }
+
+  // They stack against orders and the last-trade tag, which owns the anchor, so
+  // an indicator readout must never outrank either.
+  it('emits main-pane outputs with no priority and no fixed flag', () => {
+    const sources = createNativeIndicatorOutputTagSources({
+      panes,
+      indicatorPaneInfo: { bb: { overlay: true } },
+      plots: [plot({ id: 'basis', scriptId: 'bb', values: [63_400, 63_500] })],
+      totalBarCount: 2,
+    });
+
+    expect(sources).toHaveLength(1);
+    expect(sources[0]!.sourceType).toBe('indicatorOutput');
+    expect(sources[0]!.price).toBe(63_500);
+    expect(sources[0]!.priority).toBeUndefined();
+    expect(sources[0]!.fixed).toBeUndefined();
+    expect(sources[0]!.clampToPane).toBeUndefined();
+  });
+
+  it('leaves indicator-pane outputs to their own pass', () => {
+    const sources = createNativeIndicatorOutputTagSources({
+      panes,
+      indicatorPaneInfo: { macd: { overlay: false, paneId: 'pane_1' } },
+      plots: [plot({ id: 'signal', scriptId: 'macd', values: [1, 2] })],
+      totalBarCount: 2,
+    });
+
+    expect(sources).toEqual([]);
+  });
+
+  it('emits nothing when a plot has no resolvable value', () => {
+    expect(
+      createNativeIndicatorOutputTagSources({
+        panes,
+        indicatorPaneInfo: { bb: { overlay: true } },
+        plots: [plot({ id: 'basis', scriptId: 'bb', values: [null, Number.NaN] })],
+        totalBarCount: 2,
+      }),
+    ).toEqual([]);
+  });
+
+  // A forceOverlay plot draws on the main pane but the shared helper emits no
+  // label for it, so there is no tag and nothing to stack.
+  it('emits nothing for a forceOverlay plot', () => {
+    expect(
+      createNativeIndicatorOutputTagSources({
+        panes,
+        indicatorPaneInfo: { bb: { overlay: true } },
+        plots: [plot({ id: 'basis', scriptId: 'bb', values: [63_500], forceOverlay: true })],
+        totalBarCount: 1,
+      }),
+    ).toEqual([]);
+  });
+
+  it('emits nothing without a main pane', () => {
+    expect(
+      createNativeIndicatorOutputTagSources({
+        panes: [{ id: 'main', type: 'indicator' }],
+        indicatorPaneInfo: { bb: { overlay: true } },
+        plots: [plot({ id: 'basis', scriptId: 'bb', values: [63_500] })],
+        totalBarCount: 1,
+      }),
+    ).toEqual([]);
   });
 });

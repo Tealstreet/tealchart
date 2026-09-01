@@ -1,3 +1,5 @@
+import type { PlotOutput } from '@tealstreet/tealscript';
+import type { IndicatorOutputPane, IndicatorOutputPaneInfo } from '../../rendering/indicatorOutputAxisLabels';
 import type { OrderLineRenderData, PositionLineRenderData, PriceLine } from '../../types';
 import type {
   NativeBracketPriceLineRef,
@@ -5,6 +7,7 @@ import type {
 } from './nativeBracketPriceLines';
 import type { NativeSelectedTradeLine, NativeTradeLineObjectType } from './tradeLineLayout';
 
+import { getIndicatorOutputAxisLabelSources } from '../../rendering/indicatorOutputAxisLabels';
 import { NATIVE_PRICE_AXIS_TAG_SIZING, NATIVE_PRICE_AXIS_TAG_TWO_LINE_HEIGHT } from '../../utils/priceAxisTagSizing';
 import { getNativeOrderObjectId, getNativePositionObjectId } from './tradeLineLayout';
 
@@ -14,7 +17,7 @@ export const NATIVE_TRADE_LINE_AXIS_TAG_PRIORITY = 90;
 export const NATIVE_SELECTED_TRADE_LINE_AXIS_TAG_PRIORITY = 95;
 
 export interface NativePriceAxisTagSource {
-  sourceType: 'priceLine' | NativeTradeLineObjectType;
+  sourceType: 'priceLine' | 'indicatorOutput' | NativeTradeLineObjectType;
   tagId: string;
   objectId: string;
   price: number;
@@ -34,6 +37,14 @@ export interface NativePriceAxisTagSourcesInput {
   priceLineTagHeight?: number;
   selectedTradeLine?: NativeSelectedTradeLine | null;
   tradeLineTagHeight: number;
+}
+
+export interface NativeIndicatorOutputTagSourcesInput {
+  indicatorPaneInfo?: Readonly<Record<string, IndicatorOutputPaneInfo>>;
+  panes: readonly IndicatorOutputPane[];
+  plots?: readonly PlotOutput[];
+  totalBarCount?: number;
+  tagHeight?: number;
 }
 
 export function getNativePriceLineTagId(lineId: string): string {
@@ -80,6 +91,44 @@ function createNativePriceLineTagSource(
 
 function hasNativePriceLineAxisTag(line: PriceLine): boolean {
   return line.showAxisTag === true || !line.renderLineOnCanvas;
+}
+
+/**
+ * Main-pane indicator readouts, as ordinary stack sources.
+ *
+ * On the main pane an indicator's value IS a price - `resolveNativePaneValueRange`
+ * hands that pane the viewport's range - so these need no projection of their
+ * own and can de-overlap against orders, positions and the last-trade tag in the
+ * one stack. That is what web has done since `0f25f98a`; native kept them in a
+ * second stack that never saw the first, and the two only started colliding once
+ * overlay indicators began producing main-pane labels.
+ *
+ * Indicator panes are deliberately not included: nothing but outputs is ever
+ * drawn in them, and they keep their own denser outputs-only pass.
+ */
+export function createNativeIndicatorOutputTagSources({
+  indicatorPaneInfo,
+  panes,
+  plots,
+  totalBarCount,
+  tagHeight = NATIVE_PRICE_AXIS_TAG_SIZING.indicatorOutput.height,
+}: NativeIndicatorOutputTagSourcesInput): NativePriceAxisTagSource[] {
+  const mainPaneId = panes.find((pane) => pane.type === 'main')?.id;
+  if (mainPaneId === undefined) return [];
+
+  const sources: NativePriceAxisTagSource[] = [];
+  for (const source of getIndicatorOutputAxisLabelSources({ indicatorPaneInfo, panes, plots, totalBarCount })) {
+    if (source.paneId !== mainPaneId) continue;
+    sources.push({
+      sourceType: 'indicatorOutput',
+      tagId: source.id,
+      objectId: source.id,
+      price: source.value,
+      height: tagHeight,
+    });
+  }
+
+  return sources;
 }
 
 export function createNativePriceAxisTagSources(input: NativePriceAxisTagSourcesInput): NativePriceAxisTagSource[] {
