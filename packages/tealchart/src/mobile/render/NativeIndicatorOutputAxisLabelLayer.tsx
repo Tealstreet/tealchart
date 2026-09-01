@@ -111,6 +111,12 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   return (
     <Group>
       {labelGroups.flatMap((group) => {
+        // The shared stack deliberately does not floor-clamp its result - a tag
+        // stacked under a fixed one may need a few pixels more than the plot
+        // has - so a main-pane readout pushed past the pane edge is clipped
+        // here rather than pulled back into view the way the layer's own pass
+        // used to. Losing the crowded outlier beats closing the gap that keeps
+        // the tags above it readable.
         const clip = {
           x: frame.contentLeft,
           y: group.pane.top + 1,

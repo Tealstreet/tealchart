@@ -105,6 +105,12 @@ function hasNativePriceLineAxisTag(line: PriceLine): boolean {
  *
  * Indicator panes are deliberately not included: nothing but outputs is ever
  * drawn in them, and they keep their own denser outputs-only pass.
+ *
+ * Cost, flagged rather than measured - there is no benchmark in this package.
+ * A readout's value moves every bar, so these sources are rebuilt and re-diffed
+ * per tick by `areNativePriceAxisTagSourcesEqual`, and they widen a stack whose
+ * fixed-segment scan in `resolveNativePriceAxisTagStack` is superlinear in tag
+ * count. A pane carrying many plotted outputs is the case to watch on a device.
  */
 export function createNativeIndicatorOutputTagSources({
   indicatorPaneInfo,
