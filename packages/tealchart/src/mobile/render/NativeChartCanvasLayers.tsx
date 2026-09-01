@@ -208,6 +208,7 @@ export function NativeChartCanvasLayersImpl({
               mainPaneRange={mainPaneRange}
               paneRangeOverrides={paneRangeOverrides}
               plots={indicatorPlots}
+              resolvedPriceAxisTags={resolvedPriceAxisTags}
               sharedViewport={sharedViewport}
               smallFont={smallFont}
               totalBarCount={indicatorTotalBarCount}

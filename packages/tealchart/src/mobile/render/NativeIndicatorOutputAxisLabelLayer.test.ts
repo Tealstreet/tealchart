@@ -296,6 +296,77 @@ describe('native indicator output axis labels', () => {
     ]);
   });
 
+  // Main-pane readouts resolve in the shared price-axis stack now, beside the
+  // orders and the last-trade tag. This function must hand them back untouched
+  // - stacking them here too would fight the shared pass, and an earlier draft
+  // that skipped them with a bare `continue` dropped them from the render
+  // entirely with every gate still green.
+  it('hands crowded main-pane readouts back unstacked, for the shared pass', () => {
+    const frame = createNativeChartFrameFromPanes({
+      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      panes: [{ id: 'main', type: 'main', top: 24, height: 200, yMin: 63_000, yMax: 64_000 }],
+    });
+
+    const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }] as never,
+      frame,
+      indicatorPaneInfo: { bb: { overlay: true } },
+      mainPaneRange: { yMin: 63_000, yMax: 64_000 },
+      plots: [
+        plot({ id: 'basis', scriptId: 'bb', values: [63_500], color: '#2196f3', precision: 0 }),
+        plot({ id: 'upper', scriptId: 'bb', values: [63_480], color: '#ff9900', precision: 0 }),
+      ],
+      totalBarCount: 1,
+    });
+
+    expect(labels).toHaveLength(2);
+    // Close enough that the layer's own pass would have moved one of them.
+    expect(Math.abs(labels[0]!.valueY - labels[1]!.valueY)).toBeLessThan(
+      NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT,
+    );
+    for (const label of labels) {
+      expect(label.y).toBe(label.valueY);
+    }
+  });
+
+  it('stacks indicator-pane readouts while leaving main-pane ones to the shared pass', () => {
+    const frame = createNativeChartFrameFromPanes({
+      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      panes: [
+        { id: 'main', type: 'main', top: 24, height: 200, yMin: 63_000, yMax: 64_000 },
+        { id: 'pane_1', type: 'indicator', top: 224, height: 76, yMin: -120, yMax: 60 },
+      ],
+    });
+
+    const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }] as never,
+      frame,
+      indicatorPaneInfo: {
+        bb: { overlay: true },
+        macd: { overlay: false, paneId: 'pane_1' },
+      },
+      mainPaneRange: { yMin: 63_000, yMax: 64_000 },
+      plots: [
+        plot({ id: 'basis', scriptId: 'bb', values: [63_500], color: '#2196f3', precision: 0 }),
+        plot({ id: 'upper', scriptId: 'bb', values: [63_480], color: '#12c48b', precision: 0 }),
+        plot({ id: 'macd', scriptId: 'macd', values: [-100], color: '#2196f3', precision: 0 }),
+        plot({ id: 'signal', scriptId: 'macd', values: [-110], color: '#ff9900', precision: 0 }),
+      ],
+      totalBarCount: 1,
+    });
+
+    const mainLabels = labels.filter((label) => label.pane.id === 'main');
+    const paneLabels = labels.filter((label) => label.pane.id === 'pane_1');
+
+    expect(mainLabels).toHaveLength(2);
+    expect(paneLabels).toHaveLength(2);
+    for (const label of mainLabels) {
+      expect(label.y).toBe(label.valueY);
+    }
+    expect(paneLabels.some((label) => label.valueY !== label.y)).toBe(true);
+    assertNoOutputLabelOverlap(paneLabels);
+  });
+
   it('keeps crowded secondary output labels inside their pane', () => {
     const frame = createNativeChartFrameFromPanes({
       dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
