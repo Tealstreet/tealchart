@@ -49,6 +49,37 @@ function assertNoOutputLabelOverlap(labels: Array<{ y: number }>, gap = 0): void
 }
 
 describe('native indicator output axis labels', () => {
+  // The main pane's frame carries the unified layout's placeholder range, so an
+  // overlay indicator's value sat outside it and every main-pane label was
+  // filtered away. Order and position tags never hit this - they project
+  // through the shared viewport rather than the pane.
+  it('labels an overlay indicator on the main pane, whose range is the viewport', () => {
+    const frame = createNativeChartFrameFromPanes({
+      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      panes: [{ id: 'main', type: 'main', top: 24, height: 200, yMin: 0, yMax: 0 }],
+    });
+    const args = {
+      bars: [{ time: 0 }, { time: 60_000 }] as never,
+      frame,
+      indicatorPaneInfo: { bb: { overlay: true } },
+      plots: [plot({ id: 'basis', scriptId: 'bb', values: [63_400, 63_500] })],
+      totalBarCount: 2,
+    };
+
+    expect(resolveNativeIndicatorOutputAxisLabels(args)).toEqual([]);
+
+    const labels = resolveNativeIndicatorOutputAxisLabels({
+      ...args,
+      mainPaneRange: { yMin: 63_000, yMax: 64_000 },
+    });
+
+    expect(labels).toHaveLength(1);
+    expect(labels[0]!.pane.id).toBe('main');
+    expect(labels[0]!.text).toBe('63,500');
+    // Half a pane above the bottom, since 63,500 is the middle of the range.
+    expect(labels[0]!.valueY).toBe(124);
+  });
+
   it('renders latest non-overlay plot values from native pane ids', () => {
     const frame = createNativeChartFrameFromPanes({
       dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },

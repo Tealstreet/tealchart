@@ -1122,6 +1122,16 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeRenderInterval = nativeRenderSnapshot.interval;
   const nativeRenderPriceLines = nativeRenderSnapshot.priceLines;
   const nativeRenderProjection = nativeRenderSnapshot.projection;
+  // The main pane's frame carries the unified layout's placeholder range; the
+  // price scale is the viewport. Anything measuring a value against the main
+  // pane needs this, not `pane.yMin`/`yMax`.
+  const nativeRenderMainPaneRange = useMemo(
+    () =>
+      nativeRenderProjection
+        ? { yMin: nativeRenderProjection.viewport.priceMin, yMax: nativeRenderProjection.viewport.priceMax }
+        : null,
+    [nativeRenderProjection],
+  );
   const nativeRenderViewport = nativeRenderSnapshot.viewport;
   const useStaticNativeRenderProjection = shouldUseNativeStaticRenderProjectionForTransition({
     dataLoadRenderBlocked,
@@ -2143,6 +2153,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
                 paneRangeOverrides={paneRangeOverrides}
                 indicatorTotalBarCount={nativeRenderBars.length}
                 lineSnapshot={lineSnapshot}
+                mainPaneRange={nativeRenderMainPaneRange}
                 onDragPriceLabelWidth={growTradeLineDragPriceLabelWidth}
                 options={options}
                 plotOpacity={nativeCanvasLoading ? LOADING_OPACITY : 1}
