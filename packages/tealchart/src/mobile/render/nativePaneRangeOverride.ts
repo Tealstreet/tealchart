@@ -81,6 +81,26 @@ export function resolveNativePaneRange(
   return { yMin: pane.yMin, yMax: pane.yMax };
 }
 
+/**
+ * A pane's value range, main pane included.
+ *
+ * The main pane's frame carries the unified layout's placeholder range - the
+ * price scale lives in the viewport, not in the pane - so anything reading
+ * `pane.yMin`/`yMax` for it gets an empty range. Web rewrites the main pane's
+ * range from the viewport before it measures anything; this is the same rewrite
+ * for the native path, and it is why an indicator drawn on the main pane had no
+ * range to be inside and so had no axis label at all.
+ */
+export function resolveNativePaneValueRange(
+  pane: NativePaneFrame,
+  overrides: NativePaneRangeOverrides | undefined,
+  mainPaneRange: NativePaneRange | null | undefined,
+): NativePaneRange {
+  'worklet';
+  if (pane.type === 'main' && mainPaneRange) return mainPaneRange;
+  return resolveNativePaneRange(pane, overrides);
+}
+
 export function nativePaneValueToYWithRange(value: number, pane: NativePaneFrame, range: NativePaneRange): number {
   'worklet';
   const span = range.yMax - range.yMin;

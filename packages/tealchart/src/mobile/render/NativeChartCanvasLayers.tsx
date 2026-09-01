@@ -9,7 +9,7 @@ import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeTradeLineGeometry } from '../utils/tradeLineLayout';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
-import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
+import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativePrimitiveClip } from './nativePrimitiveClip';
 import type { NativeChartProjection } from './nativeProjection';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
@@ -49,6 +49,8 @@ export interface NativeChartCanvasLayersProps {
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   indicatorTotalBarCount: number;
   onDragPriceLabelWidth?: (objectId: string, width: number) => void;
+  /** The price scale, which the main pane's own frame does not carry. */
+  mainPaneRange?: NativePaneRange | null;
   lineSnapshot: {
     orderLines: readonly OrderLineRenderData[];
     positionLines: readonly PositionLineRenderData[];
@@ -95,6 +97,7 @@ export function NativeChartCanvasLayersImpl({
   paneRangeOverrides,
   indicatorTotalBarCount,
   lineSnapshot,
+  mainPaneRange,
   onDragPriceLabelWidth,
   options,
   plotOpacity,
@@ -202,6 +205,7 @@ export function NativeChartCanvasLayersImpl({
               bars={bars}
               frame={frame}
               indicatorPaneInfo={indicatorPaneInfo}
+              mainPaneRange={mainPaneRange}
               paneRangeOverrides={paneRangeOverrides}
               plots={indicatorPlots}
               sharedViewport={sharedViewport}
