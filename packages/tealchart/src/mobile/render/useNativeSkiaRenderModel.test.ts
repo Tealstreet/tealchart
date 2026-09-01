@@ -406,4 +406,61 @@ describe('useNativeSkiaRenderModel', () => {
       expect.objectContaining({ icon: 'chevronRight', kind: 'collapseToggle' }),
     );
   });
+
+  // A main-pane readout has to reach the shared stack, or it de-overlaps
+  // against nothing and sits under the order tags it collides with.
+  describe('main-pane indicator readouts as tag sources', () => {
+    const bollingerPlot = {
+      id: 'basis',
+      title: 'Basis',
+      type: 'plot',
+      scriptId: 'bb',
+      values: [63_400, 63_500],
+      color: '#2196F3',
+    } as never;
+
+    function renderModel(overrides: Record<string, unknown> = {}) {
+      return useNativeSkiaRenderModel({
+        bars,
+        frame,
+        interval: '15',
+        lineSnapshot: { orderLines: [], positionLines: [] },
+        marginsBottom: 32,
+        indicatorPaneInfo: { bb: { overlay: true } },
+        indicatorPlots: [bollingerPlot],
+        options: DEFAULT_RENDER_OPTIONS,
+        priceAxisTagHeight: 22,
+        pricePrecision: 0.1,
+        projection,
+        showTopBar: true,
+        symbol: 'BTC-USD',
+        topBarDefaultVisibleValues: new Set(['1', '5', '15', '30', '60']),
+        topBarHeight: 36,
+        tradeLabelHeight: 18,
+        volumeHeightRatio: 0.2,
+        ...overrides,
+      } as never);
+    }
+
+    it('publishes an overlay indicator as a price-axis tag source', () => {
+      const sources = renderModel().priceAxisTagSources;
+      const output = sources.find((source) => source.sourceType === 'indicatorOutput');
+
+      expect(output?.tagId).toBe('main:indicator-output:bb:basis');
+      expect(output?.price).toBe(63_500);
+      expect(output?.height).toBe(NATIVE_PRICE_AXIS_TAG_SIZING.indicatorOutput.height);
+      expect(output?.priority).toBeUndefined();
+      expect(output?.fixed).toBeUndefined();
+    });
+
+    // Off, the tags are not drawn, so the trade tags must not de-overlap
+    // around readouts nobody can see.
+    it('publishes nothing when the readout setting is off', () => {
+      const sources = renderModel({
+        options: { ...DEFAULT_RENDER_OPTIONS, showIndicatorOutputAxisLabels: false },
+      }).priceAxisTagSources;
+
+      expect(sources.some((source) => source.sourceType === 'indicatorOutput')).toBe(false);
+    });
+  });
 });

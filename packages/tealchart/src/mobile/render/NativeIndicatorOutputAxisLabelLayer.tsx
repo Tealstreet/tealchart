@@ -4,6 +4,7 @@ import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
 import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
+import type { NativeResolvedPriceAxisTag } from '../utils/priceAxisTagLayout';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { memo, useMemo, useRef } from 'react';
@@ -21,6 +22,7 @@ import { withPriceAxisTagBackgroundAlpha } from '../../utils/priceAxisTagStyle';
 import { createNativePriceAxisLane, NATIVE_PRICE_AXIS_TAG_PADDING_X } from '../utils/nativePriceAxisLane';
 import {
   createNativePriceAxisTagTextLayout,
+  findNativeResolvedPriceAxisTagCenterY,
   getNativePriceAxisSingleLineTextBaselineOffset,
   resolveNativePriceAxisTagStack,
 } from '../utils/priceAxisTagLayout';
@@ -62,6 +64,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   mainPaneRange,
   paneRangeOverrides,
   plots,
+  resolvedPriceAxisTags,
   sharedViewport,
   smallFont,
   totalBarCount,
@@ -74,6 +77,8 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   mainPaneRange?: NativePaneRange | null;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
+  /** The shared price-axis stack, which main-pane readouts are resolved in. */
+  resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
   smallFont: ReturnType<typeof Skia.Font>;
   totalBarCount: number;
@@ -122,6 +127,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
             group={group}
             label={label}
             paneRangeOverrides={paneRangeOverrides}
+            resolvedPriceAxisTags={label.pane.type === 'main' ? resolvedPriceAxisTags : undefined}
             sharedViewport={sharedViewport}
             smallFont={smallFont}
           />
@@ -139,6 +145,7 @@ function NativeIndicatorOutputAxisTag({
   group,
   label,
   paneRangeOverrides,
+  resolvedPriceAxisTags,
   sharedViewport,
   smallFont,
 }: {
@@ -149,6 +156,12 @@ function NativeIndicatorOutputAxisTag({
   group: NativeIndicatorOutputAxisLabelGroup;
   label: NativeIndicatorOutputAxisLabel;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
+  /**
+   * Set only for main-pane readouts, which resolve in the shared stack. An
+   * indicator-pane readout must not close over it, or every frame of an order
+   * drag re-evaluates a centre that cannot have moved.
+   */
+  resolvedPriceAxisTags?: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
   smallFont: ReturnType<typeof Skia.Font>;
 }) {
@@ -167,7 +180,14 @@ function NativeIndicatorOutputAxisTag({
     });
     return nativePaneValueToYWithRange(label.value, label.pane, range);
   });
-  const labelCenterY = useDerivedValue(() => valueY.value + labelOffsetFromValueY);
+  // A main-pane readout reads its centre off the shared stack, the same way the
+  // price and trade lines beside it do - falling back to its own price when the
+  // stack has dropped it, which is how every other consumer handles that.
+  const labelCenterY = useDerivedValue(() =>
+    resolvedPriceAxisTags
+      ? findNativeResolvedPriceAxisTagCenterY(resolvedPriceAxisTags.value, label.id, valueY.value)
+      : valueY.value + labelOffsetFromValueY,
+  );
   const tagY = useDerivedValue(() => labelCenterY.value - NATIVE_INDICATOR_OUTPUT_AXIS_TAG_HEIGHT / 2);
   const textY = useDerivedValue(() => tagY.value + baselineOffset);
   const guideY = useDerivedValue(() => Math.round(valueY.value) + 0.5);
@@ -341,6 +361,14 @@ function resolveNativeIndicatorOutputLabelCollisions(
     const sorted = [...paneLabels].sort((a, b) => a.y - b.y);
     const firstPane = sorted[0]?.pane;
     if (!firstPane) continue;
+
+    // The main pane's readouts stack with the orders, positions and the
+    // last-trade tag instead, in the one shared pass. They still have to come
+    // out of here, or they would not be drawn at all.
+    if (firstPane.type === 'main') {
+      resolved.push(...sorted);
+      continue;
+    }
 
     const stack = resolveNativePriceAxisTagStack(
       sorted.map((label) => ({

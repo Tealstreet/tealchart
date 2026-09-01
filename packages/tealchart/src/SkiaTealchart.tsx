@@ -1710,6 +1710,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     frame,
     interval: nativeRenderInterval,
     indicatorsEnabled: true,
+    indicatorPaneInfo: nativeIndicatorPaneInfo,
+    indicatorPlots: nativeIndicatorPlots,
     layoutName: nativeCurrentLayout.layoutName,
     layoutSelectorEnabled: nativeLayoutSelectorEnabled,
     leftToolRailCollapsed,
