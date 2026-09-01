@@ -3,7 +3,7 @@ import type { SharedValue } from 'react-native-reanimated';
 import type { Bar } from '../../types';
 import type { NativeChartFrame, NativePaneFrame } from './nativeChartFrame';
 import type { NativeIndicatorPaneInfo } from './NativeIndicatorPlotLayer';
-import type { NativePaneRangeOverrides } from './nativePaneRangeOverride';
+import type { NativePaneRange, NativePaneRangeOverrides } from './nativePaneRangeOverride';
 import type { NativeViewportSharedValues } from './nativeSharedViewport';
 
 import { memo, useMemo, useRef } from 'react';
@@ -24,7 +24,7 @@ import {
   getNativePriceAxisSingleLineTextBaselineOffset,
   resolveNativePriceAxisTagStack,
 } from '../utils/priceAxisTagLayout';
-import { nativePaneValueToYWithRange, resolveNativePaneRange } from './nativePaneRangeOverride';
+import { nativePaneValueToYWithRange, resolveNativePaneValueRange } from './nativePaneRangeOverride';
 import { NativePriceAxisTagBox, NativePriceAxisTagStaticText } from './NativePriceAxisTag';
 import { sharedTimeToNativeX } from './nativeSharedViewport';
 import { measureNativeSkiaTextWidth } from './nativeSkiaText';
@@ -59,6 +59,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   bars,
   frame,
   indicatorPaneInfo,
+  mainPaneRange,
   paneRangeOverrides,
   plots,
   sharedViewport,
@@ -69,6 +70,8 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   bars: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
+  /** The price scale, which the main pane's own frame does not carry. */
+  mainPaneRange?: NativePaneRange | null;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
   sharedViewport: NativeViewportSharedValues;
@@ -83,11 +86,12 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
         bars,
         frame,
         indicatorPaneInfo,
+        mainPaneRange,
         paneRangeOverrides: paneRangeOverrides?.value,
         plots,
         totalBarCount,
       }),
-    [bars, frame, indicatorPaneInfo, paneRangeOverrides, plots, totalBarCount],
+    [bars, frame, indicatorPaneInfo, mainPaneRange, paneRangeOverrides, plots, totalBarCount],
   );
   if (labels.length === 0) return null;
 
@@ -157,7 +161,10 @@ function NativeIndicatorOutputAxisTag({
   );
   const labelOffsetFromValueY = label.y - label.valueY;
   const valueY = useDerivedValue(() => {
-    const range = resolveNativePaneRange(label.pane, paneRangeOverrides?.value);
+    const range = resolveNativePaneValueRange(label.pane, paneRangeOverrides?.value, {
+      yMin: sharedViewport.priceMin.value,
+      yMax: sharedViewport.priceMax.value,
+    });
     return nativePaneValueToYWithRange(label.value, label.pane, range);
   });
   const labelCenterY = useDerivedValue(() => valueY.value + labelOffsetFromValueY);
@@ -245,6 +252,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
   bars,
   frame,
   indicatorPaneInfo,
+  mainPaneRange,
   paneRangeOverrides,
   plots,
   totalBarCount,
@@ -252,6 +260,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
   bars?: readonly Bar[];
   frame: NativeChartFrame;
   indicatorPaneInfo: Readonly<Record<string, NativeIndicatorPaneInfo>>;
+  mainPaneRange?: NativePaneRange | null;
   paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
   totalBarCount: number;
@@ -269,7 +278,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
     const pane = paneById.get(rawLabel.paneId);
     if (!pane || pane.height <= 0) continue;
 
-    const paneRange = resolveNativePaneRange(pane, paneRangeOverrides);
+    const paneRange = resolveNativePaneValueRange(pane, paneRangeOverrides, mainPaneRange);
     if (rawLabel.value < paneRange.yMin || rawLabel.value > paneRange.yMax) continue;
 
     const range = paneRange.yMax - paneRange.yMin;
