@@ -297,6 +297,26 @@ export class PaneManager {
   }
 
   /**
+   * Take the heights a divider drag produced.
+   *
+   * The drag used to keep them in `ChartCore`, which layered them over whatever
+   * this manager reported - so maximizing a pane changed the ratios here and
+   * the stale drag heights overwrote them on every render, and double-click
+   * did nothing until a reload cleared them. One owner: the drag writes here,
+   * and maximize saves and restores what the drag left.
+   */
+  setPaneHeightRatios(heights: readonly { paneId: string; heightRatio: number }[]): void {
+    for (const { paneId, heightRatio } of heights) {
+      if (!Number.isFinite(heightRatio) || heightRatio <= 0) continue;
+      const pane = this.panes.find((candidate) => candidate.id === paneId);
+      if (!pane) continue;
+      pane.heightRatio = heightRatio;
+      // A pane resized by hand is no longer the size the maximize remembers.
+      this._forgetSavedHeightRatio(paneId);
+    }
+  }
+
+  /**
    * Rebalance pane heights when panes are added/removed
    */
   private rebalanceHeights(): void {
