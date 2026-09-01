@@ -81,24 +81,6 @@ export function requestNativeSharedViewportSync({
   return nativeSharedViewportsMatch(sharedViewport, syncTargetViewport);
 }
 
-export function syncNativeSharedViewportIfIdle({
-  sharedViewport,
-  panStartViewport,
-  nativeInteractionActive,
-  nativeViewportOwned,
-  viewport,
-}: {
-  sharedViewport: NativeViewportSharedValues;
-  panStartViewport: NativeViewportSharedValues;
-  nativeInteractionActive: boolean;
-  nativeViewportOwned: boolean;
-  viewport: Viewport;
-}): void {
-  if (nativeViewportOwned || nativeInteractionActive) return;
-  syncNativeSharedViewportIfChanged(sharedViewport, viewport);
-  syncNativeSharedViewportIfChanged(panStartViewport, viewport);
-}
-
 export interface NativeViewportOwnershipState {
   hasManualViewport: boolean;
   nativeViewportOwned: boolean;
@@ -155,13 +137,6 @@ export function commitNativeViewportOwnership(
       token: state.releaseHoldToken + 1,
     }),
   };
-}
-
-export function shouldApplyNativeAutoViewport(
-  state: NativeViewportOwnershipState,
-  autoViewport: Viewport | null,
-): autoViewport is Viewport {
-  return Boolean(autoViewport && !state.hasManualViewport);
 }
 
 export function applyNativeViewportSync({

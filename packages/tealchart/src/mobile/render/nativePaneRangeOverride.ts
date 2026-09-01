@@ -48,12 +48,12 @@ export function createNativePaneRangeOverride({
   };
 }
 
-export function nativePaneRangesEqual(left: NativePaneRange, right: NativePaneRange): boolean {
+function nativePaneRangesEqual(left: NativePaneRange, right: NativePaneRange): boolean {
   'worklet';
   return left.yMin === right.yMin && left.yMax === right.yMax;
 }
 
-export function shouldApplyNativePaneRangeOverride(
+function shouldApplyNativePaneRangeOverride(
   pane: NativePaneFrame,
   override: NativePaneRangeOverride | undefined,
 ): boolean {
@@ -106,41 +106,6 @@ export function nativePaneValueToYWithRange(value: number, pane: NativePaneFrame
   const span = range.yMax - range.yMin;
   if (span === 0) return pane.top + pane.height / 2;
   return pane.top + ((range.yMax - value) / span) * pane.height;
-}
-
-/**
- * Works out which overrides the frame has caught up with.
- *
- * An override outlives its gesture on purpose: the commit reaches the pane
- * through React, so dropping it on release would leave the in-between renders
- * falling back to the pre-drag range. It is retired only once the frame agrees,
- * or once its pane is gone.
- */
-export function resolveSettledNativePaneRangeOverrides({
-  overrides,
-  panes,
-}: {
-  overrides: NativePaneRangeOverrides;
-  panes: readonly NativePaneFrame[];
-}): { remaining: NativePaneRangeOverrides; settled: boolean } {
-  const remaining: NativePaneRangeOverrides = {};
-  let settled = false;
-
-  for (const paneId of Object.keys(overrides)) {
-    const override = overrides[paneId];
-    const pane = panes.find((entry) => entry.id === paneId);
-    if (!pane) {
-      settled = true;
-      continue;
-    }
-    if (!shouldApplyNativePaneRangeOverride(pane, override)) {
-      settled = true;
-      continue;
-    }
-    remaining[paneId] = override;
-  }
-
-  return { remaining, settled };
 }
 
 /**
