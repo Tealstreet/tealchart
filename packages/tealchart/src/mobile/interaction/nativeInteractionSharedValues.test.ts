@@ -161,6 +161,29 @@ describe('native interaction shared values', () => {
     expect(actionZones.value[0]?.entryPrice).toBe(101);
   });
 
+  // An indicator readout's value moves every bar tick. The stack has to see
+  // that as a change or the tag freezes at the price it first published.
+  it('treats an indicator output value change as a source change', () => {
+    const target = shared<NativePriceAxisTagSource[]>([]);
+    const source = {
+      sourceType: 'indicatorOutput',
+      tagId: 'main:indicator-output:bb:basis',
+      objectId: 'main:indicator-output:bb:basis',
+      price: 63_500,
+      height: 11,
+    } satisfies NativePriceAxisTagSource;
+
+    syncNativePriceAxisTagSources({ target, sources: [source] });
+    const first = target.value;
+
+    syncNativePriceAxisTagSources({ target, sources: [{ ...source }] });
+    expect(target.value).toBe(first);
+
+    syncNativePriceAxisTagSources({ target, sources: [{ ...source, price: 63_501 }] });
+    expect(target.value).not.toBe(first);
+    expect(target.value[0]?.price).toBe(63_501);
+  });
+
   it('syncs price-axis tag sources without rebuilding unchanged sources', () => {
     const target = shared<NativePriceAxisTagSource[]>([]);
     const sources = [
