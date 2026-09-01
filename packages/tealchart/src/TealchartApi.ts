@@ -427,6 +427,7 @@ export class TealchartApi {
   private _lineChangeFrame: ReturnType<typeof requestAnimationFrame> | null = null;
   private _lineRemovalTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly _pendingLineRemovals = new Map<string, () => void>();
+  private _lineCreateSeq = 0;
 
   /**
    * Coalesce line changes to a frame, the way TradingView repaints.
@@ -789,6 +790,7 @@ export class TealchartApi {
    * @internal Create order line adapter with full TradingView + TEALSTREET compatibility
    */
   private _createOrderLineAdapter(id: string, options?: OrderLineOptions): InternalOrderLineAdapter {
+    const createdSeq = ++this._lineCreateSeq;
     const lineColor = options?.lineColor ?? DEFAULT_TRADE_LINE_COLOR;
     const styleDefaults = getOrderLineStyleDefaults(lineColor);
     // Store all render data in a structured object
@@ -865,9 +867,17 @@ export class TealchartApi {
         deferRemoval(
           `order:${id}`,
           () => orderLines.delete(id),
+          // An amend is a cancel and a place, and the place can reach us first;
+          // then the create flushes an empty map and this line sits out the
+          // whole coalesce window drawn over its own replacement. Matching on
+          // price only caught a replacement that landed at the SAME price,
+          // which an amend never is - the whole point of an amend is the new
+          // price. A line created after this one is the replacement whatever
+          // price it took. Older lines still defer, or every cancel flashes.
           () => {
             for (const [otherId, other] of orderLines) {
-              if (otherId !== id && other.getPrice() === data.price) return true;
+              if (otherId === id) continue;
+              if (other._getCreatedSeq() > createdSeq) return true;
             }
             return false;
           },
@@ -1185,6 +1195,10 @@ export class TealchartApi {
       },
 
       // @internal: Get render data for canvas drawing
+      _getCreatedSeq(): number {
+        return createdSeq;
+      },
+
       _getRenderData(): OrderLineRenderData {
         // editable should only be true if there's an onMove callback to handle the drag
         return {

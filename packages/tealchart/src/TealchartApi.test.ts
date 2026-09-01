@@ -116,15 +116,36 @@ describe('TealchartApi line removal coalescing', () => {
     api.dispose();
   });
 
-  // Only a line standing in for the removed one counts. A removal with an
-  // unrelated line on the book still waits, or every cancel flashes.
-  it('still defers when the other line is not a replacement', async () => {
+  // The case the price match could never see. An amend's whole point is a new
+  // price, so "another line is already sitting at mine" was false exactly when
+  // it mattered, and the replaced line sat out the full window drawn over its
+  // own replacement.
+  it('drops a removed line at once when its replacement took a new price', async () => {
     const api = new TealchartApi('BTCUSDT', '60');
     const line = await api.createOrderLine();
     line.setPrice(100);
 
-    const unrelated = await api.createOrderLine();
-    unrelated.setPrice(250);
+    const replacement = await api.createOrderLine();
+    replacement.setPrice(250);
+    line.remove();
+
+    const lines = getTealchartApiLineRenderSnapshot(api).orderLines;
+    expect(lines).toHaveLength(1);
+    expect(lines[0].price).toBe(250);
+
+    api.dispose();
+  });
+
+  // Creation order is the signal, so the protection a cancel needs survives:
+  // nothing came after this line, so nothing is standing in for it, and it
+  // still lands a beat later rather than flashing out.
+  it('still defers when only older lines are on the book', async () => {
+    const api = new TealchartApi('BTCUSDT', '60');
+    const older = await api.createOrderLine();
+    older.setPrice(250);
+
+    const line = await api.createOrderLine();
+    line.setPrice(100);
     line.remove();
 
     expect(getTealchartApiLineRenderSnapshot(api).orderLines).toHaveLength(2);
