@@ -733,6 +733,27 @@ describe('TealScript rendering behavior matrix', () => {
     expect(formatIndicatorOutputAxisValue(labels[1]!.value, 1, labels[1]!.precision, labels[1]!.format)).toBe('0.129');
   });
 
+  it('formats unspecified output-axis precision by pane context without changing values', () => {
+    expect(
+      formatIndicatorOutputAxisValue(78_256.1306, 5_000, undefined, undefined, {
+        paneType: 'main',
+        pricePrecision: 0.1,
+      }),
+    ).toBe('78,256.1');
+    expect(formatIndicatorOutputAxisValue(-259.7078, 600, undefined, undefined, { paneType: 'indicator' })).toBe(
+      '-259.7',
+    );
+    expect(formatIndicatorOutputAxisValue(30.0982, 100, undefined, undefined, { paneType: 'indicator' })).toBe(
+      '30.1',
+    );
+    expect(
+      formatIndicatorOutputAxisValue(78_256.1306, 5_000, 4, undefined, {
+        paneType: 'main',
+        pricePrecision: 0.1,
+      }),
+    ).toBe('78,256.1306');
+  });
+
   it('renders drawing objects with coordinates, mutator-visible styles, text, and layer order', () => {
     const ctx = renderDrawings([
       makeLine('line-a', { y1: 100, y2: 108 }),

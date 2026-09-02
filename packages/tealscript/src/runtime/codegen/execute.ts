@@ -5062,7 +5062,6 @@ export function executeCompiled(
     title: decl?.title ?? 'Compiled Script',
     shortTitle: undefined,
     overlay: false,
-    precision: 4,
     format: undefined,
     scale: undefined,
     timeframe: ctx.indicatorTimeframe,
@@ -5080,7 +5079,7 @@ export function executeCompiled(
     const node = decl.node;
     declaration.shortTitle = staticStringValue(node.shorttitle);
     declaration.overlay = staticBooleanValue(node.overlay) ?? declaration.overlay;
-    declaration.precision = staticNumberValue(node.precision) ?? declaration.precision;
+    declaration.precision = staticNumberValue(node.precision);
     declaration.format = staticDeclarationString(node.format, 'format');
     declaration.scale = staticDeclarationString(node.scale, 'scale');
     declaration.timeframeGaps = staticBooleanValue(node.timeframe_gaps);

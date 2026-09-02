@@ -469,7 +469,7 @@ export class ExecutionContext {
 
   /** Indicator settings */
   indicatorOverlay: boolean = false;
-  indicatorPrecision: number = 2;
+  indicatorPrecision?: number;
   indicatorFormat?: string;
   indicatorScale?: string;
   indicatorTimeframe?: string;
@@ -1165,7 +1165,7 @@ export class ExecutionContext {
     this.indicatorTitle = 'Untitled';
     this.indicatorShortTitle = undefined;
     this.indicatorOverlay = false;
-    this.indicatorPrecision = 2;
+    this.indicatorPrecision = undefined;
     this.indicatorFormat = undefined;
     this.indicatorScale = undefined;
     this.indicatorTimeframe = undefined;

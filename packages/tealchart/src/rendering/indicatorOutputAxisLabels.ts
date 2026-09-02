@@ -1,5 +1,7 @@
 import type { PlotOutput } from '@tealstreet/tealscript';
 
+import { getDecimalPlacesFromPrecision } from '../state/chartState';
+
 export interface IndicatorOutputPaneInfo {
   overlay: boolean;
   paneId?: string;
@@ -26,6 +28,11 @@ export interface IndicatorOutputAxisLabelSource {
   format?: string;
   precision?: number;
   sourceX?: number;
+}
+
+export interface IndicatorOutputAxisLabelFormatContext {
+  paneType?: string;
+  pricePrecision?: number;
 }
 
 export function resolveIndicatorOutputSourceTime({
@@ -160,9 +167,17 @@ function formatVolumeValue(value: number): string {
   }).format(value);
 }
 
-export function getIndicatorOutputAxisLabelDecimals(range: number, precision?: number): number {
+export function getIndicatorOutputAxisLabelDecimals(
+  range: number,
+  precision?: number,
+  context?: IndicatorOutputAxisLabelFormatContext,
+): number {
   if (typeof precision === 'number' && Number.isFinite(precision) && precision >= 0) {
     return Math.min(8, Math.floor(precision));
+  }
+
+  if (context?.paneType === 'main' && context.pricePrecision && context.pricePrecision > 0) {
+    return getDecimalPlacesFromPrecision(context.pricePrecision);
   }
 
   if (range >= 1_000) return 0;
@@ -172,12 +187,18 @@ export function getIndicatorOutputAxisLabelDecimals(range: number, precision?: n
   return 4;
 }
 
-export function formatIndicatorOutputAxisValue(value: number, range: number, precision?: number, format?: string): string {
+export function formatIndicatorOutputAxisValue(
+  value: number,
+  range: number,
+  precision?: number,
+  format?: string,
+  context?: IndicatorOutputAxisLabelFormatContext,
+): string {
   if (format === 'volume') {
     return formatVolumeValue(value);
   }
 
-  const decimals = getIndicatorOutputAxisLabelDecimals(range, precision);
+  const decimals = getIndicatorOutputAxisLabelDecimals(range, precision, context);
   const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,

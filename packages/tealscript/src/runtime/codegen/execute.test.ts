@@ -1189,6 +1189,26 @@ plot(close)`;
     expect(compiledResult?.indicatorDrawingLimits).toEqual(interpResult.indicatorDrawingLimits);
   });
 
+  it('preserves omitted declaration precision as unspecified', () => {
+    const pine = `//@version=6
+indicator("Compiled Default Precision", overlay=true)
+plot(close)`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const compiledResult = executeCompiled(compiled, bars.slice(0, 3));
+    const interpResult = executeScript(ast, bars.slice(0, 3));
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult?.indicatorPrecision).toBeUndefined();
+    expect(compiledResult?.declaration.precision).toBeUndefined();
+    expect(compiledResult?.plots[0]?.precision).toBeUndefined();
+    expect(compiledResult?.indicatorPrecision).toBe(interpResult.indicatorPrecision);
+  });
+
   it('compiles typed input metadata with interpreter parity', () => {
     const pine = `//@version=6
 indicator("compiled input metadata")
