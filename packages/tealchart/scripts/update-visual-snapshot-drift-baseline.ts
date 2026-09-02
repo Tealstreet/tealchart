@@ -3,6 +3,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { measureVisualSnapshotDriftFromBuffers } from '../src/rendering/visualSnapshotDrift';
+import { VISUAL_SNAPSHOT_DRIFT_BASELINE } from '../src/rendering/visualSnapshotDriftBaseline';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(scriptDir, '..');
@@ -12,7 +13,7 @@ const baselinePath = resolve(packageRoot, 'src/rendering/visualSnapshotDriftBase
 async function main(): Promise<void> {
   const files = await readdir(snapshotDir);
   const diffFiles = files.filter((file) => file.endsWith('.diff.png')).sort();
-  const measurements = [];
+  const measurements: VisualSnapshotDriftBaselineEntry[] = [];
 
   for (const diffFile of diffFiles) {
     const name = diffFile.slice(0, -'.diff.png'.length);
@@ -21,21 +22,40 @@ async function main(): Promise<void> {
       readFile(join(snapshotDir, diffFile)),
     ]);
     const measurement = await measureVisualSnapshotDriftFromBuffers(name, expected, actual);
-    if (Number.isFinite(measurement.differingPixelRatio) && measurement.differingPixels > 0) {
-      measurements.push(measurement);
+    if (Number.isFinite(measurement.differingPixelRatio)) {
+      measurements.push({ ...measurement, platform: process.platform });
     }
   }
 
-  await writeFile(baselinePath, formatBaseline(measurements), 'utf8');
-  process.stdout.write(`Wrote ${measurements.length} visual snapshot drift entries to ${baselinePath}\n`);
+  const mergedMeasurements = [
+    ...VISUAL_SNAPSHOT_DRIFT_BASELINE.filter((entry) => entry.platform !== process.platform),
+    ...measurements,
+  ].sort((a, b) => a.platform.localeCompare(b.platform) || a.name.localeCompare(b.name));
+
+  await writeFile(baselinePath, formatBaseline(mergedMeasurements), 'utf8');
+  process.stdout.write(
+    `Wrote ${measurements.length} ${process.platform} visual snapshot drift entries to ${baselinePath}\n`,
+  );
 }
 
-function formatBaseline(measurements: Awaited<ReturnType<typeof measureVisualSnapshotDriftFromBuffers>>[]): string {
+interface VisualSnapshotDriftBaselineEntry {
+  name: string;
+  platform: NodeJS.Platform;
+  differingPixels: number;
+  totalPixels: number;
+  differingPixelRatio: number;
+  channelTolerance: number;
+  maxDifferingPixelRatio: number;
+  width: number;
+  height: number;
+}
+
+function formatBaseline(measurements: VisualSnapshotDriftBaselineEntry[]): string {
   const entries = measurements
     .map(
       (measurement) => `  {
     name: ${formatStringLiteral(measurement.name)},
-    platform: ${formatStringLiteral(process.platform)},
+    platform: ${formatStringLiteral(measurement.platform)},
     differingPixels: ${measurement.differingPixels},
     totalPixels: ${measurement.totalPixels},
     differingPixelRatio: ${measurement.differingPixelRatio},

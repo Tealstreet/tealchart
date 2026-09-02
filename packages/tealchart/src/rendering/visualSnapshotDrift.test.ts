@@ -9,6 +9,7 @@ import {
 } from './visualSnapshotDrift';
 
 const baseline = VISUAL_SNAPSHOT_DRIFT_BASELINE[0]!;
+const linuxBaseline = VISUAL_SNAPSHOT_DRIFT_BASELINE.find((entry) => entry.platform === 'linux')!;
 const platformWithoutBaseline =
   (['aix', 'freebsd', 'openbsd', 'sunos', 'win32'] as const).find(
     (platform) => !VISUAL_SNAPSHOT_DRIFT_BASELINE.some((entry) => entry.platform === platform),
@@ -32,6 +33,20 @@ describe('visual snapshot drift baseline platform handling', () => {
     expect(() => {
       assertVisualSnapshotDriftMatchesBaseline(makeMeasurement('new-drift'), baseline.platform);
     }).toThrow(/no committed drift baseline/);
+  });
+
+  it('fails changed drift measurements on the Linux CI platform once baselined', () => {
+    const differingPixels = linuxBaseline.differingPixels + 1;
+    expect(() => {
+      assertVisualSnapshotDriftMatchesBaseline(
+        {
+          ...makeMeasurement(linuxBaseline.name),
+          differingPixels,
+          differingPixelRatio: differingPixels / linuxBaseline.totalPixels,
+        },
+        'linux',
+      );
+    }).toThrow(/drift changed/);
   });
 
   it('uses the global threshold only on platforms without committed renderer baselines', () => {
