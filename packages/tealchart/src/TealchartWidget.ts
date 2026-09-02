@@ -53,7 +53,7 @@ import type {
   UserDrawingTrendLineExtend,
   UserDrawingZOrderAction,
 } from './drawings';
-import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { BuiltinIndicator, IndicatorCategory } from './indicators/builtinIndicators';
 import type { DrawingDragEventOptions } from './interaction/EventManager';
 import type { DirtyFlags } from './rendering/RenderScheduler';
 import type { ChartSettingsControlContext } from './settings/chartSettingsControls';
@@ -1352,6 +1352,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       showTopBar,
       renderOptions: this._renderOptions,
       availableIndicators: this._getAvailableIndicators(),
+      additionalIndicatorCategories: this._getAdditionalIndicatorCategories(),
       onSymbolClick: this._options.onSymbolClick,
       chartSettingsContext: this._createChartSettingsContext(),
       onIntervalChange: (interval) => {
@@ -1768,6 +1769,10 @@ export class TealchartWidget implements ITealchartWebWidget {
     return [...builtins, ...custom];
   }
 
+  private _getAdditionalIndicatorCategories(): IndicatorCategory[] {
+    return this._options.additionalIndicatorCategories ?? [];
+  }
+
   private _normalizeCustomTealscriptIndicators(indicators: BuiltinIndicator[] | undefined): BuiltinIndicator[] {
     return (indicators ?? [])
       .filter((indicator) => indicator.code.trim() && !indicator.jailbreak)
@@ -1792,6 +1797,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   setCustomTealscriptIndicators(indicators: BuiltinIndicator[]): void {
     this._customTealscriptIndicators = this._normalizeCustomTealscriptIndicators(indicators);
     this._ui?.setAvailableIndicators(this._getAvailableIndicators());
+    this._ui?.setAdditionalIndicatorCategories?.(this._getAdditionalIndicatorCategories());
   }
 
   /**

@@ -9,4 +9,7 @@ export {
   getIndicatorById,
   searchIndicators,
   type BuiltinIndicator,
+  type BuiltinIndicatorCategoryId,
+  type IndicatorCategory,
+  type IndicatorCategoryId,
 } from './builtinIndicators';

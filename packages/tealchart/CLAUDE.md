@@ -107,6 +107,12 @@ indicator panes use the range-based magnitude ladder in
 `rendering/indicatorOutputAxisLabels.ts`. Apply this only while formatting axis
 tag text. Never round or clamp stored plot values to make labels tidy.
 
+**Host indicator catalogs:** Tealchart's picker owns the built-in categories, but
+hosts may pass `customTealscriptIndicators` plus `additionalIndicatorCategories`
+for user-authored or host-specific catalogs. Keep those categories neutral:
+Tealchart renders them only when matching indicators are available and must not
+hardcode Tealstreet-only buckets into `builtinIndicators.ts`.
+
 ## Directory Structure
 
 ```

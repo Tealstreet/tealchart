@@ -750,7 +750,7 @@ export {
   getIndicatorById,
   searchIndicators,
 } from './indicators';
-export type { BuiltinIndicator } from './indicators';
+export type { BuiltinIndicator, BuiltinIndicatorCategoryId, IndicatorCategory, IndicatorCategoryId } from './indicators';
 
 // Pane management (for multi-pane indicator rendering)
 export { PaneManager } from './rendering/PaneManager';
