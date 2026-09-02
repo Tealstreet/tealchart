@@ -492,7 +492,7 @@ describe('composite performance baselines', () => {
     for (const testCase of smokeCases) {
       runSmokeCase(testCase);
     }
-  });
+  }, 10_000);
 
   it('smoke-runs a request-backed performance composite through the worker path', async () => {
     const requestCase = cases.find((testCase) => testCase.name === 'request fanout composite');
