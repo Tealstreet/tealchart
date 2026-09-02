@@ -71,11 +71,12 @@ describe('native indicator output axis labels', () => {
     const labels = resolveNativeIndicatorOutputAxisLabels({
       ...args,
       mainPaneRange: { yMin: 63_000, yMax: 64_000 },
+      pricePrecision: 0.1,
     });
 
     expect(labels).toHaveLength(1);
     expect(labels[0]!.pane.id).toBe('main');
-    expect(labels[0]!.text).toBe('63,500');
+    expect(labels[0]!.text).toBe('63,500.0');
     // Half a pane above the bottom, since 63,500 is the middle of the range.
     expect(labels[0]!.valueY).toBe(124);
   });

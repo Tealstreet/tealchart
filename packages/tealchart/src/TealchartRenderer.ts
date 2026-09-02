@@ -4800,7 +4800,10 @@ export class TealchartRenderer {
       const y = this.valueToY(output.value, pane);
       if (y < visibleTop || y > pane.bottom) continue;
 
-      const text = formatIndicatorOutputAxisValue(output.value, range, output.precision, output.format);
+      const text = formatIndicatorOutputAxisValue(output.value, range, output.precision, output.format, {
+        paneType: pane.type,
+        pricePrecision: this.options.pricePrecision,
+      });
       const measuredTagWidth = Math.max(
         INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
         getCachedTextWidth(this.ctx, text, textFont) + WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.paddingX * 2,

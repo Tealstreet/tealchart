@@ -154,6 +154,10 @@ into structural block indentation.
   global plot declarations still count. A `plotshape(false)` or sparse
   `plotcandle(...)` defines a user-visible output control even when every
   sampled value is `na`.
+- Missing Pine declaration precision is represented as `undefined` across
+  interpreter, string codegen, and closure. Do not replace it with a backend
+  default such as `4`; Tealchart decides display precision at label render time
+  from the pane and instrument tick precision.
 - `table.merge_cells()` is idempotent for an already-merged identical range and
   still errors for distinct overlapping ranges. Dashboard scripts commonly call
   it inside repeated `barstate.islast` realtime updates on a persistent table;

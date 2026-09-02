@@ -291,7 +291,7 @@ export interface ExecutionResult {
   indicatorTitle: string;
   indicatorShortTitle?: string;
   indicatorOverlay: boolean;
-  indicatorPrecision: number;
+  indicatorPrecision?: number;
   indicatorFormat?: string;
   indicatorScale?: string;
   indicatorTimeframe?: string;
@@ -547,7 +547,7 @@ export interface IndicatorDeclarationMetadata {
   title: string;
   shortTitle?: string;
   overlay: boolean;
-  precision: number;
+  precision?: number;
   format?: string;
   scale?: string;
   timeframe?: string;

@@ -3870,6 +3870,21 @@ plot(close)`;
       });
     });
 
+    it('leaves omitted indicator precision unspecified', () => {
+      const script = `//@version=6
+indicator("Default Precision", overlay=true)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorPrecision).toBeUndefined();
+      expect(result.declaration.precision).toBeUndefined();
+      expect(result.plots[0]?.precision).toBeUndefined();
+    });
+
     it('records indicator named-prefix positional tail metadata', () => {
       const script = `//@version=6
 indicator(title="Mixed Declaration", "Mixed", true, format.price, 3)
@@ -3943,7 +3958,6 @@ plot(close)`;
       expect(result.declaration).toMatchObject({
         title: 'Advanced Metadata',
         overlay: false,
-        precision: 2,
         timeframe: '15',
         timeframeGaps: false,
         explicitPlotZOrder: true,
@@ -3957,6 +3971,7 @@ plot(close)`;
           polyline: 5,
         },
       });
+      expect(result.declaration.precision).toBeUndefined();
     });
 
     it('records library declaration metadata', () => {

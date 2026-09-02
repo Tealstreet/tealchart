@@ -100,6 +100,13 @@ weight and colour and immediately looks foreign next to the real chrome.
 | `TealscriptManager`   | `src/tealscript/TealscriptManager.ts` | Web Worker lifecycle for tealscript indicators                     |
 | `GapDetectionManager` | `src/GapDetectionManager.ts`          | Detects bar data gaps, auto-recovery with backoff                  |
 
+**Indicator output axis labels:** Missing Pine `indicator(precision=...)` means
+"unspecified", not a fixed decimal count. Main-pane indicator readouts inherit
+the instrument tick precision from `RenderOptions.pricePrecision`; secondary
+indicator panes use the range-based magnitude ladder in
+`rendering/indicatorOutputAxisLabels.ts`. Apply this only while formatting axis
+tag text. Never round or clamp stored plot values to make labels tidy.
+
 ## Directory Structure
 
 ```

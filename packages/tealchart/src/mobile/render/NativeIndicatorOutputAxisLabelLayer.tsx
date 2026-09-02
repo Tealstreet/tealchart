@@ -64,6 +64,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   mainPaneRange,
   paneRangeOverrides,
   plots,
+  pricePrecision,
   resolvedPriceAxisTags,
   sharedViewport,
   smallFont,
@@ -77,6 +78,7 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
   mainPaneRange?: NativePaneRange | null;
   paneRangeOverrides?: SharedValue<NativePaneRangeOverrides>;
   plots: readonly PlotOutput[];
+  pricePrecision: number;
   /** The shared price-axis stack, which main-pane readouts are resolved in. */
   resolvedPriceAxisTags: SharedValue<NativeResolvedPriceAxisTag[]>;
   sharedViewport: NativeViewportSharedValues;
@@ -94,9 +96,10 @@ export function NativeIndicatorOutputAxisLabelLayerImpl({
         mainPaneRange,
         paneRangeOverrides: paneRangeOverrides?.value,
         plots,
+        pricePrecision,
         totalBarCount,
       }),
-    [bars, frame, indicatorPaneInfo, mainPaneRange, paneRangeOverrides, plots, totalBarCount],
+    [bars, frame, indicatorPaneInfo, mainPaneRange, paneRangeOverrides, plots, pricePrecision, totalBarCount],
   );
   if (labels.length === 0) return null;
 
@@ -281,6 +284,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
   mainPaneRange,
   paneRangeOverrides,
   plots,
+  pricePrecision,
   totalBarCount,
 }: {
   bars?: readonly Bar[];
@@ -289,6 +293,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
   mainPaneRange?: NativePaneRange | null;
   paneRangeOverrides?: NativePaneRangeOverrides;
   plots: readonly PlotOutput[];
+  pricePrecision?: number;
   totalBarCount: number;
 }): NativeIndicatorOutputAxisLabel[] {
   const paneById = new Map(frame.panes.map((pane) => [pane.id, pane]));
@@ -315,7 +320,10 @@ export function resolveNativeIndicatorOutputAxisLabels({
       id: rawLabel.id,
       pane,
       value: rawLabel.value,
-      text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision, rawLabel.format),
+      text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision, rawLabel.format, {
+        paneType: pane.type,
+        pricePrecision,
+      }),
       color: rawLabel.color,
       valueY: y,
       y,
