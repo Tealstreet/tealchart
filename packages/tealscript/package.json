@@ -28,6 +28,7 @@
     "pine:closure:profile": "tsx scripts/profile-production-closure-costs.ts",
     "pine:external-corpus": "tsx scripts/run-external-pine-corpus.ts",
     "pine:external-corpus:long-bars": "tsx scripts/measure-long-bar-corpus-parity.ts",
+    "pine:product-path-corpus": "tsx scripts/run-product-path-corpus.ts",
     "pine:external-corpus:realtime": "tsx scripts/run-external-pine-corpus-realtime.ts",
     "pine:realtime:profile": "tsx scripts/profile-realtime-event-costs.ts",
     "pine:external-corpus:refetch": "tsx scripts/refetch-external-pine-corpus.ts",

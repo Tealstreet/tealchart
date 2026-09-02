@@ -413,6 +413,12 @@ export class Scope {
         }
       }
     }
+
+    for (const [name, entry] of this.variables) {
+      if (entry.kind !== 'varip' && !snapshot.variables.has(name)) {
+        this.variables.delete(name);
+      }
+    }
   }
 
   // =========================================================================

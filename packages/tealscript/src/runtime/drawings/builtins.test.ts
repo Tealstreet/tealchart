@@ -611,6 +611,39 @@ plot(drawRange(), title="Range Top")`;
       expect(nextBar.find((plot) => plot.title === 'Range Top')?.values.at(-1)).toBe(260);
     });
 
+    it('recreates UDF-local var drawings first reached on the replaceable realtime bar', () => {
+      const script = `//@version=6
+indicator("Realtime last-bar UDF labels", overlay=true, max_labels_count=10)
+drawMarker(_text) =>
+    var id = label.new(bar_index, close, _text)
+    label.set_text(id, _text)
+    label.set_xy(id, bar_index, close)
+if barstate.islast
+    drawMarker("last")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 201,
+        close: 200,
+      });
+
+      const labels = engine.getDrawings().filter((drawing) => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect(labels[0]).toMatchObject({
+        persistent: true,
+        barIndex: 2,
+        x: 2,
+        y: 200,
+        text: 'last',
+      });
+    });
+
     it('preserves confirmed drawing handles stored in persistent arrays', () => {
       const script = `//@version=6
 indicator("Realtime persistent array handles", overlay=true)

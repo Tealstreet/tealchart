@@ -92,6 +92,10 @@ into structural block indentation.
   assignment handles from a discarded same-time bar leak forward, or unconfirmed
   replay handles differ from a fresh execution. Keep this snapshot-backed rule
   aligned across interpreter, string codegen, and closure backends.
+- Realtime scope rollback must also be an exact non-`varip` restore. If a
+  UDF-local `var` drawing handle is first initialized on the replaceable last
+  bar, retaining that variable after the drawing store rolls back leaves a stale
+  handle and silently drops the current tick's label/line/box mutations.
 - Drawings whose handles are stored in persistent `array` values are persistent
   when execution writes them into the array through `array.push`, `array.set`,
   `array.unshift`, `array.insert`, `array.concat`, or indexed assignment.
@@ -574,6 +578,11 @@ the package gate stays cheap enough to run routinely. Add
 `TEALSCRIPT_REALTIME_BACKEND=closure` when the sweep needs to prove the no-eval
 closure backend was selected; that variant checks closure full-window same-bar
 replacement parity, not an incremental closure `updateBar` VM.
+The product-path corpus runner exercises Tealchart in headless Chrome rather
+than calling the engine directly. It must use existing product seams only:
+plots/drawings from the widget manager state and alerts/logs/strategy from the
+worker result message payload. Do not add shipped widget getters or host-facing
+API solely so the harness can observe more fields.
 
 ## Grammar Features
 
