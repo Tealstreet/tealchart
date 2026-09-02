@@ -380,6 +380,13 @@ gross visual regressions everywhere. The per-snapshot drift ratchet is enforced
 only on platforms that have committed baseline entries; on platforms without a
 recorded renderer baseline, under-threshold drift is tolerated because exact
 pixel counts would be platform noise rather than a reviewable semantic signal.
+As of the PR #6812 merge, the only committed drift entries are `darwin`
+measurements, so the per-snapshot ratchet enforces on macOS only. Linux CI has
+no committed platform baseline yet, which means merge gating currently falls
+back to the 8% gross-drift threshold for these snapshots. Closing that gap means
+generating and committing a Linux drift baseline on Linux (Docker or CI), not
+widening the threshold, deleting the ratchet, or regenerating whichever platform
+happens to be local.
 Regenerate platform drift deliberately with
 `yarn workspace @tealstreet/tealchart visual:snapshot:drift` only after running
 the snapshot tests that produce `.diff.png` diagnostics; if the numbers move,
