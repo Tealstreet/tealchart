@@ -380,18 +380,23 @@ gross visual regressions everywhere. The per-snapshot drift ratchet is enforced
 only on platforms that have committed baseline entries; on platforms without a
 recorded renderer baseline, under-threshold drift is tolerated because exact
 pixel counts would be platform noise rather than a reviewable semantic signal.
-As of the PR #6812 merge, the only committed drift entries are `darwin`
-measurements, so the per-snapshot ratchet enforces on macOS only. Linux CI has
-no committed platform baseline yet, which means merge gating currently falls
-back to the 8% gross-drift threshold for these snapshots. Closing that gap means
-generating and committing a Linux drift baseline on Linux (Docker or CI), not
-widening the threshold, deleting the ratchet, or regenerating whichever platform
-happens to be local.
+The committed baseline includes `darwin` entries from local macOS rendering and
+`linux` entries generated on the CI runner, so the ratchet now enforces both on
+developer Macs and on the platform that gates merges. If Linux drift moves,
+regenerate the Linux entries on Linux (Docker or CI), not by widening the
+threshold, deleting the ratchet, or regenerating whichever platform happens to
+be local.
 Regenerate platform drift deliberately with
 `yarn workspace @tealstreet/tealchart visual:snapshot:drift` only after running
 the snapshot tests that produce `.diff.png` diagnostics; if the numbers move,
 the commit message must explain why the drift is accepted. This is a ratchet for
 visibility, not permission to refresh PNG baselines or loosen the threshold.
+A `.diff.png` with `0` differing pixels after channel tolerance still means the
+PNG bytes changed on that renderer platform, so it belongs in that platform's
+committed drift baseline rather than being silently ignored.
+Use `yarn workspace @tealstreet/tealchart test-ci` as the pre-push visual
+snapshot gate. It currently delegates to `test-unit`, but CI runs `test-ci`, and
+that name is the contract to preserve if the package scripts diverge again.
 
 The indicator picker is capability-aware: Tealscript indicators are only offered
 when `createTealscriptWorker` is supplied, and jailbreak indicators are only
