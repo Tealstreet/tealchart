@@ -1,12 +1,16 @@
-import type { Program, Expression, Statement } from '../../parser/ast';
+import type { Program, Expression, FunctionDeclaration, Statement } from '../../parser/ast';
 import { analyze } from './analyzer';
-import type { AnalysisContext, SecurityCallSite } from './analyzer';
+import type { AnalysisContext, AnalyzeOptions, SecurityCallSite } from './analyzer';
 import { emit, RUNTIME_HELPERS } from './emitter';
 import {
-  NumericSeries,
-  SMA, EMA, RMA, RSI, Crossover, Crossunder, Change,
-  Highest, Lowest, MACD, ATR, Stoch, StdDev, BB,
-  DEMA, TEMA, Cum,
+  NumericSeries, ValueSeries,
+  SMA, EMA, RMA, RSI, BarsSince, ValueWhen, Cross, Crossover, Crossunder, Change,
+  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, Range, Rising, Falling, Max, Min,
+  MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev, Covariance, Correlation, COG, Median, Mode,
+  PercentileNearestRank, PercentileLinearInterpolation, PercentRank, LinReg, TrueRange, MFI, TSI, BBW, KC, KCW, KST, VWAP, RCI, BB,
+  DEMA, TEMA, Cum, HMA, WMA, VWMA, SWMA, ALMA, CCI, CMO, WPR,
+  AccumulationDistribution, IntradayIntensityIndex, NegativeVolumeIndex, PositiveVolumeIndex, PriceVolumeTrend,
+  WilliamsAccumulationDistribution, WilliamsVariableAccumulationDistribution, BarIndex,
 } from './index';
 import * as arrFuncs from '../arrays';
 import * as mapFuncs from '../maps';
@@ -26,6 +30,8 @@ export interface CompiledScript {
   generatedCode?: string;
   securityScripts: Map<number, CompiledSecurityScript>;
 }
+
+export type CompileOptions = AnalyzeOptions;
 
 export interface ArrayHelpers {
   create(size?: unknown, val?: unknown): arrFuncs.PineArray;
@@ -153,6 +159,7 @@ export interface MatrixHelpers {
 
 export interface ScriptDependencies {
   NumericSeries: typeof NumericSeries;
+  ValueSeries: typeof ValueSeries;
   maxBarsBack: number;
   _arr: ArrayHelpers;
   _map: MapHelpers;
@@ -162,19 +169,71 @@ export interface ScriptDependencies {
   EMA: typeof EMA;
   RMA: typeof RMA;
   RSI: typeof RSI;
+  BarsSince: typeof BarsSince;
+  ValueWhen: typeof ValueWhen;
+  Cross: typeof Cross;
   Crossover: typeof Crossover;
   Crossunder: typeof Crossunder;
   Change: typeof Change;
   Highest: typeof Highest;
   Lowest: typeof Lowest;
+  HighestBars: typeof HighestBars;
+  LowestBars: typeof LowestBars;
+  PivotHigh: typeof PivotHigh;
+  PivotLow: typeof PivotLow;
+  Range: typeof Range;
+  Rising: typeof Rising;
+  Falling: typeof Falling;
+  Max: typeof Max;
+  Min: typeof Min;
   MACD: typeof MACD;
   ATR: typeof ATR;
+  DMI: typeof DMI;
+  ADX: typeof ADX;
+  Supertrend: typeof Supertrend;
+  SAR: typeof SAR;
   Stoch: typeof Stoch;
   StdDev: typeof StdDev;
+  Variance: typeof Variance;
+  Dev: typeof Dev;
+  Covariance: typeof Covariance;
+  Correlation: typeof Correlation;
+  COG: typeof COG;
+  Median: typeof Median;
+  Mode: typeof Mode;
+  PercentileNearestRank: typeof PercentileNearestRank;
+  PercentileLinearInterpolation: typeof PercentileLinearInterpolation;
+  PercentRank: typeof PercentRank;
+  LinReg: typeof LinReg;
+  TrueRange: typeof TrueRange;
+  MFI: typeof MFI;
+  TSI: typeof TSI;
+  BBW: typeof BBW;
+  KC: typeof KC;
+  KCW: typeof KCW;
+  KST: typeof KST;
+  VWAP: typeof VWAP;
+  RCI: typeof RCI;
   BB: typeof BB;
   DEMA: typeof DEMA;
   TEMA: typeof TEMA;
   Cum: typeof Cum;
+  HMA: typeof HMA;
+  WMA: typeof WMA;
+  VWMA: typeof VWMA;
+  SWMA: typeof SWMA;
+  ALMA: typeof ALMA;
+  CCI: typeof CCI;
+  CMO: typeof CMO;
+  WPR: typeof WPR;
+  AccumulationDistribution: typeof AccumulationDistribution;
+  IntradayIntensityIndex: typeof IntradayIntensityIndex;
+  NegativeVolumeIndex: typeof NegativeVolumeIndex;
+  PositiveVolumeIndex: typeof PositiveVolumeIndex;
+  PriceVolumeTrend: typeof PriceVolumeTrend;
+  WilliamsAccumulationDistribution: typeof WilliamsAccumulationDistribution;
+  WilliamsVariableAccumulationDistribution: typeof WilliamsVariableAccumulationDistribution;
+  BarIndex: typeof BarIndex;
 }
 
 export interface GeneratedScriptInstance {
@@ -199,7 +258,8 @@ export interface CompiledBarContext {
   };
   syminfo: Record<string, unknown>;
   timeframe: Record<string, unknown>;
-  plot(index: number, funcName: string, value: unknown, named: Record<string, string>, extraArgs: unknown[]): void;
+  chart: Record<string, unknown>;
+  plot(index: number, funcName: string, funcCallIndex: number, value: unknown, named: Record<string, string>, extraArgs: unknown[]): void;
   input(id: string, funcName: string, defval: unknown, named: Record<string, string>, extraArgs: unknown[]): unknown;
   strategyEntry(...args: unknown[]): void;
   strategyExit(...args: unknown[]): void;
@@ -209,31 +269,91 @@ export interface CompiledBarContext {
   strategyCancelAll(...args: unknown[]): void;
   strategyOrder(...args: unknown[]): void;
   strategyProp(name: string): unknown;
-  alert(...args: unknown[]): void;
-  alertCondition(...args: unknown[]): void;
-  logInfo(...args: unknown[]): void;
-  logWarning(...args: unknown[]): void;
-  logError(...args: unknown[]): void;
-  runtimeError(...args: unknown[]): void;
-  requestSecurity(secId: number, symbol: unknown, timeframe: unknown, gaps: unknown, lookahead: unknown): unknown;
-  callBuiltin(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
-  tickerNew(...args: unknown[]): string;
-  tickerModify(...args: unknown[]): string;
-  tickerStandard(...args: unknown[]): string;
-  tickerHeikinashi(...args: unknown[]): string;
-  tickerRenko(...args: unknown[]): string;
-  tickerKagi(...args: unknown[]): string;
-  tickerLinebreak(...args: unknown[]): string;
-  tickerPointfigure(...args: unknown[]): string;
-  colorNew(...args: unknown[]): unknown;
-  colorRgb(...args: unknown[]): unknown;
-  colorR(c: unknown): unknown;
-  colorG(c: unknown): unknown;
-  colorB(c: unknown): unknown;
-  colorT(c: unknown): unknown;
+  strategyPropHistory(name: string, offset: unknown): unknown;
+  strategyTradeProp(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
+  strategyRisk(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
+  alert(args: unknown[], named?: Record<string, unknown>, callId?: string): void;
+  alertCondition(args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
+  logInfo(args: unknown[], named?: Record<string, unknown>): void;
+  logWarning(args: unknown[], named?: Record<string, unknown>): void;
+  logError(args: unknown[], named?: Record<string, unknown>): void;
+  drawingCount(): number;
+  markDrawingsPersistentFrom(index: number): void;
+  markPersistentRuntimeValue(value: unknown): void;
+  markPersistentArrayDrawing(array: arrFuncs.PineArray, value: unknown): void;
+  markPersistentUdtField(object: unknown, fieldName: string): void;
+  arrayPush(array: arrFuncs.PineArray, value: unknown): number;
+  arraySet(array: arrFuncs.PineArray, index: number, value: unknown): void;
+  arrayUnshift(array: arrFuncs.PineArray, value: unknown): number;
+  arrayInsert(array: arrFuncs.PineArray, index: number, value: unknown): number;
+  arrayConcat(array: arrFuncs.PineArray, other: arrFuncs.PineArray): arrFuncs.PineArray;
+  runtimeError(args: unknown[], named?: Record<string, unknown>, line?: number, column?: number): void;
+  capture(name: string): unknown;
+  captureSource(name: string): unknown;
+  timestamp(args: unknown[], named?: Record<string, unknown>): number;
+  timeFilter(closeTime: boolean, args: unknown[], named?: Record<string, unknown>): number;
+  calendarPart(part: string, args: unknown[], named?: Record<string, unknown>): number;
+  runtimeTimeValue(name: string, offset?: number): number;
+  sessionValue(name: string): unknown;
+  requestSecurity(
+    secId: number,
+    symbol: unknown,
+    timeframe: unknown,
+    gaps: unknown,
+    lookahead: unknown,
+    ignoreInvalidSymbol: unknown,
+    currency: unknown,
+    calcBarsCount: unknown,
+    sourceDescriptor?: unknown,
+    captures?: Record<string, unknown>,
+  ): unknown;
+  requestSecurityLowerTf(
+    secId: number,
+    symbol: unknown,
+    timeframe: unknown,
+    ignoreInvalidSymbol: unknown,
+    currency: unknown,
+    ignoreInvalidTimeframe: unknown,
+    calcBarsCount: unknown,
+    sourceDescriptor?: unknown,
+    captures?: Record<string, unknown>,
+  ): unknown;
+  requestCurrencyRate(args: unknown[], named?: Record<string, unknown>): unknown;
+  requestPointSeries(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
+  requestFootprint(args: unknown[], named?: Record<string, unknown>): unknown;
+  requestSeed(
+    secId: number,
+    source: unknown,
+    symbol: unknown,
+    ignoreInvalidSymbol: unknown,
+    calcBarsCount: unknown,
+    sourceDescriptor?: unknown,
+    captures?: Record<string, unknown>,
+  ): unknown;
+  nextBuiltinCallId(name: string): string;
+  callBuiltin(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
+  callMethodBuiltin(name: string, receiver: unknown, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
+  footprintMethod(name: string, receiver: unknown, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
+  tickerNew(args: unknown[], named?: Record<string, unknown>): string;
+  tickerModify(args: unknown[], named?: Record<string, unknown>): string;
+  tickerStandard(args: unknown[], named?: Record<string, unknown>): string;
+  tickerInherit(args: unknown[], named?: Record<string, unknown>): string;
+  tickerHeikinashi(args: unknown[], named?: Record<string, unknown>): string;
+  tickerRenko(args: unknown[], named?: Record<string, unknown>): string;
+  tickerKagi(args: unknown[], named?: Record<string, unknown>): string;
+  tickerLinebreak(args: unknown[], named?: Record<string, unknown>): string;
+  tickerPointfigure(args: unknown[], named?: Record<string, unknown>): string;
+  colorNew(args: unknown[], named?: Record<string, unknown>): unknown;
+  colorRgb(args: unknown[], named?: Record<string, unknown>): unknown;
+  colorR(args: unknown[], named?: Record<string, unknown>): unknown;
+  colorG(args: unknown[], named?: Record<string, unknown>): unknown;
+  colorB(args: unknown[], named?: Record<string, unknown>): unknown;
+  colorT(args: unknown[], named?: Record<string, unknown>): unknown;
+  colorFromGradient(args: unknown[], named?: Record<string, unknown>): unknown;
+  mathCall(name: string, args: unknown[], named?: Record<string, unknown>, callId?: string): unknown;
   mathSum(...args: unknown[]): unknown;
-  strFormat(...args: unknown[]): string;
-  strFormatTime(...args: unknown[]): string;
+  strFormat(args: unknown[], named?: Record<string, unknown>): string;
+  strFormatTime(args: unknown[], named?: Record<string, unknown>): string;
 }
 
 function fillArray(arr: arrFuncs.PineArray, val: unknown, from?: number, to?: number): void {
@@ -411,22 +531,334 @@ export const MATRIX_HELPERS: MatrixHelpers = {
 
 const DEFAULT_DEPS: ScriptDependencies = {
   NumericSeries,
+  ValueSeries,
   maxBarsBack: 500,
   _arr: ARRAY_HELPERS,
   _map: MAP_HELPERS,
   _udt: UDT_HELPERS,
   _mtx: MATRIX_HELPERS,
-  SMA, EMA, RMA, RSI, Crossover, Crossunder, Change,
-  Highest, Lowest, MACD, ATR, Stoch, StdDev, BB,
-  DEMA, TEMA, Cum,
+  SMA, EMA, RMA, RSI, BarsSince, ValueWhen, Cross, Crossover, Crossunder, Change,
+  Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, Range, Rising, Falling, Max, Min,
+  MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev, Covariance, Correlation, COG, Median, Mode,
+  PercentileNearestRank, PercentileLinearInterpolation, PercentRank, LinReg, TrueRange, MFI, TSI, BBW, KC, KCW, KST, VWAP, RCI, BB,
+  DEMA, TEMA, Cum, HMA, WMA, VWMA, SWMA, ALMA, CCI, CMO, WPR,
+  AccumulationDistribution, IntradayIntensityIndex, NegativeVolumeIndex, PositiveVolumeIndex, PriceVolumeTrend,
+  WilliamsAccumulationDistribution, WilliamsVariableAccumulationDistribution, BarIndex,
 };
 
-function isSecurityCallInit(stmt: Statement, securityNodes: Set<unknown>): boolean {
-  if (stmt.type !== 'VariableDeclaration') return false;
-  const init = (stmt as { init?: Expression }).init;
-  if (!init) return false;
-  if (init.type === 'CallExpression' && securityNodes.has(init)) return true;
+function expressionFullName(expr: Expression): string | null {
+  if (expr.type === 'Identifier') return expr.name;
+  if (expr.type === 'MemberExpression') {
+    const objectName = expressionFullName(expr.object);
+    return objectName ? `${objectName}.${expr.property.name}` : expr.property.name;
+  }
+  return null;
+}
+
+function isRequestFullName(fullName: string | null): boolean {
+  return fullName === 'request.security'
+    || fullName === 'security'
+    || fullName === 'request.security_lower_tf'
+    || fullName === 'request.seed';
+}
+
+function buildRequestFunctionMap(parentAST: Program, securityNodes: Set<unknown>): Map<string, boolean> {
+  const functionBodies = new Map<string, Expression | Statement[]>();
+  for (const stmt of parentAST.body) {
+    if (stmt.type === 'FunctionDeclaration') {
+      functionBodies.set(stmt.name.name, stmt.body);
+    }
+  }
+
+  const functionContainsRequest = new Map<string, boolean>();
+  const visiting = new Set<string>();
+  const hasRequest = (name: string): boolean => {
+    const cached = functionContainsRequest.get(name);
+    if (cached !== undefined) return cached;
+    const body = functionBodies.get(name);
+    if (!body || visiting.has(name)) return false;
+    visiting.add(name);
+    const contains = Array.isArray(body)
+      ? body.some((stmt) => nodeContainsRequest(stmt, securityNodes, hasRequest))
+      : nodeContainsRequest(body, securityNodes, hasRequest);
+    visiting.delete(name);
+    functionContainsRequest.set(name, contains);
+    return contains;
+  };
+
+  for (const stmt of parentAST.body) {
+    if (stmt.type === 'FunctionDeclaration') {
+      hasRequest(stmt.name.name);
+    }
+  }
+  return functionContainsRequest;
+}
+
+function nodeContainsRequest(
+  node: unknown,
+  securityNodes: Set<unknown>,
+  functionContainsRequest: (name: string) => boolean,
+): boolean {
+  if (!node || typeof node !== 'object') return false;
+  const maybeNode = node as { type?: string; callee?: Expression };
+  if (maybeNode.type === 'CallExpression') {
+    if (securityNodes.has(node)) return true;
+    const fullName = maybeNode.callee ? expressionFullName(maybeNode.callee) : null;
+    if (isRequestFullName(fullName)) return true;
+    if (fullName && !fullName.includes('.') && functionContainsRequest(fullName)) return true;
+  }
+
+  for (const value of Object.values(node)) {
+    if (value === node || typeof value === 'function') continue;
+    if (Array.isArray(value)) {
+      if (value.some((item) => nodeContainsRequest(item, securityNodes, functionContainsRequest))) return true;
+    } else if (value && typeof value === 'object' && nodeContainsRequest(value, securityNodes, functionContainsRequest)) {
+      return true;
+    }
+  }
   return false;
+}
+
+function nodeContainsExact(node: unknown, target: unknown): boolean {
+  if (node === target) return true;
+  if (!node || typeof node !== 'object') return false;
+  for (const value of Object.values(node)) {
+    if (value === target) return true;
+    if (Array.isArray(value)) {
+      if (value.some((item) => nodeContainsExact(item, target))) return true;
+    } else if (value && typeof value === 'object' && nodeContainsExact(value, target)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function variableDeclarationNames(stmt: Statement): string[] {
+  if (stmt.type !== 'VariableDeclaration') return [];
+  if (stmt.names.type === 'VariableDeclarator') return [stmt.names.name.name];
+  return stmt.names.names.map((name) => name.name).filter((name) => name !== '_');
+}
+
+function collectExpressionReferences(expr: Expression, references = new Set<string>()): Set<string> {
+  switch (expr.type) {
+    case 'Identifier':
+      references.add(expr.name);
+      return references;
+    case 'MemberExpression':
+      collectExpressionReferences(expr.object, references);
+      return references;
+    case 'CallExpression':
+      collectExpressionReferences(expr.callee, references);
+      for (const arg of expr.arguments) collectExpressionReferences(arg.value, references);
+      return references;
+    case 'UnaryExpression':
+      return collectExpressionReferences(expr.argument, references);
+    case 'BinaryExpression':
+      collectExpressionReferences(expr.left, references);
+      collectExpressionReferences(expr.right, references);
+      return references;
+    case 'ConditionalExpression':
+      collectExpressionReferences(expr.test, references);
+      collectExpressionReferences(expr.consequent, references);
+      collectExpressionReferences(expr.alternate, references);
+      return references;
+    case 'ArrayExpression':
+      for (const element of expr.elements) collectExpressionReferences(element, references);
+      return references;
+    case 'IndexExpression':
+      collectExpressionReferences(expr.object, references);
+      collectExpressionReferences(expr.index, references);
+      return references;
+    case 'SwitchExpression':
+      if (expr.discriminant) collectExpressionReferences(expr.discriminant, references);
+      for (const switchCase of expr.cases) {
+        if (switchCase.test) collectExpressionReferences(switchCase.test, references);
+        if (Array.isArray(switchCase.consequent)) {
+          for (const stmt of switchCase.consequent) collectStatementReferences(stmt, references);
+        } else {
+          collectExpressionReferences(switchCase.consequent, references);
+        }
+      }
+      return references;
+    case 'ForStatement':
+      collectStatementReferences(expr, references);
+      return references;
+    case 'WhileStatement':
+      collectStatementReferences(expr, references);
+      return references;
+    case 'LambdaExpression':
+      collectExpressionReferences(expr.body, references);
+      for (const param of expr.params) references.delete(param.name);
+      return references;
+    default:
+      return references;
+  }
+}
+
+function collectStatementReferences(stmt: Statement, references = new Set<string>()): Set<string> {
+  if (stmt.type === 'VariableDeclaration' && stmt.init.type !== 'IfStatement') {
+    collectExpressionReferences(stmt.init, references);
+  } else if (stmt.type === 'ExpressionStatement') {
+    collectExpressionReferences(stmt.expression, references);
+  } else if (stmt.type === 'MultiExpressionStatement') {
+    for (const expr of stmt.expressions) collectExpressionReferences(expr, references);
+  } else if (stmt.type === 'MultiDeclaration') {
+    for (const declaration of stmt.declarations) collectStatementReferences(declaration, references);
+  } else if (stmt.type === 'MultiAssignment') {
+    for (const assignment of stmt.assignments) collectStatementReferences(assignment, references);
+  } else if (stmt.type === 'MultiStatement') {
+    for (const child of stmt.statements) collectStatementReferences(child, references);
+  } else if (stmt.type === 'TupleAssignment' && stmt.right.type !== 'IfStatement') {
+    collectExpressionReferences(stmt.right, references);
+  } else if (stmt.type === 'AssignmentStatement' && stmt.right.type !== 'IfStatement') {
+    collectExpressionReferences(stmt.right, references);
+  } else if (stmt.type === 'IfStatement') {
+    collectExpressionReferences(stmt.test, references);
+    for (const child of stmt.consequent) collectStatementReferences(child, references);
+    if (Array.isArray(stmt.alternate)) {
+      for (const child of stmt.alternate) collectStatementReferences(child, references);
+    } else if (stmt.alternate) {
+      collectStatementReferences(stmt.alternate, references);
+    }
+  } else if (stmt.type === 'OnceStatement') {
+    if (stmt.test) collectExpressionReferences(stmt.test, references);
+    for (const child of stmt.body) collectStatementReferences(child, references);
+  } else if (stmt.type === 'ForStatement') {
+    if (stmt.kind === 'numeric') {
+      collectExpressionReferences(stmt.start, references);
+      collectExpressionReferences(stmt.end, references);
+      if (stmt.step) collectExpressionReferences(stmt.step, references);
+    } else {
+      collectExpressionReferences(stmt.iterable, references);
+    }
+    for (const child of stmt.body) collectStatementReferences(child, references);
+  } else if (stmt.type === 'WhileStatement') {
+    collectExpressionReferences(stmt.test, references);
+    for (const child of stmt.body) collectStatementReferences(child, references);
+  }
+  return references;
+}
+
+function collectFunctionBodyReferences(fn: FunctionDeclaration): Set<string> {
+  const references = new Set<string>();
+  if (Array.isArray(fn.body)) {
+    for (const stmt of fn.body) collectStatementReferences(stmt, references);
+  } else {
+    collectExpressionReferences(fn.body, references);
+  }
+
+  for (const param of fn.params) references.delete(param.name);
+  if (Array.isArray(fn.body)) {
+    for (const stmt of fn.body) {
+      for (const name of variableDeclarationNames(stmt)) references.delete(name);
+    }
+  }
+  return references;
+}
+
+function collectSecurityGlobalDependencies(
+  site: SecurityCallSite,
+  parentAST: Program,
+  ownerIndex: number,
+  securityNodes: Set<unknown>,
+  functionContainsRequest: (name: string) => boolean,
+  captureNames?: Set<string>,
+): Set<Statement> {
+  const priorDeclarations = parentAST.body.slice(0, ownerIndex === -1 ? parentAST.body.length : ownerIndex)
+    .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => stmt.type === 'VariableDeclaration');
+  const declarationByName = new Map<string, Extract<Statement, { type: 'VariableDeclaration' }>>();
+  for (const stmt of priorDeclarations) {
+    for (const name of variableDeclarationNames(stmt)) declarationByName.set(name, stmt);
+  }
+  const candidates = priorDeclarations
+    .filter((stmt): stmt is Extract<Statement, { type: 'VariableDeclaration' }> => (
+      isRequestReplayableGlobalStatement(stmt, securityNodes, functionContainsRequest)
+    ));
+  const functionDecls = new Map<string, FunctionDeclaration>();
+  for (const stmt of parentAST.body) {
+    if (stmt.type === 'FunctionDeclaration') functionDecls.set(stmt.name.name, stmt);
+  }
+  const needed = collectSecuritySiteReferences(site);
+  const expandedFunctions = new Set<string>();
+  const included = new Set<Statement>();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const name of Array.from(needed)) {
+      if (expandedFunctions.has(name)) continue;
+      const fn = functionDecls.get(name);
+      if (!fn) continue;
+      expandedFunctions.add(name);
+      for (const reference of collectFunctionBodyReferences(fn)) {
+        if (!needed.has(reference)) {
+          needed.add(reference);
+          changed = true;
+        }
+      }
+    }
+    for (const stmt of candidates) {
+      if (included.has(stmt)) continue;
+      if (!variableDeclarationNames(stmt).some((name) => needed.has(name))) continue;
+      included.add(stmt);
+      for (const reference of collectStatementReferences(stmt)) {
+        if (!needed.has(reference)) {
+          needed.add(reference);
+          changed = true;
+        }
+      }
+    }
+  }
+  if (captureNames) {
+    for (const name of needed) {
+      const declaration = declarationByName.get(name);
+      if (declaration && !included.has(declaration)) captureNames.add(name);
+    }
+  }
+  return included;
+}
+
+function isRequestReplayableGlobalStatement(
+  stmt: Extract<Statement, { type: 'VariableDeclaration' }>,
+  securityNodes: Set<unknown>,
+  functionContainsRequest: (name: string) => boolean,
+): boolean {
+  // Dependency-selected `var`/`varip` globals get an independent requested-
+  // context state, just like regular globals. Only declarations that perform a
+  // request or depend on block execution are excluded from replay.
+  if (stmt.init.type === 'IfStatement') return false;
+  if (nodeContainsRequest(stmt.init, securityNodes, functionContainsRequest)) return false;
+  return true;
+}
+
+function collectSecuritySiteReferences(site: SecurityCallSite): Set<string> {
+  // Keep this list aligned with every expression/statement-bearing field on
+  // SecurityCallSite. Non-expression metadata fields are `id`, `kind`, `node`,
+  // `taCallSites`, `expressionSourceParam`, and `expressionCaptureParams`.
+  const references = collectExpressionReferences(site.expressionExpr);
+  if (site.sourceExpr) collectExpressionReferences(site.sourceExpr, references);
+  collectExpressionReferences(site.symbolExpr, references);
+  collectExpressionReferences(site.timeframeExpr, references);
+  if (site.gapsExpr) collectExpressionReferences(site.gapsExpr, references);
+  if (site.lookaheadExpr) collectExpressionReferences(site.lookaheadExpr, references);
+  if (site.ignoreInvalidSymbolExpr) collectExpressionReferences(site.ignoreInvalidSymbolExpr, references);
+  if (site.currencyExpr) collectExpressionReferences(site.currencyExpr, references);
+  if (site.ignoreInvalidTimeframeExpr) collectExpressionReferences(site.ignoreInvalidTimeframeExpr, references);
+  if (site.calcBarsCountExpr) collectExpressionReferences(site.calcBarsCountExpr, references);
+  for (const stmt of site.expressionLocalStatements ?? []) {
+    collectStatementReferences(stmt, references);
+  }
+  return references;
+}
+
+function prepareSecurityCaptureParams(parentAST: Program, analysis: AnalysisContext, securityNodes: Set<unknown>): void {
+  const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
+  const functionContainsRequest = (name: string) => requestFunctionMap.get(name) === true;
+  for (const site of analysis.securitySites) {
+    const ownerIndex = parentAST.body.findIndex((stmt) => nodeContainsExact(stmt, site.node));
+    const captureNames = new Set(site.expressionCaptureParams ?? []);
+    collectSecurityGlobalDependencies(site, parentAST, ownerIndex, securityNodes, functionContainsRequest, captureNames);
+    site.expressionCaptureParams = captureNames.size > 0 ? [...captureNames].sort() : undefined;
+  }
 }
 
 function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNodes: Set<unknown>): Program {
@@ -437,13 +869,31 @@ function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNo
       title: { type: 'StringLiteral', value: `security_${site.id}` },
     } as Statement,
   ];
+  const requestFunctionMap = buildRequestFunctionMap(parentAST, securityNodes);
+  const functionContainsRequest = (name: string) => requestFunctionMap.get(name) === true;
+  const ownerIndex = parentAST.body.findIndex((stmt) => nodeContainsExact(stmt, site.node));
+  const dependencyGlobals = collectSecurityGlobalDependencies(site, parentAST, ownerIndex, securityNodes, functionContainsRequest);
 
-  for (const stmt of parentAST.body) {
-    if (stmt.type === 'FunctionDeclaration') {
+  for (let index = 0; index < parentAST.body.length; index += 1) {
+    const stmt = parentAST.body[index]!;
+    if (
+      stmt.type === 'FunctionDeclaration'
+      || stmt.type === 'ImportDeclaration'
+      || stmt.type === 'TypeDeclaration'
+      || stmt.type === 'EnumDeclaration'
+    ) {
       body.push(stmt);
-    } else if (stmt.type === 'VariableDeclaration' && !isSecurityCallInit(stmt, securityNodes)) {
+    } else if (
+      stmt.type === 'VariableDeclaration'
+      && (ownerIndex === -1 || index < ownerIndex)
+      && dependencyGlobals.has(stmt)
+    ) {
       body.push(stmt);
     }
+  }
+
+  for (const stmt of site.expressionLocalStatements ?? []) {
+    body.push(stmt);
   }
 
   body.push({
@@ -455,7 +905,7 @@ function buildSecurityAST(site: SecurityCallSite, parentAST: Program, securityNo
     },
   } as Statement);
 
-  return { type: 'Program', version: parentAST.version, body };
+  return { type: 'Program', version: parentAST.version, explicitVersion: parentAST.explicitVersion, body };
 }
 
 function compileSecurityExpression(
@@ -463,9 +913,13 @@ function compileSecurityExpression(
   parentAST: Program,
   securityNodes: Set<unknown>,
   maxBarsBack?: number,
+  options: CompileOptions = {},
 ): CompiledSecurityScript | null {
   const secAST = buildSecurityAST(site, parentAST, securityNodes);
-  const secAnalysis = analyze(secAST);
+  const secAnalysis = analyze(secAST, {
+    ...options,
+    capturedParams: new Set(site.expressionCaptureParams ?? []),
+  });
   if (secAnalysis.unsupported.length > 0) return null;
 
   const code = emit(secAST, secAnalysis);
@@ -479,8 +933,8 @@ function compileSecurityExpression(
   }
 }
 
-export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
-  const analysis = analyze(ast);
+export function compile(ast: Program, maxBarsBack?: number, options: CompileOptions = {}): CompiledScript {
+  const analysis = analyze(ast, options);
 
   if (analysis.unsupported.length > 0) {
     return {
@@ -492,6 +946,8 @@ export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
     };
   }
 
+  const securityNodes = new Set<unknown>(analysis.securitySites.map((s) => s.node));
+  prepareSecurityCaptureParams(ast, analysis, securityNodes);
   const code = emit(ast, analysis);
 
   try {
@@ -506,11 +962,20 @@ export function compile(ast: Program, maxBarsBack?: number): CompiledScript {
     const ScriptClass = factory(deps);
 
     const securityScripts = new Map<number, CompiledSecurityScript>();
-    const securityNodes = new Set<unknown>(analysis.securitySites.map((s) => s.node));
     for (const site of analysis.securitySites) {
-      const secScript = compileSecurityExpression(site, ast, securityNodes, maxBarsBack);
+      if (site.expressionSourceParam) continue;
+      const secScript = compileSecurityExpression(site, ast, securityNodes, maxBarsBack, options);
       if (secScript) {
         securityScripts.set(site.id, secScript);
+      } else {
+        return {
+          ScriptClass: null as unknown as CompiledScript['ScriptClass'],
+          analysis,
+          success: false,
+          unsupported: [`${site.kind} expression subprogram ${site.id} could not be compiled`],
+          generatedCode: code,
+          securityScripts: new Map(),
+        };
       }
     }
 

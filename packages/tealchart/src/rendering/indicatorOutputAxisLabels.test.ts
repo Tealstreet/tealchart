@@ -71,6 +71,53 @@ describe('indicator output axis labels', () => {
     expect(formatIndicatorOutputAxisValue(24.234, 300, 1)).toBe('24.2');
   });
 
+  it('inherits declaration precision and format while preserving plot overrides', () => {
+    const labels = getIndicatorOutputAxisLabelSources({
+      indicatorPaneInfo: {
+        volumePane: { overlay: false, paneId: 'pane_1', format: 'volume', precision: 0 },
+        percentPane: { overlay: false, paneId: 'pane_2', format: 'percent', precision: 2 },
+      },
+      panes: [
+        { id: 'pane_1', type: 'indicator' },
+        { id: 'pane_2', type: 'indicator' },
+      ],
+      plots: [
+        plot({
+          id: 'volume',
+          scriptId: 'volumePane',
+          values: [1_250_000],
+        }),
+        plot({
+          id: 'override',
+          scriptId: 'percentPane',
+          values: [0.1289],
+          format: 'price',
+          precision: 3,
+        }),
+      ],
+      totalBarCount: 1,
+    });
+
+    expect(labels).toEqual([
+      expect.objectContaining({ format: 'volume', precision: 0 }),
+      expect.objectContaining({ format: 'price', precision: 3 }),
+    ]);
+    expect(formatIndicatorOutputAxisValue(labels[0]!.value, 2_000_000, labels[0]!.precision, labels[0]!.format)).toBe('1.25M');
+    expect(formatIndicatorOutputAxisValue(labels[1]!.value, 1, labels[1]!.precision, labels[1]!.format)).toBe('0.129');
+    expect(formatIndicatorOutputAxisValue(12.3456, 100, 2, 'percent')).toBe('12.35%');
+  });
+
+  it('omits indicator output labels for scale.none declarations', () => {
+    expect(getIndicatorOutputAxisLabelSources({
+      indicatorPaneInfo: {
+        hiddenScale: { overlay: false, paneId: 'pane_1', scale: 'none' },
+      },
+      panes: [{ id: 'pane_1', type: 'indicator' }],
+      plots: [plot({ id: 'hidden', scriptId: 'hiddenScale', values: [42] })],
+      totalBarCount: 1,
+    })).toEqual([]);
+  });
+
   it('resolves source time with plot offset applied', () => {
     const bars = [{ time: 0 }, { time: 60_000 }, { time: 120_000 }];
 

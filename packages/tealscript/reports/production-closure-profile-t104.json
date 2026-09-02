@@ -1,0 +1,1407 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-31T18:09:02.086Z",
+  "gitCommit": "827016c061e8031ddc8503e2c9857d26ad3a3407",
+  "sample": {
+    "selection": "The 8 scripts nearest the median closure/compiled ratio from each corpus' compiled-visible-dominated cutover cohort; screener outliers and fastest rows are intentionally excluded.",
+    "scriptsPerCorpus": 8,
+    "scripts": [
+      {
+        "corpus": "v1",
+        "id": "0089:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:CandlestickKicker.pine",
+        "ratio": 1.43,
+        "declaredVersion": 5,
+        "byteSize": 1933
+      },
+      {
+        "corpus": "v1",
+        "id": "0140:https://github.com/TaichiS/pinescript_practice:#19-自行繪製K棒與調整物件樹的方法.pine",
+        "ratio": 1.49,
+        "declaredVersion": 4,
+        "byteSize": 411
+      },
+      {
+        "corpus": "v1",
+        "id": "0062:https://github.com/everget/tradingview-pinescript-indicators:movings/apirine_adaptive_exponential_moving_average.pine",
+        "ratio": 1.5,
+        "declaredVersion": 3,
+        "byteSize": 984
+      },
+      {
+        "corpus": "v1",
+        "id": "0012:https://github.com/Alorse/pinescript-strategies:indicators/KDJ.pine",
+        "ratio": 1.51,
+        "declaredVersion": 4,
+        "byteSize": 1979
+      },
+      {
+        "corpus": "v1",
+        "id": "0206:https://github.com/everget/tradingview-pinescript-indicators:movings/arnaud_legoux_moving_average.pine",
+        "ratio": 1.52,
+        "declaredVersion": 3,
+        "byteSize": 563
+      },
+      {
+        "corpus": "v1",
+        "id": "0038:https://github.com/ArunKBhaskar/PineScript:ICT Market Structure Shift (MSS)/ICT Market Structure Shift (MSS).txt",
+        "ratio": 1.53,
+        "declaredVersion": 5,
+        "byteSize": 13278
+      },
+      {
+        "corpus": "v1",
+        "id": "0091:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:CandlestickPatterns.pine",
+        "ratio": 1.53,
+        "declaredVersion": 5,
+        "byteSize": 18985
+      },
+      {
+        "corpus": "v1",
+        "id": "0191:https://github.com/Alorse/pinescript-strategies:indicators/Williams Vix Fix + Inverse.pine",
+        "ratio": 1.59,
+        "declaredVersion": 4,
+        "byteSize": 1659
+      },
+      {
+        "corpus": "v2",
+        "id": "0054:https://github.com/ictmentality/pinescript-indicators:other/HTF Key Level/HTF_Key_Level_Engine_JAW_SwingHL_FVG_v2_dbgFVG_fixCounter_fixCutoff_emitOnClose.txt",
+        "ratio": 1.46,
+        "declaredVersion": 6,
+        "byteSize": 26803
+      },
+      {
+        "corpus": "v2",
+        "id": "0091:https://github.com/TyphooN-/Pinescript_Indicators:KAMA.pine",
+        "ratio": 1.46,
+        "declaredVersion": 6,
+        "byteSize": 1073
+      },
+      {
+        "corpus": "v2",
+        "id": "0115:https://github.com/RightShiner/tradingview-pinescript-indicators:src/movings/ehlers_leading_indicator.pine",
+        "ratio": 1.46,
+        "declaredVersion": 3,
+        "byteSize": 664
+      },
+      {
+        "corpus": "v2",
+        "id": "0056:https://github.com/ictmentality/pinescript-indicators:other/HTF Key Level/HTF_Key_Level_Engine_JAW_SwingHL_FVG_v2_dbgFVG_fixCounter.txt",
+        "ratio": 1.48,
+        "declaredVersion": 6,
+        "byteSize": 26415
+      },
+      {
+        "corpus": "v2",
+        "id": "0135:https://github.com/RightShiner/tradingview-pinescript-indicators:src/movings/multiple_hull_moving_average.pine",
+        "ratio": 1.5,
+        "declaredVersion": 3,
+        "byteSize": 1022
+      },
+      {
+        "corpus": "v2",
+        "id": "0055:https://github.com/ictmentality/pinescript-indicators:other/HTF Key Level/HTF_Key_Level_Engine_JAW_SwingHL_FVG_v2_dbgFVG_fixCounter_fixCutoff.txt",
+        "ratio": 1.51,
+        "declaredVersion": 6,
+        "byteSize": 26682
+      },
+      {
+        "corpus": "v2",
+        "id": "0124:https://github.com/RightShiner/tradingview-pinescript-indicators:src/movings/hull_moving_average.pine",
+        "ratio": 1.54,
+        "declaredVersion": 3,
+        "byteSize": 496
+      },
+      {
+        "corpus": "v2",
+        "id": "0136:https://github.com/RightShiner/tradingview-pinescript-indicators:src/movings/parabolic_sar.pine",
+        "ratio": 1.54,
+        "declaredVersion": 3,
+        "byteSize": 344
+      }
+    ]
+  },
+  "construction": {
+    "scripts": 16,
+    "parseCheckMs": 293.13,
+    "compiledCompileMs": 66.44,
+    "closureSupportBindMs": 35.65,
+    "closureSupportBindToCompiledCompileRatio": 0.54
+  },
+  "barCountCurve": [
+    {
+      "barCount": 160,
+      "totalBars": 2560,
+      "compiled": {
+        "backend": "compiled",
+        "totalMs": 231.04,
+        "usPerBar": 90.25
+      },
+      "closure": {
+        "backend": "closure",
+        "totalMs": 328.15,
+        "usPerBar": 128.18
+      },
+      "closureToCompiledRatio": 1.42,
+      "perBarGapUs": 37.93,
+      "closureBindEstimateUsPerBar": 13.93,
+      "closureBindShareOfGap": 0.37
+    },
+    {
+      "barCount": 1000,
+      "totalBars": 16000,
+      "compiled": {
+        "backend": "compiled",
+        "totalMs": 1449.33,
+        "usPerBar": 90.58
+      },
+      "closure": {
+        "backend": "closure",
+        "totalMs": 1982.19,
+        "usPerBar": 123.89
+      },
+      "closureToCompiledRatio": 1.37,
+      "perBarGapUs": 33.31,
+      "closureBindEstimateUsPerBar": 2.23,
+      "closureBindShareOfGap": 0.07
+    },
+    {
+      "barCount": 5000,
+      "totalBars": 80000,
+      "compiled": {
+        "backend": "compiled",
+        "totalMs": 6818.62,
+        "usPerBar": 85.23
+      },
+      "closure": {
+        "backend": "closure",
+        "totalMs": 10853.63,
+        "usPerBar": 135.67
+      },
+      "closureToCompiledRatio": 1.59,
+      "perBarGapUs": 50.44,
+      "closureBindEstimateUsPerBar": 0.45,
+      "closureBindShareOfGap": 0.01
+    },
+    {
+      "barCount": 10000,
+      "totalBars": 160000,
+      "compiled": {
+        "backend": "compiled",
+        "totalMs": 13910.12,
+        "usPerBar": 86.94
+      },
+      "closure": {
+        "backend": "closure",
+        "totalMs": 22533.41,
+        "usPerBar": 140.83
+      },
+      "closureToCompiledRatio": 1.62,
+      "perBarGapUs": 53.89,
+      "closureBindEstimateUsPerBar": 0.22,
+      "closureBindShareOfGap": 0
+    },
+    {
+      "barCount": 20000,
+      "totalBars": 320000,
+      "compiled": {
+        "backend": "compiled",
+        "totalMs": 27948.78,
+        "usPerBar": 87.34
+      },
+      "closure": {
+        "backend": "closure",
+        "totalMs": 46125.76,
+        "usPerBar": 144.14
+      },
+      "closureToCompiledRatio": 1.65,
+      "perBarGapUs": 56.8,
+      "closureBindEstimateUsPerBar": 0.11,
+      "closureBindShareOfGap": 0
+    }
+  ],
+  "runtimeProbe": {
+    "barCount": 1000,
+    "totalBars": 16000,
+    "closureTotalMs": 2820.89,
+    "compiledTotalMs": 1420.55,
+    "perBarGapUs": 87.53,
+    "buckets": {
+      "builtinInclusive": {
+        "ms": 444.69,
+        "calls": 1238061,
+        "callsPerBar": 77.38,
+        "inclusiveUsPerBar": 27.79,
+        "inclusiveShareOfGap": 0.32
+      },
+      "scopeInclusive": {
+        "ms": 749.23,
+        "calls": 8573084,
+        "callsPerBar": 535.82,
+        "inclusiveUsPerBar": 46.83,
+        "inclusiveShareOfGap": 0.54
+      },
+      "contextInclusive": {
+        "ms": 28.86,
+        "calls": 33229,
+        "callsPerBar": 2.08,
+        "inclusiveUsPerBar": 1.8,
+        "inclusiveShareOfGap": 0.02
+      },
+      "requestInclusive": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      }
+    },
+    "builtinFamilies": {
+      "other": {
+        "ms": 126.33,
+        "calls": 441957,
+        "callsPerBar": 27.62,
+        "inclusiveUsPerBar": 7.9,
+        "inclusiveShareOfGap": 0.09
+      },
+      "visual": {
+        "ms": 97.51,
+        "calls": 43000,
+        "callsPerBar": 2.69,
+        "inclusiveUsPerBar": 6.09,
+        "inclusiveShareOfGap": 0.07
+      },
+      "ta": {
+        "ms": 74.94,
+        "calls": 50094,
+        "callsPerBar": 3.13,
+        "inclusiveUsPerBar": 4.68,
+        "inclusiveShareOfGap": 0.05
+      },
+      "array": {
+        "ms": 8.31,
+        "calls": 58933,
+        "callsPerBar": 3.68,
+        "inclusiveUsPerBar": 0.52,
+        "inclusiveShareOfGap": 0.01
+      },
+      "drawing": {
+        "ms": 137.6,
+        "calls": 644077,
+        "callsPerBar": 40.25,
+        "inclusiveUsPerBar": 8.6,
+        "inclusiveShareOfGap": 0.1
+      }
+    },
+    "topBuiltins": [
+      {
+        "name": "plotshape",
+        "ms": 44.67,
+        "calls": 20000,
+        "callsPerBar": 1.25,
+        "inclusiveUsPerBar": 2.79,
+        "inclusiveShareOfGap": 0.03
+      },
+      {
+        "name": "plot",
+        "ms": 41.25,
+        "calls": 17000,
+        "callsPerBar": 1.06,
+        "inclusiveUsPerBar": 2.58,
+        "inclusiveShareOfGap": 0.03
+      },
+      {
+        "name": "input",
+        "ms": 39.8,
+        "calls": 36000,
+        "callsPerBar": 2.25,
+        "inclusiveUsPerBar": 2.49,
+        "inclusiveShareOfGap": 0.03
+      },
+      {
+        "name": "input.int",
+        "ms": 36.37,
+        "calls": 28000,
+        "callsPerBar": 1.75,
+        "inclusiveUsPerBar": 2.27,
+        "inclusiveShareOfGap": 0.03
+      },
+      {
+        "name": "line.set_x2",
+        "ms": 26,
+        "calls": 91419,
+        "callsPerBar": 5.71,
+        "inclusiveUsPerBar": 1.62,
+        "inclusiveShareOfGap": 0.02
+      },
+      {
+        "name": "line.set_color",
+        "ms": 25.81,
+        "calls": 91419,
+        "callsPerBar": 5.71,
+        "inclusiveUsPerBar": 1.61,
+        "inclusiveShareOfGap": 0.02
+      },
+      {
+        "name": "ta.wma",
+        "ms": 23.18,
+        "calls": 12000,
+        "callsPerBar": 0.75,
+        "inclusiveUsPerBar": 1.45,
+        "inclusiveShareOfGap": 0.02
+      },
+      {
+        "name": "line.set_width",
+        "ms": 21.89,
+        "calls": 91419,
+        "callsPerBar": 5.71,
+        "inclusiveUsPerBar": 1.37,
+        "inclusiveShareOfGap": 0.02
+      },
+      {
+        "name": "line.set_y1",
+        "ms": 18.07,
+        "calls": 91419,
+        "callsPerBar": 5.71,
+        "inclusiveUsPerBar": 1.13,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "line.set_y2",
+        "ms": 17.46,
+        "calls": 91419,
+        "callsPerBar": 5.71,
+        "inclusiveUsPerBar": 1.09,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "line.set_style",
+        "ms": 17.12,
+        "calls": 91419,
+        "callsPerBar": 5.71,
+        "inclusiveUsPerBar": 1.07,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "input.bool",
+        "ms": 15.64,
+        "calls": 32000,
+        "callsPerBar": 2,
+        "inclusiveUsPerBar": 0.98,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "input.color",
+        "ms": 12.95,
+        "calls": 27000,
+        "callsPerBar": 1.69,
+        "inclusiveUsPerBar": 0.81,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "ta.sma",
+        "ms": 10.63,
+        "calls": 3011,
+        "callsPerBar": 0.19,
+        "inclusiveUsPerBar": 0.66,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "ta.atr",
+        "ms": 8.18,
+        "calls": 4000,
+        "callsPerBar": 0.25,
+        "inclusiveUsPerBar": 0.51,
+        "inclusiveShareOfGap": 0.01
+      },
+      {
+        "name": "ta.highest",
+        "ms": 6.58,
+        "calls": 7000,
+        "callsPerBar": 0.44,
+        "inclusiveUsPerBar": 0.41,
+        "inclusiveShareOfGap": 0
+      },
+      {
+        "name": "ta.lowest",
+        "ms": 5.22,
+        "calls": 6000,
+        "callsPerBar": 0.38,
+        "inclusiveUsPerBar": 0.33,
+        "inclusiveShareOfGap": 0
+      },
+      {
+        "name": "plotchar",
+        "ms": 5.11,
+        "calls": 2000,
+        "callsPerBar": 0.13,
+        "inclusiveUsPerBar": 0.32,
+        "inclusiveShareOfGap": 0
+      },
+      {
+        "name": "ta.stdev",
+        "ms": 4.08,
+        "calls": 2000,
+        "callsPerBar": 0.13,
+        "inclusiveUsPerBar": 0.25,
+        "inclusiveShareOfGap": 0
+      },
+      {
+        "name": "input.float",
+        "ms": 3.54,
+        "calls": 3000,
+        "callsPerBar": 0.19,
+        "inclusiveUsPerBar": 0.22,
+        "inclusiveShareOfGap": 0
+      }
+    ],
+    "seriesMethods": {
+      "genericGet": {
+        "ms": 19.37,
+        "calls": 772803,
+        "callsPerBar": 48.3,
+        "totalLength": 413764034,
+        "maxLength": 1000,
+        "averageLength": 535.4,
+        "inclusiveUsPerBar": 1.21,
+        "inclusiveShareOfGap": 0.01
+      },
+      "genericSet": {
+        "ms": 50.39,
+        "calls": 2034586,
+        "callsPerBar": 127.16,
+        "totalLength": 850878619,
+        "maxLength": 1000,
+        "averageLength": 418.2,
+        "inclusiveUsPerBar": 3.15,
+        "inclusiveShareOfGap": 0.04
+      },
+      "genericAdvance": {
+        "ms": 27.17,
+        "calls": 754235,
+        "callsPerBar": 47.14,
+        "totalLength": 362839916,
+        "maxLength": 1000,
+        "averageLength": 481.1,
+        "inclusiveUsPerBar": 1.7,
+        "inclusiveShareOfGap": 0.02
+      },
+      "genericCommit": {
+        "ms": 20.06,
+        "calls": 729599,
+        "callsPerBar": 45.6,
+        "totalLength": 362815280,
+        "maxLength": 1000,
+        "averageLength": 497.3,
+        "inclusiveUsPerBar": 1.25,
+        "inclusiveShareOfGap": 0.01
+      },
+      "genericSnapshot": {
+        "ms": 0.39,
+        "calls": 436,
+        "callsPerBar": 0.03,
+        "totalLength": 433694,
+        "maxLength": 1000,
+        "averageLength": 994.7,
+        "inclusiveUsPerBar": 0.02,
+        "inclusiveShareOfGap": 0
+      },
+      "genericRestore": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "genericToArray": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericGet": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericPush": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericUpdate": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericSave": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericRestore": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericToArray": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      },
+      "numericToPlotArray": {
+        "ms": 0,
+        "calls": 0,
+        "callsPerBar": 0,
+        "totalLength": 0,
+        "maxLength": 0,
+        "averageLength": 0,
+        "inclusiveUsPerBar": 0,
+        "inclusiveShareOfGap": 0
+      }
+    }
+  },
+  "runtimeProbeCurve": [
+    {
+      "barCount": 1000,
+      "totalBars": 16000,
+      "closureTotalMs": 2820.89,
+      "compiledTotalMs": 1420.55,
+      "perBarGapUs": 87.53,
+      "buckets": {
+        "builtinInclusive": {
+          "ms": 444.69,
+          "calls": 1238061,
+          "callsPerBar": 77.38,
+          "inclusiveUsPerBar": 27.79,
+          "inclusiveShareOfGap": 0.32
+        },
+        "scopeInclusive": {
+          "ms": 749.23,
+          "calls": 8573084,
+          "callsPerBar": 535.82,
+          "inclusiveUsPerBar": 46.83,
+          "inclusiveShareOfGap": 0.54
+        },
+        "contextInclusive": {
+          "ms": 28.86,
+          "calls": 33229,
+          "callsPerBar": 2.08,
+          "inclusiveUsPerBar": 1.8,
+          "inclusiveShareOfGap": 0.02
+        },
+        "requestInclusive": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        }
+      },
+      "builtinFamilies": {
+        "other": {
+          "ms": 126.33,
+          "calls": 441957,
+          "callsPerBar": 27.62,
+          "inclusiveUsPerBar": 7.9,
+          "inclusiveShareOfGap": 0.09
+        },
+        "visual": {
+          "ms": 97.51,
+          "calls": 43000,
+          "callsPerBar": 2.69,
+          "inclusiveUsPerBar": 6.09,
+          "inclusiveShareOfGap": 0.07
+        },
+        "ta": {
+          "ms": 74.94,
+          "calls": 50094,
+          "callsPerBar": 3.13,
+          "inclusiveUsPerBar": 4.68,
+          "inclusiveShareOfGap": 0.05
+        },
+        "array": {
+          "ms": 8.31,
+          "calls": 58933,
+          "callsPerBar": 3.68,
+          "inclusiveUsPerBar": 0.52,
+          "inclusiveShareOfGap": 0.01
+        },
+        "drawing": {
+          "ms": 137.6,
+          "calls": 644077,
+          "callsPerBar": 40.25,
+          "inclusiveUsPerBar": 8.6,
+          "inclusiveShareOfGap": 0.1
+        }
+      },
+      "topBuiltins": [
+        {
+          "name": "plotshape",
+          "ms": 44.67,
+          "calls": 20000,
+          "callsPerBar": 1.25,
+          "inclusiveUsPerBar": 2.79,
+          "inclusiveShareOfGap": 0.03
+        },
+        {
+          "name": "plot",
+          "ms": 41.25,
+          "calls": 17000,
+          "callsPerBar": 1.06,
+          "inclusiveUsPerBar": 2.58,
+          "inclusiveShareOfGap": 0.03
+        },
+        {
+          "name": "input",
+          "ms": 39.8,
+          "calls": 36000,
+          "callsPerBar": 2.25,
+          "inclusiveUsPerBar": 2.49,
+          "inclusiveShareOfGap": 0.03
+        },
+        {
+          "name": "input.int",
+          "ms": 36.37,
+          "calls": 28000,
+          "callsPerBar": 1.75,
+          "inclusiveUsPerBar": 2.27,
+          "inclusiveShareOfGap": 0.03
+        },
+        {
+          "name": "line.set_x2",
+          "ms": 26,
+          "calls": 91419,
+          "callsPerBar": 5.71,
+          "inclusiveUsPerBar": 1.62,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_color",
+          "ms": 25.81,
+          "calls": 91419,
+          "callsPerBar": 5.71,
+          "inclusiveUsPerBar": 1.61,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "ta.wma",
+          "ms": 23.18,
+          "calls": 12000,
+          "callsPerBar": 0.75,
+          "inclusiveUsPerBar": 1.45,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_width",
+          "ms": 21.89,
+          "calls": 91419,
+          "callsPerBar": 5.71,
+          "inclusiveUsPerBar": 1.37,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_y1",
+          "ms": 18.07,
+          "calls": 91419,
+          "callsPerBar": 5.71,
+          "inclusiveUsPerBar": 1.13,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "line.set_y2",
+          "ms": 17.46,
+          "calls": 91419,
+          "callsPerBar": 5.71,
+          "inclusiveUsPerBar": 1.09,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "line.set_style",
+          "ms": 17.12,
+          "calls": 91419,
+          "callsPerBar": 5.71,
+          "inclusiveUsPerBar": 1.07,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "input.bool",
+          "ms": 15.64,
+          "calls": 32000,
+          "callsPerBar": 2,
+          "inclusiveUsPerBar": 0.98,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "input.color",
+          "ms": 12.95,
+          "calls": 27000,
+          "callsPerBar": 1.69,
+          "inclusiveUsPerBar": 0.81,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "ta.sma",
+          "ms": 10.63,
+          "calls": 3011,
+          "callsPerBar": 0.19,
+          "inclusiveUsPerBar": 0.66,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "ta.atr",
+          "ms": 8.18,
+          "calls": 4000,
+          "callsPerBar": 0.25,
+          "inclusiveUsPerBar": 0.51,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "ta.highest",
+          "ms": 6.58,
+          "calls": 7000,
+          "callsPerBar": 0.44,
+          "inclusiveUsPerBar": 0.41,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "ta.lowest",
+          "ms": 5.22,
+          "calls": 6000,
+          "callsPerBar": 0.38,
+          "inclusiveUsPerBar": 0.33,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "plotchar",
+          "ms": 5.11,
+          "calls": 2000,
+          "callsPerBar": 0.13,
+          "inclusiveUsPerBar": 0.32,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "ta.stdev",
+          "ms": 4.08,
+          "calls": 2000,
+          "callsPerBar": 0.13,
+          "inclusiveUsPerBar": 0.25,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "input.float",
+          "ms": 3.54,
+          "calls": 3000,
+          "callsPerBar": 0.19,
+          "inclusiveUsPerBar": 0.22,
+          "inclusiveShareOfGap": 0
+        }
+      ],
+      "seriesMethods": {
+        "genericGet": {
+          "ms": 19.37,
+          "calls": 772803,
+          "callsPerBar": 48.3,
+          "totalLength": 413764034,
+          "maxLength": 1000,
+          "averageLength": 535.4,
+          "inclusiveUsPerBar": 1.21,
+          "inclusiveShareOfGap": 0.01
+        },
+        "genericSet": {
+          "ms": 50.39,
+          "calls": 2034586,
+          "callsPerBar": 127.16,
+          "totalLength": 850878619,
+          "maxLength": 1000,
+          "averageLength": 418.2,
+          "inclusiveUsPerBar": 3.15,
+          "inclusiveShareOfGap": 0.04
+        },
+        "genericAdvance": {
+          "ms": 27.17,
+          "calls": 754235,
+          "callsPerBar": 47.14,
+          "totalLength": 362839916,
+          "maxLength": 1000,
+          "averageLength": 481.1,
+          "inclusiveUsPerBar": 1.7,
+          "inclusiveShareOfGap": 0.02
+        },
+        "genericCommit": {
+          "ms": 20.06,
+          "calls": 729599,
+          "callsPerBar": 45.6,
+          "totalLength": 362815280,
+          "maxLength": 1000,
+          "averageLength": 497.3,
+          "inclusiveUsPerBar": 1.25,
+          "inclusiveShareOfGap": 0.01
+        },
+        "genericSnapshot": {
+          "ms": 0.39,
+          "calls": 436,
+          "callsPerBar": 0.03,
+          "totalLength": 433694,
+          "maxLength": 1000,
+          "averageLength": 994.7,
+          "inclusiveUsPerBar": 0.02,
+          "inclusiveShareOfGap": 0
+        },
+        "genericRestore": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "genericToArray": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericGet": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericPush": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericUpdate": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericSave": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericRestore": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericToArray": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericToPlotArray": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        }
+      }
+    },
+    {
+      "barCount": 5000,
+      "totalBars": 80000,
+      "closureTotalMs": 16717.43,
+      "compiledTotalMs": 6900.29,
+      "perBarGapUs": 122.72,
+      "buckets": {
+        "builtinInclusive": {
+          "ms": 2553.48,
+          "calls": 7904938,
+          "callsPerBar": 98.81,
+          "inclusiveUsPerBar": 31.92,
+          "inclusiveShareOfGap": 0.26
+        },
+        "scopeInclusive": {
+          "ms": 4691.62,
+          "calls": 54891958,
+          "callsPerBar": 686.15,
+          "inclusiveUsPerBar": 58.65,
+          "inclusiveShareOfGap": 0.48
+        },
+        "contextInclusive": {
+          "ms": 146.08,
+          "calls": 165915,
+          "callsPerBar": 2.07,
+          "inclusiveUsPerBar": 1.83,
+          "inclusiveShareOfGap": 0.01
+        },
+        "requestInclusive": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        }
+      },
+      "builtinFamilies": {
+        "other": {
+          "ms": 620.8,
+          "calls": 2424739,
+          "callsPerBar": 30.31,
+          "inclusiveUsPerBar": 7.76,
+          "inclusiveShareOfGap": 0.06
+        },
+        "visual": {
+          "ms": 469.58,
+          "calls": 215000,
+          "callsPerBar": 2.69,
+          "inclusiveUsPerBar": 5.87,
+          "inclusiveShareOfGap": 0.05
+        },
+        "ta": {
+          "ms": 348.18,
+          "calls": 250469,
+          "callsPerBar": 3.13,
+          "inclusiveUsPerBar": 4.35,
+          "inclusiveShareOfGap": 0.04
+        },
+        "array": {
+          "ms": 39.04,
+          "calls": 300924,
+          "callsPerBar": 3.76,
+          "inclusiveUsPerBar": 0.49,
+          "inclusiveShareOfGap": 0
+        },
+        "drawing": {
+          "ms": 1075.89,
+          "calls": 4713806,
+          "callsPerBar": 58.92,
+          "inclusiveUsPerBar": 13.45,
+          "inclusiveShareOfGap": 0.11
+        }
+      },
+      "topBuiltins": [
+        {
+          "name": "plotshape",
+          "ms": 224.91,
+          "calls": 100000,
+          "callsPerBar": 1.25,
+          "inclusiveUsPerBar": 2.81,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "plot",
+          "ms": 200.66,
+          "calls": 85000,
+          "callsPerBar": 1.06,
+          "inclusiveUsPerBar": 2.51,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "input.int",
+          "ms": 189.87,
+          "calls": 140000,
+          "callsPerBar": 1.75,
+          "inclusiveUsPerBar": 2.37,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_color",
+          "ms": 188.15,
+          "calls": 670389,
+          "callsPerBar": 8.38,
+          "inclusiveUsPerBar": 2.35,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_x2",
+          "ms": 185.21,
+          "calls": 670389,
+          "callsPerBar": 8.38,
+          "inclusiveUsPerBar": 2.32,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "input",
+          "ms": 184.54,
+          "calls": 180000,
+          "callsPerBar": 2.25,
+          "inclusiveUsPerBar": 2.31,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_width",
+          "ms": 165.77,
+          "calls": 670389,
+          "callsPerBar": 8.38,
+          "inclusiveUsPerBar": 2.07,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_y1",
+          "ms": 163.42,
+          "calls": 670389,
+          "callsPerBar": 8.38,
+          "inclusiveUsPerBar": 2.04,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_y2",
+          "ms": 160.31,
+          "calls": 670389,
+          "callsPerBar": 8.38,
+          "inclusiveUsPerBar": 2,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "line.set_style",
+          "ms": 152.87,
+          "calls": 670389,
+          "callsPerBar": 8.38,
+          "inclusiveUsPerBar": 1.91,
+          "inclusiveShareOfGap": 0.02
+        },
+        {
+          "name": "ta.wma",
+          "ms": 112.56,
+          "calls": 60000,
+          "callsPerBar": 0.75,
+          "inclusiveUsPerBar": 1.41,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "input.bool",
+          "ms": 79.97,
+          "calls": 160000,
+          "callsPerBar": 2,
+          "inclusiveUsPerBar": 1,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "input.color",
+          "ms": 61.75,
+          "calls": 135000,
+          "callsPerBar": 1.69,
+          "inclusiveUsPerBar": 0.77,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "ta.atr",
+          "ms": 54.55,
+          "calls": 20000,
+          "callsPerBar": 0.25,
+          "inclusiveUsPerBar": 0.68,
+          "inclusiveShareOfGap": 0.01
+        },
+        {
+          "name": "ta.stdev",
+          "ms": 33.59,
+          "calls": 10000,
+          "callsPerBar": 0.13,
+          "inclusiveUsPerBar": 0.42,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "ta.highest",
+          "ms": 26.61,
+          "calls": 35000,
+          "callsPerBar": 0.44,
+          "inclusiveUsPerBar": 0.33,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "int",
+          "ms": 22.52,
+          "calls": 703896,
+          "callsPerBar": 8.8,
+          "inclusiveUsPerBar": 0.28,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "ta.sma",
+          "ms": 22.1,
+          "calls": 15011,
+          "callsPerBar": 0.19,
+          "inclusiveUsPerBar": 0.28,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "plotchar",
+          "ms": 21.53,
+          "calls": 10000,
+          "callsPerBar": 0.13,
+          "inclusiveUsPerBar": 0.27,
+          "inclusiveShareOfGap": 0
+        },
+        {
+          "name": "ta.lowest",
+          "ms": 20.29,
+          "calls": 30000,
+          "callsPerBar": 0.38,
+          "inclusiveUsPerBar": 0.25,
+          "inclusiveShareOfGap": 0
+        }
+      ],
+      "seriesMethods": {
+        "genericGet": {
+          "ms": 109.24,
+          "calls": 4325691,
+          "callsPerBar": 54.07,
+          "totalLength": 11002918811,
+          "maxLength": 5000,
+          "averageLength": 2543.6,
+          "inclusiveUsPerBar": 1.37,
+          "inclusiveShareOfGap": 0.01
+        },
+        "genericSet": {
+          "ms": 335.83,
+          "calls": 13380594,
+          "callsPerBar": 167.26,
+          "totalLength": 24260074764,
+          "maxLength": 5000,
+          "averageLength": 1813.1,
+          "inclusiveUsPerBar": 4.2,
+          "inclusiveShareOfGap": 0.03
+        },
+        "genericAdvance": {
+          "ms": 142.48,
+          "calls": 3805485,
+          "callsPerBar": 47.57,
+          "totalLength": 9186811166,
+          "maxLength": 5000,
+          "averageLength": 2414.1,
+          "inclusiveUsPerBar": 1.78,
+          "inclusiveShareOfGap": 0.01
+        },
+        "genericCommit": {
+          "ms": 124.07,
+          "calls": 3681599,
+          "callsPerBar": 46.02,
+          "totalLength": 9186687280,
+          "maxLength": 5000,
+          "averageLength": 2495.3,
+          "inclusiveUsPerBar": 1.55,
+          "inclusiveShareOfGap": 0.01
+        },
+        "genericSnapshot": {
+          "ms": 2.16,
+          "calls": 436,
+          "callsPerBar": 0.01,
+          "totalLength": 2177694,
+          "maxLength": 5000,
+          "averageLength": 4994.7,
+          "inclusiveUsPerBar": 0.03,
+          "inclusiveShareOfGap": 0
+        },
+        "genericRestore": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "genericToArray": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericGet": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericPush": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericUpdate": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericSave": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericRestore": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericToArray": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        },
+        "numericToPlotArray": {
+          "ms": 0,
+          "calls": 0,
+          "callsPerBar": 0,
+          "totalLength": 0,
+          "maxLength": 0,
+          "averageLength": 0,
+          "inclusiveUsPerBar": 0,
+          "inclusiveShareOfGap": 0
+        }
+      }
+    }
+  ],
+  "findings": {
+    "typicalCostConclusion": "On the middle-ratio sample, closure/compiled is 1.42x at 160 bars, 1.59x at 5000 bars (+0.17x from 160), and 1.65x at 20000 bars. The curve plateaus in the high-1.x range rather than climbing without bound. The 160-bar regression is mostly construction amortization: closure binding costs 13.93 us/bar at 160 bars but 0.45 us/bar at 5000 bars.",
+    "addressableCostCenters": [
+      {
+        "name": "Scope and lifecycle method traffic",
+        "evidence": "Instrumented closure execution made 8573084 scope/lifecycle calls on 16000 bar executions (535.82 per bar) and 54891958 calls on 80000 bar executions (686.15 per bar). Inclusive scope probes account for 46.83 us/bar at 1000 bars and 58.65 us/bar at 5000 bars; this bucket is larger than the measured uninstrumented gap because probe wrappers add overhead, but it remains the highest call-volume surface.",
+        "estimatedRecovery": "Moderate: local slot binding for simple globals/UDF locals and cheaper function-scope lifecycle handling could remove many Map/prototype calls.",
+        "risk": "High around re-entry: scope snapshots, imported UDF state and call-site isolation are the bug-prone areas this branch already fixed repeatedly."
+      },
+      {
+        "name": "Builtin argument marshalling and shared builtin dispatch",
+        "evidence": "Inclusive builtin probes account for 27.79 us/bar at 1000 bars and 31.92 us/bar at 5000 bars; calls per bar rise from 77.38 to 98.81. The hottest 5000-bar families are drawing:13.45us/bar/58.92calls, other:7.76us/bar/30.31calls, visual:5.87us/bar/2.69calls, ta:4.35us/bar/3.13calls.",
+        "estimatedRecovery": "Moderate: pre-bind no-named positional call shapes and reuse empty named maps where safe; bigger gains need direct helpers for hot visual/TA calls.",
+        "risk": "Medium: named-argument ordering and source-aware input/TA values have produced correctness bugs, so each specialization needs two-path parity tests."
+      },
+      {
+        "name": "Lookback-gated workload becoming active",
+        "evidence": "The 5000-bar probe shows no meaningful full-history copy cost: generic snapshot is 0.03 us/bar over 436 calls and generic toArray is 0 us/bar over 0 calls. The rise is instead ordinary per-bar work: builtin calls per bar and scope/lifecycle calls per bar are higher at 5000 than at 1000 because longer synthetic windows cross script lookback and drawing/array thresholds.",
+        "estimatedRecovery": "Moderate and targeted: specialize hot builtin/method call shapes and reduce scope mirroring around active drawing/array paths; history representation is not currently the measured slope.",
+        "risk": "Medium: these are exactly the conditional long-window paths the 160-bar corpus can underexercise."
+      },
+      {
+        "name": "Closure executable re-binding on every executeClosure call",
+        "evidence": "The closure support/bind pass costs 13.93 us/bar at 160 bars and 0.45 us/bar at 5000 bars in this sample, while the closure/compiled ratio does not improve with bar count.",
+        "estimatedRecovery": "Small for steady-state charts; still worth considering for frequent short-window executions or realtime recompute if a reusable closure plan can avoid retaining runtime state.",
+        "risk": "Medium: closures currently capture an engine instance, so the cache must not retain runtime state across executions or AST versions."
+      },
+      {
+        "name": "Context/output lifecycle",
+        "evidence": "Context probes account for 1.8 us/bar at 1000 bars, far below scope and builtin traffic.",
+        "estimatedRecovery": "Low: this is not where the 1.5x median primarily goes.",
+        "risk": "Low to medium; output identity and drawing lifecycle are heavily tested but easy to regress visually."
+      }
+    ],
+    "inherentCostCenters": [
+      {
+        "name": "Closure-per-node invocation chain",
+        "evidence": "After removing measured setup/builtin/scope/context/request inclusive buckets, the remaining time is ordinary closure calls, arithmetic, control flow and output assembly; compiled JavaScript inlines much of that into one generated function.",
+        "estimatedFloor": "Non-zero: each bound expression remains at least one JavaScript function call unless a later closure optimizer fuses expression trees."
+      }
+    ]
+  },
+  "limitations": [
+    "Node timing on the shared development machine; absolute times are noisier than ratios.",
+    "The sample deliberately targets the middle of T103 distribution and excludes screener outliers, so it answers typical web-user cost rather than fan-out cost.",
+    "Inclusive probes can overlap: builtin time may include scope/context work performed inside a builtin. Use them to rank cost centers, not to sum to 100%.",
+    "The bar-count curve uses synthetic bars. It shows amortization direction, but not real exchange/session/provider behavior.",
+    "This is measurement only; it does not change runtime behavior or optimize the closure backend."
+  ]
+}

@@ -188,7 +188,7 @@ plot(scaleMatches ? 1 : 0, title="Scale Constants")
 
     expect(breakLine.style).toBe('linebr');
     expect(breakLine.lineStyle).toBe('dashed');
-    expect(breakLine.display).toBe(11);
+    expect(breakLine.display).toBe(27);
     expect(stepDiamonds.style).toBe('stepline_diamond');
     expect(stepDiamonds.display).toBe(0);
     expect(stepBreak.style).toBe('steplinebr');
@@ -367,7 +367,7 @@ plotarrow(close - open, "Move Arrow", color.new(color.green, 50), color.new(colo
       maxHeight: 20,
       editable: false,
       showLast: 7,
-      display: 15,
+      display: 31,
       format: 'price',
       precision: 2,
       forceOverlay: true,

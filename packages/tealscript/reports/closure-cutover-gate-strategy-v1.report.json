@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "sourceReports": [
+    "reports/external-pine-strategy-corpus-v1.report.json"
+  ],
+  "corpora": [
+    {
+      "corpus": "strategy",
+      "dominated": {
+        "count": 24,
+        "exceptions": []
+      },
+      "corroboratedGain": {
+        "count": 8,
+        "scripts": [
+          {
+            "id": "0026:https://github.com/geraked/tradingview:strategies/ABSAR.pine",
+            "localPath": "sources/0026-geraked_tradingview-strategies_ABSAR.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings.length",
+              "kind": "drawings"
+            }
+          },
+          {
+            "id": "0030:https://github.com/geraked/tradingview:strategies/DHLAOS.pine",
+            "localPath": "sources/0030-geraked_tradingview-strategies_DHLAOS.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values[2]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0033:https://github.com/geraked/tradingview:strategies/NWERSIASF.pine",
+            "localPath": "sources/0033-geraked_tradingview-strategies_NWERSIASF.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[2].values[13]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0051:https://github.com/NinjaView/Pinescript:TripleRed(ES3min).txt",
+            "localPath": "sources/0051-NinjaView_Pinescript-TripleRed_ES3min_.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.alerts.length",
+              "kind": "alerts"
+            }
+          },
+          {
+            "id": "0052:https://github.com/NinjaView/Pinescript:UTBOT(ES5min).txt",
+            "localPath": "sources/0052-NinjaView_Pinescript-UTBOT_ES5min_.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[4].values.length",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0079:https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy:crypto/Crypto ICT Liquidity Sweep Reversal Strategy v1/strategy/crypto_ict_liquidity_sweep_reversal_v1.pine",
+            "localPath": "sources/0079-pranay123-stack_Tradingview_Pinescript_Strategy-crypto_Crypto_ICT_Liquidity_Sweep_Reversal_Strategy_v1_strategy_crypto_ict_liquidity_sweep_reversal_v1.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.alerts[10].events[1].message",
+              "kind": "alerts"
+            }
+          },
+          {
+            "id": "0080:https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy:crypto/ICT Volume Profile Continuation Strategy v1/ICT_Volume_Profile_Continuation_v1.pine",
+            "localPath": "sources/0080-pranay123-stack_Tradingview_Pinescript_Strategy-crypto_ICT_Volume_Profile_Continuation_Strategy_v1_ICT_Volume_Profile_Continuation_v1.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings[0].cells[3].text",
+              "kind": "drawings"
+            }
+          },
+          {
+            "id": "0084:https://github.com/Arisamin/Pinescript_Strategy_Framework:Strategies/MeanReversion.pine",
+            "localPath": "sources/0084-Arisamin_Pinescript_Strategy_Framework-Strategies_MeanReversion.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings[0].cells[28].text",
+              "kind": "drawings"
+            }
+          }
+        ]
+      },
+      "uncorroboratedClosureOutput": {
+        "count": 0,
+        "scripts": []
+      },
+      "errorBackedClosureOutput": {
+        "count": 1,
+        "scripts": [
+          {
+            "id": "0042:https://github.com/hirawatt/pineScripts:strategy/defaultStrategy.pine",
+            "localPath": "sources/0042-hirawatt_pineScripts-strategy_defaultStrategy.pine",
+            "agreement": "three-way-mismatch",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings[0].barIndex",
+              "kind": "drawings"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

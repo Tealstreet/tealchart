@@ -63,8 +63,8 @@ signals, public moving-average ribbons, public percentile/rank regimes, public
 stochastic, MFI, CCI, CMO, TSI, and Williams %R oscillator signals,
 public ROC and Momentum signals, public zigzag polylines, public
 strategy performance tables, public `varip` intrabar array buffers, public
-wrapped declaration/call layouts, planned footprint request diagnostics, plus
-UDT state objects updated through user-defined methods.
+wrapped declaration/call layouts, provider-backed footprint request availability,
+plus UDT state objects updated through user-defined methods.
 Strategy coverage includes source-linked entry/exit flows, broker path behavior,
 bar magnifier, stop-limit orders, selective immediate closes, fill-alert
 suppression, entry-direction, max-position, intraday filled-order, and
@@ -189,8 +189,8 @@ Covered behavior and remaining gaps:
   weighted cumulative standard-deviation bands. A source-linked public
   anchored VWAP band checkpoint locks the common overlay/channel idiom in the
   offline corpus.
-- Recursive user-defined function calls are rejected with an explicit diagnostic
-  instead of overflowing the runtime stack.
+- Recursive user-defined function calls run with a depth guard in TealScript;
+  semantic analysis emits a warning because Pine v6 does not support recursion.
 - Arbitrary nested indented blocks still use a simplified indentation grammar
   and need continued hardening beyond the covered public-script layouts.
 - The parser wrapper rejects scripts larger than 1,000,000 UTF-16 code units
@@ -949,16 +949,12 @@ Parabolic SAR reversal, linear-regression channel, stochastic and MFI
 oscillators, currency-conversion, earnings-event, corporate-action,
 financial-dashboard, economic-macro, and seed-dataset request idioms, an
 official lower-timeframe array idiom, plus a public multi-symbol screener idiom.
-It also tracks a public footprint request diagnostic as an `unsupported_planned`
-semantic blocker.
+It also tracks public footprint request idioms with provider-backed seeded and
+unseeded-`na` behavior.
 
-Known limits: request data availability is host/provider-gated, and
-`request.footprint()` remains unsupported until the host can provide the
-footprint/intrabar volume model described in
-[`FOOTPRINT_REQUEST_DESIGN.md`](./FOOTPRINT_REQUEST_DESIGN.md). Semantic
-analysis reports the planned `request.footprint()` gap with the same explicit
-unsupported-feature diagnostic used by runtime execution, and the source-linked
-footprint checkpoint keeps that gap visible in pass-rate reporting.
+Known limits: request data availability is host/provider-gated, footprint
+accessor helpers remain outside current runtime coverage, and unseeded
+`request.footprint()` returns `na` through the same deterministic datafeed seam.
 
 The ticker pass covers `ticker.new()`, `ticker.modify()`, `ticker.standard()`,
 `ticker.inherit()`, `ticker.heikinashi()`, `ticker.renko()`,

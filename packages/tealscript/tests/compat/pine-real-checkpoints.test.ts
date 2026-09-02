@@ -1407,11 +1407,11 @@ plot(sellSignal ? 1 : 0, title="Sell Signal")
       ['ATR Period', 'int'],
     ]);
     // Bars 0-1 are na: ATR seeds on bar 2 (first full window of atrLen=3)
-    expect(getPlot(result, 'Direction').values).toEqual([null, null, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1]);
-    expect(getPlot(result, 'Up Trend').values).toEqual([null, null, 107, 103, 99, 100, 104, 109, 108, null, null, null]);
-    expect(getPlot(result, 'Down Trend').values).toEqual([null, null, null, null, null, null, null, null, null, 111, 110, 112]);
-    expect(getPlot(result, 'Buy Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    expect(getPlot(result, 'Sell Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]);
+    expect(getPlot(result, 'Direction').values).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1]);
+    expect(getPlot(result, 'Up Trend').values).toEqual([null, null, null, null, null, null, null, null, null, 111, 110, 112]);
+    expect(getPlot(result, 'Down Trend').values).toEqual([null, null, 107, 103, 99, 100, 104, 109, 108, null, null, null]);
+    expect(getPlot(result, 'Buy Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]);
+    expect(getPlot(result, 'Sell Signal').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     expect(getPlot(result, 'Supertrend').values.some((value) => value !== null)).toBe(true);
   });
 
@@ -4788,25 +4788,19 @@ plot(close > threshold ? 1 : 0, title="After Guard")
     expect(getPlot(result, 'After Guard').values).toEqual([0, 1]);
   });
 
-  it('locks a reduced public footprint request diagnostic idiom', () => {
-    // Public idiom reference: footprint-style public scripts may compile around
-    // `request.footprint()`, but deterministic replay still requires a
-    // host-provided footprint/intrabar volume model.
+  it('locks a reduced public footprint request idiom with unseeded na output', () => {
+    // Public idiom reference: footprint-style public scripts can request
+    // footprint objects, while deterministic replay returns na when unseeded.
     // Source search: https://www.tradingview.com/scripts/search/footprint%20request/
     const result = runCompatScript(`
-indicator("Public Footprint Request Diagnostic Checkpoint")
-footprintDelta = request.footprint(syminfo.tickerid)
+indicator("Public Footprint Request Checkpoint")
+footprintDelta = request.footprint(10, 70)
+plot(na(footprintDelta) ? 1 : 0, title="Missing Footprint")
 plot(close, title="Close")
 `, { bars: [compatibilityBars[0]!] });
 
-    const unsupportedMessage =
-      'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model';
-
-    expect(result.errors.filter((error) => error.message === unsupportedMessage)).toEqual([
-      expect.objectContaining({
-        message: unsupportedMessage,
-      }),
-    ]);
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Missing Footprint').values).toEqual([1]);
     expect(getPlot(result, 'Close').values).toEqual([102]);
   });
 
@@ -6139,16 +6133,14 @@ plot(risingOBV ? 1 : 0, title="Rising OBV")
     expect(getPlot(result, 'Rising OBV').values).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
   });
 
-  it('locks a reduced public recursive UDF idiom', () => {
-    // Recursive UDFs are supported with a depth limit of 100.
-    // Source search: https://www.tradingview.com/scripts/search/recursive%20factorial/
+  it('locks recursive UDF idioms as a TealScript superset', () => {
     const result = runCompatScript(`
 indicator("Public Recursive UDF Checkpoint")
 factorial(n) => n <= 1 ? 1 : n * factorial(n - 1)
 plot(factorial(3), title="Factorial")
 `, { bars: [compatibilityBars[0]!] });
 
-    expect(result.errors).toHaveLength(0);
+    expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Factorial').values).toEqual([6]);
   });
 
@@ -6788,10 +6780,7 @@ plot(array.get(mapped, 2), title="V2")
     expect(getPlot(result, 'V2').values).toEqual(Array(compatibilityBars.length).fill(6));
   });
 
-  it('locks the recursive UDF Fibonacci idiom', () => {
-    // Public idiom reference: recursive user-defined functions are a key v6
-    // language feature. fib(8) = 21 is the canonical small verification.
-    // Source search: https://www.tradingview.com/scripts/search/recursive%20fibonacci%20udf/
+  it('locks recursive Fibonacci helpers as a TealScript superset', () => {
     const result = runCompatScript(`
 indicator("Recursive Fibonacci Checkpoint")
 fib(n) =>

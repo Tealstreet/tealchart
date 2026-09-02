@@ -3,6 +3,9 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 export interface IndicatorOutputPaneInfo {
   overlay: boolean;
   paneId?: string;
+  format?: string;
+  precision?: number;
+  scale?: string;
 }
 
 export interface IndicatorOutputPane {
@@ -20,6 +23,7 @@ export interface IndicatorOutputAxisLabelSource {
   sourceIndex: number;
   value: number;
   color: string;
+  format?: string;
   precision?: number;
   sourceX?: number;
 }
@@ -109,6 +113,7 @@ export function getIndicatorOutputAxisLabelSources({
   for (const plot of plots) {
     const scriptId = plot.scriptId ?? 'unknown';
     const info = indicatorPaneInfo?.[scriptId];
+    if (info?.scale === 'none') continue;
     const paneId = info?.overlay === false ? info.paneId ?? paneByScriptId.get(scriptId) : mainPaneId;
     if (!paneId) continue;
 
@@ -124,11 +129,35 @@ export function getIndicatorOutputAxisLabelSources({
       sourceIndex: latest.sourceIndex,
       value: latest.value,
       color: getIndicatorPlotColor(plot.color, latest.sourceIndex),
-      precision: plot.precision,
+      format: plot.format ?? info?.format,
+      precision: plot.precision ?? info?.precision,
     });
   }
 
   return outputLabels;
+}
+
+function formatVolumeValue(value: number): string {
+  const abs = Math.abs(value);
+  const suffixes: Array<[number, string]> = [
+    [1_000_000_000_000, 'T'],
+    [1_000_000_000, 'B'],
+    [1_000_000, 'M'],
+    [1_000, 'K'],
+  ];
+
+  for (const [threshold, suffix] of suffixes) {
+    if (abs >= threshold) {
+      const scaled = value / threshold;
+      const decimals = Math.abs(scaled) >= 10 ? 1 : 2;
+      return `${scaled.toFixed(decimals).replace(/\.0+$/, '').replace(/(\.\d)0$/, '$1')}${suffix}`;
+    }
+  }
+
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2,
+    useGrouping: true,
+  }).format(value);
 }
 
 export function getIndicatorOutputAxisLabelDecimals(range: number, precision?: number): number {
@@ -143,11 +172,17 @@ export function getIndicatorOutputAxisLabelDecimals(range: number, precision?: n
   return 4;
 }
 
-export function formatIndicatorOutputAxisValue(value: number, range: number, precision?: number): string {
+export function formatIndicatorOutputAxisValue(value: number, range: number, precision?: number, format?: string): string {
+  if (format === 'volume') {
+    return formatVolumeValue(value);
+  }
+
   const decimals = getIndicatorOutputAxisLabelDecimals(range, precision);
-  return new Intl.NumberFormat('en-US', {
+  const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
     useGrouping: true,
   }).format(value);
+
+  return format === 'percent' ? `${formatted}%` : formatted;
 }

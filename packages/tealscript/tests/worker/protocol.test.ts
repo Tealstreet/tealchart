@@ -27,6 +27,7 @@ describe('worker protocol output bundles', () => {
     logs: [],
     inputs: [],
     profile: {
+      executionMode: 'compiled',
       elapsedMs: 12,
       bars: 2,
       statements: 8,
@@ -135,7 +136,7 @@ describe('worker protocol semantic diagnostics', () => {
     const diagnostics: SemanticDiagnostic[] = [
       {
         code: 'unsupported-feature',
-        message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        message: 'planned feature is not supported yet',
         severity: 'error',
         line: 2,
         column: 1,
@@ -145,7 +146,7 @@ describe('worker protocol semantic diagnostics', () => {
     expect(createSemanticErrorMessage('study-unsupported', diagnostics, diagnostics[0]!.message)).toEqual({
       type: 'semanticError',
       scriptId: 'study-unsupported',
-      message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      message: 'planned feature is not supported yet',
       diagnostics,
       line: 2,
       column: 1,

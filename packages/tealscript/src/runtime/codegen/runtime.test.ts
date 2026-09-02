@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NumericSeries } from './runtime';
+import { NumericSeries, ValueSeries } from './runtime';
 
 describe('NumericSeries', () => {
   it('starts empty', () => {
@@ -171,5 +171,33 @@ describe('NumericSeries', () => {
       expect(s.get(offset)).toBe(cap + 99 - offset);
     }
     expect(s.get(cap)).toBeNaN();
+  });
+});
+
+describe('ValueSeries', () => {
+  it('preserves non-numeric values for generated script history', () => {
+    const s = new ValueSeries(3);
+    s.push(false);
+    s.push('open');
+    s.push({ kind: 'marker' });
+
+    expect(s.get(0)).toEqual({ kind: 'marker' });
+    expect(s.get(1)).toBe('open');
+    expect(s.get(2)).toBe(false);
+    expect(s.get(3)).toBeNaN();
+  });
+
+  it('save/restore preserves value identity and ring order', () => {
+    const s = new ValueSeries(2);
+    const retained = { value: true };
+    s.push(false);
+    s.push(retained);
+
+    const snap = s.save();
+    s.push('replacement');
+    s.restore(snap);
+
+    expect(s.get(0)).toBe(retained);
+    expect(s.get(1)).toBe(false);
   });
 });

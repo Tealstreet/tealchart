@@ -1,4 +1,5 @@
 import type { SkPath } from '@shopify/react-native-skia';
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { RenderOptions } from '../../types';
 import type { NativeChartFrame } from './nativeChartFrame';
 import type { NativeChartProjection } from './nativeProjection';
@@ -36,6 +37,20 @@ interface NativeLiveVolumeGeometry {
 
 type NativeOhlcvPathSide = 'up' | 'down';
 
+function isNativeBarcolorPlotVisible(plot: Pick<PlotOutput, 'display'>): boolean {
+  return plot.display !== 0;
+}
+
+function shouldRenderNativeBarcolorPlotBar(
+  plot: Pick<PlotOutput, 'showLast'>,
+  totalBarCount: number,
+  sourceIndex: number,
+): boolean {
+  if (plot.showLast === undefined) return true;
+  if (plot.showLast <= 0) return false;
+  return sourceIndex >= Math.max(0, totalBarCount - plot.showLast);
+}
+
 function appendNativeRectPath(path: SkPath, x: number, y: number, width: number, height: number): void {
   'worklet';
   if (width <= 0 || height <= 0) return;
@@ -65,6 +80,25 @@ function appendNativeCandlePath(path: SkPath, geometry: NativeLiveCandleGeometry
 function isNativeBarOnPathSide(bar: NativeVisibleBar, side: NativeOhlcvPathSide): boolean {
   'worklet';
   return side === 'up' ? bar.close >= bar.open : bar.close < bar.open;
+}
+
+function resolveNativeBarColorOverride(
+  barColorPlots: readonly PlotOutput[] | undefined,
+  sourceIndex: number,
+  totalBarCount: number,
+): string | null {
+  'worklet';
+  if (!barColorPlots) return null;
+  let override: string | null = null;
+  for (let index = 0; index < barColorPlots.length; index += 1) {
+    const plot = barColorPlots[index];
+    if (plot.type !== 'barcolor' || !Array.isArray(plot.color)) continue;
+    if (!isNativeBarcolorPlotVisible(plot)) continue;
+    if (!shouldRenderNativeBarcolorPlotBar(plot, totalBarCount, sourceIndex)) continue;
+    const color = plot.color[sourceIndex];
+    if (color) override = color;
+  }
+  return override;
 }
 
 function isNativeOhlcvHorizontallyVisible({
@@ -392,12 +426,14 @@ export function getNativeProjectedVolumePath({
 }
 
 function NativeLiveCandlePath({
+  barColorPlots,
   bars,
   frame,
   options,
   sharedViewport,
   side,
 }: {
+  barColorPlots?: readonly PlotOutput[];
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   options: RenderOptions;
@@ -413,17 +449,75 @@ function NativeLiveCandlePath({
       side,
     }),
   );
+  const overrideColors = getNativeBarcolorColors(barColorPlots);
 
-  return <SkiaPath path={path} color={candleColor} />;
+  return (
+    <>
+      <SkiaPath path={path} color={candleColor} />
+      {overrideColors.map((color) => (
+        <NativeLiveBarcolorCandlePath
+          key={color}
+          barColor={color}
+          barColorPlots={barColorPlots}
+          bars={bars}
+          frame={frame}
+          sharedViewport={sharedViewport}
+          side={side}
+        />
+      ))}
+    </>
+  );
+}
+
+function getNativeBarcolorColors(barColorPlots: readonly PlotOutput[] | undefined): string[] {
+  const colors = new Set<string>();
+  for (const plot of barColorPlots ?? []) {
+    if (plot.type !== 'barcolor' || !Array.isArray(plot.color) || !isNativeBarcolorPlotVisible(plot)) continue;
+    for (const color of plot.color) {
+      if (color) colors.add(color);
+    }
+  }
+  return Array.from(colors);
+}
+
+function NativeLiveBarcolorCandlePath({
+  barColor,
+  barColorPlots,
+  bars,
+  frame,
+  sharedViewport,
+  side,
+}: {
+  barColor: string;
+  barColorPlots?: readonly PlotOutput[];
+  bars: readonly NativeVisibleBar[];
+  frame: NativeChartFrame;
+  sharedViewport: NativeViewportSharedValues;
+  side: NativeOhlcvPathSide;
+}) {
+  const path = useDerivedValue(() => {
+    const built = Skia.Path.Make();
+    for (const bar of bars) {
+      if (!isNativeBarOnPathSide(bar, side)) continue;
+      const color = resolveNativeBarColorOverride(barColorPlots, bar.sourceIndex, bars.length);
+      if (color !== barColor) continue;
+      appendNativeCandlePath(built, getNativeLiveCandleGeometry({ bar, frame, sharedViewport }));
+    }
+    return built;
+  });
+
+  return <SkiaPath path={path} color={barColor} />;
 }
 
 function NativeProjectedCandlePath({
+  barColorPlots,
   bars,
   frame,
   options,
   projection,
   side,
 }: {
+  barColorPlots?: readonly PlotOutput[];
   bars: readonly NativeVisibleBar[];
   frame: NativeChartFrame;
   options: RenderOptions;
@@ -432,8 +526,24 @@ function NativeProjectedCandlePath({
 }) {
   const candleColor = side === 'up' ? options.upColor : options.downColor;
   const path = getNativeProjectedCandlesPath({ bars, frame, projection, side });
+  const overridePaths = new Map<string, SkPath>();
+  for (const bar of bars) {
+    if (!isNativeBarOnPathSide(bar, side)) continue;
+    const color = resolveNativeBarColorOverride(barColorPlots, bar.sourceIndex, bars.length);
+    if (!color) continue;
+    const built = overridePaths.get(color) ?? Skia.Path.Make();
+    appendNativeCandlePath(built, getNativeProjectedCandleGeometry({ bar, frame, projection }));
+    overridePaths.set(color, built);
+  }
 
-  return <SkiaPath path={path} color={candleColor} />;
+  return (
+    <>
+      <SkiaPath path={path} color={candleColor} />
+      {Array.from(overridePaths).map(([color, overridePath]) => (
+        <SkiaPath key={color} path={overridePath} color={color} />
+      ))}
+    </>
+  );
 }
 
 function NativeLiveVolumePath({
@@ -487,6 +597,7 @@ function NativeProjectedVolumePath({
 }
 
 export function NativeCandleVolumeLayerImpl({
+  barColorPlots,
   frame,
   options,
   sharedViewport,
@@ -494,6 +605,7 @@ export function NativeCandleVolumeLayerImpl({
   visibleBars,
   volumeHeight,
 }: {
+  barColorPlots?: readonly PlotOutput[];
   frame: NativeChartFrame;
   options: RenderOptions;
   sharedViewport: NativeViewportSharedValues;
@@ -511,6 +623,7 @@ export function NativeCandleVolumeLayerImpl({
     return (
       <Group clip={staticClip}>
         <NativeProjectedCandlePath
+          barColorPlots={barColorPlots}
           bars={visibleBars}
           frame={frame}
           options={options}
@@ -518,6 +631,7 @@ export function NativeCandleVolumeLayerImpl({
           side="up"
         />
         <NativeProjectedCandlePath
+          barColorPlots={barColorPlots}
           bars={visibleBars}
           frame={frame}
           options={options}
@@ -551,6 +665,7 @@ export function NativeCandleVolumeLayerImpl({
   return (
     <Group clip={liveClip}>
       <NativeLiveCandlePath
+        barColorPlots={barColorPlots}
         bars={visibleBars}
         frame={frame}
         options={options}
@@ -558,6 +673,7 @@ export function NativeCandleVolumeLayerImpl({
         side="up"
       />
       <NativeLiveCandlePath
+        barColorPlots={barColorPlots}
         bars={visibleBars}
         frame={frame}
         options={options}

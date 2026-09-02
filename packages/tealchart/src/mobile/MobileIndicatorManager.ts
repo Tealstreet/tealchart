@@ -21,13 +21,21 @@ import type {
   InputDefinition,
   PlotOutput,
   Program,
+  RequestDatafeed,
+  RuntimeProfile,
+  TealscriptExecutionBackend,
   WorkerError,
 } from '@tealstreet/tealscript';
 import type { EventCallback } from '../events/EventEmitter';
 import type { IndicatorInstance, PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
-import { parse, TealscriptEngine, TealscriptParseError } from '@tealstreet/tealscript';
+import {
+  executeSelectedTealscriptBackend,
+  parse,
+  TealscriptParseError,
+  selectTealscriptExecutionBackend,
+} from '@tealstreet/tealscript';
 import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
 import { EventEmitter } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
@@ -53,6 +61,8 @@ export interface ActiveIndicator {
   isVisible: boolean;
   /** Pine indicator declaration metadata discovered during execution */
   declaration?: IndicatorDeclarationMetadata;
+  /** Last Tealscript execution profile for diagnostics and backend rollout visibility. */
+  runtimeProfile?: RuntimeProfile;
 }
 
 /**
@@ -63,7 +73,10 @@ export interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
   explicitPlotZOrder?: boolean;
+  format?: string;
   inputs?: Record<string, unknown>;
+  precision?: number;
+  scale?: string;
 }
 
 /**
@@ -86,6 +99,13 @@ export interface MobileTealscriptIndicatorOptions {
   yAxisRange?: { min: number; max: number };
 }
 
+export interface MobileIndicatorManagerOptions {
+  tealscriptExecutionBackend?: TealscriptExecutionBackend;
+  enableTealscriptClosureBackend?: boolean | (() => boolean);
+  getLibraries?: () => Map<string, Program> | undefined;
+  getRequestDatafeed?: () => RequestDatafeed | undefined;
+}
+
 /**
  * One indicator's last execution, reusable while its script, inputs and bars
  * are all unchanged. Plots are stored already tagged with `scriptId`, so a
@@ -94,9 +114,12 @@ export interface MobileTealscriptIndicatorOptions {
 interface CachedIndicatorResult {
   ast: Program;
   barsEpoch: number;
+  backendSelectionKey: string;
   drawings: DrawingOutput[];
   inputsKey: string;
+  libraries: Map<string, Program> | undefined;
   plots: PlotOutput[];
+  requestDatafeed: RequestDatafeed | undefined;
 }
 
 let uncacheableInputsCounter = 0;
@@ -118,6 +141,27 @@ function createIndicatorInputsKey(inputs: Record<string, unknown> | undefined): 
 export type MobileIndicatorErrorCallback = (scriptId: string, error: WorkerError) => void;
 
 const MOBILE_INDICATOR_ERROR_EVENT = 'indicator:error';
+const REQUEST_DATA_UNAVAILABLE_ERROR_CODE = 'request-data-unavailable';
+const REQUEST_DATAFEED_REQUIRED_PATTERN = /^(request\.[A-Za-z0-9_]+) requires a request datafeed$/;
+
+function resolveBooleanOption(value: boolean | (() => boolean) | undefined): boolean | undefined {
+  return typeof value === 'function' ? value() : value;
+}
+
+function formatMissingRequestDatafeedError(error: { message: string; line?: number; column?: number }): WorkerError | null {
+  const match = error.message.match(REQUEST_DATAFEED_REQUIRED_PATTERN);
+  if (!match) return null;
+  return {
+    type: 'runtime',
+    severity: 'warning',
+    code: REQUEST_DATA_UNAVAILABLE_ERROR_CODE,
+    message:
+      `Tealscript request data unavailable for ${match[1]}: not supported in this chart because no Tealscript request data resolver is configured. ` +
+      'The script is valid, but Tealstreet cannot supply that data here. Provider detail: No Tealscript request data resolver configured',
+    line: error.line,
+    column: error.column,
+  };
+}
 
 /**
  * MobileIndicatorManager - React-agnostic class for managing indicators
@@ -148,9 +192,47 @@ export class MobileIndicatorManager {
   private _barsEpoch = 0;
   private _plotsRevision = 0;
   private _indicatorsRevision = 0;
+  private _getLibraries: (() => Map<string, Program> | undefined) | undefined;
+  private _getRequestDatafeed: (() => RequestDatafeed | undefined) | undefined;
+  private _tealscriptExecutionBackend: TealscriptExecutionBackend | undefined;
+  private _enableTealscriptClosureBackend: boolean | (() => boolean) | undefined;
 
-  constructor() {
+  constructor(options: MobileIndicatorManagerOptions = {}) {
     this._paneManager = new PaneManager();
+    this._getLibraries = options.getLibraries;
+    this._getRequestDatafeed = options.getRequestDatafeed;
+    this._tealscriptExecutionBackend = options.tealscriptExecutionBackend;
+    this._enableTealscriptClosureBackend = options.enableTealscriptClosureBackend;
+  }
+
+  setLibrariesProvider(getLibraries: (() => Map<string, Program> | undefined) | undefined): void {
+    if (this._getLibraries === getLibraries) return;
+    this._getLibraries = getLibraries;
+    this._resultCache.clear();
+    this._recomputePlots();
+  }
+
+  setRequestDatafeedProvider(getRequestDatafeed: (() => RequestDatafeed | undefined) | undefined): void {
+    if (this._getRequestDatafeed === getRequestDatafeed) return;
+    this._getRequestDatafeed = getRequestDatafeed;
+    this._resultCache.clear();
+    this._recomputePlots();
+  }
+
+  setTealscriptBackendSelection(options: {
+    tealscriptExecutionBackend?: TealscriptExecutionBackend;
+    enableTealscriptClosureBackend?: boolean | (() => boolean);
+  }): void {
+    if (
+      this._tealscriptExecutionBackend === options.tealscriptExecutionBackend &&
+      this._enableTealscriptClosureBackend === options.enableTealscriptClosureBackend
+    ) {
+      return;
+    }
+    this._tealscriptExecutionBackend = options.tealscriptExecutionBackend;
+    this._enableTealscriptClosureBackend = options.enableTealscriptClosureBackend;
+    this._resultCache.clear();
+    this._recomputePlots();
   }
 
   /**
@@ -432,7 +514,10 @@ export class MobileIndicatorManager {
         overlay: activeInd.indicator.overlay,
         yAxisRange: activeInd.indicator.yAxisRange,
         explicitPlotZOrder: activeInd.declaration?.explicitPlotZOrder,
+        format: activeInd.declaration?.format,
         inputs: activeInd.inputs,
+        precision: activeInd.declaration?.precision,
+        scale: activeInd.declaration?.scale,
       };
     }
 
@@ -494,6 +579,7 @@ export class MobileIndicatorManager {
     if (error instanceof TealscriptParseError) {
       return {
         type: 'parse',
+        severity: 'error',
         message: error.message,
         line: error.location?.start.line,
         column: error.location?.start.column,
@@ -502,6 +588,7 @@ export class MobileIndicatorManager {
 
     return {
       type: 'parse',
+      severity: 'error',
       message: error instanceof Error ? error.message : String(error),
     };
   }
@@ -509,13 +596,18 @@ export class MobileIndicatorManager {
   private _toRuntimeError(error: unknown): WorkerError {
     return {
       type: 'runtime',
+      severity: 'error',
       message: error instanceof Error ? error.message : String(error),
     };
   }
 
   private _toExecutionError(error: { message: string; line?: number; column?: number }): WorkerError {
+    const requestDatafeedError = formatMissingRequestDatafeedError(error);
+    if (requestDatafeedError) return requestDatafeedError;
+
     return {
       type: 'runtime',
+      severity: 'error',
       message: error.message,
       line: error.line,
       column: error.column,
@@ -571,17 +663,30 @@ export class MobileIndicatorManager {
       // engine over every bar would only mint identical results. Hiding one
       // indicator or adding another must not re-execute the ones left alone.
       const inputsKey = createIndicatorInputsKey(inputs);
+      const libraries = this._getLibraries?.();
+      const requestDatafeed = this._getRequestDatafeed?.();
+      const backend = selectTealscriptExecutionBackend({
+        executionBackendOverride: this._tealscriptExecutionBackend,
+        enableClosureBackend: resolveBooleanOption(this._enableTealscriptClosureBackend),
+        defaultBackend: 'interpreter',
+      });
+      const backendSelectionKey = `${backend.backend}:${backend.source}`;
       const cached = this._resultCache.get(instanceId);
-      if (cached && cached.ast === ast && cached.barsEpoch === this._barsEpoch && cached.inputsKey === inputsKey) {
+      if (
+        cached &&
+        cached.ast === ast &&
+        cached.barsEpoch === this._barsEpoch &&
+        cached.backendSelectionKey === backendSelectionKey &&
+        cached.inputsKey === inputsKey &&
+        cached.libraries === libraries &&
+        cached.requestDatafeed === requestDatafeed
+      ) {
         allPlots.push(...cached.plots);
         allDrawings.push(...cached.drawings);
         continue;
       }
 
       try {
-        // Create a fresh engine for each execution
-        const engine = new TealscriptEngine();
-
         // Convert inputs to Map
         const inputsMap = new Map<string, unknown>();
         if (inputs) {
@@ -591,7 +696,17 @@ export class MobileIndicatorManager {
         }
 
         // Execute the script
-        const result = engine.execute(ast, this._bars, inputsMap);
+        const result = executeSelectedTealscriptBackend(ast, this._bars, inputsMap, {
+          libraries,
+          requestDatafeed,
+          runtime: {
+            backend: {
+              executionBackendOverride: this._tealscriptExecutionBackend,
+              enableClosureBackend: resolveBooleanOption(this._enableTealscriptClosureBackend),
+              defaultBackend: 'interpreter',
+            },
+          },
+        });
         const firstError = result.errors[0];
         if (firstError) {
           this._emitError(instanceId, this._toExecutionError(firstError));
@@ -609,6 +724,7 @@ export class MobileIndicatorManager {
           this._indicatorsRevision += 1;
         }
         ind.declaration = result.declaration;
+        ind.runtimeProfile = result.profile;
 
         // Tag plots with the instance ID so renderer knows which pane to use
         const taggedPlots = result.plots.map((plot) => ({ ...plot, scriptId: instanceId }));
@@ -616,9 +732,12 @@ export class MobileIndicatorManager {
         this._resultCache.set(instanceId, {
           ast,
           barsEpoch: this._barsEpoch,
+          backendSelectionKey,
           drawings: taggedDrawings,
           inputsKey,
+          libraries,
           plots: taggedPlots,
+          requestDatafeed,
         });
         allPlots.push(...taggedPlots);
         allDrawings.push(...taggedDrawings);

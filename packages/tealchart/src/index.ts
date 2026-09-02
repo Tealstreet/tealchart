@@ -696,6 +696,10 @@ export type {
   PeriodParams,
   // Widget options
   TealchartWidgetOptions,
+  TealscriptExecutionTelemetry,
+  TealscriptExecutionTelemetryFallbackKind,
+  TealscriptExecutionTelemetryOutputKind,
+  TealscriptExecutionTelemetryStatus,
   // Gap detection types
   GapDetectionOptions,
   GapDetectionEvent,

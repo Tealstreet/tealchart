@@ -22,8 +22,11 @@
     "fix-all-files": "eslint . --ext .ts,.tsx,.js,.jsx,.cjs,.mjs --fix",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx,.cjs,.mjs --cache --cache-location ../../.cache/eslint/tealchart.eslintcache",
     "test": "run-s test-unit",
+    "test-ci": "run-s test-unit",
     "test-unit": "vitest run",
     "test-unit-watch": "vitest watch --ui",
+    "mobile:tealscript-closure-smoke": "tsx scripts/run-mobile-tealscript-closure-smoke.ts",
+    "visual:snapshot:drift": "tsx scripts/update-visual-snapshot-drift-baseline.ts",
     "typecheck": "node ../../scripts/tsc-ts6.mjs --project ./tsconfig.json --noEmit",
     "typecheck:native": "node ../../scripts/tsc-ts6.mjs --project ./tsconfig.native.json --noEmit",
     "typecheck:ts7": "node ../../scripts/tsc-ts7.mjs --project ./tsconfig.json --noEmit"

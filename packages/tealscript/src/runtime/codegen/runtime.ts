@@ -4,6 +4,12 @@ export interface NumericSeriesSnapshot {
   buf: Float64Array;
 }
 
+export interface ValueSeriesSnapshot {
+  head: number;
+  size: number;
+  buf: unknown[];
+}
+
 export class NumericSeries {
   buf: Float64Array;
   head: number = 0;
@@ -85,6 +91,67 @@ export class NumericSeries {
       result[start + i] = val !== val ? null : val;
     }
     return result;
+  }
+
+  get length(): number {
+    return this.size;
+  }
+}
+
+export class ValueSeries {
+  buf: unknown[];
+  head: number = 0;
+  size: number = 0;
+  capacity: number;
+
+  constructor(capacity: number = 500) {
+    this.capacity = Math.max(1, Math.trunc(capacity));
+    this.buf = new Array(this.capacity).fill(undefined);
+  }
+
+  push(value: unknown): void {
+    if (this.size === 0) {
+      this.buf[0] = value;
+      this.head = 0;
+      this.size = 1;
+    } else {
+      this.head = this.head === 0 ? this.capacity - 1 : this.head - 1;
+      this.buf[this.head] = value;
+      if (this.size < this.capacity) this.size++;
+    }
+  }
+
+  update(value: unknown): void {
+    if (this.size === 0) {
+      this.push(value);
+    } else {
+      this.buf[this.head] = value;
+    }
+  }
+
+  get(offset: number): unknown {
+    if (offset < 0 || offset >= this.size) return NaN;
+    let idx = this.head + offset;
+    if (idx >= this.capacity) idx -= this.capacity;
+    return this.buf[idx];
+  }
+
+  current(): unknown {
+    return this.size === 0 ? NaN : this.buf[this.head];
+  }
+
+  save(): ValueSeriesSnapshot {
+    return {
+      head: this.head,
+      size: this.size,
+      buf: [...this.buf],
+    };
+  }
+
+  restore(snap: ValueSeriesSnapshot): void {
+    this.head = snap.head;
+    this.size = snap.size;
+    this.buf = [...snap.buf];
   }
 
   get length(): number {

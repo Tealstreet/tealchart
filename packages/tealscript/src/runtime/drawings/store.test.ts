@@ -159,6 +159,20 @@ describe('DrawingStore', () => {
     expect(third.persistent).toBe(true);
   });
 
+  it('marks one drawing by id as persistent', () => {
+    const store = new DrawingStore();
+    const first = label({ id: 'label_0' });
+    const second = line({ id: 'line_0' });
+
+    store.add(first);
+    store.add(second);
+    store.markPersistent('line_0');
+    store.markPersistent('missing');
+
+    expect(first.persistent).toBeUndefined();
+    expect(second.persistent).toBe(true);
+  });
+
   it('copies drawings with a new id and current bar index', () => {
     const store = new DrawingStore();
     store.add(label({ id: 'label_0', barIndex: 1, persistent: true }));
@@ -206,6 +220,20 @@ describe('DrawingStore', () => {
     store.truncateFromBarIndex(1);
 
     expect(store.all()).toEqual([first, persistent]);
+  });
+
+  it('truncates by drawing bar index rather than insertion order', () => {
+    const store = new DrawingStore();
+    const current = label({ id: 'current', barIndex: 10 });
+    const historicalTarget = label({ id: 'historical-target', barIndex: 4 });
+    const persistentCurrent = line({ id: 'persistent-current', barIndex: 10, persistent: true });
+
+    store.add(current);
+    store.add(historicalTarget);
+    store.add(persistentCurrent);
+    store.truncateFromBarIndex(10);
+
+    expect(store.all()).toEqual([historicalTarget, persistentCurrent]);
   });
 
   it('clears all drawings', () => {

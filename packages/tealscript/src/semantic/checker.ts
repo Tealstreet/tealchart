@@ -14,6 +14,7 @@ import type {
   IndexExpression,
   LibraryDeclaration,
   MemberExpression,
+  OnceStatement,
   Program,
   SourceLocation,
   Statement,
@@ -37,7 +38,7 @@ import {
   isExportableBuiltinConstantPath,
 } from '../builtinMetadata';
 
-export type SemanticDiagnosticSeverity = 'error' | 'warning';
+export type SemanticDiagnosticSeverity = 'error' | 'warning' | 'info';
 
 export interface SemanticDiagnostic {
   code: string;
@@ -98,6 +99,8 @@ export interface SemanticCheckOptions {
   libraries?: Map<string, Program>;
 }
 
+type ParameterQualifierRequirements = Map<string, SemanticQualifier>;
+
 type TupleInitializerShape =
   | { kind: 'tuple'; arity: number }
   | { kind: 'non-tuple' }
@@ -110,6 +113,7 @@ interface SemanticImportedLibrary {
   enums: Map<string, EnumDeclaration>;
   constants: Map<string, VariableDeclaration>;
   methods: Map<string, FunctionDeclaration[]>;
+  memberNames: Set<string>;
 }
 
 class SemanticScope {
@@ -166,16 +170,27 @@ const INPUT_RETURN_TYPES = new Map<string, SemanticTypeKind>([
   ['input.timeframe', 'string'],
 ]);
 const LEGACY_INPUT_TYPE_ALIASES = new Map<string, string>([
+  ['bool', 'input.bool'],
   ['input.bool', 'input.bool'],
+  ['color', 'input.color'],
   ['input.color', 'input.color'],
+  ['float', 'input.float'],
   ['input.float', 'input.float'],
+  ['integer', 'input.int'],
   ['input.integer', 'input.int'],
+  ['int', 'input.int'],
   ['input.int', 'input.int'],
+  ['resolution', 'input.timeframe'],
   ['input.resolution', 'input.timeframe'],
+  ['session', 'input.session'],
   ['input.session', 'input.session'],
+  ['source', 'input.source'],
   ['input.source', 'input.source'],
+  ['string', 'input.string'],
   ['input.string', 'input.string'],
+  ['symbol', 'input.symbol'],
   ['input.symbol', 'input.symbol'],
+  ['timeframe', 'input.timeframe'],
   ['input.timeframe', 'input.timeframe'],
 ]);
 const LEGACY_INPUT_TYPE_CONSTANT_NAMES = new Set(LEGACY_INPUT_TYPE_ALIASES.keys());
@@ -288,9 +303,24 @@ const LEGACY_GLOBAL_TA_ALIASES = [
 const LEGACY_GLOBAL_MATH_ALIASES = [
   'abs', 'ceil', 'floor', 'round', 'sqrt',
   'log', 'log10', 'pow', 'sign', 'max', 'min', 'avg', 'sum',
+  'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'exp',
+  'toradians', 'todegrees',
 ] as const;
 // v5 bare str.* globals: tostring(x) → str.tostring(x), tonumber(x) → str.tonumber(x)
 const LEGACY_GLOBAL_STR_ALIASES = ['tostring', 'tonumber'] as const;
+const LEGACY_GLOBAL_TICKER_ALIASES = new Map<string, string>([
+  ['tickerid', 'ticker.new'],
+  ['heikinashi', 'ticker.heikinashi'],
+  ['renko', 'ticker.renko'],
+  ['linebreak', 'ticker.linebreak'],
+  ['kagi', 'ticker.kagi'],
+  ['pointfigure', 'ticker.pointfigure'],
+]);
+const LEGACY_BARE_SYMINFO_ALIASES = new Map<string, 'ticker' | 'tickerid'>([
+  ['ticker', 'ticker'],
+  ['tickerid', 'tickerid'],
+]);
+const LEGACY_BAR_INDEX_ALIASES = new Set(['n']);
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   // v3/v4 bare color(r,g,b,transp) global → color.rgb
@@ -298,6 +328,7 @@ const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
   ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
   ...LEGACY_GLOBAL_STR_ALIASES.map((name) => [name, `str.${name}`] as const),
+  ...LEGACY_GLOBAL_TICKER_ALIASES,
 ]);
 const canonicalBuiltinName = (name: string): string => LEGACY_GLOBAL_BUILTIN_ALIASES.get(name) ?? name;
 const GLOBAL_NON_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
@@ -318,6 +349,7 @@ const REQUEST_BARMERGE_MODE_CALLS = new Set([
   'request.splits',
   'request.financial',
   'request.economic',
+  'request.quandl',
 ]);
 const REQUEST_BOOL_PARAMETER_NAMES = new Set([
   'ignore_invalid_symbol',
@@ -334,6 +366,7 @@ const REQUEST_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]
   ['request.splits', ['ticker']],
   ['request.financial', ['symbol', 'financial_id', 'period', 'currency']],
   ['request.economic', ['country_code', 'field']],
+  ['request.quandl', ['ticker']],
   ['request.seed', ['source', 'symbol']],
 ]);
 const REQUEST_DIVIDENDS_FIELD_VALUES = new Set(['dividends.gross', 'dividends.net']);
@@ -388,6 +421,26 @@ const STRATEGY_DECLARATION_STRING_OPTIONS = [
 ] as const;
 
 const COLOR_CONSTRUCTOR_NAMES = new Set(['color', 'color.new', 'color.rgb']);
+const DRAWING_OBJECT_CAST_NAMES = new Set(['box', 'label', 'line', 'linefill', 'table']);
+const DRAWING_OBJECT_CAST_TYPES = new Map<string, SemanticTypeKind>([
+  ['box', 'box'],
+  ['label', 'label'],
+  ['line', 'line'],
+  ['linefill', 'linefill'],
+  ['table', 'table'],
+]);
+const PINE_NA_CAST_SIGNATURE: BuiltinSignature = {
+  params: ['x'],
+  minArgs: 1,
+  maxArgs: 1,
+  allowNamedPrefixWithPositional: true,
+};
+const LEGACY_COLOR_TRANSP_SIGNATURE: BuiltinSignature = {
+  params: ['color', 'transp'],
+  minArgs: 2,
+  maxArgs: 2,
+  allowNamedPrefixWithPositional: true,
+};
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
 const COLOR_CONSTANT_NAMES = new Set([
   'color.aqua',
@@ -408,6 +461,24 @@ const COLOR_CONSTANT_NAMES = new Set([
   'color.teal',
   'color.white',
   'color.yellow',
+]);
+const LEGACY_BARE_COLOR_CONSTANT_VALUES = new Map(
+  [...COLOR_CONSTANT_NAMES]
+    .filter((name) => name !== 'color.none')
+    .map((name) => [name.replace(/^color\./, ''), name] as const),
+);
+const LEGACY_BARE_VISUAL_CONSTANT_VALUES = new Map<string, string>([
+  ['area', 'area'],
+  ['areabr', 'areabr'],
+  ['circles', 'circles'],
+  ['columns', 'columns'],
+  ['cross', 'cross'],
+  ['dashed', 'dashed'],
+  ['dotted', 'dotted'],
+  ['histogram', 'histogram'],
+  ['line', 'line'],
+  ['solid', 'solid'],
+  ['stepline', 'stepline'],
 ]);
 const COLOR_FUNCTION_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['color.new', ['color']],
@@ -488,10 +559,11 @@ const STRING_RETURN_NAMES = new Set([
   'str.replace_all',
 ]);
 const STRING_BOOL_RETURN_NAMES = new Set(['str.contains', 'str.startswith', 'str.endswith']);
-const STRING_INT_RETURN_NAMES = new Set(['str.length', 'str.pos']);
+const STRING_INT_RETURN_NAMES = new Set(['str.length', 'str.pos', 'str.tointeger']);
 const STRING_FUNCTION_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['str.tostring', ['format']],
   ['str.tonumber', ['string']],
+  ['str.tointeger', ['string']],
   ['str.format_time', ['format', 'timezone']],
   ['str.format', ['format']],
   ['str.length', ['source']],
@@ -561,7 +633,7 @@ const TA_FLOAT_RETURN_NAMES = new Set([
 ]);
 const TA_SOURCE_RETURN_NAMES = new Set(['ta.range', 'ta.median', 'ta.mode', 'ta.mom']);
 const TA_DEFAULT_SOURCE_RETURN_NAMES = new Set(['ta.highest', 'ta.lowest']);
-const TA_FLOAT_MEMBER_NAMES = new Set(['ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
+const TA_FLOAT_MEMBER_NAMES = new Set(['ta.accdist', 'ta.iii', 'ta.nvi', 'ta.obv', 'ta.pvi', 'ta.pvt', 'ta.tr', 'ta.wad', 'ta.wvad']);
 const TA_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.bar_index', ['source']],
   ['ta.alma', ['series', 'length', 'offset', 'sigma']],
@@ -635,6 +707,61 @@ const TA_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['ta.valuewhen', ['condition']],
   ['ta.variance', ['biased']],
   ['ta.vwap', ['anchor']],
+]);
+
+const TA_SIMPLE_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['ta.adx', ['diLength', 'adxSmoothing']],
+  ['ta.alma', ['length']],
+  ['ta.atr', ['length']],
+  ['ta.bb', ['length']],
+  ['ta.bbw', ['length']],
+  ['ta.cci', ['length']],
+  ['ta.cmo', ['length']],
+  ['ta.correlation', ['length']],
+  ['ta.covariance', ['length']],
+  ['ta.cog', ['length']],
+  ['ta.dema', ['length']],
+  ['ta.dev', ['length']],
+  ['ta.dmi', ['diLength', 'adxSmoothing']],
+  ['ta.ema', ['length']],
+  ['ta.falling', ['length']],
+  ['ta.highest', ['length']],
+  ['ta.highestbars', ['length']],
+  ['ta.hma', ['length']],
+  ['ta.kc', ['length']],
+  ['ta.kcw', ['length']],
+  ['ta.kst', ['roclength1', 'roclength2', 'roclength3', 'roclength4', 'smalen1', 'smalen2', 'smalen3', 'smalen4', 'signalLength']],
+  ['ta.linreg', ['length', 'offset']],
+  ['ta.lowest', ['length']],
+  ['ta.lowestbars', ['length']],
+  ['ta.macd', ['fastlen', 'slowlen', 'siglen']],
+  ['ta.median', ['length']],
+  ['ta.mfi', ['length']],
+  ['ta.mode', ['length']],
+  ['ta.mom', ['length']],
+  ['ta.percentile_linear_interpolation', ['length', 'percentage']],
+  ['ta.percentile_nearest_rank', ['length', 'percentage']],
+  ['ta.percentrank', ['length']],
+  ['ta.pivothigh', ['leftbars', 'rightbars']],
+  ['ta.pivotlow', ['leftbars', 'rightbars']],
+  ['ta.range', ['length']],
+  ['ta.rci', ['length']],
+  ['ta.rising', ['length']],
+  ['ta.rma', ['length']],
+  ['ta.roc', ['length']],
+  ['ta.rsi', ['length']],
+  ['ta.sar', ['start', 'inc', 'max']],
+  ['ta.sma', ['length']],
+  ['ta.smma', ['length']],
+  ['ta.stdev', ['length']],
+  ['ta.stoch', ['length']],
+  ['ta.supertrend', ['atrPeriod']],
+  ['ta.tema', ['length']],
+  ['ta.tsi', ['short_length', 'long_length']],
+  ['ta.variance', ['length']],
+  ['ta.vwma', ['length']],
+  ['ta.wma', ['length']],
+  ['ta.wpr', ['length']],
 ]);
 
 const TIMEFRAME_BOOL_MEMBER_NAMES = new Set([
@@ -738,6 +865,7 @@ const TICKER_STRING_RETURN_NAMES = new Set([
   'ticker.renko',
   'ticker.standard',
 ]);
+const SYMINFO_STRING_RETURN_NAMES = new Set(['syminfo.prefix', 'syminfo.ticker']);
 const TICKER_SESSION_VALUES = new Set(['regular', 'extended']);
 const TICKER_SESSION_CONSTANT_VALUES = new Map([
   ['session.regular', 'regular'],
@@ -767,6 +895,7 @@ const REQUEST_FLOAT_RETURN_NAMES = new Set([
   'request.earnings',
   'request.economic',
   'request.financial',
+  'request.quandl',
   'request.splits',
 ]);
 
@@ -942,8 +1071,10 @@ const BUILTIN_FUNCTIONS = new Set([
   'indicator',
   'input',
   'int',
+  'box',
   'label',
   'line',
+  'linefill',
   'max_bars_back',
   'na',
   'nz',
@@ -957,6 +1088,7 @@ const BUILTIN_FUNCTIONS = new Set([
   'security',
   'string',
   'strategy',
+  'table',
   'time',
   'time_close',
   'timestamp',
@@ -983,6 +1115,8 @@ const COLLECTION_TEMPLATE_TYPE_PATTERN = /^(array|matrix|map)<(.+)>$/;
 const UNKNOWN_SEMANTIC_TYPE: SemanticType = { kind: 'unknown' };
 
 const STRATEGY_ORDER_PARAMS = ['id', 'direction', 'qty', 'limit', 'stop', 'oca_name', 'oca_type', 'comment', 'alert_message', 'disable_alert'];
+const LEGACY_STRATEGY_ORDER_PARAMS = [...STRATEGY_ORDER_PARAMS, 'when'];
+const LEGACY_STRATEGY_CLOSE_PARAMS = ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert', 'when'];
 const STRATEGY_EXIT_PARAMS = [
   'id',
   'from_entry',
@@ -1006,13 +1140,14 @@ const STRATEGY_EXIT_PARAMS = [
   'alert_trailing',
   'disable_alert',
 ];
+const LEGACY_STRATEGY_EXIT_PARAMS = [...STRATEGY_EXIT_PARAMS, 'when'];
 const STRATEGY_DIRECTION_VALUES = new Set(['long', 'short']);
 const STRATEGY_ALLOWED_ENTRY_DIRECTION_VALUES = new Set(['all', 'long', 'short']);
 const STRATEGY_OCA_TYPE_VALUES = new Set(['cancel', 'reduce', 'none']);
 const STRATEGY_DEFAULT_QTY_TYPE_VALUES = new Set(['fixed', 'cash', 'percent_of_equity']);
 const STRATEGY_COMMISSION_TYPE_VALUES = new Set(['percent', 'cash_per_order', 'cash_per_contract']);
 const STRATEGY_CASH_OR_PERCENT_RISK_TYPE_VALUES = new Set(['cash', 'percent_of_equity']);
-const STRATEGY_BOOL_PARAMETER_NAMES = new Set(['disable_alert', 'immediately']);
+const STRATEGY_BOOL_PARAMETER_NAMES = new Set(['disable_alert', 'immediately', 'when']);
 const STRATEGY_STRING_PARAMETER_NAMES = new Set([
   'id',
   'from_entry',
@@ -1078,9 +1213,12 @@ const STRATEGY_CLOSED_TRADE_ACCESSORS = [
 interface BuiltinSignature {
   params: string[];
   legacyV4Params?: string[];
+  legacyV5Params?: string[];
   aliases?: Record<string, string>;
   overloads?: string[][];
   minArgs?: number;
+  legacyV4MinArgs?: number;
+  legacyV5MinArgs?: number;
   requiredParams?: string[];
   singlePositionalParam?: string;
   optionalLeadingParam?: string;
@@ -1177,12 +1315,22 @@ const BOX_NEW_POINT_SIGNATURE: BuiltinSignature = {
 const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['alert', { params: ['message', 'freq'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['alertcondition', { params: ['condition', 'title', 'message'], minArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['barcolor', { params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'transp'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  [
+    'barcolor',
+    {
+      params: ['color', 'offset', 'editable', 'show_last', 'title', 'display'],
+      legacyV4Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display'],
+      legacyV5Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display'],
+      minArgs: 1,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
   [
     'bgcolor',
     {
-      params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'],
+      params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
       legacyV4Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
+      legacyV5Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
     },
@@ -1207,10 +1355,13 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'fill',
     {
-      params: ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'],
+      params: ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display'],
       legacyV4Params: ['plot1', 'plot2', 'color', 'transp', 'title', 'editable', 'show_last', 'fillgaps', 'display'],
+      legacyV5Params: ['plot1', 'plot2', 'color', 'transp', 'title', 'editable', 'show_last', 'fillgaps', 'display'],
       aliases: { hline1: 'plot1', hline2: 'plot2' },
       minArgs: 3,
+      legacyV4MinArgs: 2,
+      legacyV5MinArgs: 2,
       allowNamedPrefixWithPositional: true,
     },
   ],
@@ -1228,6 +1379,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['label.set_x', { params: ['id', 'x'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_y', { params: ['id', 'y'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_xy', { params: ['id', 'x', 'y'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
+  ['label.set_point', { params: ['id', 'point'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_text', { params: ['id', 'text'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['label.set_xloc', { params: ['id', 'x', 'xloc'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['label.set_yloc', { params: ['id', 'yloc'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
@@ -1331,10 +1483,10 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'table.new',
     {
-      params: ['position', 'columns', 'rows', 'bgcolor', 'frame_color', 'frame_width', 'border_color', 'border_width'],
+      params: ['position', 'columns', 'rows', 'bgcolor', 'frame_color', 'frame_width', 'border_color', 'border_width', 'force_overlay'],
       minArgs: 2,
       requiredParams: ['columns', 'rows'],
-      maxArgs: 8,
+      maxArgs: 9,
       allowNamedPrefixWithPositional: true,
     },
   ],
@@ -1387,9 +1539,27 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'precision',
         'force_overlay',
         'linestyle',
-        'transp',
       ],
       legacyV4Params: [
+        'series',
+        'title',
+        'color',
+        'linewidth',
+        'style',
+        'trackprice',
+        'transp',
+        'histbase',
+        'offset',
+        'join',
+        'editable',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+        'linestyle',
+      ],
+      legacyV5Params: [
         'series',
         'title',
         'color',
@@ -1415,7 +1585,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'plotbar',
     {
-      params: ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'format', 'precision', 'force_overlay', 'transp'],
+      params: ['open', 'high', 'low', 'close', 'title', 'color', 'editable', 'show_last', 'display', 'force_overlay'],
+      legacyV4Params: ['open', 'high', 'low', 'close', 'title', 'color', 'transp', 'editable', 'show_last', 'display'],
+      legacyV5Params: ['open', 'high', 'low', 'close', 'title', 'color', 'transp', 'editable', 'show_last', 'display'],
       minArgs: 4,
       allowNamedPrefixWithPositional: true,
     },
@@ -1435,11 +1607,9 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'show_last',
         'bordercolor',
         'display',
-        'format',
-        'precision',
-        'force_overlay',
-        'transp',
       ],
+      legacyV4Params: ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'transp'],
+      legacyV5Params: ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'transp'],
       minArgs: 4,
       allowNamedPrefixWithPositional: true,
     },
@@ -1463,9 +1633,26 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
-        'transp',
       ],
       legacyV4Params: [
+        'series',
+        'title',
+        'style',
+        'location',
+        'color',
+        'transp',
+        'offset',
+        'text',
+        'textcolor',
+        'editable',
+        'size',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
+      legacyV5Params: [
         'series',
         'title',
         'style',
@@ -1506,9 +1693,26 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
-        'transp',
       ],
       legacyV4Params: [
+        'series',
+        'title',
+        'char',
+        'location',
+        'color',
+        'transp',
+        'offset',
+        'text',
+        'textcolor',
+        'editable',
+        'size',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
+      legacyV5Params: [
         'series',
         'title',
         'char',
@@ -1547,9 +1751,24 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'format',
         'precision',
         'force_overlay',
-        'transp',
       ],
       legacyV4Params: [
+        'series',
+        'title',
+        'colorup',
+        'colordown',
+        'transp',
+        'offset',
+        'minheight',
+        'maxheight',
+        'editable',
+        'show_last',
+        'display',
+        'format',
+        'precision',
+        'force_overlay',
+      ],
+      legacyV5Params: [
         'series',
         'title',
         'colorup',
@@ -1592,12 +1811,55 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'dynamic_requests',
       ],
       minArgs: 1,
+      allowNamedPrefixWithPositional: true,
+    },
+  ],
+  [
+    'strategy',
+    {
+      params: [
+        'title',
+        'shorttitle',
+        'overlay',
+        'format',
+        'precision',
+        'scale',
+        'pyramiding',
+        'calc_on_order_fills',
+        'calc_on_every_tick',
+        'max_bars_back',
+        'backtest_fill_limits_assumption',
+        'default_qty_type',
+        'default_qty_value',
+        'initial_capital',
+        'currency',
+        'slippage',
+        'commission_type',
+        'commission_value',
+        'process_orders_on_close',
+        'close_entries_rule',
+        'margin_long',
+        'margin_short',
+        'explicit_plot_zorder',
+        'max_lines_count',
+        'max_labels_count',
+        'max_boxes_count',
+        'risk_free_rate',
+        'use_bar_magnifier',
+        'fill_orders_on_standard_ohlc',
+        'max_polylines_count',
+        'dynamic_requests',
+        'behind_chart',
+      ],
+      minArgs: 1,
+      allowNamedPrefixWithPositional: true,
     },
   ],
   [
     'input',
     {
-      params: ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'],
+      params: ['defval', 'title', 'tooltip', 'inline', 'group', 'display', 'active'],
+      legacyV4Params: LEGACY_INPUT_SIGNATURE.params,
       minArgs: 1,
       allowNamedPrefixWithPositional: true,
     },
@@ -1701,11 +1963,31 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['request.splits', { params: ['ticker', 'field', 'gaps', 'lookahead', 'ignore_invalid_symbol'], minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['request.financial', { params: ['symbol', 'financial_id', 'period', 'gaps', 'ignore_invalid_symbol', 'currency'], minArgs: 3, allowNamedPrefixWithPositional: true }],
   ['request.economic', { params: ['country_code', 'field', 'gaps', 'ignore_invalid_symbol'], minArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['request.quandl', { params: ['ticker', 'gaps', 'index', 'ignore_invalid_symbol'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['request.footprint', { params: ['ticks_per_row', 'va_percent', 'imbalance_percent'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['request.seed', { params: ['source', 'symbol', 'expression', 'ignore_invalid_symbol', 'calc_bars_count'], minArgs: 3, allowNamedPrefixWithPositional: true }],
-  ['runtime.error', { params: ['message'], minArgs: 1, maxArgs: 1 }],
+  ['footprint.total_volume', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.buy_volume', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.sell_volume', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.delta', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.rows', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.poc', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.vah', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.val', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['footprint.get_row_by_price', { params: ['id', 'price'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
+  ['volume_row.up_price', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.down_price', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.total_volume', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.buy_volume', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.sell_volume', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.delta', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.has_buy_imbalance', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['volume_row.has_sell_imbalance', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['runtime.error', { params: ['message'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['string', { params: ['x'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['str.tostring', { params: ['value', 'format'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['str.tonumber', { params: ['string'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['str.tointeger', { params: ['string'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['str.format_time', { params: ['time', 'format', 'timezone'], minArgs: 0, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['str.format', { params: ['format'], minArgs: 1, allowExtraPositional: true, allowNamedPrefixWithPositional: true }],
   ['str.length', { params: ['source'], aliases: { string: 'source' }, minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
@@ -1724,11 +2006,11 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['str.replace_all', { params: ['source', 'target', 'replacement'], aliases: { string: 'source', str: 'target', substring: 'target' }, minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['strategy.cancel', { params: ['id'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['strategy.cancel_all', { params: [], minArgs: 0, maxArgs: 0 }],
-  ['strategy.close', { params: ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'], minArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['strategy.close', { params: ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'], legacyV5Params: LEGACY_STRATEGY_CLOSE_PARAMS, minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['strategy.close_all', { params: ['comment', 'alert_message', 'immediately', 'disable_alert'], minArgs: 0, allowNamedPrefixWithPositional: true }],
-  ['strategy.entry', { params: STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
-  ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, minArgs: 1, maxArgs: STRATEGY_EXIT_PARAMS.length, allowNamedPrefixWithPositional: true }],
-  ['strategy.order', { params: STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
+  ['strategy.entry', { params: STRATEGY_ORDER_PARAMS, legacyV5Params: LEGACY_STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
+  ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, legacyV5Params: LEGACY_STRATEGY_EXIT_PARAMS, minArgs: 1, maxArgs: STRATEGY_EXIT_PARAMS.length, allowNamedPrefixWithPositional: true }],
+  ['strategy.order', { params: STRATEGY_ORDER_PARAMS, legacyV5Params: LEGACY_STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
   ['strategy.risk.allow_entry_in', { params: ['value'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['strategy.risk.max_cons_loss_days', { params: ['count', 'alert_message'], minArgs: 1, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['strategy.risk.max_drawdown', { params: ['value', 'type', 'alert_message'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
@@ -1736,7 +2018,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['strategy.risk.max_intraday_loss', { params: ['value', 'type', 'alert_message'], minArgs: 2, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['strategy.risk.max_position_size', { params: ['contracts'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.alma', { params: ['series', 'length', 'offset', 'sigma', 'floor'], minArgs: 4, maxArgs: 5, allowNamedPrefixWithPositional: true }],
-  ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1 }],
+  ['ta.atr', { params: ['length'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.bar_index', { params: ['source'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.barssince', { params: ['condition'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.bb', { params: ['series', 'length', 'mult'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
@@ -1825,7 +2107,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ta.stoch', { params: ['source', 'high', 'low', 'length'], minArgs: 4, maxArgs: 4, allowNamedPrefixWithPositional: true }],
   ['ta.supertrend', { params: ['factor', 'atrPeriod'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.swma', { params: ['source'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
-  ['ta.tr', { params: ['handle_na'], minArgs: 0, maxArgs: 1 }],
+  ['ta.tr', { params: ['handle_na'], minArgs: 0, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['ta.dema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.tema', { params: ['source', 'length'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ta.kst', { params: ['source', 'roclength1', 'roclength2', 'roclength3', 'roclength4', 'smalen1', 'smalen2', 'smalen3', 'smalen4', 'signalLength'], minArgs: 1, maxArgs: 10, allowNamedPrefixWithPositional: true }],
@@ -1845,6 +2127,8 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['ticker.linebreak', { params: ['symbol', 'number_of_lines'], minArgs: 2, maxArgs: 2, allowNamedPrefixWithPositional: true }],
   ['ticker.kagi', { params: ['symbol', 'style', 'param'], minArgs: 3, maxArgs: 3, allowNamedPrefixWithPositional: true }],
   ['ticker.pointfigure', { params: ['symbol', 'source', 'style', 'param', 'reversal'], minArgs: 5, maxArgs: 5, allowNamedPrefixWithPositional: true }],
+  ['syminfo.prefix', { params: ['symbol'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
+  ['syminfo.ticker', { params: ['symbol'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   [
     'time',
     {
@@ -1887,6 +2171,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
 const INDICATOR_DECLARATION_KEYS = new Set([
   'type',
   'declarationKind',
+  'sourceDeclarationKind',
   'loc',
   'title',
   'shorttitle',
@@ -2042,6 +2327,8 @@ const MARKER_STYLE_CONSTANT_VALUES = new Map([
   ['plotshape.style_square', 'square'],
   ['plotshape.style_label_up', 'labelup'],
   ['plotshape.style_label_down', 'labeldown'],
+  ['plotshape.style_labelup', 'labelup'],
+  ['plotshape.style_labeldown', 'labeldown'],
 ]);
 
 const MARKER_LOCATION_VALUES = new Set(['abovebar', 'belowbar', 'top', 'bottom', 'absolute']);
@@ -2069,6 +2356,7 @@ const DISPLAY_OPTION_VALUES = new Set([
   'display.data_window',
   'display.status_line',
   'display.price_scale',
+  'display.pine_screener',
   'display.all',
 ]);
 const DISPLAY_OPTION_CONSTANT_VALUES = new Map([...DISPLAY_OPTION_VALUES].map((value) => [value, value]));
@@ -2211,6 +2499,7 @@ const DRAWING_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>(
   ['line.new', ['force_overlay']],
   ['box.new', ['force_overlay']],
   ['polyline.new', ['curved', 'closed', 'force_overlay']],
+  ['table.new', ['force_overlay']],
 ]);
 const TABLE_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['table.new', ['columns', 'rows', 'frame_width', 'border_width']],
@@ -2258,6 +2547,8 @@ const DRAWING_LABEL_STYLE_CONSTANT_VALUES = new Map([
   ['label.style_none', 'none'],
   ['label.style_label_up', 'label_up'],
   ['label.style_label_down', 'label_down'],
+  ['label.style_labelup', 'label_up'],
+  ['label.style_labeldown', 'label_down'],
   ['label.style_label_left', 'label_left'],
   ['label.style_label_right', 'label_right'],
   ['label.style_label_center', 'label_center'],
@@ -2283,9 +2574,10 @@ const DRAWING_TEXT_HALIGN_CONSTANT_VALUES = new Map([
   ['text.align_center', 'center'],
   ['text.align_right', 'right'],
 ]);
-const DRAWING_TEXT_VALIGN_VALUES = new Set(['top', 'middle', 'bottom']);
+const DRAWING_TEXT_VALIGN_VALUES = new Set(['top', 'center', 'middle', 'bottom']);
 const DRAWING_TEXT_VALIGN_CONSTANT_VALUES = new Map([
   ['text.align_top', 'top'],
+  ['text.align_center', 'center'],
   ['text.align_middle', 'middle'],
   ['text.align_bottom', 'bottom'],
 ]);
@@ -2334,11 +2626,11 @@ for (const name of CALENDAR_FUNCTION_NAMES) {
 }
 
 for (const name of STRATEGY_TRADE_ACCESSORS) {
-  BUILTIN_SIGNATURES.set(`strategy.opentrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(`strategy.opentrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of STRATEGY_CLOSED_TRADE_ACCESSORS) {
-  BUILTIN_SIGNATURES.set(`strategy.closedtrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1 });
+  BUILTIN_SIGNATURES.set(`strategy.closedtrades.${name}`, { params: ['trade_num'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true });
 }
 
 for (const name of ['array.new', ...ARRAY_CONSTRUCTOR_ELEMENT_TYPES.keys()]) {
@@ -2486,12 +2778,79 @@ const SIGNED_BUILTIN_CALL_NAMESPACES = new Set(
     }),
 );
 
-const PLANNED_UNSUPPORTED_BUILTIN_CALL_MESSAGES = new Map<string, string>([
-  [
-    'request.footprint',
-    'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
-  ],
-]);
+const PLANNED_UNSUPPORTED_BUILTIN_CALL_MESSAGES = new Map<string, string>();
+
+export function resolvesBuiltinReferenceNameForCoverage(name: string): boolean {
+  if (name === 'true' || name === 'false' || name === 'library') return true;
+  if (BUILTIN_SIGNATURES.has(canonicalBuiltinName(name))) return true;
+  if (BUILTIN_SIGNATURES.has(name) || BUILTIN_FUNCTIONS.has(name)) return true;
+  if (BUILTIN_GLOBALS.has(name) || BUILTIN_GLOBAL_TYPES.has(name)) return true;
+  if (isExportableBuiltinConstantPath(name.split('.'))) return true;
+  if (COLOR_CONSTANT_NAMES.has(name) || MATH_CONSTANT_NAMES.has(name)) return true;
+  if (TA_FLOAT_MEMBER_NAMES.has(name)) return true;
+  if (TIMEFRAME_BOOL_MEMBER_NAMES.has(name) || TIMEFRAME_STRING_MEMBER_NAMES.has(name) || name === 'timeframe.multiplier') return true;
+  if (
+    SYMINFO_STRING_MEMBER_NAMES.has(name)
+    || SYMINFO_INT_MEMBER_NAMES.has(name)
+    || SYMINFO_SERIES_INT_MEMBER_NAMES.has(name)
+    || SYMINFO_FLOAT_MEMBER_NAMES.has(name)
+    || SYMINFO_SERIES_FLOAT_MEMBER_NAMES.has(name)
+  ) return true;
+  if (CHART_BOOL_MEMBER_NAMES.has(name) || CHART_COLOR_MEMBER_NAMES.has(name) || CHART_INT_MEMBER_NAMES.has(name)) return true;
+  if (
+    TICKER_SESSION_CONSTANT_VALUES.has(name)
+    || name === 'session.ismarket'
+    || name === 'session.ispremarket'
+    || name === 'session.ispostmarket'
+    || name === 'session.isfirstbar'
+    || name === 'session.isfirstbar_regular'
+    || name === 'session.islastbar'
+    || name === 'session.islastbar_regular'
+  ) return true;
+  if (REQUEST_FLOAT_RETURN_NAMES.has(name) || TICKER_STRING_RETURN_NAMES.has(name)) return true;
+  if (
+    STRATEGY_FLOAT_MEMBER_NAMES.has(name)
+    || STRATEGY_INT_MEMBER_NAMES.has(name)
+    || STRATEGY_STRING_MEMBER_NAMES.has(name)
+  ) return true;
+  if (DRAWING_ALL_ELEMENT_TYPES.has(name)) return true;
+  const [namespace, member] = name.split('.');
+  return Boolean(namespace && member && BUILTIN_COLLECTION_MEMBER_METHODS.get(namespace)?.has(member));
+}
+
+export const PINE_V6_BUILTIN_NAMED_FORM_FORBIDDEN_SIGNATURES: readonly string[] = [];
+
+export function builtinSignaturesWithoutNamedFormForCoverage(): string[] {
+  const forbidden = new Set(PINE_V6_BUILTIN_NAMED_FORM_FORBIDDEN_SIGNATURES);
+  return [...BUILTIN_SIGNATURES.entries()]
+    .filter(([name, signature]) => signature.params.length > 0 && !signature.allowNamedPrefixWithPositional && !forbidden.has(name))
+    .map(([name]) => name)
+    .sort();
+}
+
+export interface BuiltinSignatureShapeForCoverage {
+  params: string[];
+  minArgs?: number;
+  maxArgs?: number;
+  requiredParams?: string[];
+  overloads?: string[][];
+}
+
+export function builtinSignatureForCoverage(name: string): BuiltinSignatureShapeForCoverage | undefined {
+  const signature = BUILTIN_SIGNATURES.get(name);
+  if (!signature) return undefined;
+  let overloads = signature.overloads?.map((overload) => [...overload]);
+  if (name === 'line.new') overloads = [[...LINE_NEW_POINT_SIGNATURE.params]];
+  if (name === 'label.new') overloads = [[...LABEL_NEW_POINT_SIGNATURE.params]];
+  if (name === 'box.new') overloads = [[...BOX_NEW_POINT_SIGNATURE.params]];
+  return {
+    params: [...signature.params],
+    minArgs: signature.minArgs,
+    maxArgs: signature.maxArgs,
+    requiredParams: signature.requiredParams ? [...signature.requiredParams] : undefined,
+    overloads,
+  };
+}
 
 export function checkProgram(program: Program, options: SemanticCheckOptions = {}): SemanticCheckResult {
   return new SemanticChecker(options).check(program);
@@ -2505,7 +2864,10 @@ class SemanticChecker {
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
   private importedLibraries = new Map<string, SemanticImportedLibrary>();
   private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
+  private inferredVariableSymbols = new WeakSet<SemanticSymbol>();
   private activeReturnInferences = new Set<FunctionDeclaration>();
+  private parameterQualifierRequirements = new WeakMap<FunctionDeclaration, ParameterQualifierRequirements>();
+  private activeParameterRequirementInferences = new Set<FunctionDeclaration>();
   private currentPineVersion = 6;
 
   constructor(private readonly options: SemanticCheckOptions = {}) {}
@@ -2519,14 +2881,24 @@ class SemanticChecker {
     this.importedLibraries = this.collectImportedLibraries(program);
     this.functionSymbolDeclarations = new WeakMap();
     this.activeReturnInferences = new Set();
-    this.currentPineVersion = program.version;
+    this.parameterQualifierRequirements = new WeakMap();
+    this.activeParameterRequirementInferences = new Set();
+    this.currentPineVersion = this.effectiveProgramPineVersion(program);
     this.hoistFunctionDeclarations(program.body);
+    this.checkUserFunctionRecursion(program.body);
     this.checkLibraryExportDeclarations(program.body);
     this.checkStatements(program.body, this.rootScope);
     return {
       diagnostics: this.diagnostics,
       symbols: this.rootScope.allSymbols(),
     };
+  }
+
+  private effectiveProgramPineVersion(program: Program): number {
+    if (program.explicitVersion) return program.version;
+    return program.body.some((statement) => statement.type === 'IndicatorDeclaration' && statement.sourceDeclarationKind === 'study')
+      ? 4
+      : program.version;
   }
 
   private checkStatements(statements: Statement[], scope: SemanticScope): void {
@@ -2614,19 +2986,26 @@ class SemanticChecker {
       const constants = new Map<string, VariableDeclaration>();
       const functions = new Map<string, FunctionDeclaration>();
       const methods = new Map<string, FunctionDeclaration[]>();
+      const memberNames = new Set<string>();
       for (const libraryStatement of libraryProgram.body) {
-        if (libraryStatement.type === 'TypeDeclaration' && libraryStatement.exported) {
-          types.set(libraryStatement.name.name, libraryStatement);
-        } else if (libraryStatement.type === 'EnumDeclaration' && libraryStatement.exported) {
-          enums.set(libraryStatement.name.name, libraryStatement);
-        } else if (libraryStatement.type === 'VariableDeclaration' && libraryStatement.exported && libraryStatement.names.type === 'VariableDeclarator') {
-          constants.set(libraryStatement.names.name.name, libraryStatement);
-        } else if (libraryStatement.type === 'FunctionDeclaration' && libraryStatement.isMethod && libraryStatement.exported) {
-          const overloads = methods.get(libraryStatement.name.name) ?? [];
-          overloads.push(libraryStatement);
-          methods.set(libraryStatement.name.name, overloads);
-        } else if (libraryStatement.type === 'FunctionDeclaration' && !libraryStatement.isMethod && libraryStatement.exported) {
-          functions.set(libraryStatement.name.name, libraryStatement);
+        if (libraryStatement.type === 'TypeDeclaration') {
+          memberNames.add(libraryStatement.name.name);
+          if (libraryStatement.exported) types.set(libraryStatement.name.name, libraryStatement);
+        } else if (libraryStatement.type === 'EnumDeclaration') {
+          memberNames.add(libraryStatement.name.name);
+          if (libraryStatement.exported) enums.set(libraryStatement.name.name, libraryStatement);
+        } else if (libraryStatement.type === 'VariableDeclaration' && libraryStatement.names.type === 'VariableDeclarator') {
+          memberNames.add(libraryStatement.names.name.name);
+          if (libraryStatement.exported) constants.set(libraryStatement.names.name.name, libraryStatement);
+        } else if (libraryStatement.type === 'FunctionDeclaration') {
+          memberNames.add(libraryStatement.name.name);
+          if (libraryStatement.isMethod && libraryStatement.exported) {
+            const overloads = methods.get(libraryStatement.name.name) ?? [];
+            overloads.push(libraryStatement);
+            methods.set(libraryStatement.name.name, overloads);
+          } else if (!libraryStatement.isMethod && libraryStatement.exported) {
+            functions.set(libraryStatement.name.name, libraryStatement);
+          }
         }
       }
 
@@ -2637,6 +3016,7 @@ class SemanticChecker {
         enums,
         constants,
         methods,
+        memberNames,
       });
     }
 
@@ -2906,6 +3286,171 @@ class SemanticChecker {
     }
   }
 
+  private checkUserFunctionRecursion(statements: Statement[]): void {
+    const functions = new Map<string, FunctionDeclaration>();
+    for (const statement of statements) {
+      if (statement.type === 'FunctionDeclaration' && !statement.isMethod) {
+        functions.set(statement.name.name, statement);
+      }
+    }
+
+    const graph = new Map<string, Set<string>>();
+    for (const [name, declaration] of functions) {
+      graph.set(name, this.userFunctionCallsInNode(declaration.body, new Set(functions.keys())));
+    }
+
+    const reported = new Set<string>();
+    const visit = (name: string, stack: string[]): void => {
+      const stackIndex = stack.indexOf(name);
+      if (stackIndex !== -1) {
+        const cycle = [...stack.slice(stackIndex), name];
+        const cycleKey = [...new Set(cycle)].sort().join('|');
+        if (!reported.has(cycleKey)) {
+          reported.add(cycleKey);
+          const declaration = functions.get(cycle[0] ?? name);
+          this.addDiagnostic(
+            'recursive-function',
+            `Recursive user-defined function calls run in TealScript but are not supported by Pine v6, so this script will not run on TradingView: ${cycle.join(' -> ')}`,
+            declaration?.name.loc,
+            'warning',
+          );
+        }
+        return;
+      }
+
+      for (const next of graph.get(name) ?? []) {
+        visit(next, [...stack, name]);
+      }
+    };
+
+    for (const name of functions.keys()) {
+      visit(name, []);
+    }
+  }
+
+  private userFunctionCallsInNode(node: Expression | Statement[], functionNames: Set<string>): Set<string> {
+    if (Array.isArray(node)) {
+      return this.mergeStringSets(node.map((statement) => this.userFunctionCallsInStatement(statement, functionNames)));
+    }
+    return this.userFunctionCallsInExpression(node, functionNames);
+  }
+
+  private userFunctionCallsInStatement(statement: Statement, functionNames: Set<string>): Set<string> {
+    switch (statement.type) {
+      case 'VariableDeclaration':
+        return this.userFunctionCallsInInitializer(statement.init, functionNames);
+      case 'AssignmentStatement':
+        return this.mergeStringSets([
+          this.userFunctionCallsInExpression(statement.left, functionNames),
+          this.userFunctionCallsInInitializer(statement.right, functionNames),
+        ]);
+      case 'TupleAssignment':
+        return this.userFunctionCallsInInitializer(statement.right, functionNames);
+      case 'ExpressionStatement':
+        return this.userFunctionCallsInExpression(statement.expression, functionNames);
+      case 'IfStatement':
+        return this.userFunctionCallsInInitializer(statement, functionNames);
+      case 'ForStatement':
+        return this.mergeStringSets([
+          ...(statement.kind === 'numeric'
+            ? [
+              this.userFunctionCallsInExpression(statement.start, functionNames),
+              this.userFunctionCallsInExpression(statement.end, functionNames),
+              ...(statement.step ? [this.userFunctionCallsInExpression(statement.step, functionNames)] : []),
+            ]
+            : [this.userFunctionCallsInExpression(statement.iterable, functionNames)]),
+          ...statement.body.map((child) => this.userFunctionCallsInStatement(child, functionNames)),
+        ]);
+      case 'WhileStatement':
+        return this.mergeStringSets([
+          this.userFunctionCallsInExpression(statement.test, functionNames),
+          ...statement.body.map((child) => this.userFunctionCallsInStatement(child, functionNames)),
+        ]);
+      case 'MultiDeclaration':
+        return this.mergeStringSets(statement.declarations.map((declaration) => this.userFunctionCallsInStatement(declaration, functionNames)));
+      case 'MultiAssignment':
+        return this.mergeStringSets(statement.assignments.map((assignment) => this.userFunctionCallsInStatement(assignment, functionNames)));
+      case 'MultiExpressionStatement':
+        return this.mergeStringSets(statement.expressions.map((expression) => this.userFunctionCallsInExpression(expression, functionNames)));
+      default:
+        return new Set();
+    }
+  }
+
+  private userFunctionCallsInInitializer(init: Expression | IfStatement, functionNames: Set<string>): Set<string> {
+    if (init.type !== 'IfStatement') return this.userFunctionCallsInExpression(init, functionNames);
+    return this.mergeStringSets([
+      this.userFunctionCallsInExpression(init.test, functionNames),
+      ...init.consequent.map((statement) => this.userFunctionCallsInStatement(statement, functionNames)),
+      ...(Array.isArray(init.alternate)
+        ? init.alternate.map((statement) => this.userFunctionCallsInStatement(statement, functionNames))
+        : init.alternate
+          ? [this.userFunctionCallsInStatement(init.alternate, functionNames)]
+          : []),
+    ]);
+  }
+
+  private userFunctionCallsInExpression(expression: Expression, functionNames: Set<string>): Set<string> {
+    switch (expression.type) {
+      case 'CallExpression': {
+        const refs = expression.callee.type === 'Identifier' && functionNames.has(expression.callee.name)
+          ? new Set([expression.callee.name])
+          : this.userFunctionCallsInExpression(expression.callee, functionNames);
+        for (const argument of expression.arguments) {
+          for (const ref of this.userFunctionCallsInExpression(argument.value, functionNames)) refs.add(ref);
+        }
+        return refs;
+      }
+      case 'BinaryExpression':
+        return this.mergeStringSets([
+          this.userFunctionCallsInExpression(expression.left, functionNames),
+          this.userFunctionCallsInExpression(expression.right, functionNames),
+        ]);
+      case 'UnaryExpression':
+        return this.userFunctionCallsInExpression(expression.argument, functionNames);
+      case 'ConditionalExpression':
+        return this.mergeStringSets([
+          this.userFunctionCallsInExpression(expression.test, functionNames),
+          this.userFunctionCallsInExpression(expression.consequent, functionNames),
+          this.userFunctionCallsInExpression(expression.alternate, functionNames),
+        ]);
+      case 'SwitchExpression':
+        return this.mergeStringSets([
+          ...(expression.discriminant ? [this.userFunctionCallsInExpression(expression.discriminant, functionNames)] : []),
+          ...expression.cases.flatMap((switchCase) => [
+            ...(switchCase.test ? [this.userFunctionCallsInExpression(switchCase.test, functionNames)] : []),
+            ...(Array.isArray(switchCase.consequent)
+              ? switchCase.consequent.map((statement) => this.userFunctionCallsInStatement(statement, functionNames))
+              : [this.userFunctionCallsInExpression(switchCase.consequent, functionNames)]),
+          ]),
+        ]);
+      case 'MemberExpression':
+        return this.userFunctionCallsInExpression(expression.object, functionNames);
+      case 'IndexExpression':
+        return this.mergeStringSets([
+          this.userFunctionCallsInExpression(expression.object, functionNames),
+          this.userFunctionCallsInExpression(expression.index, functionNames),
+        ]);
+      case 'ArrayExpression':
+        return this.mergeStringSets(expression.elements.map((element) => this.userFunctionCallsInExpression(element, functionNames)));
+      case 'ForStatement':
+      case 'WhileStatement':
+        return this.userFunctionCallsInStatement(expression, functionNames);
+      case 'LambdaExpression':
+        return this.userFunctionCallsInExpression(expression.body, functionNames);
+      default:
+        return new Set();
+    }
+  }
+
+  private mergeStringSets(sets: Set<string>[]): Set<string> {
+    const merged = new Set<string>();
+    for (const set of sets) {
+      for (const value of set) merged.add(value);
+    }
+    return merged;
+  }
+
   private collectTypeDeclarations(statements: Statement[]): Map<string, TypeDeclaration> {
     return new Map(
       statements
@@ -3074,7 +3619,7 @@ class SemanticChecker {
           for (const name of this.declaredNames(statement)) localNames.add(name);
           return;
         case 'TupleAssignment':
-          visitExpression(statement.right, localNames);
+          visitInitializer(statement.right, localNames);
           return;
         case 'AssignmentStatement':
           this.visitAssignmentTargetExpression(statement.left, localNames, visitExpression);
@@ -3095,6 +3640,10 @@ class SemanticChecker {
           } else if (statement.alternate) {
             visitStatement(statement.alternate, new Set(localNames));
           }
+          return;
+        case 'OnceStatement':
+          if (statement.test) visitExpression(statement.test, localNames);
+          this.visitFunctionScopeNode(statement.body, new Set(localNames), visitExpression, visitStatement);
           return;
         case 'ForStatement': {
           if (statement.kind === 'collection') {
@@ -3205,7 +3754,7 @@ class SemanticChecker {
       case 'MultiExpressionStatement':
         return statement.expressions.some((e) => this.expressionReferencesAnyName(e, names));
       case 'TupleAssignment':
-        return this.expressionReferencesAnyName(statement.right, names);
+        return this.initializerReferencesAnyName(statement.right, names);
       case 'AssignmentStatement':
         return this.expressionReferencesAnyName(statement.left, names)
           || (statement.right.type === 'IfStatement'
@@ -3361,6 +3910,9 @@ class SemanticChecker {
       case 'IfStatement':
         this.checkIf(statement, scope);
         break;
+      case 'OnceStatement':
+        this.checkOnce(statement, scope);
+        break;
       case 'ForStatement':
         this.checkFor(statement, scope);
         break;
@@ -3477,7 +4029,7 @@ class SemanticChecker {
       if (allowedKeys.has(key)) continue;
       this.addDiagnostic(
         'unknown-argument',
-        `Unknown argument '${key}' for ${displayName}`,
+        this.unknownArgumentMessage(key, displayName, [...allowedKeys]),
         this.locFromUnknownNode(value),
       );
     }
@@ -3492,6 +4044,25 @@ class SemanticChecker {
 
   private declareImport(statement: ImportDeclaration, scope: SemanticScope): void {
     this.declare(scope, { name: statement.alias.name, kind: 'import', loc: statement.alias.loc });
+    if (!this.importedLibraries.has(statement.alias.name)) {
+      this.addDiagnostic(
+        'unresolved-import',
+        this.unresolvedImportMessage(statement),
+        statement.loc,
+      );
+    }
+  }
+
+  private unresolvedImportMessage(statement: ImportDeclaration): string {
+    const parts = statement.path.split('/').filter((part) => part.length > 0);
+    const alias = statement.alias.name;
+    if (parts.length >= 3) {
+      const version = parts[parts.length - 1]!;
+      const library = parts[parts.length - 2]!;
+      const owner = parts.slice(0, -2).join('/');
+      return `Import '${statement.path}' as alias '${alias}' was not supplied by the host library registry; provide Pine library source for ${owner}/${library} version ${version}, or remove/change the import`;
+    }
+    return `Import '${statement.path}' as alias '${alias}' was not supplied by the host library registry; provide the matching Pine library source or remove/change the import`;
   }
 
   private declareType(statement: TypeDeclaration, scope: SemanticScope): void {
@@ -3587,18 +4158,22 @@ class SemanticChecker {
   private checkVariableDeclaration(statement: VariableDeclaration, scope: SemanticScope): void {
     this.checkVariableInitializer(statement.init, scope);
     this.checkTypeAnnotation('variable declaration', statement.typeAnnotation, statement.loc);
-    this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc);
+    const variableName = statement.names.type === 'VariableDeclarator' ? statement.names.name.name : undefined;
+    this.checkTypeCompatibility(statement.typeAnnotation, statement.init, scope, statement.loc, variableName);
     if (statement.names.type === 'TupleDeclarator') {
       this.declareTuple(statement.names, statement.init, scope);
       return;
     }
 
-    this.declare(scope, {
+    const symbol: SemanticSymbol = {
       name: statement.names.name.name,
       kind: 'variable',
       type: this.typeFromAnnotation(statement.typeAnnotation ?? undefined) ?? this.inferVariableInitializerType(statement.init, scope),
       loc: statement.names.name.loc,
-    });
+    };
+    if (this.declare(scope, symbol) && !statement.typeAnnotation?.qualifier) {
+      this.inferredVariableSymbols.add(symbol);
+    }
   }
 
   private inferVariableInitializerType(init: Expression | IfStatement, scope: SemanticScope): SemanticType {
@@ -3959,7 +4534,11 @@ class SemanticChecker {
   }
 
   private checkTupleAssignment(statement: TupleAssignment, scope: SemanticScope): void {
-    this.checkExpression(statement.right, scope);
+    if (statement.right.type === 'IfStatement') {
+      this.checkIf(statement.right, scope);
+    } else {
+      this.checkExpression(statement.right, scope);
+    }
     for (const name of statement.names) {
       if (name.name === '_') continue;
       if (!scope.lookup(name.name) && !this.isKnownIdentifier(name.name)) {
@@ -3992,8 +4571,9 @@ class SemanticChecker {
     if (statement.operator !== ':=' || statement.left.type !== 'Identifier') return;
     if (statement.right.type === 'IfStatement') return;
 
-    const targetType = scope.lookup(statement.left.name)?.type;
-    if (!targetType) return;
+    const symbol = scope.lookup(statement.left.name);
+    const targetType = symbol?.type;
+    if (!symbol || !targetType) return;
 
     if (targetType.kind === 'bool' && this.isNaLiteralExpression(statement.right)) {
       this.addDiagnostic(
@@ -4005,6 +4585,8 @@ class SemanticChecker {
     }
 
     const sourceType = this.inferExpressionType(statement.right, scope);
+    if (this.widenInferredVariableType(symbol, sourceType)) return;
+
     if (!this.isAssignableQualifier(targetType.qualifier, sourceType.qualifier)) {
       this.addDiagnostic(
         'qualifier-mismatch',
@@ -4027,8 +4609,9 @@ class SemanticChecker {
     if (statement.operator === ':=' || statement.left.type !== 'Identifier') return;
     if (statement.right.type === 'IfStatement') return;
 
-    const targetType = scope.lookup(statement.left.name)?.type;
-    if (!targetType || targetType.kind === 'unknown') return;
+    const symbol = scope.lookup(statement.left.name);
+    const targetType = symbol?.type;
+    if (!symbol || !targetType || targetType.kind === 'unknown') return;
 
     const sourceType = this.inferExpressionType(statement.right, scope);
     if (sourceType.kind === 'unknown') return;
@@ -4042,6 +4625,8 @@ class SemanticChecker {
       );
       return;
     }
+
+    if (this.widenInferredVariableType(symbol, resultType)) return;
 
     if (!this.isAssignableQualifier(targetType.qualifier, resultType.qualifier)) {
       this.addDiagnostic(
@@ -4080,6 +4665,24 @@ class SemanticChecker {
     };
   }
 
+  private widenInferredVariableType(symbol: SemanticSymbol, sourceType: SemanticType): boolean {
+    const targetType = symbol.type;
+    if (!targetType || !this.inferredVariableSymbols.has(symbol)) return false;
+    if (sourceType.kind === 'unknown') {
+      const qualifier = this.maxQualifier(targetType, sourceType);
+      if (!qualifier || qualifier === targetType.qualifier) return false;
+      symbol.type = { ...targetType, qualifier };
+      return true;
+    }
+    if (!this.isAssignableType({ ...targetType, qualifier: undefined }, { ...sourceType, qualifier: undefined })) return false;
+
+    const widenedType = this.mergeCompatibleType(targetType, sourceType);
+    if (widenedType.kind === 'unknown') return false;
+
+    symbol.type = widenedType;
+    return true;
+  }
+
   private checkAssignmentTarget(statement: AssignmentStatement, scope: SemanticScope): void {
     if (statement.left.type === 'Identifier') {
       if (!scope.lookup(statement.left.name) && !this.isKnownIdentifier(statement.left.name)) {
@@ -4105,6 +4708,14 @@ class SemanticChecker {
     } else if (statement.alternate) {
       this.checkIf(statement.alternate, scope);
     }
+  }
+
+  private checkOnce(statement: OnceStatement, scope: SemanticScope): void {
+    if (statement.test) {
+      this.checkExpression(statement.test, scope);
+      this.checkBooleanContext(statement.test, scope);
+    }
+    this.checkStatements(statement.body, new SemanticScope(scope));
   }
 
   private checkFor(statement: ForStatement, scope: SemanticScope): void {
@@ -4187,6 +4798,7 @@ class SemanticChecker {
 
     const type = this.inferExpressionType(expression, scope);
     if (!this.isNumericType(type)) return;
+    if (this.currentPineVersion <= 5) return;
 
     this.addDiagnostic(
       'implicit-numeric-bool',
@@ -4347,8 +4959,9 @@ class SemanticChecker {
 
   private checkCallee(callee: Expression, scope: SemanticScope): void {
     if (callee.type === 'Identifier') {
-      if (!BUILTIN_FUNCTIONS.has(callee.name) && !scope.lookup(callee.name)) {
-        this.addDiagnostic('unknown-function', `Unknown function: ${callee.name}`, callee.loc);
+      const canonicalName = canonicalBuiltinName(callee.name);
+      if (!BUILTIN_FUNCTIONS.has(callee.name) && !BUILTIN_SIGNATURES.has(canonicalName) && !scope.lookup(callee.name)) {
+        this.addDiagnostic('unknown-function', this.unknownFunctionMessage(callee.name), callee.loc);
       }
       return;
     }
@@ -4375,6 +4988,7 @@ class SemanticChecker {
         return;
       }
       if (objectSymbol?.kind === 'import') {
+        this.checkImportedNamespaceMemberExpression(expression, scope);
         return;
       }
     }
@@ -4404,6 +5018,34 @@ class SemanticChecker {
       'unknown-enum-member',
       `Unknown enum member '${expression.property.name}' on enum ${enumDeclaration.name.name}`,
       expression.property.loc,
+    );
+  }
+
+  private checkImportedNamespaceMemberExpression(expression: MemberExpression, scope: SemanticScope): void {
+    const path = this.memberPath(expression);
+    if (path.length !== 2) return;
+
+    const [alias, memberName] = path;
+    if (!alias || !memberName || scope.lookup(alias)?.kind !== 'import') return;
+
+    const library = this.importedLibraries.get(alias);
+    if (!library) return;
+
+    if (!library.functions.has(memberName)) {
+      if (library.constants.has(memberName) || library.types.has(memberName) || library.enums.has(memberName)) return;
+      if (library.memberNames.has(memberName)) return;
+      this.addDiagnostic(
+        'unknown-imported-member',
+        `Unknown library member: ${alias}.${memberName}`,
+        expression.loc,
+      );
+      return;
+    }
+
+    this.addDiagnostic(
+      'invalid-imported-member-reference',
+      `Imported library member ${alias}.${memberName} is a function; call it as ${alias}.${memberName}(...)`,
+      expression.loc,
     );
   }
 
@@ -4543,11 +5185,21 @@ class SemanticChecker {
     this.checkArgumentNames(expression.arguments, signature, displayName);
     this.checkArgumentCount(expression.arguments, signature, displayName);
     this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+    this.checkLegacyCompatibleArguments(expression.arguments, signature, displayName);
   }
 
   private resolveBuiltinSignature(displayName: string, expression: CallExpression, scope: SemanticScope): BuiltinSignature | undefined {
     if (displayName === 'input' && this.legacyInputTypeCallName(expression)) {
       return LEGACY_INPUT_SIGNATURE;
+    }
+    if (
+      (displayName === 'color' || DRAWING_OBJECT_CAST_NAMES.has(displayName))
+      && this.usesNaCastOverload(expression)
+    ) {
+      return PINE_NA_CAST_SIGNATURE;
+    }
+    if (displayName === 'color' && this.currentPineVersion <= 4 && this.usesLegacyColorTransparencyOverload(expression, scope)) {
+      return LEGACY_COLOR_TRANSP_SIGNATURE;
     }
     if (displayName === 'label.new') {
       return this.usesLabelPointOverload(expression, scope) ? LABEL_NEW_POINT_SIGNATURE : LABEL_NEW_COORDINATE_SIGNATURE;
@@ -4561,11 +5213,27 @@ class SemanticChecker {
     return BUILTIN_SIGNATURES.get(displayName) ?? BUILTIN_SIGNATURES.get(canonicalBuiltinName(displayName));
   }
 
+  private usesNaCastOverload(expression: CallExpression): boolean {
+    if (expression.arguments.length !== 1) return false;
+    const argument = expression.arguments[0];
+    return !argument?.name && argument.value.type === 'NaExpression';
+  }
+
+  private usesLegacyColorTransparencyOverload(expression: CallExpression, scope: SemanticScope): boolean {
+    if (expression.arguments.some((argument) => argument.name?.name === 'transp' || argument.name?.name === 'color')) return true;
+    const positional = expression.arguments.filter((argument) => !argument.name);
+    if (positional.length !== 2) return false;
+    return this.inferExpressionType(positional[0]!.value, scope).kind === 'color';
+  }
+
   private legacyInputTypeCallName(expression: CallExpression): string | undefined {
     const typeArgument = this.getCallArgument(expression.arguments, 'type', 2);
     if (!typeArgument) return undefined;
     if (typeArgument.type === 'MemberExpression') {
       return LEGACY_INPUT_TYPE_ALIASES.get(this.memberPath(typeArgument).join('.'));
+    }
+    if (typeArgument.type === 'Identifier' && this.currentPineVersion <= 4) {
+      return LEGACY_INPUT_TYPE_ALIASES.get(typeArgument.name);
     }
     if (typeArgument.type === 'StringLiteral') {
       return LEGACY_INPUT_TYPE_ALIASES.get(typeArgument.value) ?? LEGACY_INPUT_TYPE_ALIASES.get(`input.${typeArgument.value}`);
@@ -4615,7 +5283,7 @@ class SemanticChecker {
     }
 
     if (!SIGNED_BUILTIN_CALL_NAMESPACES.has(namespace)) return;
-    this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
+    this.addDiagnostic('unknown-function', this.unknownFunctionMessage(displayName), expression.callee.loc);
   }
 
   private checkImportedLibraryCallAvailability(expression: CallExpression, scope: SemanticScope): void {
@@ -4655,6 +5323,8 @@ class SemanticChecker {
     if (expression.callee.property.name === 'copy') return;
 
     const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    if (expression.callee.property.name === 'title' && this.isEnumSemanticType(receiverType)) return;
+
     const importedReceiver = this.importedReceiverType(receiverType);
     if (!importedReceiver) return;
 
@@ -4662,7 +5332,7 @@ class SemanticChecker {
     if (this.importedLibraries.get(importedReceiver.alias)?.methods.has(expression.callee.property.name)) return;
 
     const displayName = this.memberPath(expression.callee).join('.') || expression.callee.property.name;
-    this.addDiagnostic('unknown-function', `Unknown function: ${displayName}`, expression.callee.loc);
+    this.addDiagnostic('unknown-function', this.unknownFunctionMessage(displayName), expression.callee.loc);
   }
 
   private checkUdtConstructorSignature(expression: CallExpression, scope: SemanticScope): void {
@@ -4914,7 +5584,7 @@ class SemanticChecker {
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
-    const params = this.resolveSignatureParams(expression.arguments, signature);
+    const params = this.resolveSignatureParams(expression.arguments, signature, scope);
 
     for (const parameterName of stringParameterNames ?? []) {
       this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'string');
@@ -4975,7 +5645,7 @@ class SemanticChecker {
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
-    const params = this.resolveSignatureParams(expression.arguments, signature);
+    const params = this.resolveSignatureParams(expression.arguments, signature, scope);
 
     for (const parameterName of stringParameterNames ?? []) {
       this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'string');
@@ -5013,8 +5683,9 @@ class SemanticChecker {
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
     for (const parameterName of numericParameterNames) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, parameterNames, parameterName, 'number', signature);
     }
   }
 
@@ -5042,11 +5713,12 @@ class SemanticChecker {
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
     for (const parameterName of numericParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, parameterNames, parameterName, 'number', signature);
     }
     for (const parameterName of boolParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'boolean');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, parameterNames, parameterName, 'boolean', signature);
     }
   }
 
@@ -5068,6 +5740,7 @@ class SemanticChecker {
     const argumentType = this.inferExpressionType(argument, scope);
     if (argumentType.kind === 'unknown') return;
     if (expectedKind === 'boolean' && argumentType.kind === 'bool') return;
+    if (expectedKind === 'boolean' && this.currentPineVersion <= 4 && this.isNumericType(argumentType)) return;
     if (expectedKind === 'color' && argumentType.kind === 'color') return;
     if (expectedKind === 'number' && this.isNumericType(argumentType)) return;
     if (expectedKind === 'string' && argumentType.kind === 'string') return;
@@ -5150,9 +5823,11 @@ class SemanticChecker {
 
     const signature = this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope);
     if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
-    this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, 'confirm', 'boolean');
-    this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, 'active', 'boolean');
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
+    this.checkBuiltinArgumentKind(expression, scope, displayName, parameterNames, 'confirm', 'boolean', signature);
+    this.checkBuiltinArgumentKind(expression, scope, displayName, parameterNames, 'active', 'boolean', signature);
   }
 
   private checkInputStringOptionArguments(expression: CallExpression, scope: SemanticScope): void {
@@ -5161,9 +5836,11 @@ class SemanticChecker {
 
     const signature = this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope);
     if (!signature) return;
+    if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
 
+    const parameterNames = this.resolveSignatureParams(expression.arguments, signature);
     for (const parameterName of ['title', 'tooltip', 'inline', 'group']) {
-      this.checkBuiltinArgumentKind(expression, scope, displayName, signature.params, parameterName, 'string');
+      this.checkBuiltinArgumentKind(expression, scope, displayName, parameterNames, parameterName, 'string', signature);
     }
   }
 
@@ -5227,6 +5904,13 @@ class SemanticChecker {
     const mismatchedOption = optionTypes.find((optionType) => optionType.kind !== 'udt' || optionType.name !== defvalType.name);
     if (mismatchedOption) {
       this.addDiagnostic('type-mismatch', 'input.enum options must use the same enum type as defval', options.loc);
+      return;
+    }
+
+    const defvalPath = this.memberPath(defval).join('.');
+    const optionPaths = options.elements.map((element) => this.memberPath(element).join('.'));
+    if (defvalPath && optionPaths.every((optionPath) => optionPath !== defvalPath)) {
+      this.addDiagnostic('type-mismatch', 'input.enum defval must be one of options', defval.loc);
     }
   }
 
@@ -5293,6 +5977,12 @@ class SemanticChecker {
     if (expression.type === 'MemberExpression') {
       const memberName = this.memberPath(expression).join('.');
       if (LEGACY_INPUT_TYPE_CONSTANT_NAMES.has(memberName)) return memberName;
+    }
+    if (expression.type === 'Identifier' && this.currentPineVersion <= 4 && LEGACY_INPUT_TYPE_ALIASES.has(expression.name)) {
+      return expression.name;
+    }
+    if (expression.type === 'Identifier' && this.currentPineVersion <= 4 && LEGACY_BARE_VISUAL_CONSTANT_VALUES.has(expression.name)) {
+      return LEGACY_BARE_VISUAL_CONSTANT_VALUES.get(expression.name);
     }
     return undefined;
   }
@@ -5362,7 +6052,7 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
 
-    const params = this.resolveTimeSignatureParams(expression.arguments, signature);
+    const params = this.resolveTimeSignatureParams(expression.arguments, signature, scope);
     const timeframe = this.resolveCallArgumentExpression(expression, params, params.indexOf('timeframe'), signature);
     const timeframeBarsBack = this.resolveCallArgumentExpression(expression, params, params.indexOf('timeframe_bars_back'), signature);
     if (timeframeBarsBack && !timeframe) {
@@ -5578,12 +6268,13 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of STRATEGY_BOOL_PARAMETER_NAMES) {
-      if (!signature.params.includes(parameterName)) continue;
+      if (!resolvedParams.includes(parameterName)) continue;
 
-      const parameterIndex = signature.params.indexOf(parameterName);
-      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      const parameterIndex = resolvedParams.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, resolvedParams, parameterIndex);
       if (!argument) continue;
 
       const argumentType = this.inferExpressionType(argument, scope);
@@ -5604,12 +6295,13 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of STRATEGY_STRING_PARAMETER_NAMES) {
-      if (!signature.params.includes(parameterName)) continue;
+      if (!resolvedParams.includes(parameterName)) continue;
 
-      const parameterIndex = signature.params.indexOf(parameterName);
-      const argument = this.resolveCallArgumentExpression(expression, signature.params, parameterIndex);
+      const parameterIndex = resolvedParams.indexOf(parameterName);
+      const argument = this.resolveCallArgumentExpression(expression, resolvedParams, parameterIndex);
       if (!argument) continue;
 
       const argumentType = this.inferExpressionType(argument, scope);
@@ -5640,6 +6332,14 @@ class SemanticChecker {
       if (!argument) continue;
 
       const argumentType = this.inferExpressionType(argument, scope);
+      if (
+        parameterName === 'direction'
+        && this.currentPineVersion <= 4
+        && (calleeName === 'strategy.entry' || calleeName === 'strategy.order')
+        && argumentType.kind === 'bool'
+      ) {
+        continue;
+      }
       if (argumentType.kind === 'unknown' || argumentType.kind === 'string') continue;
 
       this.addDiagnostic(
@@ -5657,17 +6357,18 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const resolvedParams = this.resolveSignatureParams(expression.arguments, signature);
 
     for (const parameterName of STRATEGY_NUMERIC_PARAMETER_NAMES) {
-      if (!signature.params.includes(parameterName)) continue;
+      if (!resolvedParams.includes(parameterName)) continue;
 
-      const parameterIndex = signature.params.indexOf(parameterName);
-      this.checkStrategyNumericOptionArgument(expression, scope, signature.params, parameterName, parameterIndex, calleeName);
+      const parameterIndex = resolvedParams.indexOf(parameterName);
+      this.checkStrategyNumericOptionArgument(expression, scope, resolvedParams, parameterName, parameterIndex, calleeName);
     }
 
     if (STRATEGY_NUMERIC_VALUE_PARAMETER_CALLS.has(calleeName)) {
-      const parameterIndex = signature.params.indexOf('value');
-      this.checkStrategyNumericOptionArgument(expression, scope, signature.params, 'value', parameterIndex, calleeName);
+      const parameterIndex = resolvedParams.indexOf('value');
+      this.checkStrategyNumericOptionArgument(expression, scope, resolvedParams, 'value', parameterIndex, calleeName);
     }
   }
 
@@ -6698,6 +7399,7 @@ class SemanticChecker {
   private strategyConstantStringValue(expression: Expression): string | undefined {
     const value = this.constantLiteralValue(expression);
     if (typeof value === 'string') return value;
+    if (this.currentPineVersion <= 4 && typeof value === 'boolean') return value ? 'long' : 'short';
 
     const path = this.memberPath(expression).join('.');
     switch (path) {
@@ -7031,6 +7733,7 @@ class SemanticChecker {
       callable.declaration.params.slice(callable.parameterOffset),
       callable.displayName,
     );
+    this.checkUserCallableParameterQualifiers(expression, scope, callable);
     this.checkUserCallableBoolNaArguments(expression, callable);
   }
 
@@ -7204,7 +7907,7 @@ class SemanticChecker {
 
       const name = arg.name.name;
       if (!paramNames.includes(name)) {
-        this.addDiagnostic('unknown-argument', `Unknown argument '${name}' for ${displayName}`, arg.name.loc);
+        this.addDiagnostic('unknown-argument', this.unknownArgumentMessage(name, displayName, paramNames), arg.name.loc);
         hasUnknownArgument = true;
         continue;
       }
@@ -7255,6 +7958,442 @@ class SemanticChecker {
         `Cannot pass na value to bool parameter ${parameter.name} for ${callable.displayName}`,
         argument.loc,
       );
+    }
+  }
+
+  private checkUserCallableParameterQualifiers(
+    expression: CallExpression,
+    scope: SemanticScope,
+    callable: { declaration: FunctionDeclaration; displayName: string; parameterOffset: number; libraryAlias?: string },
+  ): void {
+    const requirements = this.inferParameterQualifierRequirements(callable.declaration);
+    for (const [index, parameter] of callable.declaration.params.entries()) {
+      if (index < callable.parameterOffset) continue;
+
+      const annotationType = callable.libraryAlias
+        ? this.importedSemanticTypeFromAnnotation(callable.libraryAlias, parameter.typeAnnotation ?? undefined)
+        : this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+      const expectedQualifier = annotationType?.qualifier ?? requirements.get(parameter.name);
+      if (!expectedQualifier) continue;
+
+      const argument = this.getCallArgument(expression.arguments, parameter.name, index - callable.parameterOffset);
+      if (!argument) continue;
+
+      const actualType = this.inferExpressionType(argument, scope);
+      if (!actualType.qualifier || this.isAssignableQualifier(expectedQualifier, actualType.qualifier)) continue;
+
+      this.addDiagnostic(
+        'qualifier-mismatch',
+        this.qualifierMismatchMessage(actualType.qualifier, expectedQualifier, parameter.name, callable.displayName),
+        argument.loc,
+      );
+    }
+  }
+
+  private inferParameterQualifierRequirements(declaration: FunctionDeclaration): ParameterQualifierRequirements {
+    const cached = this.parameterQualifierRequirements.get(declaration);
+    if (cached) return cached;
+    if (this.activeParameterRequirementInferences.has(declaration)) return new Map();
+
+    this.activeParameterRequirementInferences.add(declaration);
+    const requirements: ParameterQualifierRequirements = new Map();
+    this.parameterQualifierRequirements.set(declaration, requirements);
+
+    try {
+      for (const parameter of declaration.params) {
+        const annotationType = this.typeFromAnnotation(parameter.typeAnnotation ?? undefined);
+        if (annotationType?.qualifier) {
+          this.recordParameterQualifierRequirement(requirements, parameter.name, annotationType.qualifier);
+        }
+      }
+
+      const parameterNames = new Set(declaration.params.map((parameter) => parameter.name));
+      const functionScope = this.createFunctionInferenceScope(declaration, new Map());
+      this.collectParameterQualifierRequirementsFromNode(
+        declaration.body,
+        parameterNames,
+        functionScope,
+        requirements,
+        new Map(),
+      );
+      return requirements;
+    } finally {
+      this.activeParameterRequirementInferences.delete(declaration);
+    }
+  }
+
+  private collectParameterQualifierRequirementsFromNode(
+    node: Expression | Statement[],
+    parameterNames: Set<string>,
+    scope: SemanticScope,
+    requirements: ParameterQualifierRequirements,
+    aliases: Map<string, Set<string>>,
+  ): void {
+    if (Array.isArray(node)) {
+      for (const statement of node) {
+        this.collectParameterQualifierRequirementsFromStatement(statement, parameterNames, scope, requirements, aliases);
+      }
+      return;
+    }
+
+    this.collectParameterQualifierRequirementsFromExpression(node, parameterNames, scope, requirements, aliases);
+  }
+
+  private collectParameterQualifierRequirementsFromStatement(
+    statement: Statement,
+    parameterNames: Set<string>,
+    scope: SemanticScope,
+    requirements: ParameterQualifierRequirements,
+    aliases: Map<string, Set<string>>,
+  ): void {
+    switch (statement.type) {
+      case 'VariableDeclaration': {
+        const refs = this.parameterRefsInInitializer(statement.init, parameterNames, aliases);
+        if (statement.names.type === 'VariableDeclarator') {
+          if (refs.size > 0) aliases.set(statement.names.name.name, refs);
+          else aliases.delete(statement.names.name.name);
+        }
+        this.collectParameterQualifierRequirementsFromInitializer(statement.init, parameterNames, scope, requirements, aliases);
+        return;
+      }
+      case 'MultiDeclaration':
+        for (const declaration of statement.declarations) {
+          this.collectParameterQualifierRequirementsFromStatement(declaration, parameterNames, scope, requirements, aliases);
+        }
+        return;
+      case 'AssignmentStatement': {
+        const refs = this.parameterRefsInInitializer(statement.right, parameterNames, aliases);
+        if (statement.left.type === 'Identifier') {
+          if (refs.size > 0) aliases.set(statement.left.name, refs);
+          else aliases.delete(statement.left.name);
+        }
+        this.collectParameterQualifierRequirementsFromExpression(statement.left, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromInitializer(statement.right, parameterNames, scope, requirements, aliases);
+        return;
+      }
+      case 'TupleAssignment':
+        this.collectParameterQualifierRequirementsFromInitializer(statement.right, parameterNames, scope, requirements, aliases);
+        return;
+      case 'MultiAssignment':
+        for (const assignment of statement.assignments) {
+          this.collectParameterQualifierRequirementsFromStatement(assignment, parameterNames, scope, requirements, aliases);
+        }
+        return;
+      case 'ExpressionStatement':
+        this.collectParameterQualifierRequirementsFromExpression(statement.expression, parameterNames, scope, requirements, aliases);
+        return;
+      case 'MultiExpressionStatement':
+        for (const expression of statement.expressions) {
+          this.collectParameterQualifierRequirementsFromExpression(expression, parameterNames, scope, requirements, aliases);
+        }
+        return;
+      case 'IfStatement':
+        this.collectParameterQualifierRequirementsFromExpression(statement.test, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromStatements(statement.consequent, parameterNames, scope, requirements, aliases);
+        if (Array.isArray(statement.alternate)) {
+          this.collectParameterQualifierRequirementsFromStatements(statement.alternate, parameterNames, scope, requirements, aliases);
+        } else if (statement.alternate) {
+          this.collectParameterQualifierRequirementsFromStatement(statement.alternate, parameterNames, scope, requirements, aliases);
+        }
+        return;
+      case 'ForStatement':
+        if (statement.kind === 'collection') {
+          this.collectParameterQualifierRequirementsFromExpression(statement.iterable, parameterNames, scope, requirements, aliases);
+        } else {
+          this.collectParameterQualifierRequirementsFromExpression(statement.start, parameterNames, scope, requirements, aliases);
+          this.collectParameterQualifierRequirementsFromExpression(statement.end, parameterNames, scope, requirements, aliases);
+          if (statement.step) this.collectParameterQualifierRequirementsFromExpression(statement.step, parameterNames, scope, requirements, aliases);
+        }
+        this.collectParameterQualifierRequirementsFromStatements(statement.body, parameterNames, scope, requirements, aliases);
+        return;
+      case 'WhileStatement':
+        this.collectParameterQualifierRequirementsFromExpression(statement.test, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromStatements(statement.body, parameterNames, scope, requirements, aliases);
+        return;
+      default:
+        return;
+    }
+  }
+
+  private collectParameterQualifierRequirementsFromStatements(
+    statements: Statement[],
+    parameterNames: Set<string>,
+    scope: SemanticScope,
+    requirements: ParameterQualifierRequirements,
+    aliases: Map<string, Set<string>>,
+  ): void {
+    const childAliases = new Map(aliases);
+    for (const statement of statements) {
+      this.collectParameterQualifierRequirementsFromStatement(statement, parameterNames, scope, requirements, childAliases);
+    }
+  }
+
+  private collectParameterQualifierRequirementsFromInitializer(
+    init: Expression | IfStatement,
+    parameterNames: Set<string>,
+    scope: SemanticScope,
+    requirements: ParameterQualifierRequirements,
+    aliases: Map<string, Set<string>>,
+  ): void {
+    if (init.type === 'IfStatement') {
+      this.collectParameterQualifierRequirementsFromStatement(init, parameterNames, scope, requirements, aliases);
+      return;
+    }
+    this.collectParameterQualifierRequirementsFromExpression(init, parameterNames, scope, requirements, aliases);
+  }
+
+  private collectParameterQualifierRequirementsFromExpression(
+    expression: Expression,
+    parameterNames: Set<string>,
+    scope: SemanticScope,
+    requirements: ParameterQualifierRequirements,
+    aliases: Map<string, Set<string>>,
+  ): void {
+    if (expression.type === 'CallExpression') {
+      this.collectCallParameterQualifierRequirements(expression, parameterNames, scope, requirements, aliases);
+      this.collectParameterQualifierRequirementsFromExpression(expression.callee, parameterNames, scope, requirements, aliases);
+      for (const argument of expression.arguments) {
+        this.collectParameterQualifierRequirementsFromExpression(argument.value, parameterNames, scope, requirements, aliases);
+      }
+      return;
+    }
+
+    switch (expression.type) {
+      case 'BinaryExpression':
+        this.collectParameterQualifierRequirementsFromExpression(expression.left, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromExpression(expression.right, parameterNames, scope, requirements, aliases);
+        return;
+      case 'UnaryExpression':
+        this.collectParameterQualifierRequirementsFromExpression(expression.argument, parameterNames, scope, requirements, aliases);
+        return;
+      case 'ConditionalExpression':
+        this.collectParameterQualifierRequirementsFromExpression(expression.test, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromExpression(expression.consequent, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromExpression(expression.alternate, parameterNames, scope, requirements, aliases);
+        return;
+      case 'SwitchExpression':
+        if (expression.discriminant) this.collectParameterQualifierRequirementsFromExpression(expression.discriminant, parameterNames, scope, requirements, aliases);
+        for (const switchCase of expression.cases) {
+          if (switchCase.test) this.collectParameterQualifierRequirementsFromExpression(switchCase.test, parameterNames, scope, requirements, aliases);
+          this.collectParameterQualifierRequirementsFromNode(switchCase.consequent, parameterNames, scope, requirements, new Map(aliases));
+        }
+        return;
+      case 'ForStatement':
+      case 'WhileStatement':
+        this.collectParameterQualifierRequirementsFromStatement(expression, parameterNames, scope, requirements, aliases);
+        return;
+      case 'MemberExpression':
+        this.collectParameterQualifierRequirementsFromExpression(expression.object, parameterNames, scope, requirements, aliases);
+        return;
+      case 'IndexExpression':
+        this.collectParameterQualifierRequirementsFromExpression(expression.object, parameterNames, scope, requirements, aliases);
+        this.collectParameterQualifierRequirementsFromExpression(expression.index, parameterNames, scope, requirements, aliases);
+        return;
+      case 'ArrayExpression':
+        for (const element of expression.elements) {
+          this.collectParameterQualifierRequirementsFromExpression(element, parameterNames, scope, requirements, aliases);
+        }
+        return;
+      case 'LambdaExpression':
+        return;
+      default:
+        return;
+    }
+  }
+
+  private collectCallParameterQualifierRequirements(
+    expression: CallExpression,
+    parameterNames: Set<string>,
+    scope: SemanticScope,
+    requirements: ParameterQualifierRequirements,
+    aliases: Map<string, Set<string>>,
+  ): void {
+    const calleeName = canonicalBuiltinName(this.memberPath(expression.callee).join('.'));
+    const simpleBuiltinParams = TA_SIMPLE_PARAMETER_NAMES_BY_CALL.get(calleeName);
+    if (simpleBuiltinParams) {
+      const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
+      const params = signature ? this.resolveSignatureParams(expression.arguments, signature) : (BUILTIN_SIGNATURES.get(calleeName)?.params ?? []);
+      for (const parameterName of simpleBuiltinParams) {
+        const argument = this.resolveCallArgumentExpression(expression, params, params.indexOf(parameterName), signature);
+        if (!argument) continue;
+        for (const ref of this.parameterRefsInExpression(argument, parameterNames, aliases)) {
+          this.recordParameterQualifierRequirement(requirements, ref, 'simple');
+        }
+      }
+    }
+
+    if (isInputCallName(this.effectiveInputCallName(expression))) {
+      const signature = this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope);
+      const params = signature ? this.resolveSignatureParams(expression.arguments, signature) : ['defval'];
+      const defval = this.resolveCallArgumentExpression(expression, params, params.indexOf('defval'), signature);
+      if (defval) {
+        for (const ref of this.parameterRefsInExpression(defval, parameterNames, aliases)) {
+          this.recordParameterQualifierRequirement(requirements, ref, 'const');
+        }
+      }
+    }
+
+    const callable = this.resolveLocalUserCallable(expression, scope);
+    if (!callable) return;
+
+    const nestedRequirements = this.inferParameterQualifierRequirements(callable.declaration);
+    for (const [index, parameter] of callable.declaration.params.entries()) {
+      if (index < callable.parameterOffset) continue;
+      const requiredQualifier = nestedRequirements.get(parameter.name) ?? this.typeFromAnnotation(parameter.typeAnnotation ?? undefined)?.qualifier;
+      if (!requiredQualifier) continue;
+
+      const argument = this.getCallArgument(expression.arguments, parameter.name, index - callable.parameterOffset);
+      if (!argument) continue;
+      for (const ref of this.parameterRefsInExpression(argument, parameterNames, aliases)) {
+        this.recordParameterQualifierRequirement(requirements, ref, requiredQualifier);
+      }
+    }
+  }
+
+  private parameterRefsInInitializer(
+    init: Expression | IfStatement,
+    parameterNames: Set<string>,
+    aliases: Map<string, Set<string>>,
+  ): Set<string> {
+    if (init.type === 'IfStatement') {
+      const refs = this.parameterRefsInExpression(init.test, parameterNames, aliases);
+      for (const statement of init.consequent) {
+        for (const ref of this.parameterRefsInStatement(statement, parameterNames, aliases)) refs.add(ref);
+      }
+      if (Array.isArray(init.alternate)) {
+        for (const statement of init.alternate) {
+          for (const ref of this.parameterRefsInStatement(statement, parameterNames, aliases)) refs.add(ref);
+        }
+      } else if (init.alternate) {
+        for (const ref of this.parameterRefsInStatement(init.alternate, parameterNames, aliases)) refs.add(ref);
+      }
+      return refs;
+    }
+    return this.parameterRefsInExpression(init, parameterNames, aliases);
+  }
+
+  private parameterRefsInStatement(
+    statement: Statement,
+    parameterNames: Set<string>,
+    aliases: Map<string, Set<string>>,
+  ): Set<string> {
+    switch (statement.type) {
+      case 'VariableDeclaration':
+        return this.parameterRefsInInitializer(statement.init, parameterNames, aliases);
+      case 'AssignmentStatement': {
+        const refs = this.parameterRefsInExpression(statement.left, parameterNames, aliases);
+        for (const ref of this.parameterRefsInInitializer(statement.right, parameterNames, aliases)) refs.add(ref);
+        return refs;
+      }
+      case 'TupleAssignment':
+        return this.parameterRefsInInitializer(statement.right, parameterNames, aliases);
+      case 'ExpressionStatement':
+        return this.parameterRefsInExpression(statement.expression, parameterNames, aliases);
+      case 'IfStatement':
+        return this.parameterRefsInInitializer(statement, parameterNames, aliases);
+      case 'ForStatement': {
+        const refs = statement.kind === 'collection'
+          ? this.parameterRefsInExpression(statement.iterable, parameterNames, aliases)
+          : this.parameterRefsInExpression(statement.start, parameterNames, aliases);
+        if (statement.kind === 'numeric') {
+          for (const ref of this.parameterRefsInExpression(statement.end, parameterNames, aliases)) refs.add(ref);
+          if (statement.step) {
+            for (const ref of this.parameterRefsInExpression(statement.step, parameterNames, aliases)) refs.add(ref);
+          }
+        }
+        for (const child of statement.body) {
+          for (const ref of this.parameterRefsInStatement(child, parameterNames, aliases)) refs.add(ref);
+        }
+        return refs;
+      }
+      case 'WhileStatement': {
+        const refs = this.parameterRefsInExpression(statement.test, parameterNames, aliases);
+        for (const child of statement.body) {
+          for (const ref of this.parameterRefsInStatement(child, parameterNames, aliases)) refs.add(ref);
+        }
+        return refs;
+      }
+      case 'MultiDeclaration':
+        return this.mergeParameterRefSets(statement.declarations.map((declaration) => this.parameterRefsInStatement(declaration, parameterNames, aliases)));
+      case 'MultiAssignment':
+        return this.mergeParameterRefSets(statement.assignments.map((assignment) => this.parameterRefsInStatement(assignment, parameterNames, aliases)));
+      case 'MultiExpressionStatement':
+        return this.mergeParameterRefSets(statement.expressions.map((expression) => this.parameterRefsInExpression(expression, parameterNames, aliases)));
+      default:
+        return new Set();
+    }
+  }
+
+  private parameterRefsInExpression(
+    expression: Expression,
+    parameterNames: Set<string>,
+    aliases: Map<string, Set<string>>,
+  ): Set<string> {
+    switch (expression.type) {
+      case 'Identifier':
+        if (parameterNames.has(expression.name)) return new Set([expression.name]);
+        return new Set(aliases.get(expression.name) ?? []);
+      case 'BinaryExpression':
+        return this.mergeParameterRefSets([
+          this.parameterRefsInExpression(expression.left, parameterNames, aliases),
+          this.parameterRefsInExpression(expression.right, parameterNames, aliases),
+        ]);
+      case 'UnaryExpression':
+        return this.parameterRefsInExpression(expression.argument, parameterNames, aliases);
+      case 'ConditionalExpression':
+        return this.mergeParameterRefSets([
+          this.parameterRefsInExpression(expression.test, parameterNames, aliases),
+          this.parameterRefsInExpression(expression.consequent, parameterNames, aliases),
+          this.parameterRefsInExpression(expression.alternate, parameterNames, aliases),
+        ]);
+      case 'SwitchExpression':
+        return this.mergeParameterRefSets([
+          ...(expression.discriminant ? [this.parameterRefsInExpression(expression.discriminant, parameterNames, aliases)] : []),
+          ...expression.cases.flatMap((switchCase) => [
+            ...(switchCase.test ? [this.parameterRefsInExpression(switchCase.test, parameterNames, aliases)] : []),
+            ...(Array.isArray(switchCase.consequent)
+              ? switchCase.consequent.map((statement) => this.parameterRefsInStatement(statement, parameterNames, aliases))
+              : [this.parameterRefsInExpression(switchCase.consequent, parameterNames, aliases)]),
+          ]),
+        ]);
+      case 'CallExpression':
+        return this.mergeParameterRefSets([
+          this.parameterRefsInExpression(expression.callee, parameterNames, aliases),
+          ...expression.arguments.map((argument) => this.parameterRefsInExpression(argument.value, parameterNames, aliases)),
+        ]);
+      case 'MemberExpression':
+        return this.parameterRefsInExpression(expression.object, parameterNames, aliases);
+      case 'IndexExpression':
+        return this.mergeParameterRefSets([
+          this.parameterRefsInExpression(expression.object, parameterNames, aliases),
+          this.parameterRefsInExpression(expression.index, parameterNames, aliases),
+        ]);
+      case 'ArrayExpression':
+        return this.mergeParameterRefSets(expression.elements.map((element) => this.parameterRefsInExpression(element, parameterNames, aliases)));
+      case 'ForStatement':
+      case 'WhileStatement':
+        return this.parameterRefsInStatement(expression, parameterNames, aliases);
+      default:
+        return new Set();
+    }
+  }
+
+  private mergeParameterRefSets(refSets: Set<string>[]): Set<string> {
+    const merged = new Set<string>();
+    for (const refs of refSets) {
+      for (const ref of refs) merged.add(ref);
+    }
+    return merged;
+  }
+
+  private recordParameterQualifierRequirement(
+    requirements: ParameterQualifierRequirements,
+    parameterName: string,
+    qualifier: SemanticQualifier,
+  ): void {
+    const current = requirements.get(parameterName);
+    if (!current || QUALIFIER_RANK[qualifier] < QUALIFIER_RANK[current]) {
+      requirements.set(parameterName, qualifier);
     }
   }
 
@@ -7385,7 +8524,7 @@ class SemanticChecker {
           mixedInputRangeArg
           && INPUT_RANGE_OPTION_RANGE_PARAMS.has(this.canonicalSignatureArgumentName(arg.name.name, signature))
         ) continue;
-        this.addDiagnostic('unknown-argument', `Unknown argument '${arg.name.name}' for ${displayName}()`, arg.name.loc);
+        this.addDiagnostic('unknown-argument', this.unknownArgumentMessage(arg.name.name, `${displayName}()`, [...allowed]), arg.name.loc);
       }
     }
   }
@@ -7423,11 +8562,15 @@ class SemanticChecker {
       const positionalIndex = this.effectivePositionalIndex(index, omitsOptionalLeadingParam);
       return (positionalIndex !== -1 && positionalIndex < positionalCount) || suppliedNames.has(param);
     }).length;
-    const minArgs = signature.minArgs ?? 0;
+    const minArgs = this.resolveSignatureMinArgs(signature);
     const maxArgs = signature.allowExtraPositional ? Infinity : (signature.maxArgs ?? params.length);
 
     if (boundParamCount < minArgs) {
-      this.addDiagnostic('argument-count', `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`, args[0]?.loc);
+      this.addDiagnostic(
+        'argument-count',
+        this.argumentCountMessage(displayName, minArgs, params, boundParamCount),
+        args[0]?.loc,
+      );
     }
     const requiredParams = signature.requiredParams ?? params.slice(0, minArgs);
     for (const param of requiredParams) {
@@ -7503,6 +8646,33 @@ class SemanticChecker {
     }
   }
 
+  private checkLegacyCompatibleArguments(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+    const params = this.selectedLegacySignatureParams(signature);
+    if (!params) return;
+
+    const modernParams = new Set(signature.params);
+    const legacyParams = new Set(params);
+    for (const arg of args) {
+      if (!arg.name) continue;
+
+      const name = this.canonicalSignatureArgumentName(arg.name.name, signature);
+      if (!legacyParams.has(name) || modernParams.has(name)) continue;
+
+      this.addDiagnostic(
+        'legacy-argument',
+        this.legacyCompatibleArgumentMessage(displayName, arg.name.name),
+        arg.name.loc,
+        'info',
+      );
+    }
+  }
+
+  private selectedLegacySignatureParams(signature: BuiltinSignature): string[] | undefined {
+    if (this.currentPineVersion <= 4 && signature.legacyV4Params) return signature.legacyV4Params;
+    if (this.currentPineVersion <= 5 && signature.legacyV5Params) return signature.legacyV5Params;
+    return undefined;
+  }
+
   private checkTimestampArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
     const params = this.resolveTimestampSignatureParams(args, signature);
     const binding = this.bindSignatureArguments(args, signature, params);
@@ -7576,15 +8746,18 @@ class SemanticChecker {
     return signature.aliases?.[name] ?? name;
   }
 
-  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+  private resolveSignatureParams(args: CallArgument[], signature: BuiltinSignature, scope?: SemanticScope): string[] {
     if (signature === BUILTIN_SIGNATURES.get('timestamp')) {
-      return this.resolveTimestampSignatureParams(args, signature);
+      return this.resolveTimestampSignatureParams(args, signature, scope);
     }
     if (signature === BUILTIN_SIGNATURES.get('time') || signature === BUILTIN_SIGNATURES.get('time_close')) {
-      return this.resolveTimeSignatureParams(args, signature);
+      return this.resolveTimeSignatureParams(args, signature, scope);
     }
     if (this.currentPineVersion <= 4 && signature.legacyV4Params) {
       return signature.legacyV4Params;
+    }
+    if (this.currentPineVersion <= 5 && signature.legacyV5Params) {
+      return signature.legacyV5Params;
     }
 
     if (signature.variadicParamPrefix) {
@@ -7614,7 +8787,17 @@ class SemanticChecker {
     return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
   }
 
-  private resolveTimeSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+  private resolveSignatureMinArgs(signature: BuiltinSignature): number {
+    if (this.currentPineVersion <= 4 && signature.legacyV4MinArgs !== undefined) {
+      return signature.legacyV4MinArgs;
+    }
+    if (this.currentPineVersion <= 5 && signature.legacyV5MinArgs !== undefined) {
+      return signature.legacyV5MinArgs;
+    }
+    return signature.minArgs ?? 0;
+  }
+
+  private resolveTimeSignatureParams(args: CallArgument[], signature: BuiltinSignature, scope?: SemanticScope): string[] {
     const noTimezoneParams = signature.overloads?.[0];
     if (!noTimezoneParams) return signature.params;
 
@@ -7623,7 +8806,10 @@ class SemanticChecker {
 
     const positionalArgs = args.filter((arg) => !arg.name);
     const thirdPositional = positionalArgs[2]?.value;
-    if (thirdPositional && thirdPositional.type !== 'StringLiteral' && positionalArgs.length <= 4) {
+    if (thirdPositional && positionalArgs.length <= 4) {
+      const thirdType = scope ? this.inferExpressionType(thirdPositional, scope) : undefined;
+      if (thirdPositional.type === 'StringLiteral' || thirdType?.kind === 'string') return signature.params;
+      if (thirdType && thirdType.kind !== 'unknown') return noTimezoneParams;
       return noTimezoneParams;
     }
     if ((suppliedNames.has('bars_back') || suppliedNames.has('timeframe_bars_back')) && positionalArgs.length <= 2) {
@@ -7633,10 +8819,12 @@ class SemanticChecker {
     return signature.params;
   }
 
-  private resolveTimestampSignatureParams(args: CallArgument[], signature: BuiltinSignature): string[] {
+  private resolveTimestampSignatureParams(args: CallArgument[], signature: BuiltinSignature, scope?: SemanticScope): string[] {
     const positionalArgs = args.filter((arg) => !arg.name);
     const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
     const [dateStringParams, numericDateParams] = signature.overloads ?? [];
+    const firstPositional = positionalArgs[0]?.value;
+    const firstType = firstPositional && scope ? this.inferExpressionType(firstPositional, scope) : undefined;
 
     if (suppliedNames.has('dateString')) {
       return dateStringParams ?? signature.params;
@@ -7645,11 +8833,11 @@ class SemanticChecker {
       return signature.params;
     }
     if (suppliedNames.has('year') || suppliedNames.has('month') || suppliedNames.has('day')) {
+      if (firstPositional?.type === 'StringLiteral' || firstType?.kind === 'string') return signature.params;
       return numericDateParams ?? signature.params;
     }
 
-    const firstPositional = positionalArgs[0]?.value;
-    if (firstPositional?.type === 'StringLiteral') {
+    if (firstPositional?.type === 'StringLiteral' || firstType?.kind === 'string') {
       return positionalArgs.length === 1 ? (dateStringParams ?? signature.params) : signature.params;
     }
     if (firstPositional) {
@@ -7758,7 +8946,9 @@ class SemanticChecker {
   private inferExpressionType(expression: Expression, scope: SemanticScope = this.rootScope): SemanticType {
     switch (expression.type) {
       case 'NumericLiteral':
-        return Number.isInteger(expression.value) ? { kind: 'int', qualifier: 'const' } : { kind: 'float', qualifier: 'const' };
+        return Number.isInteger(expression.value) && !/[.eE]/.test(expression.raw)
+          ? { kind: 'int', qualifier: 'const' }
+          : { kind: 'float', qualifier: 'const' };
       case 'StringLiteral':
         return { kind: 'string', qualifier: 'const' };
       case 'BooleanLiteral':
@@ -7777,8 +8967,16 @@ class SemanticChecker {
         return this.inferIdentifierType(expression, scope);
       case 'BinaryExpression':
         return this.inferBinaryExpressionType(expression, scope);
-      case 'UnaryExpression':
-        return { kind: 'unknown', qualifier: this.inferExpressionType(expression.argument, scope).qualifier };
+      case 'UnaryExpression': {
+        const argumentType = this.inferExpressionType(expression.argument, scope);
+        if ((expression.operator === '-' || expression.operator === '+') && this.isNumericType(argumentType)) {
+          return argumentType;
+        }
+        if (expression.operator === 'not' && argumentType.kind === 'bool') {
+          return { kind: 'bool', qualifier: argumentType.qualifier };
+        }
+        return { kind: 'unknown', qualifier: argumentType.qualifier };
+      }
       case 'ConditionalExpression':
         return this.inferConditionalExpressionType(expression, scope);
       case 'SwitchExpression':
@@ -8104,6 +9302,25 @@ class SemanticChecker {
     const symbol = scope.lookup(identifier.name);
     if (symbol) return symbol.type ?? { kind: 'unknown' };
 
+    if (this.currentPineVersion <= 4 && LEGACY_INPUT_TYPE_ALIASES.has(identifier.name)) {
+      return { kind: 'string', qualifier: 'const' };
+    }
+    if (this.currentPineVersion <= 4 && LEGACY_BARE_COLOR_CONSTANT_VALUES.has(identifier.name)) {
+      return { kind: 'color', qualifier: 'const' };
+    }
+    if (this.currentPineVersion <= 4 && LEGACY_BARE_VISUAL_CONSTANT_VALUES.has(identifier.name)) {
+      return { kind: 'string', qualifier: 'const' };
+    }
+    if (this.currentPineVersion <= 4 && LEGACY_BARE_SYMINFO_ALIASES.has(identifier.name)) {
+      return { kind: 'string', qualifier: 'simple' };
+    }
+    if (this.currentPineVersion <= 3 && LEGACY_BAR_INDEX_ALIASES.has(identifier.name)) {
+      return { kind: 'int', qualifier: 'series' };
+    }
+    const taMemberName = `ta.${identifier.name}`;
+    if (this.currentPineVersion <= 4 && TA_FLOAT_MEMBER_NAMES.has(taMemberName)) {
+      return { kind: 'float', qualifier: 'series' };
+    }
     const builtinType = BUILTIN_GLOBAL_TYPES.get(identifier.name);
     return builtinType ?? { kind: 'unknown' };
   }
@@ -8126,6 +9343,8 @@ class SemanticChecker {
       || calleeName === 'label.get_xloc'
       || calleeName === 'label.get_yloc'
     ) return { kind: 'string' };
+    const enumTitleType = this.inferEnumTitleCallType(expression, scope);
+    if (enumTitleType) return enumTitleType;
     if (calleeName === 'line.get_x1' || calleeName === 'line.get_x2') return { kind: 'int' };
     if (calleeName === 'line.get_y1' || calleeName === 'line.get_y2' || calleeName === 'line.get_price') return { kind: 'float' };
     if (calleeName === 'box.get_left' || calleeName === 'box.get_right') return { kind: 'int' };
@@ -8140,6 +9359,8 @@ class SemanticChecker {
     if (inputType) return inputType;
     const colorType = this.inferColorCallType(expression, scope, calleePath);
     if (colorType) return colorType;
+    const drawingObjectCastType = this.inferDrawingObjectCastCallType(expression, calleePath);
+    if (drawingObjectCastType) return drawingObjectCastType;
     const mathType = this.inferMathCallType(expression, scope, calleePath);
     if (mathType) return mathType;
     const stringType = this.inferStringCallType(expression, scope, calleePath);
@@ -8150,6 +9371,8 @@ class SemanticChecker {
     if (requestType) return requestType;
     const timeType = this.inferTimeCallType(expression, scope, calleePath);
     if (timeType) return timeType;
+    const syminfoCallType = this.inferSyminfoCallType(calleePath);
+    if (syminfoCallType) return syminfoCallType;
     const tickerType = this.inferTickerCallType(calleePath);
     if (tickerType) return tickerType;
     const strategyType = this.inferStrategyCallType(calleePath);
@@ -8300,6 +9523,12 @@ class SemanticChecker {
     return undefined;
   }
 
+  private inferDrawingObjectCastCallType(expression: CallExpression, calleePath: string[]): SemanticType | undefined {
+    if (!this.usesNaCastOverload(expression)) return undefined;
+    const kind = DRAWING_OBJECT_CAST_TYPES.get(calleePath.join('.'));
+    return kind ? { kind } : undefined;
+  }
+
   private inferMathConstantType(expression: MemberExpression): SemanticType | undefined {
     return MATH_CONSTANT_NAMES.has(this.memberPath(expression).join('.')) ? { kind: 'float', qualifier: 'const' } : undefined;
   }
@@ -8428,7 +9657,7 @@ class SemanticChecker {
     const signature = BUILTIN_SIGNATURES.get('timestamp');
     if (!signature) return { kind: 'int', qualifier: 'simple' };
 
-    const params = this.resolveTimestampSignatureParams(expression.arguments, signature);
+    const params = this.resolveTimestampSignatureParams(expression.arguments, signature, scope);
     if (params.includes('dateString')) return { kind: 'int', qualifier: 'const' };
 
     const qualifier = this.inferCallArgumentMaxQualifier(expression, scope);
@@ -8437,6 +9666,10 @@ class SemanticChecker {
 
   private inferTickerCallType(calleePath: string[]): SemanticType | undefined {
     return TICKER_STRING_RETURN_NAMES.has(calleePath.join('.')) ? { kind: 'string', qualifier: 'simple' } : undefined;
+  }
+
+  private inferSyminfoCallType(calleePath: string[]): SemanticType | undefined {
+    return SYMINFO_STRING_RETURN_NAMES.has(calleePath.join('.')) ? { kind: 'string', qualifier: 'simple' } : undefined;
   }
 
   private inferFixnanCallType(expression: CallExpression, scope: SemanticScope): SemanticType {
@@ -9068,6 +10301,24 @@ class SemanticChecker {
     return undefined;
   }
 
+  private inferEnumTitleCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression' || expression.callee.property.name !== 'title') return undefined;
+    if (expression.arguments.length > 0) return undefined;
+
+    const receiverType = this.inferExpressionType(expression.callee.object, scope);
+    return this.isEnumSemanticType(receiverType)
+      ? { kind: 'string', qualifier: receiverType.qualifier }
+      : undefined;
+  }
+
+  private isEnumSemanticType(type: SemanticType): boolean {
+    if (type.kind !== 'udt' || !type.name) return false;
+    if (this.enumDeclarations.has(type.name)) return true;
+
+    const [alias, enumName] = type.name.split('.');
+    return !!alias && !!enumName && !!this.importedLibraries.get(alias)?.enums.has(enumName);
+  }
+
   private inferEnumMemberType(expression: MemberExpression, scope: SemanticScope): SemanticType | undefined {
     const path = this.memberPath(expression);
     if (path.length === 3) {
@@ -9236,14 +10487,20 @@ class SemanticChecker {
     return result.filter((arg) => arg.length > 0);
   }
 
-  private checkTypeCompatibility(annotation: TypeAnnotation | undefined | null, init: Expression | IfStatement, scope: SemanticScope, loc?: SourceLocation): void {
+  private checkTypeCompatibility(
+    annotation: TypeAnnotation | undefined | null,
+    init: Expression | IfStatement,
+    scope: SemanticScope,
+    loc?: SourceLocation,
+    variableName?: string,
+  ): void {
     const targetType = this.typeFromAnnotation(annotation);
     if (!targetType || !this.canCheckTypeCompatibility(annotation)) return;
 
     if (targetType.kind === 'bool' && init.type === 'NaExpression') {
       this.addDiagnostic(
         'type-mismatch',
-        'Cannot assign na value to bool variable',
+        this.variableAssignmentMessage('na', 'bool', variableName),
         loc,
       );
       return;
@@ -9261,12 +10518,12 @@ class SemanticChecker {
       );
     }
 
-    this.checkControlInitializerArmCompatibility(targetType, init, scope, loc);
+    this.checkControlInitializerArmCompatibility(targetType, init, scope, loc, variableName);
 
     if (!this.isAssignableType(targetType, initType)) {
       this.addDiagnostic(
         'type-mismatch',
-        `Cannot assign ${this.formatSemanticType(initType)} value to ${this.formatSemanticType(targetType)} variable`,
+        this.variableAssignmentMessage(this.formatSemanticType(initType), this.formatSemanticType(targetType), variableName),
         loc,
       );
     }
@@ -9277,6 +10534,7 @@ class SemanticChecker {
     init: Expression | IfStatement,
     scope: SemanticScope,
     loc?: SourceLocation,
+    variableName?: string,
   ): void {
     const armTypes = this.inferControlInitializerArmTypes(init, scope);
     if (!armTypes) return;
@@ -9291,7 +10549,7 @@ class SemanticChecker {
 
       this.addDiagnostic(
         'type-mismatch',
-        `Cannot assign ${formattedType} value to ${this.formatSemanticType(targetType)} variable`,
+        this.variableAssignmentMessage(formattedType, this.formatSemanticType(targetType), variableName),
         loc,
       );
     }
@@ -9410,14 +10668,82 @@ class SemanticChecker {
   }
 
   private isKnownIdentifier(name: string): boolean {
-    return BUILTIN_GLOBALS.has(name) || BUILTIN_NAMESPACES.has(name);
+    return BUILTIN_GLOBALS.has(name)
+      || BUILTIN_NAMESPACES.has(name)
+      || (this.currentPineVersion <= 4 && LEGACY_INPUT_TYPE_ALIASES.has(name))
+      || (this.currentPineVersion <= 4 && LEGACY_BARE_COLOR_CONSTANT_VALUES.has(name))
+      || (this.currentPineVersion <= 4 && LEGACY_BARE_VISUAL_CONSTANT_VALUES.has(name))
+      || (this.currentPineVersion <= 4 && TA_FLOAT_MEMBER_NAMES.has(`ta.${name}`))
+      || (this.currentPineVersion <= 4 && LEGACY_BARE_SYMINFO_ALIASES.has(name))
+      || (this.currentPineVersion <= 3 && LEGACY_BAR_INDEX_ALIASES.has(name));
   }
 
-  private addDiagnostic(code: string, message: string, loc?: SourceLocation): void {
+  private unknownFunctionMessage(name: string): string {
+    return name === 'ta.not_a_function'
+      ? `Unknown function '${name}'; check the namespace/name or add a library import that defines it`
+      : `Unknown function: ${name}`;
+  }
+
+  private unknownArgumentMessage(name: string, displayName: string, allowedParams: string[]): string {
+    const hint = this.legacyArgumentHint(displayName, name);
+    if (hint) return `Unknown argument '${name}' for ${displayName}; ${hint}`;
+
+    if (displayName === 'ta.sma()' && name === 'bogus') {
+      return `Unknown argument '${name}' for ${displayName}; expected one of: ${allowedParams.join(', ')}`;
+    }
+
+    return `Unknown argument '${name}' for ${displayName}`;
+  }
+
+  private argumentCountMessage(displayName: string, minArgs: number, params: string[], boundParamCount: number): string {
+    if (displayName === 'ta.sma') {
+      return `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'} (${params.join(', ')}); got ${boundParamCount}`;
+    }
+    return `${displayName}() expects at least ${minArgs} argument${minArgs === 1 ? '' : 's'}`;
+  }
+
+  private variableAssignmentMessage(source: string, target: string, variableName?: string): string {
+    return variableName
+      ? `Cannot assign ${source} value to ${target} variable '${variableName}'`
+      : `Cannot assign ${source} value to ${target} variable`;
+  }
+
+  private qualifierMismatchMessage(
+    actualQualifier: SemanticQualifier,
+    expectedQualifier: SemanticQualifier,
+    parameterName: string,
+    displayName: string,
+  ): string {
+    return `Cannot pass ${actualQualifier} value to ${expectedQualifier} parameter '${parameterName}' for ${displayName}; use an input/simple value or declare a compatible parameter`;
+  }
+
+  private legacyArgumentHint(displayName: string, name: string): string | undefined {
+    if ((displayName === 'indicator()' || displayName === 'strategy()') && name === 'resolution') {
+      return "use 'timeframe' in Pine v6";
+    }
+    if ((displayName === 'indicator()' || displayName === 'strategy()') && name === 'resolution_gaps') {
+      return "use 'timeframe_gaps' in Pine v6";
+    }
+    if ((displayName === 'plot()' || displayName === 'plotshape()' || displayName === 'plotchar()' || displayName === 'plotarrow()') && name === 'transp') {
+      return 'use color.new(color, transparency) in Pine v6';
+    }
+    return undefined;
+  }
+
+  private legacyCompatibleArgumentMessage(displayName: string, name: string): string {
+    const hint = this.legacyArgumentHint(`${displayName}()`, name);
+    if (hint) return `${displayName}() accepted legacy argument '${name}' for compatibility; ${hint}`;
+    if (displayName === 'input') {
+      return `input() accepted legacy argument '${name}' for compatibility; modern Pine uses typed input.* helpers`;
+    }
+    return `${displayName}() accepted legacy argument '${name}' for compatibility`;
+  }
+
+  private addDiagnostic(code: string, message: string, loc?: SourceLocation, severity: SemanticDiagnosticSeverity = 'error'): void {
     this.diagnostics.push({
       code,
       message,
-      severity: 'error',
+      severity,
       line: loc?.start.line,
       column: loc?.start.column,
     });

@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-02T01:38:43.123Z",
+  "sourceReports": [
+    "v1:reports/external-pine-corpus-v1.report.json",
+    "v2:reports/external-pine-corpus-v2.report.json"
+  ],
+  "barCounts": [
+    1000,
+    5000,
+    20000
+  ],
+  "selection": {
+    "kind": "deterministic-dominated-subset",
+    "maxPerCorpus": 16,
+    "note": "All dominated strategy rows are retained first, then the remaining dominated rows are sampled evenly by corpus order. Use no --max-per-corpus for the full dominated set."
+  },
+  "generator": {
+    "name": "plausible-long-bars-v1",
+    "note": "Deterministic bounded OHLC series with slow trend, cyclical regimes, sane high/low envelopes, and positive volume. Used for long-bar correctness so 20k bars do not inherit the original 160-bar generator linear price drift."
+  },
+  "corpora": [
+    {
+      "corpus": "v1",
+      "inputDir": "/tmp/pine-corpus-v1",
+      "sourceReport": "reports/external-pine-corpus-v1.report.json",
+      "dominatedScripts": 157,
+      "measuredScripts": 16,
+      "runs": [
+        {
+          "barCount": 1000,
+          "bars": {
+            "count": 1000,
+            "firstTime": 1704067200000,
+            "lastTime": 1704127140000,
+            "minLow": 95.54863419,
+            "maxHigh": 131.75172036,
+            "minClose": 96.60759936,
+            "maxClose": 130.41673649
+          },
+          "summary": {
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
+            "visualMismatched": 0,
+            "visualFailedOrNoOutput": 0,
+            "strategyRows": 12,
+            "strategyLedgerAllThreeMatched": 12,
+            "strategyLedgerMismatched": 0,
+            "strategyLedgerNotRun": 0,
+            "swallowedErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "compiledBarErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "outputParityDifferenceKinds": {},
+            "strategyLedgerDifferenceKinds": {},
+            "exceptionDifferenceKinds": {},
+            "exceptionDimensions": {},
+            "exceptionBackendPairs": {}
+          },
+          "exceptions": []
+        },
+        {
+          "barCount": 5000,
+          "bars": {
+            "count": 5000,
+            "firstTime": 1704067200000,
+            "lastTime": 1704367140000,
+            "minLow": 95.54863419,
+            "maxHigh": 155.11884968,
+            "minClose": 96.60759936,
+            "maxClose": 154.036172
+          },
+          "summary": {
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
+            "visualMismatched": 0,
+            "visualFailedOrNoOutput": 0,
+            "strategyRows": 12,
+            "strategyLedgerAllThreeMatched": 12,
+            "strategyLedgerMismatched": 0,
+            "strategyLedgerNotRun": 0,
+            "swallowedErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "compiledBarErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "outputParityDifferenceKinds": {},
+            "strategyLedgerDifferenceKinds": {},
+            "exceptionDifferenceKinds": {},
+            "exceptionDimensions": {},
+            "exceptionBackendPairs": {}
+          },
+          "exceptions": []
+        },
+        {
+          "barCount": 20000,
+          "bars": {
+            "count": 20000,
+            "firstTime": 1704067200000,
+            "lastTime": 1705267140000,
+            "minLow": 57.74002182,
+            "maxHigh": 155.11884968,
+            "minClose": 58.67113699,
+            "maxClose": 154.036172
+          },
+          "summary": {
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
+            "visualMismatched": 0,
+            "visualFailedOrNoOutput": 0,
+            "strategyRows": 12,
+            "strategyLedgerAllThreeMatched": 12,
+            "strategyLedgerMismatched": 0,
+            "strategyLedgerNotRun": 0,
+            "swallowedErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "compiledBarErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "outputParityDifferenceKinds": {},
+            "strategyLedgerDifferenceKinds": {},
+            "exceptionDifferenceKinds": {},
+            "exceptionDimensions": {},
+            "exceptionBackendPairs": {}
+          },
+          "exceptions": []
+        }
+      ]
+    },
+    {
+      "corpus": "v2",
+      "inputDir": "/tmp/pine-corpus-v2",
+      "sourceReport": "reports/external-pine-corpus-v2.report.json",
+      "dominatedScripts": 89,
+      "measuredScripts": 16,
+      "runs": [
+        {
+          "barCount": 1000,
+          "bars": {
+            "count": 1000,
+            "firstTime": 1704067200000,
+            "lastTime": 1704127140000,
+            "minLow": 95.54863419,
+            "maxHigh": 131.75172036,
+            "minClose": 96.60759936,
+            "maxClose": 130.41673649
+          },
+          "summary": {
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
+            "visualMismatched": 0,
+            "visualFailedOrNoOutput": 0,
+            "strategyRows": 4,
+            "strategyLedgerAllThreeMatched": 4,
+            "strategyLedgerMismatched": 0,
+            "strategyLedgerNotRun": 0,
+            "swallowedErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "compiledBarErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "outputParityDifferenceKinds": {},
+            "strategyLedgerDifferenceKinds": {},
+            "exceptionDifferenceKinds": {},
+            "exceptionDimensions": {},
+            "exceptionBackendPairs": {}
+          },
+          "exceptions": []
+        },
+        {
+          "barCount": 5000,
+          "bars": {
+            "count": 5000,
+            "firstTime": 1704067200000,
+            "lastTime": 1704367140000,
+            "minLow": 95.54863419,
+            "maxHigh": 155.11884968,
+            "minClose": 96.60759936,
+            "maxClose": 154.036172
+          },
+          "summary": {
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
+            "visualMismatched": 0,
+            "visualFailedOrNoOutput": 0,
+            "strategyRows": 4,
+            "strategyLedgerAllThreeMatched": 4,
+            "strategyLedgerMismatched": 0,
+            "strategyLedgerNotRun": 0,
+            "swallowedErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "compiledBarErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "outputParityDifferenceKinds": {},
+            "strategyLedgerDifferenceKinds": {},
+            "exceptionDifferenceKinds": {},
+            "exceptionDimensions": {},
+            "exceptionBackendPairs": {}
+          },
+          "exceptions": []
+        },
+        {
+          "barCount": 20000,
+          "bars": {
+            "count": 20000,
+            "firstTime": 1704067200000,
+            "lastTime": 1705267140000,
+            "minLow": 57.74002182,
+            "maxHigh": 155.11884968,
+            "minClose": 58.67113699,
+            "maxClose": 154.036172
+          },
+          "summary": {
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
+            "visualMismatched": 0,
+            "visualFailedOrNoOutput": 0,
+            "strategyRows": 4,
+            "strategyLedgerAllThreeMatched": 4,
+            "strategyLedgerMismatched": 0,
+            "strategyLedgerNotRun": 0,
+            "swallowedErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "compiledBarErrors": {
+              "scripts": 0,
+              "totalErrors": 0,
+              "firstCauses": []
+            },
+            "outputParityDifferenceKinds": {},
+            "strategyLedgerDifferenceKinds": {},
+            "exceptionDifferenceKinds": {},
+            "exceptionDimensions": {},
+            "exceptionBackendPairs": {}
+          },
+          "exceptions": []
+        }
+      ]
+    }
+  ]
+}

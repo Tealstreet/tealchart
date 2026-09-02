@@ -1614,12 +1614,8 @@ plot(open, title="Open")
     expect(getPlot(result, 'Open').values).toEqual([100, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
   });
 
-  // request.security with a tuple expression [open, high, low, close] as the
-  // expression argument cannot be destructured — the runtime returns a non-array
-  // value and the destructuring fails with "Cannot destructure non-array value".
-  // This is a structural gap: the expression is evaluated in the chart context, not
-  // the HTF context, so only scalar series values are forwarded.
-  // Skipped: gap documented in PINE_V6_REFERENCE_GAP.md under "Deep parity probes".
+  // Public MTF scripts often request OHLC as one tuple so all fields share one
+  // request context and merge path.
   it('request.security with tuple expression destructure [o, h, l, c]', () => {
     const datafeed = new InMemoryRequestDatafeed([{
       symbol: 'BTCUSDT',
@@ -5209,7 +5205,7 @@ plot(strategy.netprofit, title="Profit")
 
   it('locks pyramiding=3 — position_size grows and opentrades increments with each entry', () => {
     // Public idiom reference: scale-in strategies pyramid into a position on each
-    // successive signal bar; pyramiding=3 allows up to 4 concurrent same-direction trades.
+    // successive signal bar; pyramiding=3 allows up to 3 concurrent same-direction trades.
     // Source search: https://www.tradingview.com/scripts/search/strategy%20pyramiding%20scale%20in%20entries/
     const bars: Bar[] = [
       { time: 1_700_710_000_000, open: 100, high: 101, low: 99,  close: 100, volume: 100 },
@@ -5810,8 +5806,8 @@ plot(trendDir, title="Trend Dir")
       96.452675, 100.46845, 102.8123, 104.041533,
       106.194356, 106.194356,
     ]);
-    // Direction: na for bars 0-1; -1 from bar 2 to bar 5, flips to 1 at bar 6 onward
-    expect(getPlot(result, 'Trend Dir').values).toEqual([null, null, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1]);
+    // Direction follows Pine's public idiom: negative is uptrend, positive is downtrend.
+    expect(getPlot(result, 'Trend Dir').values).toEqual([null, null, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1]);
   });
 
   it('replicates Volume Profile Lite — volume colored by direction + volume SMA + bgcolor for high volume', () => {

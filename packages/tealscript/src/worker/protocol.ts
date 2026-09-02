@@ -6,6 +6,21 @@
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
 import type { IndicatorDeclarationMetadata, RuntimeErrorCode, RuntimeErrorPayload, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type { StrategyLedger } from '../runtime/strategy';
+import type {
+  RequestCorporateActionEvent,
+  RequestCorporateActionQuery,
+  RequestCurrencyRateQuery,
+  RequestDataContext,
+  RequestDatafeedQuery,
+  RequestEconomicSeriesQuery,
+  RequestFinancialMetricQuery,
+  RequestFootprintData,
+  RequestFootprintQuery,
+  RequestQuandlSeriesQuery,
+  RequestSeriesPoint,
+  RequestSeriesQuery,
+} from '../runtime/requestDatafeed';
 import type { Program } from '../parser/ast';
 import type { SemanticDiagnostic } from '../semantic';
 
@@ -17,7 +32,8 @@ export type ToWorkerMessage =
   | UpdateBarsMessage
   | UpdateBarMessage
   | SetInputsMessage
-  | DisposeMessage;
+  | DisposeMessage
+  | RequestDataResultMessage;
 
 /**
  * Initialize worker with script and data
@@ -72,10 +88,82 @@ export interface DisposeMessage {
  */
 export type FromWorkerMessage =
   | ReadyMessage
+  | RequestDataMessage
   | ResultMessage
   | ErrorMessage
   | SemanticErrorMessage
   | ParseErrorMessage;
+
+export type WorkerRequestDataKind =
+  | 'bars'
+  | 'series'
+  | 'currency_rate'
+  | 'corporate_action'
+  | 'economic'
+  | 'financial'
+  | 'quandl'
+  | 'footprint';
+
+export type WorkerRequestDataQuery =
+  | RequestDatafeedQuery
+  | RequestSeriesQuery
+  | RequestCurrencyRateQuery
+  | RequestCorporateActionQuery
+  | RequestEconomicSeriesQuery
+  | RequestFinancialMetricQuery
+  | RequestQuandlSeriesQuery
+  | RequestFootprintQuery;
+
+export type WorkerRequestDataValue =
+  | RequestDataContext
+  | RequestSeriesPoint[]
+  | RequestCorporateActionEvent[]
+  | RequestCorporateActionEvent
+  | RequestFootprintData[]
+  | RequestFootprintData
+  | number
+  | null;
+
+export type WorkerRequestDataErrorCode =
+  | 'missing-provider'
+  | 'not-found'
+  | 'timeout'
+  | 'invalid-query'
+  | 'provider-error';
+
+export interface RequestDataMessage {
+  type: 'requestData';
+  scriptId: string;
+  requestId: number;
+  generation: number;
+  kind: WorkerRequestDataKind;
+  query: WorkerRequestDataQuery;
+}
+
+export interface RequestDataSuccessMessage {
+  type: 'requestDataResult';
+  scriptId: string;
+  requestId: number;
+  generation: number;
+  kind: WorkerRequestDataKind;
+  ok: true;
+  value: WorkerRequestDataValue;
+}
+
+export interface RequestDataErrorMessage {
+  type: 'requestDataResult';
+  scriptId: string;
+  requestId: number;
+  generation: number;
+  kind: WorkerRequestDataKind;
+  ok: false;
+  error: {
+    code: WorkerRequestDataErrorCode;
+    message: string;
+  };
+}
+
+export type RequestDataResultMessage = RequestDataSuccessMessage | RequestDataErrorMessage;
 
 /**
  * Worker is ready to receive messages
@@ -104,6 +192,7 @@ export interface WorkerOutputBundle {
   logs?: LogOutput[];
   inputs: InputDefinition[];
   declaration?: IndicatorDeclarationMetadata;
+  strategy?: StrategyLedger;
   profile?: RuntimeProfile;
   metadata?: WorkerOutputMetadata;
 }
@@ -130,6 +219,7 @@ export interface ResultMessage {
   logs?: LogOutput[];
   inputs: InputDefinition[];
   declaration?: IndicatorDeclarationMetadata;
+  strategy?: StrategyLedger;
   profile?: RuntimeProfile;
 }
 
@@ -189,6 +279,7 @@ export interface ErrorMessage {
   line?: number;
   column?: number;
   runtimeError?: RuntimeErrorPayload;
+  profile?: RuntimeProfile;
   metadata?: WorkerOutputMetadata;
 }
 

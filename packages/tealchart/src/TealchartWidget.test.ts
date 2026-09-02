@@ -1,4 +1,4 @@
-import type { DrawingOutput, PlotOutput } from '@tealstreet/tealscript';
+import type { DrawingOutput, PlotOutput, Program } from '@tealstreet/tealscript';
 import type {
   DrawingCoordinateSpace,
   UserDrawing,
@@ -50,6 +50,22 @@ const widgetUiOptionsCalls: Array<{
   onUserDrawingUndo?: () => void;
   onUserDrawingRedo?: () => void;
 }> = [];
+
+class TealscriptTestWorker {
+  onmessage: ((event: MessageEvent) => void) | null = null;
+  onerror: ((event: ErrorEvent) => void) | null = null;
+  messages: unknown[] = [];
+
+  postMessage(message: unknown): void {
+    this.messages.push(message);
+  }
+
+  terminate(): void {}
+
+  emit(data: unknown): void {
+    this.onmessage?.({ data } as MessageEvent);
+  }
+}
 
 // Use plain classes for mocks so mockReset doesn't strip implementations
 vi.mock('./ui/TealchartWidgetUI', () => ({
@@ -441,6 +457,53 @@ describe('TealchartWidget', () => {
       widget.setCustomTealscriptIndicators([updatedIndicator]);
 
       expect(setAvailableIndicatorsCalls.at(-1)?.some((indicator) => indicator.name === 'Updated Study')).toBe(true);
+      widget.remove();
+    });
+
+    it('passes host Tealscript library registries into study workers', async () => {
+      const datafeed = createMockDatafeed();
+      const worker = new TealscriptTestWorker();
+      const libraries = new Map<string, Program>();
+      const widget = createWidget(datafeed, {
+        createTealscriptWorker: () => worker as unknown as Worker,
+        getTealscriptLibraries: () => libraries,
+      });
+      completeInit(datafeed);
+
+      const created = widget.chart().createStudy('indicator("Uses Library")\nplot(close)');
+      worker.emit({ type: 'ready' });
+      await created;
+
+      const initMessage = worker.messages.find((message): message is { type: string; libraries?: unknown } => {
+        return typeof message === 'object' && message !== null && (message as { type?: unknown }).type === 'init';
+      });
+      expect(initMessage?.libraries).toBe(libraries);
+      widget.remove();
+    });
+
+    it('passes backend selection into study worker runtime options', async () => {
+      const datafeed = createMockDatafeed();
+      const worker = new TealscriptTestWorker();
+      const widget = createWidget(datafeed, {
+        createTealscriptWorker: () => worker as unknown as Worker,
+        tealscriptExecutionBackend: 'closure',
+        enableTealscriptClosureBackend: () => false,
+      });
+      completeInit(datafeed);
+
+      const created = widget.chart().createStudy('indicator("Uses Backend")\nplot(close)');
+      worker.emit({ type: 'ready' });
+      await created;
+
+      const initMessage = worker.messages.find((message): message is { type: string; runtime?: unknown } => {
+        return typeof message === 'object' && message !== null && (message as { type?: unknown }).type === 'init';
+      });
+      expect(initMessage?.runtime).toMatchObject({
+        backend: {
+          executionBackendOverride: 'closure',
+          enableClosureBackend: false,
+        },
+      });
       widget.remove();
     });
 

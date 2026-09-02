@@ -5,13 +5,20 @@ import type { CanvasContext } from './CanvasContext';
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createCanvas, loadImage, type Canvas } from '@napi-rs/canvas';
+import { createCanvas, type Canvas } from '@napi-rs/canvas';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TealchartRenderer } from '../TealchartRenderer';
 import { clearChartStoreCache } from '../state/chartState';
 import { partitionTealScriptDrawings } from './TealScriptDrawingPartition';
 import { TealScriptDrawingRenderer } from './TealScriptDrawingRenderer';
+import {
+  assertVisualSnapshotDriftMatchesBaseline,
+  assertVisualSnapshotHasNoCommittedDrift,
+  formatDriftRatio,
+  measureVisualSnapshotDriftFromBuffers,
+  SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO,
+} from './visualSnapshotDrift';
 
 afterEach(() => {
   clearChartStoreCache();
@@ -20,14 +27,6 @@ afterEach(() => {
 const WIDTH = 400;
 const HEIGHT = 300;
 const SNAPSHOT_DIR = path.join(__dirname, '__visual_snapshots__');
-const SNAPSHOT_CHANNEL_TOLERANCE = 16;
-const SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO = 0.08;
-
-interface SnapshotPixels {
-  width: number;
-  height: number;
-  data: Uint8ClampedArray;
-}
 
 function ensureSnapshotDir(): void {
   if (!fs.existsSync(SNAPSHOT_DIR)) {
@@ -130,19 +129,6 @@ function renderDrawingsToBuffer(
   return canvas.toBuffer('image/png');
 }
 
-async function readSnapshotPixels(buffer: Buffer): Promise<SnapshotPixels> {
-  const image = await loadImage(buffer);
-  const canvas = createCanvas(image.width, image.height);
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
-
-  return {
-    width: image.width,
-    height: image.height,
-    data: ctx.getImageData(0, 0, image.width, image.height).data,
-  };
-}
-
 async function assertSnapshot(name: string, buffer: Buffer): Promise<void> {
   ensureSnapshotDir();
   const filePath = path.join(SNAPSHOT_DIR, `${name}.png`);
@@ -153,13 +139,16 @@ async function assertSnapshot(name: string, buffer: Buffer): Promise<void> {
   }
 
   const existing = fs.readFileSync(filePath);
-  if (existing.equals(buffer)) return;
+  if (existing.equals(buffer)) {
+    assertVisualSnapshotHasNoCommittedDrift(name);
+    return;
+  }
 
-  const [expected, actual] = await Promise.all([readSnapshotPixels(existing), readSnapshotPixels(buffer)]);
+  const drift = await measureVisualSnapshotDriftFromBuffers(name, existing, buffer);
   const diffPath = path.join(SNAPSHOT_DIR, `${name}.diff.png`);
   fs.writeFileSync(diffPath, buffer);
 
-  if (expected.width !== actual.width || expected.height !== actual.height) {
+  if (!Number.isFinite(drift.differingPixelRatio)) {
     expect.fail(
       `Visual snapshot "${name}" changed. ` +
       `Compare ${filePath} (expected) with ${diffPath} (actual). ` +
@@ -167,28 +156,15 @@ async function assertSnapshot(name: string, buffer: Buffer): Promise<void> {
     );
   }
 
-  let differingPixels = 0;
-  for (let i = 0; i < expected.data.length; i += 4) {
-    const channelDelta = Math.max(
-      Math.abs(expected.data[i]! - actual.data[i]!),
-      Math.abs(expected.data[i + 1]! - actual.data[i + 1]!),
-      Math.abs(expected.data[i + 2]! - actual.data[i + 2]!),
-      Math.abs(expected.data[i + 3]! - actual.data[i + 3]!),
-    );
-
-    if (channelDelta > SNAPSHOT_CHANNEL_TOLERANCE) {
-      differingPixels += 1;
-    }
-  }
-
-  const differingRatio = differingPixels / (expected.width * expected.height);
-  if (differingRatio > SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO) {
+  if (drift.differingPixelRatio > SNAPSHOT_MAX_DIFFERING_PIXEL_RATIO) {
     expect.fail(
-      `Visual snapshot "${name}" changed by ${(differingRatio * 100).toFixed(2)}% of pixels. ` +
+      `Visual snapshot "${name}" changed by ${formatDriftRatio(drift.differingPixelRatio)} of pixels. ` +
       `Compare ${filePath} (expected) with ${diffPath} (actual). ` +
       `Run with UPDATE_SNAPSHOTS=1 to accept the new baseline.`,
     );
   }
+
+  assertVisualSnapshotDriftMatchesBaseline(drift);
 }
 
 describe('visual snapshot rendering (extended)', () => {

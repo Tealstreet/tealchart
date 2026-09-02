@@ -1,0 +1,1709 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-02T01:27:29.755Z",
+  "sourceGateReport": "reports/closure-cutover-gate-strategy-v1.report.json",
+  "scope": "All scripts from each closure cutover dominated set: compiled produced visible historical output and closure matches compiled.",
+  "replay": {
+    "seedBars": 148,
+    "realtimeTailBars": 12,
+    "sameTimeReplacements": 24,
+    "confirmationBars": 1,
+    "comparison": "After a historical seed, each backend receives realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; interpreter, compiled, and closure outputs are compared pairwise with the historical corpus comparator."
+  },
+  "corpora": [
+    {
+      "corpus": "strategy",
+      "sourceReport": "reports/external-pine-strategy-corpus-v1.report.json",
+      "inputDir": "/tmp/pine-strategy-corpus-v1",
+      "seedBars": 148,
+      "realtimeTailBars": 12,
+      "sameTimeReplacements": 24,
+      "confirmationBars": 1,
+      "summary": {
+        "corpus": "strategy",
+        "dominatedScripts": 24,
+        "realtimeEventsPerScript": 37,
+        "totalBackendPairComparisons": 2664,
+        "matchedScripts": 24,
+        "mismatchedScripts": 0,
+        "failedScripts": 0,
+        "matchedComparisons": 2664,
+        "mismatchedComparisons": 0,
+        "failedComparisons": 0,
+        "mismatchKinds": {},
+        "firstCauses": [],
+        "strategyLedger": {
+          "strategies": 24,
+          "activeStrategies": 7,
+          "totalBackendPairComparisons": 2664,
+          "matchedScripts": 24,
+          "mismatchedScripts": 0,
+          "failedScripts": 0,
+          "matchedComparisons": 2664,
+          "mismatchedComparisons": 0,
+          "failedComparisons": 0,
+          "mismatchKinds": {},
+          "firstCauses": []
+        }
+      },
+      "rows": [
+        {
+          "id": "0014:https://github.com/Alorse/pinescript-strategies:strategies/MTF BB.pine",
+          "localPath": "sources/0014-Alorse_pinescript-strategies-strategies_MTF_BB.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/MTF BB.pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 2,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": 0.6751066899836805,
+              "equityCurve": 160,
+              "equity": 1003.4467699266219
+            },
+            "compiled": {
+              "active": true,
+              "orders": 2,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": 0.6751066899836805,
+              "equityCurve": 160,
+              "equity": 1003.4467699266219
+            },
+            "closure": {
+              "active": true,
+              "orders": 2,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": 0.6751066899836805,
+              "equityCurve": 160,
+              "equity": 1003.4467699266219
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0016:https://github.com/Alorse/pinescript-strategies:strategies/MTF+MACD.pine",
+          "localPath": "sources/0016-Alorse_pinescript-strategies-strategies_MTF_MACD.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/MTF+MACD.pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0017:https://github.com/Alorse/pinescript-strategies:strategies/MacdNew.pine",
+          "localPath": "sources/0017-Alorse_pinescript-strategies-strategies_MacdNew.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/MacdNew.pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0018:https://github.com/Alorse/pinescript-strategies:strategies/grid/GridBotDir [Alorse].pine",
+          "localPath": "sources/0018-Alorse_pinescript-strategies-strategies_grid_GridBotDir_Alorse_.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/grid/GridBotDir [Alorse].pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0021:https://github.com/Alorse/pinescript-strategies:strategies/mean-reversion/BB Winner LITE.pine",
+          "localPath": "sources/0021-Alorse_pinescript-strategies-strategies_mean-reversion_BB_Winner_LITE.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/mean-reversion/BB Winner LITE.pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0022:https://github.com/Alorse/pinescript-strategies:strategies/mean-reversion/BB Winner PRO.pine",
+          "localPath": "sources/0022-Alorse_pinescript-strategies-strategies_mean-reversion_BB_Winner_PRO.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/mean-reversion/BB Winner PRO.pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0024:https://github.com/Alorse/pinescript-strategies:strategies/mean-reversion/Exceeded candle.pine",
+          "localPath": "sources/0024-Alorse_pinescript-strategies-strategies_mean-reversion_Exceeded_candle.pine",
+          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
+          "sourceFilePath": "strategies/mean-reversion/Exceeded candle.pine",
+          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0025:https://github.com/geraked/tradingview:strategies/3MAF.pine",
+          "localPath": "sources/0025-geraked_tradingview-strategies_3MAF.pine",
+          "sourceRepoUrl": "https://github.com/geraked/tradingview",
+          "sourceFilePath": "strategies/3MAF.pine",
+          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 7,
+              "fills": 5,
+              "openTrades": 1,
+              "closedTrades": 2,
+              "positionSize": 1,
+              "equityCurve": 160,
+              "equity": 100028.36716728708
+            },
+            "compiled": {
+              "active": true,
+              "orders": 7,
+              "fills": 5,
+              "openTrades": 1,
+              "closedTrades": 2,
+              "positionSize": 1,
+              "equityCurve": 160,
+              "equity": 100028.36716728708
+            },
+            "closure": {
+              "active": true,
+              "orders": 7,
+              "fills": 5,
+              "openTrades": 1,
+              "closedTrades": 2,
+              "positionSize": 1,
+              "equityCurve": 160,
+              "equity": 100028.36716728708
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0028:https://github.com/geraked/tradingview:strategies/CEZLSMA.pine",
+          "localPath": "sources/0028-geraked_tradingview-strategies_CEZLSMA.pine",
+          "sourceRepoUrl": "https://github.com/geraked/tradingview",
+          "sourceFilePath": "strategies/CEZLSMA.pine",
+          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0031:https://github.com/geraked/tradingview:strategies/LRCUTB.pine",
+          "localPath": "sources/0031-geraked_tradingview-strategies_LRCUTB.pine",
+          "sourceRepoUrl": "https://github.com/geraked/tradingview",
+          "sourceFilePath": "strategies/LRCUTB.pine",
+          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0034:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:STRG One Bar Pursuit.pine",
+          "localPath": "sources/0034-harryguiacorn_TradingView-Proprietary-Indicators-STRG_One_Bar_Pursuit.pine",
+          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
+          "sourceFilePath": "STRG One Bar Pursuit.pine",
+          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 7,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 7,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 7,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 15,
+              "fills": 15,
+              "openTrades": 1,
+              "closedTrades": 14,
+              "positionSize": -2,
+              "equityCurve": 160,
+              "equity": 100011.29509667685
+            },
+            "compiled": {
+              "active": true,
+              "orders": 15,
+              "fills": 15,
+              "openTrades": 1,
+              "closedTrades": 14,
+              "positionSize": -2,
+              "equityCurve": 160,
+              "equity": 100011.29509667685
+            },
+            "closure": {
+              "active": true,
+              "orders": 15,
+              "fills": 15,
+              "openTrades": 1,
+              "closedTrades": 14,
+              "positionSize": -2,
+              "equityCurve": 160,
+              "equity": 100011.29509667685
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0035:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:STRG-BBForce.pine",
+          "localPath": "sources/0035-harryguiacorn_TradingView-Proprietary-Indicators-STRG-BBForce.pine",
+          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
+          "sourceFilePath": "STRG-BBForce.pine",
+          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 80,
+              "fills": 40,
+              "openTrades": 1,
+              "closedTrades": 39,
+              "positionSize": 1.6807970686776887e-10,
+              "equityCurve": 160,
+              "equity": 10260.863967140504
+            },
+            "compiled": {
+              "active": true,
+              "orders": 80,
+              "fills": 40,
+              "openTrades": 1,
+              "closedTrades": 39,
+              "positionSize": 1.6807970686776887e-10,
+              "equityCurve": 160,
+              "equity": 10260.863967140504
+            },
+            "closure": {
+              "active": true,
+              "orders": 80,
+              "fills": 40,
+              "openTrades": 1,
+              "closedTrades": 39,
+              "positionSize": 1.6807970686776887e-10,
+              "equityCurve": 160,
+              "equity": 10260.863967140504
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0037:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:STRG-KijunArrow.pine",
+          "localPath": "sources/0037-harryguiacorn_TradingView-Proprietary-Indicators-STRG-KijunArrow.pine",
+          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
+          "sourceFilePath": "STRG-KijunArrow.pine",
+          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0044:https://github.com/hirawatt/pineScripts:strategy/myStrategy.pine",
+          "localPath": "sources/0044-hirawatt_pineScripts-strategy_myStrategy.pine",
+          "sourceRepoUrl": "https://github.com/hirawatt/pineScripts",
+          "sourceFilePath": "strategy/myStrategy.pine",
+          "commitSha": "254d17ebb449d8ea3048f2cff60526375f2b2dff",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0048:https://github.com/Salikha003/PineScripts:src/pinescripts/strategies/free/02_stocks/stan-weinstein.pine",
+          "localPath": "sources/0048-Salikha003_PineScripts-src_pinescripts_strategies_free_02_stocks_stan-weinstein.pine",
+          "sourceRepoUrl": "https://github.com/Salikha003/PineScripts",
+          "sourceFilePath": "src/pinescripts/strategies/free/02_stocks/stan-weinstein.pine",
+          "commitSha": "7eeaed2fdd94b00964f057531684c5308c7cd74c",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0050:https://github.com/NinjaView/Pinescript:Ninjaview DI+ and DI- Crossover Strategy OCO_ID Dynamic Example",
+          "localPath": "sources/0050-NinjaView_Pinescript-Ninjaview_DI_and_DI-_Crossover_Strategy_OCO_ID_Dynamic_Example",
+          "sourceRepoUrl": "https://github.com/NinjaView/Pinescript",
+          "sourceFilePath": "Ninjaview DI+ and DI- Crossover Strategy OCO_ID Dynamic Example",
+          "commitSha": "8752c9c8bde07753e3e0d778fcafbbe2e768c90f",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0053:https://github.com/JavierCastilloGuillen/Tradingview-Strategies-Flask-Webhook_Tool:Strategies/Public_Bollinger_strategy.txt",
+          "localPath": "sources/0053-JavierCastilloGuillen_Tradingview-Strategies-Flask-Webhook_Tool-Strategies_Public_Bollinger_strategy.txt",
+          "sourceRepoUrl": "https://github.com/JavierCastilloGuillen/Tradingview-Strategies-Flask-Webhook_Tool",
+          "sourceFilePath": "Strategies/Public_Bollinger_strategy.txt",
+          "commitSha": "6e29d50235183660d0150e99cacb99b877e5c8ca",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 5000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 5000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 5000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0058:https://github.com/vanAmsen/tradingview:strategy/rsi.pine",
+          "localPath": "sources/0058-vanAmsen_tradingview-strategy_rsi.pine",
+          "sourceRepoUrl": "https://github.com/vanAmsen/tradingview",
+          "sourceFilePath": "strategy/rsi.pine",
+          "commitSha": "aeecdc66c7bab990f8bd736c507f291f414a5fd3",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0073:https://github.com/alexfuchs/ORB:Strategy 005 ORB - Opening Range Breakout",
+          "localPath": "sources/0073-alexfuchs_ORB-Strategy_005_ORB_-_Opening_Range_Breakout",
+          "sourceRepoUrl": "https://github.com/alexfuchs/ORB",
+          "sourceFilePath": "Strategy 005 ORB - Opening Range Breakout",
+          "commitSha": "6f7d18915c396ccf4400e395b94fa8bcd62bf2e4",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0076:https://github.com/jaiom-rola-sp/Pinescript_Strategy:strategy.pine",
+          "localPath": "sources/0076-jaiom-rola-sp_Pinescript_Strategy-strategy.pine",
+          "sourceRepoUrl": "https://github.com/jaiom-rola-sp/Pinescript_Strategy",
+          "sourceFilePath": "strategy.pine",
+          "commitSha": "881ddcad42a665af291d62da177042f74ab5c14b",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 7,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 7,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 7,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0086:https://github.com/danielhyuncoder/PineScriptStrategiesAndIndicators:TrippleSupertrendStrategy.pine",
+          "localPath": "sources/0086-danielhyuncoder_PineScriptStrategiesAndIndicators-TrippleSupertrendStrategy.pine",
+          "sourceRepoUrl": "https://github.com/danielhyuncoder/PineScriptStrategiesAndIndicators",
+          "sourceFilePath": "TrippleSupertrendStrategy.pine",
+          "commitSha": "07d020b2b673b6ee7519fb97fd29cf42d4d8ec95",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 1,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": 1,
+              "equityCurve": 160,
+              "equity": 100039.55730657715
+            },
+            "compiled": {
+              "active": true,
+              "orders": 1,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": 1,
+              "equityCurve": 160,
+              "equity": 100039.55730657715
+            },
+            "closure": {
+              "active": true,
+              "orders": 1,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": 1,
+              "equityCurve": 160,
+              "equity": 100039.55730657715
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0102:https://github.com/TradersPost/pinescript-agents:projects/dead-cat-bounce-strategy.pine",
+          "localPath": "sources/0102-TradersPost_pinescript-agents-projects_dead-cat-bounce-strategy.pine",
+          "sourceRepoUrl": "https://github.com/TradersPost/pinescript-agents",
+          "sourceFilePath": "projects/dead-cat-bounce-strategy.pine",
+          "commitSha": "ebc382f88b6103fcda2569fe666a38b00fe714c5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 16,
+              "drawings": 159,
+              "alerts": 0,
+              "logs": 9,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 16,
+              "drawings": 159,
+              "alerts": 0,
+              "logs": 9,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 16,
+              "drawings": 159,
+              "alerts": 0,
+              "logs": 9,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 2000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 2000
+            },
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 2000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0103:https://github.com/TradersPost/pinescript-agents:projects/ema-crossover-strategy.pine",
+          "localPath": "sources/0103-TradersPost_pinescript-agents-projects_ema-crossover-strategy.pine",
+          "sourceRepoUrl": "https://github.com/TradersPost/pinescript-agents",
+          "sourceFilePath": "projects/ema-crossover-strategy.pine",
+          "commitSha": "ebc382f88b6103fcda2569fe666a38b00fe714c5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 1,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 1,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 1,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 3,
+              "fills": 2,
+              "openTrades": 0,
+              "closedTrades": 1,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100038.36813682961
+            },
+            "compiled": {
+              "active": true,
+              "orders": 3,
+              "fills": 2,
+              "openTrades": 0,
+              "closedTrades": 1,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100038.36813682961
+            },
+            "closure": {
+              "active": true,
+              "orders": 3,
+              "fills": 2,
+              "openTrades": 0,
+              "closedTrades": 1,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100038.36813682961
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0105:https://github.com/TradersPost/pinescript-agents:projects/macd-86-strategy.pine",
+          "localPath": "sources/0105-TradersPost_pinescript-agents-projects_macd-86-strategy.pine",
+          "sourceRepoUrl": "https://github.com/TradersPost/pinescript-agents",
+          "sourceFilePath": "projects/macd-86-strategy.pine",
+          "commitSha": "ebc382f88b6103fcda2569fe666a38b00fe714c5",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "interpreter": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 6,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 6,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 6,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "interpreter": {
+              "active": true,
+              "orders": 1,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": -95.06272814200894,
+              "equityCurve": 160,
+              "equity": 95209.63963093693
+            },
+            "compiled": {
+              "active": true,
+              "orders": 1,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": -95.06272814200894,
+              "equityCurve": 160,
+              "equity": 95209.63963093693
+            },
+            "closure": {
+              "active": true,
+              "orders": 1,
+              "fills": 1,
+              "openTrades": 1,
+              "closedTrades": 0,
+              "positionSize": -95.06272814200894,
+              "equityCurve": 160,
+              "equity": 95209.63963093693
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        }
+      ]
+    }
+  ]
+}

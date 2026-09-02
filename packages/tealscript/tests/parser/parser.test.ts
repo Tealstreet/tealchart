@@ -14,6 +14,7 @@ import type {
   LibraryDeclaration,
   TypeDeclaration,
   VariableDeclaration,
+  AssignmentStatement,
   CallExpression,
 } from '../../src/parser';
 
@@ -38,11 +39,19 @@ describe('Tealscript Parser', () => {
       const ast = parse('//@version=6\n');
       expect(ast.type).toBe('Program');
       expect(ast.version).toBe(6);
+      expect(ast.explicitVersion).toBe(true);
+    });
+
+    it('honors version annotation after leading comments', () => {
+      const ast = parse('// @author somebody\n// notes\n//@version=4\nstudy("Legacy")\n');
+      expect(ast.version).toBe(4);
+      expect(ast.explicitVersion).toBe(true);
     });
 
     it('defaults to version 6 when no annotation', () => {
       const ast = parse('x = 1\n');
       expect(ast.version).toBe(6);
+      expect(ast.explicitVersion).toBe(false);
     });
   });
 
@@ -86,6 +95,7 @@ describe('Tealscript Parser', () => {
 
       expect(indicator.type).toBe('IndicatorDeclaration');
       expect(indicator.declarationKind).toBe('indicator');
+      expect(indicator.sourceDeclarationKind).toBe('study');
       expect(indicator.title).toEqual(expect.objectContaining({
         type: 'StringLiteral',
         value: 'Legacy Study',
@@ -1363,6 +1373,20 @@ plot(value + smoothed + upper + lower)
       ]);
     });
 
+    it('parses comments between a continuation initializer and expression', () => {
+      const ast = parse(`indicator("Commented Continuation")
+short_cont =
+ // ta.crossunder(pchg, -limit) and
+ pchg < -limit and
+ close < open
+plot(short_cont ? 1 : 0)
+`);
+      const declaration = ast.body[1] as VariableDeclaration;
+
+      expect(declaration.type).toBe('VariableDeclaration');
+      expect(declaration.init.type).toBe('BinaryExpression');
+    });
+
     it('parses continuation-line initializers inside user-defined function bodies', () => {
       const ast = parse(`indicator("Function Continuation Initializers")
 score(source) =>
@@ -2001,6 +2025,16 @@ lookup = map.new<
       expect(itrend.names.type === 'VariableDeclarator' ? itrend.names.name.name : null).toBe('itrend');
     });
 
+    it('parses array type annotations with whitespace before brackets', () => {
+      const ast = parse('var label [] upLabel = array.new_label(1)\nvar box [] highBlock = array.new_box()\n');
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+
+      expect(declarations.map((declaration) => declaration.typeAnnotation)).toEqual([
+        expect.objectContaining({ baseType: 'array', elementType: 'label' }),
+        expect.objectContaining({ baseType: 'array', elementType: 'box' }),
+      ]);
+    });
+
     it('parses untyped multi-declaration', () => {
       const ast = parse('x = 1, y = 2\n');
       expect(ast.body).toHaveLength(2);
@@ -2064,6 +2098,68 @@ lookup = map.new<
         expect(fn.body[1].type).toBe('VariableDeclaration');
         expect(fn.body[2].type).toBe('ExpressionStatement');
       }
+    });
+
+    it('parses CRLF-wrapped tuple declaration chains from public screener sources', () => {
+      const ast = parse('indicator("Screener")\r\n[tid_001, out_001] = feed(i_symbols), [tid_002, out_002] = feed(out_001),\r\n[tid_003, out_003] = feed(out_002)\r\n');
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+
+      expect(declarations).toHaveLength(3);
+      expect(declarations.map((declaration) => declaration.names.type)).toEqual([
+        'TupleDeclarator',
+        'TupleDeclarator',
+        'TupleDeclarator',
+      ]);
+    });
+
+    it('parses mixed declaration and reassignment chains from public zigzag sources', () => {
+      const ast = parse(`indicator("Scanner")
+var int dir = 0, dir := high > high[1] ? 1 : dir
+var max_array_size = 14, var zigzag = array.new_float(0), oldzigzag = array.copy(zigzag)
+`);
+      const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
+      const assignments = ast.body.filter((statement): statement is AssignmentStatement => statement.type === 'AssignmentStatement');
+
+      expect(declarations.map((declaration) => declaration.names.type === 'VariableDeclarator' ? declaration.names.name.name : null)).toEqual([
+        'dir',
+        'max_array_size',
+        'zigzag',
+        'oldzigzag',
+      ]);
+      expect(assignments.map((assignment) => assignment.left.type === 'Identifier' ? assignment.left.name : null)).toEqual(['dir']);
+    });
+
+    it('parses declaration chains followed by expression calls', () => {
+      const ast = parse(`indicator("Drawing Swap")
+x2 = id.get_x2(), x1 = id.get_x1()
+y2 = id.get_y2(), y1 = id.get_y1(),
+         id.set_xy2(x1, y1),
+         id.set_xy1(x2, y2)
+plot(close)
+`);
+
+      expect(ast.body.map((statement) => statement.type)).toEqual([
+        'IndicatorDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'VariableDeclaration',
+        'ExpressionStatement',
+        'ExpressionStatement',
+        'ExpressionStatement',
+      ]);
+    });
+
+    it('parses two-space indented multiline UDF bodies from public sources', () => {
+      const ast = parse(`indicator("Two Space UDF")
+data(timeframe, price) =>
+  request.security(symbol=syminfo.tickerid, timeframe=timeframe, expression=price, lookahead=barmerge.lookahead_on)
+plot(data("D", close))
+`);
+      const fn = ast.body[1] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
     });
   });
 
@@ -2447,6 +2543,48 @@ plot(x)
             expect(deepestDecl.init.cases).toHaveLength(2);
           }
         }
+      }
+    });
+
+    it('parses comma-separated expression switch arms as case bodies', () => {
+      const ast = parse(`//@version=6
+indicator("switch draw")
+value = switch close > open
+    true => lines.put("High", line.new(time, high, time, high, xloc = xloc.bar_time, color = color.aqua)),
+            lines.put("Low", line.new(time, low, time, low, xloc = xloc.bar_time, color = color.aqua))
+    => lines.get("High").set_xy1(time, high),
+       lines.get("High").set_xy2(time, high)
+plot(close)
+`);
+      const declaration = ast.body[1] as VariableDeclaration;
+
+      expect(declaration.type).toBe('VariableDeclaration');
+      expect(declaration.init.type).toBe('SwitchExpression');
+      if (declaration.init.type === 'SwitchExpression') {
+        expect(declaration.init.cases.map((switchCase) => Array.isArray(switchCase.consequent))).toEqual([
+          true,
+          true,
+        ]);
+      }
+    });
+
+    it('parses blank lines before switch cases in indented blocks', () => {
+      const ast = parse(`//@version=6
+indicator("switch blank")
+if close > open
+    switch values.size() == 0
+
+        true => values.push(close),
+                values.push(open)
+
+        => values.set(0, close)
+plot(close)
+`);
+      const ifStatement = ast.body[1];
+
+      expect(ifStatement.type).toBe('IfStatement');
+      if (ifStatement.type === 'IfStatement') {
+        expect(ifStatement.consequent[0]?.type).toBe('ExpressionStatement');
       }
     });
   });

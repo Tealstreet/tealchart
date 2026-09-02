@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { createResultMessage, type Bar, type DrawingOutput, type PlotOutput, type Program, type WorkerError } from '@tealstreet/tealscript';
+import {
+  createResultMessage,
+  type Bar,
+  type DrawingOutput,
+  type PlotOutput,
+  type Program,
+  type RuntimeProfile,
+  type WorkerError,
+} from '@tealstreet/tealscript';
 
 import { TealscriptManager } from './TealscriptManager';
+import type { TealscriptExecutionTelemetry } from '../types';
 
 class FakeWorker {
   onmessage: ((event: MessageEvent) => void) | null = null;
@@ -51,10 +60,42 @@ const bar: Bar = {
   volume: 10,
 };
 
+function runtimeProfile(overrides: Partial<RuntimeProfile> = {}): RuntimeProfile {
+  return {
+    executionMode: 'compiled',
+    selectedBackend: 'compiled',
+    backendSelectionSource: 'default',
+    elapsedMs: 12,
+    bars: 2,
+    statements: 3,
+    expressions: 4,
+    builtinCalls: 5,
+    requestContexts: 0,
+    maxBarsBack: 0,
+    errors: 0,
+    ...overrides,
+  };
+}
+
 function flushWorkerInit(): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, 0);
   });
+}
+
+const NON_ERROR_DIAGNOSTIC_FORBIDDEN_SUBSTRINGS = [
+  'script is invalid',
+  'script failed',
+  'failed to run',
+  'compile failed',
+  'broken script',
+];
+
+function expectNonErrorDiagnosticMessage(message: string): void {
+  const normalized = message.toLowerCase();
+  for (const forbidden of NON_ERROR_DIAGNOSTIC_FORBIDDEN_SUBSTRINGS) {
+    expect(normalized).not.toContain(forbidden);
+  }
 }
 
 describe('TealscriptManager', () => {
@@ -214,6 +255,260 @@ describe('TealscriptManager', () => {
     expect(plotUpdates[1]).toEqual([{ ...plot, scriptId: 'study-1' }]);
   });
 
+  it('emits compact execution telemetry for accepted worker results', async () => {
+    const worker = new FakeWorker();
+    const telemetry: TealscriptExecutionTelemetry[] = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onExecution: (summary) => telemetry.push(summary),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+      profile: runtimeProfile({
+        executionMode: 'closure',
+        selectedBackend: 'closure',
+        backendSelectionSource: 'flag',
+        elapsedMs: 8,
+        bars: 2,
+      }),
+    }));
+
+    expect(telemetry).toEqual([
+      {
+        scriptId: 'study-1',
+        status: 'ok',
+        outputKind: 'visual',
+        executionMode: 'closure',
+        selectedBackend: 'closure',
+        backendSelectionSource: 'flag',
+        fallbackKind: 'none',
+        elapsedMs: 8,
+        bars: 2,
+        requestKind: 'full',
+        generation: 1,
+        plots: 1,
+        drawings: 0,
+        alerts: 0,
+        logs: 0,
+        runtimeErrors: 0,
+      },
+    ]);
+  });
+
+  it('classifies successful executions with no retained output', async () => {
+    const worker = new FakeWorker();
+    const telemetry: TealscriptExecutionTelemetry[] = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onExecution: (summary) => telemetry.push(summary),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit(createResultMessage('study-1', {
+      plots: [],
+      drawings: [],
+      alerts: [],
+      logs: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+      profile: runtimeProfile(),
+    }));
+
+    expect(telemetry[0]).toMatchObject({
+      scriptId: 'study-1',
+      status: 'empty-output',
+      outputKind: 'empty',
+      executionMode: 'compiled',
+      selectedBackend: 'compiled',
+      plots: 0,
+      drawings: 0,
+      alerts: 0,
+      logs: 0,
+    });
+  });
+
+  it('attributes runtime-error telemetry to the backend profile carried by the worker error', async () => {
+    const worker = new FakeWorker();
+    const telemetry: TealscriptExecutionTelemetry[] = [];
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+      onExecution: (summary) => telemetry.push(summary),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")\nruntime.error("halt")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit({
+      type: 'error',
+      scriptId: 'study-1',
+      message: 'halt',
+      code: 'runtime.error',
+      runtimeError: {
+        code: 'runtime.error',
+        message: 'halt',
+        line: 2,
+        column: 1,
+      },
+      profile: runtimeProfile({
+        executionMode: 'closure',
+        selectedBackend: 'closure',
+        backendSelectionSource: 'explicit',
+        elapsedMs: 3,
+        bars: 1,
+        errors: 1,
+      }),
+      metadata: initMessage?.metadata,
+    });
+
+    expect(errors[0]).toMatchObject({
+      scriptId: 'study-1',
+      error: {
+        type: 'runtime',
+        severity: 'error',
+        code: 'runtime.error',
+        profile: {
+          executionMode: 'closure',
+          selectedBackend: 'closure',
+        },
+      },
+    });
+    expect(telemetry).toEqual([
+      {
+        scriptId: 'study-1',
+        status: 'runtime-error',
+        outputKind: 'empty',
+        executionMode: 'closure',
+        selectedBackend: 'closure',
+        backendSelectionSource: 'explicit',
+        fallbackKind: 'runtime-error',
+        elapsedMs: 3,
+        bars: 1,
+        plots: 0,
+        drawings: 0,
+        alerts: 0,
+        logs: 0,
+        runtimeErrors: 1,
+      },
+    ]);
+  });
+
+  it('surfaces realtime compiled fallbacks as actionable nonfatal diagnostics', async () => {
+    const worker = new FakeWorker();
+    const plotUpdates: PlotOutput[][] = [];
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")\nvarip ticks = 0');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+      profile: {
+        executionMode: 'interpreter',
+        fallbackReason: 'compiled-worker-stateless-intrabar-reentry: varip-declaration',
+        fallbackDiagnostics: [
+          {
+            reason: 'varip-declaration',
+            construct: 'varip declaration ticks',
+            message: 'varip declaration ticks keeps intrabar state between realtime ticks.',
+            line: 2,
+            column: 1,
+          },
+        ],
+        elapsedMs: 1,
+        bars: 2,
+        statements: 0,
+        expressions: 0,
+        builtinCalls: 0,
+        requestContexts: 0,
+        maxBarsBack: 0,
+        errors: 0,
+      },
+    }));
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+      profile: {
+        executionMode: 'interpreter',
+        fallbackReason: 'compiled-worker-stateless-intrabar-reentry: varip-declaration',
+        fallbackDiagnostics: [
+          {
+            reason: 'varip-declaration',
+            construct: 'varip declaration ticks',
+            message: 'varip declaration ticks keeps intrabar state between realtime ticks.',
+            line: 2,
+            column: 1,
+          },
+        ],
+        elapsedMs: 1,
+        bars: 2,
+        statements: 0,
+        expressions: 0,
+        builtinCalls: 0,
+        requestContexts: 0,
+        maxBarsBack: 0,
+        errors: 0,
+      },
+    }));
+
+    expect(plotUpdates).toEqual([
+      [{ ...plot, scriptId: 'study-1' }],
+      [{ ...plot, scriptId: 'study-1' }],
+    ]);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatchObject({
+      scriptId: 'study-1',
+      error: {
+        type: 'runtime',
+        severity: 'warning',
+        code: 'realtime-compiled-fallback',
+        line: 2,
+        column: 1,
+      },
+    });
+    expect(errors[0]!.error.message).toContain("output stays correct");
+    expect(errors[0]!.error.message).toContain("live ticks can be slower");
+    expect(errors[0]!.error.message).toContain("Trigger: varip declaration ticks at line 2, column 1");
+    expect(errors[0]!.error.message).toContain("remove or rewrite that stateful intrabar construct");
+    expectNonErrorDiagnosticMessage(errors[0]!.error.message);
+    expect(manager.getAllPlots()).toEqual([{ ...plot, scriptId: 'study-1' }]);
+  });
+
   it('surfaces unsettled init errors when a live update is already pending', async () => {
     const worker = new FakeWorker();
     const plotUpdates: PlotOutput[][] = [];
@@ -245,6 +540,7 @@ describe('TealscriptManager', () => {
         scriptId: 'study-1',
         error: {
           type: 'runtime',
+          severity: 'error',
           message: 'init error',
           line: undefined,
           column: undefined,
@@ -360,7 +656,11 @@ describe('TealscriptManager', () => {
       runtimeError: {
         code: 'runtime.error',
         message: 'bad bar',
+        line: 4,
+        column: 5,
       },
+      line: 4,
+      column: 5,
       metadata: initMessage?.metadata,
     });
 
@@ -369,13 +669,16 @@ describe('TealscriptManager', () => {
         scriptId: 'study-1',
         error: {
           type: 'runtime',
+          severity: 'error',
           message: 'bad bar',
           code: 'runtime.error',
-          line: undefined,
-          column: undefined,
+          line: 4,
+          column: 5,
           runtimeError: {
             code: 'runtime.error',
             message: 'bad bar',
+            line: 4,
+            column: 5,
           },
         },
       },
@@ -419,6 +722,7 @@ describe('TealscriptManager', () => {
         scriptId: 'study-1',
         error: {
           type: 'semantic',
+          severity: 'error',
           message: 'Unknown identifier: missing',
           line: 3,
           column: 7,
@@ -646,5 +950,217 @@ describe('TealscriptManager', () => {
     const [initMessage] = worker.messages as PostedWorkerMessage[];
     expect(initMessage.type).toBe('init');
     expect(initMessage.libraries).toBe(libraries);
+  });
+
+  it('resolves worker request data through the host adapter', async () => {
+    const worker = new FakeWorker();
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      resolveRequestData: async (request) => {
+        expect(request.kind).toBe('currency_rate');
+        return { ok: true, value: 1.25 };
+      },
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    worker.emit({
+      type: 'requestData',
+      scriptId: 'study-1',
+      requestId: 101,
+      generation: 1,
+      kind: 'currency_rate',
+      query: {
+        baseCurrency: 'USD',
+        quoteCurrency: 'EUR',
+        time: 1,
+      },
+    });
+    await flushWorkerInit();
+
+    expect(worker.messages.at(-1)).toEqual({
+      type: 'requestDataResult',
+      scriptId: 'study-1',
+      requestId: 101,
+      generation: 1,
+      kind: 'currency_rate',
+      ok: true,
+      value: 1.25,
+    });
+  });
+
+  it('returns a typed request data miss when no host adapter is configured', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    worker.emit({
+      type: 'requestData',
+      scriptId: 'study-1',
+      requestId: 102,
+      generation: 1,
+      kind: 'currency_rate',
+      query: {
+        baseCurrency: 'USD',
+        quoteCurrency: 'EUR',
+        time: 1,
+      },
+    });
+    await flushWorkerInit();
+
+    expect(worker.messages.at(-1)).toEqual({
+      type: 'requestDataResult',
+      scriptId: 'study-1',
+      requestId: 102,
+      generation: 1,
+      kind: 'currency_rate',
+      ok: false,
+      error: {
+        code: 'missing-provider',
+        message: 'No Tealscript request data resolver configured',
+      },
+    });
+    expect(errors).toEqual([
+      {
+        scriptId: 'study-1',
+        error: {
+          type: 'runtime',
+          severity: 'warning',
+          code: 'request-data-unavailable',
+          message: expect.stringContaining('request.currency_rate USD/EUR'),
+        },
+      },
+    ]);
+    expect(errors[0]!.error.message).toContain('not supported');
+    expect(errors[0]!.error.message).toContain('The script is valid');
+    expectNonErrorDiagnosticMessage(errors[0]!.error.message);
+  });
+
+  it('surfaces request data not-seeded misses without clearing rendered output', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+    const plotUpdates: PlotOutput[][] = [];
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+      onPlotsUpdated: (plots) => plotUpdates.push(plots),
+      resolveRequestData: async () => ({
+        ok: false,
+        error: {
+          code: 'not-found',
+          message: 'No seeded bars for EXT D',
+        },
+      }),
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    const [initMessage] = worker.messages as PostedWorkerMessage[];
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+    }));
+
+    worker.emit({
+      type: 'requestData',
+      scriptId: 'study-1',
+      requestId: 103,
+      generation: 1,
+      kind: 'bars',
+      query: {
+        symbol: 'EXT',
+        timeframe: 'D',
+      },
+    });
+    await flushWorkerInit();
+
+    expect(worker.messages.at(-1)).toEqual({
+      type: 'requestDataResult',
+      scriptId: 'study-1',
+      requestId: 103,
+      generation: 1,
+      kind: 'bars',
+      ok: false,
+      error: {
+        code: 'not-found',
+        message: 'No seeded bars for EXT D',
+      },
+    });
+    expect(errors).toHaveLength(1);
+    expect(errors[0]!.error).toMatchObject({
+      type: 'runtime',
+      severity: 'warning',
+      code: 'request-data-unavailable',
+    });
+    expect(errors[0]!.error.message).toContain('request.security symbol EXT timeframe D');
+    expect(errors[0]!.error.message).toContain('not seeded');
+    expect(errors[0]!.error.message).toContain('Provider detail: No seeded bars for EXT D');
+    expectNonErrorDiagnosticMessage(errors[0]!.error.message);
+    expect(plotUpdates).toEqual([[{ ...plot, scriptId: 'study-1' }]]);
+    expect(manager.getAllPlots()).toEqual([{ ...plot, scriptId: 'study-1' }]);
+  });
+
+  it('distinguishes request data provider failures from not-seeded misses', async () => {
+    const worker = new FakeWorker();
+    const errors: Array<{ scriptId: string; error: WorkerError }> = [];
+    const manager = new TealscriptManager({
+      createWorker: () => worker as unknown as Worker,
+      onError: (scriptId, error) => errors.push({ scriptId, error }),
+      resolveRequestData: async () => {
+        throw new Error('upstream footprint cache failed');
+      },
+    });
+
+    const addScript = manager.addScript('study-1', 'indicator("T")');
+    worker.emit({ type: 'ready' });
+    await addScript;
+
+    worker.emit({
+      type: 'requestData',
+      scriptId: 'study-1',
+      requestId: 104,
+      generation: 1,
+      kind: 'footprint',
+      query: {
+        symbol: 'BTCUSDT',
+        timeframe: '1',
+        ticksPerRow: 10,
+        valueAreaPercent: 70,
+        imbalancePercent: 300,
+        time: 1,
+      },
+    });
+    await flushWorkerInit();
+
+    expect(worker.messages.at(-1)).toEqual({
+      type: 'requestDataResult',
+      scriptId: 'study-1',
+      requestId: 104,
+      generation: 1,
+      kind: 'footprint',
+      ok: false,
+      error: {
+        code: 'provider-error',
+        message: 'upstream footprint cache failed',
+      },
+    });
+    expect(errors).toHaveLength(1);
+    expect(errors[0]!.error.message).toContain('request.footprint BTCUSDT timeframe 1');
+    expect(errors[0]!.error.message).toContain('provider failed');
+    expect(errors[0]!.error.message).toContain('upstream footprint cache failed');
   });
 });

@@ -25,6 +25,11 @@ export const MAX_DRAWING_LIMITS: DrawingLimits = {
 
 type LimitedDrawingType = Extract<DrawingObjectType, keyof DrawingLimits>;
 
+export interface DrawingStoreSnapshot {
+  drawings: DrawingOutput[];
+  limits: DrawingLimits;
+}
+
 function isLimitedDrawingType(type: DrawingObjectType | keyof DrawingLimits): type is LimitedDrawingType {
   return type === 'label' || type === 'line' || type === 'box' || type === 'polyline';
 }
@@ -63,6 +68,13 @@ export class DrawingStore {
       if (drawing) {
         drawing.persistent = true;
       }
+    }
+  }
+
+  markPersistent(id: string): void {
+    const drawing = this.get(id);
+    if (drawing) {
+      drawing.persistent = true;
     }
   }
 
@@ -161,14 +173,24 @@ export class DrawingStore {
     return [...this.drawings];
   }
 
+  snapshot(): DrawingStoreSnapshot {
+    return {
+      drawings: this.drawings.map(cloneDrawing),
+      limits: { ...this.limits },
+    };
+  }
+
+  restore(snapshot: DrawingStoreSnapshot): void {
+    this.drawings.length = 0;
+    this.drawings.push(...snapshot.drawings.map(cloneDrawing));
+    this.limits = { ...snapshot.limits };
+  }
+
   truncateFromBarIndex(fromBarIndex: number): void {
-    const keepCount = this.drawings.findIndex((drawing) => drawing.barIndex >= fromBarIndex);
-    if (keepCount >= 0) {
-      const prefix = this.drawings.slice(0, keepCount);
-      const persistentTail = this.drawings.slice(keepCount).filter((drawing) => drawing.persistent);
-      this.drawings.length = 0;
-      this.drawings.push(...prefix, ...persistentTail);
-    }
+    const kept = this.drawings.filter((drawing) => drawing.barIndex < fromBarIndex || drawing.persistent);
+    if (kept.length === this.drawings.length) return;
+    this.drawings.length = 0;
+    this.drawings.push(...kept);
   }
 
   clear(): void {
@@ -187,4 +209,21 @@ export class DrawingStore {
       excess--;
     }
   }
+}
+
+function cloneDrawing(drawing: DrawingOutput): DrawingOutput {
+  if (drawing.type === 'polyline') {
+    return {
+      ...drawing,
+      points: drawing.points.map((point) => ({ ...point })),
+    };
+  }
+  if (drawing.type === 'table') {
+    return {
+      ...drawing,
+      cells: drawing.cells.map((cell) => ({ ...cell })),
+      mergedCells: drawing.mergedCells?.map((cell) => ({ ...cell })),
+    };
+  }
+  return { ...drawing };
 }

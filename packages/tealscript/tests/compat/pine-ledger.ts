@@ -794,24 +794,11 @@ export const compatibilityCheckpointCorpus: PineCompatibilityCorpusCase[] = [
   {
     ledgerEntry: publicSearchEntry({
       id: 'public-footprint-request-diagnostic-checkpoint',
-      title: 'Public Footprint Request Diagnostic Checkpoint',
+      title: 'Public Footprint Request Checkpoint',
       searchContext: 'TradingView public scripts search: footprint request',
-      featureTags: ['request', 'footprint', 'intrabar', 'unsupported'],
+      featureTags: ['request', 'footprint', 'intrabar'],
     }),
-    stages: [
-      { stage: 'parse', status: 'passed' },
-      {
-        stage: 'semantic',
-        status: 'failed',
-        failureClass: 'unsupported_planned',
-        diagnostics: [{
-          code: 'unsupported-feature',
-          message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
-          line: 3,
-          column: 13,
-        }],
-      },
-    ],
+    stages: passedThroughOutput,
   },
   {
     ledgerEntry: publicSearchEntry({

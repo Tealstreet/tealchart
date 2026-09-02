@@ -3,16 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { compatibilityBars, runCompatScript } from './fixtures';
 
 describe('Pine compatibility unsupported diagnostics', () => {
-  it('reports planned request namespaces that remain outside the deterministic datafeed contract', () => {
+  it('runs unseeded footprint requests as na instead of planned unsupported diagnostics', () => {
     const result = runCompatScript(`
-indicator("Unsupported footprint request")
-request.footprint(syminfo.tickerid)
-plot(close)
+indicator("Unseeded footprint request")
+fp = request.footprint(10, 70)
+plot(na(fp) ? 1 : 0)
 `, { bars: [compatibilityBars[0]!] });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
-    ]);
+    expect(result.errors).toEqual([]);
+    expect(result.plots[0]?.values).toEqual([1]);
   });
 
   it('does not treat local variables named like planned namespaces as namespaces', () => {

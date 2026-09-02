@@ -36,6 +36,7 @@ describe('Pine compatibility steering model', () => {
       'semantic_gap',
       'unsupported_planned',
       'runtime_gap',
+      'compiled_fallback',
       'data_gap',
       'output_gap',
       'render_gap',
@@ -102,7 +103,7 @@ describe('Pine compatibility steering model', () => {
         status: 'failed',
         diagnostics: [{
           code: 'unsupported-feature',
-          message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+          message: 'planned feature is not supported yet',
         }],
       },
     ];
@@ -113,9 +114,9 @@ describe('Pine compatibility steering model', () => {
       status: 'failed',
       diagnostics: [{ code: 'unknown-function', message: 'Unknown function: ta.foo' }],
     })).toEqual(['failed stage semantic must include a failureClass']);
-    expect(createCompatibilityRunOutcome({ scriptId: 'public-footprint-gap', pineVersion: 'v6', stages })).toEqual({
+    expect(createCompatibilityRunOutcome({ scriptId: 'public-planned-gap', pineVersion: 'v6', stages })).toEqual({
       schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
-      scriptId: 'public-footprint-gap',
+      scriptId: 'public-planned-gap',
       pineVersion: 'v6',
       stages: [
         { stage: 'parse', status: 'passed' },
@@ -125,7 +126,7 @@ describe('Pine compatibility steering model', () => {
           failureClass: 'unsupported_planned',
           diagnostics: [{
             code: 'unsupported-feature',
-            message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+            message: 'planned feature is not supported yet',
           }],
         },
         { stage: 'runtime', status: 'not_run' },
@@ -178,8 +179,10 @@ plot(close)
 `)[1]).toMatchObject({
       stage: 'semantic',
       status: 'failed',
-      failureClass: 'unsupported_planned',
-      diagnostics: [expect.objectContaining({ code: 'unsupported-feature' })],
+      failureClass: 'semantic_gap',
+      diagnostics: expect.arrayContaining([
+        expect.objectContaining({ code: 'argument-count', message: 'request.footprint() expects at least 2 arguments' }),
+      ]),
     });
   });
 
@@ -197,7 +200,17 @@ plot(close)
 
     expect(createPineParseSemanticStageOutcomes(source)).toEqual([
       { stage: 'parse', status: 'passed' },
-      { stage: 'semantic', status: 'passed' },
+      {
+        stage: 'semantic',
+        status: 'failed',
+        failureClass: 'semantic_gap',
+        diagnostics: [{
+          code: 'unresolved-import',
+          message: "Import 'TestUser/Signals/1' as alias 'sig' was not supplied by the host library registry; provide Pine library source for TestUser/Signals version 1, or remove/change the import",
+          line: 3,
+          column: 1,
+        }],
+      },
     ]);
     expect(createPineParseSemanticStageOutcomes(source, {
       libraries: new Map([['TestUser/Signals/1', library]]),
@@ -349,10 +362,10 @@ plot(close)
   it('summarizes planned unsupported diagnostics without validation errors', () => {
     const unsupportedEntry = createLedgerEntry({
       id: 'public-planned-unsupported',
-      featureTags: ['request', 'footprint'],
+      featureTags: ['planned-gap'],
       source: {
         kind: 'public_script',
-        searchContext: 'Public TradingView examples using request.footprint',
+        searchContext: 'Public TradingView examples using a planned unsupported feature',
         licenseStatus: 'unknown',
       },
     });
@@ -365,7 +378,7 @@ plot(close)
           {
             stage: 'semantic',
             status: 'failed',
-            diagnostics: [{ code: 'unsupported-feature', message: 'request.footprint is not supported yet' }],
+            diagnostics: [{ code: 'unsupported-feature', message: 'planned feature is not supported yet' }],
           },
         ],
       },
@@ -435,6 +448,7 @@ Total: 2
 Passed: 1
 Failed: 1
 Planned unsupported: 0
+Excluded failed: 0
 Actionable failed: 1
 Pass rate: 50.0%
 Actionable pass rate: 50.0%
@@ -448,6 +462,9 @@ Actionable pass rate: 50.0%
 | Name | Count |
 | --- | ---: |
 | parse_gap | 1 |
+
+## Excluded Failure Reasons
+- None
 
 ## Feature Tags
 | Feature | Total | Passed | Failed |

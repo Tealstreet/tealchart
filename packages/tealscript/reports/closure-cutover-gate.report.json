@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 2,
+  "sourceReports": [
+    "reports/external-pine-corpus-v1.report.json",
+    "reports/external-pine-corpus-v2.report.json"
+  ],
+  "corpora": [
+    {
+      "corpus": "v1",
+      "dominated": {
+        "count": 157,
+        "exceptions": []
+      },
+      "corroboratedGain": {
+        "count": 16,
+        "scripts": [
+          {
+            "id": "0022:https://github.com/ArunKBhaskar/PineScript:[Indicator] Magnetic Zones - Multi Timeframe.txt",
+            "localPath": "sources/0022__ArunKBhaskar__PineScript.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings[0].x2",
+              "kind": "drawings"
+            }
+          },
+          {
+            "id": "0052:https://github.com/everget/tradingview-pinescript-indicators:bands_and_channels/vortex_bands.pine",
+            "localPath": "sources/0052__everget__tradingview-pinescript-indicators.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values[1]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0075:https://github.com/gocaman/Indicators:6. DIP FINDER MIX.txt",
+            "localPath": "sources/0075__gocaman__Indicators.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[16].values[16]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0076:https://github.com/gocaman/Indicators:6A. DIP FINDER MIX KRIPTO.txt",
+            "localPath": "sources/0076__gocaman__Indicators.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[16].values[16]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0077:https://github.com/gocaman/Indicators:ALMA TARAMA.txt",
+            "localPath": "sources/0077__gocaman__Indicators.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.alerts[3].events.length",
+              "kind": "alerts"
+            }
+          },
+          {
+            "id": "0084:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:ADX-Hist.pine",
+            "localPath": "sources/0084__harryguiacorn__TradingView-Proprietary-Indicators.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values[27]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0093:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:CommitmentGauge.pine",
+            "localPath": "sources/0093__harryguiacorn__TradingView-Proprietary-Indicators.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[1].textValues[8]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0096:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:QuantityQualityCommitment.pine",
+            "localPath": "sources/0096__harryguiacorn__TradingView-Proprietary-Indicators.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[6].values[27]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0127:https://github.com/SENEMBERK/Indicators:trendstop+boll.txt",
+            "localPath": "sources/0127__SENEMBERK__Indicators.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values[116]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0154:https://github.com/TPCharts/TradingViewIndicators:Chad's Swing Points.pine",
+            "localPath": "sources/0154__TPCharts__TradingViewIndicators.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings.length",
+              "kind": "drawings"
+            }
+          },
+          {
+            "id": "0173:https://github.com/geraked/tradingview:strategies/ABSAR.pine",
+            "localPath": "sources/0173__geraked__tradingview.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings.length",
+              "kind": "drawings"
+            }
+          },
+          {
+            "id": "0177:https://github.com/geraked/tradingview:strategies/DHLAOS.pine",
+            "localPath": "sources/0177__geraked__tradingview.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values[2]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0180:https://github.com/geraked/tradingview:strategies/NWERSIASF.pine",
+            "localPath": "sources/0180__geraked__tradingview.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[2].values[13]",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0184:https://github.com/Pa1-Tiwari/Tradingview-Pinescript-indicators-strategies:source-code/Traffic-light-strategy--shubhasis-pani.txt",
+            "localPath": "sources/0184__Pa1-Tiwari__Tradingview-Pinescript-indicators-strategies.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values.length",
+              "kind": "plot-values"
+            }
+          },
+          {
+            "id": "0193:https://github.com/Alorse/pinescript-strategies:multi/Multi MACD + BB + RSI.pine",
+            "localPath": "sources/0193__Alorse__pinescript-strategies.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.alerts.length",
+              "kind": "alerts"
+            }
+          },
+          {
+            "id": "0211:https://github.com/everget/tradingview-pinescript-indicators:movings/distance_weighted_moving_average.pine",
+            "localPath": "sources/0211__everget__tradingview-pinescript-indicators.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.plots[0].values[0]",
+              "kind": "plot-values"
+            }
+          }
+        ]
+      },
+      "uncorroboratedClosureOutput": {
+        "count": 0,
+        "scripts": []
+      },
+      "errorBackedClosureOutput": {
+        "count": 0,
+        "scripts": []
+      }
+    },
+    {
+      "corpus": "v2",
+      "dominated": {
+        "count": 89,
+        "exceptions": []
+      },
+      "corroboratedGain": {
+        "count": 3,
+        "scripts": [
+          {
+            "id": "0021:https://github.com/eliasvictor-trading/multi-time-frame:matrix_v7.pine",
+            "localPath": "sources/0021-eliasvictor-trading-multi-time-frame-matrix_v7.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.alerts[3].renderedMessages[2]",
+              "kind": "alerts"
+            }
+          },
+          {
+            "id": "0059:https://github.com/ictmentality/pinescript-indicators:other/OpeningLines[JAW].txt",
+            "localPath": "sources/0059-ictmentality-pinescript-indicators-other_OpeningLines_JAW_.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings.length",
+              "kind": "drawings"
+            }
+          },
+          {
+            "id": "0092:https://github.com/TyphooN-/Pinescript_Indicators:MTF_KAMA.pine",
+            "localPath": "sources/0092-TyphooN--Pinescript_Indicators-MTF_KAMA.pine",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings[0].cells[4].text",
+              "kind": "drawings"
+            }
+          }
+        ]
+      },
+      "uncorroboratedClosureOutput": {
+        "count": 0,
+        "scripts": []
+      },
+      "errorBackedClosureOutput": {
+        "count": 1,
+        "scripts": [
+          {
+            "id": "0023:https://github.com/Erald12/PinescriptIndicator:order block.txt",
+            "localPath": "sources/0023-Erald12-PinescriptIndicator-order_block.txt",
+            "agreement": "closure-interpreter-only",
+            "closureStatus": "mismatched",
+            "firstDifference": {
+              "path": "$.drawings.length",
+              "kind": "drawings"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

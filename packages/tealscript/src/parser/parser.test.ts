@@ -288,6 +288,48 @@ enum Direction
         expect(typeDeclaration?.type === 'TypeDeclaration' ? typeDeclaration.fields.map((field) => field.name.name) : []).toEqual(['x', 'y']);
         expect(enumDeclaration?.type === 'EnumDeclaration' ? enumDeclaration.fields.map((field) => field.name.name) : []).toEqual(['up', 'down']);
       });
+
+      it('does not treat two-space call continuations after enums as enum fields', () => {
+        const ast = parse(`//@version=6
+indicator("Enum Continuation")
+enum TablePosition
+    left = "left"
+    center = "center"
+    right = "right"
+
+table_position = input.enum(defval = TablePosition.left, title = "Table position",
+  options = [TablePosition.left, TablePosition.center, TablePosition.right])
+plot(close)
+`);
+
+        const enumDeclaration = ast.body.find((statement) => statement.type === 'EnumDeclaration');
+        const tablePosition = ast.body.find(
+          (statement) => statement.type === 'VariableDeclaration'
+            && statement.names.type === 'VariableDeclarator'
+            && statement.names.name.name === 'table_position',
+        );
+
+        expect(enumDeclaration?.type === 'EnumDeclaration' ? enumDeclaration.fields.map((field) => field.name.name) : []).toEqual(['left', 'center', 'right']);
+        expect(tablePosition?.type).toBe('VariableDeclaration');
+      });
+
+      it('does not promote type fields after leading-comma declaration continuations', () => {
+        const ast = parse(`//@version=5
+indicator("Order Blocks", overlay = true
+  , max_lines_count = 500
+  , max_labels_count = 500
+  , max_boxes_count = 500)
+
+type ob
+    float top = na
+    float btm = na
+    int loc = bar_index
+plot(close)
+`);
+
+        const typeDeclaration = ast.body.find((statement) => statement.type === 'TypeDeclaration');
+        expect(typeDeclaration?.type === 'TypeDeclaration' ? typeDeclaration.fields.map((field) => field.name.name) : []).toEqual(['top', 'btm', 'loc']);
+      });
     });
 
     describe('literals', () => {
@@ -679,6 +721,47 @@ x := 42`);
 
         const assignments = ast.body.filter(s => s.type === 'AssignmentStatement');
         expect(assignments.length).toBe(1);
+      });
+
+      it('parses root := with block if as RHS', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+finalPrice = 0.0
+finalPrice := if close > open
+    high
+else
+    low
+plot(finalPrice)`);
+
+        const assignment = ast.body.find((s) => s.type === 'AssignmentStatement') as {
+          type: string;
+          operator: string;
+          right: { type: string };
+        } | undefined;
+        expect(assignment).toBeDefined();
+        expect(assignment?.operator).toBe(':=');
+        expect(assignment?.right.type).toBe('IfStatement');
+      });
+
+      it('parses root tuple := with block if as RHS', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+hi = 0.0
+lo = 0.0
+[hi, lo] := if close > open
+    [high, low]
+else
+    [close, open]
+plot(hi - lo)`);
+
+        const assignment = ast.body.find((s) => s.type === 'TupleAssignment') as {
+          type: string;
+          names: Array<{ name: string }>;
+          right: { type: string };
+        } | undefined;
+        expect(assignment).toBeDefined();
+        expect(assignment?.names.map((name) => name.name)).toEqual(['hi', 'lo']);
+        expect(assignment?.right.type).toBe('IfStatement');
       });
 
       it('parses := with block if as RHS in a UDF body', () => {

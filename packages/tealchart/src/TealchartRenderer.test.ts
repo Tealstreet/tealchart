@@ -637,6 +637,40 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fillRect.mock.calls[1]![3]).toBeCloseTo(baselineY - valueY);
     });
 
+    it('uses linewidth for histogram width while columns keep candle-slot width', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 80,
+        priceMax: 140,
+      };
+      const basePlot: PlotOutput = {
+        id: 'plot_Width',
+        type: 'plot',
+        title: 'Width',
+        values: [90, 110],
+        color: '#2196F3',
+        histbase: 100,
+        linewidth: 4,
+      };
+
+      renderer.renderPlots([{ ...basePlot, style: 'histogram' }], bars, viewport);
+      const histogramWidth = fillRect.mock.calls[0]![2];
+      fillRect.mockClear();
+      renderer.renderPlots([{ ...basePlot, style: 'columns' }], bars, viewport);
+      const columnsWidth = fillRect.mock.calls[0]![2];
+
+      expect(histogramWidth).toBe(12);
+      expect(columnsWidth).toBeGreaterThan(histogramWidth);
+    });
+
     it('uses plot histbase metadata as the area baseline when provided', () => {
       const moveTo = vi.fn();
       const lineTo = vi.fn();
@@ -2460,6 +2494,39 @@ describe('TealchartRenderer coordinate transforms', () => {
           'fill:#E91E63',
         ]),
       );
+    });
+
+    it('renders plotshape textValues per visible bar', () => {
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const marker: PlotOutput = {
+        id: 'plotshape_Dynamic',
+        type: 'plotshape',
+        title: 'Dynamic',
+        values: [1, null, 1],
+        color: ['#E91E63', null, '#4CAF50'],
+        shape: 'labelup',
+        location: 'belowbar',
+        text: 'fallback',
+        textValues: ['A', null, 'C'],
+      };
+
+      (renderer as any).renderPlotShape(marker, bars, viewport);
+
+      expect(fillText).toHaveBeenCalledWith('A', expect.any(Number), expect.any(Number));
+      expect(fillText).toHaveBeenCalledWith('C', expect.any(Number), expect.any(Number));
+      expect(fillText).not.toHaveBeenCalledWith('fallback', expect.any(Number), expect.any(Number));
     });
 
     it('skips rendering plots with display.none while keeping them available as fill sources', () => {

@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "task": "T91",
+  "generatedAt": "2026-08-31T08:27:20.166Z",
+  "baseCommit": "d6bd2c06577d351fdb42a791d41695f2abba26a2",
+  "corpus": {
+    "inputDir": "/tmp/pine-corpus-v1",
+    "targetScripts": 24,
+    "handledScripts": 14,
+    "unsupportedScripts": 10,
+    "unsupported": [
+      {
+        "localPath": "sources/0003__ADWilkinson__pinescript-indicators.pine",
+        "reason": "VariableDeclaration: unsupported call commodityChannelIndex"
+      },
+      {
+        "localPath": "sources/0012__Alorse__pinescript-strategies.pine",
+        "reason": "VariableDeclaration: unsupported call bcwsma"
+      },
+      {
+        "localPath": "sources/0016__Alorse__pinescript-strategies.pine",
+        "reason": "Unknown identifier: dotted"
+      },
+      {
+        "localPath": "sources/0017__Alorse__pinescript-strategies.pine",
+        "reason": "VariableDeclaration: unsupported call smoothrng"
+      },
+      {
+        "localPath": "sources/0018__Alorse__pinescript-strategies.pine",
+        "reason": "VariableDeclaration: unsupported call _inRange"
+      },
+      {
+        "localPath": "sources/0020__Alorse__pinescript-strategies.pine",
+        "reason": "VariableDeclaration: unsupported call bband"
+      },
+      {
+        "localPath": "sources/0021__Alorse__pinescript-strategies.pine",
+        "reason": "VariableDeclaration: unsupported call bband"
+      },
+      {
+        "localPath": "sources/0025__ArunKBhaskar__PineScript.txt",
+        "reason": "IfStatement: unsupported call cell_perform"
+      },
+      {
+        "localPath": "sources/0038__ArunKBhaskar__PineScript.txt",
+        "reason": "IfStatement: unsupported call add_to_zigzag"
+      },
+      {
+        "localPath": "sources/0045__eonfutures__Pinescript-Indicators.txt",
+        "reason": "IfStatement: unsupported statement ForStatement"
+      }
+    ],
+    "barsPerScript": 160,
+    "totalBars": 2240,
+    "declaredVersions": {
+      "3": 5,
+      "4": 6,
+      "5": 3
+    },
+    "declarationKinds": {
+      "indicator": 3,
+      "study": 11
+    },
+    "byteSize": {
+      "total": 18774,
+      "min": 708,
+      "max": 3591
+    }
+  },
+  "benchmark": {
+    "warmupRuns": 3,
+    "measuredRuns": 20,
+    "results": [
+      {
+        "backend": "current-compiled-new-function",
+        "coldMs": 55.48,
+        "steadyMs": 970.76,
+        "coldUsPerBar": 24.8,
+        "steadyUsPerBar": 21.7
+      },
+      {
+        "backend": "current-interpreter",
+        "coldMs": 79.34,
+        "steadyMs": 1558.82,
+        "coldUsPerBar": 35.4,
+        "steadyUsPerBar": 34.8
+      },
+      {
+        "backend": "bound-expression-closure-prototype",
+        "coldMs": 57.41,
+        "steadyMs": 1143.65,
+        "coldUsPerBar": 25.6,
+        "steadyUsPerBar": 25.5
+      }
+    ]
+  },
+  "prototypeProperties": {
+    "astUse": "AST nodes are read during construction. Per-bar execution uses statement and expression closures that capture child closures directly; it does not patch evaluateExpression, traverse AST nodes, or look up closures by AST node.",
+    "coveredNodes": [
+      "indicator/study declaration metadata",
+      "scalar variable declarations and identifier assignments",
+      "if/else blocks with child closure arrays",
+      "expression statements",
+      "numeric/string/bool/color/na literals",
+      "identifier reads for OHLCV/time/bar_index/scope values",
+      "binary/unary/conditional expressions",
+      "namespace/member constants",
+      "direct builtin calls with pre-bound argument closures",
+      "identifier history indexing",
+      "array literals"
+    ],
+    "limitations": [
+      "No UDF/imported function execution in the closure prototype.",
+      "No loops, switch expressions, tuple assignment, UDT constructors/mutation, method dispatch, request calls, drawing constructors, or strategy order semantics.",
+      "The prototype does not delegate any covered expression node back to evaluateExpression; TA and input builtins delegate only to shared builtin implementations after pre-bound argument evaluation, matching the expected shape of a real backend.",
+      "The sample is therefore narrower than the T90 24-script target; handledScripts is the honest denominator for the benchmark."
+    ]
+  }
+}

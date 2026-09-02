@@ -523,11 +523,14 @@ var expectedPvi = 1.0
 if bar_index > 0
     expectedNvi := volume < volume[1] ? expectedNvi[1] + ((close - close[1]) / close[1]) * expectedNvi[1] : expectedNvi[1]
     expectedPvi := volume > volume[1] ? expectedPvi[1] + ((close - close[1]) / close[1]) * expectedPvi[1] : expectedPvi[1]
+adMove = high == low ? 0 : (((close - low) - (high - close)) / (high - low)) * volume
+adExpected = ta.cum(adMove)
 iiiExpected = high == low ? na : ((2 * close - high - low) / (high - low)) * volume
 pvtExpected = ta.cum(bar_index == 0 ? 0 : volume * ((close - close[1]) / close[1]))
 wadMove = close > close[1] ? close - math.min(low, close[1]) : close < close[1] ? close - math.max(high, close[1]) : 0
 wadExpected = ta.cum(wadMove)
 wvadExpected = high == low ? na : ((close - open) / (high - low)) * volume
+plot(math.abs(ta.accdist - adExpected) < 0.000001, title="AD")
 plot(math.abs(ta.iii - iiiExpected) < 0.000001, title="III")
 plot(math.abs(ta.nvi - expectedNvi) < 0.000001, title="NVI")
 plot(math.abs(ta.pvi - expectedPvi) < 0.000001, title="PVI")
@@ -538,7 +541,7 @@ plot(bar_index == 0 ? na(ta.pvt[1]) : math.abs(ta.pvt[1] - pvtExpected[1]) < 0.0
 `);
 
     expect(result.errors).toEqual([]);
-    for (const title of ['III', 'NVI', 'PVI', 'PVT', 'WAD', 'WVAD', 'PVT History']) {
+    for (const title of ['AD', 'III', 'NVI', 'PVI', 'PVT', 'WAD', 'WVAD', 'PVT History']) {
       expect(getPlot(result, title).values).toEqual(Array(compatibilityBars.length).fill(true));
     }
   });
@@ -781,7 +784,7 @@ plot(histLine, title="Hist")
       expect(roundSeries(getPlot(mixed, title).values)).toEqual(roundSeries(getPlot(positional, title).values));
     }
     expect(roundSeries(getPlot(positional, 'Supertrend').values)).toEqual([null, null, 114.666667, 114.666667, 111.962963, 109.141975, 109.141975, 109.141975, 109.141975, 98.583067, 100.888711, 100.888711]);
-    expect(getPlot(positional, 'Supertrend Direction').values).toEqual([null, null, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1]);
+    expect(getPlot(positional, 'Supertrend Direction').values).toEqual([null, null, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1]);
     expect(roundSeries(getPlot(positional, 'MACD').values)).toEqual([0, 0.642857, 1.209184, 0.38156, -0.825672, -0.924587, 0.029313, 1.437232, 1.520456, 1.975828, 1.641914, 1.716671]);
     expect(roundSeries(getPlot(positional, 'Signal').values)).toEqual([0, 0.428571, 0.94898, 0.5707, -0.360214, -0.736463, -0.225946, 0.88284, 1.307917, 1.753191, 1.679006, 1.704116]);
     expect(roundSeries(getPlot(positional, 'Hist').values)).toEqual([0, 0.214286, 0.260204, -0.18914, -0.465457, -0.188124, 0.255259, 0.554393, 0.212539, 0.222637, -0.037092, 0.012555]);
@@ -1279,6 +1282,7 @@ plot(namedPrice == 101.25, title="Named Price")
 study("Legacy input type constants")
 length = input(3, "Length", type=input.integer, minval=1, maxval=5, step=1)
 multiplier = input(2.0, "Multiplier", input.float, minval=1.0, maxval=4.0, confirm=true, step=0.5)
+negative = input(title="Negative", type=input.float, defval=-0.5, step=0.1)
 enabled = input(true, "Enabled", type=input.bool)
 mode = input("EMA", "Mode", type=input.string, options=["SMA", "EMA"])
 source = input(close, "Source", type=input.source)
@@ -1287,13 +1291,14 @@ symbol = input("BINANCE:BTCUSDT", "Symbol", type=input.symbol)
 session = input("0930-1600", "Session", type=input.session)
 tint = input(color.red, "Tint", type=input.color)
 plot(sma(source, length) * multiplier, title="Average")
-plot(enabled and mode == "EMA" and tf == "60" and symbol == "BINANCE:BTCUSDT" and session == "0930-1600" and tint == color.red, title="Metadata")
+plot(enabled and mode == "EMA" and negative == -0.5 and tf == "60" and symbol == "BINANCE:BTCUSDT" and session == "0930-1600" and tint == color.red, title="Metadata")
 `);
 
     expect(result.errors).toEqual([]);
     expect(result.inputs).toMatchObject([
       { id: 'input_Length', type: 'int', title: 'Length', defval: 3, minval: 1, maxval: 5, step: 1 },
       { id: 'input_Multiplier', type: 'float', title: 'Multiplier', defval: 2, minval: 1, maxval: 4, step: 0.5, confirm: true },
+      { id: 'input_Negative', type: 'float', title: 'Negative', defval: -0.5, step: 0.1 },
       { id: 'input_Enabled', type: 'bool', title: 'Enabled', defval: true },
       { id: 'input_Mode', type: 'string', title: 'Mode', defval: 'EMA', options: ['SMA', 'EMA'] },
       { id: 'input_Source', type: 'source', title: 'Source', defval: 102 },

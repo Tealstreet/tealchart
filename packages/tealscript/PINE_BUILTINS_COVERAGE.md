@@ -28,7 +28,7 @@ builtins.set("...")
 this.builtins.set("...")
 ```
 
-Last audited: 2026-06-01
+Last audited: 2026-08-30
 
 Local runtime registrations: 429
 
@@ -61,7 +61,7 @@ Local runtime registrations: 429
 | `session` | 2 | Partial | Epic 7 time and sessions |
 | `settlement_as_close` | 3 | Partial | Epic 9 ticker and request data |
 | `str` | 18 | Partial | Epic 5 `str.*` pass |
-| `strategy` | 44 | Partial | Epic 14 strategy broker emulator; +13 performance-stat variables |
+| `strategy` | 95 | Partial | Epic 14 strategy broker emulator; foundation signatures and compiled parity |
 | `ta` | 56 | Partial | Epic 5 `ta.*` pass |
 | `table` | 8 | Partial | Epic 11 drawing objects |
 | `ticker` | 9 | Partial | Epic 9 ticker and request data |
@@ -81,6 +81,32 @@ approximate coverage to tested Pine-compatible behavior.
 | `color.*` | 7 registrations covering RGB construction, channel extraction, transparency, and gradients | Channel precision and theme-sensitive behavior where possible |
 | Global helpers | 23 mixed global registrations including casts, `na`, `nz`, `fixnan`, time helpers, and visual functions | Typed casts, `na`/`nz`/`fixnan` parity across types, and separation of visual/data helpers into later epics |
 
+## Task 13 Namespace Diff
+
+Reference source: TradingView Pine Script v6 Reference Manual and Built-ins
+manual pages. The official reference is client-rendered, so the 2026-08-30
+diff used the official manual URLs plus a raw TradingView-reference mirror as
+an extraction aid, then checked candidates against local runtime, semantic, and
+compiled registrations.
+
+| Namespace | v6 reference candidates audited | Local result | Ranked gaps |
+| --- | --- | --- | --- |
+| `math.*` | `abs`, `avg`, `ceil`, `cos`, `exp`, `floor`, `log`, `log10`, `max`, `min`, `pow`, `random`, `round`, `round_to_mintick`, `sign`, `sin`, `sqrt`, `sum`, `tan`, `todegrees`, `toradians` plus constants | Covered by runtime/checker/codegen through `math.*` and legacy global aliases | 1. Exact overload/qualifier return behavior; 2. `math.random()` seed/session parity; 3. edge-case `na` propagation |
+| `str.*` | `contains`, `format`, `format_time`, `length`, `lower`, `match`, `pos`, `repeat`, `replace`, `replace_all`, `split`, `startswith`, `substring`, `tonumber`, `tostring`, `trim`, `upper` | Covered by runtime/checker/codegen; TealScript also covers `str.endswith` | 1. Placeholder compatibility across mixed numeric/string inputs; 2. Unicode and escape edge behavior; 3. `na` conversion details |
+| `ta.*` | `accdist`, `alma`, `atr`, `barssince`, `bb`, `bbw`, `cci`, `change`, `cmo`, `cog`, `cross`, `crossover`, `crossunder`, `cum`, `dev`, `dmi`, `ema`, `falling`, `highest`, `highestbars`, `iii`, `kc`, `kcw`, `lowest`, `lowestbars`, `macd`, `mfi`, `nvi`, `obv`, `pivot_point_levels`, `pivothigh`, `pivotlow`, `pvi`, `pvt`, `range`, `rising`, `rma`, `rsi`, `sar`, `sma`, `stdev`, `stoch`, `supertrend`, `swma`, `tr`, `tsi`, `valuewhen`, `vwap`, `vwma`, `wad`, `wma`, `wpr`, `wvad` | Broadly covered by runtime/checker/codegen, including additional common local entries such as `adx`, `correlation`, `covariance`, `dema`, `hma`, `kst`, `linreg`, `median`, `mode`, `mom`, percentile helpers, `rci`, `roc`, `smma`, `tema`, and `variance` | 1. Exact warmup/`na` parity for covered TA state machines; 2. source-default and series-length qualifier edge cases |
+
+## Task 15 Executable Reference Coverage
+
+`src/compat/pineV6BuiltinReference.ts` now records v6 reference name data for
+`ta`, `math`, `str`, `array`, `matrix`, `map`, `request`, `ticker`,
+`timeframe`, `session`, `syminfo`, `chart`, `color`, `box`, `line`, `label`,
+`table`, `polyline`, `linefill`, and `strategy`.
+
+`src/semantic/checker.test.ts` asserts every listed name resolves through the
+semantic checker's own builtin/signature/context-member tables unless the name
+is present in `PINE_V6_KNOWN_MISSING_BUILTINS`. No v6 reference builtin names
+are currently allowlisted as missing.
+
 Current `math.*` progress:
 
 - Common scalar helpers support Pine-style named arguments, including
@@ -97,14 +123,30 @@ Current `ta.*` progress:
 
 - Common `ta.*` helpers accept Pine-style named arguments for covered
   parameters.
+- `ta.accdist` is available as a variable-only cumulative A/D series in both
+  interpreter and compiled execution, with history and callable-use diagnostics
+  matching the other TA variables.
+- A table-driven compiled/interpreter warmup sweep covers 64 implemented `ta.*`
+  state-machine and variable rows with explicit first-valid-bar expectations.
+  The sweep fixed `ta.adx(5)` so the interpreter applies the same
+  `adxSmoothing=14` default as the compiled path.
 - Event and cross helpers accept Pine-style named arguments for covered
   `condition`/`source` parameters and cross helper `source1`/`source2`
   parameters.
 - `ta.highest`, `ta.lowest`, `ta.highestbars`, and `ta.lowestbars` support the
-  one-argument default-source forms.
+  one-argument default-source forms, including compiled coverage for the
+  extrema helpers and offset helpers. Compiled `ta.highest()`/`ta.lowest()`
+  skip early `na` source values like the interpreter.
 - Common windowed helpers now track derived source expressions such as
   `ta.sma(close - open, length)` using call-local history instead of falling
   back to chart `close`.
+- Compiled indexed TA call results such as `ta.sma(source, length)[1]` keep
+  call-site history and match interpreter output inside UDF chains.
+- Stateful `ta.*` calls nested through UDF helper graphs keep call-chain-local
+  history in both interpreter and compiled execution.
+- The compiled runtime binds mixed `source=..., length` calls for common
+  source/length helpers through the same ordered argument rule as the
+  interpreter.
 - `ta.stdev` and `ta.variance` support the `biased` parameter.
 - `ta.ema` and `ta.rma` use stable call-site state for recursive smoothing.
 - `ta.dmi`, `ta.sar`, `ta.pivothigh`, `ta.pivotlow`, and `ta.linreg`
@@ -139,6 +181,97 @@ Current `ta.*` progress:
 - A source-linked public moving-average ribbon checkpoint locks common
   `ta.vwma()`, `ta.wma()`, `ta.alma()`, and `ta.hma()` overlay/ribbon routing
   over deterministic OHLCV bars.
+- The compiled runtime accepts `ta.hma()` with static length arguments and has
+  interpreter-parity coverage for the TA class and full compiled execution path.
+- The compiled runtime parity sweep includes active `ta.atr()` coverage against
+  the interpreter, with matching TA-class coverage for first-bar true range and
+  RMA seeding behavior.
+- The compiled runtime accepts `ta.swma()` and `ta.alma()` with static
+  constructor arguments and has interpreter-parity coverage for both TA classes
+  and full compiled execution output.
+- The compiled runtime accepts `ta.cci()`, `ta.cmo()`, and `ta.wpr()` with
+  static and default length arguments and has interpreter-parity coverage for
+  the TA classes plus positional, mixed, and default full compiled execution
+  output.
+- The compiled runtime accepts `ta.smma()` and `ta.vwma()` with static length
+  arguments and has interpreter-parity coverage for the reused RMA state, VWMA
+  class, and full compiled execution output.
+- The compiled runtime accepts `ta.cross()` and has interpreter-parity coverage
+  for either-direction threshold crossing behavior in the TA class and full
+  compiled execution output.
+- The compiled runtime accepts `ta.range()`, `ta.rising()`, and `ta.falling()`
+  with static length arguments and has interpreter-parity coverage for the TA
+  classes and full compiled execution output.
+- The compiled runtime accepts `ta.highestbars()` and `ta.lowestbars()` with
+  static length arguments, including Pine shorthand defaults to high/low, and
+  has interpreter-parity coverage for the TA classes and full compiled
+  execution output.
+- The compiled runtime accepts `ta.highest()` and `ta.lowest()` with explicit
+  sources, default high/low sources, named length, mixed named-source static
+  length forms, and interpreter-matching early `na` handling.
+- The compiled runtime accepts element-wise `ta.max()` and `ta.min()` calls with
+  interpreter-parity coverage for positional, named, and mixed source arguments.
+- The compiled runtime accepts `ta.variance()` and `ta.dev()` with static
+  length arguments, including static `biased=false` variance, and has
+  interpreter-parity coverage for the TA classes and full compiled execution
+  output.
+- The compiled runtime accepts `ta.covariance()` and `ta.correlation()` with
+  static length arguments and has interpreter-parity coverage for paired source
+  windows, including flat-correlation `na` output.
+- The compiled runtime accepts `ta.cog()` with static length arguments and has
+  interpreter-parity coverage for source and derived-source compiled execution
+  output.
+- The compiled runtime accepts `ta.median()` and `ta.mode()` with static length
+  arguments and has interpreter-parity coverage for odd/even median windows,
+  derived-source median, and mode tie behavior.
+- The compiled runtime accepts `ta.percentile_nearest_rank()`,
+  `ta.percentile_linear_interpolation()`, and `ta.percentrank()` with static
+  arguments and has interpreter-parity coverage for the TA classes and full
+  compiled execution output.
+- The compiled runtime accepts `ta.linreg()` with static length/offset
+  arguments and has interpreter-parity coverage for offset and derived-source
+  regression through the TA class and full compiled execution output.
+- The compiled runtime accepts `ta.tr()` with static `handle_na` arguments and
+  has interpreter-parity coverage for handle-na and strict prior-close behavior.
+- The compiled runtime accepts `ta.mfi()` with static length arguments and has
+  interpreter-parity coverage for positional, named, mixed, and derived-source
+  money-flow calls.
+- The compiled runtime accepts `ta.tsi()` with static short/long length
+  arguments and has interpreter-parity coverage for positional, named, mixed,
+  and derived-source double-smoothing calls.
+- The compiled runtime accepts `ta.barssince()` and `ta.valuewhen()` with static
+  occurrence arguments and has interpreter-parity coverage for positional,
+  named, and mixed event-memory calls.
+- The compiled runtime accepts `ta.bbw()` with static length/multiplier
+  arguments and has interpreter-parity coverage for positional, named, and mixed
+  Bollinger Band width calls.
+- The compiled runtime accepts `ta.kc()` and `ta.kcw()` with static
+  length/multiplier/useTrueRange arguments and has interpreter-parity coverage
+  for tuple destructuring, width output, named calls, and mixed calls.
+- The compiled runtime accepts `ta.dmi()` and `ta.adx()` with static
+  diLength/adxSmoothing arguments and has interpreter-parity coverage for tuple
+  destructuring, scalar ADX output, named calls, mixed calls, and ADX's
+  one-argument smoothing default.
+- The compiled runtime accepts `ta.supertrend()` with static factor/atrPeriod
+  arguments and has interpreter-parity coverage for tuple destructuring,
+  positional calls, named calls, and mixed calls.
+- The compiled runtime accepts `ta.sar()` with static start/inc/max arguments
+  and has interpreter-parity coverage for positional, named, and mixed calls.
+- The compiled runtime accepts `ta.kst()` with static ROC, smoothing, and signal
+  lengths and has interpreter-parity coverage for tuple destructuring,
+  positional calls, named calls, mixed calls, and default length arguments.
+- The compiled runtime accepts `ta.vwap()` scalar and `stdev_mult` band tuple
+  overloads with interpreter-parity coverage for default source, explicit
+  source, anchored resets, named calls, and mixed calls.
+- The compiled runtime accepts `ta.rci()` with static length arguments and has
+  interpreter-parity coverage for positional, named, mixed, and derived-source
+  rank-correlation calls.
+- The compiled runtime accepts `ta.pivothigh()` and `ta.pivotlow()` with static
+  left/right arguments and has interpreter-parity coverage for explicit,
+  default-source, named, and mixed source calls.
+- The compiled runtime accepts default-length and mixed named-source
+  `ta.mom()` / `ta.roc()` calls and has interpreter-parity coverage for those
+  call forms.
 - A source-linked public percentile-rank signal checkpoint locks common
   `ta.percentile_nearest_rank()`, `ta.percentile_linear_interpolation()`, and
   `ta.percentrank()` regime routing over deterministic close-series bars.
@@ -223,6 +356,31 @@ Current `input.*` progress:
 - Advanced `indicator()` declaration settings for timeframe, gap handling,
   object limits, explicit plot z-order, behind-chart mode, calc bars count, and
   dynamic request mode are exposed on execution results.
+- Request-family built-ins are inventoried under Epic 8; interpreter and
+  compiled execution support direct source-parameter and captured
+  computed-expression request wrappers, including root-scope regular values
+  referenced by compiled request subprograms.
+- Host-provided Pine library imports are not a built-in namespace, but compiled
+  execution now supports exported constants, expression/block-bodied pure
+  functions, methods, UDT constructors/fields, enum members and `.title()`, and imported
+  helpers inside compiled request expression subprograms.
+- Ticker-family request IDs are inventoried under Epic 9; in-memory fixtures
+  derive Heikin-Ashi bars from the nearest available host context and classify
+  other synthetic chart bars as provider-gated unless the host supplies that
+  exact request context.
+
+Current `runtime.*` / `log.*` progress:
+
+- `runtime.error()` halts execution with a stable structured `runtime.error`
+  payload in interpreter and compiled results, including named
+  `message=` calls.
+- Compiled logical `and`/`or` short-circuit unreachable `runtime.error()`
+  operands with interpreter parity.
+- `log.info()`, `log.warning()`, and `log.error()` emit level/bar/message
+  outputs without halting execution; compiled formatting matches interpreter
+  numeric placeholders such as `{0:#.0}`.
+- `tests/compat/pine-external-corpus-classifier.test.ts` measures reduced
+  public-style runtime/log idioms inside the external corpus classifier.
 
 ## Out-Of-Scope Namespaces For Epic 5
 

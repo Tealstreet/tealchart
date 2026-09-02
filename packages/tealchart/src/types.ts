@@ -4,7 +4,15 @@
  */
 
 import type { ReactNode } from 'react';
-import type { WorkerError } from '@tealstreet/tealscript';
+import type {
+  FromWorkerMessage,
+  Program,
+  RuntimeProfile,
+  TealscriptBackendSelectionSource,
+  TealscriptExecutionBackend,
+  ToWorkerMessage,
+  WorkerError,
+} from '@tealstreet/tealscript';
 import type {
   UserDrawingCommandEvent,
   UserDrawingCommandEventListener,
@@ -29,6 +37,42 @@ export interface Bar {
 
 export interface DatafeedBar extends Omit<Bar, 'volume'> {
   volume?: number;
+}
+
+export type TealscriptRequestDataMessage = Extract<FromWorkerMessage, { type: 'requestData' }>;
+export type TealscriptRequestDataResultPayload =
+  | Pick<Extract<ToWorkerMessage, { type: 'requestDataResult'; ok: true }>, 'ok' | 'value'>
+  | Pick<Extract<ToWorkerMessage, { type: 'requestDataResult'; ok: false }>, 'ok' | 'error'>;
+export type TealscriptRequestDataResolver = (
+  request: TealscriptRequestDataMessage,
+) => TealscriptRequestDataResultPayload | Promise<TealscriptRequestDataResultPayload>;
+
+export type TealscriptExecutionTelemetryStatus = 'ok' | 'empty-output' | 'runtime-error';
+export type TealscriptExecutionTelemetryOutputKind = 'visual' | 'side-effect' | 'empty';
+export type TealscriptExecutionTelemetryFallbackKind =
+  | 'none'
+  | 'request-data'
+  | 'realtime-safety'
+  | 'runtime-error'
+  | 'other';
+
+export interface TealscriptExecutionTelemetry {
+  scriptId: string;
+  status: TealscriptExecutionTelemetryStatus;
+  outputKind: TealscriptExecutionTelemetryOutputKind;
+  executionMode?: RuntimeProfile['executionMode'];
+  selectedBackend?: TealscriptExecutionBackend;
+  backendSelectionSource?: TealscriptBackendSelectionSource;
+  fallbackKind: TealscriptExecutionTelemetryFallbackKind;
+  elapsedMs?: number;
+  bars?: number;
+  requestKind?: 'full' | 'incremental';
+  generation?: number;
+  plots: number;
+  drawings: number;
+  alerts: number;
+  logs: number;
+  runtimeErrors: number;
 }
 
 // Viewport defines the visible area of the chart
@@ -1156,6 +1200,18 @@ export interface TealchartWidgetOptions {
    * ```
    */
   createTealscriptWorker?: () => Worker;
+  /** Explicit TealScript backend override. Intended for tests, CLI harnesses and controlled cutover. */
+  tealscriptExecutionBackend?: TealscriptExecutionBackend;
+  /** Feature-flag hook for closure backend rollout. False/undefined keeps the compiled default. */
+  enableTealscriptClosureBackend?: boolean | (() => boolean);
+  /**
+   * Host-registered Pine libraries available to TealScript imports.
+   */
+  getTealscriptLibraries?: () => Map<string, Program>;
+  /**
+   * Resolves serializable request.* data misses emitted by TealScript workers.
+   */
+  resolveTealscriptRequestData?: TealscriptRequestDataResolver;
   /**
    * Host-supplied Tealscript indicators, such as user-authored Tealchart studies.
    * These use the normal Tealscript worker runtime and are never jailbreak indicators.
@@ -1166,6 +1222,11 @@ export interface TealchartWidgetOptions {
    * The script id is the study id returned by createStudy().
    */
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
+  /**
+   * Called with a compact, non-source execution summary for every accepted
+   * TealScript worker result and runtime halt.
+   */
+  onTealscriptExecution?: (summary: TealscriptExecutionTelemetry) => void;
   /**
    * Gap detection configuration for automatic bar recovery.
    * When enabled, the chart will detect gaps in bar data (from network issues,

@@ -315,7 +315,7 @@ export function resolveNativeIndicatorOutputAxisLabels({
       id: rawLabel.id,
       pane,
       value: rawLabel.value,
-      text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision),
+      text: formatIndicatorOutputAxisValue(rawLabel.value, range, rawLabel.precision, rawLabel.format),
       color: rawLabel.color,
       valueY: y,
       y,

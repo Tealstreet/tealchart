@@ -65,8 +65,7 @@ Used by strategy stats tables and performance dashboards.
 
 - [n/a] dividends.future_amount / future_ex_date / future_pay_date
 - [n/a] earnings.future_eps / future_period_end_time / future_revenue / future_time
-- [n/a] request.footprint (planned unsupported)
-- [n/a] request.quandl (deprecated alias)
+- [x] request.footprint provider seam and unseeded `na`
 
 ---
 
@@ -266,7 +265,7 @@ Two related issues were resolved:
 ## Deep Parity Probes (12 scripts) — 2026-06-08
 
 A "Deep parity probes" describe block was added to `tests/compat/pine-realworld-corpus.test.ts`
-targeting untested idiom combinations. 11 of 12 pass; 1 is skipped.
+targeting untested idiom combinations. All 12 pass.
 
 | Script | Status | Pattern |
 | --- | --- | --- |
@@ -275,7 +274,7 @@ targeting untested idiom combinations. 11 of 12 pass; 1 is skipped.
 | array.new<float>() generic constructor | pass | `var array<float> w = array.new<float>()` — angle-bracket type param |
 | switch on string values | pass | `switch mode` with `"buy"/"sell"/"hold"` arms |
 | Multi-line string + concatenation | pass | `"O:" + str.tostring(open) + " H:" + ...` across continuation lines |
-| **request.security tuple destructure** | **skip** | `[htfO, htfH, htfL, htfC] = request.security(...)` — gap below |
+| request.security tuple destructure | pass | `[htfO, htfH, htfL, htfC] = request.security(...)` |
 | plotcandle conditional colors | pass | `plotcandle(o, h, l, c, color=isBull ? green : red)` |
 | ta.bb with fill | pass | `[mid, upper, lower] = ta.bb(close, 5, 2.0)` + `fill(upperPlot, lowerPlot)` |
 | strategy.exit OCA group | pass | Two `strategy.exit` calls (TP + SL) on same entry — auto-OCA cancels the other |
@@ -283,26 +282,26 @@ targeting untested idiom combinations. 11 of 12 pass; 1 is skipped.
 | Nested UDF with var series state | pass | `accumulate()` uses `var float acc`; called from both top-level and another UDF |
 | label.delete lifecycle | pass | `var label lbl = na`; delete previous, create new each bar; only 1 label survives |
 
-### Gap: request.security tuple expression destructure
+### ~~Gap: request.security tuple expression destructure~~ — CLOSED
 
 **Pattern:**
 ```pine
 [htfO, htfH, htfL, htfC] = request.security(syminfo.tickerid, "2", [open, high, low, close])
 ```
 
-**Status:** Runtime fails with "Cannot destructure non-array value". The expression
-`[open, high, low, close]` is evaluated in the chart execution context (not the HTF context),
-so it returns the chart-bar array values, not an HTF-merged tuple. The `request.security`
-runtime merges scalar series, not array expressions.
+**Status:** CLOSED. Tuple expression requests are evaluated in the requested context,
+merged per tuple element, and returned as a destructurable array aligned to chart bars.
+Both the interpreter path and compiled runtime path have regression coverage.
 
-**Impact:** Medium — some public scripts pass OHLC as a tuple to avoid 4 separate
-`request.security` calls. Workaround is 4 separate calls: `htfO = request.security(..., open)`, etc.
+**Impact:** Public scripts can pass OHLC as a tuple to avoid 4 separate
+`request.security` calls.
 
-**Test:** `it.skip('request.security with tuple expression destructure [o, h, l, c]', ...)` in
-`pine-realworld-corpus.test.ts`.
+**Tests:** `it('request.security with tuple expression destructure [o, h, l, c]', ...)`
+in `pine-realworld-corpus.test.ts` and `it('request.security returns tuple expression values aligned to chart', ...)`
+in `src/runtime/codegen/execute.test.ts`.
 
-**Fix path:** The `requestDatafeed.ts` merge path needs to detect when the expression is a tuple
-literal and forward each element separately, then re-assemble as a destructurable array.
+**Behavior:** Missing pre-confirmation values align as `na` for each tuple element, and
+valid requested bars produce one merged value per tuple slot.
 
 ---
 
@@ -344,5 +343,5 @@ No new failure classes were introduced.
 | **Edge-case corpus probe (12 scripts)** | **0** | All 12 pass (trailing comma fixed) |
 | **Pine v5 compatibility probe (9 scripts)** | **1** | 8 pass, 1 skipped (security datafeed) |
 | **Parser stress probe (8 scripts)** | **0** | 8 pass |
-| **Deep parity probes (12 scripts)** | **1 (runtime)** | 11 pass, 1 skipped (request.security tuple) |
+| **Deep parity probes (12 scripts)** | **0** | All 12 pass |
 | **Multi-feature integration probe (11 scripts)** | **0** | All pass |

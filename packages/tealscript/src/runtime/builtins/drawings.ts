@@ -290,6 +290,21 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     return undefined;
   });
 
+  builtins.set('label.set_point', (args, namedArgs, ctx) => {
+    withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
+      const point = callArg(args, namedArgs, 1, 'point', undefined, ['id']);
+      if (isChartPoint(point)) {
+        label.x = pointX(point, label.xloc);
+        label.y = point.price;
+      } else {
+        label.x = null;
+        label.y = null;
+      }
+      label.barIndex = ctx.bar_index;
+    });
+    return undefined;
+  });
+
   builtins.set('label.set_text', (args, namedArgs, ctx) => {
     withDrawing(callArg(args, namedArgs, 0, 'id'), ctx, 'label', runtime.isNa, (label) => {
       label.text = runtime.toStringValue(callArg(args, namedArgs, 1, 'text', '', ['id']));
@@ -949,6 +964,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     'frame_width',
     'border_color',
     'border_width',
+    'force_overlay',
   ] as const;
   const tableCellArgs = [
     'table_id',
@@ -1066,6 +1082,15 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
     && first.startRow <= second.endRow
     && first.endRow >= second.startRow
   );
+  const mergedCellRangesEqual = (
+    first: { startColumn: number; startRow: number; endColumn: number; endRow: number },
+    second: { startColumn: number; startRow: number; endColumn: number; endRow: number },
+  ): boolean => (
+    first.startColumn === second.startColumn
+    && first.startRow === second.startRow
+    && first.endColumn === second.endColumn
+    && first.endRow === second.endRow
+  );
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `table_${callId}_${ctx.bar_index}`;
@@ -1087,6 +1112,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       borderWidth: tableBorderWidth(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 7)),
       cells: [],
     };
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, tableNewArgs, 8));
+    if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
     ctx.addDrawing(drawing);
     return id;
@@ -1131,8 +1158,12 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         callArg(args, namedArgs, 3, 'end_column', undefined, ['table_id', 'start_column', 'start_row']),
         callArg(args, namedArgs, 4, 'end_row', undefined, ['table_id', 'start_column', 'start_row', 'end_column']),
       );
-      if (table.mergedCells?.some((mergedCell) => mergedCellRangesOverlap(mergedCell, range))) {
+      const overlappingRange = table.mergedCells?.find((mergedCell) => mergedCellRangesOverlap(mergedCell, range));
+      if (overlappingRange && !mergedCellRangesEqual(overlappingRange, range)) {
         throw new Error(`Table merged cell range overlaps existing merged cells: columns ${range.startColumn}-${range.endColumn}, rows ${range.startRow}-${range.endRow}`);
+      }
+      if (overlappingRange) {
+        return;
       }
       table.mergedCells = [...(table.mergedCells ?? []), range];
     });

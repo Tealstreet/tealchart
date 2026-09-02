@@ -34,6 +34,11 @@ import type {
   IndexExpression,
   LambdaExpression,
 } from '../parser/ast';
+import type {
+  TealscriptBackendSelectionOptions,
+  TealscriptBackendSelectionSource,
+  TealscriptExecutionBackend,
+} from './backendSelection';
 import {
   CURRENCY_CONSTANT_CODES,
   isExportableBuiltinConstantPath,
@@ -182,16 +187,33 @@ import {
   type PineMap,
 } from './maps';
 import { Scope, createRootScope, type ScopeSnapshot, type SourceSeriesAccessor } from './scope';
+import { Series } from './series';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
   economicRequestKey,
   financialRequestKey,
+  footprintDelta,
+  footprintPoc,
+  footprintRowByPrice,
+  footprintRequestKey,
+  footprintRows,
+  footprintValue,
+  footprintValueAreaHigh,
+  footprintValueAreaLow,
+  isRequestFootprintData,
+  isRequestVolumeRowData,
+  quandlRequestKey,
+  selectCorporateActionField,
   seedRequestSymbol,
   type RequestDataContext,
   type RequestDatafeed,
+  type RequestDatafeedErrorCode,
   type RequestSeriesFamily,
   type RequestSeriesPoint,
+  volumeRowDelta,
+  volumeRowImbalance,
+  volumeRowValue,
 } from './requestDatafeed';
 import {
   cancelAllStrategyOrders,
@@ -201,8 +223,12 @@ import {
   fillStrategyMarketOrder,
   hasReachedStrategyOrderRiskLimit,
   markStrategyLedgerToMarket,
+  isStrategyHistoryProp,
+  readStrategyHistoryProp,
   selectStrategyIntrabarContext,
   submitStrategyOrder,
+  submitOrReplaceStrategyExitOrder,
+  STRATEGY_HISTORY_PROPS,
   cloneStrategyLedger,
   type StrategyDirection,
   type StrategyFill,
@@ -318,6 +344,8 @@ const REQUEST_CURRENCY_RATE_ARGS = ['from', 'to', 'ignore_invalid_currency'] as 
 const REQUEST_SERIES_ARGS = ['ticker', 'field', 'gaps', 'lookahead', 'ignore_invalid_symbol', 'currency'] as const;
 const REQUEST_FINANCIAL_ARGS = ['symbol', 'financial_id', 'period', 'gaps', 'ignore_invalid_symbol', 'currency'] as const;
 const REQUEST_ECONOMIC_ARGS = ['country_code', 'field', 'gaps', 'ignore_invalid_symbol'] as const;
+const REQUEST_QUANDL_ARGS = ['ticker', 'gaps', 'index', 'ignore_invalid_symbol'] as const;
+const REQUEST_FOOTPRINT_ARGS = ['ticks_per_row', 'va_percent', 'imbalance_percent'] as const;
 const REQUEST_SEED_ARGS = ['source', 'symbol', 'expression', 'ignore_invalid_symbol', 'calc_bars_count'] as const;
 const LEGACY_GLOBAL_TA_ALIASES = [
   'alma',
@@ -382,9 +410,19 @@ const LEGACY_GLOBAL_TA_ALIASES = [
 const LEGACY_GLOBAL_MATH_ALIASES = [
   'abs', 'ceil', 'floor', 'round', 'sqrt',
   'log', 'log10', 'pow', 'sign', 'max', 'min', 'avg', 'sum',
+  'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'exp',
+  'toradians', 'todegrees',
 ] as const;
 // v5 bare str.* globals: tostring(x) → str.tostring(x), tonumber(x) → str.tonumber(x)
 const LEGACY_GLOBAL_STR_ALIASES = ['tostring', 'tonumber'] as const;
+const LEGACY_GLOBAL_TICKER_ALIASES = new Map<string, string>([
+  ['tickerid', 'ticker.new'],
+  ['heikinashi', 'ticker.heikinashi'],
+  ['renko', 'ticker.renko'],
+  ['linebreak', 'ticker.linebreak'],
+  ['kagi', 'ticker.kagi'],
+  ['pointfigure', 'ticker.pointfigure'],
+]);
 const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ['security', 'request.security'],
   // v3/v4 bare color(r,g,b,transp) global → color.rgb
@@ -392,6 +430,117 @@ const LEGACY_GLOBAL_BUILTIN_ALIASES = new Map<string, string>([
   ...LEGACY_GLOBAL_TA_ALIASES.map((name) => [name, `ta.${name}`] as const),
   ...LEGACY_GLOBAL_MATH_ALIASES.map((name) => [name, `math.${name}`] as const),
   ...LEGACY_GLOBAL_STR_ALIASES.map((name) => [name, `str.${name}`] as const),
+  ...LEGACY_GLOBAL_TICKER_ALIASES,
+]);
+const LEGACY_INPUT_TYPE_ALIASES = new Map<string, string>([
+  ['bool', 'input.bool'],
+  ['color', 'input.color'],
+  ['float', 'input.float'],
+  ['integer', 'input.int'],
+  ['int', 'input.int'],
+  ['resolution', 'input.timeframe'],
+  ['session', 'input.session'],
+  ['source', 'input.source'],
+  ['string', 'input.string'],
+  ['symbol', 'input.symbol'],
+  ['timeframe', 'input.timeframe'],
+]);
+const LEGACY_BARE_COLOR_CONSTANTS: Record<string, string> = {
+  aqua: '#00BCD4',
+  black: '#363A45',
+  blue: '#2196F3',
+  fuchsia: '#E040FB',
+  gray: '#787B86',
+  green: '#4CAF50',
+  lime: '#00E676',
+  maroon: '#880E4F',
+  navy: '#311B92',
+  olive: '#808000',
+  orange: '#FF9800',
+  purple: '#9C27B0',
+  red: '#F23645',
+  silver: '#B2B5BE',
+  teal: '#089981',
+  white: '#FFFFFF',
+  yellow: '#FDD835',
+};
+const LEGACY_BARE_VISUAL_CONSTANTS = new Set([
+  'area',
+  'areabr',
+  'circles',
+  'columns',
+  'cross',
+  'dashed',
+  'dotted',
+  'histogram',
+  'line',
+  'solid',
+  'stepline',
+]);
+const LOCATION_STABLE_BUILTIN_CALLS = new Set([
+  'alert',
+  'math.random',
+  'ta.alma',
+  'ta.atr',
+  'ta.barssince',
+  'ta.bb',
+  'ta.bbw',
+  'ta.cci',
+  'ta.change',
+  'ta.cmo',
+  'ta.cog',
+  'ta.correlation',
+  'ta.cross',
+  'ta.crossover',
+  'ta.crossunder',
+  'ta.cum',
+  'ta.dema',
+  'ta.dev',
+  'ta.dmi',
+  'ta.ema',
+  'ta.falling',
+  'ta.highest',
+  'ta.highestbars',
+  'ta.hma',
+  'ta.kc',
+  'ta.kcw',
+  'ta.kst',
+  'ta.linreg',
+  'ta.lowest',
+  'ta.lowestbars',
+  'ta.macd',
+  'ta.median',
+  'ta.mfi',
+  'ta.mode',
+  'ta.mom',
+  'ta.obv',
+  'ta.percentrank',
+  'ta.percentile_linear_interpolation',
+  'ta.percentile_nearest_rank',
+  'ta.pivothigh',
+  'ta.pivotlow',
+  'ta.range',
+  'ta.rci',
+  'ta.rising',
+  'ta.rma',
+  'ta.roc',
+  'ta.rsi',
+  'ta.sar',
+  'ta.sma',
+  'ta.smma',
+  'ta.stdev',
+  'ta.stoch',
+  'ta.supertrend',
+  'ta.swma',
+  'ta.tema',
+  'ta.tr',
+  'ta.tsi',
+  'ta.valuewhen',
+  'ta.variance',
+  'ta.vwap',
+  'ta.vwma',
+  'ta.wma',
+  'ta.wpr',
 ]);
 
 export interface IndicatorDeclarationMetadata {
@@ -417,6 +566,17 @@ export interface IndicatorDeclarationMetadata {
 }
 
 export interface RuntimeProfile {
+  executionMode: 'compiled' | 'interpreter' | 'closure';
+  selectedBackend?: TealscriptExecutionBackend;
+  backendSelectionSource?: TealscriptBackendSelectionSource;
+  fallbackReason?: string;
+  fallbackDiagnostics?: RuntimeFallbackDiagnostic[];
+  swallowedErrors?: RuntimeSwallowedErrorSummary[];
+  compiledBarErrors?: {
+    count: number;
+    firstBarIndex: number;
+    firstMessage: string;
+  };
   elapsedMs: number;
   bars: number;
   statements: number;
@@ -425,6 +585,21 @@ export interface RuntimeProfile {
   requestContexts: number;
   maxBarsBack: number;
   errors: number;
+}
+
+export interface RuntimeSwallowedErrorSummary {
+  site: string;
+  count: number;
+  firstBarIndex: number;
+  firstMessage: string;
+}
+
+export interface RuntimeFallbackDiagnostic {
+  reason: string;
+  construct: string;
+  message: string;
+  line?: number;
+  column?: number;
 }
 
 /**
@@ -452,9 +627,15 @@ export interface TealscriptEngineOptions {
   strategyIntrabarDatafeed?: StrategyIntrabarDatafeed;
   libraries?: Map<string, Program>;
   runtime?: TealscriptRuntimeOptions;
+  realtimeLastBar?: {
+    isNew: boolean;
+  };
+  confirmedRealtimeBarIndex?: number;
+  confirmedRealtimeBarStartIndex?: number;
 }
 
 export interface TealscriptRuntimeOptions {
+  backend?: TealscriptBackendSelectionOptions;
   syminfo?: Partial<SymInfo>;
   chart?: Partial<ChartInfo>;
   timeframe?: Partial<TimeframeInfo>;
@@ -527,10 +708,55 @@ type StaticCollectionScopes = Array<Map<string, StaticNameInfo>>;
 /**
  * Tealscript Engine - executes AST bar-by-bar
  */
+export const TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS = 40;
+
+interface CachedGlobalInputDeclaration {
+  value: unknown;
+  sourceSeries?: SourceSeriesAccessor;
+  inputCallReservations: InputCallReservation[];
+}
+
+interface InputCallReservation {
+  name: string;
+}
+
+interface UserFunctionSignature {
+  bindingOffset: number;
+  callableParamCount: number;
+  callableParamNames: Set<string>;
+  paramNames: string[];
+  hasDefaultValue: boolean[];
+  hasDefaults: boolean;
+}
+
+type CachedDirectCallable =
+  | {
+      kind: 'user';
+      fn: FunctionDeclaration;
+    }
+  | {
+      kind: 'imported';
+      alias: string;
+      fn: FunctionDeclaration;
+    };
+
+interface CachedCallMetadata {
+  funcName: string;
+  namespace?: string;
+  fullName: string;
+  builtinName: string;
+  hasPositionalArgumentAfterNamed: boolean;
+}
+
+interface CachedRequestLocalDependencies {
+  candidateCount: number;
+  lastCandidate?: Statement;
+  selected: Statement[];
+}
+
 export class TealscriptEngine {
   private static readonly MAX_LOOP_ITERATIONS = 10000;
   private static readonly MAX_BUILTIN_SOURCE_HISTORY = 10000;
-  private static readonly MAX_UNIQUE_REQUEST_CONTEXTS = 40;
   private static readonly MAX_STRATEGY_ORDER_FILL_RECALCULATIONS = 20;
 
   private ctx: ExecutionContext;
@@ -554,21 +780,39 @@ export class TealscriptEngine {
   private strategyIntrabarDatafeed?: StrategyIntrabarDatafeed;
   private libraries: Map<string, Program>;
   private importedLibraries = new Map<string, ImportedLibrary>();
+  private registeredImportKeys = new Set<string>();
   private requestEvaluationCache = new Map<string, RequestEvaluationCacheEntry>();
   private requestContextKeys = new Set<string>();
   private requestExpressionIds = new WeakMap<Expression, number>();
+  private requestGlobalDependencyCache = new WeakMap<Expression, VariableDeclaration[]>();
+  private requestLocalDependencyCache = new WeakMap<Expression, CachedRequestLocalDependencies>();
   private callExpressionIds = new WeakMap<CallExpression, number>();
+  private inputCallSiteIds = new Map<string, string>();
+  private callMetadataCache = new WeakMap<CallExpression, CachedCallMetadata>();
+  private callSiteScopeSuffixes = new WeakMap<CallExpression, string>();
+  private directCallableCache = new WeakMap<CallExpression, CachedDirectCallable>();
+  private userCallableScopeKeyCache = new WeakMap<FunctionDeclaration, string>();
+  private importedFunctionScopeKeyCache = new Map<string, WeakMap<FunctionDeclaration, string>>();
+  private userFunctionSignatureCache = new WeakMap<FunctionDeclaration, UserFunctionSignature>();
+  private functionNeedsActiveScopeStackCache = new WeakMap<FunctionDeclaration, boolean>();
+  private globalInputDeclarationCache = new WeakMap<VariableDeclaration, CachedGlobalInputDeclaration>();
+  private persistentDeclarationInputCallReservations = new WeakMap<VariableDeclaration, InputCallReservation[]>();
+  private inputCallReservationCaptureStack: InputCallReservation[][] = [];
   private expressionHistory = new WeakMap<Expression, ExpressionHistoryEntry>();
+  private strategyPropHistories = new Map<string, Series<unknown>>();
   private sourceSeriesIds = new WeakMap<SeriesAccessor, number>();
   private nextRequestExpressionId = 0;
   private nextCallExpressionId = 0;
   private nextSourceSeriesId = 0;
   private inferredMaxBarsBack = 0;
   private userFunctionCallDepth = new Map<string, number>();
+  private activeFunctionScopeKeys: string[] = [];
   private importedLibraryCallStack: string[] = [];
   private indicatorDynamicRequests = true;
   private requestContextDepth = 0;
   private requestLocalScopeDepth = 0;
+  private activeRequestLocalStatements: Statement[] | null = null;
+  private currentProgram: Program | null = null;
   private errors: ExecutionError[] = [];
   private profileStartMs = 0;
   private profileBars = 0;
@@ -576,6 +820,9 @@ export class TealscriptEngine {
   private profileExpressions = 0;
   private profileBuiltinCalls = 0;
   private runtimeOptions: TealscriptRuntimeOptions;
+  private realtimeLastBar?: { isNew: boolean };
+  private confirmedRealtimeBarIndex?: number;
+  private confirmedRealtimeBarStartIndex?: number;
   private pineVersion = 6;
   private hasStrategyDeclaration = false;
   private strategyOrderFillRecalculationRequested = false;
@@ -583,6 +830,10 @@ export class TealscriptEngine {
   private orderFillScopeSnapshot: ScopeSnapshot | null = null;
   private orderFillFunctionScopeSnapshots = new Map<string, ScopeSnapshot>();
   private orderFillFunctionBlockScopeSnapshots = new Map<string, ScopeSnapshot>();
+  private realtimeScopeSnapshot: ScopeSnapshot | null = null;
+  private realtimeFunctionScopeSnapshots = new Map<string, ScopeSnapshot>();
+  private realtimeFunctionBlockScopeSnapshots = new Map<string, ScopeSnapshot>();
+  private currentRealtimeBarWasAppended = false;
 
   constructor(options: TealscriptEngineOptions = {}) {
     this.ctx = new ExecutionContext();
@@ -600,6 +851,9 @@ export class TealscriptEngine {
     this.strategyIntrabarDatafeed = options.strategyIntrabarDatafeed;
     this.libraries = options.libraries ?? new Map();
     this.runtimeOptions = options.runtime ?? {};
+    this.realtimeLastBar = options.realtimeLastBar;
+    this.confirmedRealtimeBarIndex = options.confirmedRealtimeBarIndex;
+    this.confirmedRealtimeBarStartIndex = options.confirmedRealtimeBarStartIndex;
     this.applyRuntimeOptions(this.runtimeOptions);
 
     this.registerBuiltins();
@@ -652,11 +906,17 @@ export class TealscriptEngine {
     this.functionBlockIds = new WeakMap();
     this.nextFunctionBlockId = 0;
     this.importedLibraries.clear();
+    this.registeredImportKeys.clear();
     this.requestEvaluationCache.clear();
     this.requestContextKeys.clear();
     this.requestExpressionIds = new WeakMap();
     this.callExpressionIds = new WeakMap();
+    this.inputCallSiteIds.clear();
+    this.globalInputDeclarationCache = new WeakMap();
+    this.persistentDeclarationInputCallReservations = new WeakMap();
+    this.inputCallReservationCaptureStack = [];
     this.expressionHistory = new WeakMap();
+    this.strategyPropHistories.clear();
     this.nextRequestExpressionId = 0;
     this.nextCallExpressionId = 0;
     this.pineVersion = ast.version;
@@ -670,8 +930,14 @@ export class TealscriptEngine {
     this.orderFillScopeSnapshot = null;
     this.orderFillFunctionScopeSnapshots.clear();
     this.orderFillFunctionBlockScopeSnapshots.clear();
+    this.realtimeScopeSnapshot = null;
+    this.realtimeFunctionScopeSnapshots.clear();
+    this.realtimeFunctionBlockScopeSnapshots.clear();
+    this.currentRealtimeBarWasAppended = false;
     this.requestContextDepth = 0;
     this.requestLocalScopeDepth = 0;
+    this.visualOutputIdsByCallId.clear();
+    this.currentProgram = ast;
     this.applyRuntimeOptions(this.runtimeOptions);
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
@@ -693,35 +959,49 @@ export class TealscriptEngine {
     // Execute bar by bar
     while (this.ctx.advanceBar()) {
       this.profileBars += 1;
+      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
+      this.applyReconstructedRealtimeBarstate(isLastBar);
+      if (isLastBar) {
+        this.captureRealtimeScopeRollbackState();
+      }
       // Advance scope to new bar
       this.scope.advanceBar();
       this.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       this.resetPerBarBuiltinState();
       this.currentStrategyIntrabarContext = null;
-      const isLastBar = this.ctx.bar_index === this.ctx.last_bar_index;
+      const preStatementStrategyLedgerFinalization = this.shouldFinalizeCurrentReconstructedStrategyLedger();
       if (this.hasStrategyDeclaration) {
         this.captureOrderFillRecalculationState();
         if (isLastBar) {
           this.ctx.captureRealtimeRollbackState();
         }
-        this.fillPendingStrategyMarketOrdersForCurrentBar();
-        this.markStrategyLedgerToMarketForCurrentBar();
+        if (preStatementStrategyLedgerFinalization) {
+          this.fillPendingStrategyMarketOrdersForCurrentBar();
+          this.markStrategyLedgerToMarketForCurrentBar();
+        } else if (this.shouldProcessCurrentRealtimeBrokerFills()) {
+          this.fillPendingStrategyMarketOrdersForCurrentBar();
+        }
         this.strategyOrderFillRecalculationRequested = false;
+        this.updateStrategyPropHistories();
       } else if (isLastBar) {
         this.ctx.captureRealtimeRollbackState();
       }
 
-      if (this.executeHistoricalStatements(ast)) {
+      const executedStatements = this.shouldExecuteCurrentReconstructedStatements();
+      if (executedStatements && this.executeHistoricalStatements(ast)) {
         return this.createExecutionResult();
       }
 
-      if (this.hasStrategyDeclaration) {
+      const postStatementStrategyLedgerFinalization = this.shouldFinalizeCurrentReconstructedStrategyLedger();
+      if (postStatementStrategyLedgerFinalization) {
         this.markStrategyLedgerToMarketAtCurrentClose();
         this.fillPendingStrategyOrdersForCurrentBar();
         this.markStrategyLedgerAfterPendingOrders();
         if (this.recalculateHistoricalStrategyOrderFills(ast)) {
           return this.createExecutionResult();
         }
+      } else if (this.shouldProcessCurrentRealtimeBrokerFills()) {
+        this.fillPendingStrategyOrdersForCurrentBar();
       }
 
       // Commit bar — only snapshot on the last bar (for realtime rollback)
@@ -733,18 +1013,75 @@ export class TealscriptEngine {
     return this.createExecutionResult();
   }
 
+  private applyReconstructedRealtimeBarstate(isLastBar: boolean): void {
+    if (
+      this.confirmedRealtimeBarStartIndex !== undefined &&
+      this.confirmedRealtimeBarStartIndex > 0 &&
+      this.ctx.bar_index === this.confirmedRealtimeBarStartIndex - 1
+    ) {
+      this.ctx.barstate.islast = true;
+      this.ctx.barstate.ishistory = true;
+      this.ctx.barstate.isrealtime = false;
+      this.ctx.barstate.isnew = true;
+      this.ctx.barstate.isconfirmed = true;
+      this.ctx.barstate.islastconfirmedhistory = true;
+    }
+    const isConfirmedRealtimeBar =
+      this.ctx.bar_index === this.confirmedRealtimeBarIndex ||
+      (
+        this.confirmedRealtimeBarStartIndex !== undefined &&
+        this.ctx.bar_index >= this.confirmedRealtimeBarStartIndex &&
+        !isLastBar
+      );
+    if (isConfirmedRealtimeBar) {
+      this.ctx.barstate.islast = true;
+      this.ctx.barstate.ishistory = false;
+      this.ctx.barstate.isrealtime = true;
+      this.ctx.barstate.isnew = false;
+      this.ctx.barstate.isconfirmed = true;
+      this.ctx.barstate.islastconfirmedhistory = false;
+    }
+    if (isLastBar && this.realtimeLastBar) {
+      this.ctx.barstate.islast = true;
+      this.ctx.barstate.ishistory = false;
+      this.ctx.barstate.isrealtime = true;
+      this.ctx.barstate.isnew = this.realtimeLastBar.isNew;
+      this.ctx.barstate.isconfirmed = false;
+      this.ctx.barstate.islastconfirmedhistory = false;
+    }
+  }
+
   private executeHistoricalStatements(ast: Program): boolean {
+    const previousRequestLocalStatements = this.activeRequestLocalStatements;
+    const priorRequestLocalStatements: Statement[] = [];
     for (const stmt of ast.body) {
+      this.activeRequestLocalStatements = priorRequestLocalStatements;
       try {
-        this.executeStatement(stmt);
+        this.executeTopLevelStatement(stmt);
       } catch (error) {
         this.errors.push(createExecutionError(error, stmt.loc?.start.line, stmt.loc?.start.column));
         if (error instanceof RuntimeErrorException) {
+          this.activeRequestLocalStatements = previousRequestLocalStatements;
           return true;
         }
+      } finally {
+        this.activeRequestLocalStatements = previousRequestLocalStatements;
+      }
+      if (this.isRequestReplayableLocalStatement(stmt)) {
+        priorRequestLocalStatements.push(stmt);
       }
     }
     return false;
+  }
+
+  withRequestReplayableStatements<T>(statements: Statement[], callback: () => T): T {
+    const previousRequestLocalStatements = this.activeRequestLocalStatements;
+    this.activeRequestLocalStatements = statements;
+    try {
+      return callback();
+    } finally {
+      this.activeRequestLocalStatements = previousRequestLocalStatements;
+    }
   }
 
   private createExecutionResult(): ExecutionResult {
@@ -777,8 +1114,13 @@ export class TealscriptEngine {
     };
   }
 
+  getCurrentExecutionResult(): ExecutionResult {
+    return this.createExecutionResult();
+  }
+
   getProfile(): RuntimeProfile {
     return {
+      executionMode: 'interpreter',
       elapsedMs: Date.now() - this.profileStartMs,
       bars: this.profileBars,
       statements: this.profileStatements,
@@ -930,7 +1272,7 @@ export class TealscriptEngine {
         return initMax;
       }
       case 'TupleAssignment':
-        return this.inferExpressionMaxBarsBack(statement.right, collectionScopes);
+        return this.inferInitializerMaxBarsBack(statement.right, collectionScopes);
       case 'AssignmentStatement': {
         const rightMax = this.inferInitializerMaxBarsBack(statement.right, collectionScopes);
         if (statement.left.type === 'Identifier') {
@@ -962,6 +1304,14 @@ export class TealscriptEngine {
             () => this.inferStatementsMaxBarsBack(statement.consequent, collectionScopes),
           ),
           this.inferIfAlternateMaxBarsBack(statement.alternate, collectionScopes),
+        );
+      case 'OnceStatement':
+        return Math.max(
+          statement.test ? this.inferExpressionMaxBarsBack(statement.test, collectionScopes) : 0,
+          this.withStaticCollectionScope(
+            collectionScopes,
+            () => this.inferStatementsMaxBarsBack(statement.body, collectionScopes),
+          ),
         );
       case 'ForStatement':
         if (statement.kind === 'collection') {
@@ -1006,6 +1356,8 @@ export class TealscriptEngine {
           (max, e) => Math.max(max, this.inferExpressionMaxBarsBack(e, collectionScopes)),
           0,
         );
+      case 'MultiStatement':
+        return this.inferStatementsMaxBarsBack(statement.statements, collectionScopes);
       case 'ImportDeclaration':
       case 'BreakStatement':
       case 'ContinueStatement':
@@ -1784,6 +2136,7 @@ export class TealscriptEngine {
       this.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       this.ctx.setNow(this.getRuntimeNow());
       this.ctx.startRealtimeBar(bar);
+      this.currentRealtimeBarWasAppended = true;
       this.captureOrderFillRecalculationState();
       this.strategyOrderFillRecalculationRequested = false;
       this.fillPendingStrategyMarketOrdersForCurrentBar();
@@ -1791,6 +2144,7 @@ export class TealscriptEngine {
       this.forEachFunctionRuntimeScope((scope) => scope.commit(true));
       this.ctx.captureRealtimeRollbackState();
       this.prepareRealtimeExecution(ast);
+      this.updateStrategyPropHistories();
       if (this.shouldExecuteRealtimeStatements()) {
         this.executeRealtimeStatements(ast);
       } else {
@@ -1804,9 +2158,17 @@ export class TealscriptEngine {
       throw new Error(`Out-of-order bar update: ${bar.time} < ${currentBar.time}`);
     }
 
-    // Rollback to last committed state
-    this.scope.rollback();
-    this.forEachFunctionRuntimeScope((scope) => scope.rollback());
+    const sameBarReplacement = this.isSameBarRealtimeReplacement(currentBar, bar);
+
+    // Rollback to the correct pre-execution state for the replaceable bar.
+    if (sameBarReplacement) {
+      this.restoreRealtimeScopeRollbackState();
+      this.scope.advanceBar();
+      this.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
+    } else {
+      this.scope.rollback();
+      this.forEachFunctionRuntimeScope((scope) => scope.rollback());
+    }
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.ctx.setNow(this.getRuntimeNow());
@@ -1826,13 +2188,24 @@ export class TealscriptEngine {
     this.captureOrderFillRecalculationState();
     this.strategyOrderFillRecalculationRequested = false;
 
-    // Re-execute statements for current bar when Pine strategy settings allow it.
-    if (this.shouldExecuteRealtimeStatements()) {
-      this.executeRealtimeStatements(ast);
+    if (sameBarReplacement && this.hasStrategyDeclaration) {
+      this.fillPendingStrategyMarketOrdersForCurrentBar();
+      this.markStrategyLedgerToMarketForCurrentBar();
+    }
+
+    // Same-time updates replace the last calculated bar, so re-execute it even
+    // for strategies that do not calculate newly appended realtime ticks.
+    if (sameBarReplacement || this.shouldExecuteRealtimeStatements()) {
+      this.executeRealtimeStatements(ast, { finalizeStrategy: !sameBarReplacement });
     } else {
       this.fillPendingStrategyOrdersForCurrentBar();
     }
     this.handleRealtimeStrategyOrderFillRecalculation(ast);
+    if (sameBarReplacement && this.hasStrategyDeclaration) {
+      this.markStrategyLedgerToMarketAtCurrentClose();
+      this.fillPendingStrategyOrdersForCurrentBar();
+      this.markStrategyLedgerAfterPendingOrders();
+    }
 
     return this.ctx.getPlots();
   }
@@ -1852,7 +2225,14 @@ export class TealscriptEngine {
     this.prepareRealtimeExecution(ast);
     this.captureOrderFillRecalculationState();
     this.strategyOrderFillRecalculationRequested = false;
+    if (this.hasStrategyDeclaration) {
+      this.fillPendingStrategyMarketOrdersForCurrentBar();
+      this.markStrategyLedgerToMarketForCurrentBar();
+      this.updateStrategyPropHistories();
+    }
+    const confirmedDrawingStart = this.ctx.getDrawingCount();
     this.executeRealtimeStatements(ast);
+    this.ctx.markDrawingsPersistentFrom(confirmedDrawingStart);
     this.handleRealtimeStrategyOrderFillRecalculation(ast);
     this.markStrategyLedgerAfterPendingOrders();
   }
@@ -1865,6 +2245,7 @@ export class TealscriptEngine {
     this.registerTypeDeclarations(ast);
     this.registerUserFunctions(ast);
     this.importedLibraries.clear();
+    this.registeredImportKeys.clear();
     this.registerLibraryImports(ast);
   }
 
@@ -1875,19 +2256,74 @@ export class TealscriptEngine {
     return this.ctx.strategyLedger.settings.calcOnEveryTick || this.ctx.barstate.isconfirmed;
   }
 
-  private executeRealtimeStatements(ast: Program): void {
+  private shouldExecuteCurrentReconstructedStatements(): boolean {
+    if (!this.ctx.barstate.isrealtime) {
+      return true;
+    }
+    if (
+      this.hasStrategyDeclaration &&
+      this.realtimeLastBar &&
+      !this.realtimeLastBar.isNew &&
+      this.confirmedRealtimeBarStartIndex === undefined
+    ) {
+      return true;
+    }
+    return this.shouldExecuteRealtimeStatements();
+  }
+
+  private shouldFinalizeCurrentReconstructedStrategyLedger(): boolean {
+    if (!this.hasStrategyDeclaration) {
+      return false;
+    }
+    if (!this.ctx.barstate.isrealtime || this.ctx.barstate.isconfirmed) {
+      return true;
+    }
+    if (
+      this.realtimeLastBar &&
+      !this.realtimeLastBar.isNew &&
+      this.confirmedRealtimeBarStartIndex === undefined
+    ) {
+      return true;
+    }
+    return this.ctx.strategyLedger.settings.calcOnEveryTick;
+  }
+
+  private shouldProcessCurrentRealtimeBrokerFills(): boolean {
+    return this.hasStrategyDeclaration
+      && this.ctx.barstate.isrealtime
+      && !this.ctx.barstate.isconfirmed
+      && !this.ctx.strategyLedger.settings.calcOnEveryTick;
+  }
+
+  private isSameBarRealtimeReplacement(currentBar: Bar | undefined, bar: Bar): boolean {
+    return currentBar !== undefined && bar.time === currentBar.time && !this.currentRealtimeBarWasAppended;
+  }
+
+  private executeRealtimeStatements(ast: Program, options: { finalizeStrategy?: boolean } = {}): void {
     this.profileBars += 1;
+    const previousRequestLocalStatements = this.activeRequestLocalStatements;
+    const priorRequestLocalStatements: Statement[] = [];
     for (const stmt of ast.body) {
+      this.activeRequestLocalStatements = priorRequestLocalStatements;
       try {
-        this.executeStatement(stmt);
+        this.executeTopLevelStatement(stmt);
       } catch (error) {
         this.errors.push(createExecutionError(error, stmt.loc?.start.line, stmt.loc?.start.column));
         if (error instanceof RuntimeErrorException) {
+          this.activeRequestLocalStatements = previousRequestLocalStatements;
           throw error;
         }
         // Log error but continue
         console.error('Execution error:', error);
+      } finally {
+        this.activeRequestLocalStatements = previousRequestLocalStatements;
       }
+      if (this.isRequestReplayableLocalStatement(stmt)) {
+        priorRequestLocalStatements.push(stmt);
+      }
+    }
+    if (options.finalizeStrategy === false) {
+      return;
     }
     this.markStrategyLedgerToMarketAtCurrentClose();
     this.fillPendingStrategyOrdersForCurrentBar();
@@ -1963,6 +2399,40 @@ export class TealscriptEngine {
     this.ctx.rollbackBar();
     this.ctx.bar_index = this.ctx.last_bar_index;
     this.currentStrategyIntrabarContext = null;
+  }
+
+  private captureRealtimeScopeRollbackState(): void {
+    this.realtimeScopeSnapshot = this.scope.snapshot();
+    this.realtimeFunctionScopeSnapshots = new Map();
+    for (const [key, functionScope] of this.functionScopes) {
+      this.realtimeFunctionScopeSnapshots.set(key, functionScope.snapshot());
+    }
+    this.realtimeFunctionBlockScopeSnapshots = new Map();
+    for (const [key, blockScope] of this.functionBlockScopes) {
+      this.realtimeFunctionBlockScopeSnapshots.set(key, blockScope.snapshot());
+    }
+  }
+
+  private restoreRealtimeScopeRollbackState(): void {
+    if (this.realtimeScopeSnapshot) {
+      this.scope.restore(this.realtimeScopeSnapshot);
+    }
+    for (const [key, snapshot] of this.realtimeFunctionScopeSnapshots) {
+      this.functionScopes.get(key)?.restore(snapshot);
+    }
+    for (const key of this.functionScopes.keys()) {
+      if (!this.realtimeFunctionScopeSnapshots.has(key)) {
+        this.functionScopes.delete(key);
+      }
+    }
+    for (const [key, snapshot] of this.realtimeFunctionBlockScopeSnapshots) {
+      this.functionBlockScopes.get(key)?.restore(snapshot);
+    }
+    for (const key of this.functionBlockScopes.keys()) {
+      if (!this.realtimeFunctionBlockScopeSnapshots.has(key)) {
+        this.functionBlockScopes.delete(key);
+      }
+    }
   }
 
   private captureOrderFillRecalculationState(): void {
@@ -2058,6 +2528,23 @@ export class TealscriptEngine {
     this.executeStatementInternal(stmt, true);
   }
 
+  private executeTopLevelStatement(stmt: Statement): void {
+    if (stmt.type === 'VariableDeclaration') {
+      this.profileStatements += 1;
+      this.executeGlobalVariableDeclaration(stmt);
+      return;
+    }
+    if (stmt.type === 'MultiDeclaration') {
+      this.profileStatements += 1;
+      for (const declaration of stmt.declarations) {
+        this.executeGlobalVariableDeclaration(declaration);
+      }
+      return;
+    }
+
+    this.executeStatement(stmt);
+  }
+
   private executeStatementInternal(stmt: Statement, countProfile: boolean): void {
     if (countProfile) {
       this.profileStatements += 1;
@@ -2100,6 +2587,11 @@ export class TealscriptEngine {
           this.evaluateExpression(expr);
         }
         break;
+      case 'MultiStatement':
+        for (const statement of stmt.statements) {
+          this.executeStatement(statement);
+        }
+        break;
       case 'AssignmentStatement':
         this.executeAssignment(stmt);
         break;
@@ -2108,6 +2600,9 @@ export class TealscriptEngine {
         break;
       case 'IfStatement':
         this.executeIf(stmt);
+        break;
+      case 'OnceStatement':
+        this.executeOnce(stmt);
         break;
       case 'ForStatement':
         this.executeFor(stmt);
@@ -2175,6 +2670,7 @@ export class TealscriptEngine {
     if (stmt.declarationKind === 'strategy') {
       this.applyStrategyDeclaration(stmt);
       this.hasStrategyDeclaration = true;
+      this.updateStrategyPropHistories();
     }
   }
 
@@ -2567,67 +3063,80 @@ export class TealscriptEngine {
   private registerLibraryImports(ast: Program): void {
     for (const stmt of ast.body) {
       if (stmt.type !== 'ImportDeclaration') continue;
+      this.registerLibraryImport(stmt);
+    }
+  }
 
-      const libraryAst = this.libraries.get(stmt.path);
-      if (!libraryAst) continue;
+  private registerLibraryImport(stmt: ImportDeclaration): void {
+    const importKey = `${stmt.alias.name}\u0000${stmt.path}`;
+    if (this.registeredImportKeys.has(importKey)) return;
+    this.registeredImportKeys.add(importKey);
 
-      const functions = new Map<string, FunctionDeclaration>();
-      const exportedFunctions = new Set<string>();
-      const methods = new Map<string, FunctionDeclaration[]>();
-      const types = new Map<string, TypeDeclaration>();
-      const exportedTypes = new Set<string>();
-      const enums = new Map<string, Map<string, string>>();
-      const constants = new Map<string, unknown>();
-      for (const libraryStmt of libraryAst.body) {
-        if (libraryStmt.type === 'FunctionDeclaration') {
-          if (libraryStmt.isMethod) {
-            const overloads = methods.get(libraryStmt.name.name) ?? [];
-            overloads.push(libraryStmt);
-            methods.set(libraryStmt.name.name, overloads);
-          } else {
-            functions.set(libraryStmt.name.name, libraryStmt);
-            if (libraryStmt.exported) {
-              exportedFunctions.add(libraryStmt.name.name);
-            }
-          }
-          const scopeKey = this.importedFunctionScopeKey(stmt.alias.name, libraryStmt);
-          this.ensureFunctionScope(scopeKey);
-        }
-        if (libraryStmt.type === 'TypeDeclaration') {
-          types.set(libraryStmt.name.name, libraryStmt);
+    const libraryAst = this.libraries.get(stmt.path);
+    if (!libraryAst) return;
+
+    for (const libraryStmt of libraryAst.body) {
+      if (libraryStmt.type === 'ImportDeclaration') this.registerLibraryImport(libraryStmt);
+    }
+
+    const functions = new Map<string, FunctionDeclaration>();
+    const exportedFunctions = new Set<string>();
+    const methods = new Map<string, FunctionDeclaration[]>();
+    const types = new Map<string, TypeDeclaration>();
+    const exportedTypes = new Set<string>();
+    const enums = new Map<string, Map<string, string>>();
+    const constants = new Map<string, unknown>();
+    for (const libraryStmt of libraryAst.body) {
+      if (libraryStmt.type === 'FunctionDeclaration') {
+        if (libraryStmt.isMethod) {
+          const overloads = methods.get(libraryStmt.name.name) ?? [];
+          overloads.push(libraryStmt);
+          methods.set(libraryStmt.name.name, overloads);
+        } else {
+          functions.set(libraryStmt.name.name, libraryStmt);
           if (libraryStmt.exported) {
-            exportedTypes.add(libraryStmt.name.name);
+            exportedFunctions.add(libraryStmt.name.name);
           }
         }
-        if (libraryStmt.type === 'EnumDeclaration' && libraryStmt.exported) {
-          enums.set(libraryStmt.name.name, this.createImportedEnumValues(stmt.path, libraryStmt));
-        }
-        if (libraryStmt.type === 'VariableDeclaration' && libraryStmt.exported && libraryStmt.names.type === 'VariableDeclarator') {
-          const value = this.evaluateLibraryConstantExpression(libraryStmt.init);
-          if (value !== undefined) {
-            constants.set(libraryStmt.names.name.name, value);
-          }
+        const scopeKey = this.importedFunctionScopeKey(stmt.alias.name, libraryStmt);
+        this.ensureFunctionScope(scopeKey);
+      }
+      if (libraryStmt.type === 'TypeDeclaration') {
+        types.set(libraryStmt.name.name, libraryStmt);
+        if (libraryStmt.exported) {
+          exportedTypes.add(libraryStmt.name.name);
         }
       }
-
-      this.importedLibraries.set(stmt.alias.name, {
-        path: stmt.path,
-        alias: stmt.alias.name,
-        functions,
-        exportedFunctions,
-        methods,
-        types,
-        exportedTypes,
-        enums,
-        constants,
-      });
+      if (libraryStmt.type === 'EnumDeclaration' && libraryStmt.exported) {
+        enums.set(libraryStmt.name.name, this.createImportedEnumValues(stmt.path, libraryStmt));
+      }
+      if (libraryStmt.type === 'VariableDeclaration' && libraryStmt.exported && libraryStmt.names.type === 'VariableDeclarator') {
+        const value = this.evaluateLibraryConstantExpression(libraryStmt.init);
+        if (value !== undefined) {
+          constants.set(libraryStmt.names.name.name, value);
+        }
+      }
     }
+
+    this.importedLibraries.set(stmt.alias.name, {
+      path: stmt.path,
+      alias: stmt.alias.name,
+      functions,
+      exportedFunctions,
+      methods,
+      types,
+      exportedTypes,
+      enums,
+      constants,
+    });
   }
 
   private createImportedEnumValues(libraryPath: string, declaration: EnumDeclaration): Map<string, string> {
     const values = new Map<string, string>();
     for (const field of declaration.fields) {
-      values.set(field.name.name, `${libraryPath}.${declaration.name.name}.${field.name.name}`);
+      const key = `${libraryPath}.${declaration.name.name}.${field.name.name}`;
+      values.set(field.name.name, key);
+      this.enumTitles.set(key, field.title?.value ?? field.name.name);
     }
     return values;
   }
@@ -2731,10 +3240,12 @@ export class TealscriptEngine {
     if (stmt.names.type === 'VariableDeclarator') {
       const name = stmt.names.name.name;
       if (this.shouldSkipInitializedPersistentDeclaration(kind, [name])) {
+        this.reserveInputCallReservations(this.persistentDeclarationInputCallReservations.get(stmt));
         return;
       }
       const drawingCount = this.ctx.getDrawingCount();
-      const rawValue = this.evaluateVariableInitializer(stmt.init);
+      const { value: rawValue, reservations } = this.captureInputCallReservations(() => this.evaluateVariableInitializer(stmt.init));
+      this.rememberPersistentDeclarationInputCallReservations(stmt, kind, reservations);
       const value = this.unwrapKnownSourceValue(rawValue);
       this.scope.declare(
         name,
@@ -2743,14 +3254,17 @@ export class TealscriptEngine {
         this.getTypeAnnotationName(stmt.typeAnnotation),
         this.getSourceSeriesForInitializer(stmt.init, rawValue),
       );
+      this.markPersistentRuntimeValue(kind, value);
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     } else if (stmt.names.type === 'TupleDeclarator') {
       const names = stmt.names.names.map((name) => name.name).filter((name) => name !== '_');
       if (this.shouldSkipInitializedPersistentDeclaration(kind, names)) {
+        this.reserveInputCallReservations(this.persistentDeclarationInputCallReservations.get(stmt));
         return;
       }
       const drawingCount = this.ctx.getDrawingCount();
-      const value = this.evaluateVariableInitializer(stmt.init);
+      const { value, reservations } = this.captureInputCallReservations(() => this.evaluateVariableInitializer(stmt.init));
+      this.rememberPersistentDeclarationInputCallReservations(stmt, kind, reservations);
       // Tuple destructuring
       if (!Array.isArray(value)) {
         throw new Error('Cannot destructure non-array value');
@@ -2760,9 +3274,71 @@ export class TealscriptEngine {
         const name = stmt.names.names[i].name;
         if (name === '_') continue;
         this.scope.declare(name, kind, values[i]);
+        this.markPersistentRuntimeValue(kind, values[i]);
       }
       this.markPersistentDeclarationDrawings(kind, drawingCount);
     }
+  }
+
+  private executeGlobalVariableDeclaration(stmt: VariableDeclaration): void {
+    if (!this.tryExecuteCachedGlobalInputDeclaration(stmt)) {
+      this.executeVariableDeclaration(stmt);
+    }
+  }
+
+  private tryExecuteCachedGlobalInputDeclaration(stmt: VariableDeclaration): boolean {
+    if (!this.isCacheableGlobalInputDeclaration(stmt)) {
+      return false;
+    }
+
+    const name = stmt.names.type === 'VariableDeclarator' ? stmt.names.name.name : undefined;
+    if (!name) return false;
+
+    const cached = this.globalInputDeclarationCache.get(stmt);
+    if (cached) {
+      this.reserveInputCallReservations(cached.inputCallReservations);
+      this.scope.declare(
+        name,
+        stmt.kind,
+        cached.value,
+        this.getTypeAnnotationName(stmt.typeAnnotation),
+        cached.sourceSeries,
+      );
+      return true;
+    }
+
+    const drawingCount = this.ctx.getDrawingCount();
+    const { value: rawValue, reservations } = this.captureInputCallReservations(() => this.evaluateVariableInitializer(stmt.init));
+    const value = this.unwrapKnownSourceValue(rawValue);
+    const sourceSeries = this.getSourceSeriesForInitializer(stmt.init, rawValue);
+    this.scope.declare(
+      name,
+      stmt.kind,
+      value,
+      this.getTypeAnnotationName(stmt.typeAnnotation),
+      sourceSeries,
+    );
+    this.markPersistentRuntimeValue(stmt.kind, value);
+    this.markPersistentDeclarationDrawings(stmt.kind, drawingCount);
+    this.globalInputDeclarationCache.set(stmt, { value, sourceSeries, inputCallReservations: reservations });
+    return true;
+  }
+
+  private isCacheableGlobalInputDeclaration(stmt: VariableDeclaration): boolean {
+    if (stmt.kind !== 'none' || stmt.names.type !== 'VariableDeclarator' || stmt.init.type !== 'CallExpression') {
+      return false;
+    }
+
+    const name = this.getCallExpressionName(stmt.init);
+    if (!name || name === 'input' || name === 'input.source') {
+      return false;
+    }
+    if (!name.startsWith('input.')) {
+      return false;
+    }
+
+    const title = this.getStaticCallArgument(stmt.init, ['title'], 1);
+    return title === undefined || title.type === 'StringLiteral';
   }
 
   private getTypeAnnotationName(typeAnnotation: TypeAnnotation | null | undefined): string | undefined {
@@ -2782,8 +3358,17 @@ export class TealscriptEngine {
     }
   }
 
+  private rememberPersistentDeclarationInputCallReservations(
+    stmt: VariableDeclaration,
+    kind: string,
+    reservations: InputCallReservation[],
+  ): void {
+    if (kind !== 'var' && kind !== 'varip') return;
+    this.persistentDeclarationInputCallReservations.set(stmt, reservations);
+  }
+
   private executeTupleAssignment(stmt: TupleAssignment): void {
-    const value = this.evaluateExpression(stmt.right);
+    const value = this.evaluateVariableInitializer(stmt.right);
     if (!Array.isArray(value)) {
       throw new Error('Tuple assignment expects a tuple (array) value on the right-hand side');
     }
@@ -2796,11 +3381,13 @@ export class TealscriptEngine {
   }
 
   private executeAssignment(stmt: AssignmentStatement): void {
+    const drawingCount = this.ctx.getDrawingCount();
     const rawValue = this.evaluateVariableInitializer(stmt.right);
     const value = this.unwrapKnownSourceValue(rawValue);
 
     if (stmt.left.type === 'Identifier') {
       const name = stmt.left.name;
+      const persistentTarget = this.scope.getEntry(name)?.kind;
       const currentValue = this.scope.get(name);
 
       const newValue = this.applyAssignmentOperator(currentValue, value, stmt.operator);
@@ -2812,6 +3399,8 @@ export class TealscriptEngine {
           ? this.getSourceSeriesForInitializer(stmt.right, rawValue)
           : undefined,
       );
+      this.markPersistentRuntimeValue(persistentTarget ?? 'none', newValue);
+      this.markPersistentDeclarationDrawings(persistentTarget ?? 'none', drawingCount);
     } else if (stmt.left.type === 'IndexExpression') {
       this.executeIndexAssignment(stmt.left, value, stmt.operator);
     } else {
@@ -2827,7 +3416,12 @@ export class TealscriptEngine {
 
     const fieldName = target.property.name;
     const currentValue = getUdtField(object, fieldName);
-    setUdtField(object, fieldName, this.applyAssignmentOperator(currentValue, value, operator));
+    const nextValue = this.applyAssignmentOperator(currentValue, value, operator);
+    setUdtField(object, fieldName, nextValue);
+    if (object.persistent) {
+      this.markPersistentContainedValue(nextValue);
+      this.markPersistentDrawingHandle(nextValue);
+    }
   }
 
   private executeIndexAssignment(target: IndexExpression, value: unknown, operator: AssignmentStatement['operator']): void {
@@ -2844,6 +3438,45 @@ export class TealscriptEngine {
     const currentValue = this.readArrayElement(array, index);
     const newValue = this.applyAssignmentOperator(currentValue, value, operator);
     this.writeArrayElement(array, index, newValue);
+  }
+
+  private markPersistentRuntimeValue(kind: string, value: unknown): void {
+    if (kind !== 'var' && kind !== 'varip') return;
+    this.markPersistentContainedValue(value);
+  }
+
+  private markPersistentContainedValue(value: unknown, seen = new Set<unknown>()): void {
+    if (!value || typeof value !== 'object') return;
+    if (seen.has(value)) return;
+    seen.add(value);
+    (value as { persistent?: boolean }).persistent = true;
+    if (isPineArray(value)) {
+      for (let index = 0; index < getArraySize(value); index++) {
+        const element = getArrayValue(value, index);
+        this.markPersistentContainedValue(element, seen);
+        this.markPersistentDrawingHandle(element);
+      }
+      return;
+    }
+    if (isPineUdtObject(value)) {
+      for (const fieldValue of value.fields.values()) {
+        this.markPersistentContainedValue(fieldValue, seen);
+        this.markPersistentDrawingHandle(fieldValue);
+      }
+    }
+  }
+
+  private markPersistentArrayDrawing(array: PineArray, value: unknown): void {
+    if (!array.persistent) return;
+    this.markPersistentContainedValue(value);
+    this.markPersistentDrawingHandle(value);
+  }
+
+  private markPersistentDrawingHandle(value: unknown): void {
+    const drawingId = this.toDrawingId(value);
+    if (drawingId) {
+      this.ctx.markDrawingPersistent(drawingId);
+    }
   }
 
   private applyAssignmentOperator(currentValue: unknown, value: unknown, operator: AssignmentStatement['operator']): unknown {
@@ -2903,6 +3536,33 @@ export class TealscriptEngine {
         // else-if
         this.executeIf(stmt.alternate);
       }
+    }
+  }
+
+  private executeOnce(stmt: Extract<Statement, { type: 'OnceStatement' }>): void {
+    const key = `__once_${stmt.loc?.start.offset ?? stmt.loc?.start.line ?? 0}_${stmt.loc?.start.column ?? 0}`;
+    if (!this.scope.has(key)) {
+      this.scope.declare(key, 'var', false);
+    }
+    if (this.scope.get(key) === true) return;
+
+    const condition = stmt.test ? this.evaluateExpression(stmt.test) : true;
+    if (!this.isTruthy(condition)) return;
+
+    this.scope.set(key, true);
+    const childScope = this.scope.createChild();
+    const savedScope = this.scope;
+    this.scope = childScope;
+    this.requestLocalScopeDepth++;
+
+    try {
+      for (const s of stmt.body) {
+        this.executeStatement(s);
+      }
+    } finally {
+      this.requestLocalScopeDepth--;
+      this.scope = savedScope;
+      childScope.promoteNewLocalsTo(savedScope);
     }
   }
 
@@ -3172,6 +3832,8 @@ export class TealscriptEngine {
         return this.ctx.hlc3;
       case 'ohlc4':
         return this.ctx.ohlc4;
+      case 'ta.accdist':
+        return this.updateAccumulationDistribution(this.scope, '_ta_accdist_value');
       case 'ta.obv':
         this.recordLookbackLength(2);
         return this.updateObv(this.ctx.close.get(0)!, this.ctx.close.get(1), this.ctx.volume.get(0)!, this.scope, '_ta_obv_value');
@@ -3199,6 +3861,17 @@ export class TealscriptEngine {
       return entry.series ? entry.series.get(0) : entry.value;
     }
 
+    const legacyInputType = LEGACY_INPUT_TYPE_ALIASES.get(name);
+    if (legacyInputType) return legacyInputType;
+    if (Object.prototype.hasOwnProperty.call(LEGACY_BARE_COLOR_CONSTANTS, name)) {
+      return LEGACY_BARE_COLOR_CONSTANTS[name]!;
+    }
+    if (LEGACY_BARE_VISUAL_CONSTANTS.has(name)) return name;
+    if (name === 'ticker') return this.ctx.syminfo.ticker;
+    if (name === 'tickerid') return this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker;
+    if (name === 'n') return this.ctx.bar_index;
+    if (name === 'tr') return this.builtins.get('ta.tr')?.([], new Map(), this.ctx, this.scope, this.nextBuiltinCallId('ta.tr')) ?? Number.NaN;
+
     throw new Error(`Unknown identifier: ${name}`);
   }
 
@@ -3218,10 +3891,12 @@ export class TealscriptEngine {
     }
 
     const right = this.evaluateExpression(expr.right);
+    const leftValue = this.unwrapKnownSourceValue(left);
+    const rightValue = this.unwrapKnownSourceValue(right);
 
     // Pine comparison operators return false when either operand is an
     // undefined variable. Arithmetic keeps propagating na.
-    if (this.isNa(left) || this.isNa(right)) {
+    if (this.isNa(leftValue) || this.isNa(rightValue)) {
       if (this.isComparisonOperator(expr.operator)) {
         return false;
       }
@@ -3231,32 +3906,32 @@ export class TealscriptEngine {
     switch (expr.operator) {
       // Arithmetic
       case '+':
-        if (typeof left === 'string' || typeof right === 'string') {
-          return `${this.toStringValue(left)}${this.toStringValue(right)}`;
+        if (typeof leftValue === 'string' || typeof rightValue === 'string') {
+          return `${this.toStringValue(leftValue)}${this.toStringValue(rightValue)}`;
         }
-        return (left as number) + (right as number);
+        return (leftValue as number) + (rightValue as number);
       case '-':
-        return (left as number) - (right as number);
+        return (leftValue as number) - (rightValue as number);
       case '*':
-        return (left as number) * (right as number);
+        return (leftValue as number) * (rightValue as number);
       case '/':
-        return (right as number) === 0 ? Number.NaN : (left as number) / (right as number);
+        return (rightValue as number) === 0 ? Number.NaN : (leftValue as number) / (rightValue as number);
       case '%':
-        return (right as number) === 0 ? Number.NaN : (left as number) % (right as number);
+        return (rightValue as number) === 0 ? Number.NaN : (leftValue as number) % (rightValue as number);
 
       // Comparison
       case '==':
-        return left === right;
+        return leftValue === rightValue;
       case '!=':
-        return left !== right;
+        return leftValue !== rightValue;
       case '<':
-        return (left as number) < (right as number);
+        return (leftValue as number) < (rightValue as number);
       case '>':
-        return (left as number) > (right as number);
+        return (leftValue as number) > (rightValue as number);
       case '<=':
-        return (left as number) <= (right as number);
+        return (leftValue as number) <= (rightValue as number);
       case '>=':
-        return (left as number) >= (right as number);
+        return (leftValue as number) >= (rightValue as number);
 
       default:
         throw new Error(`Unknown operator: ${expr.operator}`);
@@ -3335,28 +4010,13 @@ export class TealscriptEngine {
   }
 
   private evaluateCall(expr: CallExpression): unknown {
-    // Get function name (could be identifier or member expression)
-    let funcName: string;
-    let namespace: string | undefined;
-
-    if (expr.callee.type === 'Identifier') {
-      funcName = expr.callee.name;
-    } else if (expr.callee.type === 'MemberExpression') {
-      funcName = expr.callee.property.name;
-      if (expr.callee.object.type === 'Identifier') {
-        namespace = expr.callee.object.name;
-      } else {
-        const memberPath = this.getMemberPath(expr.callee);
-        if (memberPath) {
-          namespace = memberPath.slice(0, -1).join('.');
-        }
-      }
-    } else {
-      throw new Error('Invalid callee type');
-    }
-
-    const fullName = namespace ? `${namespace}.${funcName}` : funcName;
-    const builtinName = this.canonicalBuiltinName(fullName);
+    const {
+      funcName,
+      namespace,
+      fullName,
+      builtinName,
+      hasPositionalArgumentAfterNamed,
+    } = this.getCachedCallMetadata(expr);
 
     if (namespace === 'strategy' && !this.isStrategyOrderFunction(builtinName)) {
       throw new Error(`strategy.* functions are not supported yet: ${builtinName}`);
@@ -3396,14 +4056,17 @@ export class TealscriptEngine {
       this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestEconomic(expr);
     }
+    if (fullName === 'request.quandl') {
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestQuandl(expr);
+    }
     if (fullName === 'request.seed') {
       this.assertCanEvaluateRequest(fullName);
       return this.evaluateRequestSeed(expr, this.nextBuiltinCallId(fullName));
     }
     if (fullName === 'request.footprint') {
-      throw new Error(
-        'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
-      );
+      this.assertCanEvaluateRequest(fullName);
+      return this.evaluateRequestFootprint(expr);
     }
     if (namespace === 'request') {
       throw new Error(`request.* functions are not supported yet: ${fullName}`);
@@ -3413,8 +4076,6 @@ export class TealscriptEngine {
     const args: unknown[] = [];
     const namedArgs = new Map<string, unknown>();
     const sourceBindings: CallSourceBindings = { positional: [], named: new Map() };
-    const hasPositionalArgumentAfterNamed = this.hasPositionalArgumentAfterNamed(expr.arguments);
-
     let preserveSourceFlags = this.callArgPreserveSourceCache.get(expr);
     if (!preserveSourceFlags) {
       preserveSourceFlags = expr.arguments.map((_, i) =>
@@ -3489,6 +4150,18 @@ export class TealscriptEngine {
     }
 
     if (namespace && this.importedLibraries.has(namespace)) {
+      const cached = this.getCachedDirectCallable(expr, namespace, funcName);
+      if (cached?.kind === 'imported') {
+        return this.evaluateImportedFunctionDeclaration(
+          cached.alias,
+          cached.fn,
+          args,
+          namedArgs,
+          hasPositionalArgumentAfterNamed,
+          expr,
+          sourceBindings,
+        );
+      }
       return this.evaluateImportedFunction(namespace, funcName, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
     }
 
@@ -3528,7 +4201,16 @@ export class TealscriptEngine {
           methodSourceBindings,
         );
       }
-      if (isPineArray(receiver) || isPineMatrix(receiver) || isPineMap(receiver)) {
+      if (
+        !this.isSameNamedNamespaceBuiltinCall(expr, namespace, builtinName)
+        && (
+          isPineArray(receiver)
+          || isPineMatrix(receiver)
+          || isPineMap(receiver)
+          || isRequestFootprintData(receiver)
+          || isRequestVolumeRowData(receiver)
+        )
+      ) {
         const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
         const methodBuiltin = this.builtins.get(methodBuiltinName);
         if (methodBuiltin) {
@@ -3545,12 +4227,40 @@ export class TealscriptEngine {
       }
     }
 
+    if (!namespace) {
+      const cached = this.getCachedDirectCallable(expr, namespace, funcName);
+      if (cached?.kind === 'user') {
+        return this.evaluateDirectUserFunction(cached.fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
+      }
+
+      const importedLibrary = this.currentImportedLibrary();
+      const libraryFunction = importedLibrary?.functions.get(funcName);
+      if (importedLibrary && libraryFunction) {
+        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
+      }
+
+      const userFunction = this.userFunctions.get(funcName);
+      if (userFunction) {
+        return this.evaluateDirectUserFunction(userFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
+      }
+    }
+
     if (VARIABLE_ONLY_BUILTIN_NAMES.has(builtinName)) {
       throw new Error(`Unknown function: ${builtinName}`);
     }
 
+    if (
+      fullName === 'color'
+      && (args.length <= 2 || namedArgs.has('color') || namedArgs.has('transp'))
+    ) {
+      return this.builtins.get('color.new')?.(args, namedArgs, this.ctx, this.scope, this.builtinCallId('color.new', expr));
+    }
+
     const builtin = this.builtins.get(builtinName);
     if (builtin) {
+      if (builtinName === 'input' || namespace === 'input') {
+        namedArgs.set('__tealscriptStaticTitle', this.hasStaticInputTitle(expr));
+      }
       return builtin(args, namedArgs, this.ctx, this.scope, this.builtinCallId(builtinName, expr));
     }
 
@@ -3600,7 +4310,7 @@ export class TealscriptEngine {
       }
       const methodBuiltinName = this.getMethodBuiltinName(funcName, receiver);
       const methodBuiltin = this.builtins.get(methodBuiltinName);
-      if (methodBuiltin) {
+      if (methodBuiltin && !this.isSameNamedNamespaceBuiltinCall(expr, namespace, builtinName)) {
         return methodBuiltin([receiver, ...args], namedArgs, this.ctx, this.scope, this.nextBuiltinCallId(methodBuiltinName));
       }
       if (funcName === 'title') {
@@ -3610,30 +4320,6 @@ export class TealscriptEngine {
       if (funcName === 'copy' && isPineUdtObject(receiver)) {
         this.assertNoArguments('copy', args, namedArgs);
         return copyUdtObject(receiver);
-      }
-    }
-
-    if (!namespace) {
-      const importedLibrary = this.currentImportedLibrary();
-      const libraryFunction = importedLibrary?.functions.get(funcName);
-      if (importedLibrary && libraryFunction) {
-        return this.evaluateImportedLibraryFunction(importedLibrary, libraryFunction, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
-      }
-
-      const userFunction = this.userFunctions.get(funcName);
-      if (userFunction) {
-        const recursionKey = this.userCallableScopeKey(userFunction);
-        const scopeKey = this.callSiteFunctionScopeKey(userFunction, expr);
-        return this.evaluateUserFunction(
-          userFunction,
-          args,
-          namedArgs,
-          `function ${userFunction.name.name}`,
-          scopeKey,
-          recursionKey,
-          hasPositionalArgumentAfterNamed,
-          sourceBindings,
-        );
       }
     }
 
@@ -3652,6 +4338,51 @@ export class TealscriptEngine {
     );
   }
 
+  private getCachedCallMetadata(expr: CallExpression): CachedCallMetadata {
+    const cached = this.callMetadataCache.get(expr);
+    if (cached) return cached;
+
+    let funcName: string;
+    let namespace: string | undefined;
+
+    if (expr.callee.type === 'Identifier') {
+      funcName = expr.callee.name;
+    } else if (expr.callee.type === 'MemberExpression') {
+      funcName = expr.callee.property.name;
+      if (expr.callee.object.type === 'Identifier') {
+        namespace = expr.callee.object.name;
+      } else {
+        const memberPath = this.getMemberPath(expr.callee);
+        if (memberPath) {
+          namespace = memberPath.slice(0, -1).join('.');
+        }
+      }
+    } else {
+      throw new Error('Invalid callee type');
+    }
+
+    const fullName = namespace ? `${namespace}.${funcName}` : funcName;
+    const metadata: CachedCallMetadata = {
+      funcName,
+      namespace,
+      fullName,
+      builtinName: this.canonicalBuiltinName(fullName),
+      hasPositionalArgumentAfterNamed: this.hasPositionalArgumentAfterNamed(expr.arguments),
+    };
+    this.callMetadataCache.set(expr, metadata);
+    return metadata;
+  }
+
+  private isSameNamedNamespaceBuiltinCall(
+    expr: CallExpression,
+    namespace: string | undefined,
+    builtinName: string,
+  ): boolean {
+    if (!namespace || !this.builtins.has(builtinName)) return false;
+    const firstArg = expr.arguments[0]?.value;
+    return firstArg?.type === 'Identifier' && firstArg.name === namespace;
+  }
+
   private hasPositionalArgumentAfterNamed(args: CallArgument[]): boolean {
     let hasNamedArgument = false;
     for (const arg of args) {
@@ -3666,9 +4397,10 @@ export class TealscriptEngine {
 
   private shouldPreserveBuiltinSourceArgument(fullName: string, args: CallArgument[], argIndex: number): boolean {
     const builtinName = this.canonicalBuiltinName(fullName);
-    if (builtinName !== 'input.source' && builtinName !== 'math.sum' && !builtinName.startsWith('ta.')) return false;
+    if (builtinName !== 'input' && builtinName !== 'input.source' && builtinName !== 'math.sum' && !builtinName.startsWith('ta.')) return false;
 
     const parameterName = this.getBuiltinSourceArgumentParameterName(builtinName, args, argIndex);
+    if (builtinName === 'input') return parameterName === 'defval';
     if (builtinName === 'input.source') return parameterName === 'defval';
     return parameterName !== undefined && ['source', 'series', 'source1', 'source2', 'high', 'low'].includes(parameterName);
   }
@@ -3703,6 +4435,7 @@ export class TealscriptEngine {
     switch (builtinName) {
       case 'math.sum':
         return ['source', 'length'];
+      case 'input':
       case 'input.source':
         return ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'];
       case 'ta.cross':
@@ -3926,20 +4659,34 @@ export class TealscriptEngine {
   }
 
   private userCallableScopeKey(fn: FunctionDeclaration): string {
-    if (!fn.isMethod) return fn.name.name;
+    const cached = this.userCallableScopeKeyCache.get(fn);
+    if (cached !== undefined) return cached;
+
+    if (!fn.isMethod) {
+      this.userCallableScopeKeyCache.set(fn, fn.name.name);
+      return fn.name.name;
+    }
 
     const locKey = fn.loc
       ? `${fn.loc.start.line}:${fn.loc.start.column}-${fn.loc.end.line}:${fn.loc.end.column}`
       : `${fn.params.map((param) => param.typeAnnotation?.baseType ?? 'any').join(',')}#${fn.params.length}`;
-    return `method:${fn.name.name}:${locKey}`;
+    const key = `method:${fn.name.name}:${locKey}`;
+    this.userCallableScopeKeyCache.set(fn, key);
+    return key;
   }
 
   private callSiteFunctionScopeKey(fn: FunctionDeclaration, expr: CallExpression): string {
     const declarationKey = this.userCallableScopeKey(fn);
-    return `${declarationKey}${this.callSiteScopeSuffix(expr)}`;
+    const callerScopeKey = this.activeFunctionScopeKeys[this.activeFunctionScopeKeys.length - 1];
+    const callKey = `${declarationKey}${this.callSiteScopeSuffix(expr)}`;
+    return callerScopeKey ? `${callerScopeKey}>>${callKey}` : callKey;
   }
 
   private callSiteScopeSuffix(expr: CallExpression): string {
+    const cached = this.callSiteScopeSuffixes.get(expr);
+    if (cached !== undefined) return cached;
+
+    let suffix: string;
     if (!expr.loc) {
       const existing = this.callExpressionIds.get(expr);
       if (existing !== undefined) {
@@ -3948,21 +4695,50 @@ export class TealscriptEngine {
 
       const id = this.nextCallExpressionId++;
       this.callExpressionIds.set(expr, id);
-      return `@call:expr:${id}`;
+      suffix = `@call:expr:${id}`;
+    } else {
+      suffix = `@call:${expr.loc.start.line}:${expr.loc.start.column}-${expr.loc.end.line}:${expr.loc.end.column}`;
     }
 
-    return `@call:${expr.loc.start.line}:${expr.loc.start.column}-${expr.loc.end.line}:${expr.loc.end.column}`;
+    this.callSiteScopeSuffixes.set(expr, suffix);
+    return suffix;
+  }
+
+  private hasStaticInputTitle(expr: CallExpression): boolean {
+    const namedTitle = expr.arguments.find((arg) => arg.name?.name === 'title');
+    if (namedTitle) return namedTitle.value.type === 'StringLiteral';
+
+    let positionalIndex = 0;
+    for (const arg of expr.arguments) {
+      if (arg.name) continue;
+      if (positionalIndex === 1) return arg.value.type === 'StringLiteral';
+      positionalIndex++;
+    }
+
+    return true;
   }
 
   private importedFunctionScopeKey(alias: string, fn: FunctionDeclaration): string {
+    let aliasCache = this.importedFunctionScopeKeyCache.get(alias);
+    if (!aliasCache) {
+      aliasCache = new WeakMap();
+      this.importedFunctionScopeKeyCache.set(alias, aliasCache);
+    }
+    const cached = aliasCache.get(fn);
+    if (cached !== undefined) return cached;
+
     const locKey = fn.loc
       ? `${fn.loc.start.line}:${fn.loc.start.column}-${fn.loc.end.line}:${fn.loc.end.column}`
       : fn.name.name;
-    return `import:${alias}:${fn.name.name}:${locKey}`;
+    const key = `import:${alias}:${fn.name.name}:${locKey}`;
+    aliasCache.set(fn, key);
+    return key;
   }
 
   private importedCallSiteFunctionScopeKey(alias: string, fn: FunctionDeclaration, expr: CallExpression): string {
-    return `${this.importedFunctionScopeKey(alias, fn)}${this.callSiteScopeSuffix(expr)}`;
+    const callKey = `${this.importedFunctionScopeKey(alias, fn)}${this.callSiteScopeSuffix(expr)}`;
+    const callerScopeKey = this.activeFunctionScopeKeys[this.activeFunctionScopeKeys.length - 1];
+    return callerScopeKey ? `${callerScopeKey}>>${callKey}` : callKey;
   }
 
   private evaluateImportedFunction(
@@ -3980,6 +4756,74 @@ export class TealscriptEngine {
       throw new Error(`Unknown library function: ${alias}.${functionName}`);
     }
     return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
+  }
+
+  private evaluateImportedFunctionDeclaration(
+    alias: string,
+    fn: FunctionDeclaration,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    hasPositionalArgumentAfterNamed = false,
+    expr?: CallExpression,
+    sourceBindings?: CallSourceBindings,
+  ): unknown {
+    const library = this.importedLibraries.get(alias);
+    if (!library || library.functions.get(fn.name.name) !== fn || !library.exportedFunctions.has(fn.name.name)) {
+      throw new Error(`Unknown library function: ${alias}.${fn.name.name}`);
+    }
+    return this.evaluateImportedLibraryFunction(library, fn, args, namedArgs, hasPositionalArgumentAfterNamed, expr, sourceBindings);
+  }
+
+  private evaluateDirectUserFunction(
+    fn: FunctionDeclaration,
+    args: unknown[],
+    namedArgs: Map<string, unknown>,
+    hasPositionalArgumentAfterNamed: boolean,
+    expr: CallExpression,
+    sourceBindings: CallSourceBindings,
+  ): unknown {
+    const recursionKey = this.userCallableScopeKey(fn);
+    const scopeKey = this.callSiteFunctionScopeKey(fn, expr);
+    return this.evaluateUserFunction(
+      fn,
+      args,
+      namedArgs,
+      `function ${fn.name.name}`,
+      scopeKey,
+      recursionKey,
+      hasPositionalArgumentAfterNamed,
+      sourceBindings,
+    );
+  }
+
+  private getCachedDirectCallable(
+    expr: CallExpression,
+    namespace: string | undefined,
+    functionName: string,
+  ): CachedDirectCallable | undefined {
+    const cached = this.directCallableCache.get(expr);
+    if (cached) return cached;
+
+    if (namespace) {
+      const library = this.importedLibraries.get(namespace);
+      const fn = library?.functions.get(functionName);
+      if (library && fn && library.exportedFunctions.has(functionName)) {
+        const resolution: CachedDirectCallable = { kind: 'imported', alias: namespace, fn };
+        this.directCallableCache.set(expr, resolution);
+        return resolution;
+      }
+      return undefined;
+    }
+
+    if (this.currentImportedLibrary()) return undefined;
+
+    const fn = this.userFunctions.get(functionName);
+    if (fn) {
+      const resolution: CachedDirectCallable = { kind: 'user', fn };
+      this.directCallableCache.set(expr, resolution);
+      return resolution;
+    }
+    return undefined;
   }
 
   private currentImportedLibrary(): ImportedLibrary | undefined {
@@ -4236,6 +5080,10 @@ export class TealscriptEngine {
     }
   }
 
+  private isInvalidOrUnavailableRequestContext(code: RequestDatafeedErrorCode): boolean {
+    return code === 'invalid_symbol' || code === 'missing_context' || code === 'unsupported_context';
+  }
+
   private evaluateRequestSecurity(expr: CallExpression, callId: string): unknown {
     const symbolArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 0);
     const timeframeArg = this.getOrderedCallArgument(expr, REQUEST_SECURITY_ARGS, 1);
@@ -4264,7 +5112,7 @@ export class TealscriptEngine {
 
     const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount, currency });
     if (!result.ok) {
-      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+      if (ignoreInvalidSymbol && this.isInvalidOrUnavailableRequestContext(result.code)) {
         if (expressionArg.value.type === 'ArrayExpression') {
           const arity = (expressionArg.value as Expression & { elements: Expression[] }).elements.length;
           return Array<number>(arity).fill(Number.NaN);
@@ -4285,15 +5133,31 @@ export class TealscriptEngine {
     }
 
     const merged = this.mergeRequestedValue(cached.bars, cached.values, gaps, lookahead);
-    // When the expression is an array literal [e1, e2, ...] and no HTF bar has
-    // aligned yet, mergeRequestedValue returns NaN. Return [NaN, ...] instead so
-    // tuple destructuring (e.g. [o, h, l, c] = request.security(...)) works on
-    // every chart bar, not just those where an HTF bar has confirmed.
-    if (Number.isNaN(merged as number) && expressionArg.value.type === 'ArrayExpression') {
-      const arity = (expressionArg.value as Expression & { elements: Expression[] }).elements.length;
-      return Array<number>(arity).fill(Number.NaN);
+    // When a tuple-producing request has no aligned HTF bar yet,
+    // mergeRequestedValue returns scalar NaN. Return [NaN, ...] instead so
+    // tuple destructuring works on every chart bar, including UDFs that wrap the
+    // tuple expression.
+    if (typeof merged === 'number' && Number.isNaN(merged)) {
+      const arity = this.requestTupleArity(expressionArg.value, cached.values);
+      if (arity !== null) {
+        return Array<number>(arity).fill(Number.NaN);
+      }
     }
     return merged;
+  }
+
+  private requestTupleArity(expression: Expression, requestedValues: unknown[]): number | null {
+    if (expression.type === 'ArrayExpression') {
+      return expression.elements.length;
+    }
+
+    for (const value of requestedValues) {
+      if (Array.isArray(value)) {
+        return value.length;
+      }
+    }
+
+    return null;
   }
 
   private evaluateRequestSecurityLowerTf(expr: CallExpression, callId: string): PineArray {
@@ -4328,7 +5192,7 @@ export class TealscriptEngine {
 
     const result = this.requestDatafeed.getBars({ symbol, timeframe, calcBarsCount, currency });
     if (!result.ok) {
-      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+      if (ignoreInvalidSymbol && this.isInvalidOrUnavailableRequestContext(result.code)) {
         return createPineArray();
       }
       if (ignoreInvalidTimeframe && result.code === 'invalid_timeframe') {
@@ -4371,18 +5235,28 @@ export class TealscriptEngine {
     if (fromCurrency === toCurrency) {
       return 1;
     }
-    if (!this.requestDatafeed?.getSeries) {
-      throw new Error('request.currency_rate requires a request series datafeed');
-    }
 
     const key = currencyRateRequestKey(fromCurrency, toCurrency);
     this.trackRequestContext(`request.currency_rate\u0000${key}`);
+    const rate = this.requestDatafeed?.getCurrencyRate?.({
+      baseCurrency: fromCurrency,
+      quoteCurrency: toCurrency,
+      time: this.ctx.time.get(0) ?? Number.NaN,
+    });
+    if (rate !== undefined) {
+      return rate;
+    }
+
+    if (!this.requestDatafeed?.getSeries) {
+      return Number.NaN;
+    }
+
     const result = this.requestDatafeed.getSeries({ family: 'currency_rate', key });
     if (!result.ok) {
       if (ignoreInvalidCurrency && (result.code === 'invalid_currency' || result.code === 'missing_context')) {
         return Number.NaN;
       }
-      throw new Error(`request.currency_rate failed: ${result.message}`);
+      return Number.NaN;
     }
 
     return this.mergeRequestSeriesValue(result.context.points);
@@ -4400,20 +5274,36 @@ export class TealscriptEngine {
     const lookahead = this.normalizeBarmergeLookahead(
       this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 3) ?? 'barmerge.lookahead_off',
     );
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 4) ?? false);
+    this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 4);
     const currency = supportsCurrency
       ? this.normalizeOptionalRequestCurrency(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_SERIES_ARGS, 5))
       : undefined;
     const key = corporateActionRequestKey(ticker, field, currency);
-
-    return this.evaluateRequestPointSeries({
-      family,
-      key,
-      functionName: `request.${family}`,
-      gaps,
-      lookahead,
-      ignoreInvalid: ignoreInvalidSymbol,
+    const providerEvent = this.requestDatafeed?.getCorporateAction?.({
+      kind: family,
+      ticker,
+      currency,
+      time: this.ctx.time.get(0) ?? Number.NaN,
     });
+    if (providerEvent !== undefined) {
+      this.trackRequestContext(`request.${family}\u0000${key}`);
+      if (gaps === 'barmerge.gaps_on' && providerEvent.time !== this.ctx.time.get(0)) {
+        return Number.NaN;
+      }
+      return selectCorporateActionField(providerEvent.value, field) ?? Number.NaN;
+    }
+
+    this.trackRequestContext(`request.${family}\u0000${key}`);
+    if (!this.requestDatafeed?.getSeries) {
+      return Number.NaN;
+    }
+
+    const result = this.requestDatafeed.getSeries({ family, key });
+    if (!result.ok) {
+      return Number.NaN;
+    }
+
+    return this.mergeRequestSeriesValue(result.context.points, gaps, lookahead);
   }
 
   private evaluateRequestFinancial(expr: CallExpression): unknown {
@@ -4428,17 +5318,35 @@ export class TealscriptEngine {
     const financialId = this.toStringValue(this.evaluateExpression(financialIdArg.value)).trim();
     const period = this.toStringValue(this.evaluateExpression(periodArg.value)).trim().toUpperCase();
     const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 3) ?? 'barmerge.gaps_off');
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 4) ?? false);
+    this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 4);
     const currency = this.normalizeOptionalRequestCurrency(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FINANCIAL_ARGS, 5));
-
-    return this.evaluateRequestPointSeries({
-      family: 'financial',
-      key: financialRequestKey(symbol, financialId, period, currency),
-      functionName: 'request.financial',
-      gaps,
-      lookahead: 'barmerge.lookahead_off',
-      ignoreInvalid: ignoreInvalidSymbol,
+    const key = financialRequestKey(symbol, financialId, period, currency);
+    const providerPoint = this.requestDatafeed?.getFinancialMetric?.({
+      symbol,
+      financialId,
+      period,
+      currency,
+      time: this.ctx.time.get(0) ?? Number.NaN,
     });
+    if (providerPoint !== undefined) {
+      this.trackRequestContext(`request.financial\u0000${key}`);
+      if (gaps === 'barmerge.gaps_on' && providerPoint.time !== this.ctx.time.get(0)) {
+        return Number.NaN;
+      }
+      return providerPoint.value;
+    }
+
+    this.trackRequestContext(`request.financial\u0000${key}`);
+    if (!this.requestDatafeed?.getSeries) {
+      return Number.NaN;
+    }
+
+    const result = this.requestDatafeed.getSeries({ family: 'financial', key });
+    if (!result.ok) {
+      return Number.NaN;
+    }
+
+    return this.mergeRequestSeriesValue(result.context.points, gaps, 'barmerge.lookahead_off');
   }
 
   private evaluateRequestEconomic(expr: CallExpression): unknown {
@@ -4451,16 +5359,99 @@ export class TealscriptEngine {
     const countryCode = this.toStringValue(this.evaluateExpression(countryCodeArg.value)).trim().toUpperCase();
     const field = this.toStringValue(this.evaluateExpression(fieldArg.value)).trim();
     const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 2) ?? 'barmerge.gaps_off');
-    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 3) ?? false);
-
-    return this.evaluateRequestPointSeries({
-      family: 'economic',
-      key: economicRequestKey(countryCode, field),
-      functionName: 'request.economic',
-      gaps,
-      lookahead: 'barmerge.lookahead_off',
-      ignoreInvalid: ignoreInvalidSymbol,
+    this.evaluateOptionalOrderedCallArgument(expr, REQUEST_ECONOMIC_ARGS, 3);
+    const providerValue = this.requestDatafeed?.getEconomicSeries?.({
+      countryCode,
+      field,
+      time: this.ctx.time.get(0) ?? Number.NaN,
     });
+    if (providerValue !== undefined) {
+      this.trackRequestContext(`request.economic\u0000${economicRequestKey(countryCode, field)}`);
+      return providerValue;
+    }
+
+    const key = economicRequestKey(countryCode, field);
+    this.trackRequestContext(`request.economic\u0000${key}`);
+    if (!this.requestDatafeed?.getSeries) {
+      return Number.NaN;
+    }
+
+    const result = this.requestDatafeed.getSeries({ family: 'economic', key });
+    if (!result.ok) {
+      return Number.NaN;
+    }
+
+    return this.mergeRequestSeriesValue(result.context.points, gaps, 'barmerge.lookahead_off');
+  }
+
+  private evaluateRequestQuandl(expr: CallExpression): unknown {
+    const tickerArg = this.getOrderedCallArgument(expr, REQUEST_QUANDL_ARGS, 0);
+    if (!tickerArg) {
+      throw new Error('request.quandl requires a ticker argument');
+    }
+
+    const ticker = this.toStringValue(this.evaluateExpression(tickerArg.value)).trim();
+    const gaps = this.normalizeBarmergeGaps(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_QUANDL_ARGS, 1) ?? 'barmerge.gaps_off');
+    const columnValue = this.evaluateOptionalOrderedCallArgument(expr, REQUEST_QUANDL_ARGS, 2) ?? 0;
+    const column = Math.trunc(this.toNumber(columnValue));
+    const ignoreInvalidSymbol = this.isTruthy(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_QUANDL_ARGS, 3) ?? false);
+    const key = quandlRequestKey(ticker, column);
+    const providerPoint = Number.isFinite(column)
+      ? this.requestDatafeed?.getQuandlSeries?.({
+        ticker,
+        column,
+        time: this.ctx.time.get(0) ?? Number.NaN,
+      })
+      : undefined;
+    if (providerPoint !== undefined) {
+      this.trackRequestContext(`request.quandl\u0000${key}`);
+      if (gaps === 'barmerge.gaps_on' && providerPoint.time !== this.ctx.time.get(0)) {
+        return Number.NaN;
+      }
+      return providerPoint.value;
+    }
+
+    this.trackRequestContext(`request.quandl\u0000${key}`);
+    if (!this.requestDatafeed?.getSeries) {
+      return Number.NaN;
+    }
+
+    const result = this.requestDatafeed.getSeries({ family: 'quandl', key });
+    if (!result.ok) {
+      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+        return Number.NaN;
+      }
+      return Number.NaN;
+    }
+
+    return this.mergeRequestSeriesValue(result.context.points, gaps, 'barmerge.lookahead_off');
+  }
+
+  private evaluateRequestFootprint(expr: CallExpression): unknown {
+    const ticksPerRowArg = this.getOrderedCallArgument(expr, REQUEST_FOOTPRINT_ARGS, 0);
+    const valueAreaArg = this.getOrderedCallArgument(expr, REQUEST_FOOTPRINT_ARGS, 1);
+    if (!ticksPerRowArg || !valueAreaArg) {
+      throw new Error('request.footprint requires ticks_per_row and va_percent arguments');
+    }
+
+    const ticksPerRow = Math.trunc(this.toNumber(this.evaluateExpression(ticksPerRowArg.value)));
+    const valueAreaPercent = this.toNumber(this.evaluateExpression(valueAreaArg.value));
+    const imbalancePercent = this.toNumber(this.evaluateOptionalOrderedCallArgument(expr, REQUEST_FOOTPRINT_ARGS, 2) ?? 300);
+    if (!Number.isFinite(ticksPerRow) || ticksPerRow <= 0 || !Number.isFinite(valueAreaPercent) || !Number.isFinite(imbalancePercent)) {
+      return Number.NaN;
+    }
+
+    const symbol = this.ctx.syminfo.tickerid || this.ctx.syminfo.ticker || '';
+    const timeframe = this.ctx.timeframe.period || '';
+    this.trackRequestContext(`request.footprint\u0000${footprintRequestKey(symbol, timeframe, ticksPerRow, valueAreaPercent, imbalancePercent)}`);
+    return this.requestDatafeed?.getFootprint?.({
+      symbol,
+      timeframe,
+      ticksPerRow,
+      valueAreaPercent,
+      imbalancePercent,
+      time: this.ctx.time.get(0) ?? Number.NaN,
+    }) ?? Number.NaN;
   }
 
   private evaluateRequestSeed(expr: CallExpression, callId: string): unknown {
@@ -4488,7 +5479,7 @@ export class TealscriptEngine {
 
     const result = this.requestDatafeed.getBars({ symbol: requestSymbol, timeframe, calcBarsCount });
     if (!result.ok) {
-      if (ignoreInvalidSymbol && (result.code === 'invalid_symbol' || result.code === 'missing_context')) {
+      if (ignoreInvalidSymbol && this.isInvalidOrUnavailableRequestContext(result.code)) {
         return Number.NaN;
       }
       throw new Error(`request.seed failed: ${result.message}`);
@@ -4633,9 +5624,9 @@ export class TealscriptEngine {
 
   private trackRequestContext(key: string): void {
     this.requestContextKeys.add(key);
-    if (this.requestContextKeys.size > TealscriptEngine.MAX_UNIQUE_REQUEST_CONTEXTS) {
+    if (this.requestContextKeys.size > TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS) {
       throw new Error(
-        `Too many unique request.* contexts: maximum is ${TealscriptEngine.MAX_UNIQUE_REQUEST_CONTEXTS}`,
+        `Too many unique request.* contexts: maximum is ${TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS}`,
       );
     }
   }
@@ -4689,6 +5680,7 @@ export class TealscriptEngine {
     }
     engine.ctx.timeframe = timeframeInfo;
     engine.ctx.loadBars(requestContext.bars);
+    engine.typeDeclarations = new Map(this.typeDeclarations);
     engine.enumValues = new Map(Array.from(this.enumValues, ([name, values]) => [name, new Map(values)]));
     engine.enumTitles = new Map(this.enumTitles);
     engine.userFunctions = new Map(this.userFunctions);
@@ -4715,14 +5707,44 @@ export class TealscriptEngine {
     }
     engine.registerCallableCallSites(expression);
 
+    const requestGlobalStatements = this.collectRequestGlobalDependencies(expression);
+    const requestGlobalStatementSet = new Set<Statement>(requestGlobalStatements);
+    const requestLocalCandidates = this.activeRequestLocalStatements
+      ?.filter((stmt) => this.isRequestReplayableLocalStatement(stmt) && !requestGlobalStatementSet.has(stmt)) ?? [];
+    const requestLocalStatements = this.collectRequestLocalDependencies(expression, requestLocalCandidates);
+    const requestLocalNames = new Set<string>();
+    for (const stmt of [...requestGlobalStatements, ...requestLocalStatements]) {
+      if (stmt.type !== 'VariableDeclaration') continue;
+      if (stmt.names.type === 'VariableDeclarator') {
+        requestLocalNames.add(stmt.names.name.name);
+      } else {
+        for (const name of stmt.names.names) {
+          if (name.name !== '_') requestLocalNames.add(name.name);
+        }
+      }
+    }
+    const requestSourceBindings: { name: string; series: SeriesAccessor }[] = [];
+
     // Seed the sub-engine scope with scalar values from the outer scope so
     // that simple variables (e.g. rsiLength = input.int(14)) are visible
-    // when the expression references them by name. Use 'var' kind so the
-    // values survive advanceBar() across the sub-engine's bar loop.
+    // when the expression references them by name.
     for (const name of this.scope.getAllNames()) {
+      if (this.isInternalRuntimeStateName(name)) continue;
+      if (requestLocalNames.has(name)) continue;
       const value = this.scope.get(name);
-      if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
-        engine.scope.declare(name, 'var', value);
+      const sourceSeries = this.scope.getSourceSeries(name);
+      const requestSourceSeries = sourceSeries
+        ? this.remapRequestSourceSeries(sourceSeries, engine.ctx)
+        : undefined;
+      if (requestSourceSeries) {
+        engine.scope.declare(name, 'none', requestSourceSeries.get(0), undefined, requestSourceSeries);
+        requestSourceBindings.push({ name, series: requestSourceSeries });
+        continue;
+      }
+
+      const captured = this.cloneRequestCapturedValue(value);
+      if (captured.captured) {
+        engine.scope.declare(name, 'var', captured.value);
       }
     }
 
@@ -4731,6 +5753,15 @@ export class TealscriptEngine {
       engine.scope.advanceBar();
       engine.forEachFunctionRuntimeScope((scope) => scope.advanceBar());
       engine.resetPerBarBuiltinState();
+      for (const binding of requestSourceBindings) {
+        engine.scope.set(binding.name, binding.series.get(0), binding.series);
+      }
+      for (const stmt of requestGlobalStatements) {
+        engine.executeTopLevelStatement(stmt);
+      }
+      for (const stmt of requestLocalStatements) {
+        engine.executeFunctionStatement(stmt);
+      }
       values.push(engine.evaluateExpression(expression));
       const isLastBar = engine.ctx.bar_index === engine.ctx.last_bar_index;
       engine.scope.commit(isLastBar);
@@ -4739,6 +5770,432 @@ export class TealscriptEngine {
     }
 
     return values;
+  }
+
+  private isInternalRuntimeStateName(name: string): boolean {
+    return name.startsWith('_ta_');
+  }
+
+  private collectRequestGlobalDependencies(expression: Expression): VariableDeclaration[] {
+    const cached = this.requestGlobalDependencyCache.get(expression);
+    if (cached) return cached;
+
+    const program = this.currentProgram;
+    if (!program) {
+      this.requestGlobalDependencyCache.set(expression, []);
+      return [];
+    }
+    const ownerIndex = program.body.findIndex((stmt) => this.nodeContainsExact(stmt, expression));
+    const candidates = program.body.slice(0, ownerIndex === -1 ? program.body.length : ownerIndex)
+      .filter((stmt): stmt is VariableDeclaration => this.isRequestReplayableGlobalStatement(stmt));
+    if (candidates.length === 0) {
+      this.requestGlobalDependencyCache.set(expression, []);
+      return [];
+    }
+
+    const functionDecls = new Map<string, FunctionDeclaration>();
+    for (const stmt of program.body) {
+      if (stmt.type === 'FunctionDeclaration') functionDecls.set(stmt.name.name, stmt);
+    }
+
+    const needed = this.collectExpressionReferences(expression);
+    const expandedFunctions = new Set<string>();
+    const included = new Set<VariableDeclaration>();
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const name of Array.from(needed)) {
+        if (expandedFunctions.has(name)) continue;
+        const fn = functionDecls.get(name);
+        if (!fn) continue;
+        expandedFunctions.add(name);
+        for (const reference of this.collectFunctionBodyReferences(fn)) {
+          if (!needed.has(reference)) {
+            needed.add(reference);
+            changed = true;
+          }
+        }
+      }
+      for (const stmt of candidates) {
+        if (included.has(stmt)) continue;
+        if (!this.variableDeclarationNames(stmt).some((name) => needed.has(name))) continue;
+        included.add(stmt);
+        for (const reference of this.collectStatementReferences(stmt)) {
+          if (!needed.has(reference)) {
+            needed.add(reference);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    const selected = this.excludeRequestInvariantDependencies(candidates.filter((stmt) => included.has(stmt)));
+    this.requestGlobalDependencyCache.set(expression, selected);
+    return selected;
+  }
+
+  private collectRequestLocalDependencies(expression: Expression, candidates: Statement[]): Statement[] {
+    if (candidates.length === 0) return [];
+    const cached = this.requestLocalDependencyCache.get(expression);
+    const lastCandidate = candidates.at(-1);
+    if (
+      cached
+      && cached.candidateCount === candidates.length
+      && cached.lastCandidate === lastCandidate
+    ) {
+      return cached.selected;
+    }
+
+    const functionDecls = new Map<string, FunctionDeclaration>();
+    for (const stmt of this.currentProgram?.body ?? []) {
+      if (stmt.type === 'FunctionDeclaration') functionDecls.set(stmt.name.name, stmt);
+    }
+
+    const needed = this.collectExpressionReferences(expression);
+    const expandedFunctions = new Set<string>();
+    const included = new Set<Statement>();
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const name of Array.from(needed)) {
+        if (expandedFunctions.has(name)) continue;
+        const fn = functionDecls.get(name);
+        if (!fn) continue;
+        expandedFunctions.add(name);
+        for (const reference of this.collectFunctionBodyReferences(fn)) {
+          if (!needed.has(reference)) {
+            needed.add(reference);
+            changed = true;
+          }
+        }
+      }
+      for (const stmt of candidates) {
+        if (included.has(stmt)) continue;
+        if (!this.variableDeclarationNames(stmt).some((name) => needed.has(name))) continue;
+        included.add(stmt);
+        for (const reference of this.collectStatementReferences(stmt)) {
+          if (!needed.has(reference)) {
+            needed.add(reference);
+            changed = true;
+          }
+        }
+      }
+    }
+
+    const selected = this.excludeRequestInvariantDependencies(candidates.filter((stmt) => included.has(stmt)));
+    this.requestLocalDependencyCache.set(expression, {
+      candidateCount: candidates.length,
+      lastCandidate,
+      selected,
+    });
+    return selected;
+  }
+
+  private excludeRequestInvariantDependencies<T extends Statement>(statements: T[]): T[] {
+    if (statements.length === 0) return statements;
+    const invariantNames = new Set<string>();
+    const selected: T[] = [];
+    for (const stmt of statements) {
+      if (this.isRequestContextInvariantDeclaration(stmt, invariantNames)) {
+        for (const name of this.variableDeclarationNames(stmt)) invariantNames.add(name);
+      } else {
+        selected.push(stmt);
+      }
+    }
+    return selected;
+  }
+
+  private isRequestContextInvariantDeclaration(stmt: Statement, invariantNames: Set<string>): boolean {
+    return stmt.type === 'VariableDeclaration'
+      && stmt.kind === 'none'
+      && stmt.init.type !== 'IfStatement'
+      && this.isRequestContextInvariantExpression(stmt.init, invariantNames);
+  }
+
+  private isRequestContextInvariantExpression(expr: Expression, invariantNames: Set<string>): boolean {
+    switch (expr.type) {
+      case 'NumericLiteral':
+      case 'StringLiteral':
+      case 'BooleanLiteral':
+      case 'ColorLiteral':
+      case 'NaExpression':
+        return true;
+      case 'Identifier':
+        return invariantNames.has(expr.name) || this.isRequestInvariantConstantName(expr.name);
+      case 'MemberExpression': {
+        const objectName = this.expressionFullName(expr.object);
+        return objectName !== null && this.isRequestInvariantNamespace(objectName);
+      }
+      case 'UnaryExpression':
+        return this.isRequestContextInvariantExpression(expr.argument, invariantNames);
+      case 'BinaryExpression':
+        return this.isRequestContextInvariantExpression(expr.left, invariantNames)
+          && this.isRequestContextInvariantExpression(expr.right, invariantNames);
+      case 'ConditionalExpression':
+        return this.isRequestContextInvariantExpression(expr.test, invariantNames)
+          && this.isRequestContextInvariantExpression(expr.consequent, invariantNames)
+          && this.isRequestContextInvariantExpression(expr.alternate, invariantNames);
+      case 'ArrayExpression':
+        return expr.elements.every((element) => this.isRequestContextInvariantExpression(element, invariantNames));
+      case 'CallExpression':
+        return this.isRequestInvariantCall(expr, invariantNames);
+      default:
+        return false;
+    }
+  }
+
+  private isRequestInvariantCall(expr: CallExpression, invariantNames: Set<string>): boolean {
+    const fullName = this.expressionFullName(expr.callee);
+    if (!fullName || !this.isRequestInvariantCallName(fullName)) return false;
+    return expr.arguments.every((arg) => this.isRequestContextInvariantExpression(arg.value, invariantNames));
+  }
+
+  private isRequestInvariantCallName(name: string): boolean {
+    // `input.source()` and legacy generic `input(..., type=input.source)`
+    // return source-series values that must remap to the requested symbol.
+    // Keep them replayed in requested context; only scalar configuration input
+    // helpers are safe to capture from the chart context once.
+    return name === 'input.bool'
+      || name === 'input.color'
+      || name === 'input.float'
+      || name === 'input.int'
+      || name === 'input.price'
+      || name === 'input.session'
+      || name === 'input.string'
+      || name === 'input.symbol'
+      || name === 'input.text_area'
+      || name === 'input.time'
+      || name === 'input.timeframe'
+      || name === 'float'
+      || name === 'int'
+      || name === 'bool'
+      || name === 'string'
+      || name === 'str.tostring'
+      || name === 'string.tostring'
+      || name === 'timestamp'
+      || name.startsWith('math.')
+      || name.startsWith('color.');
+  }
+
+  private isRequestInvariantNamespace(name: string): boolean {
+    return name === 'color'
+      || name === 'display'
+      || name === 'format'
+      || name === 'scale'
+      || name === 'location'
+      || name === 'shape'
+      || name === 'size'
+      || name === 'line'
+      || name === 'label'
+      || name === 'box'
+      || name === 'table'
+      || name === 'plot'
+      || name === 'hline'
+      || name === 'barmerge';
+  }
+
+  private isRequestInvariantConstantName(name: string): boolean {
+    return name === 'na';
+  }
+
+  private isRequestReplayableGlobalStatement(stmt: Statement): stmt is VariableDeclaration {
+    if (stmt.type !== 'VariableDeclaration') return false;
+    // Dependency-selected `var`/`varip` globals get an independent requested-
+    // context state, just like regular globals. Only declarations that perform a
+    // request or depend on block execution are excluded from replay.
+    if (stmt.init.type === 'IfStatement') return false;
+    if (this.nodeContainsRequestCall(stmt.init)) return false;
+    return true;
+  }
+
+  private collectFunctionBodyReferences(fn: FunctionDeclaration): Set<string> {
+    const references = new Set<string>();
+    if (Array.isArray(fn.body)) {
+      for (const stmt of fn.body) this.collectStatementReferences(stmt, references);
+    } else {
+      this.collectExpressionReferences(fn.body, references);
+    }
+    for (const param of fn.params) references.delete(param.name);
+    if (Array.isArray(fn.body)) {
+      for (const stmt of fn.body) {
+        for (const name of this.variableDeclarationNames(stmt)) references.delete(name);
+      }
+    }
+    return references;
+  }
+
+  private collectStatementReferences(stmt: Statement, references = new Set<string>()): Set<string> {
+    if (stmt.type === 'VariableDeclaration' && stmt.init.type !== 'IfStatement') {
+      this.collectExpressionReferences(stmt.init, references);
+    } else if (stmt.type === 'ExpressionStatement') {
+      this.collectExpressionReferences(stmt.expression, references);
+    } else if (stmt.type === 'MultiExpressionStatement') {
+      for (const expr of stmt.expressions) this.collectExpressionReferences(expr, references);
+    } else if (stmt.type === 'MultiDeclaration') {
+      for (const declaration of stmt.declarations) this.collectStatementReferences(declaration, references);
+    } else if (stmt.type === 'MultiAssignment') {
+      for (const assignment of stmt.assignments) this.collectStatementReferences(assignment, references);
+    } else if (stmt.type === 'MultiStatement') {
+      for (const child of stmt.statements) this.collectStatementReferences(child, references);
+    } else if (stmt.type === 'TupleAssignment' && stmt.right.type !== 'IfStatement') {
+      this.collectExpressionReferences(stmt.right, references);
+    } else if (stmt.type === 'AssignmentStatement' && stmt.right.type !== 'IfStatement') {
+      this.collectExpressionReferences(stmt.right, references);
+    } else if (stmt.type === 'IfStatement') {
+      this.collectExpressionReferences(stmt.test, references);
+      for (const child of stmt.consequent) this.collectStatementReferences(child, references);
+      if (Array.isArray(stmt.alternate)) {
+        for (const child of stmt.alternate) this.collectStatementReferences(child, references);
+      } else if (stmt.alternate) {
+        this.collectStatementReferences(stmt.alternate, references);
+      }
+    } else if (stmt.type === 'OnceStatement') {
+      if (stmt.test) this.collectExpressionReferences(stmt.test, references);
+      for (const child of stmt.body) this.collectStatementReferences(child, references);
+    } else if (stmt.type === 'ForStatement') {
+      if (stmt.kind === 'numeric') {
+        this.collectExpressionReferences(stmt.start, references);
+        this.collectExpressionReferences(stmt.end, references);
+        if (stmt.step) this.collectExpressionReferences(stmt.step, references);
+      } else {
+        this.collectExpressionReferences(stmt.iterable, references);
+      }
+      for (const child of stmt.body) this.collectStatementReferences(child, references);
+    } else if (stmt.type === 'WhileStatement') {
+      this.collectExpressionReferences(stmt.test, references);
+      for (const child of stmt.body) this.collectStatementReferences(child, references);
+    }
+    return references;
+  }
+
+  private collectExpressionReferences(expr: Expression, references = new Set<string>()): Set<string> {
+    switch (expr.type) {
+      case 'Identifier':
+        references.add(expr.name);
+        return references;
+      case 'MemberExpression':
+        this.collectExpressionReferences(expr.object, references);
+        return references;
+      case 'CallExpression':
+        this.collectExpressionReferences(expr.callee, references);
+        for (const arg of expr.arguments) this.collectExpressionReferences(arg.value, references);
+        return references;
+      case 'UnaryExpression':
+        return this.collectExpressionReferences(expr.argument, references);
+      case 'BinaryExpression':
+        this.collectExpressionReferences(expr.left, references);
+        this.collectExpressionReferences(expr.right, references);
+        return references;
+      case 'ConditionalExpression':
+        this.collectExpressionReferences(expr.test, references);
+        this.collectExpressionReferences(expr.consequent, references);
+        this.collectExpressionReferences(expr.alternate, references);
+        return references;
+      case 'ArrayExpression':
+        for (const element of expr.elements) this.collectExpressionReferences(element, references);
+        return references;
+      case 'IndexExpression':
+        this.collectExpressionReferences(expr.object, references);
+        this.collectExpressionReferences(expr.index, references);
+        return references;
+      case 'SwitchExpression':
+        if (expr.discriminant) this.collectExpressionReferences(expr.discriminant, references);
+        for (const switchCase of expr.cases) {
+          if (switchCase.test) this.collectExpressionReferences(switchCase.test, references);
+          if (Array.isArray(switchCase.consequent)) {
+            for (const stmt of switchCase.consequent) this.collectStatementReferences(stmt, references);
+          } else {
+            this.collectExpressionReferences(switchCase.consequent, references);
+          }
+        }
+        return references;
+      case 'ForStatement':
+        this.collectStatementReferences(expr, references);
+        return references;
+      case 'WhileStatement':
+        this.collectStatementReferences(expr, references);
+        return references;
+      case 'LambdaExpression':
+        this.collectExpressionReferences(expr.body, references);
+        for (const param of expr.params) references.delete(param.name);
+        return references;
+      default:
+        return references;
+    }
+  }
+
+  private expressionFullName(expr: Expression): string | null {
+    if (expr.type === 'Identifier') return expr.name;
+    if (expr.type === 'MemberExpression') {
+      const objectName = this.expressionFullName(expr.object);
+      return objectName ? `${objectName}.${expr.property.name}` : expr.property.name;
+    }
+    return null;
+  }
+
+  private variableDeclarationNames(stmt: Statement): string[] {
+    if (stmt.type !== 'VariableDeclaration') return [];
+    if (stmt.names.type === 'VariableDeclarator') return [stmt.names.name.name];
+    return stmt.names.names.map((name) => name.name).filter((name) => name !== '_');
+  }
+
+  private nodeContainsExact(node: unknown, target: unknown): boolean {
+    if (node === target) return true;
+    if (!node || typeof node !== 'object') return false;
+    for (const value of Object.values(node)) {
+      if (value === target) return true;
+      if (Array.isArray(value)) {
+        if (value.some((item) => this.nodeContainsExact(item, target))) return true;
+      } else if (value && typeof value === 'object' && this.nodeContainsExact(value, target)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private cloneRequestCapturedValue(value: unknown): { captured: true; value: unknown } | { captured: false } {
+    if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean') {
+      return { captured: true, value };
+    }
+    if (isPineArray(value)) {
+      const copy = createPineArray();
+      for (let i = 0; i < getArraySize(value); i += 1) {
+        pushArrayValue(copy, this.cloneRequestCapturedFieldValue(getArrayValue(value, i)));
+      }
+      return { captured: true, value: copy };
+    }
+    if (isPineMatrix(value)) {
+      const copy = copyMatrix(value);
+      copy.values = copy.values.map((entry) => this.cloneRequestCapturedFieldValue(entry));
+      return { captured: true, value: copy };
+    }
+    if (isPineMap(value)) {
+      const copy = copyMap(value);
+      for (const [key, entry] of copy.entries) {
+        copy.entries.set(key, this.cloneRequestCapturedFieldValue(entry));
+      }
+      return { captured: true, value: copy };
+    }
+    if (isPineUdtObject(value)) {
+      return { captured: true, value: copyUdtObject(value, (fieldValue) => this.cloneRequestCapturedFieldValue(fieldValue)) };
+    }
+    return { captured: false };
+  }
+
+  private cloneRequestCapturedFieldValue(value: unknown): unknown {
+    const captured = this.cloneRequestCapturedValue(value);
+    return captured.captured ? captured.value : value;
+  }
+
+  private remapRequestSourceSeries(sourceSeries: SeriesAccessor, ctx: ExecutionContext): SeriesAccessor | undefined {
+    if (sourceSeries === this.ctx.open) return ctx.open;
+    if (sourceSeries === this.ctx.high) return ctx.high;
+    if (sourceSeries === this.ctx.low) return ctx.low;
+    if (sourceSeries === this.ctx.close) return ctx.close;
+    if (sourceSeries === this.ctx.volume) return ctx.volume;
+    if (sourceSeries === this.ctx.bid) return ctx.bid;
+    if (sourceSeries === this.ctx.ask) return ctx.ask;
+    return undefined;
   }
 
   private mergeRequestedValue(
@@ -4752,7 +6209,8 @@ export class TealscriptEngine {
       return Number.NaN;
     }
 
-    const selectedIndex = lookahead === 'barmerge.lookahead_on'
+    const useActiveRealtimeRequestBar = this.ctx.barstate.isrealtime && !this.ctx.barstate.isconfirmed;
+    const selectedIndex = lookahead === 'barmerge.lookahead_on' || useActiveRealtimeRequestBar
       ? this.findActiveRequestBarIndex(requestBars, chartTime)
       : this.findConfirmedRequestBarIndex(requestBars, chartTime);
     if (selectedIndex < 0) {
@@ -4760,7 +6218,7 @@ export class TealscriptEngine {
     }
 
     if (gaps === 'barmerge.gaps_on') {
-      const availableAt = lookahead === 'barmerge.lookahead_on'
+      const availableAt = lookahead === 'barmerge.lookahead_on' || useActiveRealtimeRequestBar
         ? requestBars[selectedIndex]?.time
         : requestBars[selectedIndex + 1]?.time;
       if (availableAt === undefined || !this.isFirstChartBarAtOrAfter(availableAt)) {
@@ -4863,6 +6321,17 @@ export class TealscriptEngine {
   }
 
   private registerDrawingBuiltins(): void {
+    const castDrawingId = (args: unknown[]) => {
+      const value = args[0];
+      return value === null || value === undefined || this.isNa(value) ? Number.NaN : String(value);
+    };
+
+    this.builtins.set('box', castDrawingId);
+    this.builtins.set('label', castDrawingId);
+    this.builtins.set('line', castDrawingId);
+    this.builtins.set('linefill', castDrawingId);
+    this.builtins.set('table', castDrawingId);
+
     registerLabelBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
     registerLineBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
     registerLineFillBuiltins(this.builtins, this.createDrawingBuiltinRuntime());
@@ -4926,6 +6395,17 @@ export class TealscriptEngine {
   }
 
   private getMethodBuiltinName(methodName: string, receiver: unknown): string {
+    const drawingMethodNamespace = this.getDrawingMethodNamespace(receiver);
+    if (drawingMethodNamespace) {
+      return `${drawingMethodNamespace}.${methodName}`;
+    }
+
+    if (isRequestFootprintData(receiver)) {
+      return `footprint.${methodName}`;
+    }
+    if (isRequestVolumeRowData(receiver)) {
+      return `volume_row.${methodName}`;
+    }
     if (isPineMatrix(receiver)) {
       return `matrix.${methodName}`;
     }
@@ -4983,24 +6463,64 @@ export class TealscriptEngine {
     }
   }
 
+  private getDrawingMethodNamespace(receiver: unknown): DrawingOutput['type'] | undefined {
+    const drawingId = this.toDrawingId(receiver);
+    if (!drawingId) return undefined;
+
+    const existing = this.ctx.getDrawing(drawingId);
+    if (existing) return existing.type;
+
+    const separatorIndex = drawingId.indexOf('_');
+    if (separatorIndex < 0) return undefined;
+    const prefix = drawingId.slice(0, separatorIndex);
+    return (
+      prefix === 'line'
+      || prefix === 'label'
+      || prefix === 'box'
+      || prefix === 'table'
+      || prefix === 'polyline'
+      || prefix === 'linefill'
+    )
+      ? prefix
+      : undefined;
+  }
+
   private canCallUserFunction(fn: FunctionDeclaration, args: unknown[], namedArgs: Map<string, unknown>): boolean {
+    const signature = this.userFunctionSignature(fn);
     if (args.length > fn.params.length) return false;
 
-    const paramNames = new Set(fn.params.map((param) => param.name));
     for (const argName of namedArgs.keys()) {
-      if (!paramNames.has(argName)) return false;
+      if (!signature.callableParamNames.has(argName)) return false;
     }
 
-    const noDuplicateBindings = fn.params.every((param, index) => {
-      const hasPositionalValue = index < args.length;
-      return !(hasPositionalValue && namedArgs.has(param.name));
-    });
-    if (!noDuplicateBindings) return false;
+    for (let index = 0; index < fn.params.length; index++) {
+      if (index < args.length && namedArgs.has(signature.paramNames[index]!)) return false;
+    }
 
-    return fn.params.every((param, index) => {
-      const hasValue = index < args.length || namedArgs.has(param.name);
-      return hasValue || param.defaultValue;
-    });
+    for (let index = 0; index < fn.params.length; index++) {
+      const hasValue = index < args.length || namedArgs.has(signature.paramNames[index]!);
+      if (!hasValue && !signature.hasDefaultValue[index]) return false;
+    }
+
+    return true;
+  }
+
+  private userFunctionSignature(fn: FunctionDeclaration): UserFunctionSignature {
+    const cached = this.userFunctionSignatureCache.get(fn);
+    if (cached) return cached;
+
+    const bindingOffset = fn.isMethod ? 1 : 0;
+    const callableParams = fn.params.slice(bindingOffset);
+    const signature: UserFunctionSignature = {
+      bindingOffset,
+      callableParamCount: callableParams.length,
+      callableParamNames: new Set(callableParams.map((param) => param.name)),
+      paramNames: fn.params.map((param) => param.name),
+      hasDefaultValue: fn.params.map((param) => param.defaultValue !== undefined),
+      hasDefaults: fn.params.some((param) => param.defaultValue !== undefined),
+    };
+    this.userFunctionSignatureCache.set(fn, signature);
+    return signature;
   }
 
   private evaluateUserFunction(
@@ -5022,59 +6542,64 @@ export class TealscriptEngine {
       throw new Error(`${displayName} cannot use positional arguments after named arguments`);
     }
 
-    const bindingOffset = fn.isMethod ? 1 : 0;
+    const signature = this.userFunctionSignature(fn);
+    const bindingOffset = signature.bindingOffset;
     const callArgCount = Math.max(0, args.length - bindingOffset);
-    const callableParams = fn.params.slice(bindingOffset);
 
-    if (callArgCount > callableParams.length) {
+    if (callArgCount > signature.callableParamCount) {
       throw new Error(
-        `Too many arguments for ${displayName}: expected ${callableParams.length}, got ${callArgCount}`,
+        `Too many arguments for ${displayName}: expected ${signature.callableParamCount}, got ${callArgCount}`,
       );
     }
 
-    const paramNames = new Set(callableParams.map((param) => param.name));
     for (const argName of namedArgs.keys()) {
-      if (!paramNames.has(argName)) {
+      if (!signature.callableParamNames.has(argName)) {
         throw new Error(`Unknown argument '${argName}' for ${displayName}`);
       }
     }
 
-    for (const [index, param] of fn.params.entries()) {
+    for (let index = 0; index < fn.params.length; index++) {
       if (index < bindingOffset) continue;
-      if (index < args.length || namedArgs.has(param.name) || param.defaultValue) continue;
-      throw new Error(`${displayName} missing required argument '${param.name}'`);
+      const paramName = signature.paramNames[index]!;
+      if (index < args.length || namedArgs.has(paramName) || signature.hasDefaultValue[index]) continue;
+      throw new Error(`${displayName} missing required argument '${paramName}'`);
     }
 
-    const parameterValues = fn.params.map((param, index) => {
-      const paramName = param.name;
-      if (namedArgs.has(paramName)) {
-        if (index < args.length) {
-          throw new Error(
-            `Argument '${paramName}' for ${displayName} was supplied multiple times`,
-          );
+    let parameterValues: unknown[] | undefined;
+    let parameterSources: Array<SeriesAccessor | undefined> | undefined;
+    if (signature.hasDefaults) {
+      parameterValues = new Array(fn.params.length);
+      parameterSources = new Array(fn.params.length);
+      for (let index = 0; index < fn.params.length; index++) {
+        const param = fn.params[index]!;
+        const paramName = signature.paramNames[index]!;
+        if (namedArgs.has(paramName)) {
+          if (index < args.length) {
+            throw new Error(
+              `Argument '${paramName}' for ${displayName} was supplied multiple times`,
+            );
+          }
+          const value = namedArgs.get(paramName);
+          parameterValues[index] = value;
+          parameterSources[index] = sourceBindings.named.get(paramName) ?? this.getSourceSeriesForValue(value);
+          continue;
         }
-        const value = namedArgs.get(paramName);
-        return {
-          value,
-          sourceSeries: sourceBindings.named.get(paramName) ?? this.getSourceSeriesForValue(value),
-        };
+        if (index < args.length) {
+          const value = args[index];
+          parameterValues[index] = value;
+          parameterSources[index] = sourceBindings.positional[index] ?? this.getSourceSeriesForValue(value);
+          continue;
+        }
+        if (param.defaultValue) {
+          const value = this.evaluateExpression(param.defaultValue);
+          parameterValues[index] = value;
+          parameterSources[index] = this.getSourceSeriesForExpression(param.defaultValue, value);
+          continue;
+        }
+        parameterValues[index] = undefined;
+        parameterSources[index] = undefined;
       }
-      if (index < args.length) {
-        const value = args[index];
-        return {
-          value,
-          sourceSeries: sourceBindings.positional[index] ?? this.getSourceSeriesForValue(value),
-        };
-      }
-      if (param.defaultValue) {
-        const value = this.evaluateExpression(param.defaultValue);
-        return {
-          value,
-          sourceSeries: this.getSourceSeriesForExpression(param.defaultValue, value),
-        };
-      }
-      return { value: undefined, sourceSeries: undefined };
-    });
+    }
 
     // Increment depth after all argument validation; decrement in finally.
     this.userFunctionCallDepth.set(recursionKey, currentDepth + 1);
@@ -5084,26 +6609,44 @@ export class TealscriptEngine {
     const functionScope =
       currentDepth === 0 ? this.ensureFunctionScope(scopeKey) : this.rootScope.createChild();
     this.scope = functionScope;
+    const needsActiveScopeStack = this.functionNeedsActiveScopeStack(fn);
+    if (needsActiveScopeStack) {
+      this.activeFunctionScopeKeys.push(scopeKey);
+    }
 
     try {
       for (let i = 0; i < fn.params.length; i++) {
-        const paramName = fn.params[i].name;
-        const parameterValue = parameterValues[i]!;
-        this.scope.declare(
-          paramName,
-          'none',
-          this.unwrapKnownSourceValue(parameterValue.value),
-          undefined,
-          parameterValue.sourceSeries,
+        const value = parameterValues ? parameterValues[i] : (
+          i < args.length ? args[i] : namedArgs.get(signature.paramNames[i]!)
+        );
+        const sourceSeries = parameterSources ? parameterSources[i] : (
+          i < args.length
+            ? sourceBindings.positional[i] ?? this.getSourceSeriesForValue(value)
+            : sourceBindings.named.get(signature.paramNames[i]!) ?? this.getSourceSeriesForValue(value)
+        );
+        this.scope.declareParameter(
+          signature.paramNames[i]!,
+          this.unwrapKnownSourceValue(value),
+          sourceSeries,
         );
       }
 
       if (Array.isArray(fn.body)) {
         let result: unknown = undefined;
+        const previousRequestLocalStatements = this.activeRequestLocalStatements;
+        const priorRequestLocalStatements: Statement[] = [];
         for (const stmt of fn.body) {
-          const statementResult = this.executeFunctionStatement(stmt);
-          if (statementResult.hasResult) {
-            result = statementResult.value;
+          this.activeRequestLocalStatements = priorRequestLocalStatements;
+          try {
+            const statementResult = this.executeFunctionStatement(stmt, fn.name.name);
+            if (statementResult.hasResult) {
+              result = statementResult.value;
+            }
+          } finally {
+            this.activeRequestLocalStatements = previousRequestLocalStatements;
+          }
+          if (this.isRequestReplayableLocalStatement(stmt)) {
+            priorRequestLocalStatements.push(stmt);
           }
         }
         return result;
@@ -5111,11 +6654,66 @@ export class TealscriptEngine {
 
       return this.evaluateSourceAwareExpression(fn.body);
     } finally {
+      if (needsActiveScopeStack) {
+        this.activeFunctionScopeKeys.pop();
+      }
       const depth = this.userFunctionCallDepth.get(recursionKey) ?? 1;
       if (depth <= 1) this.userFunctionCallDepth.delete(recursionKey);
       else this.userFunctionCallDepth.set(recursionKey, depth - 1);
       this.scope = savedScope;
     }
+  }
+
+  private functionNeedsActiveScopeStack(fn: FunctionDeclaration): boolean {
+    const cached = this.functionNeedsActiveScopeStackCache.get(fn);
+    if (cached !== undefined) return cached;
+
+    const needsStack = this.functionBodyContainsCallableCall(fn);
+    this.functionNeedsActiveScopeStackCache.set(fn, needsStack);
+    return needsStack;
+  }
+
+  private functionBodyContainsCallableCall(fn: FunctionDeclaration): boolean {
+    const seen = new WeakSet<object>();
+    const visit = (node: unknown): boolean => {
+      if (!node || typeof node !== 'object') return false;
+      if (seen.has(node)) return false;
+      seen.add(node);
+
+      if (this.isNodeType(node, 'CallExpression')) {
+        const expr = node as CallExpression;
+        if (expr.callee.type === 'Identifier') {
+          const name = expr.callee.name;
+          if (this.userFunctions.has(name)) return true;
+          for (const library of this.importedLibraries.values()) {
+            if (library.functions.has(name)) return true;
+          }
+        } else if (expr.callee.type === 'MemberExpression') {
+          const methodName = expr.callee.property.name;
+          if (this.userMethods.has(methodName)) return true;
+          const namespace = expr.callee.object.type === 'Identifier'
+            ? expr.callee.object.name
+            : undefined;
+          if (namespace && this.importedLibraries.has(namespace)) return true;
+          for (const library of this.importedLibraries.values()) {
+            if (library.methods.has(methodName)) return true;
+          }
+        }
+      }
+
+      for (const value of Object.values(node)) {
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            if (visit(item)) return true;
+          }
+        } else if (visit(value)) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    return Array.isArray(fn.body) ? fn.body.some((stmt) => visit(stmt)) : visit(fn.body);
   }
 
   private invokeLambda(lambda: PineLambda, args: unknown[]): unknown {
@@ -5134,7 +6732,7 @@ export class TealscriptEngine {
     }
   }
 
-  private executeFunctionStatement(stmt: Statement): { hasResult: boolean; value?: unknown } {
+  private executeFunctionStatement(stmt: Statement, functionName?: string): { hasResult: boolean; value?: unknown } {
     this.profileStatements += 1;
 
     if (stmt.type === 'ExpressionStatement') {
@@ -5142,19 +6740,68 @@ export class TealscriptEngine {
     }
 
     if (stmt.type === 'IfStatement') {
-      return this.executeFunctionIf(stmt);
+      return this.executeFunctionIf(stmt, functionName);
     }
 
     if (stmt.type === 'ForStatement') {
-      return this.executeFunctionFor(stmt);
+      return this.executeFunctionFor(stmt, functionName);
     }
 
     if (stmt.type === 'WhileStatement') {
-      return this.executeFunctionWhile(stmt);
+      return this.executeFunctionWhile(stmt, functionName);
     }
 
     this.executeStatementInternal(stmt, false);
+    if (functionName && this.isFunctionNameReturnStatement(stmt, functionName)) {
+      return {
+        hasResult: true,
+        value: this.evaluateSourceAwareExpression({ type: 'Identifier', name: functionName }),
+      };
+    }
     return { hasResult: false };
+  }
+
+  private isFunctionNameReturnStatement(stmt: Statement, functionName: string): boolean {
+    if (stmt.type === 'VariableDeclaration' && stmt.names.type === 'VariableDeclarator') {
+      return stmt.names.name.name === functionName;
+    }
+    return stmt.type === 'AssignmentStatement'
+      && stmt.left.type === 'Identifier'
+      && stmt.left.name === functionName;
+  }
+
+  private isRequestReplayableLocalStatement(stmt: Statement): boolean {
+    return stmt.type === 'VariableDeclaration'
+      && stmt.kind === 'none'
+      && stmt.init.type !== 'IfStatement'
+      && !this.nodeContainsRequestCall(stmt.init);
+  }
+
+  private nodeContainsRequestCall(node: unknown): boolean {
+    if (!node || typeof node !== 'object') return false;
+
+    if (this.isNodeType(node, 'CallExpression')) {
+      const metadata = this.getCachedCallMetadata(node as CallExpression);
+      if (
+        metadata.builtinName === 'request.security'
+        || metadata.builtinName === 'request.security_lower_tf'
+        || metadata.fullName.startsWith('request.')
+      ) {
+        return true;
+      }
+    }
+
+    for (const value of Object.values(node)) {
+      if (value === node || typeof value === 'function') continue;
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          if (this.nodeContainsRequestCall(item)) return true;
+        }
+      } else if (this.nodeContainsRequestCall(value)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private evaluateSourceAwareExpression(expr: Expression): unknown {
@@ -5163,9 +6810,9 @@ export class TealscriptEngine {
     return sourceSeries ? this.toKnownSourceValue(value, sourceSeries) : value;
   }
 
-  private executeFunctionFor(stmt: ForStatement): { hasResult: boolean; value?: unknown } {
+  private executeFunctionFor(stmt: ForStatement, functionName?: string): { hasResult: boolean; value?: unknown } {
     if (stmt.kind === 'collection') {
-      return this.executeFunctionForIn(stmt);
+      return this.executeFunctionForIn(stmt, functionName);
     }
 
     const start = this.evaluateExpression(stmt.start) as number;
@@ -5191,7 +6838,7 @@ export class TealscriptEngine {
         this.scope.declare(stmt.counter.name, 'none', i);
 
         try {
-          const statementResult = this.executeFunctionLoopBody(stmt.body);
+          const statementResult = this.executeFunctionLoopBody(stmt.body, functionName);
           if (statementResult.hasResult) {
             result = statementResult;
           }
@@ -5209,6 +6856,7 @@ export class TealscriptEngine {
 
   private executeFunctionForIn(
     stmt: Extract<ForStatement, { kind: 'collection' }>,
+    functionName?: string,
   ): { hasResult: boolean; value?: unknown } {
     const iterable = this.evaluateExpression(stmt.iterable);
     let values: unknown[];
@@ -5248,7 +6896,7 @@ export class TealscriptEngine {
         this.scope.declare(stmt.counter.name, 'none', value);
 
         try {
-          const statementResult = this.executeFunctionLoopBody(stmt.body);
+          const statementResult = this.executeFunctionLoopBody(stmt.body, functionName);
           if (statementResult.hasResult) {
             result = statementResult;
           }
@@ -5264,7 +6912,7 @@ export class TealscriptEngine {
     }
   }
 
-  private executeFunctionWhile(stmt: WhileStatement): { hasResult: boolean; value?: unknown } {
+  private executeFunctionWhile(stmt: WhileStatement, functionName?: string): { hasResult: boolean; value?: unknown } {
     const childScope = this.functionBlockScope(stmt, 'while');
     const savedScope = this.scope;
     this.scope = childScope;
@@ -5279,7 +6927,7 @@ export class TealscriptEngine {
         }
 
         try {
-          const statementResult = this.executeFunctionLoopBody(stmt.body);
+          const statementResult = this.executeFunctionLoopBody(stmt.body, functionName);
           if (statementResult.hasResult) {
             result = statementResult;
           }
@@ -5295,10 +6943,10 @@ export class TealscriptEngine {
     }
   }
 
-  private executeFunctionLoopBody(statements: Statement[]): { hasResult: boolean; value?: unknown } {
+  private executeFunctionLoopBody(statements: Statement[], functionName?: string): { hasResult: boolean; value?: unknown } {
     let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
     for (const statement of statements) {
-      const statementResult = this.executeFunctionStatement(statement);
+      const statementResult = this.executeFunctionStatement(statement, functionName);
       if (statementResult.hasResult) {
         result = statementResult;
       }
@@ -5310,6 +6958,7 @@ export class TealscriptEngine {
     ownerOrStatements: IfStatement | Statement[],
     label?: 'consequent' | 'alternate',
     statements?: Statement[],
+    functionName?: string,
   ): { hasResult: boolean; value?: unknown } {
     const childScope = Array.isArray(ownerOrStatements)
       ? this.scope.createChild()
@@ -5321,7 +6970,7 @@ export class TealscriptEngine {
     try {
       let result: { hasResult: boolean; value?: unknown } = { hasResult: false };
       for (const statement of blockStatements) {
-        const statementResult = this.executeFunctionStatement(statement);
+        const statementResult = this.executeFunctionStatement(statement, functionName);
         if (statementResult.hasResult) {
           result = statementResult;
         }
@@ -5332,11 +6981,11 @@ export class TealscriptEngine {
     }
   }
 
-  private executeFunctionIf(stmt: IfStatement): { hasResult: boolean; value?: unknown } {
+  private executeFunctionIf(stmt: IfStatement, functionName?: string): { hasResult: boolean; value?: unknown } {
     const condition = this.evaluateExpression(stmt.test);
 
     if (this.isTruthy(condition)) {
-      return this.executeFunctionStatements(stmt, 'consequent', stmt.consequent);
+      return this.executeFunctionStatements(stmt, 'consequent', stmt.consequent, functionName);
     }
 
     if (!stmt.alternate) {
@@ -5344,10 +6993,10 @@ export class TealscriptEngine {
     }
 
     if (Array.isArray(stmt.alternate)) {
-      return this.executeFunctionStatements(stmt, 'alternate', stmt.alternate);
+      return this.executeFunctionStatements(stmt, 'alternate', stmt.alternate, functionName);
     }
 
-    return this.executeFunctionIf(stmt.alternate);
+    return this.executeFunctionIf(stmt.alternate, functionName);
   }
 
   private evaluateMember(expr: MemberExpression): unknown {
@@ -5690,6 +7339,40 @@ export class TealscriptEngine {
     return this.ctx.strategyLedger.closedTrades.length === 0 ? Number.NaN : 0;
   }
 
+  private strategyPropSeries(name: string): Series<unknown> {
+    let series = this.strategyPropHistories.get(name);
+    if (!series) {
+      series = new Series<unknown>();
+      this.strategyPropHistories.set(name, series);
+    }
+    return series;
+  }
+
+  private updateStrategyPropHistory(name: string): void {
+    const series = this.strategyPropSeries(name);
+    if (series.barIndex < this.ctx.bar_index) {
+      while (series.barIndex < this.ctx.bar_index) series.advance();
+    }
+    if (!isStrategyHistoryProp(name)) return;
+    series.set(readStrategyHistoryProp(this.ctx.strategyLedger, name));
+  }
+
+  private updateStrategyPropHistories(): void {
+    for (const name of STRATEGY_HISTORY_PROPS) this.updateStrategyPropHistory(name);
+  }
+
+  private evaluateStrategyPropHistory(name: string, offset: unknown): unknown {
+    if (!isStrategyHistoryProp(name)) {
+      return Number.NaN;
+    }
+    const numericOffset = this.normalizeIndexOffset(offset);
+    if (numericOffset === null) {
+      return Number.NaN;
+    }
+    this.checkHistoryOffset(numericOffset);
+    return this.naIfMissing(this.strategyPropSeries(name).get(numericOffset));
+  }
+
   private strategyInitialCapitalPercent(value: number): number {
     const initialCapital = this.ctx.strategyLedger.initialCapital;
     if (!Number.isFinite(initialCapital) || initialCapital <= 0) return Number.NaN;
@@ -5754,6 +7437,17 @@ export class TealscriptEngine {
           const openTime = this.ctx.time.get(offset);
           return openTime === undefined ? Number.NaN : this.naIfMissing(this.getBarCloseTime(openTime, this.ctx.timeframe.period));
         }
+        case 'year':
+        case 'month':
+        case 'weekofyear':
+        case 'dayofmonth':
+        case 'dayofweek':
+        case 'hour':
+        case 'minute':
+        case 'second': {
+          this.checkHistoryOffset(offset);
+          return this.naIfMissing(this.getCalendarPart(name, this.ctx.time.get(offset), this.ctx.syminfo.timezone));
+        }
         case 'last_bar_time':
           this.checkHistoryOffset(offset);
           return offset > this.ctx.bar_index ? Number.NaN : this.naIfMissing(this.ctx.getBar(this.ctx.last_bar_index)?.time);
@@ -5772,6 +7466,10 @@ export class TealscriptEngine {
         case 'ohlc4':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.getOhlc4(offset));
+        case 'ta.accdist':
+          this.checkHistoryOffset(offset);
+          this.updateAccumulationDistribution(this.scope, '_ta_accdist_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_accdist_value', offset));
         case 'ta.obv':
           this.checkHistoryOffset(offset);
           this.recordLookbackLength(2);
@@ -5794,7 +7492,14 @@ export class TealscriptEngine {
     if (expr.object.type === 'MemberExpression') {
       const memberPath = this.getMemberPath(expr.object);
       const name = memberPath?.join('.');
+      if (name?.startsWith('strategy.')) {
+        return this.evaluateStrategyPropHistory(name.slice('strategy.'.length), offset);
+      }
       switch (name) {
+        case 'ta.accdist':
+          this.checkHistoryOffset(offset);
+          this.updateAccumulationDistribution(this.scope, '_ta_accdist_value');
+          return this.naIfMissing(this.scope.getWithOffset('_ta_accdist_value', offset));
         case 'ta.iii':
           this.checkHistoryOffset(offset);
           return this.naIfMissing(this.intradayIntensityIndex(offset));
@@ -5967,6 +7672,19 @@ export class TealscriptEngine {
     return range === 0 ? Number.NaN : ((close - open) / range) * volume;
   }
 
+  private updateAccumulationDistribution(scope: Scope, key: string): number {
+    return this.updateBarCachedNumericState(scope, key, 0, (previous) => {
+      const high = this.ctx.high.get(0);
+      const low = this.ctx.low.get(0);
+      const close = this.ctx.close.get(0);
+      const volume = this.ctx.volume.get(0);
+      if (high === undefined || low === undefined || close === undefined || volume === undefined) return previous;
+      const range = high - low;
+      if (range === 0) return previous;
+      return previous + (((close - low) - (high - close)) / range) * volume;
+    });
+  }
+
   private updateNegativeVolumeIndex(scope: Scope, key: string): number {
     return this.updateVolumeIndex(scope, key, (volume, previousVolume) => volume < previousVolume);
   }
@@ -6041,6 +7759,7 @@ export class TealscriptEngine {
   private writeArrayElement(array: unknown, index: number, value: unknown): void {
     if (isPineArray(array)) {
       setArrayValue(array, index, value);
+      this.markPersistentArrayDrawing(array, value);
       return;
     }
     if (Array.isArray(array)) {
@@ -6192,6 +7911,14 @@ export class TealscriptEngine {
     }
   }
 
+  private setPlotArrayValue<T>(values: T[] | undefined, barIndex: number, value: T): void {
+    if (!values || barIndex < 0) return;
+    while (values.length < barIndex) {
+      values.push(null as T);
+    }
+    values[barIndex] = value;
+  }
+
   private setPlotTextColorValue(plot: PlotOutput | undefined, barIndex: number, color: string | null): void {
     if (!plot || barIndex < 0) return;
 
@@ -6214,6 +7941,15 @@ export class TealscriptEngine {
 
     plot.textColor = Array.from({ length: barIndex }, () => previousColor);
     plot.textColor[barIndex] = color;
+  }
+
+  private setPlotTextValue(plot: PlotOutput | undefined, barIndex: number, text: string | null): void {
+    if (!plot || barIndex < 0) return;
+    if (!Array.isArray(plot.textValues)) plot.textValues = [];
+    while (plot.textValues.length < barIndex) {
+      plot.textValues.push(null);
+    }
+    plot.textValues[barIndex] = text;
   }
 
   private toStringValue(value: unknown, format?: string): string {
@@ -6269,7 +8005,10 @@ export class TealscriptEngine {
     fallback?: unknown,
   ): unknown {
     const name = names[index];
-    const positionalIndex = index - names.slice(0, index).filter((priorName) => namedArgs.has(priorName)).length;
+    let positionalIndex = index;
+    for (let priorIndex = 0; priorIndex < index; priorIndex++) {
+      if (namedArgs.has(names[priorIndex]!)) positionalIndex--;
+    }
     return name && namedArgs.has(name)
       ? namedArgs.get(name)
       : args[positionalIndex] !== undefined
@@ -6682,9 +8421,7 @@ export class TealscriptEngine {
       TealscriptEngine.MAX_BUILTIN_SOURCE_HISTORY,
     );
     const values = this.updateBuiltinSourceHistory(scope, key, numericSource, keep, false);
-    const window = values.slice(0, length);
-    if (window.length < length || window.some((value) => isNaN(value))) return null;
-    return window;
+    return this.readCompleteNumericWindow(values, length);
   }
 
   private getAvailableSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] {
@@ -6695,7 +8432,40 @@ export class TealscriptEngine {
     if (knownWindow) return knownWindow;
 
     const values = this.updateBuiltinSourceHistory(scope, key, numericSource, length, false);
-    return values.slice(0, length).filter((value) => !isNaN(value));
+    return this.readAvailableNumericWindow(values, length);
+  }
+
+  private readCompleteNumericWindow(values: number[], length: number): number[] | null {
+    if (values.length < length) return null;
+    if (values.length === length) {
+      for (let index = 0; index < length; index++) {
+        if (isNaN(values[index]!)) return null;
+      }
+      return values;
+    }
+
+    const window = new Array<number>(length);
+    for (let index = 0; index < length; index++) {
+      const value = values[index]!;
+      if (isNaN(value)) return null;
+      window[index] = value;
+    }
+    return window;
+  }
+
+  private readAvailableNumericWindow(values: number[], length: number): number[] {
+    const limit = Math.min(values.length, length);
+    let window: number[] | null = null;
+    for (let index = 0; index < limit; index++) {
+      const value = values[index]!;
+      if (isNaN(value)) {
+        if (!window) window = values.slice(0, index);
+      } else if (window) {
+        window.push(value);
+      }
+    }
+    if (window) return window;
+    return values.length <= length ? values : values.slice(0, length);
   }
 
   private getCompleteNonNaSourceWindow(scope: Scope, key: string, source: unknown, length: number): number[] | null {
@@ -6916,6 +8686,7 @@ export class TealscriptEngine {
 
     // Request helpers and constants
     this.registerRequestBuiltins();
+    this.registerFootprintBuiltins();
 
     // Ticker constructors and constants
     this.registerTickerBuiltins();
@@ -6930,6 +8701,7 @@ export class TealscriptEngine {
   // Plot call ordering is reset on every bar so output arrays align by call site.
   private plotCallIndex = 0;
   private builtinCallCounts = new Map<string, number>();
+  private visualOutputIdsByCallId = new Map<string, string>();
 
   private resetPerBarBuiltinState(): void {
     this.plotCallIndex = 0;
@@ -7166,6 +8938,8 @@ export class TealscriptEngine {
   }
 
   private submitStrategyOrderBuiltin(args: unknown[], namedArgs: Map<string, unknown>, isEntry: boolean): undefined {
+    if (!this.strategyWhenAllowsSubmit(namedArgs)) return undefined;
+
     const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 0, ''));
     const direction = this.normalizeStrategyDirection(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 1));
     const rawQty = this.toOptionalNumber(this.getOrderedCallArg(args, namedArgs, STRATEGY_ORDER_ARGS, 2));
@@ -7209,7 +8983,7 @@ export class TealscriptEngine {
       if (requestedQty <= 0) {
         return undefined;
       }
-      orderQty = requestedQty;
+      orderQty = this.resolveStrategyEntryTransactionQty(direction, requestedQty);
     }
 
     const order = submitStrategyOrder(this.ctx.strategyLedger, {
@@ -7250,7 +9024,7 @@ export class TealscriptEngine {
 
   private canSubmitStrategyEntry(direction: StrategyDirection): boolean {
     const openEntries = this.ctx.strategyLedger.openTrades.filter((trade) => trade.direction === direction).length;
-    return openEntries < this.ctx.strategyLedger.settings.pyramiding + 1;
+    return openEntries < Math.max(1, this.ctx.strategyLedger.settings.pyramiding);
   }
 
   private isStrategyEntryDirectionRestricted(direction: StrategyDirection): boolean {
@@ -7281,6 +9055,14 @@ export class TealscriptEngine {
       return total + (order.requestedQty ?? order.qty ?? 0);
     }, 0);
     return Math.min(requestedQty, Math.max(0, maxPositionSize - sameDirectionSize - pendingSameDirectionSize));
+  }
+
+  private resolveStrategyEntryTransactionQty(direction: StrategyDirection, requestedQty: number): number {
+    const position = this.ctx.strategyLedger.position;
+    if (position.direction !== null && position.direction !== direction) {
+      return Math.abs(position.size) + requestedQty;
+    }
+    return requestedQty;
   }
 
   private resolveStrategyOrderQty(
@@ -7400,6 +9182,8 @@ export class TealscriptEngine {
   }
 
   private submitStrategyExitBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    if (!this.strategyWhenAllowsSubmit(namedArgs)) return undefined;
+
     const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, STRATEGY_EXIT_ARGS, 0, ''));
     if (id === '') {
       throw new Error('strategy exit id must not be empty');
@@ -7465,7 +9249,7 @@ export class TealscriptEngine {
     this.cancelObsoleteStrategyExitOrders(id, fromEntry, suffixOrders);
 
     if (limitPrice !== undefined) {
-      this.submitOrReplaceStrategyExitOrder({
+      submitOrReplaceStrategyExitOrder(this.ctx.strategyLedger, {
         id: suffixOrders ? `${id} Limit` : id,
         sourceId: id,
         direction: exitDirection,
@@ -7486,7 +9270,7 @@ export class TealscriptEngine {
     }
 
     if (stopPrice !== undefined) {
-      this.submitOrReplaceStrategyExitOrder({
+      submitOrReplaceStrategyExitOrder(this.ctx.strategyLedger, {
         id: suffixOrders ? `${id} Stop` : id,
         sourceId: id,
         direction: exitDirection,
@@ -7507,7 +9291,7 @@ export class TealscriptEngine {
     }
 
     if (trailActivationPrice !== undefined && trailOffset !== undefined) {
-      this.submitOrReplaceStrategyExitOrder({
+      submitOrReplaceStrategyExitOrder(this.ctx.strategyLedger, {
         id: suffixOrders ? `${id} Trail` : id,
         sourceId: id,
         direction: exitDirection,
@@ -7644,65 +9428,9 @@ export class TealscriptEngine {
     }
   }
 
-  private submitOrReplaceStrategyExitOrder(input: Parameters<typeof submitStrategyOrder>[1]): void {
-    const existingOrder = this.ctx.strategyLedger.orders.find((order) => (
-      order.status === 'pending'
-      && order.id === input.id
-      && order.fromEntry === input.fromEntry
-    ));
-    if (!existingOrder) {
-      submitStrategyOrder(this.ctx.strategyLedger, input);
-      return;
-    }
-
-    const triggerChanged = existingOrder.limitPrice !== input.limitPrice
-      || existingOrder.stopPrice !== input.stopPrice
-      || existingOrder.trailActivationPrice !== input.trailActivationPrice
-      || existingOrder.trailOffset !== input.trailOffset;
-    existingOrder.direction = input.direction;
-    existingOrder.sourceId = input.sourceId;
-    existingOrder.isExit = input.isExit ?? false;
-    if (input.trailActivationPrice !== undefined || input.trailOffset !== undefined) {
-      existingOrder.type = 'trailing_stop';
-    } else if (input.limitPrice !== undefined && input.stopPrice !== undefined) {
-      existingOrder.type = 'stop_limit';
-    } else if (input.limitPrice !== undefined) {
-      existingOrder.type = 'limit';
-    } else if (input.stopPrice !== undefined) {
-      existingOrder.type = 'stop';
-    } else {
-      existingOrder.type = 'market';
-    }
-    existingOrder.qty = input.qty;
-    existingOrder.qtyType = input.qtyType;
-    existingOrder.qtyValue = input.qtyValue;
-    existingOrder.limitPrice = input.limitPrice;
-    existingOrder.stopPrice = input.stopPrice;
-    existingOrder.trailActivationPrice = input.trailActivationPrice;
-    existingOrder.trailOffset = input.trailOffset;
-    existingOrder.fromEntry = input.fromEntry;
-    existingOrder.ocaName = input.ocaName;
-    existingOrder.ocaType = input.ocaType;
-    existingOrder.comment = input.comment;
-    existingOrder.alertMessage = input.alertMessage;
-    existingOrder.disableAlert = input.disableAlert;
-    if (triggerChanged) {
-      existingOrder.stopLimitActivated = false;
-      existingOrder.stopLimitActivatedBarIndex = null;
-      existingOrder.stopLimitActivatedTime = null;
-      existingOrder.trailingActivated = false;
-      existingOrder.trailingActivatedBarIndex = null;
-      existingOrder.trailingActivatedTime = null;
-      existingOrder.trailingBestPrice = undefined;
-      existingOrder.trailingStopPrice = undefined;
-      existingOrder.activationBarIndex = input.barIndex;
-      existingOrder.activationTime = input.time;
-    }
-    existingOrder.updatedBarIndex = input.barIndex;
-    existingOrder.updatedTime = input.time;
-  }
-
   private submitStrategyCloseBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    if (!this.strategyWhenAllowsSubmit(namedArgs)) return undefined;
+
     const id = this.toStringValue(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ARGS, 0, ''));
     if (id === '') {
       throw new Error('strategy close id must not be empty');
@@ -7743,6 +9471,8 @@ export class TealscriptEngine {
   }
 
   private submitStrategyCloseAllBuiltin(args: unknown[], namedArgs: Map<string, unknown>): undefined {
+    if (!this.strategyWhenAllowsSubmit(namedArgs)) return undefined;
+
     const position = this.ctx.strategyLedger.position;
     if (position.direction === null || position.size === 0) {
       return undefined;
@@ -7758,6 +9488,10 @@ export class TealscriptEngine {
       disableAlert: this.isTruthy(this.getOrderedCallArg(args, namedArgs, STRATEGY_CLOSE_ALL_ARGS, 3, false)),
     });
     return undefined;
+  }
+
+  private strategyWhenAllowsSubmit(namedArgs: Map<string, unknown>): boolean {
+    return !namedArgs.has('when') || this.isTruthy(namedArgs.get('when'));
   }
 
   private resolveStrategyCloseQty(openQty: number, rawQty: number | undefined, rawQtyPercent: number | undefined, name: string): number {
@@ -7820,6 +9554,9 @@ export class TealscriptEngine {
     if (value === 'long' || value === 'short') {
       return value;
     }
+    if (this.pineVersion <= 4 && typeof value === 'boolean') {
+      return value ? 'long' : 'short';
+    }
     throw new Error(`Invalid strategy direction: ${this.toStringValue(value)}`);
   }
 
@@ -7854,6 +9591,40 @@ export class TealscriptEngine {
     this.builtins.set('splits.numerator', () => 'splits.numerator');
   }
 
+  private registerFootprintBuiltins(): void {
+    const footprintArg = (args: unknown[], namedArgs: Map<string, unknown>) => (
+      namedArgs.has('id') ? namedArgs.get('id') : args[0]
+    );
+    const rowArg = footprintArg;
+
+    this.builtins.set('footprint.total_volume', (args, namedArgs) => footprintValue(footprintArg(args, namedArgs), 'totalVolume'));
+    this.builtins.set('footprint.buy_volume', (args, namedArgs) => footprintValue(footprintArg(args, namedArgs), 'buyVolume'));
+    this.builtins.set('footprint.sell_volume', (args, namedArgs) => footprintValue(footprintArg(args, namedArgs), 'sellVolume'));
+    this.builtins.set('footprint.delta', (args, namedArgs) => footprintDelta(footprintArg(args, namedArgs)));
+    this.builtins.set('footprint.rows', (args, namedArgs) => {
+      const rows = createPineArray();
+      rows.values = footprintRows(footprintArg(args, namedArgs));
+      return rows;
+    });
+    this.builtins.set('footprint.poc', (args, namedArgs) => footprintPoc(footprintArg(args, namedArgs)) ?? Number.NaN);
+    this.builtins.set('footprint.vah', (args, namedArgs) => footprintValueAreaHigh(footprintArg(args, namedArgs)) ?? Number.NaN);
+    this.builtins.set('footprint.val', (args, namedArgs) => footprintValueAreaLow(footprintArg(args, namedArgs)) ?? Number.NaN);
+    this.builtins.set('footprint.get_row_by_price', (args, namedArgs) => {
+      const footprint = footprintArg(args, namedArgs);
+      const price = namedArgs.has('price') ? namedArgs.get('price') : args[namedArgs.has('id') ? 0 : 1];
+      return footprintRowByPrice(footprint, price) ?? Number.NaN;
+    });
+
+    this.builtins.set('volume_row.up_price', (args, namedArgs) => volumeRowValue(rowArg(args, namedArgs), 'upPrice'));
+    this.builtins.set('volume_row.down_price', (args, namedArgs) => volumeRowValue(rowArg(args, namedArgs), 'downPrice'));
+    this.builtins.set('volume_row.total_volume', (args, namedArgs) => volumeRowValue(rowArg(args, namedArgs), 'totalVolume'));
+    this.builtins.set('volume_row.buy_volume', (args, namedArgs) => volumeRowValue(rowArg(args, namedArgs), 'buyVolume'));
+    this.builtins.set('volume_row.sell_volume', (args, namedArgs) => volumeRowValue(rowArg(args, namedArgs), 'sellVolume'));
+    this.builtins.set('volume_row.delta', (args, namedArgs) => volumeRowDelta(rowArg(args, namedArgs)));
+    this.builtins.set('volume_row.has_buy_imbalance', (args, namedArgs) => volumeRowImbalance(rowArg(args, namedArgs), 'hasBuyImbalance'));
+    this.builtins.set('volume_row.has_sell_imbalance', (args, namedArgs) => volumeRowImbalance(rowArg(args, namedArgs), 'hasSellImbalance'));
+  }
+
   private registerLogBuiltins(): void {
     const addLog = (level: LogLevel, args: unknown[], namedArgs: Map<string, unknown>) => {
       const rawMessage = namedArgs.has('message') ? namedArgs.get('message') : args[0];
@@ -7882,35 +9653,55 @@ export class TealscriptEngine {
     this.profileBuiltinCalls += 1;
     const index = this.builtinCallCounts.get(name) ?? 0;
     this.builtinCallCounts.set(name, index + 1);
+    this.recordInputCallReservation(name);
     return `${name}_${index}`;
   }
 
   private builtinCallId(name: string, expr: CallExpression): string {
-    if (
-      (
-        name === 'alert'
-        || name === 'math.random'
-        || name === 'ta.cross'
-        || name === 'ta.crossover'
-        || name === 'ta.crossunder'
-        || name === 'ta.atr'
-        || name === 'ta.dmi'
-        || name === 'ta.macd'
-        || name === 'ta.obv'
-        || name === 'ta.pivothigh'
-        || name === 'ta.pivotlow'
-        || name === 'ta.rma'
-        || name === 'ta.smma'
-        || name === 'ta.rsi'
-        || name === 'ta.sar'
-        || name === 'ta.supertrend'
-      ) && expr.loc
-    ) {
+    if (LOCATION_STABLE_BUILTIN_CALLS.has(name) && expr.loc) {
       this.profileBuiltinCalls += 1;
       return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
     }
 
     return this.nextBuiltinCallId(name);
+  }
+
+  private visualOutputId(kind: string, callId: string, legacyId: string, existingIds: ReadonlyMap<string, unknown>): string {
+    const cached = this.visualOutputIdsByCallId.get(callId);
+    if (cached) return cached;
+    let id = existingIds.has(legacyId) ? callId : legacyId;
+    let suffix = 1;
+    while (existingIds.has(id)) {
+      id = `${kind}_${callId}_${suffix}`;
+      suffix += 1;
+    }
+    this.visualOutputIdsByCallId.set(callId, id);
+    return id;
+  }
+
+  private captureInputCallReservations<T>(fn: () => T): { value: T; reservations: InputCallReservation[] } {
+    const reservations: InputCallReservation[] = [];
+    this.inputCallReservationCaptureStack.push(reservations);
+    try {
+      return { value: fn(), reservations };
+    } finally {
+      this.inputCallReservationCaptureStack.pop();
+    }
+  }
+
+  private recordInputCallReservation(name: string): void {
+    if (name !== 'input' && !name.startsWith('input.')) return;
+    const active = this.inputCallReservationCaptureStack[this.inputCallReservationCaptureStack.length - 1];
+    if (!active) return;
+    active.push({ name });
+  }
+
+  private reserveInputCallReservations(reservations: InputCallReservation[] | undefined): void {
+    if (!reservations) return;
+    for (const reservation of reservations) {
+      const index = this.builtinCallCounts.get(reservation.name) ?? 0;
+      this.builtinCallCounts.set(reservation.name, index + 1);
+    }
   }
 
   private registerPlotBuiltins(): void {
@@ -7931,7 +9722,7 @@ export class TealscriptEngine {
     const fillArgs = ['plot1', 'plot2', 'color', 'title', 'editable', 'show_last', 'fillgaps', 'display', 'transp'] as const;
     const fillV4Args = ['plot1', 'plot2', 'color', 'transp', 'title', 'editable', 'show_last', 'fillgaps', 'display'] as const;
 
-    this.builtins.set('plot', (args, namedArgs, ctx) => {
+    this.builtins.set('plot', (args, namedArgs, ctx, _scope, callId) => {
       const parameterNames = this.pineVersion <= 4 ? plotV4Args : plotArgs;
       const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
       const value = arg('series') as number;
@@ -7958,9 +9749,8 @@ export class TealscriptEngine {
       const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
       const lineStyle = this.toOptionalString(arg('linestyle')) as PlotLineStyle | undefined;
 
-      // Use plot call order for untitled plots so multiple plot(...) calls do
-      // not collapse into one "Plot" series across every bar.
-      const id = hasExplicitTitle ? `plot_${title}` : `plot_untitled_${callIndex}`;
+      const legacyId = hasExplicitTitle ? `plot_${title}` : `plot_untitled_${callIndex}`;
+      const id = this.visualOutputId('plot', callId, legacyId, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -7994,7 +9784,7 @@ export class TealscriptEngine {
       return id;
     });
 
-    this.builtins.set('hline', (args, namedArgs, ctx) => {
+    this.builtins.set('hline', (args, namedArgs, ctx, _scope, callId) => {
       const price = this.toNumber(this.getOrderedCallArg(args, namedArgs, hlineArgs, 0));
       const title = (this.getOrderedCallArg(args, namedArgs, hlineArgs, 1, 'HLine')) as string;
       const color = (this.getOrderedCallArg(args, namedArgs, hlineArgs, 2, '#787B86')) as string;
@@ -8003,7 +9793,7 @@ export class TealscriptEngine {
       const editable = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, hlineArgs, 5));
       const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, hlineArgs, 6));
 
-      const id = `hline_${title}`;
+      const id = this.visualOutputId('hline', callId, `hline_${title}`, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -8022,7 +9812,7 @@ export class TealscriptEngine {
       return id;
     });
 
-    this.builtins.set('bgcolor', (args, namedArgs, ctx) => {
+    this.builtins.set('bgcolor', (args, namedArgs, ctx, _scope, callId) => {
       const parameterNames = this.pineVersion <= 4 ? bgcolorV4Args : bgcolorArgs;
       const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
       const color = this.applyPlotTransparency(
@@ -8036,7 +9826,7 @@ export class TealscriptEngine {
       const display = this.toOptionalInteger(arg('display'));
       const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
-      const id = `bgcolor_${title}`;
+      const id = this.visualOutputId('bgcolor', callId, `bgcolor_${title}`, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -8068,7 +9858,7 @@ export class TealscriptEngine {
       const showLast = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 3));
       const title = (this.getOrderedCallArg(args, namedArgs, barcolorArgs, 4, callId)) as string;
       const display = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, barcolorArgs, 5));
-      const id = `barcolor_${title}`;
+      const id = this.visualOutputId('barcolor', callId, `barcolor_${title}`, ctx.plots);
 
       let plot = ctx.plots.get(id);
       if (!plot) {
@@ -8113,7 +9903,7 @@ export class TealscriptEngine {
       const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 9));
       const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 10));
       const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotbarArgs, 11));
-      const id = `plotbar_${title}`;
+      const id = this.visualOutputId('plotbar', callId, `plotbar_${title}`, ctx.plots);
 
       let plot = ctx.plots.get(id);
       if (!plot) {
@@ -8157,7 +9947,7 @@ export class TealscriptEngine {
       const format = this.toOptionalString(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 11));
       const precision = this.toOptionalInteger(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 12));
       const forceOverlay = this.toOptionalBoolean(this.getOrderedCallArg(args, namedArgs, plotcandleArgs, 13));
-      const id = `plotcandle_${title}`;
+      const id = this.visualOutputId('plotcandle', callId, `plotcandle_${title}`, ctx.plots);
 
       let plot = ctx.plots.get(id);
       if (!plot) {
@@ -8209,7 +9999,7 @@ export class TealscriptEngine {
     // =========================================================================
     // plotshape - Conditional shape markers
     // =========================================================================
-    this.builtins.set('plotshape', (args, namedArgs, ctx) => {
+    this.builtins.set('plotshape', (args, namedArgs, ctx, _scope, callId) => {
       const parameterNames = this.pineVersion <= 4 ? plotshapeV4Args : plotshapeArgs;
       const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
       const series = arg('series'); // Can be boolean or number
@@ -8231,7 +10021,7 @@ export class TealscriptEngine {
       const precision = this.toOptionalInteger(arg('precision'));
       const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
-      const id = `plotshape_${title}`;
+      const id = this.visualOutputId('plotshape', callId, `plotshape_${title}`, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -8243,6 +10033,7 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
+          textValues: [],
           textColor: textColor ?? [],
           offset,
           editable,
@@ -8268,6 +10059,7 @@ export class TealscriptEngine {
         plot.color.push(value === null ? null : color);
       }
       this.setPlotTextColorValue(plot, ctx.bar_index, value === null ? null : textColor);
+      this.setPlotTextValue(plot, ctx.bar_index, value === null ? null : text);
 
       ctx.addPlotValue(id, value);
       return series;
@@ -8276,7 +10068,7 @@ export class TealscriptEngine {
     // =========================================================================
     // plotchar - Custom character markers
     // =========================================================================
-    this.builtins.set('plotchar', (args, namedArgs, ctx) => {
+    this.builtins.set('plotchar', (args, namedArgs, ctx, _scope, callId) => {
       const parameterNames = this.pineVersion <= 4 ? plotcharV4Args : plotcharArgs;
       const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
       const series = arg('series'); // Can be boolean or number
@@ -8298,7 +10090,7 @@ export class TealscriptEngine {
       const precision = this.toOptionalInteger(arg('precision'));
       const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
-      const id = `plotchar_${title}`;
+      const id = this.visualOutputId('plotchar', callId, `plotchar_${title}`, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -8310,6 +10102,7 @@ export class TealscriptEngine {
           location: location as 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute',
           size: size as 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto',
           text,
+          textValues: [],
           textColor: textColor ?? [],
           offset,
           editable,
@@ -8335,6 +10128,7 @@ export class TealscriptEngine {
         plot.color.push(value === null ? null : color);
       }
       this.setPlotTextColorValue(plot, ctx.bar_index, value === null ? null : textColor);
+      this.setPlotTextValue(plot, ctx.bar_index, value === null ? null : text);
 
       ctx.addPlotValue(id, value);
       return series;
@@ -8343,7 +10137,7 @@ export class TealscriptEngine {
     // =========================================================================
     // plotarrow - Directional arrows
     // =========================================================================
-    this.builtins.set('plotarrow', (args, namedArgs, ctx) => {
+    this.builtins.set('plotarrow', (args, namedArgs, ctx, _scope, callId) => {
       const parameterNames = this.pineVersion <= 4 ? plotarrowV4Args : plotarrowArgs;
       const arg = (name: string, fallback?: unknown) => this.getOrderedCallArgByName(args, namedArgs, parameterNames, name, fallback);
       const series = arg('series') as number; // Positive = up arrow, negative = down arrow
@@ -8361,7 +10155,7 @@ export class TealscriptEngine {
       const precision = this.toOptionalInteger(arg('precision'));
       const forceOverlay = this.toOptionalBoolean(arg('force_overlay'));
 
-      const id = `plotarrow_${title}`;
+      const id = this.visualOutputId('plotarrow', callId, `plotarrow_${title}`, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -8387,22 +10181,14 @@ export class TealscriptEngine {
       // Determine color based on value sign
       const plot = ctx.plots.get(id);
       if (plot && Array.isArray(plot.color)) {
-        if (isNaN(series) || series === 0) {
-          plot.color.push(null);
-        } else {
-          plot.color.push(series > 0 ? colorup : colordown);
-        }
-      }
-      if (plot && Array.isArray(plot.colorup)) {
-        plot.colorup.push(!isNaN(series) && series > 0 ? colorup : null);
-      }
-      if (plot && Array.isArray(plot.colordown)) {
-        plot.colordown.push(!isNaN(series) && series < 0 ? colordown : null);
+        this.setPlotArrayValue(plot.color, ctx.bar_index, isNaN(series) || series === 0 ? null : series > 0 ? colorup : colordown);
       }
 
       // Value determines arrow direction and size
       const value = isNaN(series) || series === 0 ? null : series;
-      ctx.addPlotValue(id, value);
+      this.setPlotArrayValue(plot?.values, ctx.bar_index, value);
+      this.setPlotArrayValue(plot?.colorup as (string | null)[] | undefined, ctx.bar_index, !isNaN(series) && series > 0 ? colorup : null);
+      this.setPlotArrayValue(plot?.colordown as (string | null)[] | undefined, ctx.bar_index, !isNaN(series) && series < 0 ? colordown : null);
       return series;
     });
 
@@ -8430,7 +10216,8 @@ export class TealscriptEngine {
       const fillgaps = this.toOptionalBoolean(arg('fillgaps'));
       const display = this.toOptionalInteger(arg('display'));
 
-      const id = hasExplicitTitle ? `fill_${title}` : `fill_${callId}`;
+      const legacyId = hasExplicitTitle ? `fill_${title}` : `fill_${callId}`;
+      const id = this.visualOutputId('fill', callId, legacyId, ctx.plots);
 
       if (ctx.bar_index === 0) {
         ctx.registerPlot({
@@ -8490,7 +10277,7 @@ export class TealscriptEngine {
       const condition = this.getOrderedCallArg(args, namedArgs, alertConditionArgs, 0);
       const title = String(this.getOrderedCallArg(args, namedArgs, alertConditionArgs, 1, callId));
       const message = String(this.getOrderedCallArg(args, namedArgs, alertConditionArgs, 2, ''));
-      const id = `alertcondition_${title}`;
+      const id = this.visualOutputId('alertcondition', callId, `alertcondition_${title}`, ctx.alerts);
       const isActive = this.isTruthy(condition);
 
       if (!ctx.alerts.has(id)) {
@@ -8580,18 +10367,30 @@ export class TealscriptEngine {
     const inputRangeArgs = ['defval', 'title', 'minval', 'maxval', 'step', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
     const inputOptionsArgs = ['defval', 'title', 'options', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
     const inputSimpleArgs = ['defval', 'title', 'tooltip', 'inline', 'group', 'confirm', 'display', 'active'] as const;
+    const inputBareArgs = ['defval', 'title', 'tooltip', 'inline', 'group', 'display', 'active'] as const;
     const legacyInputArgs = ['defval', 'title', 'type', 'minval', 'maxval', 'confirm', 'step', 'options', 'tooltip', 'inline', 'group', 'display', 'active'] as const;
     const legacyInputTypeAliases = new Map<string, InputType>([
+      ['bool', 'bool'],
       ['input.bool', 'bool'],
+      ['color', 'color'],
       ['input.color', 'color'],
+      ['float', 'float'],
       ['input.float', 'float'],
+      ['integer', 'int'],
       ['input.integer', 'int'],
+      ['int', 'int'],
       ['input.int', 'int'],
+      ['resolution', 'timeframe'],
       ['input.resolution', 'timeframe'],
+      ['session', 'session'],
       ['input.session', 'session'],
+      ['source', 'source'],
       ['input.source', 'source'],
+      ['string', 'string'],
       ['input.string', 'string'],
+      ['symbol', 'symbol'],
       ['input.symbol', 'symbol'],
+      ['timeframe', 'timeframe'],
       ['input.timeframe', 'timeframe'],
     ]);
 
@@ -8649,6 +10448,19 @@ export class TealscriptEngine {
     const optionsArg = (args: unknown[], namedArgs: Map<string, unknown>, names: readonly string[], index = 2): unknown[] | undefined => {
       const value = inputArg(args, namedArgs, names, index);
       return Array.isArray(value) ? value : undefined;
+    };
+
+    const inputIdForCallSite = (ctx: ExecutionContext, title: string, callId: string, staticTitle: boolean): string => {
+      const baseId = `input_${title}`;
+      if (!staticTitle) return baseId;
+
+      const cached = this.inputCallSiteIds.get(callId);
+      if (cached) return cached;
+      const id = ctx.inputDefinitions.some((input) => input.id === baseId)
+        ? `${baseId}_${callId}`
+        : baseId;
+      this.inputCallSiteIds.set(callId, id);
+      return id;
     };
 
     const commonMetadata = (
@@ -8759,12 +10571,12 @@ export class TealscriptEngine {
       names: readonly string[] = inputSimpleArgs,
       metadataResolver: (type: InputType, args: unknown[], namedArgs: Map<string, unknown>) => InputMetadata = metadataForInput,
     ) => {
-      return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
-        const defval = inputArg(args, namedArgs, names, 0);
+      return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext, _scope: Scope, callId: string) => {
+        const defval = this.unwrapKnownSourceValue(inputArg(args, namedArgs, names, 0));
         const title = this.toStringValue(inputArg(args, namedArgs, names, 1, type));
         const metadata = metadataResolver(type, args, namedArgs);
 
-        const id = `input_${title}`;
+        const id = inputIdForCallSite(ctx, title, callId, namedArgs.get('__tealscriptStaticTitle') !== false);
 
         if (ctx.bar_index === 0) {
           validateInputDefault(type, defval, metadata);
@@ -8781,21 +10593,21 @@ export class TealscriptEngine {
       };
     };
 
-    const createSourceInputFunc = (names: readonly string[]) => {
-      return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext) => {
+    const createSourceInputFunc = (names: readonly string[], includeConfirm = true) => {
+      return (args: unknown[], namedArgs: Map<string, unknown>, ctx: ExecutionContext, _scope: Scope, callId: string) => {
         const rawDefval = inputArg(args, namedArgs, names, 0); // Should be a series like 'close'
         const defval = this.unwrapKnownSourceValue(rawDefval);
         const title = this.toStringValue(inputArg(args, namedArgs, names, 1, 'Source'));
-        const id = `input_${title}`;
+        const id = inputIdForCallSite(ctx, title, callId, namedArgs.get('__tealscriptStaticTitle') !== false);
         const metadata = names === legacyInputArgs
           ? legacyMetadataForInput('source', args, namedArgs)
           : {
-              tooltip: optionalStringArg(args, namedArgs, inputSimpleArgs, 2),
-              inline: optionalStringArg(args, namedArgs, inputSimpleArgs, 3),
-              group: optionalStringArg(args, namedArgs, inputSimpleArgs, 4),
-              confirm: optionalBoolArg(args, namedArgs, inputSimpleArgs, 5),
-              display: inputArg(args, namedArgs, inputSimpleArgs, 6),
-              active: inputArg(args, namedArgs, inputSimpleArgs, 7),
+              tooltip: optionalStringArg(args, namedArgs, names, 2),
+              inline: optionalStringArg(args, namedArgs, names, 3),
+              group: optionalStringArg(args, namedArgs, names, 4),
+              confirm: includeConfirm ? optionalBoolArg(args, namedArgs, names, 5) : undefined,
+              display: inputArg(args, namedArgs, names, includeConfirm ? 6 : 5),
+              active: inputArg(args, namedArgs, names, includeConfirm ? 7 : 6),
             };
 
         if (ctx.bar_index === 0) {
@@ -8817,13 +10629,15 @@ export class TealscriptEngine {
       };
     };
 
-    this.builtins.set('input', (args, namedArgs, ctx) => {
+    this.builtins.set('input', (args, namedArgs, ctx, scope, callId) => {
       const explicitType = normalizeInputType(inputArg(args, namedArgs, legacyInputArgs, 2));
-      if (explicitType === 'source') return createSourceInputFunc(legacyInputArgs)(args, namedArgs, ctx);
-      if (explicitType) return createInputFunc(explicitType, legacyInputArgs, legacyMetadataForInput)(args, namedArgs, ctx);
+      if (explicitType === 'source') return createSourceInputFunc(legacyInputArgs)(args, namedArgs, ctx, scope, callId);
+      if (explicitType) return createInputFunc(explicitType, legacyInputArgs, legacyMetadataForInput)(args, namedArgs, ctx, scope, callId);
 
       const defval = inputArg(args, namedArgs, inputSimpleArgs, 0);
-      return createInputFunc(inferInputType(defval))(args, namedArgs, ctx);
+      return inferInputType(defval) === 'source'
+        ? createSourceInputFunc(inputBareArgs, false)(args, namedArgs, ctx, scope, callId)
+        : createInputFunc(inferInputType(defval))(args, namedArgs, ctx, scope, callId);
     });
     this.builtins.set('input.int', createInputFunc('int'));
     this.builtins.set('input.float', createInputFunc('float'));
@@ -8866,8 +10680,21 @@ export class TealscriptEngine {
         return this.toKnownSourceValue(ctx.ohlc4, this.getKnownSeriesByName('ohlc4', ctx)!);
       case 'hlcc4':
         return this.toKnownSourceValue(ctx.hlcc4, this.getKnownSeriesByName('hlcc4', ctx)!);
-      default:
+      default: {
+        const plot = ctx.getPlots().find((candidate) =>
+          candidate.type === 'plot'
+          && (candidate.id === value || candidate.title === value)
+        );
+        if (plot) {
+          return this.toKnownSourceValue(plot.values[ctx.bar_index], {
+            get: (i) => {
+              const index = ctx.bar_index - i;
+              return index >= 0 ? plot.values[index] ?? undefined : undefined;
+            },
+          });
+        }
         return value;
+      }
     }
   }
 
@@ -9058,6 +10885,11 @@ export class TealscriptEngine {
     this.builtins.set('str.tonumber', (args, namedArgs) => {
       const source = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'string'));
       return this.parsePineStringNumber(source);
+    });
+    this.builtins.set('str.tointeger', (args, namedArgs) => {
+      const source = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'string'));
+      const parsed = this.parsePineStringNumber(source);
+      return Number.isFinite(parsed) ? Math.trunc(parsed) : Number.NaN;
     });
     this.builtins.set('str.format_time', (args, namedArgs) => {
       const formatTimeArgs = ['time', 'format', 'timezone'];
@@ -9315,22 +11147,39 @@ export class TealscriptEngine {
     ));
     this.builtins.set('array.standardize', (args, namedArgs) => standardizeArrayValue(copyReadonlyArray(readArrayFromCall(args, namedArgs))));
     this.builtins.set('array.set', (args, namedArgs) => {
-      setArrayValue(
-        readMutableArrayFromCall(args, namedArgs),
-        arrayCallArg(args, namedArgs, 1, 'index') as number,
-        arrayCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'index']),
-      );
+      const array = readMutableArrayFromCall(args, namedArgs);
+      const value = arrayCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'index']);
+      setArrayValue(array, arrayCallArg(args, namedArgs, 1, 'index') as number, value);
+      this.markPersistentArrayDrawing(array, value);
       return null;
     });
-    this.builtins.set('array.push', (args, namedArgs) => pushArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'value')));
+    this.builtins.set('array.push', (args, namedArgs) => {
+      const array = readMutableArrayFromCall(args, namedArgs);
+      const value = arrayCallArg(args, namedArgs, 1, 'value');
+      const result = pushArrayValue(array, value);
+      this.markPersistentArrayDrawing(array, value);
+      return result;
+    });
     this.builtins.set('array.pop', (args, namedArgs) => popArrayValue(readMutableArrayFromCall(args, namedArgs)));
     this.builtins.set('array.shift', (args, namedArgs) => shiftArrayValue(readMutableArrayFromCall(args, namedArgs)));
-    this.builtins.set('array.unshift', (args, namedArgs) => unshiftArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'value')));
-    this.builtins.set('array.insert', (args, namedArgs) => insertArrayValue(
-      readMutableArrayFromCall(args, namedArgs),
-      arrayCallArg(args, namedArgs, 1, 'index') as number,
-      arrayCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'index']),
-    ));
+    this.builtins.set('array.unshift', (args, namedArgs) => {
+      const array = readMutableArrayFromCall(args, namedArgs);
+      const value = arrayCallArg(args, namedArgs, 1, 'value');
+      const result = unshiftArrayValue(array, value);
+      this.markPersistentArrayDrawing(array, value);
+      return result;
+    });
+    this.builtins.set('array.insert', (args, namedArgs) => {
+      const array = readMutableArrayFromCall(args, namedArgs);
+      const value = arrayCallArg(args, namedArgs, 2, 'value', undefined, ['id', 'index']);
+      const result = insertArrayValue(
+        array,
+        arrayCallArg(args, namedArgs, 1, 'index') as number,
+        value,
+      );
+      this.markPersistentArrayDrawing(array, value);
+      return result;
+    });
     this.builtins.set('array.remove', (args, namedArgs) => removeArrayValue(readMutableArrayFromCall(args, namedArgs), arrayCallArg(args, namedArgs, 1, 'index') as number));
     this.builtins.set('array.sort', (args, namedArgs) => {
       const secondArg = arrayCallArg(args, namedArgs, 1, 'order', undefined);
@@ -9359,7 +11208,15 @@ export class TealscriptEngine {
       return null;
     });
     this.builtins.set('array.join', (args, namedArgs) => joinArray(copyReadonlyArray(readArrayFromCall(args, namedArgs)), arrayCallArg(args, namedArgs, 1, 'separator')));
-    this.builtins.set('array.concat', (args, namedArgs) => concatArray(readMutableArrayFromCall(args, namedArgs), copyReadonlyArray(readArray(arrayCallArg(args, namedArgs, 1, 'id2')))));
+    this.builtins.set('array.concat', (args, namedArgs) => {
+      const array = readMutableArrayFromCall(args, namedArgs);
+      const other = copyReadonlyArray(readArray(arrayCallArg(args, namedArgs, 1, 'id2')));
+      const result = concatArray(array, other);
+      for (let index = 0; index < getArraySize(other); index++) {
+        this.markPersistentArrayDrawing(array, getArrayValue(other, index));
+      }
+      return result;
+    });
     this.builtins.set('array.slice', (args, namedArgs) => sliceArray(
       copyReadonlyArray(readArrayFromCall(args, namedArgs)),
       arrayCallArg(args, namedArgs, 1, 'index_from') as number,
@@ -9876,7 +11733,8 @@ export class TealscriptEngine {
       'display.data_window': 2,
       'display.status_line': 4,
       'display.price_scale': 8,
-      'display.all': 15,
+      'display.pine_screener': 16,
+      'display.all': 31,
     };
 
     for (const [name, value] of Object.entries(displayConstants)) {
@@ -9938,6 +11796,14 @@ export class TealscriptEngine {
     this.builtins.set('settlement_as_close.on', () => 'on');
     this.builtins.set('settlement_as_close.off', () => 'off');
     this.builtins.set('settlement_as_close.inherit', () => 'inherit');
+    this.builtins.set('syminfo.prefix', (args, namedArgs) => {
+      const symbol = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'symbol', this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker));
+      return this.syminfoPrefixFromSymbol(symbol);
+    });
+    this.builtins.set('syminfo.ticker', (args, namedArgs) => {
+      const symbol = this.toStringValue(this.getCallArg(args, namedArgs, 0, 'symbol', this.ctx.syminfo.tickerid ?? this.ctx.syminfo.ticker));
+      return this.syminfoTickerFromSymbol(symbol);
+    });
 
     const tickerNewArgs = [['prefix'], ['ticker'], ['session'], ['adjustment'], ['backadjustment'], ['settlement_as_close']] as const;
     const tickerModifyArgs = [['tickerid'], ['session'], ['adjustment'], ['backadjustment'], ['settlement_as_close']] as const;
@@ -10281,6 +12147,22 @@ export class TealscriptEngine {
       base: normalizedBase,
       modifiers: modifiers.filter((modifier) => modifier.trim() !== ''),
     };
+  }
+
+  private syminfoBaseFromSymbol(symbol: string): string {
+    return symbol.trim().split('|')[0]?.trim() ?? '';
+  }
+
+  private syminfoPrefixFromSymbol(symbol: string): string {
+    const base = this.syminfoBaseFromSymbol(symbol);
+    const separatorIndex = base.indexOf(':');
+    return separatorIndex >= 0 ? base.slice(0, separatorIndex) : '';
+  }
+
+  private syminfoTickerFromSymbol(symbol: string): string {
+    const base = this.syminfoBaseFromSymbol(symbol);
+    const separatorIndex = base.indexOf(':');
+    return separatorIndex >= 0 ? base.slice(separatorIndex + 1) : base;
   }
 
   private parseTickerModifierMap(modifiers: string[]): Map<string, string> {
@@ -11059,6 +12941,7 @@ export class TealscriptEngine {
       return total;
     });
 
+    this.builtins.set('ta.accdist', (_args, _namedArgs, _ctx, scope) => this.updateAccumulationDistribution(scope, '_ta_accdist_value'));
     this.builtins.set('ta.iii', (_args, _namedArgs, _ctx) => this.currentIntradayIntensityIndex());
     this.builtins.set('ta.nvi', (_args, _namedArgs, _ctx, scope) => this.updateNegativeVolumeIndex(scope, '_ta_nvi_value'));
     this.builtins.set('ta.pvi', (_args, _namedArgs, _ctx, scope) => this.updatePositiveVolumeIndex(scope, '_ta_pvi_value'));
@@ -11598,7 +13481,7 @@ export class TealscriptEngine {
     });
 
     // SuperTrend - ATR-based trend indicator
-    // Returns [supertrend value, direction (1 = up, -1 = down)]
+    // Returns [supertrend value, direction (-1 = up, 1 = down)]
     this.builtins.set('ta.supertrend', (args, namedArgs, ctx, scope, callId) => {
       const taSupertrendArgs = ['factor', 'atrPeriod'];
       const factor = this.toNumber(this.getOrderedCallArg(args, namedArgs, taSupertrendArgs, 0, 3.0));
@@ -11658,19 +13541,19 @@ export class TealscriptEngine {
       // Determine direction
       let direction: number;
       if (prevDir === undefined) {
-        direction = close > finalUpperBand ? 1 : -1;
+        direction = close > finalUpperBand ? -1 : 1;
       } else {
-        if (prevDir === -1 && close > finalUpperBand) {
-          direction = 1;
-        } else if (prevDir === 1 && close < finalLowerBand) {
+        if (prevDir === 1 && close > finalUpperBand) {
           direction = -1;
+        } else if (prevDir === -1 && close < finalLowerBand) {
+          direction = 1;
         } else {
           direction = prevDir;
         }
       }
 
       // SuperTrend value
-      const supertrend = direction === 1 ? finalLowerBand : finalUpperBand;
+      const supertrend = direction === -1 ? finalLowerBand : finalUpperBand;
 
       this.setBuiltinState(scope, prevUpperKey, finalUpperBand);
       this.setBuiltinState(scope, prevLowerKey, finalLowerBand);
@@ -11769,7 +13652,10 @@ export class TealscriptEngine {
 
     // ADX - Average Directional Index (scalar; same logic as ta.dmi but returns only adx)
     this.builtins.set('ta.adx', (args, namedArgs, ctx, scope, callId) => {
-      const [, , adx] = this.builtins.get('ta.dmi')!(args, namedArgs, ctx, scope, callId) as [number, number, number];
+      const taDmiArgs = ['diLength', 'adxSmoothing'];
+      const diLength = this.getOrderedCallArg(args, namedArgs, taDmiArgs, 0);
+      const adxSmoothing = this.getOrderedCallArg(args, namedArgs, taDmiArgs, 1, 14);
+      const [, , adx] = this.builtins.get('ta.dmi')!([diLength, adxSmoothing], new Map(), ctx, scope, callId) as [number, number, number];
       return adx;
     });
 
@@ -12034,9 +13920,8 @@ export class TealscriptEngine {
       if (duration === null || currentTime === undefined || !Number.isFinite(currentTime)) return false;
       if (previousTime === undefined || !Number.isFinite(previousTime)) return true;
 
-      const currentTimezoneOffsetMs = this.getTimezoneOffsetMinutes(this.ctx.syminfo.timezone, currentTime) * 60_000;
-      const previousTimezoneOffsetMs = this.getTimezoneOffsetMinutes(this.ctx.syminfo.timezone, previousTime) * 60_000;
-      return Math.floor((currentTime + currentTimezoneOffsetMs) / duration) !== Math.floor((previousTime + previousTimezoneOffsetMs) / duration);
+      return this.getTimeframeOpenTime(currentTime, timeframe, this.ctx.syminfo.timezone)
+        !== this.getTimeframeOpenTime(previousTime, timeframe, this.ctx.syminfo.timezone);
     });
 
     for (const part of ['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']) {
@@ -12348,7 +14233,7 @@ export class TealscriptEngine {
 
     if (/^\d+$/.test(normalized)) {
       const multiplier = Number(normalized);
-      return multiplier > 0 ? { period: normalized, multiplier, unit: 'minute' } : null;
+      return multiplier >= 1 && multiplier <= 1440 ? { period: normalized, multiplier, unit: 'minute' } : null;
     }
 
     const match = /^(\d+)?([TSDWM])$/.exec(normalized);
@@ -12358,20 +14243,21 @@ export class TealscriptEngine {
     if (!Number.isInteger(multiplier) || multiplier <= 0) return null;
 
     const unit = match[2];
-    if (unit === 'S' && ![1, 5, 10, 15, 30, 45].includes(multiplier)) {
-      return null;
-    }
-
     switch (unit) {
       case 'T':
+        if (![1, 10, 100, 1000].includes(multiplier)) return null;
         return { period: normalized, multiplier, unit: 'tick' };
       case 'S':
+        if (![1, 5, 10, 15, 30, 45].includes(multiplier)) return null;
         return { period: normalized, multiplier, unit: 'second' };
       case 'D':
+        if (multiplier > 365) return null;
         return { period: normalized, multiplier, unit: 'day' };
       case 'W':
+        if (multiplier > 52) return null;
         return { period: normalized, multiplier, unit: 'week' };
       case 'M':
+        if (multiplier > 12) return null;
         return { period: normalized, multiplier, unit: 'month' };
       default:
         return null;

@@ -243,6 +243,7 @@ describe('strategy ledger model', () => {
       processOrdersOnClose: false,
       useBarMagnifier: false,
     });
+    expect(createDefaultStrategySettings().pyramiding).toBe(1);
   });
 
   it('initializes an empty ledger from resolved settings', () => {

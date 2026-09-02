@@ -117,13 +117,57 @@ export class Scope {
   }
 
   /**
+   * Bind a regular function parameter. This is equivalent to declaring a
+   * `kind: none` variable without a type annotation, but avoids the generic
+   * declaration checks on the UDF hot path.
+   */
+  declareParameter(name: string, value: unknown, sourceSeries?: SourceSeriesAccessor): void {
+    const existing = this.variables.get(name);
+    if (existing) {
+      existing.value = value;
+      existing.kind = 'none';
+      existing.type = undefined;
+      existing.initialized = true;
+      existing.sourceSeries = sourceSeries;
+
+      if (existing.series) {
+        existing.series.set(value);
+      } else if (this.shouldBecomeSeries(value)) {
+        existing.series = new Series<unknown>();
+        existing.series.advance();
+        existing.series.set(value);
+      }
+      return;
+    }
+
+    const entry: VariableEntry = {
+      value,
+      kind: 'none',
+      type: undefined,
+      initialized: true,
+      sourceSeries,
+    };
+
+    if (this.shouldBecomeSeries(value)) {
+      entry.series = new Series<unknown>();
+      entry.series.advance();
+      entry.series.set(value);
+    }
+
+    this.variables.set(name, entry);
+  }
+
+  /**
    * Check if a value should be wrapped in a series.
    *
    * Arrays are intentionally excluded because this runtime currently treats
    * `arrayVar[index]` as element access, while map history uses `mapVar[n]`.
    */
   private shouldBecomeSeries(value: unknown): boolean {
-    return typeof value === 'number' || isPineMap(value);
+    return typeof value === 'number'
+      || typeof value === 'boolean'
+      || typeof value === 'string'
+      || isPineMap(value);
   }
 
   // =========================================================================
@@ -459,6 +503,9 @@ function createCloneContext(): CloneContext {
 }
 
 function cloneSnapshotValue(value: unknown, context: CloneContext): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => cloneSnapshotValue(entry, context));
+  }
   if (isPineArray(value)) {
     return copyArray(value);
   }

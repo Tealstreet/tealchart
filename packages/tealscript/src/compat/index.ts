@@ -1,21 +1,62 @@
 export const PINE_COMPATIBILITY_SCHEMA_VERSION = 1;
 
-export const compatibilityStages = [
-  'parse',
-  'semantic',
-  'runtime',
-  'datafeed',
-  'output',
-  'render',
-] as const;
+export {
+  PINE_V6_GRAMMAR_CONSTRUCTS,
+  PINE_V6_GRAMMAR_REFERENCE_SOURCES,
+  PINE_V6_KNOWN_MISSING_GRAMMAR,
+  summarizePineV6GrammarCoverage,
+  type PineV6GrammarCategory,
+  type PineV6GrammarConstruct,
+  type PineV6GrammarCoverageSummary,
+} from './pineV6GrammarReference';
 
-export type CompatibilityStage = typeof compatibilityStages[number];
+export {
+  committedPineV6BuiltinReferenceNames,
+  flattenedAuditGroupNames,
+  PINE_V6_REFERENCE_MANUAL_LOCAL_EXTENSION_GROUPS,
+  PINE_V6_REFERENCE_MANUAL_MISSING_GRAMMAR_GROUPS,
+  PINE_V6_REFERENCE_MANUAL_UNRESOLVED_BUILTIN_GROUPS,
+  pineV6ReferenceManualBuiltinNames,
+  pineV6ReferenceManualGrammarEntries,
+  summarizePineV6ReferenceManualAudit,
+  type PineV6ManualAuditReasonGroup,
+  type PineV6ReferenceManualAuditSummary,
+} from './pineV6ReferenceManualAudit';
+
+export {
+  PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX,
+  PINE_V6_REFERENCE_MANUAL_GRAMMAR_INDEX,
+  PINE_V6_REFERENCE_MANUAL_INDEX_SOURCE,
+} from './pineV6ReferenceManualIndex';
+
+export {
+  getCompiledFallbackBaselineGroup,
+  PINE_COMPILED_FALLBACK_BASELINE,
+  summarizeCompiledFallbackReasons,
+  type CompiledFallbackBaseline,
+  type CompiledFallbackBaselineGroup,
+  type CompiledFallbackReasonSummary,
+} from './compiledFallbackBaseline';
+
+export {
+  getProductionWorkerFallbackBaselineGroup,
+  PINE_PRODUCTION_WORKER_FALLBACK_BASELINE,
+  summarizeProductionWorkerExecutionModes,
+  summarizeProductionWorkerFallbackReasons,
+  type ProductionWorkerFallbackBaseline,
+  type ProductionWorkerFallbackBaselineGroup,
+} from './productionWorkerFallbackBaseline';
+
+export const compatibilityStages = ['parse', 'semantic', 'runtime', 'datafeed', 'output', 'render'] as const;
+
+export type CompatibilityStage = (typeof compatibilityStages)[number];
 
 export const compatibilityFailureClasses = [
   'parse_gap',
   'semantic_gap',
   'unsupported_planned',
   'runtime_gap',
+  'compiled_fallback',
   'data_gap',
   'output_gap',
   'render_gap',
@@ -23,15 +64,16 @@ export const compatibilityFailureClasses = [
   'licensing_blocked',
 ] as const;
 
-export type CompatibilityFailureClass = typeof compatibilityFailureClasses[number];
+export type CompatibilityFailureClass = (typeof compatibilityFailureClasses)[number];
 
 export const compatibilityStageStatuses = ['not_run', 'passed', 'failed', 'skipped'] as const;
 
-export type CompatibilityStageStatus = typeof compatibilityStageStatuses[number];
+export type CompatibilityStageStatus = (typeof compatibilityStageStatuses)[number];
 
 export interface CompatibilityDiagnostic {
   code: string;
   message: string;
+  severity?: 'error' | 'warning' | 'info';
   line?: number;
   column?: number;
 }
@@ -63,21 +105,27 @@ export type PineCompatibilityCorpusStages = CompatibilityStageOutcome[] | (() =>
 export interface PineCompatibilityCorpusCase {
   ledgerEntry: PineScriptLedgerEntry;
   stages: PineCompatibilityCorpusStages;
+  excludedFailureReason?: PineCompatibilityExcludedFailureReason;
 }
 
 type ResolvedPineCompatibilityCorpusCase = {
   ledgerEntry: PineScriptLedgerEntry;
   stages: CompatibilityStageOutcome[];
+  excludedFailureReason?: PineCompatibilityExcludedFailureReason;
 };
+
+export type PineCompatibilityExcludedFailureReason = 'classifier_self_test' | 'intentional_negative';
 
 export interface PineCompatibilityCorpusSummary {
   total: number;
   passed: number;
   failed: number;
   plannedUnsupported: number;
+  excludedFailed: number;
   actionableFailed: number;
   byFirstFailureStage: Partial<Record<CompatibilityStage, number>>;
   byFirstFailureClass: Partial<Record<CompatibilityFailureClass, number>>;
+  byExcludedFailureReason: Partial<Record<PineCompatibilityExcludedFailureReason, number>>;
   byFeatureTag: Record<string, { total: number; passed: number; failed: number }>;
   validationErrors: Record<string, string[]>;
 }
@@ -110,20 +158,11 @@ export interface PineCompatibilityCorpusRun {
 
 export type PineVersion = 'v1' | 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'unknown';
 
-export type PineScriptCategory =
-  | 'indicator'
-  | 'strategy'
-  | 'library'
-  | 'screener'
-  | 'unknown';
+export type PineScriptCategory = 'indicator' | 'strategy' | 'library' | 'screener' | 'unknown';
 
 export type PineScriptSourceKind = 'official_docs' | 'public_script' | 'manual_fixture';
 
-export type PineScriptLicenseStatus =
-  | 'redistributable'
-  | 'unknown'
-  | 'not_redistributable'
-  | 'internal_fixture';
+export type PineScriptLicenseStatus = 'redistributable' | 'unknown' | 'not_redistributable' | 'internal_fixture';
 
 export type PineScriptStoragePolicy = 'metadata_only' | 'reduced_fixture_only' | 'raw_allowed';
 
@@ -165,9 +204,9 @@ export function normalizeCompatibilityStageOutcomes(stages: CompatibilityStageOu
 }
 
 export function summarizeCompatibilityOutcome(stages: CompatibilityStageOutcome[]): CompatibilityRunSummary {
-  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find((stage) => (
-    stage.status !== 'passed' && stage.status !== 'skipped'
-  ));
+  const firstFailure = normalizeCompatibilityStageOutcomes(stages).find(
+    (stage) => stage.status !== 'passed' && stage.status !== 'skipped',
+  );
   if (!firstFailure) {
     return { passed: true };
   }
@@ -235,12 +274,15 @@ export function validatePineScriptLedgerEntry(entry: PineScriptLedgerEntry): str
   const errors: string[] = [];
   if (entry.id.trim() === '') errors.push('ledger entry id must not be empty');
   if (entry.title.trim() === '') errors.push(`ledger entry ${entry.id || '<missing>'} title must not be empty`);
-  if (entry.featureTags.length === 0) errors.push(`ledger entry ${entry.id || '<missing>'} must include at least one feature tag`);
+  if (entry.featureTags.length === 0)
+    errors.push(`ledger entry ${entry.id || '<missing>'} must include at least one feature tag`);
   if (entry.source.kind !== 'manual_fixture' && !entry.source.url && !entry.source.searchContext) {
     errors.push(`ledger entry ${entry.id || '<missing>'} source must include a url or searchContext`);
   }
   if (entry.source.licenseStatus === 'not_redistributable' && entry.storagePolicy === 'raw_allowed') {
-    errors.push(`ledger entry ${entry.id || '<missing>'} cannot store raw source when licenseStatus is not_redistributable`);
+    errors.push(
+      `ledger entry ${entry.id || '<missing>'} cannot store raw source when licenseStatus is not_redistributable`,
+    );
   }
   if (entry.source.licenseStatus === 'unknown' && entry.storagePolicy === 'raw_allowed') {
     errors.push(`ledger entry ${entry.id || '<missing>'} cannot store raw source when licenseStatus is unknown`);
@@ -251,9 +293,7 @@ export function validatePineScriptLedgerEntry(entry: PineScriptLedgerEntry): str
 export function validatePineScriptLedger(ledger: PineScriptLedger): Record<string, string[]> {
   const validationErrors: Record<string, string[]> = {};
   if (ledger.schemaVersion !== PINE_COMPATIBILITY_SCHEMA_VERSION) {
-    validationErrors['<ledger>'] = [
-      `unsupported Pine compatibility ledger schema version: ${ledger.schemaVersion}`,
-    ];
+    validationErrors['<ledger>'] = [`unsupported Pine compatibility ledger schema version: ${ledger.schemaVersion}`];
   }
 
   const seenIds = new Set<string>();
@@ -275,11 +315,13 @@ export function validatePineScriptLedger(ledger: PineScriptLedger): Record<strin
 
 export function runPineCompatibilityCorpus(cases: PineCompatibilityCorpusCase[]): PineCompatibilityCorpusRun {
   const resolvedCases = cases.map(resolvePineCompatibilityCorpusCase);
-  const outcomes = resolvedCases.map(({ ledgerEntry, stages }) => createCompatibilityRunOutcome({
-    scriptId: ledgerEntry.id,
-    pineVersion: ledgerEntry.pineVersion,
-    stages,
-  }));
+  const outcomes = resolvedCases.map(({ ledgerEntry, stages }) =>
+    createCompatibilityRunOutcome({
+      scriptId: ledgerEntry.id,
+      pineVersion: ledgerEntry.pineVersion,
+      stages,
+    }),
+  );
 
   return {
     schemaVersion: PINE_COMPATIBILITY_SCHEMA_VERSION,
@@ -292,10 +334,12 @@ export function runPineCompatibilityLedger(
   ledger: PineScriptLedger,
   getStages: PineCompatibilityStageProvider,
 ): PineCompatibilityCorpusRun {
-  return runPineCompatibilityCorpus(ledger.entries.map((ledgerEntry, index) => ({
-    ledgerEntry,
-    stages: getStages(ledgerEntry, index),
-  })));
+  return runPineCompatibilityCorpus(
+    ledger.entries.map((ledgerEntry, index) => ({
+      ledgerEntry,
+      stages: getStages(ledgerEntry, index),
+    })),
+  );
 }
 
 export function createPineCompatibilityCoverageIndex(ledger: PineScriptLedger): PineCompatibilityCoverageIndex {
@@ -327,7 +371,7 @@ export function createPineCompatibilityCoverageIndex(ledger: PineScriptLedger): 
 }
 
 export function summarizePineCompatibilityCorpus(
-  cases: Array<{ ledgerEntry: PineScriptLedgerEntry; stages: CompatibilityStageOutcome[] }>,
+  cases: ResolvedPineCompatibilityCorpusCase[],
   outcomes: CompatibilityRunOutcome[],
 ): PineCompatibilityCorpusSummary {
   const validationErrors: Record<string, string[]> = {
@@ -335,9 +379,11 @@ export function summarizePineCompatibilityCorpus(
   };
   const byFirstFailureStage: Partial<Record<CompatibilityStage, number>> = {};
   const byFirstFailureClass: Partial<Record<CompatibilityFailureClass, number>> = {};
+  const byExcludedFailureReason: Partial<Record<PineCompatibilityExcludedFailureReason, number>> = {};
   const byFeatureTag: Record<string, { total: number; passed: number; failed: number }> = {};
   let passed = 0;
   let plannedUnsupported = 0;
+  let excludedFailed = 0;
 
   for (let index = 0; index < outcomes.length; index += 1) {
     const outcome = outcomes[index];
@@ -366,13 +412,20 @@ export function summarizePineCompatibilityCorpus(
     }
 
     if (outcome.summary.firstFailureStage) {
-      byFirstFailureStage[outcome.summary.firstFailureStage] = (byFirstFailureStage[outcome.summary.firstFailureStage] ?? 0) + 1;
+      byFirstFailureStage[outcome.summary.firstFailureStage] =
+        (byFirstFailureStage[outcome.summary.firstFailureStage] ?? 0) + 1;
     }
     if (outcome.summary.firstFailureClass) {
-      byFirstFailureClass[outcome.summary.firstFailureClass] = (byFirstFailureClass[outcome.summary.firstFailureClass] ?? 0) + 1;
+      byFirstFailureClass[outcome.summary.firstFailureClass] =
+        (byFirstFailureClass[outcome.summary.firstFailureClass] ?? 0) + 1;
       if (outcome.summary.firstFailureClass === 'unsupported_planned') {
         plannedUnsupported += 1;
       }
+    }
+    if (corpusCase?.excludedFailureReason) {
+      excludedFailed += 1;
+      byExcludedFailureReason[corpusCase.excludedFailureReason] =
+        (byExcludedFailureReason[corpusCase.excludedFailureReason] ?? 0) + 1;
     }
   }
 
@@ -383,18 +436,23 @@ export function summarizePineCompatibilityCorpus(
     passed,
     failed,
     plannedUnsupported,
-    actionableFailed: failed - plannedUnsupported,
+    excludedFailed,
+    actionableFailed: failed - plannedUnsupported - excludedFailed,
     byFirstFailureStage,
     byFirstFailureClass,
+    byExcludedFailureReason,
     byFeatureTag,
     validationErrors,
   };
 }
 
-function resolvePineCompatibilityCorpusCase(corpusCase: PineCompatibilityCorpusCase): ResolvedPineCompatibilityCorpusCase {
+function resolvePineCompatibilityCorpusCase(
+  corpusCase: PineCompatibilityCorpusCase,
+): ResolvedPineCompatibilityCorpusCase {
   return {
     ledgerEntry: corpusCase.ledgerEntry,
     stages: typeof corpusCase.stages === 'function' ? corpusCase.stages() : corpusCase.stages,
+    excludedFailureReason: corpusCase.excludedFailureReason,
   };
 }
 
@@ -456,11 +514,7 @@ function clonePineScriptLedgerEntry(entry: PineScriptLedgerEntry): PineScriptLed
   };
 }
 
-function appendValidationErrors(
-  validationErrors: Record<string, string[]>,
-  key: string,
-  errors: string[],
-): void {
+function appendValidationErrors(validationErrors: Record<string, string[]>, key: string, errors: string[]): void {
   if (errors.length === 0) return;
   validationErrors[key] = [...(validationErrors[key] ?? []), ...errors];
 }
@@ -481,6 +535,7 @@ export function formatPineCompatibilityCorpusMarkdown(run: PineCompatibilityCorp
     `Passed: ${run.summary.passed}`,
     `Failed: ${run.summary.failed}`,
     `Planned unsupported: ${run.summary.plannedUnsupported}`,
+    `Excluded failed: ${run.summary.excludedFailed}`,
     `Actionable failed: ${run.summary.actionableFailed}`,
     `Pass rate: ${passRate}%`,
     `Actionable pass rate: ${actionablePassRate}%`,
@@ -491,13 +546,18 @@ export function formatPineCompatibilityCorpusMarkdown(run: PineCompatibilityCorp
     '## First Failure Classes',
     ...formatCountTable(run.summary.byFirstFailureClass),
     '',
+    '## Excluded Failure Reasons',
+    ...formatCountTable(run.summary.byExcludedFailureReason),
+    '',
     '## Feature Tags',
     ...formatFeatureTagTable(run.summary.byFeatureTag),
   ];
 
   if (Object.keys(run.summary.validationErrors).length > 0) {
     lines.push('', '## Validation Errors');
-    for (const [scriptId, errors] of Object.entries(run.summary.validationErrors).sort(([a], [b]) => a.localeCompare(b))) {
+    for (const [scriptId, errors] of Object.entries(run.summary.validationErrors).sort(([a], [b]) =>
+      a.localeCompare(b),
+    )) {
       lines.push(`- ${scriptId}: ${errors.join('; ')}`);
     }
   }

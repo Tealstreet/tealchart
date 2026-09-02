@@ -460,6 +460,13 @@ export class TealchartWidget implements ITealchartWebWidget {
             this._logger?.error(LogCategory.Indicators, `onTealscriptError callback threw for ${scriptId}`, cbErr);
           }
         },
+        onExecution: (summary) => {
+          try {
+            this._options.onTealscriptExecution?.(summary);
+          } catch (cbErr) {
+            this._logger?.error(LogCategory.Indicators, `onTealscriptExecution callback threw`, cbErr);
+          }
+        },
         onInputsDiscovered: (scriptId, inputDefs) => {
           // Populate study's inputs with default values from input definitions
           const study = this._chartApi.getStudyById(scriptId);
@@ -482,7 +489,9 @@ export class TealchartWidget implements ITealchartWebWidget {
           this._indicatorDeclarationMap.set(scriptId, declaration);
           this._scheduler.markDirty(DIRTY.PLOTS);
         },
-        getRuntimeOptions: () => this._getTealscriptRuntimeOptions(),
+        getRuntimeOptions: () => this._getTealscriptRuntimeOptions(options),
+        getLibraries: options.getTealscriptLibraries,
+        resolveRequestData: options.resolveTealscriptRequestData,
       });
 
       // Set up study creation callback
@@ -1699,19 +1708,26 @@ export class TealchartWidget implements ITealchartWebWidget {
           overlay: boolean;
           yAxisRange?: { min: number; max: number };
           explicitPlotZOrder?: boolean;
+          format?: string;
           name?: string;
+          precision?: number;
+          scale?: string;
           inputs?: Record<string, unknown>;
         }
       > = {};
       for (const [studyId, config] of this._indicatorConfigMap) {
+        const declaration = this._indicatorDeclarationMap.get(studyId);
         // For jailbreak indicators, get inputs from persisted state
         if (this._jailbreakInstanceIds.has(studyId)) {
           const persisted = persistedIndicators.find((ind) => ind.id === studyId);
           indicatorPaneInfo[studyId] = {
             overlay: config.overlay,
             yAxisRange: config.yAxisRange,
-            explicitPlotZOrder: this._indicatorDeclarationMap.get(studyId)?.explicitPlotZOrder,
+            explicitPlotZOrder: declaration?.explicitPlotZOrder,
+            format: declaration?.format,
             name: config.name,
+            precision: declaration?.precision,
+            scale: declaration?.scale,
             inputs: persisted?.inputs ?? {},
           };
         } else {
@@ -1720,8 +1736,11 @@ export class TealchartWidget implements ITealchartWebWidget {
           indicatorPaneInfo[studyId] = {
             overlay: config.overlay,
             yAxisRange: config.yAxisRange,
-            explicitPlotZOrder: this._indicatorDeclarationMap.get(studyId)?.explicitPlotZOrder,
+            explicitPlotZOrder: declaration?.explicitPlotZOrder,
+            format: declaration?.format,
             name: config.name,
+            precision: declaration?.precision,
+            scale: declaration?.scale,
             inputs,
           };
         }
@@ -2275,12 +2294,19 @@ export class TealchartWidget implements ITealchartWebWidget {
     return jailbreakInputsToInputDefinitions(builtin.jailbreak.inputs);
   }
 
-  private _getTealscriptRuntimeOptions(): TealscriptRuntimeOptions {
+  private _getTealscriptRuntimeOptions(options?: TealchartWidgetOptions): TealscriptRuntimeOptions {
     const symbolInfo = this._symbolInfo;
     const pricescale = symbolInfo?.pricescale && symbolInfo.pricescale > 0 ? symbolInfo.pricescale : undefined;
     const minmov = symbolInfo?.minmov && symbolInfo.minmov > 0 ? symbolInfo.minmov : 1;
 
     return {
+      backend: {
+        executionBackendOverride: options?.tealscriptExecutionBackend,
+        enableClosureBackend:
+          typeof options?.enableTealscriptClosureBackend === 'function'
+            ? options.enableTealscriptClosureBackend()
+            : options?.enableTealscriptClosureBackend,
+      },
       syminfo: {
         ticker: symbolInfo?.ticker ?? symbolInfo?.name ?? this._symbol,
         description: symbolInfo?.description ?? symbolInfo?.name ?? this._symbol,
