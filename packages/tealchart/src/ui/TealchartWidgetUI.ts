@@ -74,6 +74,8 @@ import { applyChromeThemeVars } from './chromeTheme';
 import { div, icons, span } from './dom';
 import { IndicatorPaneLegend } from './IndicatorPaneLegend';
 import { IndicatorSettingsModal } from './IndicatorSettingsModal';
+import type { IndicatorCategory } from '../indicators/builtinIndicators';
+
 import { IndicatorsModal } from './IndicatorsModal';
 
 function resolveUserDrawingTextDecorationLine(style: { textUnderline?: boolean; textLineThrough?: boolean }): string {
@@ -127,6 +129,8 @@ export interface TealchartWidgetUIOptions {
   onAddIndicator?: (indicator: BuiltinIndicator) => void;
   /** Indicators available in this chart runtime */
   availableIndicators?: BuiltinIndicator[];
+  /** Host-supplied categories for available custom indicators */
+  additionalIndicatorCategories?: IndicatorCategory[];
   /** Callback when indicator visibility is toggled */
   onToggleIndicator?: (indicatorId: string) => void;
   /** Callback when indicator settings are requested */
@@ -475,6 +479,7 @@ export class TealchartWidgetUI {
     // Create modals (mounted to rootEl so they're positioned within the chart)
     this.indicatorsModal = new IndicatorsModal({
       indicators: options.availableIndicators,
+      additionalCategories: options.additionalIndicatorCategories,
       onSelectIndicator: (indicator) => {
         options.onAddIndicator?.(indicator);
       },
@@ -953,6 +958,11 @@ export class TealchartWidgetUI {
   setAvailableIndicators(indicators: BuiltinIndicator[]): void {
     this.options.availableIndicators = indicators;
     this.indicatorsModal?.setIndicators(indicators);
+  }
+
+  setAdditionalIndicatorCategories(categories: IndicatorCategory[]): void {
+    this.options.additionalIndicatorCategories = categories;
+    this.indicatorsModal?.setAdditionalCategories(categories);
   }
 
   /**

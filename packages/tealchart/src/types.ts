@@ -20,7 +20,7 @@ import type {
   UserDrawingPropertiesIntent,
   UserDrawingState,
 } from './drawings';
-import type { BuiltinIndicator } from './indicators/builtinIndicators';
+import type { BuiltinIndicator, IndicatorCategory } from './indicators/builtinIndicators';
 import type { ChartThemeInput } from './theme';
 
 import { DEFAULT_BUY_CANDLE_COLOR, DEFAULT_SELL_CANDLE_COLOR } from './constants';
@@ -1217,6 +1217,11 @@ export interface TealchartWidgetOptions {
    * These use the normal Tealscript worker runtime and are never jailbreak indicators.
    */
   customTealscriptIndicators?: BuiltinIndicator[];
+  /**
+   * Host-supplied indicator categories for custom indicator catalogs.
+   * Tealchart renders them only when matching indicators are available.
+   */
+  additionalIndicatorCategories?: IndicatorCategory[];
   /**
    * Called when a TealScript study emits a parse/runtime error after creation.
    * The script id is the study id returned by createStudy().

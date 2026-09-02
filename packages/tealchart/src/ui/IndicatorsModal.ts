@@ -4,7 +4,7 @@
  * Displays a searchable list of indicators grouped by category.
  * Extends the Modal base class for overlay, escape key, and click-outside handling.
  */
-import type { BuiltinIndicator } from '../indicators/builtinIndicators';
+import type { BuiltinIndicator, BuiltinIndicatorCategoryId, IndicatorCategory } from '../indicators/builtinIndicators';
 import type { ModalOptions } from './Modal';
 
 import { BUILTIN_INDICATORS, INDICATOR_CATEGORIES } from '../indicators/builtinIndicators';
@@ -19,6 +19,8 @@ export interface IndicatorsModalOptions {
   onSelectIndicator: (indicator: BuiltinIndicator) => void;
   /** Indicators available in this chart runtime */
   indicators?: BuiltinIndicator[];
+  /** Categories available beyond the built-in Tealchart catalog */
+  additionalCategories?: IndicatorCategory[];
   /** Get currently active indicator IDs */
   getActiveIndicatorIds?: () => string[];
   /** Translation strings */
@@ -36,7 +38,7 @@ export interface IndicatorsModalOptions {
 }
 
 // Category translation key mapping
-const CATEGORY_KEYS: Record<BuiltinIndicator['category'], string> = {
+const CATEGORY_KEYS: Record<BuiltinIndicatorCategoryId, string> = {
   tealstreet: 'categoryTealstreet',
   trend: 'categoryTrend',
   momentum: 'categoryMomentum',
@@ -223,7 +225,7 @@ export class IndicatorsModal extends Modal {
     }
 
     // Group by category
-    const groups = new Map<BuiltinIndicator['category'], BuiltinIndicator[]>();
+    const groups = new Map<string, BuiltinIndicator[]>();
     for (const indicator of indicators) {
       const existing = groups.get(indicator.category) || [];
       groups.set(indicator.category, [...existing, indicator]);
@@ -233,15 +235,13 @@ export class IndicatorsModal extends Modal {
     const activeIds = new Set(this.indicatorOptions.getActiveIndicatorIds?.() || []);
 
     // Render categories in order
-    for (const { id: categoryId } of INDICATOR_CATEGORIES) {
+    const categories = this.getIndicatorCategories();
+    for (const { id: categoryId, name } of categories) {
       const categoryIndicators = groups.get(categoryId);
       if (!categoryIndicators || categoryIndicators.length === 0) continue;
 
-      const categoryKey = CATEGORY_KEYS[categoryId];
-      const categoryName = this.getTranslation(
-        categoryKey,
-        INDICATOR_CATEGORIES.find((c) => c.id === categoryId)?.name || categoryId,
-      );
+      const categoryKey = CATEGORY_KEYS[categoryId as BuiltinIndicatorCategoryId];
+      const categoryName = categoryKey ? this.getTranslation(categoryKey, name) : name;
 
       // Category header
       const categoryHeader = this.createElement('div', {
@@ -296,6 +296,17 @@ export class IndicatorsModal extends Modal {
     return this.indicatorOptions.indicators ?? BUILTIN_INDICATORS;
   }
 
+  private getIndicatorCategories(): IndicatorCategory[] {
+    const seen = new Set<string>();
+    const categories: IndicatorCategory[] = [];
+    for (const category of [...INDICATOR_CATEGORIES, ...(this.indicatorOptions.additionalCategories ?? [])]) {
+      if (seen.has(category.id)) continue;
+      seen.add(category.id);
+      categories.push(category);
+    }
+    return categories;
+  }
+
   private searchIndicators(query: string): BuiltinIndicator[] {
     const lowerQuery = query.toLowerCase();
     return this.getAvailableIndicators().filter(
@@ -326,6 +337,13 @@ export class IndicatorsModal extends Modal {
 
   setIndicators(indicators: BuiltinIndicator[]): void {
     this.indicatorOptions.indicators = indicators;
+    if (this.state.isOpen) {
+      this.renderList();
+    }
+  }
+
+  setAdditionalCategories(categories: IndicatorCategory[]): void {
+    this.indicatorOptions.additionalCategories = categories;
     if (this.state.isOpen) {
       this.renderList();
     }

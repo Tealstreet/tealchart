@@ -87,4 +87,39 @@ describe('IndicatorsModal', () => {
     expect(document.body.textContent).toContain('Demo Custom Study');
     modal.unmount();
   });
+
+  it('renders host-supplied categories only when matching indicators are available', () => {
+    const movingAverage = BUILTIN_INDICATORS.find((indicator) => indicator.id === 'sma');
+    if (!movingAverage) {
+      throw new Error('Expected SMA indicator to exist');
+    }
+
+    const modal = new IndicatorsModal({
+      indicators: [movingAverage],
+      additionalCategories: [{ id: 'custom-host-studies', name: 'MY SCRIPTS' }],
+      onSelectIndicator: vi.fn(),
+    });
+
+    modal.mount(document.body);
+    modal.open();
+    expect(document.body.textContent).not.toContain('MY SCRIPTS');
+
+    modal.setIndicators([
+      movingAverage,
+      {
+        ...movingAverage,
+        id: 'custom-tealchart-study:demo',
+        sourceKind: 'custom_tealchart_study',
+        sourceId: 'demo',
+        sourceHash: 'v1',
+        name: 'Demo Custom Study',
+        category: 'custom-host-studies',
+        description: 'User-authored Tealscript study',
+      },
+    ]);
+
+    expect(document.body.textContent).toContain('MY SCRIPTS');
+    expect(document.body.textContent).toContain('Demo Custom Study');
+    modal.unmount();
+  });
 });

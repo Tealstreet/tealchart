@@ -48,7 +48,7 @@ export interface BuiltinIndicator {
   /** Display name */
   name: string;
   /** Category for grouping in the UI */
-  category: 'tealstreet' | 'trend' | 'momentum' | 'volatility' | 'volume' | 'other';
+  category: IndicatorCategoryId;
   /** Short description */
   description?: string;
   /** Whether this indicator overlays on the price chart */
@@ -59,6 +59,14 @@ export interface BuiltinIndicator {
   code: string;
   /** If set, this is a jailbreak (canvas-drawing) indicator, not a tealscript one */
   jailbreak?: JailbreakIndicatorMeta;
+}
+
+export type BuiltinIndicatorCategoryId = 'tealstreet' | 'trend' | 'momentum' | 'volatility' | 'volume' | 'other';
+export type IndicatorCategoryId = BuiltinIndicatorCategoryId | (string & {});
+
+export interface IndicatorCategory {
+  id: IndicatorCategoryId;
+  name: string;
 }
 
 /**
@@ -1527,7 +1535,7 @@ export function isJailbreakIndicator(indicator: BuiltinIndicator): boolean {
  * Category display names and order
  */
 export const INDICATOR_CATEGORIES: Array<{
-  id: BuiltinIndicator['category'];
+  id: BuiltinIndicatorCategoryId;
   name: string;
 }> = [
   { id: 'tealstreet', name: 'TEALSTREET SCRIPTS' },
