@@ -33,6 +33,53 @@ Current external-corpus evidence:
   interpreter and closure agree; uncorroborated closure-only output is zero.
   One v2 closure/interpreter output row is error-backed and is tracked
   separately rather than counted as a clean gain.
+- T158/T161 added a browser product-path corpus proof in
+  `reports/product-path-corpus.report.json`. It builds a temporary Vite driver,
+  constructs a real Tealchart widget in headless Chrome, uses the real
+  TealScript module worker, creates each study through
+  `activeChart().createStudy(...)`, and compares compiled versus closure output
+  with the existing corpus comparator rather than a second parity definition.
+  The full dominated set was practical in this form: 246 scripts total
+  (157 v1, 89 v2), with one same-time realtime redraw per script. T162 closed
+  the four v1 realtime drawing mismatches on the ArunKBhaskar Momentum Setup
+  rows. Closure reconstruction was Pine-correct: the scripts create current-bar
+  UDF-local `var` labels inside `barstate.islast`, and realtime rollback should
+  discard previous tick output while the current tick recreates those labels.
+  The product compiled selection fell back to the interpreter for realtime
+  safety, and the interpreter was retaining non-`varip` UDF-local variables
+  created after the rollback snapshot while the drawing store correctly rolled
+  back, leaving stale label handles and silently dropping 3-4 labels per row.
+  `Scope.restore()` is now an exact non-`varip` restore. Current product-path
+  result: 246/246 matched, zero historical visual mismatches, zero realtime
+  visual mismatches, zero historical strategy-ledger mismatches, and zero
+  realtime strategy-ledger mismatches. The browser run covers plots, drawings,
+  alerts, logs, and strategy ledgers: plots/drawings come from the existing
+  widget manager state, while alerts/logs/strategy come from the existing worker
+  result message seam, without adding a shipped product accessor for the
+  harness. The current 246-row sample contains 48 alert-emitting rows and 16
+  strategy-ledger rows; logs are compared but no sampled row emits logs.
+  The browser run still observes 45 compiled realtime fallbacks overall. These
+  are expected safety fallbacks from the selected compiled realtime path to the
+  interpreter incremental path when the realtime safety detector sees stateful
+  intrabar constructs such as collection mutation, history-with-intrabar state,
+  persistent collection mutation, or `varip`; users may see slower live ticks
+  and the fallback warning, but the fallback is intended to preserve output
+  correctness rather than indicate a parity failure. T163 verified that closure
+  has zero realtime safety fallbacks on these rows; the 45 fallbacks are a
+  compiled-only limitation.
+- T165 audited compiled-backend deletion in
+  `reports/compiled-backend-deletion-audit.md`. The codegen tree itself is
+  mostly contained under `src/runtime/codegen/`, but deletion is not a one-day
+  mechanical cleanup because compiled is still the web product default, a worker
+  request-discovery mechanism, a realtime fallback classification target, and
+  the baseline for many reports/tests. The main non-obvious blocker is
+  `src/worker/worker.ts` using `tryExecuteScript(...)` for hidden dynamic request
+  discovery before the selected backend runs; that needs a closure/shared
+  replacement before the string emitter can disappear cleanly. The audit
+  estimates 3-6 engineering days to remove compiled as a selectable backend,
+  5-9 days to remove it while preserving gates/reports, and records request
+  subprograms plus generated incremental realtime as separate interpreter
+  deletion blockers rather than compiled-deletion blockers.
 - T144/T145 audited a sample of eight corroborated-gain rows against Pine
   semantics rather than only against the interpreter. Six sampled gains mostly
   validated the column; `sources/0178__geraked__tradingview.pine` exposed a
