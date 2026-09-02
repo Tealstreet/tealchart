@@ -39,11 +39,13 @@ export interface WorkerResult {
  */
 export interface WorkerError {
   type: 'parse' | 'semantic' | 'runtime';
+  severity: 'error' | 'warning';
   message: string;
-  code?: RuntimeErrorCode;
+  code?: RuntimeErrorCode | 'request-data-unavailable' | 'realtime-compiled-fallback';
   line?: number;
   column?: number;
   runtimeError?: RuntimeErrorPayload;
+  profile?: RuntimeProfile;
   diagnostics?: SemanticDiagnostic[];
 }
 
@@ -145,6 +147,7 @@ export class TealscriptWorker {
       console.error('Worker error:', event);
       this.onError?.({
         type: 'runtime',
+        severity: 'error',
         message: event.message || 'Unknown worker error',
       });
     };
@@ -219,11 +222,13 @@ export class TealscriptWorker {
     }
     this.onError?.({
       type: 'runtime',
+      severity: 'error',
       message: message.message,
       line: message.line,
       column: message.column,
       ...(message.code ? { code: message.code } : {}),
       ...(message.runtimeError ? { runtimeError: message.runtimeError } : {}),
+      ...(message.profile ? { profile: message.profile } : {}),
     });
   }
 
@@ -236,6 +241,7 @@ export class TealscriptWorker {
     }
     this.onError?.({
       type: 'parse',
+      severity: 'error',
       message: message.message,
       line: message.line,
       column: message.column,
@@ -251,6 +257,7 @@ export class TealscriptWorker {
     }
     this.onError?.({
       type: 'semantic',
+      severity: 'error',
       message: message.message,
       line: message.line,
       column: message.column,

@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
+import type { PlotOutput } from '@tealstreet/tealscript';
 import type { RenderOptions } from '../../types';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
@@ -234,6 +235,32 @@ describe('NativeCandleVolumeLayer', () => {
 
     expect(collectElementsByType(rendered[0], SkiaPath)).toHaveLength(1);
     expect(collectElementsByType(rendered[1], SkiaPath)).toHaveLength(1);
+  });
+
+  it('overlays TealScript barcolor candles on native OHLC paths', () => {
+    const barColorPlots: PlotOutput[] = [
+      {
+        color: [null, '#7c3aed'],
+        id: 'barcolor_override',
+        title: 'Override',
+        type: 'barcolor',
+        values: [null, 1],
+      },
+    ];
+    const rendered = renderFunctionChildren(
+      NativeCandleVolumeLayerImpl({
+        barColorPlots,
+        frame,
+        options,
+        sharedViewport,
+        visibleBars: bars,
+        volumeHeight: 0,
+      }),
+    );
+    const downLayer = renderFunctionChildren(rendered[1]);
+    const paths = collectElementsByType([rendered[0], rendered[1], ...downLayer], SkiaPath);
+
+    expect(paths.map((path) => path.props.color)).toContain('#7c3aed');
   });
 
   it('routes each bar into the path for its own side', () => {

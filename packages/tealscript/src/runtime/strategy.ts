@@ -107,23 +107,29 @@ export function cloneStrategyIntrabarContext(context: StrategyIntrabarContext): 
 
 export function createDefaultStrategyOhlcIntrabarContext(request: StrategyIntrabarRequest): StrategyIntrabarContext {
   const { chartBar } = request;
-  const highFirst = Math.abs(chartBar.open - chartBar.high) < Math.abs(chartBar.open - chartBar.low);
-  const middleKinds: Array<'high' | 'low'> = highFirst ? ['high', 'low'] : ['low', 'high'];
-  const kinds: Array<'open' | 'high' | 'low' | 'close'> = ['open', ...middleKinds, 'close'];
+  const ticks = createDefaultStrategyOhlcTicks(chartBar, request.chartBarIndex);
 
   return {
     ...request,
     chartBar: { ...chartBar },
     source: 'chart_ohlc',
-    ticks: kinds.map((kind, sequence) => ({
-      time: chartBar.time,
-      price: chartBar[kind],
-      kind,
-      sequence,
-      sourceBarTime: chartBar.time,
-      sourceBarIndex: request.chartBarIndex,
-    })),
+    ticks,
   };
+}
+
+export function createDefaultStrategyOhlcTicks(chartBar: Bar, chartBarIndex: number): StrategyExecutionTick[] {
+  const highFirst = Math.abs(chartBar.open - chartBar.high) < Math.abs(chartBar.open - chartBar.low);
+  const middleKinds: Array<'high' | 'low'> = highFirst ? ['high', 'low'] : ['low', 'high'];
+  const kinds: Array<'open' | 'high' | 'low' | 'close'> = ['open', ...middleKinds, 'close'];
+
+  return kinds.map((kind, sequence) => ({
+    time: chartBar.time,
+    price: chartBar[kind],
+    kind,
+    sequence,
+    sourceBarTime: chartBar.time,
+    sourceBarIndex: chartBarIndex,
+  }));
 }
 
 export function selectStrategyIntrabarContext(options: StrategyIntrabarSelectionOptions): StrategyIntrabarContext {
@@ -336,6 +342,78 @@ export interface StrategyLedger {
   _pendingOrderCount: number;
 }
 
+export const STRATEGY_HISTORY_PROPS = [
+  'position_entry_name',
+  'position_size',
+  'position_avg_price',
+  'equity',
+  'initial_capital',
+  'netprofit',
+  'grossprofit',
+  'grossloss',
+  'openprofit',
+  'max_runup',
+  'max_drawdown',
+  'opentrades.capital_held',
+  'closedtrades.first_index',
+  'capital_held',
+  'closedtrades',
+  'opentrades',
+  'wintrades',
+  'losstrades',
+  'eventrades',
+] as const;
+
+export type StrategyHistoryProp = typeof STRATEGY_HISTORY_PROPS[number];
+
+const STRATEGY_HISTORY_PROP_SET = new Set<string>(STRATEGY_HISTORY_PROPS);
+
+export function isStrategyHistoryProp(name: string): name is StrategyHistoryProp {
+  return STRATEGY_HISTORY_PROP_SET.has(name);
+}
+
+export function readStrategyHistoryProp(ledger: StrategyLedger, name: StrategyHistoryProp): unknown {
+  switch (name) {
+    case 'position_entry_name':
+      return ledger.openTrades[0]?.entryOrderId ?? '';
+    case 'position_size':
+      return ledger.position.size;
+    case 'position_avg_price':
+      return ledger.position.avgPrice ?? Number.NaN;
+    case 'equity':
+      return ledger.equity;
+    case 'initial_capital':
+      return ledger.initialCapital;
+    case 'netprofit':
+      return ledger.netProfit;
+    case 'grossprofit':
+      return ledger.grossProfit;
+    case 'grossloss':
+      return ledger.grossLoss;
+    case 'openprofit':
+      return ledger.position.openProfit;
+    case 'max_runup':
+      return ledger.maxRunup;
+    case 'max_drawdown':
+      return ledger.maxDrawdown;
+    case 'opentrades.capital_held':
+    case 'capital_held':
+      return ledger.openTrades.reduce((total, trade) => total + (trade.entryPrice * Math.abs(trade.qty)), 0);
+    case 'closedtrades.first_index':
+      return ledger.closedTrades.length === 0 ? Number.NaN : 0;
+    case 'closedtrades':
+      return ledger.closedTrades.length;
+    case 'opentrades':
+      return ledger.openTrades.length;
+    case 'wintrades':
+      return ledger.closedTrades.filter((trade) => trade.profit > 0).length;
+    case 'losstrades':
+      return ledger.closedTrades.filter((trade) => trade.profit < 0).length;
+    case 'eventrades':
+      return ledger.closedTrades.filter((trade) => trade.profit === 0).length;
+  }
+}
+
 export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSettings> = {}): StrategyLedgerSettings {
   return {
     title: 'Untitled strategy',
@@ -344,7 +422,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     allowedEntryDirection: 'all',
     defaultQtyType: 'fixed',
     defaultQtyValue: 1,
-    pyramiding: 0,
+    pyramiding: 1,
     commissionType: 'percent',
     commissionValue: 0,
     slippageTicks: 0,
@@ -564,6 +642,43 @@ export function submitStrategyOrder(ledger: StrategyLedger, input: StrategyOrder
   ledger.orders.push(order);
   ledger._pendingOrderCount++;
   return order;
+}
+
+export function submitOrReplaceStrategyExitOrder(ledger: StrategyLedger, input: StrategyOrderInput): void {
+  const existing = ledger.orders.find((order) => (
+    order.status === 'pending'
+    && order.id === input.id
+    && order.fromEntry === input.fromEntry
+  ));
+  if (!existing) {
+    submitStrategyOrder(ledger, input);
+    return;
+  }
+
+  existing.direction = input.direction;
+  existing.sourceId = input.sourceId;
+  existing.isExit = input.isExit ?? false;
+  existing.type = inferStrategyOrderType(
+    input.limitPrice,
+    input.stopPrice,
+    input.trailActivationPrice,
+    input.trailOffset,
+  );
+  existing.qty = input.qty;
+  existing.qtyType = input.qtyType;
+  existing.qtyValue = input.qtyValue;
+  existing.limitPrice = input.limitPrice;
+  existing.stopPrice = input.stopPrice;
+  existing.trailActivationPrice = input.trailActivationPrice;
+  existing.trailOffset = input.trailOffset;
+  existing.fromEntry = input.fromEntry;
+  existing.ocaName = input.ocaName;
+  existing.ocaType = input.ocaType;
+  existing.comment = input.comment;
+  existing.alertMessage = input.alertMessage;
+  existing.disableAlert = input.disableAlert;
+  existing.updatedBarIndex = input.barIndex;
+  existing.updatedTime = input.time;
 }
 
 export function hasReachedStrategyIntradayFilledOrderLimit(ledger: StrategyLedger, time: number): boolean {

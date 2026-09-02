@@ -200,9 +200,8 @@ Phases:
    and `ta.obv` cumulative-volume momentum with EMA signal-line routing
    into plotted trend/signal outputs.
    Synthetic ticker coverage includes official docs examples plus a reduced
-   public Heikin-Ashi trend request fixture.
-   Public footprint request coverage is tracked as a planned unsupported
-   semantic blocker until a host footprint/intrabar volume data model exists.
+   public Heikin-Ashi trend request fixture. Public footprint request coverage
+   exercises provider-backed seeded and unseeded-`na` behavior.
 7. Generate a trendable pass-rate report: total scripts, parse pass, semantic
    pass, runtime pass, usable-output pass, top failure classes, and regressions.
 
@@ -387,9 +386,8 @@ Phases:
    invalid symbol/timeframe handling.
 4. Support point-series request families such as dividends, earnings, splits,
    financial, economic, currency rates, and seed where host data exists.
-5. Defer `request.footprint()` until host footprint/intrabar-volume data is
-   available, while preserving an explicit planned-unsupported semantic
-   diagnostic for corpus/editor classification.
+5. Route `request.footprint()` through the host footprint/intrabar-volume
+   provider seam, returning `na` when deterministic data is unseeded.
 6. Maintain corpus-driven checkpoints for MTF trend filters, lower-timeframe
    arrays, currency conversion, earnings events, corporate actions, financial
    dashboards, economic macro overlays, seed datasets, documented synthetic
@@ -534,8 +532,8 @@ measurable.
 
 Phases:
 
-1. Implement `request.footprint()` once host footprint/intrabar-volume data is
-   available.
+1. Implement footprint object accessor/helper functions once a live host
+   footprint row schema is selected.
 2. Complete rare matrix numerical edge cases and exact reference-manual corner
    behavior.
 3. Complete library publishing/version lookup and remote TradingView-style

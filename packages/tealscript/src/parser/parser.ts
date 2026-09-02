@@ -95,6 +95,11 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
       grammarSource: options.grammarSource || 'input',
     });
 
+    if ((options.startRule ?? 'Program') === 'Program' && isProgramNode(result)) {
+      const detectedVersion = detectPineVersion(normalized);
+      result.version = detectedVersion ?? result.version;
+      result.explicitVersion = detectedVersion !== undefined;
+    }
     assertAstDepth(result as AnyNode, options.maxAstDepth ?? DEFAULT_MAX_AST_DEPTH);
     return result as Program | Expression | Statement;
   } catch (error) {
@@ -119,6 +124,15 @@ export function parse(source: string, options: ParseOptions<ParseStartRule> = {}
     }
     throw error;
   }
+}
+
+function isProgramNode(value: unknown): value is Program {
+  return Boolean(value && typeof value === 'object' && (value as { type?: unknown }).type === 'Program');
+}
+
+function detectPineVersion(source: string): number | undefined {
+  const match = source.match(/\/\/\s*@version\s*=\s*(\d+)/i);
+  return match ? Number(match[1]) : undefined;
 }
 
 // Replace leading tabs on each line with 4 spaces (Pine convention).
@@ -162,9 +176,11 @@ function normalizeNbspOutsideStrings(source: string): string {
 // small-indent before promoting to 4-space multiples.
 function normalizeIndent(source: string): string {
   const lines = source.split('\n');
+  const continuationLines = continuationLineIndexes(lines);
   let minIndent = Infinity;
   const indentLevels = new Set<number>();
-  for (const line of lines) {
+  for (const [index, line] of lines.entries()) {
+    if (continuationLines.has(index)) continue;
     if (line.trim().length === 0) continue;
     const leading = line.match(/^ +/);
     if (leading) {
@@ -181,7 +197,8 @@ function normalizeIndent(source: string): string {
   if ([...indentLevels].some(n => n % minIndent !== 0)) return source;
   // Consistent small-unit indent — promote each level to multiples of 4.
   return lines
-    .map(line => {
+    .map((line, index) => {
+      if (continuationLines.has(index)) return line;
       const leading = line.match(/^ +/);
       if (!leading) return line;
       const spaces = leading[0].length;
@@ -189,6 +206,79 @@ function normalizeIndent(source: string): string {
       return ' '.repeat(units * 4) + line.slice(spaces);
     })
     .join('\n');
+}
+
+function continuationLineIndexes(lines: readonly string[]): Set<number> {
+  const indexes = new Set<number>();
+  let previousCode = '';
+
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index] ?? '';
+    const trimmed = line.trim();
+    if (trimmed.length === 0 || trimmed.startsWith('//')) continue;
+
+    const leading = line.match(/^ +/)?.[0].length ?? 0;
+    if (leading > 0 && previousCode && isLikelyContinuation(previousCode, trimmed)) {
+      indexes.add(index);
+    }
+    previousCode = stripLineCommentOutsideStrings(line).trimEnd();
+  }
+
+  return indexes;
+}
+
+function isLikelyContinuation(previousCode: string, currentTrimmed: string): boolean {
+  if (/^[,?:+\-*\/%]/.test(currentTrimmed)) return true;
+  if (/[,(?:+\-*\/%]$/.test(previousCode.trimEnd())) return true;
+  return hasUnclosedDelimiter(previousCode);
+}
+
+function hasUnclosedDelimiter(code: string): boolean {
+  let parens = 0;
+  let brackets = 0;
+  let inDouble = false;
+  let inSingle = false;
+  let escaped = false;
+  for (const ch of code) {
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && (inDouble || inSingle)) {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"' && !inSingle) { inDouble = !inDouble; continue; }
+    if (ch === "'" && !inDouble) { inSingle = !inSingle; continue; }
+    if (inDouble || inSingle) continue;
+    if (ch === '(') parens++;
+    if (ch === ')' && parens > 0) parens--;
+    if (ch === '[') brackets++;
+    if (ch === ']' && brackets > 0) brackets--;
+  }
+  return parens > 0 || brackets > 0;
+}
+
+function stripLineCommentOutsideStrings(line: string): string {
+  let inDouble = false;
+  let inSingle = false;
+  let escaped = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    const next = line[i + 1];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\' && (inDouble || inSingle)) {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"' && !inSingle) { inDouble = !inDouble; continue; }
+    if (ch === "'" && !inDouble) { inSingle = !inSingle; continue; }
+    if (!inDouble && !inSingle && ch === '/' && next === '/') return line.slice(0, i);
+  }
+  return line;
 }
 
 function assertSourceLength(source: string, maxSourceLength: number): void {

@@ -1,8 +1,8 @@
 # Footprint Request Design
 
-This note records the explicit deferral boundary for Pine v6
-`request.footprint()` support. It is a parity target, but it should not be
-implemented as a placeholder over normal OHLC bars.
+This note records the remaining boundary for Pine v6 `request.footprint()`
+support. The request itself routes through the host request datafeed seam, but
+footprint objects and row accessors should not be faked over normal OHLC bars.
 
 Sources:
 
@@ -28,8 +28,7 @@ The public Pine contract has important constraints:
 
 ## Required TealScript Model
 
-Before runtime support lands, the host datafeed needs a footprint context with
-at least:
+The host datafeed provides a footprint context with at least:
 
 - chart-bar timestamp and symbol/timeframe identity;
 - rows ordered by price range;
@@ -40,32 +39,32 @@ at least:
   realtime recalculation;
 - a missing-data result that maps to Pine `na`.
 
-The runtime then needs first-class `footprint` and `volume_row` reference types,
-the `footprint.*()` accessor namespace, the `volume_row.*()` accessor namespace,
-and enforcement for the one-call-per-script limit.
+The runtime still needs first-class `footprint` and `volume_row` reference
+types, the `footprint.*()` accessor namespace, the `volume_row.*()` accessor
+namespace, and enforcement for the one-call-per-script limit.
 
 ## Current TealScript Behavior
 
-`request.footprint()` is intentionally rejected with a specific diagnostic:
+`request.footprint()` accepts positional and named v6 arguments in the
+interpreter and compiled path. It resolves seeded footprint contexts through
+`RequestDatafeed.getFootprint()` and returns Pine `na` when no context is
+available.
 
-```text
-request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model
-```
-
-This is preferable to returning synthetic data from OHLCV bars because Pine
-footprint scripts reason about intrabar bid/ask volume distribution. Fake rows
-would make order-flow indicators appear to work while producing misleading
-outputs.
+The returned value is currently only a data-availability sentinel. TealScript
+does not synthesize footprint rows from OHLCV bars because Pine footprint
+scripts reason about intrabar bid/ask volume distribution. Fake rows would make
+order-flow indicators appear to work while producing misleading outputs.
 
 ## Implementation Phases
 
-1. Extend the request datafeed contract with footprint contexts and deterministic
+1. [x] Extend the request datafeed contract with footprint contexts and deterministic
    fixture builders.
 2. Add parser/semantic coverage for `footprint` and `volume_row` reference
    types plus the associated accessor namespaces.
-3. Implement `request.footprint()` with argument validation and one-call limit
-   enforcement.
-4. Implement deterministic footprint-row accessors and negative missing-data
+3. [x] Implement `request.footprint()` argument validation and provider-backed
+   missing-data behavior.
+4. Implement one-call limit enforcement.
+5. Implement deterministic footprint-row accessors and negative missing-data
    behavior.
-5. Add reduced public-idiom fixtures for volume delta, value-area, and imbalance
+6. Add reduced public-idiom fixtures for volume delta, value-area, and imbalance
    scripts.

@@ -55,6 +55,14 @@ describe('PineArray', () => {
     expect(array.values).toEqual([7, 7, 7]);
   });
 
+  it('rejects negative array sizes', () => {
+    expect(() => createPineArray(-1)).toThrow('Cannot create an array with a negative size');
+  });
+
+  it('rejects arrays larger than Pine v6 allows', () => {
+    expect(() => createPineArray(100_001)).toThrow('Array is too large. Maximum size is 100000');
+  });
+
   it('reads and writes by numeric index', () => {
     const array = createPineArray<number>(2);
 
@@ -93,6 +101,19 @@ describe('PineArray', () => {
     expect(array.values).toEqual([1]);
   });
 
+  it('rejects stack and queue growth beyond Pine v6 array size limits', () => {
+    expect(() => pushArrayValue(createPineArray(100_000), 1)).toThrow('Array is too large. Maximum size is 100000');
+    expect(() => unshiftArrayValue(createPineArray(100_000), 1)).toThrow('Array is too large. Maximum size is 100000');
+    expect(() => insertArrayValue(createPineArray(100_000), 0, 1)).toThrow('Array is too large. Maximum size is 100000');
+  });
+
+  it('rejects stack and queue removal from empty arrays', () => {
+    const array = createPineArray<number>();
+
+    expect(() => popArrayValue(array)).toThrow('Cannot use pop() if array is empty.');
+    expect(() => shiftArrayValue(array)).toThrow('Cannot use shift() if array is empty.');
+  });
+
   it('clears arrays in place', () => {
     const array = createPineArray(2, 'x');
 
@@ -123,6 +144,13 @@ describe('PineArray', () => {
     expect(includesArrayValue(array, 5)).toBe(true);
     expect(indexOfArrayValue(array, 3)).toBe(0);
     expect(lastIndexOfArrayValue(array, 3)).toBe(2);
+  });
+
+  it('rejects first and last reads from empty arrays', () => {
+    const array = createPineArray<number>();
+
+    expect(() => firstArrayValue(array)).toThrow('Array index 0 is out of bounds. Array size is 0');
+    expect(() => lastArrayValue(array)).toThrow('Array index -1 is out of bounds. Array size is 0');
   });
 
   it('supports insert and remove operations', () => {
@@ -165,6 +193,12 @@ describe('PineArray', () => {
     expect(returned).toBe(array);
     expect(array.values).toEqual(['a', 'z', '', 'm']);
     expect(joinArray(array, '|')).toBe('a|z||m');
+  });
+
+  it('rejects concatenation beyond Pine v6 array size limits', () => {
+    expect(() => concatArray(createPineArray(100_000), createPineArray(1))).toThrow(
+      'Array is too large. Maximum size is 100000',
+    );
   });
 
   it('sorts strings by code-unit order', () => {

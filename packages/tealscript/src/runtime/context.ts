@@ -18,7 +18,7 @@ import type {
   LineDrawingOutput,
   PolylineDrawingOutput,
 } from './drawings/types';
-import { DrawingStore } from './drawings/store';
+import { DrawingStore, type DrawingStoreSnapshot } from './drawings/store';
 import { Series } from './series';
 import {
   cloneStrategyIntrabarContext,
@@ -216,6 +216,7 @@ export interface PlotOutput {
   shape?: string;
   size?: 'tiny' | 'small' | 'normal' | 'large' | 'huge' | 'auto';
   text?: string;
+  textValues?: (string | null)[];
   textColor?: string | (string | null)[];
   char?: string;
 
@@ -431,6 +432,7 @@ export class ExecutionContext {
   // =========================================================================
 
   private readonly drawingStore = new DrawingStore();
+  private realtimeDrawingStoreSnapshot: DrawingStoreSnapshot = this.drawingStore.snapshot();
 
   /** Drawing object outputs (populated during execution) */
   readonly drawings: DrawingOutput[] = this.drawingStore.drawings;
@@ -701,6 +703,7 @@ export class ExecutionContext {
     this.ask.rollback();
     this.time.rollback();
     this.timenow.rollback();
+    this.drawingStore.restore(this.realtimeDrawingStoreSnapshot);
     this.strategyLedger = cloneStrategyLedger(this.realtimeStrategyLedgerSnapshot);
     this.rebuildStrategyIntrabarContextIndexes();
   }
@@ -709,6 +712,7 @@ export class ExecutionContext {
    * Snapshot state before the replaceable realtime bar executes.
    */
   captureRealtimeRollbackState(): void {
+    this.realtimeDrawingStoreSnapshot = this.drawingStore.snapshot();
     this.realtimeStrategyLedgerSnapshot = cloneStrategyLedger(this.strategyLedger);
   }
 
@@ -808,6 +812,7 @@ export class ExecutionContext {
    */
   truncatePlots(length: number): void {
     for (const plot of this.plots.values()) {
+      if (plot.type === 'hline') continue;
       plot.values.length = length;
       if (Array.isArray(plot.color)) {
         plot.color.length = length;
@@ -819,6 +824,7 @@ export class ExecutionContext {
       if (Array.isArray(plot.wickColor)) plot.wickColor.length = length;
       if (Array.isArray(plot.borderColor)) plot.borderColor.length = length;
       if (Array.isArray(plot.textColor)) plot.textColor.length = length;
+      if (Array.isArray(plot.textValues)) plot.textValues.length = length;
     }
   }
 
@@ -869,6 +875,13 @@ export class ExecutionContext {
    */
   markDrawingsPersistentFrom(index: number): void {
     this.drawingStore.markPersistentFrom(index);
+  }
+
+  /**
+   * Mark one drawing output as persistent by handle ID.
+   */
+  markDrawingPersistent(id: string): void {
+    this.drawingStore.markPersistent(id);
   }
 
   /**
@@ -1027,6 +1040,7 @@ export class ExecutionContext {
    * Truncate all alert arrays and events to the given length.
    */
   truncateAlerts(length: number, options: { preserveStrategyFillAlerts?: boolean } = {}): void {
+    const emptyDirectAlerts: string[] = [];
     for (const alert of this.alerts.values()) {
       alert.values.length = length;
       if (alert.renderedMessages) {
@@ -1036,6 +1050,23 @@ export class ExecutionContext {
         event.barIndex < length
         || (options.preserveStrategyFillAlerts === true && alert.id === 'strategy_order_fills')
       ));
+      if (alert.type === 'alert') {
+        const latestEvent = alert.events.at(-1);
+        if (latestEvent) {
+          alert.message = latestEvent.message;
+          alert.frequency = latestEvent.frequency;
+          if (alert.id !== 'strategy_order_fills') {
+            alert.values.length = Math.min(alert.values.length, latestEvent.barIndex + 1);
+          }
+        } else if (alert.id !== 'strategy_order_fills') {
+          emptyDirectAlerts.push(alert.id);
+        }
+      }
+    }
+    for (const id of emptyDirectAlerts) {
+      this.alerts.delete(id);
+      const orderIndex = this.alertOrder.indexOf(id);
+      if (orderIndex !== -1) this.alertOrder.splice(orderIndex, 1);
     }
   }
 

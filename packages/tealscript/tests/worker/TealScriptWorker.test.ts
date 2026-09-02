@@ -72,6 +72,7 @@ describe('TealscriptWorker semantic diagnostics', () => {
     expect(errors).toEqual([
       {
         type: 'semantic',
+        severity: 'error',
         message: "line 2:13: Unknown argument 'caption' for plot()",
         line: 2,
         column: 13,
@@ -97,18 +98,18 @@ describe('TealscriptWorker semantic diagnostics', () => {
     const mock = MockWorker.instances[0]!;
 
     mock.emit({ type: 'ready' });
-    await worker.init('study-unsupported', 'indicator("Unsupported")\nrequest.footprint(syminfo.tickerid)\n', [], {});
+    await worker.init('study-unsupported', 'indicator("Unsupported")\nplot(close)\n', [], {});
     mock.emit({
       type: 'semanticError',
       scriptId: 'study-unsupported',
-      message: 'line 2:1: request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+      message: 'line 2:1: planned feature is not supported yet',
       line: 2,
       column: 1,
       metadata: { generation: 1, requestId: 1 },
       diagnostics: [
         {
           code: 'unsupported-feature',
-          message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+          message: 'planned feature is not supported yet',
           severity: 'error',
           line: 2,
           column: 1,
@@ -119,13 +120,14 @@ describe('TealscriptWorker semantic diagnostics', () => {
     expect(errors).toEqual([
       {
         type: 'semantic',
-        message: 'line 2:1: request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        severity: 'error',
+        message: 'line 2:1: planned feature is not supported yet',
         line: 2,
         column: 1,
         diagnostics: [
           {
             code: 'unsupported-feature',
-            message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+            message: 'planned feature is not supported yet',
             severity: 'error',
             line: 2,
             column: 1,

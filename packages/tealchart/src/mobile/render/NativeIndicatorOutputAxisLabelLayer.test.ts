@@ -125,6 +125,41 @@ describe('native indicator output axis labels', () => {
     ]);
   });
 
+  it('inherits declaration formatting for native output-axis labels', () => {
+    const frame = createNativeChartFrameFromPanes({
+      dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },
+      panes: [
+        { id: 'main', type: 'main', top: 24, height: 200, yMin: 63_000, yMax: 64_000 },
+        { id: 'pane_1', type: 'indicator', top: 224, height: 104, yMin: 0, yMax: 2_000_000 },
+      ],
+    });
+
+    const labels = resolveNativeIndicatorOutputAxisLabels({
+      bars: [{ time: 0 }] as never,
+      frame,
+      indicatorPaneInfo: {
+        volume: { overlay: false, paneId: 'pane_1', format: 'volume', precision: 0 },
+      },
+      plots: [
+        plot({
+          id: 'histogram',
+          scriptId: 'volume',
+          values: [1_250_000],
+          color: '#22aa88',
+        }),
+      ],
+      totalBarCount: 1,
+    });
+
+    expect(labels).toEqual([
+      expect.objectContaining({
+        id: 'pane_1:indicator-output:volume:histogram',
+        text: '1.25M',
+        color: '#22aa88',
+      }),
+    ]);
+  });
+
   it('keeps the latest source time from the full bar series when the source is offscreen', () => {
     const frame = createNativeChartFrameFromPanes({
       dimensions: { width: 390, height: 360, margins: { top: 24, right: 76, bottom: 32, left: 62 } },

@@ -74,8 +74,11 @@ export interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
   explicitPlotZOrder?: boolean;
+  format?: string;
   /** Indicator name for pane label */
   name?: string;
+  precision?: number;
+  scale?: string;
   /** Input values for pane label display */
   inputs?: Record<string, unknown>;
 }
@@ -2289,7 +2292,7 @@ export class TealchartRenderer {
     const volumeHeight = options.showVolume ? chartHeight * options.volumeHeight : 0;
     const priceHeight = chartHeight - volumeHeight;
 
-    const { values, color, linewidth: _linewidth = 1 } = plot;
+    const { values, color, linewidth = 1, style = 'histogram' } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     // Calculate bar width
@@ -2300,7 +2303,8 @@ export class TealchartRenderer {
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = barInterval * pixelsPerMs;
-    const barWidth = Math.max(1, slotWidth * 0.6);
+    const barWidth =
+      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
 
     const baselineY = this.priceToY(this.getPlotHistbase(plot), viewport, priceHeight);
 
@@ -3125,12 +3129,13 @@ export class TealchartRenderer {
         this.drawShape(x, y, markerShape, markerSize);
       }
 
-      if (plot.text) {
+      const markerText = Array.isArray(plot.textValues) ? plot.textValues[i] : plot.text;
+      if (markerText) {
         ctx.fillStyle = Array.isArray(plot.textColor) && plot.textColor[i] ? (plot.textColor[i] as string) : textColor;
         ctx.font = `${Math.max(10, markerSize * 1.5)}px sans-serif`;
         ctx.textAlign = 'center';
         this.drawPlotMarkerText(
-          plot.text,
+          markerText,
           x,
           effectiveLocation === 'belowbar' ? y + markerSize : y - markerSize,
           markerSize,
@@ -4795,7 +4800,7 @@ export class TealchartRenderer {
       const y = this.valueToY(output.value, pane);
       if (y < visibleTop || y > pane.bottom) continue;
 
-      const text = formatIndicatorOutputAxisValue(output.value, range, output.precision);
+      const text = formatIndicatorOutputAxisValue(output.value, range, output.precision, output.format);
       const measuredTagWidth = Math.max(
         INDICATOR_OUTPUT_AXIS_TAG_MIN_WIDTH,
         getCachedTextWidth(this.ctx, text, textFont) + WEB_PRICE_AXIS_TAG_SIZING.indicatorOutput.paddingX * 2,
@@ -5321,7 +5326,7 @@ export class TealchartRenderer {
     // Use extended width that goes under the price axis for transparency effect
     const chartWidth = options.width - margins.left;
 
-    const { values, color } = plot;
+    const { values, color, linewidth = 1, style = 'histogram' } = plot;
     const plotBaseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     // Check for style overrides
@@ -5338,7 +5343,8 @@ export class TealchartRenderer {
 
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = barInterval * pixelsPerMs;
-    const barWidth = Math.max(1, slotWidth * 0.6);
+    const barWidth =
+      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
 
     const baselineY = this.valueToY(this.getPlotHistbase(plot), pane);
 
@@ -6034,7 +6040,7 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
 
-    const { values, color } = plot;
+    const { values, color, linewidth = 1, style = 'histogram' } = plot;
     const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
 
     // Calculate bar width
@@ -6045,7 +6051,8 @@ export class TealchartRenderer {
     }
     const pixelsPerMs = chartWidth / viewportTimeRange;
     const slotWidth = barInterval * pixelsPerMs;
-    const barWidth = Math.max(1, slotWidth * 0.6);
+    const barWidth =
+      style === 'columns' ? Math.max(1, slotWidth * 0.6) : Math.max(1, Math.min(slotWidth, linewidth * 3));
 
     const baselineY = this.valueToPaneY(this.getPlotHistbase(plot), paneOffset);
 

@@ -6,8 +6,15 @@ import {
   economicRequestKey,
   financialRequestKey,
   InMemoryRequestDatafeed,
+  quandlRequestKey,
   requestDatafeedKey,
   requestSeriesKey,
+  seedCorporateAction,
+  seedCurrencyRate,
+  seedEconomicSeries,
+  seedFinancialMetric,
+  seedFootprints,
+  seedQuandlSeries,
   seedRequestSymbol,
   type Bar,
   type RequestDataContext,
@@ -26,6 +33,7 @@ describe('request datafeed contract', () => {
     expect(requestSeriesKey('dividends', corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'))).toBe('dividends\u0000NASDAQ:AAPL\u0000dividends.gross\u0000USD');
     expect(requestSeriesKey('financial', financialRequestKey('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ'))).toBe('financial\u0000NASDAQ:AAPL\u0000TOTAL_REVENUE\u0000FQ\u0000');
     expect(requestSeriesKey('economic', economicRequestKey('US', 'GDP'))).toBe('economic\u0000US\u0000GDP');
+    expect(requestSeriesKey('quandl', quandlRequestKey('MULTPL/SHILLER_PE_RATIO_MONTH', 0))).toBe('quandl\u0000MULTPL/SHILLER_PE_RATIO_MONTH\u00000');
     expect(requestDatafeedKey(seedRequestSymbol('user/repo', 'BTC_DEV'), '1D')).toBe('seed\u0000user/repo\u0000BTC_DEV\u00001D');
   });
 
@@ -108,6 +116,19 @@ describe('request datafeed contract', () => {
     ]);
   });
 
+  it('reports provider-gated synthetic chart contexts when base bars exist', () => {
+    const datafeed = new InMemoryRequestDatafeed([
+      { symbol: 'NASDAQ:AAPL', timeframe: '1D', bars },
+    ]);
+    const result = datafeed.getBars({ symbol: 'NASDAQ:AAPL|chart=renko:ATR:10', timeframe: '1D' });
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'unsupported_context',
+      message: 'Synthetic chart request chart=renko:ATR:10 for NASDAQ:AAPL|chart=renko:ATR:10 1D requires host-provided bars',
+    });
+  });
+
   it('returns cloned request series fixture points', () => {
     const datafeed = new InMemoryRequestDatafeed([], [
       {
@@ -133,5 +154,175 @@ describe('request datafeed contract', () => {
     expect(second?.ok).toBe(true);
     if (!second?.ok) throw new Error(second?.message ?? 'expected series context');
     expect(second.context.points[0].value).toBe(0.8);
+  });
+
+  it('resolves seeded currency rates at or before the requested bar time', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [], [
+      seedCurrencyRate('USD', 'JPY', [
+        { time: bars[0]!.time, value: 150 },
+        { time: bars[2]!.time, value: 152 },
+      ]),
+    ]);
+
+    expect(datafeed.getCurrencyRate?.({ baseCurrency: 'USD', quoteCurrency: 'JPY', time: bars[1]!.time })).toBe(150);
+    expect(datafeed.getCurrencyRate?.({ baseCurrency: 'USD', quoteCurrency: 'JPY', time: bars[2]!.time })).toBe(152);
+    expect(datafeed.getCurrencyRate?.({ baseCurrency: 'EUR', quoteCurrency: 'JPY', time: bars[2]!.time })).toBeUndefined();
+  });
+
+  it('resolves seeded economic series values at or before the requested bar time', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [], [], [
+      seedEconomicSeries('US', 'GDP', [
+        { time: bars[0]!.time, value: 3.1 },
+        { time: bars[2]!.time, value: 3.3 },
+      ]),
+    ]);
+
+    expect(datafeed.getEconomicSeries?.({ countryCode: 'US', field: 'GDP', time: bars[1]!.time })).toBe(3.1);
+    expect(datafeed.getEconomicSeries?.({ countryCode: 'US', field: 'GDP', time: bars[2]!.time })).toBe(3.3);
+    expect(datafeed.getEconomicSeries?.({ countryCode: 'ZZ', field: 'GDP', time: bars[2]!.time })).toBeUndefined();
+  });
+
+  it('resolves seeded corporate actions at or before the requested bar time', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [], [], [], [
+      seedCorporateAction('splits', 'NASDAQ:AAPL', [
+        { time: bars[1]!.time, value: { kind: 'splits', numerator: 2, denominator: 1 } },
+      ]),
+      seedCorporateAction('dividends', 'NASDAQ:AAPL', [
+        { time: bars[0]!.time, value: { kind: 'dividends', gross: 0.24, net: 0.2 } },
+      ], 'USD'),
+    ]);
+
+    expect(datafeed.getCorporateAction?.({ kind: 'splits', ticker: 'NASDAQ:AAPL', time: bars[2]!.time })?.value).toEqual({
+      kind: 'splits',
+      numerator: 2,
+      denominator: 1,
+    });
+    expect(datafeed.getCorporateAction?.({ kind: 'dividends', ticker: 'NASDAQ:AAPL', currency: 'USD', time: bars[1]!.time })?.value).toEqual({
+      kind: 'dividends',
+      gross: 0.24,
+      net: 0.2,
+    });
+    expect(datafeed.getCorporateAction?.({ kind: 'earnings', ticker: 'NASDAQ:AAPL', time: bars[2]!.time })).toBeUndefined();
+  });
+
+  it('resolves seeded financial metrics by symbol, id, and period', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [], [], [], [], [
+      seedFinancialMetric('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ', [
+        { time: bars[0]!.time, value: 1000 },
+      ], 'USD'),
+      seedFinancialMetric('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FY', [
+        { time: bars[0]!.time, value: 4000 },
+      ], 'USD'),
+    ]);
+
+    expect(datafeed.getFinancialMetric?.({
+      symbol: 'NASDAQ:AAPL',
+      financialId: 'TOTAL_REVENUE',
+      period: 'FQ',
+      currency: 'USD',
+      time: bars[2]!.time,
+    })?.value).toBe(1000);
+    expect(datafeed.getFinancialMetric?.({
+      symbol: 'NASDAQ:AAPL',
+      financialId: 'TOTAL_REVENUE',
+      period: 'FY',
+      currency: 'USD',
+      time: bars[2]!.time,
+    })?.value).toBe(4000);
+    expect(datafeed.getFinancialMetric?.({
+      symbol: 'NASDAQ:AAPL',
+      financialId: 'NET_INCOME',
+      period: 'FQ',
+      currency: 'USD',
+      time: bars[2]!.time,
+    })).toBeUndefined();
+  });
+
+  it('resolves seeded Quandl series values by ticker and column', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [], [], [], [], [], [
+      seedQuandlSeries('MULTPL/SHILLER_PE_RATIO_MONTH', 0, [
+        { time: bars[0]!.time, value: 28.5 },
+        { time: bars[2]!.time, value: 29.25 },
+      ]),
+      seedQuandlSeries('MULTPL/SHILLER_PE_RATIO_MONTH', 1, [
+        { time: bars[0]!.time, value: 5000 },
+      ]),
+    ]);
+
+    expect(datafeed.getQuandlSeries?.({
+      ticker: 'MULTPL/SHILLER_PE_RATIO_MONTH',
+      column: 0,
+      time: bars[1]!.time,
+    })?.value).toBe(28.5);
+    expect(datafeed.getQuandlSeries?.({
+      ticker: 'MULTPL/SHILLER_PE_RATIO_MONTH',
+      column: 0,
+      time: bars[2]!.time,
+    })?.value).toBe(29.25);
+    expect(datafeed.getQuandlSeries?.({
+      ticker: 'MULTPL/SHILLER_PE_RATIO_MONTH',
+      column: 1,
+      time: bars[2]!.time,
+    })?.value).toBe(5000);
+    expect(datafeed.getQuandlSeries?.({
+      ticker: 'MULTPL/SP500_PE_RATIO_MONTH',
+      column: 0,
+      time: bars[2]!.time,
+    })).toBeUndefined();
+  });
+
+  it('resolves cloned footprint rows at or before the requested bar time', () => {
+    const datafeed = new InMemoryRequestDatafeed([], [], [], [], [], [], [], [
+      seedFootprints('BINANCE:BTCUSDT', '1D', 10, 70, [
+        {
+          time: bars[0]!.time,
+          totalVolume: 1200,
+          buyVolume: 700,
+          sellVolume: 500,
+          rows: [
+            { downPrice: 100, upPrice: 101, totalVolume: 350, buyVolume: 120, sellVolume: 230 },
+          ],
+        },
+        {
+          time: bars[2]!.time,
+          totalVolume: 1400,
+          buyVolume: 820,
+          sellVolume: 580,
+          rows: [
+            { downPrice: 102, upPrice: 103, totalVolume: 450, buyVolume: 180, sellVolume: 270 },
+          ],
+        },
+      ]),
+    ]);
+
+    const first = datafeed.getFootprint?.({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      ticksPerRow: 10,
+      valueAreaPercent: 70,
+      imbalancePercent: 300,
+      time: bars[1]!.time,
+    });
+    expect(first?.totalVolume).toBe(1200);
+    expect(first?.rows?.[0]?.totalVolume).toBe(350);
+    if (first?.rows?.[0]) first.rows[0].totalVolume = 999;
+
+    const secondRead = datafeed.getFootprint?.({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      ticksPerRow: 10,
+      valueAreaPercent: 70,
+      imbalancePercent: 300,
+      time: bars[1]!.time,
+    });
+    expect(secondRead?.rows?.[0]?.totalVolume).toBe(350);
+    expect(datafeed.getFootprint?.({
+      symbol: 'BINANCE:BTCUSDT',
+      timeframe: '1D',
+      ticksPerRow: 10,
+      valueAreaPercent: 70,
+      imbalancePercent: 300,
+      time: bars[2]!.time,
+    })?.totalVolume).toBe(1400);
   });
 });

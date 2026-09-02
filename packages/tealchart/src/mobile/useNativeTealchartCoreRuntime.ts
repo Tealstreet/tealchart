@@ -1,4 +1,4 @@
-import type { WorkerError } from '@tealstreet/tealscript';
+import type { Program, RequestDatafeed, TealscriptExecutionBackend, WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from '../core/ChartWidgetCore';
 import type { ChartThemeInput } from '../theme';
 import type { IBasicDataFeed } from '../types';
@@ -16,6 +16,10 @@ export interface NativeTealchartCoreRuntimeInput {
   onIntervalChange?: (interval: string) => void;
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
+  tealscriptExecutionBackend?: TealscriptExecutionBackend;
+  enableTealscriptClosureBackend?: boolean | (() => boolean);
+  getTealscriptLibraries?: () => Map<string, Program> | undefined;
+  getTealscriptRequestDatafeed?: () => RequestDatafeed | undefined;
   propInterval: string;
   propSymbol: string;
   realtimeUpdateThrottleMs?: number;
@@ -28,6 +32,10 @@ export function useNativeTealchartCoreRuntime({
   onIntervalChange,
   onSymbolChange,
   onTealscriptError,
+  tealscriptExecutionBackend,
+  enableTealscriptClosureBackend,
+  getTealscriptLibraries,
+  getTealscriptRequestDatafeed,
   propInterval,
   propSymbol,
   realtimeUpdateThrottleMs,
@@ -43,7 +51,12 @@ export function useNativeTealchartCoreRuntime({
   const [imperativeTheme, setImperativeTheme] = useState<ChartThemeInput | null>(null);
   const indicatorManagerRef = useRef<MobileIndicatorManager | null>(null);
   if (!indicatorManagerRef.current) {
-    indicatorManagerRef.current = new MobileIndicatorManager();
+    indicatorManagerRef.current = new MobileIndicatorManager({
+      tealscriptExecutionBackend,
+      enableTealscriptClosureBackend,
+      getLibraries: getTealscriptLibraries,
+      getRequestDatafeed: getTealscriptRequestDatafeed,
+    });
     indicatorManagerRef.current.setOnUpdate(forceUpdate);
   }
 
@@ -97,6 +110,21 @@ export function useNativeTealchartCoreRuntime({
       manager.onErrorUnsubscribe(onTealscriptError);
     };
   }, [onTealscriptError]);
+
+  useEffect(() => {
+    indicatorManagerRef.current?.setLibrariesProvider(getTealscriptLibraries);
+  }, [getTealscriptLibraries]);
+
+  useEffect(() => {
+    indicatorManagerRef.current?.setRequestDatafeedProvider(getTealscriptRequestDatafeed);
+  }, [getTealscriptRequestDatafeed]);
+
+  useEffect(() => {
+    indicatorManagerRef.current?.setTealscriptBackendSelection({
+      tealscriptExecutionBackend,
+      enableTealscriptClosureBackend,
+    });
+  }, [tealscriptExecutionBackend, enableTealscriptClosureBackend]);
 
   // Keyed on the PROP, in a layout effect, so `chartApi.symbol()` answers with
   // the market the host asked for in the same commit the host asked for it.

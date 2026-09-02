@@ -1,5 +1,11 @@
 import type { SkImage } from '@shopify/react-native-skia';
-import type { PlotOutput, WorkerError } from '@tealstreet/tealscript';
+import type {
+  PlotOutput,
+  Program,
+  RequestDatafeed,
+  TealscriptExecutionBackend,
+  WorkerError,
+} from '@tealstreet/tealscript';
 import type { ReactNode } from 'react';
 import type { LayoutRectangle } from 'react-native';
 import type {
@@ -234,6 +240,10 @@ export interface SkiaTealchartProps {
   onSymbolClick?: () => void;
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
+  tealscriptExecutionBackend?: TealscriptExecutionBackend;
+  enableTealscriptClosureBackend?: boolean | (() => boolean);
+  getTealscriptLibraries?: () => Map<string, Program> | undefined;
+  getTealscriptRequestDatafeed?: () => RequestDatafeed | undefined;
   onUserDrawingCommand?: UserDrawingCommandEventListener;
   onUserDrawingStateChange?: (state: UserDrawingState) => void;
   realtimeUpdateThrottleMs?: number;
@@ -271,6 +281,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onSymbolClick,
     onSymbolChange,
     onTealscriptError,
+    tealscriptExecutionBackend,
+    enableTealscriptClosureBackend,
+    getTealscriptLibraries,
+    getTealscriptRequestDatafeed,
     onUserDrawingCommand,
     onUserDrawingStateChange,
     realtimeUpdateThrottleMs,
@@ -445,6 +459,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onLayoutDirty: markNativeLayoutDirtyIfReady,
     onSymbolChange: handleNativeSymbolChangeForLayout,
     onTealscriptError,
+    tealscriptExecutionBackend,
+    enableTealscriptClosureBackend,
+    getTealscriptLibraries,
+    getTealscriptRequestDatafeed,
     propInterval,
     propSymbol,
     realtimeUpdateThrottleMs,

@@ -37,6 +37,31 @@
   function formatTemplateType(name, args) {
     return `${name}<${args.join(', ')}>`;
   }
+
+  function flattenTransientStatement(statement) {
+    if (statement.type === 'MultiDeclaration') return statement.declarations;
+    if (statement.type === 'MultiAssignment') return statement.assignments;
+    if (statement.type === 'MultiExpressionStatement') {
+      return statement.expressions.map(expression => ({
+        type: 'ExpressionStatement',
+        expression,
+        loc: statement.loc
+      }));
+    }
+    if (statement.type === 'MultiStatement') return statement.statements.flatMap(flattenTransientStatement);
+    return [statement];
+  }
+
+  function buildStatementChain(head, tail) {
+    const statements = [head, ...tail.map(t => t[3]).flatMap(flattenTransientStatement)];
+    if (statements.every(statement => statement.type === 'VariableDeclaration')) {
+      return { type: 'MultiDeclaration', declarations: statements, loc: loc() };
+    }
+    if (statements.every(statement => statement.type === 'AssignmentStatement')) {
+      return { type: 'MultiAssignment', assignments: statements, loc: loc() };
+    }
+    return { type: 'MultiStatement', statements, loc: loc() };
+  }
 }
 
 // ============================================================================
@@ -48,6 +73,7 @@ Program
       return {
         type: 'Program',
         version: version || 6,
+        explicitVersion: version !== null,
         body: statements,
         loc: loc()
       };
@@ -60,12 +86,7 @@ VersionAnnotation
 
 StatementList
   = statements:(Statement _)* {
-      return statements.map(s => s[0]).filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.map(s => s[0]).filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 // ============================================================================
@@ -81,6 +102,7 @@ Statement
   / MethodDeclaration
   / FunctionDeclaration
   / IfStatement
+  / OnceStatement
   / ForStatement
   / WhileStatement
   / BreakStatement
@@ -101,6 +123,7 @@ IndicatorDeclaration
       const result = {
         type: 'IndicatorDeclaration',
         declarationKind: declarationKind === 'study' ? 'indicator' : declarationKind,
+        sourceDeclarationKind: declarationKind,
         loc: loc()
       };
 
@@ -415,7 +438,7 @@ VariableDeclaration
   / UntypedVariableDeclaration
 
 TypedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:VariableInitializer tail:(_ "," _ VariableDeclaration)* _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:VariableInitializer tail:(_ "," CommaContinuationSpace ChainedStatement)* _ LineTerminator? {
       const first = {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -426,12 +449,11 @@ TypedVariableDeclaration
         loc: loc()
       };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 UntypedVariableDeclaration
-  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:VariableInitializer tail:(_ "," _ VariableDeclaration)* _ LineTerminator? {
+  = exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:VariableInitializer tail:(_ "," CommaContinuationSpace ChainedStatement)* _ LineTerminator? {
       const first = {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -442,9 +464,13 @@ UntypedVariableDeclaration
         loc: loc()
       };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
+
+ChainedStatement
+  = VariableDeclaration
+  / SingleAssignment
+  / ExpressionStatement
 
 VariableInitializer
   = IfStatement
@@ -509,7 +535,7 @@ TypeAnnotationBase
         loc: loc()
       };
     }
-  / elementType:TypeName "[]" {
+  / elementType:TypeName _ "[]" {
       return {
         type: 'TypeAnnotation',
         baseType: 'array',
@@ -571,7 +597,7 @@ TypeReferenceName
 
 // Tuple reassignment: [a, b] := expr (reassigns already-declared variables)
 TupleAssignment
-  = "[" __ head:Identifier tail:(__ "," __ Identifier)* __ "]" _ ":=" InitializerSpace right:Expression _ LineTerminator? {
+  = "[" __ head:Identifier tail:(__ "," __ Identifier)* __ "]" _ ":=" InitializerSpace right:VariableInitializer _ LineTerminator? {
       return {
         type: 'TupleAssignment',
         names: [head, ...tail.map(t => t[3])],
@@ -583,13 +609,13 @@ TupleAssignment
 // Assignment: x := value, or comma-separated: x := 1, y := 2
 // Left side can be an identifier, member access, or index access
 AssignmentStatement
-  = head:SingleAssignment tail:(_ "," _ SingleAssignment)* _ LineTerminator? {
+  = head:SingleAssignment tail:(_ "," CommaContinuationSpace SingleAssignment)* _ LineTerminator? {
       if (tail.length === 0) return head;
       return { type: 'MultiAssignment', assignments: [head, ...tail.map(t => t[3])], loc: loc() };
     }
 
 SingleAssignment
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:Expression {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:VariableInitializer {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -744,13 +770,13 @@ AssignmentOperator
 // and method is valid as a variable/parameter name in expression context.
 StatementReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
-    / "to" / "by"
+    / "to" / "by" / "once"
     / "type" / "enum"
-    / "indicator" / "library" / "import" / "export"
+    / "library" / "import" / "export"
     ) !IdentifierPart
 
 ExpressionStatement
-  = !StatementReservedWord head:Expression tail:(_ "," _ !StatementReservedWord Expression)* _ LineTerminator? {
+  = !StatementReservedWord head:Expression tail:(_ "," CommaContinuationSpace !StatementReservedWord Expression)* _ LineTerminator? {
       if (tail.length === 0) {
         return { type: 'ExpressionStatement', expression: head, loc: loc() };
       }
@@ -795,6 +821,17 @@ ElseClause
     }
   / _ "else" !IdentifierPart _ LineTerminator? block:IndentedBlock {
       return block;
+    }
+
+// Once block
+OnceStatement
+  = "once" !IdentifierPart condition:(_ Expression)? _ LineTerminator body:IndentedBlock {
+      return {
+        type: 'OnceStatement',
+        test: condition ? condition[1] : null,
+        body,
+        loc: loc()
+      };
     }
 
 // For loop
@@ -855,12 +892,7 @@ ContinueStatement
 // Indented block (simplified: just look for indented lines)
 IndentedBlock
   = statements:(BlockIgnorableLine / IndentedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 IndentedStatement
@@ -870,12 +902,7 @@ IndentedStatement
 
 FunctionIndentedBlock
   = statements:(BlockIgnorableLine / FunctionIndentedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionIndentedStatement
@@ -893,7 +920,7 @@ FunctionSwitchExpressionStatement
     }
 
 FunctionSwitchExpression
-  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:FunctionSwitchCase+ {
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator (BlockIgnorableLine)* cases:FunctionSwitchCase+ {
       return {
         type: 'SwitchExpression',
         discriminant: discriminant || null,
@@ -919,7 +946,7 @@ FunctionSwitchCase
         loc: loc()
       };
     }
-  / Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -927,7 +954,7 @@ FunctionSwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1032,11 +1059,10 @@ TypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 UntypedFunctionVariableDeclaration
@@ -1062,21 +1088,15 @@ UntypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 FunctionNestedBlock
   = statements:(BlockIgnorableLine / FunctionNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionNestedStatement
@@ -1094,7 +1114,7 @@ FunctionNestedSwitchExpressionStatement
     }
 
 FunctionNestedSwitchExpression
-  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:FunctionNestedSwitchCase+ {
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator (BlockIgnorableLine)* cases:FunctionNestedSwitchCase+ {
       return {
         type: 'SwitchExpression',
         discriminant: discriminant || null,
@@ -1120,7 +1140,7 @@ FunctionNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1128,7 +1148,7 @@ FunctionNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1224,11 +1244,10 @@ TypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionNestedVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 UntypedFunctionNestedVariableDeclaration
@@ -1254,21 +1273,15 @@ UntypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionNestedVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 FunctionDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionDeepNestedStatement
@@ -1286,7 +1299,7 @@ FunctionDeepNestedSwitchExpressionStatement
     }
 
 FunctionDeepNestedSwitchExpression
-  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:FunctionDeepNestedSwitchCase+ {
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator (BlockIgnorableLine)* cases:FunctionDeepNestedSwitchCase+ {
       return {
         type: 'SwitchExpression',
         discriminant: discriminant || null,
@@ -1312,7 +1325,7 @@ FunctionDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1320,7 +1333,7 @@ FunctionDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1416,11 +1429,10 @@ TypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionDeepNestedVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 UntypedFunctionDeepNestedVariableDeclaration
@@ -1446,21 +1458,15 @@ UntypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionDeepNestedVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 FunctionVeryDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionVeryDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionVeryDeepNestedStatement
@@ -1478,7 +1484,7 @@ FunctionVeryDeepNestedSwitchExpressionStatement
     }
 
 FunctionVeryDeepNestedSwitchExpression
-  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:FunctionVeryDeepNestedSwitchCase+ {
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator (BlockIgnorableLine)* cases:FunctionVeryDeepNestedSwitchCase+ {
       return {
         type: 'SwitchExpression',
         discriminant: discriminant || null,
@@ -1504,7 +1510,7 @@ FunctionVeryDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1512,7 +1518,7 @@ FunctionVeryDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1572,11 +1578,10 @@ TypedFunctionVeryDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVeryDeepNestedVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 UntypedFunctionVeryDeepNestedVariableDeclaration
@@ -1591,11 +1596,10 @@ UntypedFunctionVeryDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," _ FunctionVeryDeepNestedVariableDeclaration)* LineTerminator? {
+  / exported:("export" _)? kind:VarKind? _ pattern:DeclarationPattern _ "=" InitializerSpace init:Expression tail:(_ "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
-      const rest = tail.map(t => t[3]).flatMap(d => d.type === 'MultiDeclaration' ? d.declarations : [d]);
-      return { type: 'MultiDeclaration', declarations: [first, ...rest], loc: loc() };
+      return buildStatementChain(first, tail);
     }
 
 FunctionVeryDeepNestedIfStatement
@@ -1625,12 +1629,7 @@ FunctionVeryDeepNestedElseClause
 
 FunctionUltraDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionUltraDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionUltraDeepNestedStatement
@@ -1700,12 +1699,7 @@ FunctionUltraDeepNestedElseClause
 
 FunctionMegaDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionMegaDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionMegaDeepNestedStatement
@@ -1775,12 +1769,7 @@ FunctionMegaDeepNestedElseClause
 
 FunctionSuperDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionSuperDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionSuperDeepNestedStatement
@@ -1850,12 +1839,7 @@ FunctionSuperDeepNestedElseClause
 
 FunctionHyperDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionHyperDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionHyperDeepNestedStatement
@@ -1925,12 +1909,7 @@ FunctionHyperDeepNestedElseClause
 
 FunctionExtremeDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionExtremeDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionExtremeDeepNestedStatement
@@ -2000,12 +1979,7 @@ FunctionExtremeDeepNestedElseClause
 
 FunctionMaxDeepNestedBlock
   = statements:(BlockIgnorableLine / FunctionMaxDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(s => {
-        if (s.type === 'MultiDeclaration') return s.declarations;
-        if (s.type === 'MultiAssignment') return s.assignments;
-        if (s.type === 'MultiExpressionStatement') return s.expressions.map(e => ({ type: 'ExpressionStatement', expression: e, loc: s.loc }));
-        return [s];
-      });
+      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
     }
 
 FunctionMaxDeepNestedStatement
@@ -2015,6 +1989,7 @@ FunctionMaxDeepNestedStatement
 
 FunctionIndent
   = "    "
+  / "  "
   / "\t"
 
 FunctionNestedIndent
@@ -2111,6 +2086,7 @@ SingleLineBody
 
 Indent
   = "    " // 4 spaces
+  / "  "   // public Pine often uses two-space UDF bodies
   / "\t"   // or tab
 
 BlockIgnorableLine
@@ -2130,7 +2106,7 @@ Expression
   / ConditionalExpression
 
 SwitchExpression
-  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:SwitchCase+ {
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator (BlockIgnorableLine)* cases:SwitchCase+ {
       return {
         type: 'SwitchExpression',
         discriminant: discriminant || null,
@@ -2193,7 +2169,7 @@ SwitchCase
         loc: loc()
       };
     }
-  / Indent _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -2201,13 +2177,23 @@ SwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ consequent:Expression _ LineTerminator? {
+  / Indent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
         consequent,
         loc: loc()
       };
+    }
+
+SwitchConsequentExpression
+  = head:Expression tail:(_ "," CommaContinuationSpace Expression)* {
+      if (tail.length === 0) return head;
+      return [head, ...tail.map(t => t[3])].map(expression => ({
+        type: 'ExpressionStatement',
+        expression,
+        loc: loc()
+      }));
     }
 
 // Ternary: condition ? true : false
@@ -2498,7 +2484,7 @@ ReservedWord
   = ("if" / "else" / "for" / "while" / "break" / "continue" / "var" / "varip"
     / "true" / "false" / "na" / "and" / "or" / "not" / "to" / "by"
     / "switch" / "enum"
-    / "indicator" / "library" / "import" / "export"
+    / "library" / "import" / "export"
     ) !IdentifierPart
 
 // ============================================================================
@@ -2566,11 +2552,14 @@ ContinuationLeadingSpace
   = [ \t]+
 
 InitializerSpace
-  = &( _ LineTerminator ContinuationLeadingSpace) _ LineTerminator ContinuationLeadingSpace _
+  = &( _ LineTerminator ContinuationLeadingSpace) _ LineTerminator ContinuationLeadingSpace (LineCommentText LineTerminator ContinuationLeadingSpace)* _
   / _
 
 LoopHeaderContinuationSpace
   = InitializerSpace
+
+CommaContinuationSpace
+  = __
 
 // Delimited whitespace allows line continuations inside parentheses/brackets.
 __

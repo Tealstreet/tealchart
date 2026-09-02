@@ -26,6 +26,7 @@ export interface BaseNode {
 export interface Program extends BaseNode {
   type: 'Program';
   version: number; // e.g., 6 from //@version=6
+  explicitVersion: boolean;
   body: Statement[];
 }
 
@@ -44,10 +45,12 @@ export type Statement =
   | MultiDeclaration
   | MultiAssignment
   | MultiExpressionStatement
+  | MultiStatement
   | TupleAssignment
   | AssignmentStatement
   | ExpressionStatement
   | IfStatement
+  | OnceStatement
   | ForStatement
   | WhileStatement
   | BreakStatement
@@ -59,6 +62,7 @@ export type Statement =
 export interface IndicatorDeclaration extends BaseNode {
   type: 'IndicatorDeclaration';
   declarationKind: 'indicator' | 'strategy';
+  sourceDeclarationKind?: 'indicator' | 'strategy' | 'study';
   title: Expression;
   shorttitle?: Expression;
   overlay?: Expression;
@@ -244,6 +248,17 @@ export interface MultiExpressionStatement extends BaseNode {
 }
 
 /**
+ * Mixed comma-separated statement chains that combine declarations and
+ * reassignments, e.g. `var int dir = 0, dir := next`.
+ *
+ * Flattened before runtime/checker stages see the AST.
+ */
+export interface MultiStatement extends BaseNode {
+  type: 'MultiStatement';
+  statements: Statement[];
+}
+
+/**
  * Assignment (reassignment) statement
  *
  * myVar := newValue
@@ -263,7 +278,7 @@ export interface AssignmentStatement extends BaseNode {
 export interface TupleAssignment extends BaseNode {
   type: 'TupleAssignment';
   names: Identifier[];
-  right: Expression;
+  right: Expression | IfStatement;
 }
 
 /**
@@ -284,6 +299,15 @@ export interface IfStatement extends BaseNode {
   test: Expression;
   consequent: Statement[];
   alternate?: Statement[] | IfStatement; // else block or else-if
+}
+
+/**
+ * Once block. Executes the body the first time the optional condition is true.
+ */
+export interface OnceStatement extends BaseNode {
+  type: 'OnceStatement';
+  test?: Expression | null;
+  body: Statement[];
 }
 
 /**
@@ -640,6 +664,7 @@ export function isStatement(node: AnyNode): node is Statement {
     'MultiDeclaration',
     'MultiAssignment',
     'MultiExpressionStatement',
+    'MultiStatement',
     'TupleAssignment',
     'AssignmentStatement',
     'ExpressionStatement',

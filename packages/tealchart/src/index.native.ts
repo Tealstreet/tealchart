@@ -90,3 +90,12 @@ export type { AsyncStorageLike, TealchartKeyValueStorage } from './transformer/s
 export { AVAILABLE_TIMEFRAMES as MOBILE_TIMEFRAMES } from './state/chartState';
 export type { TimeframeOption as MobileTimeframeOption } from './state/chartState';
 export type { ITealchartWidget } from './widgetContract';
+
+export { runMobileTealscriptClosureSmoke } from './mobile/mobileTealscriptClosureSmoke';
+export type {
+  MobileTealscriptClosureSmokeCase,
+  MobileTealscriptClosureSmokeCaseResult,
+  MobileTealscriptClosureSmokeExpectedOutput,
+  MobileTealscriptClosureSmokeOptions,
+  MobileTealscriptClosureSmokeResult,
+} from './mobile/mobileTealscriptClosureSmoke';

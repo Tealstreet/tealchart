@@ -17,6 +17,9 @@ real-script intake metadata or corpus summaries:
   `validatePineScriptLedger()` validates each entry and rejects duplicate ids.
 - `CompatibilityRunOutcome` records parse, semantic, runtime, datafeed, output,
   and render stage results for a script.
+- `classifyPineCompatibilitySource()` executes a reduced source fixture against
+  deterministic bars/datafeeds and classifies parse, semantic, runtime,
+  datafeed, compiled fallback, output, and render-normalization results.
 - `normalizeCompatibilityStageOutcomes()` expands partial stage lists into the
   canonical six-stage order, filling missing stages with `not_run`.
 - `createPineParseSemanticStageOutcomes()` runs a reduced source fixture
@@ -28,7 +31,7 @@ real-script intake metadata or corpus summaries:
   `skipped` with a message for an intentionally out-of-scope stage.
 - `CompatibilityFailureClass` keeps failure buckets stable across reports:
   `parse_gap`, `semantic_gap`, `unsupported_planned`, `runtime_gap`,
-  `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
+  `compiled_fallback`, `data_gap`, `output_gap`, `render_gap`, `oracle_gap`, and
   `licensing_blocked`.
 - Failed stages with an `unsupported-feature` diagnostic code are normalized to
   the `unsupported_planned` failure class, which keeps planned gaps separate
@@ -83,6 +86,9 @@ Keep fixtures grouped by behavior:
   tables, and future visual object checkpoints.
 - `pine-real-checkpoints.test.ts` for source-linked, reduced fixtures derived
   from official TradingView docs and later public idiom checkpoints.
+- `pine-external-corpus-classifier.test.ts` for public-style reduced script
+  corpus classification across request, ticker, session, timeframe, runtime,
+  compiled fallback, and normalized output stages.
 
 ## Fixture Rules
 

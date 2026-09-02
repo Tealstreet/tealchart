@@ -19,8 +19,10 @@ import type {
   Program,
   Bar,
   FromWorkerMessage,
+  ToWorkerMessage,
   WorkerOutputMetadata,
 } from '@tealstreet/tealscript';
+import type { TealscriptExecutionTelemetry, TealscriptRequestDataResolver } from '../types';
 import { isTealchartPlotDebugEnabled, summarizePlotsForDebug } from '../debug/plotDebug';
 import { preserveLongerCurrentPlotSeries } from './plotSeriesFreshness';
 
@@ -40,6 +42,7 @@ interface ManagedScript {
   isReady: boolean;
   isVisible: boolean;
   error?: WorkerError;
+  reportedRuntimeProfileDiagnostics: Set<string>;
 }
 
 /**
@@ -76,6 +79,12 @@ export interface TealscriptManagerOptions {
   onError?: (scriptId: string, error: WorkerError) => void;
 
   /**
+   * Called with a compact execution summary after every accepted worker
+   * execution result or runtime halt.
+   */
+  onExecution?: (summary: TealscriptExecutionTelemetry) => void;
+
+  /**
    * Called when a script's input definitions are available
    */
   onInputsDiscovered?: (scriptId: string, inputs: InputDefinition[]) => void;
@@ -94,6 +103,199 @@ export interface TealscriptManagerOptions {
    * Provides host-registered Pine library ASTs for newly initialized scripts.
    */
   getLibraries?: () => Map<string, Program>;
+
+  /**
+   * Resolves serializable request.* data misses emitted by worker execution.
+   */
+  resolveRequestData?: TealscriptRequestDataResolver;
+}
+
+type RequestDataMessage = Extract<FromWorkerMessage, { type: 'requestData' }>;
+type RequestDataResultMessage = Extract<ToWorkerMessage, { type: 'requestDataResult' }>;
+type RequestDataFailure = Extract<RequestDataResultMessage, { ok: false }>['error'];
+const REQUEST_DATA_UNAVAILABLE_ERROR_CODE = 'request-data-unavailable' as const;
+const REALTIME_COMPILED_FALLBACK_ERROR_CODE = 'realtime-compiled-fallback' as const;
+const REALTIME_STATELESS_FALLBACK_PREFIX = 'compiled-worker-stateless-intrabar-reentry';
+
+interface TealscriptWorkerWrapperOptions extends TealscriptWorkerOptions {
+  resolveRequestData?: TealscriptRequestDataResolver;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function formatValue(value: unknown): string | undefined {
+  if (typeof value === 'string' && value.length > 0) return value;
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  return undefined;
+}
+
+function describeRequestDataQuery(message: RequestDataMessage): string {
+  const query = message.query;
+  if (!isRecord(query)) return `request.${message.kind}`;
+
+  switch (message.kind) {
+    case 'bars': {
+      const symbol = formatValue(query.symbol) ?? 'unknown symbol';
+      const timeframe = formatValue(query.timeframe) ?? 'unknown timeframe';
+      return `request.security symbol ${symbol} timeframe ${timeframe}`;
+    }
+    case 'currency_rate': {
+      const base = formatValue(query.baseCurrency) ?? 'unknown';
+      const quote = formatValue(query.quoteCurrency) ?? 'unknown';
+      return `request.currency_rate ${base}/${quote}`;
+    }
+    case 'economic': {
+      const country = formatValue(query.countryCode) ?? 'unknown country';
+      const field = formatValue(query.field) ?? 'unknown field';
+      return `request.economic ${country}.${field}`;
+    }
+    case 'financial': {
+      const symbol = formatValue(query.symbol) ?? 'unknown symbol';
+      const metric = formatValue(query.financialId) ?? 'unknown field';
+      const period = formatValue(query.period) ?? 'unknown period';
+      const currency = formatValue(query.currency);
+      return `request.financial ${symbol}.${metric} period ${period}${currency ? ` currency ${currency}` : ''}`;
+    }
+    case 'corporate_action': {
+      const action = formatValue(query.kind) ?? 'corporate_action';
+      const ticker = formatValue(query.ticker) ?? 'unknown ticker';
+      const currency = formatValue(query.currency);
+      return `request.${action} ${ticker}${currency ? ` currency ${currency}` : ''}`;
+    }
+    case 'quandl': {
+      const ticker = formatValue(query.ticker) ?? 'unknown ticker';
+      const column = formatValue(query.column) ?? 'unknown column';
+      return `request.quandl ${ticker} column ${column}`;
+    }
+    case 'footprint': {
+      const symbol = formatValue(query.symbol) ?? 'unknown symbol';
+      const timeframe = formatValue(query.timeframe) ?? 'unknown timeframe';
+      return `request.footprint ${symbol} timeframe ${timeframe}`;
+    }
+    case 'series': {
+      const family = formatValue(query.family) ?? 'series';
+      const key = formatValue(query.key) ?? 'unknown key';
+      return `request.${family} ${key}`;
+    }
+  }
+}
+
+function classifyRequestDataFailure(error: RequestDataFailure): string {
+  switch (error.code) {
+    case 'missing-provider':
+      return 'not supported in this chart because no Tealscript request data resolver is configured';
+    case 'not-found':
+      return 'not seeded by the chart provider';
+    case 'timeout':
+      return 'unavailable because the chart provider timed out';
+    case 'provider-error':
+      return 'unavailable because the chart provider failed while loading it';
+    case 'invalid-query':
+      return 'unavailable because the request query is invalid for this provider';
+  }
+}
+
+function formatRequestDataDiagnostic(message: RequestDataMessage, error: RequestDataFailure): WorkerError {
+  const queryDescription = describeRequestDataQuery(message);
+  return {
+    type: 'runtime',
+    severity: 'warning',
+    code: REQUEST_DATA_UNAVAILABLE_ERROR_CODE,
+    message:
+      `Tealscript request data unavailable for ${queryDescription}: ${classifyRequestDataFailure(error)}. ` +
+      `The script is valid, but Tealstreet cannot supply that data here. Provider detail: ${error.message}`,
+  };
+}
+
+function formatRealtimeCompiledFallbackDiagnostic(result: WorkerResult): WorkerError | undefined {
+  const profile = result.profile;
+  const reason = profile?.fallbackReason;
+  if (!profile || !reason?.startsWith(REALTIME_STATELESS_FALLBACK_PREFIX)) return undefined;
+
+  const diagnostics = profile.fallbackDiagnostics ?? [];
+  const primary = diagnostics[0];
+  const location = primary?.line === undefined
+    ? ''
+    : ` at line ${primary.line}${primary.column === undefined ? '' : `, column ${primary.column}`}`;
+  const trigger = primary ? `${primary.construct}${location}` : reason;
+  const additional = diagnostics.length > 1
+    ? ` ${diagnostics.length - 1} more realtime stateful construct(s) also contributed.`
+    : '';
+
+  return {
+    type: 'runtime',
+    severity: 'warning',
+    code: REALTIME_COMPILED_FALLBACK_ERROR_CODE,
+    line: primary?.line,
+    column: primary?.column,
+    message:
+      `Tealscript is using the interpreter for realtime updates so this script's output stays correct; live ticks can be slower. ` +
+      `Trigger: ${trigger}. ${primary?.message ?? 'The compiled worker cannot prove this intrabar state shape is safe.'}${additional} ` +
+      `To keep compiled realtime execution, remove or rewrite that stateful intrabar construct. Fallback reason: ${reason}`,
+  };
+}
+
+function classifyFallbackKind(profile: WorkerResult['profile'] | WorkerError['profile']): TealscriptExecutionTelemetry['fallbackKind'] {
+  const reason = profile?.fallbackReason;
+  if (!reason) return 'none';
+  if (reason.startsWith(REALTIME_STATELESS_FALLBACK_PREFIX)) return 'realtime-safety';
+  if (reason.startsWith('unpreloadable-request-data')) return 'request-data';
+  return 'other';
+}
+
+function summarizeResultExecution(
+  scriptId: string,
+  result: WorkerResult,
+  effectivePlots: number,
+  effectiveDrawings: number,
+): TealscriptExecutionTelemetry {
+  const sideEffects = result.alerts.length + result.logs.length;
+  const visualOutputs = effectivePlots + effectiveDrawings;
+  const outputKind: TealscriptExecutionTelemetry['outputKind'] = visualOutputs > 0
+    ? 'visual'
+    : sideEffects > 0
+      ? 'side-effect'
+      : 'empty';
+
+  return {
+    scriptId,
+    status: outputKind === 'empty' ? 'empty-output' : 'ok',
+    outputKind,
+    executionMode: result.profile?.executionMode,
+    selectedBackend: result.profile?.selectedBackend,
+    backendSelectionSource: result.profile?.backendSelectionSource,
+    fallbackKind: classifyFallbackKind(result.profile),
+    elapsedMs: result.profile?.elapsedMs,
+    bars: result.profile?.bars,
+    requestKind: result.metadata?.requestKind,
+    generation: result.metadata?.generation,
+    plots: effectivePlots,
+    drawings: effectiveDrawings,
+    alerts: result.alerts.length,
+    logs: result.logs.length,
+    runtimeErrors: result.profile?.errors ?? 0,
+  };
+}
+
+function summarizeRuntimeErrorExecution(scriptId: string, error: WorkerError): TealscriptExecutionTelemetry {
+  return {
+    scriptId,
+    status: 'runtime-error',
+    outputKind: 'empty',
+    executionMode: error.profile?.executionMode,
+    selectedBackend: error.profile?.selectedBackend,
+    backendSelectionSource: error.profile?.backendSelectionSource,
+    fallbackKind: error.code === 'runtime.error' ? 'runtime-error' : classifyFallbackKind(error.profile),
+    elapsedMs: error.profile?.elapsedMs,
+    bars: error.profile?.bars,
+    plots: 0,
+    drawings: 0,
+    alerts: 0,
+    logs: 0,
+    runtimeErrors: error.profile?.errors ?? 1,
+  };
 }
 
 /**
@@ -105,14 +307,15 @@ class TealscriptWorkerWrapper {
   private isReady = false;
   private readyPromise: Promise<void>;
   private readyResolve: (() => void) | null = null;
-  private options: TealscriptWorkerOptions;
+  private options: TealscriptWorkerWrapperOptions;
   private requestId = 0;
   private latestRequestId = 0;
   private latestFullRequestId = 0;
   private lastSettledRequestId = 0;
   private generation = 0;
+  private reportedRequestDataFailures = new Set<string>();
 
-  constructor(worker: Worker, options: TealscriptWorkerOptions) {
+  constructor(worker: Worker, options: TealscriptWorkerWrapperOptions) {
     this.worker = worker;
     this.options = options;
 
@@ -129,6 +332,7 @@ class TealscriptWorkerWrapper {
       console.error('Worker error:', event);
       this.options.onError?.({
         type: 'runtime',
+        severity: 'error',
         message: event.message || 'Unknown worker error',
       });
     };
@@ -150,6 +354,10 @@ class TealscriptWorkerWrapper {
         this.options.onResult?.(getResultOutput(message));
         break;
 
+      case 'requestData':
+        void this.handleRequestData(message);
+        break;
+
       case 'error':
       case 'parseError':
       case 'semanticError': {
@@ -159,16 +367,79 @@ class TealscriptWorkerWrapper {
         const type = this.toWorkerErrorType(message.type);
         this.options.onError?.({
           type,
+          severity: 'error',
           message: message.message as string,
           line: message.line as number | undefined,
           column: message.column as number | undefined,
           ...(message.type === 'error' && message.code ? { code: message.code } : {}),
           ...(message.type === 'error' && message.runtimeError ? { runtimeError: message.runtimeError } : {}),
+          ...(message.type === 'error' && message.profile ? { profile: message.profile } : {}),
           diagnostics: message.type === 'semanticError' ? message.diagnostics : undefined,
         });
         break;
       }
     }
+  }
+
+  private async handleRequestData(message: RequestDataMessage): Promise<void> {
+    const payload = this.options.resolveRequestData
+      ? await this.resolveRequestData(message)
+      : {
+        ok: false as const,
+        error: {
+          code: 'missing-provider' as const,
+          message: 'No Tealscript request data resolver configured',
+        },
+      };
+
+    if (this.scriptId !== message.scriptId) return;
+
+    const response: RequestDataResultMessage = payload.ok
+      ? {
+        type: 'requestDataResult',
+        scriptId: message.scriptId,
+        requestId: message.requestId,
+        generation: message.generation,
+        kind: message.kind,
+        ok: true,
+        value: payload.value,
+      }
+      : {
+        type: 'requestDataResult',
+        scriptId: message.scriptId,
+        requestId: message.requestId,
+        generation: message.generation,
+        kind: message.kind,
+        ok: false,
+        error: payload.error,
+      };
+
+    if (!payload.ok && this.shouldReportRequestDataFailure(message, payload.error)) {
+      this.options.onError?.(formatRequestDataDiagnostic(message, payload.error));
+    }
+
+    this.worker.postMessage(response);
+  }
+
+  private async resolveRequestData(message: RequestDataMessage) {
+    try {
+      return await this.options.resolveRequestData!(message);
+    } catch (error) {
+      return {
+        ok: false as const,
+        error: {
+          code: 'provider-error' as const,
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
+    }
+  }
+
+  private shouldReportRequestDataFailure(message: RequestDataMessage, error: RequestDataFailure): boolean {
+    const key = `${message.kind}\u0000${JSON.stringify(message.query)}\u0000${error.code}\u0000${error.message}`;
+    if (this.reportedRequestDataFailures.has(key)) return false;
+    this.reportedRequestDataFailures.add(key);
+    return true;
   }
 
   private toWorkerErrorType(messageType: 'error' | 'parseError' | 'semanticError'): WorkerError['type'] {
@@ -315,6 +586,7 @@ export class TealscriptManager {
       inputValues: { ...inputs },
       isReady: false,
       isVisible: true,
+      reportedRuntimeProfileDiagnostics: new Set(),
     };
     this.scripts.set(scriptId, managedScript);
 
@@ -535,6 +807,7 @@ export class TealscriptManager {
       onResult: (result) => this.handleResult(scriptId, workerGeneration, result),
       onError: (error) => this.handleError(scriptId, workerGeneration, error),
       onReady: () => this.handleReady(scriptId, workerGeneration),
+      resolveRequestData: this.options.resolveRequestData,
     }) as unknown as TealscriptWorker;
   }
 
@@ -558,6 +831,7 @@ export class TealscriptManager {
     void this.initializeCurrentWorker(script.id, workerGeneration).catch((error: unknown) => {
       this.handleError(script.id, workerGeneration, {
         type: 'runtime',
+        severity: 'error',
         message: error instanceof Error ? error.message : String(error),
       });
     });
@@ -637,6 +911,8 @@ export class TealscriptManager {
     // Notify listeners
     this.notifyPlotsUpdated();
     this.notifyDrawingsUpdated();
+    this.options.onExecution?.(summarizeResultExecution(scriptId, result, script.plots.length, script.drawings.length));
+    this.reportRuntimeProfileDiagnostic(scriptId, script, result);
   }
 
   private handleError(scriptId: string, workerGeneration: number, error: WorkerError): void {
@@ -644,16 +920,34 @@ export class TealscriptManager {
     if (!script) return;
 
     script.error = error;
-    script.plots = []; // Clear plots on error
-    script.drawings = []; // Clear drawings on error
+    if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE && error.code !== REALTIME_COMPILED_FALLBACK_ERROR_CODE) {
+      script.plots = []; // Clear plots on fatal errors
+      script.drawings = []; // Clear drawings on fatal errors
+    }
 
     if (isTealchartPlotDebugEnabled()) {
       console.error('[tealchart:plots] manager error', { scriptId, workerGeneration, error });
     }
 
     this.options.onError?.(scriptId, error);
-    this.notifyPlotsUpdated();
-    this.notifyDrawingsUpdated();
+    if (error.type === 'runtime' && error.severity === 'error') {
+      this.options.onExecution?.(summarizeRuntimeErrorExecution(scriptId, error));
+    }
+    if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE && error.code !== REALTIME_COMPILED_FALLBACK_ERROR_CODE) {
+      this.notifyPlotsUpdated();
+      this.notifyDrawingsUpdated();
+    }
+  }
+
+  private reportRuntimeProfileDiagnostic(scriptId: string, script: ManagedScript, result: WorkerResult): void {
+    const error = formatRealtimeCompiledFallbackDiagnostic(result);
+    if (!error) return;
+
+    const key = `${error.code}\u0000${error.message}`;
+    if (script.reportedRuntimeProfileDiagnostics.has(key)) return;
+    script.reportedRuntimeProfileDiagnostics.add(key);
+    script.error = error;
+    this.options.onError?.(scriptId, error);
   }
 
   private handleReady(scriptId: string, workerGeneration: number): void {

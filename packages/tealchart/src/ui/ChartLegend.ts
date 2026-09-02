@@ -39,7 +39,10 @@ export interface IndicatorPaneInfo {
   overlay: boolean;
   yAxisRange?: { min: number; max: number };
   explicitPlotZOrder?: boolean;
+  format?: string;
   name?: string;
+  precision?: number;
+  scale?: string;
   inputs?: Record<string, unknown>;
 }
 

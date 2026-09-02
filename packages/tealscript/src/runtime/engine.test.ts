@@ -232,6 +232,7 @@ plot(basis, title="Basis")`;
       expect(result.profile.requestContexts).toBe(0);
       expect(result.profile.maxBarsBack).toBe(1);
       expect(result.profile.errors).toBe(0);
+      expect(result.profile.executionMode).toBe('interpreter');
       expect(result.profile.elapsedMs).toBeGreaterThanOrEqual(0);
     });
 
@@ -1126,7 +1127,7 @@ plot(strategy.equity)`), createBars(1));
       const script = `//@version=6
 strategy("Open access",
     process_orders_on_close=true,
-    pyramiding=1,
+    pyramiding=2,
     commission_type=strategy.commission.cash_per_contract,
     commission_value=1)
 if bar_index == 0
@@ -1323,6 +1324,50 @@ plot(strategy.opentrades, title="Open Trades")`;
       const secondUpdate = engine.updateBar(ast, { ...bars[2], close: 300 });
       expect(secondUpdate.find((plot) => plot.title === 'Position')?.values.at(-1)).toBe(1);
       expect(secondUpdate.find((plot) => plot.title === 'Open Trades')?.values.at(-1)).toBe(1);
+    });
+
+    it('re-registers imported library bindings during realtime updateBar re-entry', () => {
+      const library = parse(`//@version=6
+library("RealtimeHelpers", true)
+export adjusted(series float value) =>
+    var counter = 0.0
+    counter += 1.0
+    value + counter`);
+      const ast = parse(`//@version=6
+indicator("Realtime imported helper")
+import TestUser/RealtimeHelpers/1 as rt
+plot(rt.adjusted(close), title="Adjusted")`);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine({
+        libraries: new Map([['TestUser/RealtimeHelpers/1', library]]),
+      });
+      const result = engine.execute(ast, bars);
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Adjusted')?.values).toEqual([
+        bars[0]!.close + 1,
+        bars[1]!.close + 2,
+        bars[2]!.close + 3,
+      ]);
+
+      const firstTick = { ...bars[2]!, close: 130 };
+      const secondTick = { ...bars[2]!, close: 131 };
+      const thirdTick = { ...bars[2]!, close: 132 };
+
+      expect(engine.updateBar(ast, firstTick).find((plot) => plot.title === 'Adjusted')?.values).toEqual([
+        bars[0]!.close + 1,
+        bars[1]!.close + 2,
+        firstTick.close + 3,
+      ]);
+      expect(engine.updateBar(ast, secondTick).find((plot) => plot.title === 'Adjusted')?.values).toEqual([
+        bars[0]!.close + 1,
+        bars[1]!.close + 2,
+        secondTick.close + 3,
+      ]);
+      expect(engine.updateBar(ast, thirdTick).find((plot) => plot.title === 'Adjusted')?.values).toEqual([
+        bars[0]!.close + 1,
+        bars[1]!.close + 2,
+        thirdTick.close + 3,
+      ]);
     });
 
     it('fills default strategy market orders when a realtime bar starts', () => {
@@ -2431,7 +2476,7 @@ plot(strategy.opentrades)`;
 
     it('allows additional strategy.entry calls up to the pyramiding setting', () => {
       const script = `//@version=6
-strategy("Pyramiding allowed", pyramiding=1, process_orders_on_close=true)
+strategy("Pyramiding allowed", pyramiding=2, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("First", strategy.long, qty=1)
 if bar_index == 1
@@ -2471,11 +2516,12 @@ plot(strategy.closedtrades)`;
         id: order.id,
         direction: order.direction,
         qty: order.qty,
+        requestedQty: order.requestedQty,
         filledQty: order.filledQty,
         status: order.status,
       }))).toEqual([
-        { id: 'Long', direction: 'long', qty: 2, filledQty: 2, status: 'filled' },
-        { id: 'Short', direction: 'short', qty: 1, filledQty: 3, status: 'filled' },
+        { id: 'Long', direction: 'long', qty: 2, requestedQty: 2, filledQty: 2, status: 'filled' },
+        { id: 'Short', direction: 'short', qty: 3, requestedQty: 1, filledQty: 3, status: 'filled' },
       ]);
       expect(result.strategy.position).toMatchObject({
         direction: 'short',
@@ -2514,7 +2560,7 @@ plot(strategy.closedtrades)`;
         status: order.status,
       }))).toEqual([
         { id: 'Long', qty: 2, requestedQty: 2, filledQty: 2, status: 'filled' },
-        { id: 'ShortStop', qty: 1, requestedQty: 1, filledQty: 2, status: 'filled' },
+        { id: 'ShortStop', qty: 3, requestedQty: 1, filledQty: 2, status: 'filled' },
         { id: 'Close Long', qty: 1, requestedQty: 1, filledQty: 1, status: 'filled' },
       ]);
       expect(result.strategy.position).toMatchObject({
@@ -3027,7 +3073,7 @@ plot(strategy.closedtrades)`;
 
     it('keeps strategy.exit OCA cancellation scoped to from_entry', () => {
       const script = `//@version=6
-strategy("OCA scope", pyramiding=1, process_orders_on_close=true)
+strategy("OCA scope", pyramiding=2, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("A", strategy.long, qty=1)
     strategy.entry("B", strategy.long, qty=1)
@@ -3202,7 +3248,7 @@ plot(strategy.position_size)`;
       expect(result.plots[0]?.values).toEqual([0, 0, 3]);
     });
 
-    it('does not fill updated strategy.exit prices until a later bar', () => {
+    it('keeps updated strategy.exit prices active for the original pending order', () => {
       const script = `//@version=6
 strategy("Exit activation", process_orders_on_close=true)
 if bar_index == 0
@@ -3224,9 +3270,9 @@ plot(strategy.position_size)`;
         updatedBarIndex: order.updatedBarIndex,
       }))).toEqual([
         { id: 'Long', status: 'filled', limitPrice: undefined, activationBarIndex: 0, updatedBarIndex: 0 },
-        { id: 'Target', status: 'filled', limitPrice: 101.4, activationBarIndex: 2, updatedBarIndex: 3 },
+        { id: 'Target', status: 'filled', limitPrice: 101.4, activationBarIndex: 1, updatedBarIndex: 2 },
       ]);
-      expect(result.strategy.closedTrades[0]?.exitBarIndex).toBe(3);
+      expect(result.strategy.closedTrades[0]?.exitBarIndex).toBe(2);
     });
 
     it('fills long strategy.exit trailing stops after activation', () => {
@@ -3324,7 +3370,7 @@ plot(strategy.position_size)`;
 
     it('uses weighted entry price for multi-fill strategy.exit trail_points activation', () => {
       const script = `//@version=6
-strategy("Weighted trail", pyramiding=1, process_orders_on_close=true)
+strategy("Weighted trail", pyramiding=2, process_orders_on_close=true)
 if bar_index == 0
     strategy.entry("A", strategy.long, qty=1)
 if bar_index == 1
@@ -4057,6 +4103,29 @@ plot(hour(timestamp("GMT+2", 2024, 1, 5, 9, 30), "GMT+2"), title="Timestamp Hour
       expect(result.plots.find((plot) => plot.title === 'Timestamp Hour')?.values).toEqual([9]);
     });
 
+    it('supports history access on Pine calendar variables', () => {
+      const script = `//@version=6
+indicator("Calendar History")
+plot(dayofweek[1], title="Previous DOW")
+plot(hour[1], title="Previous Hour")
+plot(minute[1], title="Previous Minute")
+plot(year[2], title="Two Bars Back Year")`;
+
+      const ast = parse(script);
+      const bars: Bar[] = [
+        { time: Date.UTC(2024, 0, 5, 7, 30), open: 1, high: 2, low: 1, close: 2, volume: 100 },
+        { time: Date.UTC(2024, 0, 6, 8, 31), open: 2, high: 3, low: 2, close: 3, volume: 101 },
+        { time: Date.UTC(2024, 0, 7, 9, 32), open: 3, high: 4, low: 3, close: 4, volume: 102 },
+      ];
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Previous DOW')?.values).toEqual([null, 6, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Hour')?.values).toEqual([null, 7, 8]);
+      expect(result.plots.find((plot) => plot.title === 'Previous Minute')?.values).toEqual([null, 30, 31]);
+      expect(result.plots.find((plot) => plot.title === 'Two Bars Back Year')?.values).toEqual([null, null, 2024]);
+    });
+
     it('supports IANA timezones in calendar, timestamp, and format helpers', () => {
       const script = `//@version=6
 indicator("IANA Timezones")
@@ -4662,7 +4731,22 @@ plot(timeframe.in_seconds("15") < timeframe.in_seconds("1D") ? 1 : 0, title="Com
         { time: Date.UTC(2024, 0, 5, 0, 30), open: 2, high: 3, low: 2, close: 3, volume: 100 },
         { time: Date.UTC(2024, 0, 5, 1, 0), open: 3, high: 4, low: 3, close: 4, volume: 100 },
       ];
-      const result = executeScript(ast, bars);
+      const result = executeScript(ast, bars, undefined, {
+        runtime: {
+          timeframe: {
+            period: '30',
+            multiplier: 30,
+            isminutes: true,
+            isdaily: false,
+            isweekly: false,
+            ismonthly: false,
+            isintraday: true,
+            isseconds: false,
+            isticks: false,
+          },
+          syminfo: { timezone: 'UTC' },
+        },
+      });
 
       expect(result.errors).toHaveLength(0);
       expect(result.plots.find((plot) => plot.title === 'Seconds')?.values).toEqual([45, 45, 45]);
@@ -5088,6 +5172,28 @@ alert("Close", alert.freq_once_per_bar_close)`;
       const alerts = engine.getAlerts();
       expect(alerts[0]?.values).toEqual([true, true]);
       expect(alerts[0]?.events.map((event) => event.barIndex)).toEqual([0, 1]);
+    });
+
+    it('rolls direct alert metadata back when a realtime replacement no longer fires', () => {
+      const script = `//@version=6
+indicator("Alerts")
+if bar_index == 0 or (bar_index == 2 and high > 105)
+    alert(bar_index == 0 ? "base" : "transient " + str.tostring(high), alert.freq_all)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars.slice(0, 2));
+      const realtimeBar = { ...bars[2]!, high: 110 };
+      engine.updateBar(ast, realtimeBar);
+      expect(engine.getAlerts()[0]?.message).toBe('transient 110');
+
+      engine.updateBar(ast, { ...realtimeBar, high: 90 });
+      const alert = engine.getAlerts()[0];
+      expect(alert?.message).toBe('base');
+      expect(alert?.events.map((event) => [event.barIndex, event.message])).toEqual([[0, 'base']]);
+      expect(alert?.values.map((value, index) => value ? index : null).filter((value) => value !== null)).toEqual([0]);
     });
 
     it('marks direct alert events from realtime bar updates', () => {
@@ -5817,20 +5923,44 @@ plot(classify(bar_index - 1), title="Classified")`;
       expect(result.plots.find((plot) => plot.title === 'Classified')?.values).toEqual([-1, 0, 1]);
     });
 
-    it('enforces max recursion depth for direct recursive user function calls', () => {
+    it('resolves imported enum title methods', () => {
+      const library = parse(`//@version=6
+library("EnumTools", true)
+export enum Mode
+    strict = "Strict Mode"
+    loose
+`);
+      const script = `//@version=6
+indicator("Imported Enum Titles")
+import TestUser/EnumTools/1 as modes
+plot(str.length(modes.Mode.strict.title()), title="Strict")
+plot(str.length(modes.Mode.loose.title()), title="Loose")
+`;
+
+      const result = executeScript(parse(script), createBars(1), undefined, {
+        libraries: new Map([['TestUser/EnumTools/1', library]]),
+      });
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Strict')?.values).toEqual([11]);
+      expect(result.plots.find((plot) => plot.title === 'Loose')?.values).toEqual([5]);
+    });
+
+    it('executes direct recursive user function calls', () => {
       const script = `//@version=6
 indicator("Direct Recursive Function")
 countdown(value) => value <= 0 ? 0 : countdown(value - 1)
-plot(countdown(101), title="Countdown")`;
+plot(countdown(2), title="Countdown")`;
 
       const ast = parse(script);
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('Maximum recursion depth exceeded for function: countdown');
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Countdown')?.values).toEqual([0]);
     });
 
-    it('allows mutual recursive user function calls that terminate within depth limit', () => {
+    it('executes mutual recursive user function calls', () => {
       const script = `//@version=6
 indicator("Mutual Recursive Function")
 even(value) => value <= 0 ? 1 : odd(value - 1)
@@ -5841,11 +5971,11 @@ plot(even(4), title="Even")`;
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors).toHaveLength(0);
+      expect(result.errors).toEqual([]);
       expect(result.plots.find((plot) => plot.title === 'Even')?.values).toEqual([1]);
     });
 
-    it('computes factorial recursively', () => {
+    it('executes recursive factorial helpers', () => {
       const script = `//@version=6
 indicator("Factorial")
 factorial(n) => n <= 1 ? 1 : n * factorial(n - 1)
@@ -5855,11 +5985,11 @@ plot(factorial(5), title="Result")`;
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors).toHaveLength(0);
+      expect(result.errors).toEqual([]);
       expect(result.plots.find((plot) => plot.title === 'Result')?.values).toEqual([120]);
     });
 
-    it('computes fibonacci recursively', () => {
+    it('executes recursive fibonacci helpers', () => {
       const script = `//@version=6
 indicator("Fibonacci")
 fib(n) => n <= 1 ? n : fib(n - 1) + fib(n - 2)
@@ -5869,21 +5999,21 @@ plot(fib(8), title="Result")`;
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors).toHaveLength(0);
+      expect(result.errors).toEqual([]);
       expect(result.plots.find((plot) => plot.title === 'Result')?.values).toEqual([21]);
     });
 
-    it('throws a clear error when recursion exceeds 100 levels', () => {
+    it('halts runaway recursion at the maximum depth guard', () => {
       const script = `//@version=6
-indicator("Deep Recursion")
-deep(n) => n <= 0 ? 0 : deep(n - 1)
-plot(deep(101), title="Result")`;
+indicator("Runaway Recursion")
+loop(n) => loop(n + 1)
+plot(loop(0), title="Result")`;
 
       const ast = parse(script);
       const bars = createBars(1, 100);
       const result = executeScript(ast, bars);
 
-      expect(result.errors[0]?.message).toBe('Maximum recursion depth exceeded for function: deep');
+      expect(result.errors[0]?.message).toBe('Maximum recursion depth exceeded for function: loop');
     });
 
     it('halts execution on runtime.error with a message', () => {
@@ -6007,6 +6137,9 @@ plot(str.tonumber("42.5"), title="Decimal")
 plot(str.tonumber("  -3e2  "), title="Scientific")
 plot(str.tonumber(string="+.5"), title="Named Fraction")
 plot(str.tonumber("1."), title="Trailing Dot")
+plot(str.tointeger("42.9"), title="Integer")
+plot(str.tointeger("-42.9"), title="Negative Integer")
+plot(na(str.tointeger("bad")) ? 1 : 0, title="Bad Integer")
 plot(str.tonumber("bad"), title="Invalid")
 plot(str.tonumber("0x10"), title="Hex Invalid")
 plot(str.tonumber("Infinity"), title="Infinity Invalid")
@@ -6021,6 +6154,9 @@ plot(na(str.tonumber("")) ? 1 : 0, title="Empty Is NA")`;
       expect(result.plots.find((plot) => plot.title === 'Scientific')?.values).toEqual([-300, -300]);
       expect(result.plots.find((plot) => plot.title === 'Named Fraction')?.values).toEqual([0.5, 0.5]);
       expect(result.plots.find((plot) => plot.title === 'Trailing Dot')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Integer')?.values).toEqual([42, 42]);
+      expect(result.plots.find((plot) => plot.title === 'Negative Integer')?.values).toEqual([-42, -42]);
+      expect(result.plots.find((plot) => plot.title === 'Bad Integer')?.values).toEqual([1, 1]);
       expect(result.plots.find((plot) => plot.title === 'Invalid')?.values).toEqual([null, null]);
       expect(result.plots.find((plot) => plot.title === 'Hex Invalid')?.values).toEqual([null, null]);
       expect(result.plots.find((plot) => plot.title === 'Infinity Invalid')?.values).toEqual([null, null]);
@@ -7902,7 +8038,7 @@ plot(dir, title="Dir")`;
       const basicLower = hl2Bar6 - 3 * expectedAtr;
       expect(stVals[6]).not.toBeNull();
       // Direction based on close=15 vs bands; verify supertrend value is within a reasonable range
-      if (dirVals[6] === 1) {
+      if (dirVals[6] === -1) {
         expect(stVals[6] as number).toBeCloseTo(basicLower, 4);
       } else {
         expect(stVals[6] as number).toBeCloseTo(basicUpper, 4);
@@ -8305,6 +8441,24 @@ plot(x)`;
 
       const plot = result.plots[0];
       expect(plot.values[1]).toBeCloseTo(bars[0].close, 1);
+    });
+
+    it('supports history offsets on computed boolean variables', () => {
+      const bars: Bar[] = [
+        { time: 1_700_000_000_000, open: 100, high: 101, low: 99, close: 99, volume: 100 },
+        { time: 1_700_000_060_000, open: 99, high: 102, low: 98, close: 101, volume: 100 },
+        { time: 1_700_000_120_000, open: 101, high: 102, low: 98, close: 100, volume: 100 },
+        { time: 1_700_000_180_000, open: 100, high: 103, low: 99, close: 102, volume: 100 },
+      ];
+      const result = executeScript(parse(`//@version=6
+indicator("Boolean History")
+bullish = close > open
+bearish = close < open
+turnsUp = bearish[1] and bullish
+plot(turnsUp ? 1 : 0, title="Turns Up")`), bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Turns Up')?.values).toEqual([0, 1, 0, 1]);
     });
 
     it('supports dynamic history offsets', () => {
@@ -9176,6 +9330,20 @@ plot(length)`;
       expect(result.plots[0].values).toEqual([14, 14, 14]);
     });
 
+    it('infers bare source input defaults as series', () => {
+      const script = `//@version=6
+indicator("Bare Source Input")
+source = input(close, "Source")
+plot(source, title="Source")
+plot(ta.sma(source, 2), title="Average")`;
+
+      const result = executeScript(parse(script), createBars(3));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Source')?.values).toEqual([100.2, 100.7, 101.2]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Average')?.values ?? [], 4)).toEqual([null, 100.45, 100.95]);
+    });
+
     it('accepts custom input values', () => {
       const script = `//@version=6
 indicator("Test")
@@ -9188,6 +9356,132 @@ plot(length)`;
       const result = executeScript(ast, bars, inputs);
 
       expect(result.plots[0].values).toEqual([20, 20, 20]);
+    });
+
+    it('caches top-level scalar input declarations after registration', () => {
+      const script = `//@version=6
+indicator("Cached Inputs")
+length = input.int(3, "Length")
+enabled = input.bool(true, "Enabled")
+plot(enabled ? close + length : na)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.profile.builtinCalls).toBe(6);
+      expect(result.plots[0].values).toEqual([103.2, 103.7, 104.2, 104.7]);
+    });
+
+    it('keeps later input call IDs stable when earlier declarations are cached', () => {
+      const script = `//@version=6
+indicator("Cached Input Call IDs")
+fib = input.float(0.5, "Fib Value")
+atr = input.float(1, "ATR Multi")
+body = input.float(80, "Body % Above") / 100
+plot(fib, title="Fib")
+plot(atr, title="ATR")
+plot(body, title="Body")`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.inputs.map((input) => [input.id, input.defval])).toEqual([
+        ['input_Fib Value', 0.5],
+        ['input_ATR Multi', 1],
+        ['input_Body % Above', 80],
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Fib')?.values).toEqual([0.5, 0.5, 0.5, 0.5]);
+      expect(result.plots.find((plot) => plot.title === 'ATR')?.values).toEqual([1, 1, 1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Body')?.values).toEqual([0.8, 0.8, 0.8, 0.8]);
+    });
+
+    it('keeps later generic input call IDs stable when persistent declarations are skipped', () => {
+      const script = `//@version=4
+study("Persistent Generic Input Call IDs", overlay=true)
+var trendRule = input("SMA50", "Detect Trend Based On", options=["SMA50", "No detection"])
+markerColor = input(title="Marker Color", type=input.color, defval=color.gray)
+textColor = input(title="Text Color", type=input.color, defval=color.white)
+markerStyle = input(title="Marker Style", defval="label up", options=["label up", "label down"])
+label.new(bar_index, close, text=trendRule, color=markerColor, textcolor=textColor, style=markerStyle == "label up" ? label.style_label_up : label.style_label_down)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.inputs.map((input) => [input.id, input.defval])).toEqual([
+        ['input_Detect Trend Based On', 'SMA50'],
+        ['input_Marker Color', '#787B86'],
+        ['input_Text Color', '#FFFFFF'],
+        ['input_Marker Style', 'label up'],
+      ]);
+      expect(
+        result.drawings.map((drawing) => ({
+          color: drawing.type === 'label' ? drawing.color : undefined,
+          style: drawing.type === 'label' ? drawing.style : undefined,
+          text: drawing.type === 'label' ? drawing.text : undefined,
+          textColor: drawing.type === 'label' ? drawing.textColor : undefined,
+        })),
+      ).toEqual([
+        { color: '#787B86', style: 'label_up', text: 'SMA50', textColor: '#FFFFFF' },
+        { color: '#787B86', style: 'label_up', text: 'SMA50', textColor: '#FFFFFF' },
+        { color: '#787B86', style: 'label_up', text: 'SMA50', textColor: '#FFFFFF' },
+        { color: '#787B86', style: 'label_up', text: 'SMA50', textColor: '#FFFFFF' },
+      ]);
+    });
+
+    it('keeps qualified array namespace calls distinct from same-named UDF parameters', () => {
+      const script = `//@version=5
+indicator("Array Namespace Shadow")
+addAndPop(array, value) =>
+    array.unshift(array, value)
+    array.pop(array)
+var values = array.new_int(2, 0)
+addAndPop(values, bar_index[1])
+plot(array.get(values, 0), title="Newest")
+plot(array.get(values, 1), title="Previous")`;
+
+      const result = executeScript(parse(script), createBars(5));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Newest')?.values).toEqual([null, 0, 1, 2, 3]);
+      expect(result.plots.find((plot) => plot.title === 'Previous')?.values).toEqual([0, null, 0, 1, 2]);
+    });
+
+    it('does not cache accepted dynamic-title input declarations', () => {
+      const script = `//@version=6
+indicator("Dynamic Input Title")
+length = input.int(bar_index, "Length " + str.tostring(bar_index))
+plot(length)`;
+
+      const result = executeScript(parse(script), createBars(4));
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots[0].values).toEqual([0, 1, 2, 3]);
+      expect(result.inputs.map((input) => input.id)).toEqual(['input_Length 0']);
+    });
+
+    it('reuses cached scalar inputs during realtime re-entry and invalidates on full execute', () => {
+      const script = `//@version=6
+indicator("Realtime Cached Inputs")
+length = input.int(3, "Length")
+plot(close + length)`;
+
+      const ast = parse(script);
+      const engine = new TealscriptEngine();
+      const bars = createBars(3);
+      const initial = engine.execute(ast, bars);
+
+      expect(initial.errors).toEqual([]);
+      expect(initial.plots[0].values).toEqual([103.2, 103.7, 104.2]);
+
+      engine.updateBar(ast, { ...bars[2]!, close: 110 });
+      const updated = engine.getCurrentExecutionResult();
+      expect(updated.errors).toEqual([]);
+      expect(updated.profile.builtinCalls).toBe(1);
+      expect(updated.plots[0].values).toEqual([103.2, 103.7, 113]);
+
+      const changedInputs = engine.execute(ast, createBars(3), new Map([['input_Length', 7]]));
+      expect(changedInputs.errors).toEqual([]);
+      expect(changedInputs.plots[0].values).toEqual([107.2, 107.7, 108.2]);
     });
 
     it('registers source input metadata and accepts overrides', () => {
@@ -9227,6 +9521,21 @@ plot(ta.sma(source, 2))`;
       const result = executeScript(ast, bars, new Map([['input_Source', 'hlcc4']]));
 
       expect(roundSeries(result.plots[0].values, 4)).toEqual([null, 100.4, 100.9]);
+    });
+
+    it('resolves plot source input overrides as source history', () => {
+      const script = `//@version=6
+indicator("Plot Source Input History")
+base = plot(hlc3, title="Selectable Plot")
+source = input.source(defval=close, title="Source")
+plot(source, title="Selected")
+plot(ta.sma(source, 2), title="Average")`;
+
+      const result = executeScript(parse(script), createBars(3), new Map([['input_Source', 'Selectable Plot']]));
+
+      expect(result.errors).toEqual([]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Selected')?.values ?? [], 4)).toEqual([100.1333, 100.6333, 101.1333]);
+      expect(roundSeries(result.plots.find((plot) => plot.title === 'Average')?.values ?? [], 4)).toEqual([null, 100.3833, 100.8833]);
     });
 
     it('preserves input source identity when current source values collide', () => {
@@ -9786,6 +10095,42 @@ if close > open
       expect(updatedPlot?.openValues).toEqual([100, 100.5]);
       expect(updatedPlot?.closeValues).toEqual([100.2, 100.7]);
       expect(updatedPlot?.color).toEqual(['#4CAF50', '#4CAF50']);
+    });
+
+    it('keeps hline outputs non-series across same-timestamp re-execution', () => {
+      const script = `//@version=6
+indicator("HLine realtime")
+hline(0, "Zero", color=color.gray)
+plot(close, "Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const updatedBar = { ...bars[2], close: bars[2].close + 2 };
+      const plots = engine.updateBar(ast, updatedBar);
+      const freshPlots = executeScript(ast, [...bars.slice(0, -1), updatedBar]).plots;
+
+      expect(plots.find((plot) => plot.title === 'Zero')).toEqual(freshPlots.find((plot) => plot.title === 'Zero'));
+    });
+
+    it('replaces plotarrow direction and colors on same-timestamp re-execution', () => {
+      const script = `//@version=6
+indicator("Arrow realtime")
+signal = close > open ? 1 : close < open ? -1 : 0
+plotarrow(signal, title="Signal", colorup=color.green, colordown=color.red)`;
+
+      const ast = parse(script);
+      const bars = createBars(3, 100);
+      const engine = new TealscriptEngine();
+
+      engine.execute(ast, bars);
+      const updatedBar = { ...bars[2], close: bars[2].open - 1 };
+      const plots = engine.updateBar(ast, updatedBar);
+      const freshPlots = executeScript(ast, [...bars.slice(0, -1), updatedBar]).plots;
+
+      expect(plots.find((plot) => plot.title === 'Signal')).toEqual(freshPlots.find((plot) => plot.title === 'Signal'));
     });
 
     it('truncates alerts before same-timestamp re-execution', () => {

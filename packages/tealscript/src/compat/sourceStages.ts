@@ -19,8 +19,9 @@ export function createPineParseSemanticStageOutcomes(
     const program = parse(source);
     const semanticResult = checkProgram(program, semanticOptions);
 
-    if (semanticResult.diagnostics.length > 0) {
-      const diagnostics = semanticResult.diagnostics.map((diagnostic) => ({
+    const semanticErrors = semanticResult.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    if (semanticErrors.length > 0) {
+      const diagnostics = semanticErrors.map((diagnostic) => ({
         code: diagnostic.code,
         message: diagnostic.message,
         line: diagnostic.line,

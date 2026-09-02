@@ -2,6 +2,7 @@ export interface PineUdtObject {
   readonly __tealscriptUdt: true;
   readonly typeName: string;
   readonly varipFields: Set<string>;
+  persistent?: boolean;
   fields: Map<string, unknown>;
 }
 
@@ -37,9 +38,11 @@ export function setUdtField(object: PineUdtObject, fieldName: string, value: unk
 }
 
 export function copyUdtObject(object: PineUdtObject, cloneValue: (value: unknown) => unknown = (value) => value): PineUdtObject {
-  return createPineUdtObject(
+  const copy = createPineUdtObject(
     object.typeName,
     Array.from(object.fields.entries(), ([fieldName, value]) => [fieldName, cloneValue(value)]),
     object.varipFields,
   );
+  copy.persistent = object.persistent;
+  return copy;
 }

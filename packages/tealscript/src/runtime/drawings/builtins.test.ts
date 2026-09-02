@@ -28,7 +28,7 @@ function createBars(count: number, startPrice = 100): Bar[] {
 indicator("Drawing calls")
 label.new(bar_index, close, text="x", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
 line.new(bar_index - 1, close[1], bar_index, close)
-table.new(position.top_right, 1, 1)
+table.new(position.top_right, 1, 1, force_overlay=true)
 box.new(bar_index - 1, high, bar_index, low)
 plot(close)`;
 
@@ -80,6 +80,7 @@ plot(close)`;
           frameWidth: 0,
           borderColor: null,
           borderWidth: 0,
+          forceOverlay: true,
           cells: [],
         },
         {
@@ -252,6 +253,41 @@ plot(label.get_x(marker), title="Label X")`;
           size: 'normal',
           tooltip: undefined,
         },
+      ]);
+    });
+
+    it('replaces assignment-created persistent drawings on same-time realtime updates', () => {
+      const script = `//@version=6
+indicator("Realtime assigned label")
+var marker = na
+if barstate.islast
+    marker := label.new(bar_index, high, text=str.tostring(high))
+plot(label.get_y(marker), title="Label Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 201,
+        close: 200,
+      });
+
+      const labels = engine.getDrawings().filter((drawing) => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect(labels[0]).toMatchObject({
+        persistent: true,
+        barIndex: 2,
+        x: 2,
+        y: 201,
+        text: '201',
+      });
+      expect(engine.getCurrentExecutionResult().plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([
+        null,
+        null,
+        201,
       ]);
     });
 
@@ -509,6 +545,125 @@ plot(line.get_y2(trend), title="Line Y2")`;
           forceOverlay: false,
         },
       ]);
+    });
+
+    it('preserves UDF-local persistent drawing handles during realtime re-entry', () => {
+      const script = `//@version=6
+indicator("Realtime UDF drawings", overlay=true)
+drawRange() =>
+    var line range = na
+    var label marker = na
+    if barstate.islast
+        if na(range)
+            range := line.new(bar_index - 1, low, bar_index, high)
+            marker := label.new(bar_index, high, "range")
+        else
+            line.set_xy1(range, bar_index - 1, low)
+            line.set_xy2(range, bar_index, high)
+            label.set_x(marker, bar_index)
+            label.set_y(marker, high)
+    line.get_y2(range)
+plot(drawRange(), title="Range Top")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const firstRealtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60000,
+        high: 250,
+        low: 190,
+        close: 220,
+      };
+      engine.updateBar(ast, firstRealtimeBar);
+      engine.updateBar(ast, {
+        ...firstRealtimeBar,
+        high: 255,
+        low: 192,
+        close: 225,
+      });
+      const nextBar = engine.updateBar(ast, {
+        ...bars[2],
+        time: bars[2].time + 120000,
+        high: 260,
+        low: 195,
+        close: 230,
+      });
+
+      expect(engine.getDrawings()).toMatchObject([
+        {
+          type: 'line',
+          persistent: true,
+          x1: 3,
+          y1: 195,
+          x2: 4,
+          y2: 260,
+        },
+        {
+          type: 'label',
+          persistent: true,
+          x: 4,
+          y: 260,
+        },
+      ]);
+      expect(nextBar.find((plot) => plot.title === 'Range Top')?.values.at(-1)).toBe(260);
+    });
+
+    it('preserves confirmed drawing handles stored in persistent arrays', () => {
+      const script = `//@version=6
+indicator("Realtime persistent array handles", overlay=true)
+var line[] levels = array.new_line()
+if barstate.islast
+    if bar_index == 3
+        first = line.new(bar_index - 1, low, bar_index, high)
+        second = line.new(bar_index, low, bar_index + 1, high)
+        array.push(levels, first)
+        array.push(levels, second)
+plot(array.size(levels), "Level Count")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const firstRealtimeBar = { ...bars[2], time: bars[2].time + 60000, high: 250, low: 190, close: 220 };
+      engine.updateBar(ast, firstRealtimeBar);
+      engine.updateBar(ast, { ...firstRealtimeBar, high: 255, close: 225 });
+      const nextRealtimeBar = { ...bars[2], time: bars[2].time + 120000, high: 260, low: 195, close: 230 };
+      engine.updateBar(ast, nextRealtimeBar);
+      engine.updateBar(ast, { ...nextRealtimeBar, high: 265, close: 235 });
+      engine.updateBar(ast, { ...bars[2], time: bars[2].time + 180000, high: 270, low: 200, close: 240 });
+
+      const lines = engine.getDrawings().filter((drawing) => drawing.type === 'line');
+      expect(lines).toHaveLength(2);
+      expect(lines.map((drawing) => drawing.persistent)).toEqual([true, true]);
+      expect(lines.map((drawing) => drawing.x2)).toEqual([3, 4]);
+    });
+
+    it('preserves drawings created during confirmed realtime close', () => {
+      const script = `//@version=6
+indicator("Realtime confirmed close drawings", overlay=true)
+if barstate.isconfirmed and barstate.isrealtime and bar_index == 2
+    label.new(bar_index, high, "confirmed")
+plot(close, "Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const firstRealtimeBar = { ...bars[1], time: bars[1].time + 60000, high: 250, close: 220 };
+      engine.updateBar(ast, firstRealtimeBar);
+      engine.updateBar(ast, { ...firstRealtimeBar, high: 255, close: 225 });
+      const nextRealtimeBar = { ...bars[1], time: bars[1].time + 120000, high: 260, close: 230 };
+      engine.updateBar(ast, nextRealtimeBar);
+      engine.updateBar(ast, { ...nextRealtimeBar, high: 265, close: 235 });
+
+      const labels = engine.getDrawings().filter((drawing) => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect(labels[0]).toMatchObject({ persistent: true, text: 'confirmed', x: 2, y: 255 });
     });
 
     it('creates, reads, mutates, and deletes linefill drawings by handle', () => {
@@ -1467,6 +1622,41 @@ plot(close)`;
       const result = executeScript(ast, bars);
 
       expect(result.errors[0]?.message).toBe('Table merged cell range overlaps existing merged cells: columns 1-2, rows 0-1');
+    });
+
+    it('keeps identical table cell merges idempotent during realtime re-entry', () => {
+      const script = `//@version=6
+indicator("Realtime table merge", overlay=true)
+var stats = table.new(position.top_right, 2, 1)
+if barstate.islast
+    table.cell(stats, 0, 0, "Header")
+    table.merge_cells(stats, 0, 0, 1, 0)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        close: bars[2].close + 1,
+      });
+
+      expect(engine.getCurrentExecutionResult().errors).toEqual([]);
+      expect(engine.getDrawings()).toEqual([
+        expect.objectContaining({
+          type: 'table',
+          mergedCells: [
+            {
+              startColumn: 0,
+              startRow: 0,
+              endColumn: 1,
+              endRow: 0,
+            },
+          ],
+        }),
+      ]);
     });
 
     it('clears merged table cell ranges touched by table.clear', () => {

@@ -1,8 +1,210 @@
 import { describe, expect, it } from 'vitest';
 
+import { PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX } from '../../src/compat/pineV6ReferenceManualIndex';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
+const manualDrawingObjectNames = [...new Set(Object.values(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX).flat())]
+  .filter((name) => (
+    name === 'box'
+    || name === 'label'
+    || name === 'line'
+    || name === 'linefill'
+    || name === 'table'
+    || name.startsWith('box.')
+    || name.startsWith('chart.point.')
+    || name.startsWith('label.')
+    || name.startsWith('line.')
+    || name.startsWith('linefill.')
+    || name.startsWith('polyline.')
+    || name.startsWith('table.')
+  ))
+  .sort();
+
+const drawingBehaviorCoveredNames = [
+  'box',
+  'box.all',
+  'box.copy',
+  'box.delete',
+  'box.get_bottom',
+  'box.get_left',
+  'box.get_right',
+  'box.get_top',
+  'box.new',
+  'box.set_bgcolor',
+  'box.set_border_color',
+  'box.set_border_style',
+  'box.set_border_width',
+  'box.set_bottom',
+  'box.set_bottom_right_point',
+  'box.set_extend',
+  'box.set_left',
+  'box.set_lefttop',
+  'box.set_right',
+  'box.set_rightbottom',
+  'box.set_text',
+  'box.set_text_color',
+  'box.set_text_font_family',
+  'box.set_text_formatting',
+  'box.set_text_halign',
+  'box.set_text_size',
+  'box.set_text_valign',
+  'box.set_text_wrap',
+  'box.set_top',
+  'box.set_top_left_point',
+  'box.set_xloc',
+  'chart.point.copy',
+  'chart.point.from_index',
+  'chart.point.from_time',
+  'chart.point.new',
+  'chart.point.now',
+  'label',
+  'label.all',
+  'label.copy',
+  'label.delete',
+  'label.get_text',
+  'label.get_x',
+  'label.get_y',
+  'label.new',
+  'label.set_color',
+  'label.set_point',
+  'label.set_size',
+  'label.set_style',
+  'label.set_text',
+  'label.set_text_font_family',
+  'label.set_text_formatting',
+  'label.set_textalign',
+  'label.set_textcolor',
+  'label.set_tooltip',
+  'label.set_x',
+  'label.set_xloc',
+  'label.set_xy',
+  'label.set_y',
+  'label.set_yloc',
+  'label.style_arrowdown',
+  'label.style_arrowup',
+  'label.style_circle',
+  'label.style_cross',
+  'label.style_diamond',
+  'label.style_flag',
+  'label.style_label_center',
+  'label.style_label_down',
+  'label.style_label_left',
+  'label.style_label_lower_left',
+  'label.style_label_lower_right',
+  'label.style_label_right',
+  'label.style_label_up',
+  'label.style_label_upper_left',
+  'label.style_label_upper_right',
+  'label.style_none',
+  'label.style_square',
+  'label.style_text_outline',
+  'label.style_triangledown',
+  'label.style_triangleup',
+  'label.style_xcross',
+  'line',
+  'line.all',
+  'line.copy',
+  'line.delete',
+  'line.get_price',
+  'line.get_x1',
+  'line.get_x2',
+  'line.get_y1',
+  'line.get_y2',
+  'line.new',
+  'line.set_color',
+  'line.set_extend',
+  'line.set_first_point',
+  'line.set_second_point',
+  'line.set_style',
+  'line.set_width',
+  'line.set_x1',
+  'line.set_x2',
+  'line.set_xloc',
+  'line.set_xy1',
+  'line.set_xy2',
+  'line.set_y1',
+  'line.set_y2',
+  'line.style_arrow_both',
+  'line.style_arrow_left',
+  'line.style_arrow_right',
+  'line.style_dashed',
+  'line.style_dotted',
+  'line.style_solid',
+  'linefill',
+  'linefill.all',
+  'linefill.delete',
+  'linefill.get_line1',
+  'linefill.get_line2',
+  'linefill.new',
+  'linefill.set_color',
+  'polyline.all',
+  'polyline.delete',
+  'polyline.new',
+  'table',
+  'table.all',
+  'table.cell',
+  'table.cell_set_bgcolor',
+  'table.cell_set_height',
+  'table.cell_set_text',
+  'table.cell_set_text_color',
+  'table.cell_set_text_font_family',
+  'table.cell_set_text_formatting',
+  'table.cell_set_text_halign',
+  'table.cell_set_text_size',
+  'table.cell_set_text_valign',
+  'table.cell_set_tooltip',
+  'table.cell_set_width',
+  'table.clear',
+  'table.delete',
+  'table.merge_cells',
+  'table.new',
+  'table.set_bgcolor',
+  'table.set_border_color',
+  'table.set_border_width',
+  'table.set_frame_color',
+  'table.set_frame_width',
+  'table.set_position',
+] as const;
+
+const allCompatibilityBarsFalse = Array(compatibilityBars.length).fill(false);
+
 describe('Pine compatibility golden harness', () => {
+  it('pins behavior coverage for every implemented official drawing/object manual-index name', () => {
+    expect(drawingBehaviorCoveredNames).toEqual(manualDrawingObjectNames);
+    expect(drawingBehaviorCoveredNames).toHaveLength(143);
+  });
+
+  it('typechecks official drawing object type annotations', () => {
+    const result = runCompatScript(`
+indicator("Drawing object type annotations")
+var box b = na
+var label lb = na
+var line ln = na
+var linefill lf = na
+var table t = na
+plot(na(b) and na(lb) and na(ln) and na(lf) and na(t) ? 1 : 0, title="Typed Objects")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Typed Objects').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
+  it('casts na to nullable drawing object handles without creating drawings', () => {
+    const result = runCompatScript(`
+indicator("Drawing object casts")
+var box b = box(na)
+var label lb = label(na)
+var line ln = line(na)
+var linefill lf = linefill(na)
+var table t = table(na)
+plot(na(b) and na(lb) and na(ln) and na(lf) and na(t) ? 1 : 0, title="Casts")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Casts').values).toEqual(Array(compatibilityBars.length).fill(1));
+    expect(result.drawings).toEqual([]);
+  });
+
   it('emits label drawing outputs from common last-bar label idioms', () => {
     const result = runCompatScript(`
 indicator("Label docs smoke", overlay=true)
@@ -25,6 +227,7 @@ if barstate.islast
         color: '#F23645',
         textColor: '#FFFFFF',
         size: 'small',
+        tooltip: undefined,
       },
     ]);
   });
@@ -156,6 +359,52 @@ if barstate.islast
         tooltip: undefined,
       },
     ]);
+  });
+
+  it('updates labels from chart.point values and covers label lifecycle state', () => {
+    const result = runCompatScript(`
+indicator("Label point lifecycle", overlay=true)
+var marker = label.new(na, na, "")
+if barstate.islast
+    label.set_xy(marker, bar_index - 4, low)
+    label.set_text(marker, "seed")
+    label.set_style(marker, label.style_label_center)
+    label.set_xloc(id=marker, x=time[1], xloc=xloc.bar_time)
+    point = chart.point.new(time=time, index=bar_index - 1, price=high)
+    clone = label.copy(marker)
+    label.set_point(id=marker, point=point)
+    label.set_yloc(id=marker, yloc=yloc.abovebar)
+    label.set_text(id=clone, text="copy")
+    label.delete(id=clone)
+plot(label.get_x(marker), title="Point Label X")
+plot(label.get_y(marker), title="Point Label Y")
+plot(label.get_text(marker) == "seed", title="Point Label Text")
+plot(array.size(label.all), title="Label Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'label_label.new_0_0',
+        type: 'label',
+        persistent: true,
+        barIndex: 11,
+        x: compatibilityBars[11]!.time,
+        y: 113,
+        text: 'seed',
+        xloc: 'bar_time',
+        yloc: 'abovebar',
+        style: 'label_center',
+        color: '#2196F3',
+        textColor: '#FFFFFF',
+        size: 'normal',
+        tooltip: undefined,
+      },
+    ]);
+    expect(getPlot(result, 'Point Label X').values).toEqual([...Array(11).fill(null), compatibilityBars[11]!.time]);
+    expect(getPlot(result, 'Point Label Y').values).toEqual([...Array(11).fill(null), 113]);
+    expect(getPlot(result, 'Point Label Text').values).toEqual([...allCompatibilityBarsFalse.slice(0, 11), true]);
+    expect(getPlot(result, 'Label Count').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
   it('preserves explicit na label colors on constructors', () => {
@@ -377,6 +626,53 @@ plot(line.get_price(id=trend, x=bar_index - 1), title="Named Line Price")
     expect(getPlot(result, 'Named Line Price').values).toEqual([null, null, null, null, null, null, null, null, null, null, null, 110]);
   });
 
+  it('copies, deletes, mutates, and reads scalar line fields', () => {
+    const result = runCompatScript(`
+indicator("Line scalar lifecycle", overlay=true)
+var trend = line.new(na, na, na, na)
+if barstate.islast
+    line.set_xy1(trend, bar_index - 4, low[1])
+    line.set_xy2(trend, bar_index - 2, high[1])
+    clone = line.copy(trend)
+    line.delete(clone)
+    line.set_x1(id=trend, x=bar_index - 3)
+    line.set_y1(id=trend, y=low)
+    line.set_x2(id=trend, x=bar_index)
+    line.set_y2(id=trend, y=high)
+    line.set_style(id=trend, style=line.style_arrow_right)
+plot(line.get_x1(trend), title="Scalar Line X1")
+plot(line.get_y1(trend), title="Scalar Line Y1")
+plot(line.get_x2(trend), title="Scalar Line X2")
+plot(line.get_y2(trend), title="Scalar Line Y2")
+plot(array.size(line.all), title="Line Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'line_line.new_0_0',
+        type: 'line',
+        persistent: true,
+        barIndex: 11,
+        x1: 8,
+        y1: 108,
+        x2: 11,
+        y2: 113,
+        xloc: 'bar_index',
+        extend: 'none',
+        color: '#2196F3',
+        style: 'arrow_right',
+        width: 1,
+        forceOverlay: false,
+      },
+    ]);
+    expect(getPlot(result, 'Scalar Line X1').values).toEqual([...Array(11).fill(null), 8]);
+    expect(getPlot(result, 'Scalar Line Y1').values).toEqual([...Array(11).fill(null), 108]);
+    expect(getPlot(result, 'Scalar Line X2').values).toEqual([...Array(11).fill(null), 11]);
+    expect(getPlot(result, 'Scalar Line Y2').values).toEqual([...Array(11).fill(null), 113]);
+    expect(getPlot(result, 'Line Count').values).toEqual(Array(compatibilityBars.length).fill(1));
+  });
+
   it('updates, reads, and deletes linefills with Pine named setter idioms', () => {
     const result = runCompatScript(`
 indicator("Named Linefill", overlay=true)
@@ -402,6 +698,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
       {
         id: 'line_line.new_0_11',
         type: 'line',
+        persistent: true,
         barIndex: 11,
         x1: 10,
         y1: 114,
@@ -417,6 +714,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
       {
         id: 'line_line.new_1_11',
         type: 'line',
+        persistent: true,
         barIndex: 11,
         x1: 10,
         y1: 109,
@@ -432,6 +730,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
       {
         id: 'line_line.new_2_11',
         type: 'line',
+        persistent: true,
         barIndex: 11,
         x1: 10,
         y1: 111.5,
@@ -447,6 +746,7 @@ plot(array.size(linefill.all), title="Named Linefill Count")
       {
         id: 'linefill_linefill.new_0_11',
         type: 'linefill',
+        persistent: true,
         barIndex: 11,
         line1: 'line_line.new_0_11',
         line2: 'line_line.new_1_11',
@@ -520,6 +820,55 @@ plot(box.get_text_valign(id=zone) == "bottom", title="Named Box VAlign")
     expect(getPlot(result, 'Named Box Text').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
     expect(getPlot(result, 'Named Box HAlign').values).toEqual([true, true, true, true, true, true, true, true, true, true, true, true]);
     expect(getPlot(result, 'Named Box VAlign').values).toEqual([false, false, false, false, false, false, false, false, false, false, false, true]);
+  });
+
+  it('copies, deletes, mutates, and reads scalar box fields', () => {
+    const result = runCompatScript(`
+indicator("Box scalar lifecycle", overlay=true)
+var zone = box.new(na, na, na, na, text="seed")
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 4, high[1])
+    box.set_rightbottom(zone, bar_index - 1, low[1])
+    clone = box.copy(zone)
+    box.delete(clone)
+    box.set_left(id=zone, left=bar_index - 3)
+    box.set_top(id=zone, top=high)
+    box.set_right(id=zone, right=bar_index)
+    box.set_bottom(id=zone, bottom=low)
+plot(box.get_left(zone), title="Scalar Box Left")
+plot(box.get_top(zone), title="Scalar Box Top")
+plot(box.get_right(zone), title="Scalar Box Right")
+plot(box.get_bottom(zone), title="Scalar Box Bottom")
+plot(array.size(box.all), title="Box Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'box_box.new_0_0',
+        type: 'box',
+        persistent: true,
+        barIndex: 11,
+        left: 8,
+        top: 113,
+        right: 11,
+        bottom: 108,
+        xloc: 'bar_index',
+        extend: 'none',
+        borderColor: '#2196F3',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        bgcolor: '#2196F3',
+        text: 'seed',
+        textColor: '#363A45',
+        textSize: 'auto',
+      },
+    ]);
+    expect(getPlot(result, 'Scalar Box Left').values).toEqual([...Array(11).fill(null), 8]);
+    expect(getPlot(result, 'Scalar Box Top').values).toEqual([...Array(11).fill(null), 113]);
+    expect(getPlot(result, 'Scalar Box Right').values).toEqual([...Array(11).fill(null), 11]);
+    expect(getPlot(result, 'Scalar Box Bottom').values).toEqual([...Array(11).fill(null), 108]);
+    expect(getPlot(result, 'Box Count').values).toEqual(Array(compatibilityBars.length).fill(1));
   });
 
   it('emits polylines from chart.point arrays', () => {
@@ -727,6 +1076,50 @@ plot(array.size(table.all), title="Named Table Count")
       },
     ]);
     expect(getPlot(result, 'Named Table Count').values).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  });
+
+  it('deletes table objects and updates table.all lifecycle counts', () => {
+    const result = runCompatScript(`
+indicator("Table lifecycle", overlay=true)
+if barstate.islast
+    keep = table.new(position.top_right, 1, 1)
+    drop = table.new(position.bottom_left, 1, 1)
+    table.cell(keep, 0, 0, "keep")
+    table.delete(drop)
+plot(array.size(table.all), title="Table Lifecycle Count")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings).toEqual([
+      {
+        id: 'table_table.new_0_11',
+        type: 'table',
+        barIndex: 11,
+        position: 'top_right',
+        columns: 1,
+        rows: 1,
+        bgcolor: null,
+        frameColor: null,
+        frameWidth: 0,
+        borderColor: null,
+        borderWidth: 0,
+        cells: [
+          {
+            column: 0,
+            row: 0,
+            text: 'keep',
+            width: undefined,
+            height: undefined,
+            textColor: null,
+            textHalign: 'center',
+            textValign: 'middle',
+            textSize: 'normal',
+            bgcolor: null,
+          },
+        ],
+      },
+    ]);
+    expect(getPlot(result, 'Table Lifecycle Count').values).toEqual([...Array(11).fill(0), 1]);
   });
 
   it('resolves mixed named and positional drawing constructor arguments in Pine order', () => {
@@ -1028,5 +1421,81 @@ if barstate.islast
     expect(result.errors).toEqual([]);
     expect(result.drawings).toHaveLength(1);
     expect(result.drawings[0]).toMatchObject({ type: 'label', style: 'text_outline' });
+  });
+
+  it('maps every official label style constant into label drawing style output', () => {
+    const result = runCompatScript(`
+indicator("All Label Styles", overlay=true)
+if barstate.islast
+    label.new(bar_index, high, "0", style=label.style_none)
+    label.new(bar_index, high, "1", style=label.style_xcross)
+    label.new(bar_index, high, "2", style=label.style_cross)
+    label.new(bar_index, high, "3", style=label.style_triangleup)
+    label.new(bar_index, high, "4", style=label.style_triangledown)
+    label.new(bar_index, high, "5", style=label.style_flag)
+    label.new(bar_index, high, "6", style=label.style_circle)
+    label.new(bar_index, high, "7", style=label.style_arrowup)
+    label.new(bar_index, high, "8", style=label.style_arrowdown)
+    label.new(bar_index, high, "9", style=label.style_label_up)
+    label.new(bar_index, high, "10", style=label.style_label_down)
+    label.new(bar_index, high, "11", style=label.style_label_left)
+    label.new(bar_index, high, "12", style=label.style_label_right)
+    label.new(bar_index, high, "13", style=label.style_label_lower_left)
+    label.new(bar_index, high, "14", style=label.style_label_lower_right)
+    label.new(bar_index, high, "15", style=label.style_label_upper_left)
+    label.new(bar_index, high, "16", style=label.style_label_upper_right)
+    label.new(bar_index, high, "17", style=label.style_label_center)
+    label.new(bar_index, high, "18", style=label.style_square)
+    label.new(bar_index, high, "19", style=label.style_diamond)
+    label.new(bar_index, high, "20", style=label.style_text_outline)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings.filter((drawing) => drawing.type === 'label').map((drawing) => drawing.style)).toEqual([
+      'none',
+      'xcross',
+      'cross',
+      'triangleup',
+      'triangledown',
+      'flag',
+      'circle',
+      'arrowup',
+      'arrowdown',
+      'label_up',
+      'label_down',
+      'label_left',
+      'label_right',
+      'label_lower_left',
+      'label_lower_right',
+      'label_upper_left',
+      'label_upper_right',
+      'label_center',
+      'square',
+      'diamond',
+      'text_outline',
+    ]);
+  });
+
+  it('maps every official line style constant into line drawing style output', () => {
+    const result = runCompatScript(`
+indicator("All Line Styles", overlay=true)
+if barstate.islast
+    line.new(bar_index - 1, high, bar_index, high, style=line.style_solid)
+    line.new(bar_index - 1, high, bar_index, high, style=line.style_dotted)
+    line.new(bar_index - 1, high, bar_index, high, style=line.style_dashed)
+    line.new(bar_index - 1, high, bar_index, high, style=line.style_arrow_left)
+    line.new(bar_index - 1, high, bar_index, high, style=line.style_arrow_right)
+    line.new(bar_index - 1, high, bar_index, high, style=line.style_arrow_both)
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(result.drawings.filter((drawing) => drawing.type === 'line').map((drawing) => drawing.style)).toEqual([
+      'solid',
+      'dotted',
+      'dashed',
+      'arrow_left',
+      'arrow_right',
+      'arrow_both',
+    ]);
   });
 });

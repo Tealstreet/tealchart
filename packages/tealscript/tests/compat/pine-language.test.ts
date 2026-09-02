@@ -1754,14 +1754,14 @@ plot(indexed, title="Indexed Collection Loop Expression")
     );
   });
 
-  it('allows recursive user-defined function calls within depth limit', () => {
+  it('executes recursive user-defined function calls as a TealScript superset', () => {
     const result = runCompatScript(`
 indicator("UDF recursion")
 countdown(value) => value <= 0 ? 0 : countdown(value - 1)
 plot(countdown(2), title="Countdown")
 `);
 
-    expect(result.errors).toHaveLength(0);
+    expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Countdown').values).toEqual(Array(compatibilityBars.length).fill(0));
   });
 

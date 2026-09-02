@@ -4,15 +4,20 @@ import type {
   AssignmentStatement,
   TupleAssignment,
   IfStatement,
+  OnceStatement,
   ForStatement,
   WhileStatement,
   CallExpression,
+  CallArgument,
+  FunctionDeclaration,
   MemberExpression,
   IndexExpression,
   Identifier,
   SwitchExpression,
+  SourceLocation,
 } from '../../parser/ast';
-import type { AnalysisContext, TACallSite } from './analyzer';
+import type { AnalysisContext, FuncInfo, ImportedMethodOverloadInfo, TACallSite, VarDeclInfo } from './analyzer';
+import { BUILTIN_NAMESPACES } from '../../builtinMetadata';
 
 const BAR_FIELDS: Record<string, string> = {
   open: '_s_open', high: '_s_high', low: '_s_low', close: '_s_close',
@@ -27,13 +32,65 @@ const BARSTATE_FIELDS = new Set([
 const SYMINFO_FIELDS = new Set([
   'ticker', 'tickerid', 'prefix', 'root', 'currency', 'basecurrency',
   'description', 'type', 'timezone', 'session', 'pricescale', 'mintick',
-  'pointvalue', 'volumetype',
+  'pointvalue', 'mincontract', 'volumetype', 'main_tickerid', 'country',
+  'sector', 'industry', 'isin', 'current_contract', 'expiration_date',
+  'employees', 'shareholders', 'shares_outstanding_float',
+  'shares_outstanding_total', 'recommendations_date', 'target_price_date',
+  'target_price_average', 'target_price_estimates', 'target_price_high',
+  'target_price_low', 'target_price_median',
 ]);
+
+const SYMINFO_DERIVED_FIELDS: Record<string, string> = {
+  tickerid: '(ctx.syminfo.tickerid ?? ctx.syminfo.ticker)',
+  main_tickerid: '(ctx.syminfo.main_tickerid ?? ctx.syminfo.tickerid ?? ctx.syminfo.ticker)',
+  exchange: '(ctx.syminfo.exchange ?? (ctx.syminfo.ticker.includes(":") ? ctx.syminfo.ticker.split(":")[0] : ""))',
+  minmove: '(ctx.syminfo.mintick * ctx.syminfo.pricescale)',
+};
 
 const TIMEFRAME_FIELDS = new Set([
   'period', 'multiplier', 'isminutes', 'isdaily', 'isweekly', 'ismonthly',
-  'isintraday', 'isseconds',
+  'isintraday', 'isseconds', 'isticks',
 ]);
+
+const TIMEFRAME_DERIVED_FIELDS: Record<string, string> = {
+  main_period: 'ctx.timeframe.period',
+  isdwm: '(ctx.timeframe.isdaily || ctx.timeframe.isweekly || ctx.timeframe.ismonthly)',
+};
+
+const CHART_FIELDS: Record<string, string> = {
+  bg_color: 'ctx.chart.bgColor',
+  fg_color: 'ctx.chart.fgColor',
+  left_visible_bar_time: 'ctx.chart.leftVisibleBarTime',
+  right_visible_bar_time: 'ctx.chart.rightVisibleBarTime',
+  is_standard: '(ctx.chart.type === "standard")',
+  is_heikinashi: '(ctx.chart.type === "heikinashi")',
+  is_kagi: '(ctx.chart.type === "kagi")',
+  is_linebreak: '(ctx.chart.type === "linebreak")',
+  is_pnf: '(ctx.chart.type === "pnf")',
+  is_range: '(ctx.chart.type === "range")',
+  is_renko: '(ctx.chart.type === "renko")',
+};
+
+const CALENDAR_PARTS = new Set(['year', 'month', 'weekofyear', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second']);
+const RUNTIME_TIME_VALUES = new Set(['time_close', 'time_tradingday', 'timenow', 'last_bar_time']);
+const DAYOFWEEK_CONSTANTS: Record<string, number> = {
+  sunday: 1,
+  monday: 2,
+  tuesday: 3,
+  wednesday: 4,
+  thursday: 5,
+  friday: 6,
+  saturday: 7,
+};
+const DISPLAY_CONSTANTS: Record<string, number> = {
+  none: 0,
+  pane: 1,
+  data_window: 2,
+  status_line: 4,
+  price_scale: 8,
+  pine_screener: 16,
+  all: 31,
+};
 
 const MATH_FUNCS: Record<string, string> = {
   'math.abs': 'Math.abs', 'math.ceil': 'Math.ceil', 'math.floor': 'Math.floor',
@@ -43,7 +100,6 @@ const MATH_FUNCS: Record<string, string> = {
   'math.tan': 'Math.tan', 'math.asin': 'Math.asin', 'math.acos': 'Math.acos',
   'math.atan': 'Math.atan',
   'math.max': 'Math.max', 'math.min': 'Math.min',
-  'math.random': 'Math.random',
   'math.pi': 'Math.PI', 'math.e': 'Math.E',
   'math.phi': '1.618033988749895',
   'math.rphi': '0.618033988749895',
@@ -54,12 +110,131 @@ const PLOT_FUNCTIONS = new Set([
   'bgcolor', 'barcolor', 'hline', 'fill',
 ]);
 
+const FOOTPRINT_METHODS = new Set([
+  'total_volume',
+  'buy_volume',
+  'sell_volume',
+  'delta',
+  'rows',
+  'poc',
+  'vah',
+  'val',
+  'get_row_by_price',
+  'up_price',
+  'down_price',
+  'has_buy_imbalance',
+  'has_sell_imbalance',
+]);
+
+const PLOT_PRIMARY_ARGS: Record<string, string> = {
+  plot: 'series',
+  plotshape: 'series',
+  plotchar: 'series',
+  plotarrow: 'series',
+  plotbar: 'open',
+  plotcandle: 'open',
+  bgcolor: 'color',
+  barcolor: 'color',
+  hline: 'price',
+  fill: 'plot1',
+};
+
+const RUNTIME_STR_FUNCTIONS = new Set([
+  'str.tostring',
+  'str.tonumber',
+  'str.tointeger',
+  'str.length',
+  'str.contains',
+  'str.startswith',
+  'str.endswith',
+  'str.substring',
+  'str.replace',
+  'str.replace_all',
+  'str.lower',
+  'str.upper',
+  'str.trim',
+  'str.pos',
+  'str.match',
+  'str.repeat',
+  'str.split',
+]);
+
+const LEGACY_GLOBAL_MATH_ALIASES = new Set([
+  'abs', 'ceil', 'floor', 'round', 'sqrt',
+  'log', 'log10', 'pow', 'sign', 'max', 'min', 'avg', 'sum',
+  'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'exp',
+  'toradians', 'todegrees',
+]);
+
+const LEGACY_GLOBAL_STR_ALIASES = new Map([
+  ['tostring', 'str.tostring'],
+  ['tonumber', 'str.tonumber'],
+]);
+
+const LEGACY_GLOBAL_TICKER_ALIASES = new Map([
+  ['tickerid', 'ticker.new'],
+  ['heikinashi', 'ticker.heikinashi'],
+  ['renko', 'ticker.renko'],
+  ['linebreak', 'ticker.linebreak'],
+  ['kagi', 'ticker.kagi'],
+  ['pointfigure', 'ticker.pointfigure'],
+]);
+const LEGACY_INPUT_TYPE_ALIASES = new Map([
+  ['bool', 'input.bool'],
+  ['color', 'input.color'],
+  ['float', 'input.float'],
+  ['integer', 'input.int'],
+  ['int', 'input.int'],
+  ['resolution', 'input.timeframe'],
+  ['session', 'input.session'],
+  ['source', 'input.source'],
+  ['string', 'input.string'],
+  ['symbol', 'input.symbol'],
+  ['timeframe', 'input.timeframe'],
+]);
+const LEGACY_BARE_COLOR_CONSTANTS: Record<string, string> = {
+  aqua: '#00BCD4',
+  black: '#363A45',
+  blue: '#2196F3',
+  fuchsia: '#E040FB',
+  gray: '#787B86',
+  green: '#4CAF50',
+  lime: '#00E676',
+  maroon: '#880E4F',
+  navy: '#311B92',
+  olive: '#808000',
+  orange: '#FF9800',
+  purple: '#9C27B0',
+  red: '#F23645',
+  silver: '#B2B5BE',
+  teal: '#089981',
+  white: '#FFFFFF',
+  yellow: '#FDD835',
+};
+const LEGACY_BARE_VISUAL_CONSTANTS = new Set([
+  'area',
+  'areabr',
+  'circles',
+  'columns',
+  'cross',
+  'dashed',
+  'dotted',
+  'histogram',
+  'line',
+  'solid',
+  'stepline',
+]);
+
 const ITERATION_CAP = 10000;
+const DRAWING_NAMESPACES = new Set(['label', 'line', 'box', 'polyline', 'linefill', 'table', 'chart']);
+const DRAWING_CONSTRUCTOR_FUNCTIONS = new Set(['label.new', 'line.new', 'box.new', 'polyline.new', 'linefill.new', 'table.new']);
 
 const ARRAY_FUNC_MAP: Record<string, string> = {
   'array.new': 'create', 'array.new_float': 'create', 'array.new_int': 'create',
   'array.new_bool': 'create', 'array.new_string': 'create', 'array.new_color': 'create',
   'array.new_line': 'create', 'array.new_label': 'create', 'array.new_box': 'create',
+  'array.new_linefill': 'create', 'array.new_polyline': 'create',
+  'array.new_table': 'create', 'array.new_chart_point': 'create',
   'array.from': 'from',
   'array.push': 'push', 'array.pop': 'pop',
   'array.shift': 'shift', 'array.unshift': 'unshift',
@@ -89,6 +264,71 @@ const ARRAY_FUNC_MAP: Record<string, string> = {
   'array.fill': 'fill',
   'array.every': 'every', 'array.some': 'some',
   'array.map': 'map', 'array.filter': 'filter',
+};
+
+const ARRAY_ARG_NAMES: Record<string, readonly string[]> = {
+  'array.new': ['size', 'initial_value'],
+  'array.new_float': ['size', 'initial_value'],
+  'array.new_int': ['size', 'initial_value'],
+  'array.new_bool': ['size', 'initial_value'],
+  'array.new_string': ['size', 'initial_value'],
+  'array.new_color': ['size', 'initial_value'],
+  'array.new_line': ['size', 'initial_value'],
+  'array.new_label': ['size', 'initial_value'],
+  'array.new_box': ['size', 'initial_value'],
+  'array.new_linefill': ['size', 'initial_value'],
+  'array.new_polyline': ['size', 'initial_value'],
+  'array.new_table': ['size', 'initial_value'],
+  'array.new_chart_point': ['size', 'initial_value'],
+  'array.copy': ['id'],
+  'array.size': ['id'],
+  'array.get': ['id', 'index'],
+  'array.first': ['id'],
+  'array.last': ['id'],
+  'array.includes': ['id', 'value'],
+  'array.every': ['id', 'callback'],
+  'array.some': ['id', 'callback'],
+  'array.indexof': ['id', 'value'],
+  'array.lastindexof': ['id', 'value'],
+  'array.binary_search': ['id', 'value'],
+  'array.binary_search_leftmost': ['id', 'value'],
+  'array.binary_search_rightmost': ['id', 'value'],
+  'array.abs': ['id'],
+  'array.min': ['id'],
+  'array.max': ['id'],
+  'array.sum': ['id'],
+  'array.avg': ['id'],
+  'array.range': ['id'],
+  'array.median': ['id'],
+  'array.mode': ['id'],
+  'array.variance': ['id', 'biased'],
+  'array.stdev': ['id', 'biased'],
+  'array.covariance': ['id1', 'id2', 'biased'],
+  'array.percentile_nearest_rank': ['id', 'percentage'],
+  'array.percentile_linear_interpolation': ['id', 'percentage'],
+  'array.percentrank': ['id', 'value'],
+  'array.standardize': ['id'],
+  'array.set': ['id', 'index', 'value'],
+  'array.push': ['id', 'value'],
+  'array.pop': ['id'],
+  'array.shift': ['id'],
+  'array.unshift': ['id', 'value'],
+  'array.insert': ['id', 'index', 'value'],
+  'array.remove': ['id', 'index'],
+  'array.sort': ['id', 'order', 'sort_field'],
+  'array.sort_indices': ['id', 'order'],
+  'array.reverse': ['id'],
+  'array.clear': ['id'],
+  'array.join': ['id', 'separator'],
+  'array.concat': ['id', 'id2'],
+  'array.slice': ['id', 'index_from', 'index_to'],
+  'array.fill': ['id', 'value', 'index_from', 'index_to'],
+  'array.map': ['id', 'callback'],
+  'array.filter': ['id', 'callback'],
+};
+
+const ARRAY_ARG_ALIASES: Record<string, Record<string, string>> = {
+  'array.covariance': { id: 'id1' },
 };
 
 const MAP_FUNC_MAP: Record<string, string> = {
@@ -129,10 +369,568 @@ const MATRIX_FUNC_MAP: Record<string, string> = {
   'matrix.is_valid': 'isValid',
 };
 
+type CollectionKind = 'array' | 'map' | 'matrix';
+
+interface FunctionEmitContext {
+  localVars: Map<string, VarDeclInfo[]>;
+  callSites: Map<CallExpression, number>;
+  callSiteFunctions: Map<CallExpression, string[]>;
+  calledFunctions: Map<string, Set<string>>;
+  paramHistory: Map<string, Set<string>>;
+  localHistory: Map<string, Set<string>>;
+}
+
+const COLLECTION_METHOD_RETURNS: Record<CollectionKind, Record<string, CollectionKind>> = {
+  array: {
+    copy: 'array', concat: 'array', slice: 'array', abs: 'array',
+    standardize: 'array', sort_indices: 'array',
+  },
+  map: {
+    copy: 'map', keys: 'array', values: 'array',
+  },
+  matrix: {
+    copy: 'matrix', concat: 'matrix', row: 'array', col: 'array',
+    column: 'array', submatrix: 'matrix', diff: 'matrix', mult: 'matrix',
+    pow: 'matrix', inv: 'matrix', pinv: 'matrix', eigenvalues: 'array',
+    eigenvectors: 'matrix', kron: 'matrix',
+  },
+};
+
+const COLLECTION_METHOD_NAMES = new Set([
+  ...Object.keys(ARRAY_FUNC_MAP).filter((name) => name !== 'array.new').map((name) => name.replace('array.', '')),
+  ...Object.keys(MAP_FUNC_MAP).filter((name) => name !== 'map.new').map((name) => name.replace('map.', '')),
+  ...Object.keys(MATRIX_FUNC_MAP).filter((name) => !name.startsWith('matrix.new')).map((name) => name.replace('matrix.', '')),
+]);
+
+function collectionRuntimeMethodName(kind: CollectionKind, method: string): string | undefined {
+  if (kind === 'array') return ARRAY_FUNC_MAP[`array.${method}`];
+  if (kind === 'map') return MAP_FUNC_MAP[`map.${method}`];
+  return MATRIX_FUNC_MAP[`matrix.${method}`];
+}
+
+function staticMemberChainName(expr: Expression): string | undefined {
+  if (expr.type === 'Identifier') return expr.name;
+  if (expr.type !== 'MemberExpression') return undefined;
+  const objectName = staticMemberChainName(expr.object);
+  return objectName ? `${objectName}.${expr.property.name}` : undefined;
+}
+
+function collectionKindFromTypeAnnotation(annotation: VariableDeclaration['typeAnnotation']): CollectionKind | undefined {
+  if (!annotation) return undefined;
+  if (annotation.baseType === 'array' || annotation.baseType === 'map' || annotation.baseType === 'matrix') {
+    return annotation.baseType;
+  }
+  return undefined;
+}
+
+function inferCollectionVars(ast: Program): Map<string, CollectionKind> {
+  const vars = new Map<string, CollectionKind>();
+
+  const inferExpr = (expr: Expression | IfStatement): CollectionKind | undefined => {
+    if (expr.type === 'IfStatement') return undefined;
+    if (expr.type === 'Identifier') return vars.get(expr.name);
+    if (expr.type === 'ConditionalExpression') {
+      const consequent = inferExpr(expr.consequent);
+      const alternate = inferExpr(expr.alternate);
+      return consequent === alternate ? consequent : undefined;
+    }
+    if (expr.type !== 'CallExpression') return undefined;
+
+    const fullName = staticMemberChainName(expr.callee) ?? '';
+    if (fullName === 'array.new' || fullName.startsWith('array.new_') || fullName === 'array.from') return 'array';
+    if (fullName === 'map.new') return 'map';
+    if (fullName === 'matrix.new' || fullName.startsWith('matrix.new_')) return 'matrix';
+
+    if (expr.callee.type !== 'MemberExpression') return undefined;
+    const receiverKind = inferExpr(expr.callee.object);
+    if (!receiverKind) return undefined;
+    return COLLECTION_METHOD_RETURNS[receiverKind][expr.callee.property.name];
+  };
+
+  const visitStmt = (stmt: Statement): void => {
+    switch (stmt.type) {
+      case 'VariableDeclaration': {
+        if (stmt.names.type === 'VariableDeclarator') {
+          const annotationKind = collectionKindFromTypeAnnotation(stmt.typeAnnotation);
+          const initKind = inferExpr(stmt.init);
+          const kind = annotationKind ?? initKind;
+          if (kind) vars.set(stmt.names.name.name, kind);
+        }
+        if (stmt.init.type === 'IfStatement') visitStmt(stmt.init);
+        break;
+      }
+      case 'AssignmentStatement': {
+        if (stmt.left.type === 'Identifier') {
+          const kind = inferExpr(stmt.right);
+          if (kind) vars.set(stmt.left.name, kind);
+        }
+        if (stmt.right.type === 'IfStatement') visitStmt(stmt.right);
+        break;
+      }
+      case 'TupleAssignment':
+        if (stmt.right.type === 'IfStatement') visitStmt(stmt.right);
+        break;
+      case 'ExpressionStatement':
+        inferExpr(stmt.expression);
+        break;
+      case 'IfStatement':
+        for (const s of stmt.consequent) visitStmt(s);
+        if (stmt.alternate) {
+          if (Array.isArray(stmt.alternate)) {
+            for (const s of stmt.alternate) visitStmt(s);
+          } else {
+            visitStmt(stmt.alternate);
+          }
+        }
+        break;
+      case 'OnceStatement':
+        if (stmt.test) inferExpr(stmt.test);
+        for (const s of stmt.body) visitStmt(s);
+        break;
+      case 'ForStatement':
+      case 'WhileStatement':
+        for (const s of stmt.body) visitStmt(s);
+        break;
+      case 'MultiDeclaration':
+        for (const d of stmt.declarations) visitStmt(d);
+        break;
+      case 'MultiAssignment':
+        for (const a of stmt.assignments) visitStmt(a);
+        break;
+      default:
+        break;
+    }
+  };
+
+  for (const stmt of ast.body) visitStmt(stmt);
+  return vars;
+}
+
+function inferFunctionEmitContext(
+  ast: Program,
+  funcInfos: Map<string, FuncInfo>,
+  importedFunctions: Map<string, string>,
+  importedMethods: Map<string, string>,
+  importedMethodOverloads: Map<string, ImportedMethodOverloadInfo[]>,
+): FunctionEmitContext {
+  const functionNames = new Set(funcInfos.keys());
+  const localVars = new Map<string, VarDeclInfo[]>();
+  const callSites = new Map<CallExpression, number>();
+  const callSiteFunctions = new Map<CallExpression, string[]>();
+  const calledFunctions = new Map<string, Set<string>>();
+  const paramHistory = new Map<string, Set<string>>();
+  const localHistory = new Map<string, Set<string>>();
+  const regularLocalNames = new Map<string, Set<string>>();
+  let callSiteIndex = 0;
+
+  const sameImportedLibraryFunctionName = (ownerName: string | undefined, calleeName: string): string | undefined => {
+    if (!ownerName?.includes('__')) return undefined;
+    const alias = ownerName.split('__')[0];
+    const candidate = `${alias}__${calleeName}`;
+    return functionNames.has(candidate) ? candidate : undefined;
+  };
+
+  const registerCallSite = (expr: CallExpression, ownerName?: string): void => {
+    let names: string[] = [];
+    if (expr.callee.type === 'Identifier') {
+      names = [sameImportedLibraryFunctionName(ownerName, expr.callee.name) ?? expr.callee.name];
+    } else if (expr.callee.type === 'MemberExpression') {
+      const fullName = staticMemberChainName(expr.callee);
+      const importedOverloads = importedMethodOverloads.get(expr.callee.property.name);
+      if (importedOverloads && importedOverloads.length > 0) {
+        names = importedOverloads.map((overload) => overload.internalName);
+      } else {
+        names = [(fullName ? importedFunctions.get(fullName) : undefined)
+          ?? importedMethods.get(expr.callee.property.name)
+          ?? expr.callee.property.name];
+      }
+    }
+    names = [...new Set(names.filter((name) => functionNames.has(name)))];
+    if (names.length === 0) return;
+    callSites.set(expr, callSiteIndex++);
+    callSiteFunctions.set(expr, names);
+    if (ownerName) {
+      let called = calledFunctions.get(ownerName);
+      if (!called) {
+        called = new Set();
+        calledFunctions.set(ownerName, called);
+      }
+      for (const name of names) called.add(name);
+    }
+  };
+
+  const collectRegularLocals = (stmts: Statement[]): Set<string> => {
+    const names = new Set<string>();
+    const visit = (stmt: Statement): void => {
+      if (stmt.type === 'VariableDeclaration') {
+        if (stmt.kind !== 'var' && stmt.kind !== 'varip') {
+          if (stmt.names.type === 'VariableDeclarator') {
+            names.add(stmt.names.name.name);
+          } else {
+            for (const name of stmt.names.names) names.add(name.name);
+          }
+        }
+      } else if (stmt.type === 'MultiDeclaration') {
+        for (const declaration of stmt.declarations) visit(declaration);
+      } else if (stmt.type === 'IfStatement') {
+        for (const child of stmt.consequent) visit(child);
+        if (Array.isArray(stmt.alternate)) {
+          for (const child of stmt.alternate) visit(child);
+        } else if (stmt.alternate) {
+          visit(stmt.alternate);
+        }
+      } else if (stmt.type === 'ForStatement' || stmt.type === 'WhileStatement') {
+        for (const child of stmt.body) visit(child);
+      }
+    };
+    for (const stmt of stmts) visit(stmt);
+    return names;
+  };
+
+  const walkExpr = (expr: Expression, ownerParams?: Set<string>, ownerName?: string): void => {
+    switch (expr.type) {
+      case 'CallExpression':
+        registerCallSite(expr, ownerName);
+        walkExpr(expr.callee, ownerParams, ownerName);
+        for (const arg of expr.arguments) walkExpr(arg.value, ownerParams, ownerName);
+        break;
+      case 'MemberExpression':
+        walkExpr(expr.object, ownerParams, ownerName);
+        break;
+      case 'IndexExpression':
+        if (expr.object.type === 'Identifier' && ownerName && ownerParams?.has(expr.object.name)) {
+          let params = paramHistory.get(ownerName);
+          if (!params) {
+            params = new Set();
+            paramHistory.set(ownerName, params);
+          }
+          params.add(expr.object.name);
+        } else if (expr.object.type === 'Identifier' && ownerName && regularLocalNames.get(ownerName)?.has(expr.object.name)) {
+          let locals = localHistory.get(ownerName);
+          if (!locals) {
+            locals = new Set();
+            localHistory.set(ownerName, locals);
+          }
+          locals.add(expr.object.name);
+        }
+        walkExpr(expr.object, ownerParams, ownerName);
+        walkExpr(expr.index, ownerParams, ownerName);
+        break;
+      case 'BinaryExpression':
+        walkExpr(expr.left, ownerParams, ownerName);
+        walkExpr(expr.right, ownerParams, ownerName);
+        break;
+      case 'UnaryExpression':
+        walkExpr(expr.argument, ownerParams, ownerName);
+        break;
+      case 'ConditionalExpression':
+        walkExpr(expr.test, ownerParams, ownerName);
+        walkExpr(expr.consequent, ownerParams, ownerName);
+        walkExpr(expr.alternate, ownerParams, ownerName);
+        break;
+      case 'SwitchExpression':
+        if (expr.discriminant) walkExpr(expr.discriminant, ownerParams, ownerName);
+        for (const branch of expr.cases) {
+          if (branch.test) walkExpr(branch.test, ownerParams, ownerName);
+          if (Array.isArray(branch.consequent)) {
+            for (const stmt of branch.consequent) walkStmt(stmt);
+          } else {
+            walkExpr(branch.consequent, ownerParams, ownerName);
+          }
+        }
+        break;
+      case 'ArrayExpression':
+        for (const element of expr.elements) walkExpr(element, ownerParams, ownerName);
+        break;
+      case 'LambdaExpression':
+        walkExpr(expr.body, ownerParams, ownerName);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const walkStmt = (stmt: Statement, owner?: FunctionDeclaration): void => {
+    switch (stmt.type) {
+      case 'FunctionDeclaration':
+        if (!localVars.has(stmt.name.name)) localVars.set(stmt.name.name, []);
+        if (Array.isArray(stmt.body)) regularLocalNames.set(stmt.name.name, collectRegularLocals(stmt.body));
+        paramHistory.set(stmt.name.name, new Set());
+        localHistory.set(stmt.name.name, new Set());
+        if (Array.isArray(stmt.body)) {
+          for (const s of stmt.body) walkStmt(s, stmt);
+        } else {
+          walkExpr(stmt.body, new Set(stmt.params.map((p) => p.name)), stmt.name.name);
+        }
+        break;
+      case 'VariableDeclaration':
+        if (owner && (stmt.kind === 'var' || stmt.kind === 'varip') && stmt.names.type === 'VariableDeclarator') {
+          localVars.get(owner.name.name)!.push({
+            name: stmt.names.name.name,
+            kind: stmt.kind,
+            initExpr: stmt.init,
+          });
+        }
+        if (stmt.init.type === 'IfStatement') walkStmt(stmt.init, owner);
+        else walkExpr(stmt.init, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        break;
+      case 'AssignmentStatement':
+        if (stmt.right.type === 'IfStatement') walkStmt(stmt.right, owner);
+        else walkExpr(stmt.right, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        if (stmt.left.type !== 'Identifier') walkExpr(stmt.left, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        break;
+      case 'TupleAssignment':
+        if (stmt.right.type === 'IfStatement') walkStmt(stmt.right, owner);
+        else walkExpr(stmt.right, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        break;
+      case 'ExpressionStatement':
+        walkExpr(stmt.expression, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        break;
+      case 'IfStatement':
+        walkExpr(stmt.test, owner ? new Set(owner.params.map((p) => p.name)) : undefined, owner?.name.name);
+        for (const s of stmt.consequent) walkStmt(s, owner);
+        if (stmt.alternate) {
+          if (Array.isArray(stmt.alternate)) {
+            for (const s of stmt.alternate) walkStmt(s, owner);
+          } else {
+            walkStmt(stmt.alternate, owner);
+          }
+        }
+        break;
+      case 'ForStatement':
+        if (stmt.kind === 'numeric') {
+          walkExpr(stmt.start);
+          walkExpr(stmt.end);
+          if (stmt.step) walkExpr(stmt.step);
+        } else {
+          walkExpr(stmt.iterable);
+        }
+        for (const s of stmt.body) walkStmt(s, owner);
+        break;
+      case 'WhileStatement':
+        walkExpr(stmt.test);
+        for (const s of stmt.body) walkStmt(s, owner);
+        break;
+      case 'MultiDeclaration':
+        for (const d of stmt.declarations) walkStmt(d, owner);
+        break;
+      case 'MultiAssignment':
+        for (const a of stmt.assignments) walkStmt(a, owner);
+        break;
+      case 'MultiExpressionStatement':
+        for (const e of stmt.expressions) walkExpr(e);
+        break;
+      case 'TypeDeclaration':
+        for (const field of stmt.fields) {
+          if (field.defaultValue) walkExpr(field.defaultValue);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const walkFunctionInfo = (name: string, fi: FuncInfo): void => {
+    if (localVars.has(name)) return;
+    localVars.set(name, []);
+    paramHistory.set(name, new Set());
+    localHistory.set(name, new Set());
+    if (Array.isArray(fi.body)) {
+      regularLocalNames.set(name, collectRegularLocals(fi.body));
+      const owner = {
+        name: { name },
+        params: fi.params.map((param) => ({ name: param })),
+      } as FunctionDeclaration;
+      for (const stmt of fi.body) walkStmt(stmt, owner);
+    } else {
+      walkExpr(fi.body, new Set(fi.params), name);
+    }
+  };
+
+  for (const stmt of ast.body) walkStmt(stmt);
+  for (const [name, fi] of funcInfos) walkFunctionInfo(name, fi);
+  return { localVars, callSites, callSiteFunctions, calledFunctions, paramHistory, localHistory };
+}
+
+function inferRootRegularVars(ast: Program): Set<string> {
+  const vars = new Set<string>();
+  for (const stmt of ast.body) {
+    if (
+      stmt.type === 'VariableDeclaration'
+      && stmt.kind !== 'var'
+      && stmt.kind !== 'varip'
+    ) {
+      if (stmt.names.type === 'VariableDeclarator') {
+        vars.add(stmt.names.name.name);
+      } else {
+        for (const name of stmt.names.names) {
+          if (name.name !== '_') vars.add(name.name);
+        }
+      }
+    }
+  }
+  return vars;
+}
+
+function inferRootSourceAliases(ast: Program): Map<string, Expression> {
+  const aliases = new Map<string, Expression>();
+  for (const stmt of ast.body) {
+    if (
+      stmt.type !== 'VariableDeclaration'
+      || stmt.kind === 'var'
+      || stmt.kind === 'varip'
+      || stmt.names.type !== 'VariableDeclarator'
+      || stmt.init.type === 'IfStatement'
+    ) continue;
+    const name = stmt.names.name.name;
+    if (stmt.init.type === 'Identifier') {
+      aliases.set(name, stmt.init);
+      continue;
+    }
+    if (stmt.init.type === 'CallExpression') {
+      const fullName = staticMemberChainName(stmt.init.callee) ?? '';
+      const sourceArg = stmt.init.arguments[0]?.value;
+      if (fullName === 'input.source' && sourceArg) aliases.set(name, sourceArg);
+    }
+  }
+  return aliases;
+}
+
+function inferFieldHistory(ast: Program): Map<string, Set<string>> {
+  const fields = new Map<string, Set<string>>();
+  const visit = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    const node = value as { type?: string; object?: unknown; property?: { name?: unknown } };
+    if (node.type === 'IndexExpression') {
+      const indexedObject = node.object as { type?: string; object?: unknown; property?: { name?: unknown } } | undefined;
+      if (indexedObject?.type === 'MemberExpression') {
+        const receiver = indexedObject.object as { type?: string; name?: unknown } | undefined;
+        const field = indexedObject.property?.name;
+        if (
+          receiver?.type === 'Identifier'
+          && typeof receiver.name === 'string'
+          && receiver.name !== 'strategy'
+          && typeof field === 'string'
+        ) {
+          let receiverFields = fields.get(receiver.name);
+          if (!receiverFields) {
+            receiverFields = new Set();
+            fields.set(receiver.name, receiverFields);
+          }
+          receiverFields.add(field);
+        }
+      }
+    }
+    for (const child of Object.values(value)) {
+      if (Array.isArray(child)) {
+        for (const item of child) visit(item);
+      } else {
+        visit(child);
+      }
+    }
+  };
+  visit(ast);
+  return fields;
+}
+
+function containsNode(root: unknown, target: object): boolean {
+  const seen = new WeakSet<object>();
+  const visit = (node: unknown): boolean => {
+    if (!node || typeof node !== 'object') return false;
+    if (node === target) return true;
+    if (seen.has(node)) return false;
+    seen.add(node);
+
+    for (const child of Object.values(node)) {
+      if (Array.isArray(child)) {
+        if (child.some((item) => visit(item))) return true;
+      } else if (visit(child)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  return visit(root);
+}
+
 export function emit(ast: Program, ctx: AnalysisContext): string {
+  const builtinCallCounts = new Map<string, number>();
+  const runtimeErrorLocStack: SourceLocation[] = [];
+  const collectionVars = inferCollectionVars(ast);
+  const functionEmitContext = inferFunctionEmitContext(
+    ast,
+    ctx.funcInfos,
+    ctx.importedFunctions,
+    ctx.importedMethods,
+    ctx.importedMethodOverloads,
+  );
+  const rootRegularVars = inferRootRegularVars(ast);
+  const rootSourceAliases = inferRootSourceAliases(ast);
+  const fieldHistory = inferFieldHistory(ast);
+  const onceStateMembers = new Set<string>();
+  const taSiteFunctionNames = new Map<TACallSite, string>();
+  for (const [name, fi] of ctx.funcInfos) {
+    for (const site of ctx.taCallSites) {
+      if (containsNode(fi.body, site.node)) taSiteFunctionNames.set(site, name);
+    }
+  }
+
   const lines: string[] = [];
   const indent = (n: number) => '  '.repeat(n);
   let fixnanIndex = 0;
+  let indexedTAResultIndex = 0;
+  const localNameStack: Map<string, string>[] = [];
+  const localSourceNameStack: Map<string, string>[] = [];
+  const localHistoryNameStack: Map<string, string>[] = [];
+  const persistentLocalStack: Map<string, string>[] = [];
+  const functionNameStack: string[] = [];
+
+  function sameImportedLibraryFunctionName(calleeName: string): string | undefined {
+    const currentFunctionName = functionNameStack[functionNameStack.length - 1];
+    if (!currentFunctionName?.includes('__')) return undefined;
+    const alias = currentFunctionName.split('__')[0];
+    const candidate = `${alias}__${calleeName}`;
+    return ctx.funcInfos.has(candidate) ? candidate : undefined;
+  }
+
+  function callSiteLocalVars(callExpr: CallExpression): VarDeclInfo[] {
+    const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
+    const byName = new Map<string, VarDeclInfo>();
+    for (const name of names) {
+      for (const localVar of functionEmitContext.localVars.get(name) ?? []) {
+        if (!byName.has(localVar.name)) byName.set(localVar.name, localVar);
+      }
+    }
+    return [...byName.values()];
+  }
+
+  function callSiteHasTACalls(callExpr: CallExpression): boolean {
+    const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
+    return names.some((name) => ctx.funcInfos.get(name)?.hasTACalls === true);
+  }
+
+  function callSiteNeedsState(callExpr: CallExpression): boolean {
+    const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
+    return names.some((name) => functionNeedsState(name));
+  }
+
+  function callSiteHistoryParams(callExpr: CallExpression): string[] {
+    const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
+    const params = new Set<string>();
+    for (const name of names) {
+      for (const param of functionEmitContext.paramHistory.get(name) ?? []) params.add(param);
+    }
+    return [...params];
+  }
+
+  function callSiteHistoryLocals(callExpr: CallExpression): string[] {
+    const names = functionEmitContext.callSiteFunctions.get(callExpr) ?? [];
+    const locals = new Set<string>();
+    for (const name of names) {
+      for (const local of functionEmitContext.localHistory.get(name) ?? []) locals.add(local);
+    }
+    return [...locals];
+  }
 
   function emitExpr(expr: Expression): string {
     switch (expr.type) {
@@ -153,9 +951,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         const right = emitExpr(expr.right);
         switch (expr.operator) {
           case 'and':
-            return `(_and(${left}, ${right}))`;
+            return `(_isTruthy(${left}) ? _isTruthy(${right}) : false)`;
           case 'or':
-            return `(_or(${left}, ${right}))`;
+            return `(_isTruthy(${left}) ? true : _isTruthy(${right}))`;
           case '==':
             return `_eq(${left}, ${right})`;
           case '!=':
@@ -196,6 +994,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function emitIdentifier(id: Identifier): string {
     const name = id.name;
+    const localName = currentLocalName(name);
+    if (localName) return localName;
+    const persistentLocalName = currentPersistentLocalName(name);
+    if (persistentLocalName) return persistentLocalName;
     if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(0)`;
     if (name === 'hl2') return '((ctx.bar.high + ctx.bar.low) / 2)';
     if (name === 'hlc3') return '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
@@ -203,58 +1005,268 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (name === 'hlcc4') return '((ctx.bar.high + ctx.bar.low + ctx.bar.close + ctx.bar.close) / 4)';
     if (name === 'bar_index') return 'ctx.barIndex';
     if (name === 'last_bar_index') return 'ctx.lastBarIndex';
+    if (RUNTIME_TIME_VALUES.has(name)) return `ctx.runtimeTimeValue("${name}")`;
+    if (CALENDAR_PARTS.has(name)) return `ctx.calendarPart("${name}", [], {})`;
     if (name === 'na') return 'NaN';
     if (name === 'true') return 'true';
     if (name === 'false') return 'false';
     if (name === 'math') return 'Math';
+    if (ctx.capturedParams.has(name)) return `ctx.capture("${name}")`;
     if (ctx.seriesVars.has(name)) return `this._sv_${name}.get(0)`;
     if (ctx.varDecls.some((v) => v.name === name)) return `this._v_${name}`;
+    if (rootRegularVars.has(name)) return `this._g_${name}`;
+    if (LEGACY_INPUT_TYPE_ALIASES.has(name)) return JSON.stringify(LEGACY_INPUT_TYPE_ALIASES.get(name));
+    if (Object.prototype.hasOwnProperty.call(LEGACY_BARE_COLOR_CONSTANTS, name)) return JSON.stringify(LEGACY_BARE_COLOR_CONSTANTS[name]);
+    if (LEGACY_BARE_VISUAL_CONSTANTS.has(name)) return JSON.stringify(name);
+    if (name === 'ticker') return 'ctx.syminfo.ticker';
+    if (name === 'tickerid') return '(ctx.syminfo.tickerid ?? ctx.syminfo.ticker)';
+    if (name === 'n') return 'ctx.barIndex';
+    if (name === 'tr') return emitTrueRangeMemberValue();
     return name;
   }
 
+  function emitAssignmentTarget(name: string): string {
+    const localName = currentLocalName(name);
+    if (localName) return localName;
+    const persistentLocalName = currentPersistentLocalName(name);
+    if (persistentLocalName) return persistentLocalName;
+    if (rootRegularVars.has(name) && !ctx.seriesVars.has(name) && !ctx.varDecls.some((v) => v.name === name)) {
+      return `this._g_${name}`;
+    }
+    return name;
+  }
+
+  function isPersistentAssignmentTarget(name: string): boolean {
+    return Boolean(currentPersistentLocalName(name)) || ctx.varDecls.some((v) => v.name === name);
+  }
+
+  function currentLocalName(name: string): string | undefined {
+    for (let i = localNameStack.length - 1; i >= 0; i--) {
+      const localName = localNameStack[i].get(name);
+      if (localName) return localName;
+    }
+    return undefined;
+  }
+
+  function currentLocalSourceName(name: string): string | undefined {
+    for (let i = localSourceNameStack.length - 1; i >= 0; i--) {
+      const localName = localSourceNameStack[i].get(name);
+      if (localName) return localName;
+    }
+    return undefined;
+  }
+
+  function currentLocalHistoryName(name: string): string | undefined {
+    for (let i = localHistoryNameStack.length - 1; i >= 0; i--) {
+      const localName = localHistoryNameStack[i].get(name);
+      if (localName) return localName;
+    }
+    return undefined;
+  }
+
+  function localParamName(name: string): string {
+    return name === 'this' ? '_this' : name;
+  }
+
+  function localSourceParamName(name: string): string {
+    return `${localParamName(name)}__source`;
+  }
+
+  function localHistoryParamName(name: string): string {
+    return `${localParamName(name)}__series`;
+  }
+
+  function localVariableHistoryParamName(name: string): string {
+    return `${localParamName(name)}__local_series`;
+  }
+
+  function fieldHistoryMemberName(objectName: string, fieldName: string): string {
+    return `_field_series_${objectName}_${fieldName}`;
+  }
+
+  function emitFieldHistoryPush(pad: string, objectName: string, objectExpr: string): void {
+    const fields = fieldHistory.get(objectName);
+    if (!fields) return;
+    for (const field of fields) {
+      const member = fieldHistoryMemberName(objectName, field);
+      const tmp = `_field_${objectName}_${field}_${lines.length}`;
+      lines.push(`${pad}const ${tmp} = _getField(${objectExpr}, "${field}");`);
+      lines.push(`${pad}if (this.${member}.size < ctx.barIndex + 1) this.${member}.push(${tmp});`);
+      lines.push(`${pad}else this.${member}.update(${tmp});`);
+    }
+  }
+
+  function emitLocalHistoryPush(pad: string, name: string, valueExpr: string): void {
+    const historyName = currentLocalHistoryName(name);
+    if (!historyName) return;
+    lines.push(`${pad}if (${historyName}) {`);
+    lines.push(`${pad}  if (${historyName}.size < ctx.barIndex + 1) ${historyName}.push(${valueExpr});`);
+    lines.push(`${pad}  else ${historyName}.update(${valueExpr});`);
+    lines.push(`${pad}}`);
+  }
+
+  function emitSeriesVarWrite(pad: string, name: string, valueExpr: string): void {
+    lines.push(`${pad}if (this._sv_bar_${name} !== ctx.barIndex) {`);
+    lines.push(`${pad}  this._sv_${name}.push(${valueExpr});`);
+    lines.push(`${pad}  this._sv_bar_${name} = ctx.barIndex;`);
+    lines.push(`${pad}} else {`);
+    lines.push(`${pad}  this._sv_${name}.update(${valueExpr});`);
+    lines.push(`${pad}}`);
+  }
+
+  function emitSourceDescriptor(expr: Expression | undefined): string {
+    if (!expr || expr.type !== 'Identifier') return 'undefined';
+    const forwarded = currentLocalSourceName(expr.name);
+    if (forwarded) return forwarded;
+    if (ctx.capturedParams.has(expr.name)) return `ctx.captureSource("${expr.name}")`;
+    const rootAlias = rootSourceAliases.get(expr.name);
+    if (rootAlias && rootAlias !== expr) return emitSourceDescriptor(rootAlias);
+    return expr.name in BAR_FIELDS || expr.name === 'hl2' || expr.name === 'hlc3' || expr.name === 'ohlc4' || expr.name === 'hlcc4'
+      ? `{"kind":"series","name":${JSON.stringify(expr.name)}}`
+      : 'undefined';
+  }
+
+  function emitCaptureDescriptor(param: string): string {
+    const source = currentLocalSourceName(param);
+    const resolved = currentLocalName(param) ?? currentPersistentLocalName(param);
+    const value = resolved
+      ?? (param in BAR_FIELDS ? `this.${BAR_FIELDS[param]}.get(0)` : undefined)
+      ?? (ctx.seriesVars.has(param) ? `this._sv_${param}.get(0)` : undefined)
+      ?? (ctx.varDecls.some((v) => v.name === param) ? `this._v_${param}` : undefined)
+      ?? (rootRegularVars.has(param) ? `this._g_${param}` : undefined)
+      ?? (ctx.capturedParams.has(param) && functionNameStack.length === 0 ? `ctx.capture("${param}")` : param);
+    return source
+      ? `{kind:"capture", value:${value}, source:${source}}`
+      : `{kind:"capture", value:${value}}`;
+  }
+
+  function emitRequestCaptureObject(params: string[] | undefined): string {
+    if (!params || params.length === 0) return 'undefined';
+    return `{${params.map((param) => `${JSON.stringify(param)}:${emitCaptureDescriptor(param)}`).join(',')}}`;
+  }
+
+  function currentPersistentLocalName(name: string): string | undefined {
+    for (let i = persistentLocalStack.length - 1; i >= 0; i--) {
+      const localName = persistentLocalStack[i].get(name);
+      if (localName) return localName;
+    }
+    return undefined;
+  }
+
   function emitMemberExpr(expr: MemberExpression): string {
+    const chainName = getMemberChainName(expr);
+    if (chainName) {
+      const enumValue = ctx.enumValues.get(chainName);
+      if (enumValue) return JSON.stringify(enumValue);
+
+      const importedEnumValue = ctx.importedEnumValues.get(chainName);
+      if (importedEnumValue) return JSON.stringify(importedEnumValue);
+      if (chainName.startsWith('strategy.commission.')) return JSON.stringify(chainName.slice('strategy.commission.'.length));
+      if (chainName.startsWith('strategy.direction.')) return JSON.stringify(chainName.slice('strategy.direction.'.length));
+      if (chainName.startsWith('strategy.oca.')) return JSON.stringify(chainName.slice('strategy.oca.'.length));
+      if (chainName === 'strategy.opentrades.capital_held') return 'ctx.strategyProp("opentrades.capital_held")';
+      if (chainName === 'strategy.closedtrades.first_index') return 'ctx.strategyProp("closedtrades.first_index")';
+    }
+
     if (expr.object.type === 'Identifier') {
       const ns = expr.object.name;
       const prop = expr.property.name;
       const fullName = `${ns}.${prop}`;
 
+      const importedConstant = ctx.importedConstants.get(fullName);
+      if (importedConstant) return emitExpr(importedConstant);
+
       if (ns === 'barstate' && BARSTATE_FIELDS.has(prop)) return `ctx.barstate.${prop}`;
+      if (ns === 'syminfo' && prop in SYMINFO_DERIVED_FIELDS) return SYMINFO_DERIVED_FIELDS[prop]!;
       if (ns === 'syminfo' && SYMINFO_FIELDS.has(prop)) return `ctx.syminfo.${prop}`;
+      if (ns === 'timeframe' && prop in TIMEFRAME_DERIVED_FIELDS) return TIMEFRAME_DERIVED_FIELDS[prop]!;
       if (ns === 'timeframe' && TIMEFRAME_FIELDS.has(prop)) return `ctx.timeframe.${prop}`;
+      if (ns === 'chart' && prop in CHART_FIELDS) return CHART_FIELDS[prop]!;
+      if (fullName === 'ta.tr') return emitTrueRangeMemberValue();
+      const taVarSite = ctx.taVarSiteMap.get(expr);
+      if (taVarSite) return `this.${taVarSite.seriesName}.get(0)`;
+      if (DRAWING_NAMESPACES.has(ns) && prop === 'all') {
+        return `deps._arr.from(...ctx.callBuiltin("${fullName}", [], {}, "${nextBuiltinCallId(fullName)}"))`;
+      }
       if (ns === 'math' && fullName in MATH_FUNCS) return MATH_FUNCS[fullName];
       if (ns === 'strategy') return `ctx.strategyProp("${prop}")`;
       if (ns === 'color') return `"${prop}"`;
       if (ns === 'shape') return `"${prop}"`;
+      if (ns === 'plotshape') return `"plotshape.${prop}"`;
       if (ns === 'location') return `"${prop}"`;
       if (ns === 'size') return `"${prop}"`;
-      if (ns === 'plot') return `"${prop}"`;
-      if (ns === 'display') return `"${prop}"`;
+      if (ns === 'plot') return `"plot.${prop}"`;
+      if (ns === 'display') return prop in DISPLAY_CONSTANTS ? String(DISPLAY_CONSTANTS[prop]) : `"${prop}"`;
       if (ns === 'format') return `"${prop}"`;
       if (ns === 'scale') return `"${prop}"`;
       if (ns === 'currency') return `"${prop}"`;
+      if (ns === 'dividends') return `"dividends.${prop}"`;
+      if (ns === 'earnings') return `"earnings.${prop}"`;
+      if (ns === 'splits') return `"splits.${prop}"`;
       if (ns === 'xloc') return `"${prop}"`;
       if (ns === 'yloc') return `"${prop}"`;
-      if (ns === 'text') return `"${prop}"`;
+      if (ns === 'text') return `"${prop.replace('align_', '').replace('wrap_', '').replace('format_', '')}"`;
       if (ns === 'extend') return `"${prop}"`;
-      if (ns === 'line') return `"${prop}"`;
-      if (ns === 'label') return `"${prop}"`;
+      if (ns === 'line') return `"${prop.replace('style_', '')}"`;
+      if (ns === 'label') return `"${prop.replace('style_', '')}"`;
       if (ns === 'box') return `"${prop}"`;
+      if (ns === 'hline') return `"${prop.replace('style_', '')}"`;
       if (ns === 'polyline') return `"${prop}"`;
       if (ns === 'linefill') return `"${prop}"`;
       if (ns === 'table') return `"${prop}"`;
-      if (ns === 'adjust') return `"${prop}"`;
-      if (ns === 'alert') return `"${prop}"`;
+      if (ns === 'font') return `"${prop.replace('family_', '')}"`;
+      if (ns === 'position') return `"${prop}"`;
+      if (ns === 'adjust' || ns === 'adjustment' || ns === 'backadjustment' || ns === 'settlement_as_close') return `"${prop}"`;
+      if (ns === 'session') return `ctx.sessionValue("${prop}")`;
+      if (ns === 'alert') return `"${prop.replace('freq_', '')}"`;
       if (ns === 'order') return `"${prop}"`;
-      if (ns === 'dayofweek') return `"${prop}"`;
+      if (ns === 'barmerge') return `"barmerge.${prop}"`;
+      if (ns === 'dayofweek' && prop in DAYOFWEEK_CONSTANTS) return String(DAYOFWEEK_CONSTANTS[prop]);
+      if (ns === 'input') return `"${prop}"`;
+      if (BUILTIN_NAMESPACES.has(ns)) return `ctx.callBuiltin("${fullName}", [], {}, "${nextBuiltinCallId(fullName)}")`;
     }
     return `_getField(${emitExpr(expr.object)}, "${expr.property.name}")`;
   }
 
   function emitIndexExpr(expr: IndexExpression): string {
     const idx = emitExpr(expr.index);
+    if (expr.object.type === 'CallExpression') {
+      const taSite = ctx.taCallSiteMap.get(expr.object);
+      if (taSite) {
+        const tmp = `_ta_indexed_${indexedTAResultIndex++}`;
+        const series = isFunctionScopedTASite(taSite)
+          ? `this._scopedTASeries(_state, "${taSite.memberName}")`
+          : `this._ta_result_${taSite.memberName}`;
+        return `(() => { const ${tmp} = ${emitTACall(taSite, expr.object)}; const _series = ${series}; _series.push(${tmp}); return _series.get(${idx}); })()`;
+      }
+    }
+    if (expr.object.type === 'MemberExpression') {
+      const chainName = getMemberChainName(expr.object);
+      if (chainName?.startsWith('strategy.')) {
+        return `ctx.strategyPropHistory("${chainName.slice('strategy.'.length)}", ${idx})`;
+      }
+      const taVarSite = ctx.taVarSiteMap.get(expr.object);
+      if (taVarSite) return `this.${taVarSite.seriesName}.get(${idx})`;
+      if (expr.object.object.type === 'Identifier') {
+        const objectName = expr.object.object.name;
+        const fieldName = expr.object.property.name;
+        if (fieldHistory.get(objectName)?.has(fieldName)) {
+          return `this.${fieldHistoryMemberName(objectName, fieldName)}.get(${idx})`;
+        }
+      }
+    }
     if (expr.object.type === 'Identifier') {
       const name = expr.object.name;
+      const historyName = currentLocalHistoryName(name);
+      if (historyName) {
+        const localName = currentLocalName(name) ?? name;
+        return `(${historyName} ? ${historyName}.get(${idx}) : _idx(${localName}, ${idx}))`;
+      }
       if (name in BAR_FIELDS) return `this.${BAR_FIELDS[name]}.get(${idx})`;
+      if (name === 'bar_index' || name === 'n') return `(${idx} > ctx.barIndex ? NaN : ctx.barIndex - ${idx})`;
+      if (name === 'last_bar_index') return 'ctx.lastBarIndex';
+      if (RUNTIME_TIME_VALUES.has(name)) return `ctx.runtimeTimeValue("${name}", ${idx})`;
+      if (CALENDAR_PARTS.has(name)) return `ctx.calendarPart("${name}", [this._s_time.get(${idx})], {})`;
       if (name === 'hl2' || name === 'hlc3' || name === 'ohlc4' || name === 'hlcc4') {
         return `this._s_${name}.get(${idx})`;
       }
@@ -268,72 +1280,126 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (taSite) return emitTACall(taSite, expr);
 
     const callee = expr.callee;
-    let fullName = '';
-    let namespace = '';
-    if (callee.type === 'Identifier') {
-      fullName = callee.name;
-    } else if (callee.type === 'MemberExpression' && callee.object.type === 'Identifier') {
-      namespace = callee.object.name;
-      fullName = `${namespace}.${callee.property.name}`;
-    }
+    const fullName = getMemberChainName(callee) ?? (callee.type === 'Identifier' ? callee.name : '');
+    const namespace = fullName.split('.')[0] ?? '';
 
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
+    const hasNamedArgs = expr.arguments.some((arg) => arg.name);
+    const collectionMethodKind = getCollectionMethodKind(expr);
+
+    if (
+      expr.callee.type === 'MemberExpression'
+      && expr.callee.property.name === 'title'
+      && expr.arguments.length === 0
+    ) {
+      const receiverName = getMemberChainName(expr.callee.object);
+      const importedTitle = receiverName ? (ctx.enumTitles.get(receiverName) ?? ctx.importedEnumTitles.get(receiverName)) : undefined;
+      if (importedTitle !== undefined) return JSON.stringify(importedTitle);
+    }
+
+    const importedFunctionName = ctx.importedFunctions.get(fullName);
+    if (importedFunctionName) {
+      return emitUserFunctionCall(importedFunctionName, expr);
+    }
+    if (expr.callee.type === 'Identifier' && ctx.funcInfos.has(fullName)) {
+      return emitUserFunctionCall(fullName, expr);
+    }
+    if (expr.callee.type === 'Identifier') {
+      const sameLibraryFunction = sameImportedLibraryFunctionName(fullName);
+      if (sameLibraryFunction) return emitUserFunctionCall(sameLibraryFunction, expr);
+    }
+
+    if (collectionMethodKind) {
+      const receiver = emitExpr((expr.callee as MemberExpression).object);
+      const method = (expr.callee as MemberExpression).property.name;
+      const runtimeMethod = collectionRuntimeMethodName(collectionMethodKind, method) ?? method;
+      return `_callCollectionMethod("${collectionMethodKind}", ${receiver}, "${runtimeMethod}", [${posArgs.join(', ')}])`;
+    }
+
+    if (fullName === 'iff') {
+      return `ctx.callBuiltin("iff", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+    }
+
+    if (LEGACY_GLOBAL_MATH_ALIASES.has(fullName)) {
+      const mathName = `math.${fullName}`;
+      return `ctx.mathCall("${mathName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${builtinCallId(mathName, expr)}")`;
+    }
 
     // Math functions
+    if (namespace === 'math' && hasNamedArgs) {
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${builtinCallId(fullName, expr)}")`;
+    }
+    if (fullName === 'math.avg') {
+      return posArgs.length > 0
+        ? `((${posArgs.join(' + ')}) / ${posArgs.length})`
+        : 'NaN';
+    }
+    if (fullName === 'math.sum') {
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+    }
+    if (fullName === 'math.random') {
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+    }
     if (fullName in MATH_FUNCS) {
       const fn = MATH_FUNCS[fullName];
-      if (fullName === 'math.avg') {
-        return posArgs.length > 0
-          ? `((${posArgs.join(' + ')}) / ${posArgs.length})`
-          : 'NaN';
-      }
-      if (fullName === 'math.sum') {
-        return `ctx.mathSum(${posArgs.join(', ')})`;
-      }
       if (fullName === 'math.todegrees') return `(${posArgs[0]} * 180 / Math.PI)`;
       if (fullName === 'math.toradians') return `(${posArgs[0]} * Math.PI / 180)`;
       return `${fn}(${posArgs.join(', ')})`;
     }
+    if (namespace === 'math') {
+      return `ctx.mathCall("${fullName}", [${posArgs.join(', ')}], {}, "${builtinCallId(fullName, expr)}")`;
+    }
 
     // nz / na
-    if (fullName === 'nz') return posArgs.length > 1 ? `_nz(${posArgs[0]}, ${posArgs[1]})` : `_nz(${posArgs[0]})`;
-    if (fullName === 'na') return posArgs.length > 0 ? `_isNa(${posArgs[0]})` : 'NaN';
+    if (fullName === 'nz') {
+      const value = emitOrderedArg(expr.arguments, ['source', 'replacement'], 'source', 0) ?? 'NaN';
+      const replacement = emitOrderedArg(expr.arguments, ['source', 'replacement'], 'replacement', 1);
+      return replacement ? `_nz(${value}, ${replacement})` : `_nz(${value})`;
+    }
+    if (fullName === 'na') {
+      const value = emitOrderedArg(expr.arguments, ['x'], 'x', 0);
+      return value ? `_isNa(${value})` : 'NaN';
+    }
     if (fullName === 'fixnan') {
       const fnIdx = fixnanIndex++;
-      return `(_isNa(${posArgs[0]}) ? this._fixnan_${fnIdx} : (this._fixnan_${fnIdx} = ${posArgs[0]}))`;
+      const value = emitOrderedArg(expr.arguments, ['source'], 'source', 0) ?? 'NaN';
+      return `(_isNa(${value}) ? this._fixnan_${fnIdx} : (this._fixnan_${fnIdx} = ${value}))`;
     }
 
     // Type casts
-    if (fullName === 'int') return `Math.trunc(${posArgs[0]})`;
-    if (fullName === 'float') return `+(${posArgs[0]})`;
-    if (fullName === 'bool') return `!!(${posArgs[0]})`;
-    if (fullName === 'string' || fullName === 'str.tostring') return `String(${posArgs[0]})`;
-    if (fullName === 'str.tonumber') return `Number(${posArgs[0]})`;
+    if (fullName === 'int') return `Math.trunc(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
+    if (fullName === 'float') return `+(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
+    if (fullName === 'bool') return `_isTruthy(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
+    if (fullName === 'string') return `String(${emitOrderedArg(expr.arguments, ['x'], 'x', 0) ?? 'NaN'})`;
 
     // String functions
-    if (fullName === 'str.length') return `${posArgs[0]}.length`;
-    if (fullName === 'str.contains') return `${posArgs[0]}.includes(${posArgs[1]})`;
-    if (fullName === 'str.startswith') return `${posArgs[0]}.startsWith(${posArgs[1]})`;
-    if (fullName === 'str.endswith') return `${posArgs[0]}.endsWith(${posArgs[1]})`;
-    if (fullName === 'str.substring') return `${posArgs[0]}.substring(${posArgs[1]}${posArgs[2] ? ', ' + posArgs[2] : ''})`;
-    if (fullName === 'str.replace') return `${posArgs[0]}.replace(${posArgs[1]}, ${posArgs[2]})`;
-    if (fullName === 'str.replace_all') return `${posArgs[0]}.replaceAll(${posArgs[1]}, ${posArgs[2]})`;
-    if (fullName === 'str.lower') return `${posArgs[0]}.toLowerCase()`;
-    if (fullName === 'str.upper') return `${posArgs[0]}.toUpperCase()`;
-    if (fullName === 'str.trim') return `${posArgs[0]}.trim()`;
-    if (fullName === 'str.pos') return `${posArgs[0]}.indexOf(${posArgs[1]})`;
-    if (fullName === 'str.repeat') return `${posArgs[0]}.repeat(${posArgs[1]})`;
-    if (fullName === 'str.split') return `${posArgs[0]}.split(${posArgs[1]})`;
-    if (fullName === 'str.format') return `ctx.strFormat(${posArgs.join(', ')})`;
-    if (fullName === 'str.format_time') return `ctx.strFormatTime(${posArgs.join(', ')})`;
+    if (LEGACY_GLOBAL_STR_ALIASES.has(fullName)) {
+      const strName = LEGACY_GLOBAL_STR_ALIASES.get(fullName)!;
+      return `ctx.callBuiltin("${strName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(strName)}")`;
+    }
+    if (RUNTIME_STR_FUNCTIONS.has(fullName)) {
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+    }
+    if (fullName === 'str.format') return `ctx.strFormat([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'str.format_time') return `ctx.strFormatTime([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
 
     // Color functions
-    if (fullName === 'color.new') return `ctx.colorNew(${posArgs.join(', ')})`;
-    if (fullName === 'color.rgb') return `ctx.colorRgb(${posArgs.join(', ')})`;
-    if (fullName === 'color.r') return `ctx.colorR(${posArgs[0]})`;
-    if (fullName === 'color.g') return `ctx.colorG(${posArgs[0]})`;
-    if (fullName === 'color.b') return `ctx.colorB(${posArgs[0]})`;
-    if (fullName === 'color.t') return `ctx.colorT(${posArgs[0]})`;
+    if (fullName === 'color') {
+      const legacyColorTransparencyCall = expr.arguments.length <= 2
+        || expr.arguments.some((argument) => argument.name?.name === 'color' || argument.name?.name === 'transp');
+      return legacyColorTransparencyCall
+        ? `ctx.colorNew([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`
+        : `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    }
+    if (fullName === 'color.new') return `ctx.colorNew([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.rgb') return `ctx.colorRgb([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.r') return `ctx.colorR([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.g') return `ctx.colorG([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.b') return `ctx.colorB([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.t') return `ctx.colorT([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'color.from_gradient') return `ctx.colorFromGradient([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+
+    if (fullName === 'ta.pivot_point_levels') return emitPivotPointLevelsCall(expr);
 
     // Array functions
     if (namespace === 'array') {
@@ -348,23 +1414,31 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     // Ticker functions
-    if (namespace === 'ticker') {
-      if (fullName === 'ticker.new') return `ctx.tickerNew(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.modify') return `ctx.tickerModify(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.standard') return `ctx.tickerStandard(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.heikinashi') return `ctx.tickerHeikinashi(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.renko') return `ctx.tickerRenko(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.kagi') return `ctx.tickerKagi(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.linebreak') return `ctx.tickerLinebreak(${posArgs.join(', ')})`;
-      if (fullName === 'ticker.pointfigure') return `ctx.tickerPointfigure(${posArgs.join(', ')})`;
-      return `ctx.tickerNew(${posArgs.join(', ')})`;
+    const tickerFullName = LEGACY_GLOBAL_TICKER_ALIASES.get(fullName) ?? fullName;
+    if (namespace === 'ticker' || LEGACY_GLOBAL_TICKER_ALIASES.has(fullName)) {
+      const namedObj = emitNamedArgsObj(expr.arguments);
+      if (tickerFullName === 'ticker.new') return `ctx.tickerNew([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.modify') return `ctx.tickerModify([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.standard') return `ctx.tickerStandard([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.inherit') return `ctx.tickerInherit([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.heikinashi') return `ctx.tickerHeikinashi([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.renko') return `ctx.tickerRenko([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.kagi') return `ctx.tickerKagi([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.linebreak') return `ctx.tickerLinebreak([${posArgs.join(', ')}], ${namedObj})`;
+      if (tickerFullName === 'ticker.pointfigure') return `ctx.tickerPointfigure([${posArgs.join(', ')}], ${namedObj})`;
+      return `ctx.tickerNew([${posArgs.join(', ')}], ${namedObj})`;
+    }
+    if (fullName === 'syminfo.prefix' || fullName === 'syminfo.ticker') {
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
     }
 
     // Drawing functions — delegate to context
-    if (namespace === 'label' || namespace === 'line' || namespace === 'box' ||
-        namespace === 'polyline' || namespace === 'linefill' || namespace === 'table') {
+    if (namespace && DRAWING_NAMESPACES.has(namespace)) {
       const namedObj = emitNamedArgsObj(expr.arguments);
-      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj})`;
+      const callId = DRAWING_CONSTRUCTOR_FUNCTIONS.has(fullName)
+        ? `ctx.nextBuiltinCallId("${fullName}")`
+        : `"${nextBuiltinCallId(fullName)}"`;
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${namedObj}, ${callId})`;
     }
 
     // Matrix functions
@@ -375,15 +1449,63 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     // Request.security
-    if (fullName === 'request.security' || fullName === 'security') {
+    if (fullName === 'request.security' || fullName === 'security' || fullName === 'request.security_lower_tf' || fullName === 'request.seed') {
       const secSite = ctx.securitySites.find((s) => s.node === expr);
       if (secSite) {
+        if (secSite.kind === 'seed') {
+          const sourceExpr = secSite.sourceExpr ? emitExpr(secSite.sourceExpr) : '""';
+          const symExpr = emitExpr(secSite.symbolExpr);
+          const ignoreSymbolExpr = secSite.ignoreInvalidSymbolExpr ? emitExpr(secSite.ignoreInvalidSymbolExpr) : 'false';
+          const calcExpr = secSite.calcBarsCountExpr ? emitExpr(secSite.calcBarsCountExpr) : 'undefined';
+          const sourceDescriptorExpr = emitSourceDescriptor(secSite.expressionSourceParam
+            ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
+            : undefined);
+          const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams);
+          return `ctx.requestSeed(${secSite.id}, ${sourceExpr}, ${symExpr}, ${ignoreSymbolExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
+        }
         const symExpr = emitExpr(secSite.symbolExpr);
         const tfExpr = emitExpr(secSite.timeframeExpr);
+        if (secSite.kind === 'security_lower_tf') {
+          const ignoreSymbolExpr = secSite.ignoreInvalidSymbolExpr ? emitExpr(secSite.ignoreInvalidSymbolExpr) : 'false';
+          const currencyExpr = secSite.currencyExpr ? emitExpr(secSite.currencyExpr) : 'undefined';
+          const ignoreTfExpr = secSite.ignoreInvalidTimeframeExpr ? emitExpr(secSite.ignoreInvalidTimeframeExpr) : 'false';
+          const calcExpr = secSite.calcBarsCountExpr ? emitExpr(secSite.calcBarsCountExpr) : 'undefined';
+          const sourceDescriptorExpr = emitSourceDescriptor(secSite.expressionSourceParam
+            ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
+            : undefined);
+          const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams);
+          return `ctx.requestSecurityLowerTf(${secSite.id}, ${symExpr}, ${tfExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${ignoreTfExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
+        }
         const gapsExpr = secSite.gapsExpr ? emitExpr(secSite.gapsExpr) : '"barmerge.gaps_off"';
         const laExpr = secSite.lookaheadExpr ? emitExpr(secSite.lookaheadExpr) : '"barmerge.lookahead_off"';
-        return `ctx.requestSecurity(${secSite.id}, ${symExpr}, ${tfExpr}, ${gapsExpr}, ${laExpr})`;
+        const ignoreSymbolExpr = secSite.ignoreInvalidSymbolExpr ? emitExpr(secSite.ignoreInvalidSymbolExpr) : 'false';
+        const currencyExpr = secSite.currencyExpr ? emitExpr(secSite.currencyExpr) : 'undefined';
+        const calcExpr = secSite.calcBarsCountExpr ? emitExpr(secSite.calcBarsCountExpr) : 'undefined';
+        const sourceDescriptorExpr = emitSourceDescriptor(secSite.expressionSourceParam
+          ? { type: 'Identifier', name: secSite.expressionSourceParam, loc: undefined }
+          : undefined);
+        const captureExpr = emitRequestCaptureObject(secSite.expressionCaptureParams);
+        return `ctx.requestSecurity(${secSite.id}, ${symExpr}, ${tfExpr}, ${gapsExpr}, ${laExpr}, ${ignoreSymbolExpr}, ${currencyExpr}, ${calcExpr}, ${sourceDescriptorExpr}, ${captureExpr})`;
       }
+    }
+    if (fullName === 'request.currency_rate') {
+      return `ctx.requestCurrencyRate([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    }
+    if (fullName === 'request.footprint') {
+      return `ctx.requestFootprint([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    }
+    if (namespace === 'footprint' || namespace === 'volume_row') {
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+    }
+    if (
+      fullName === 'request.dividends'
+      || fullName === 'request.earnings'
+      || fullName === 'request.splits'
+      || fullName === 'request.financial'
+      || fullName === 'request.economic'
+      || fullName === 'request.quandl'
+    ) {
+      return `ctx.requestPointSeries("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
     }
 
     // Plot functions
@@ -392,21 +1514,33 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     // Input functions
-    if (namespace === 'input') {
+    if (fullName === 'input' || namespace === 'input') {
       return emitInputCall(fullName, expr);
     }
 
     // Alert
-    if (fullName === 'alert') return `ctx.alert(${posArgs.join(', ')})`;
-    if (fullName === 'alertcondition') return `ctx.alertCondition(${posArgs.join(', ')})`;
+    if (fullName === 'alert') return `ctx.alert([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${builtinCallId(fullName, expr)}")`;
+    if (fullName === 'alertcondition') return `ctx.alertCondition([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
 
     // Log
-    if (fullName === 'log.info') return `ctx.logInfo(${posArgs.join(', ')})`;
-    if (fullName === 'log.warning') return `ctx.logWarning(${posArgs.join(', ')})`;
-    if (fullName === 'log.error') return `ctx.logError(${posArgs.join(', ')})`;
+    if (fullName === 'log.info') return `ctx.logInfo([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'log.warning') return `ctx.logWarning([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'log.error') return `ctx.logError([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
 
     // Runtime
-    if (fullName === 'runtime.error') return `ctx.runtimeError(${posArgs.join(', ')})`;
+    if (fullName === 'runtime.error') return emitRuntimeErrorCall(expr, expr.loc);
+    if (fullName === 'max_bars_back') {
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+    }
+
+    // Time
+    if (fullName === 'time') return `ctx.timeFilter(false, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'time_close') return `ctx.timeFilter(true, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (fullName === 'timestamp') return `ctx.timestamp([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (CALENDAR_PARTS.has(fullName)) return `ctx.calendarPart("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    if (namespace === 'timeframe') {
+      return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(fullName)}")`;
+    }
 
     // Strategy functions
     if (fullName === 'strategy.entry') return emitStrategyCall('entry', expr);
@@ -416,6 +1550,12 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (fullName === 'strategy.cancel') return emitStrategyCall('cancel', expr);
     if (fullName === 'strategy.cancel_all') return emitStrategyCall('cancelAll', expr);
     if (fullName === 'strategy.order') return emitStrategyCall('order', expr);
+    if (fullName.startsWith('strategy.opentrades.') || fullName.startsWith('strategy.closedtrades.')) {
+      return `ctx.strategyTradeProp("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    }
+    if (fullName.startsWith('strategy.risk.')) {
+      return `ctx.strategyRisk("${fullName}", [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)})`;
+    }
 
     // Strategy risk
     if (namespace === 'strategy' && expr.callee.type === 'MemberExpression') {
@@ -424,16 +1564,200 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
 
     // UDT constructor: MyType.new(field1=val1, ...)
-    if (namespace && ctx.typeDecls.has(namespace) && expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'new') {
-      return emitUdtConstructor(namespace, expr);
+    const constructorTypeName = expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'new'
+      ? getMemberChainName(expr.callee.object)
+      : undefined;
+    if (constructorTypeName && ctx.typeDecls.has(constructorTypeName)) {
+      return emitUdtConstructor(constructorTypeName, expr);
+    }
+
+    // User-defined method
+    if (expr.callee.type === 'MemberExpression' && ctx.funcInfos.has(expr.callee.property.name)) {
+      const receiver = emitExpr(expr.callee.object);
+      const methodName = expr.callee.property.name;
+      return emitUserFunctionCall(methodName, expr, receiver);
+    }
+
+    if (expr.callee.type === 'MemberExpression') {
+      const importedOverloads = ctx.importedMethodOverloads.get(expr.callee.property.name);
+      if (importedOverloads && importedOverloads.length > 0) {
+        return emitImportedMethodCall(importedOverloads, expr as CallExpression & { callee: MemberExpression });
+      }
+
+      const importedMethodName = ctx.importedMethods.get(expr.callee.property.name);
+      if (importedMethodName) {
+        const receiver = emitExpr(expr.callee.object);
+        return emitUserFunctionCall(importedMethodName, expr, receiver);
+      }
+    }
+
+    if (expr.callee.type === 'MemberExpression' && FOOTPRINT_METHODS.has(expr.callee.property.name)) {
+      const receiver = emitExpr(expr.callee.object);
+      const methodName = expr.callee.property.name;
+      return `ctx.footprintMethod("${methodName}", ${receiver}, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(methodName)}")`;
+    }
+
+    if (expr.callee.type === 'MemberExpression') {
+      const receiver = emitExpr(expr.callee.object);
+      const methodName = expr.callee.property.name;
+      return `ctx.callMethodBuiltin("${methodName}", ${receiver}, [${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, "${nextBuiltinCallId(methodName)}")`;
     }
 
     // User-defined function
     if (ctx.funcInfos.has(fullName)) {
-      return `this._fn_${fullName}(${posArgs.join(', ')})`;
+      return emitUserFunctionCall(fullName, expr);
     }
 
-    return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}])`;
+    const callId = DRAWING_CONSTRUCTOR_FUNCTIONS.has(fullName)
+      ? `ctx.nextBuiltinCallId("${fullName}")`
+      : `"${nextBuiltinCallId(fullName)}"`;
+    return `ctx.callBuiltin("${fullName}", [${posArgs.join(', ')}], {}, ${callId})`;
+  }
+
+  function emitImportedMethodCall(overloads: ImportedMethodOverloadInfo[], expr: CallExpression & { callee: MemberExpression }): string {
+    const receiver = emitExpr(expr.callee.object);
+    const temp = `_method_receiver_${functionEmitContext.callSites.get(expr) ?? 'x'}`;
+    const branches = overloads.map((overload) => {
+      const call = emitUserFunctionCall(overload.internalName, expr, temp);
+      if (!overload.receiverType) return `return ${call};`;
+      return `if (${temp} && ${temp}.__tealscriptUdt && ${temp}.typeName === ${JSON.stringify(overload.receiverType)}) return ${call};`;
+    });
+    return `(() => { const ${temp} = ${receiver}; ${branches.join(' ')} throw new Error("No imported method overload matched ${expr.callee.property.name} for receiver " + (${temp} && ${temp}.__tealscriptUdt ? ${temp}.typeName : typeof ${temp})); })()`;
+  }
+
+  function emitUserFunctionCall(name: string, expr: CallExpression, receiver?: string): string {
+    const fi = ctx.funcInfos.get(name)!;
+    const args = expr.arguments;
+    const start = receiver ? 1 : 0;
+    const callSiteId = functionEmitContext.callSites.get(expr);
+    const localVars = functionEmitContext.localVars.get(name) ?? [];
+    const hasTACalls = ctx.funcInfos.get(name)?.hasTACalls ?? false;
+    const hasState = functionNeedsState(name) && callSiteId !== undefined;
+    const currentFunctionName = functionNameStack[functionNameStack.length - 1];
+    const stateArg = hasState
+      ? currentFunctionName
+        ? `this._childFnState(_state, ${callSiteId}, [${localVars.map((localVar) => JSON.stringify(localVar.name)).join(', ')}], ${hasTACalls ? 'true' : 'false'})`
+        : `this._fn_state_${callSiteId}`
+      : 'undefined';
+    const values = receiver ? [receiver] : [];
+    const positional = args.filter((arg) => !arg.name).map((arg) => arg.value);
+    const sourceArgs = new Map<string, Expression>();
+    if (receiver) sourceArgs.set(fi.params[0], (expr.callee as MemberExpression).object);
+    for (let i = start; i < fi.params.length; i++) {
+      const param = fi.params[i];
+      const named = args.find((arg) => arg.name?.name === param)?.value;
+      if (named) {
+        values.push(emitExpr(named));
+        sourceArgs.set(param, named);
+        continue;
+      }
+      const positionalIndex = (i - start)
+        - fi.params.slice(start, i).filter((prev) => args.some((arg) => arg.name?.name === prev)).length;
+      const positionalArg = positional[positionalIndex];
+      values.push(positionalArg ? emitExpr(positionalArg) : 'undefined');
+      if (positionalArg) sourceArgs.set(param, positionalArg);
+    }
+    const sourceDescriptors = fi.params.map((param) => emitSourceDescriptor(sourceArgs.get(param)));
+    const historyParams = functionEmitContext.paramHistory.get(name) ?? new Set();
+    const historyLocals = functionEmitContext.localHistory.get(name) ?? new Set();
+    const needsHistory = (historyParams.size > 0 || historyLocals.size > 0) && callSiteId !== undefined;
+    if (!needsHistory) {
+      return `this._fn_${name}(${['ctx', stateArg, ...values, ...sourceDescriptors, ...fi.params.map(() => 'undefined'), ...historyLocals].join(', ')})`;
+    }
+    const tempPrefix = `_fn_arg_${callSiteId}_`;
+    const setup = values.map((value, index) => `const ${tempPrefix}${index} = ${value};`).join(' ');
+    const historyUpdates: string[] = [];
+    const historyArgs = fi.params.map((param, index) => {
+      if (!historyParams.has(param)) return 'undefined';
+      const member = `this._fn_param_series_${callSiteId}_${param}`;
+      historyUpdates.push(`${member}.push(${tempPrefix}${index});`);
+      return member;
+    });
+    const localHistoryArgs = [...historyLocals].map((local) => `this._fn_local_series_${callSiteId}_${local}`);
+    const callValues = fi.params.map((_, index) => `${tempPrefix}${index}`);
+    return `(() => { ${setup} ${historyUpdates.join(' ')} return this._fn_${name}(${['ctx', stateArg, ...callValues, ...sourceDescriptors, ...historyArgs, ...localHistoryArgs].join(', ')}); })()`;
+  }
+
+  function functionNeedsState(name: string, seen = new Set<string>()): boolean {
+    if (seen.has(name)) return false;
+    seen.add(name);
+    if ((functionEmitContext.localVars.get(name)?.length ?? 0) > 0) return true;
+    if (ctx.funcInfos.get(name)?.hasTACalls ?? false) return true;
+    for (const callee of functionEmitContext.calledFunctions.get(name) ?? []) {
+      if (functionNeedsState(callee, seen)) return true;
+    }
+    return false;
+  }
+
+  function nextBuiltinCallId(name: string): string {
+    const count = builtinCallCounts.get(name) ?? 0;
+    builtinCallCounts.set(name, count + 1);
+    return `${name}_${count}`;
+  }
+
+  function builtinCallId(name: string, expr: CallExpression): string {
+    if ((name === 'alert' || name === 'math.random') && expr.loc) {
+      return `${name}_${expr.loc.start.line}_${expr.loc.start.column}`;
+    }
+    return nextBuiltinCallId(name);
+  }
+
+  function getCollectionExprKind(expr: Expression): CollectionKind | undefined {
+    if (expr.type === 'Identifier') return collectionVars.get(expr.name);
+    if (expr.type !== 'CallExpression') return undefined;
+
+    const fullName = getMemberChainName(expr.callee) ?? (expr.callee.type === 'Identifier' ? expr.callee.name : '');
+    if (fullName === 'array.new' || fullName.startsWith('array.new_') || fullName === 'array.from') return 'array';
+    if (fullName === 'map.new') return 'map';
+    if (fullName === 'matrix.new' || fullName.startsWith('matrix.new_')) return 'matrix';
+
+    const methodKind = getCollectionMethodKind(expr);
+    if (!methodKind || expr.callee.type !== 'MemberExpression') return undefined;
+    return COLLECTION_METHOD_RETURNS[methodKind][expr.callee.property.name];
+  }
+
+  function getCollectionMethodKind(expr: CallExpression): CollectionKind | undefined {
+    if (expr.callee.type !== 'MemberExpression') return undefined;
+    const method = expr.callee.property.name;
+    if (!COLLECTION_METHOD_NAMES.has(method)) return undefined;
+    return getCollectionExprKind(expr.callee.object);
+  }
+
+  function emitExpressionStatement(expr: Expression, loc?: SourceLocation): string {
+    if (expr.type === 'CallExpression') {
+      const fullName = getMemberChainName(expr.callee) ?? (expr.callee.type === 'Identifier' ? expr.callee.name : '');
+      if (fullName === 'runtime.error') return emitRuntimeErrorCall(expr, runtimeErrorLocStack[0] ?? loc ?? expr.loc);
+    }
+    return emitExpr(expr);
+  }
+
+  function emitTrueRangeMemberValue(): string {
+    return `(() => { const _prevClose = this._s_close.get(1); return _prevClose === undefined || _isNa(_prevClose) ? NaN : Math.max(ctx.bar.high - ctx.bar.low, Math.abs(ctx.bar.high - _prevClose), Math.abs(ctx.bar.low - _prevClose)); })()`;
+  }
+
+  function emitWithRuntimeErrorLoc(loc: SourceLocation | undefined, fn: () => void): void {
+    if (!loc || runtimeErrorLocStack.length > 0) {
+      fn();
+      return;
+    }
+    runtimeErrorLocStack.push(loc);
+    try {
+      fn();
+    } finally {
+      runtimeErrorLocStack.pop();
+    }
+  }
+
+  function emitRuntimeErrorCall(expr: CallExpression, loc?: SourceLocation): string {
+    const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
+    return `ctx.runtimeError([${posArgs.join(', ')}], ${emitNamedArgsObj(expr.arguments)}, ${loc?.start.line ?? 'undefined'}, ${loc?.start.column ?? 'undefined'})`;
+  }
+
+  function getMemberChainName(expr: Expression): string | undefined {
+    if (expr.type === 'Identifier') return expr.name;
+    if (expr.type !== 'MemberExpression') return undefined;
+    const objectName = getMemberChainName(expr.object);
+    return objectName ? `${objectName}.${expr.property.name}` : undefined;
   }
 
   function emitUdtConstructor(typeName: string, expr: CallExpression): string {
@@ -469,9 +1793,43 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function emitTACall(site: TACallSite, _expr: CallExpression): string {
     const args = site.computeArgExprs.map(emitExpr);
-    const member = `this.${site.memberName}`;
+    const scoped = isFunctionScopedTASite(site);
+    const ctorArgExpr = site.dynamicCtorArgExprs
+      ? `[${site.dynamicCtorArgExprs.map(emitExpr).join(', ')}]`
+      : `[${site.ctorArgs.map((arg) => JSON.stringify(arg)).join(', ')}]`;
+    const member = scoped
+      ? `this._scopedTA(_state, "${site.memberName}", "${site.className}", ${ctorArgExpr})`
+      : site.dynamicCtorArgExprs
+      ? `this._dynamicTA("${site.memberName}", "${site.className}", [${site.dynamicCtorArgExprs.map(emitExpr).join(', ')}])`
+      : `this.${site.memberName}`;
 
     if (site.className === 'ATR') {
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+    }
+
+    if (site.className === 'TrueRange') {
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+    }
+
+    if (site.className === 'DMI' || site.className === 'ADX') {
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+    }
+
+    if (site.className === 'Supertrend') {
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+    }
+
+    if (site.className === 'SAR') {
+      return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low) : ${member}.recompute(ctx.bar.high, ctx.bar.low))`;
+    }
+
+    if (site.className === 'VWAP') {
+      const source = args[0] ?? '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
+      const anchor = args[1] ?? 'false';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ${anchor}, ctx.bar.volume) : ${member}.recompute(${source}, ${anchor}, ctx.bar.volume))`;
+    }
+
+    if (site.className === 'WPR') {
       return `(ctx.isFirstTick ? ${member}.compute(ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
     }
 
@@ -479,6 +1837,56 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const source = args[0] ?? 'ctx.bar.close';
       const volume = args[1] ?? 'ctx.bar.volume';
       return `(ctx.isFirstTick ? ${member}.compute(${source}, ${volume}) : ${member}.recompute(${source}, ${volume}))`;
+    }
+
+    if (site.className === 'BarIndex') {
+      const source = args[0] ?? 'NaN';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ctx.barIndex) : ${member}.recompute(${source}, ctx.barIndex))`;
+    }
+
+    if (site.className === 'VWMA') {
+      const source = args[0] ?? 'ctx.bar.close';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ctx.bar.volume) : ${member}.recompute(${source}, ctx.bar.volume))`;
+    }
+
+    if (site.className === 'Highest') {
+      const source = args[0] ?? 'ctx.bar.high';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}) : ${member}.recompute(${source}))`;
+    }
+
+    if (site.className === 'Lowest') {
+      const source = args[0] ?? 'ctx.bar.low';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}) : ${member}.recompute(${source}))`;
+    }
+
+    if (site.className === 'MFI') {
+      const source = args[0] ?? '((ctx.bar.high + ctx.bar.low + ctx.bar.close) / 3)';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ctx.bar.volume) : ${member}.recompute(${source}, ctx.bar.volume))`;
+    }
+
+    if (site.className === 'KC' || site.className === 'KCW') {
+      const source = args[0] ?? 'ctx.bar.close';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}, ctx.bar.high, ctx.bar.low, ctx.bar.close) : ${member}.recompute(${source}, ctx.bar.high, ctx.bar.low, ctx.bar.close))`;
+    }
+
+    if (site.className === 'HighestBars') {
+      const source = args[0] ?? 'ctx.bar.high';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}) : ${member}.recompute(${source}))`;
+    }
+
+    if (site.className === 'LowestBars') {
+      const source = args[0] ?? 'ctx.bar.low';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}) : ${member}.recompute(${source}))`;
+    }
+
+    if (site.className === 'PivotHigh') {
+      const source = args[0] ?? 'ctx.bar.high';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}) : ${member}.recompute(${source}))`;
+    }
+
+    if (site.className === 'PivotLow') {
+      const source = args[0] ?? 'ctx.bar.low';
+      return `(ctx.isFirstTick ? ${member}.compute(${source}) : ${member}.recompute(${source}))`;
     }
 
     const argStr = args.join(', ');
@@ -490,30 +1898,121 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     return entries.length > 0 ? `{${entries.join(', ')}}` : '{}';
   }
 
+  function inputDefaultSourceName(value: Expression | undefined): string | undefined {
+    if (value?.type !== 'Identifier') return undefined;
+    return ['open', 'high', 'low', 'close', 'hl2', 'hlc3', 'ohlc4', 'hlcc4', 'volume', 'bid', 'ask'].includes(value.name)
+      ? value.name
+      : undefined;
+  }
+
+  function hasStaticInputTitle(args: { name?: Identifier; value: Expression }[]): boolean {
+    const namedTitle = args.find((arg) => arg.name?.name === 'title');
+    if (namedTitle) return namedTitle.value.type === 'StringLiteral';
+
+    let positionalIndex = 0;
+    for (const arg of args) {
+      if (arg.name) continue;
+      if (positionalIndex === 1) return arg.value.type === 'StringLiteral';
+      positionalIndex++;
+    }
+
+    return true;
+  }
+
+  function emitOrderedArg(args: { name?: Identifier; value: Expression }[], names: string[], name: string, index: number): string | undefined {
+    const named = args.find((arg) => arg.name?.name === name)?.value;
+    if (named) return emitExpr(named);
+    const positional = args.filter((arg) => !arg.name).map((arg) => arg.value);
+    const positionalIndex = index - names.slice(0, index).filter((param) => args.some((arg) => arg.name?.name === param)).length;
+    const arg = positional[positionalIndex];
+    return arg ? emitExpr(arg) : undefined;
+  }
+
+  function emitOrderedCallArgs(
+    args: { name?: Identifier; value: Expression }[],
+    names: readonly string[],
+    aliases: Record<string, string> = {},
+  ): string[] {
+    const namedArgs = new Map<string, Expression>();
+    for (const arg of args) {
+      if (!arg.name) continue;
+      namedArgs.set(aliases[arg.name.name] ?? arg.name.name, arg.value);
+    }
+
+    const positional = args.filter((arg) => !arg.name).map((arg) => arg.value);
+    const values: Array<string | undefined> = [];
+    for (let index = 0; index < names.length; index++) {
+      const name = names[index]!;
+      const named = namedArgs.get(name);
+      if (named) {
+        values.push(emitExpr(named));
+        continue;
+      }
+      const positionalIndex = index - names.slice(0, index).filter((param) => namedArgs.has(param)).length;
+      const positionalArg = positional[positionalIndex];
+      values.push(positionalArg ? emitExpr(positionalArg) : undefined);
+    }
+    while (values.length > 0 && values[values.length - 1] === undefined) values.pop();
+    return values.map((value) => value ?? 'undefined');
+  }
+
+  function isFunctionScopedTASite(site: TACallSite): boolean {
+    const currentFunctionName = functionNameStack[functionNameStack.length - 1];
+    return currentFunctionName !== undefined && taSiteFunctionNames.get(site) === currentFunctionName;
+  }
+
+  function emitPivotPointLevelsCall(expr: CallExpression): string {
+    const developing = emitOrderedArg(expr.arguments, ['type', 'anchor', 'developing'], 'developing', 2) ?? 'false';
+    return `_pivotPointLevels(${developing}, this._s_high.get(0), this._s_low.get(0), this._s_close.get(0), this._s_high.get(1), this._s_low.get(1), this._s_close.get(1))`;
+  }
+
   function emitPlotCall(funcName: string, expr: CallExpression): string {
     const site = ctx.plotSites.find((p) => p.node === expr);
     const idx = site?.index ?? 0;
+    const funcCallIndex = site?.funcCallIndex ?? 0;
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
     const namedObj = emitNamedArgsObj(expr.arguments);
-    return `ctx.plot(${idx}, "${funcName}", ${posArgs[0] ?? 'NaN'}, ${namedObj}, [${posArgs.slice(1).join(', ')}])`;
+    const primaryName = PLOT_PRIMARY_ARGS[funcName] ?? 'series';
+    const primaryValue = emitOrderedArg(expr.arguments, [primaryName], primaryName, 0) ?? 'NaN';
+    const hasNamedPrimary = expr.arguments.some((arg) => arg.name?.name === primaryName);
+    const extraArgs = hasNamedPrimary ? posArgs : posArgs.slice(1);
+    return `ctx.plot(${idx}, "${funcName}", ${funcCallIndex}, ${primaryValue}, ${namedObj}, [${extraArgs.join(', ')}])`;
   }
 
   function emitInputCall(funcName: string, expr: CallExpression): string {
     const site = ctx.inputSites.find((s) => s.node === expr);
     const id = site?.id ?? 'unknown';
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
-    const namedObj = emitNamedArgsObj(expr.arguments);
+    const sourceHint = funcName === 'input'
+      ? inputDefaultSourceName(expr.arguments.find((arg) => arg.name?.name === 'defval')?.value ?? expr.arguments.find((arg) => !arg.name)?.value)
+      : undefined;
+    const metadataEntries = [
+      sourceHint ? `__tealscriptInputDefaultSource: "${sourceHint}"` : undefined,
+      hasStaticInputTitle(expr.arguments) ? undefined : '__tealscriptStaticTitle: false',
+    ].filter(Boolean);
+    const namedObj = metadataEntries.length > 0
+      ? `({...${emitNamedArgsObj(expr.arguments)}, ${metadataEntries.join(', ')}})`
+      : emitNamedArgsObj(expr.arguments);
     return `ctx.input("${id}", "${funcName}", ${posArgs[0] ?? 'NaN'}, ${namedObj}, [${posArgs.slice(1).join(', ')}])`;
   }
 
   function emitStrategyCall(method: string, expr: CallExpression): string {
     const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
     const namedObj = emitNamedArgsObj(expr.arguments);
-    return `ctx.strategy${method.charAt(0).toUpperCase() + method.slice(1)}(${posArgs.join(', ')}, ${namedObj})`;
+    const args = posArgs.length > 0 ? `${posArgs.join(', ')}, ${namedObj}` : namedObj;
+    return `ctx.strategy${method.charAt(0).toUpperCase() + method.slice(1)}(${args})`;
   }
 
   function emitArrayCall(fullName: string, expr: CallExpression): string {
-    const posArgs = expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
+    const argNames = ARRAY_ARG_NAMES[fullName];
+    const posArgs = argNames
+      ? emitOrderedCallArgs(expr.arguments, argNames, ARRAY_ARG_ALIASES[fullName])
+      : expr.arguments.filter((a) => !a.name).map((a) => emitExpr(a.value));
+    if (fullName === 'array.push') return `ctx.arrayPush(${posArgs.join(', ')})`;
+    if (fullName === 'array.set') return `ctx.arraySet(${posArgs.join(', ')})`;
+    if (fullName === 'array.unshift') return `ctx.arrayUnshift(${posArgs.join(', ')})`;
+    if (fullName === 'array.insert') return `ctx.arrayInsert(${posArgs.join(', ')})`;
+    if (fullName === 'array.concat') return `ctx.arrayConcat(${posArgs.join(', ')})`;
     const mapped = ARRAY_FUNC_MAP[fullName];
     if (mapped) return `deps._arr.${mapped}(${posArgs.join(', ')})`;
     return `deps._arr.${fullName.replace('array.', '')}(${posArgs.join(', ')})`;
@@ -568,7 +2067,55 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     if (stmts.length === 1 && stmts[0].type === 'ExpressionStatement') {
       return emitExpr(stmts[0].expression);
     }
-    return 'NaN';
+    const inline = emitInlineBlockAsExpr(stmts);
+    return inline ?? 'NaN';
+  }
+
+  function emitInlineBlockAsExpr(stmts: Statement[]): string | null {
+    if (stmts.length === 0) return 'NaN';
+    const body: string[] = [];
+    for (let i = 0; i < stmts.length; i++) {
+      const stmt = stmts[i];
+      const isLast = i === stmts.length - 1;
+      if (isLast) {
+        if (stmt.type !== 'ExpressionStatement') return null;
+        body.push(`return ${emitExpr(stmt.expression)};`);
+        continue;
+      }
+      if (stmt.type === 'VariableDeclaration') {
+        if (stmt.names.type !== 'VariableDeclarator') return null;
+        if (
+          stmt.init.type === 'IfStatement'
+          || stmt.init.type === 'ForStatement'
+          || stmt.init.type === 'WhileStatement'
+        ) return null;
+        body.push(`let ${stmt.names.name.name} = ${emitExpr(stmt.init)};`);
+        continue;
+      }
+      if (stmt.type === 'AssignmentStatement') {
+        if (
+          stmt.right.type === 'IfStatement'
+          || stmt.right.type === 'ForStatement'
+          || stmt.right.type === 'WhileStatement'
+        ) return null;
+        body.push(`${emitExpr(stmt.left)} ${stmt.operator === ':=' ? '=' : stmt.operator} ${emitExpr(stmt.right)};`);
+        continue;
+      }
+      if (stmt.type === 'MultiDeclaration') {
+        for (const declaration of stmt.declarations) {
+          if (declaration.names.type !== 'VariableDeclarator') return null;
+          if (
+            declaration.init.type === 'IfStatement'
+            || declaration.init.type === 'ForStatement'
+            || declaration.init.type === 'WhileStatement'
+          ) return null;
+          body.push(`let ${declaration.names.name.name} = ${emitExpr(declaration.init)};`);
+        }
+        continue;
+      }
+      return null;
+    }
+    return `(() => { ${body.join(' ')} })()`;
   }
 
   function emitStmt(stmt: Statement, depth: number): void {
@@ -586,16 +2133,19 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         emitTupleAssignment(stmt, depth);
         break;
       case 'ExpressionStatement':
-        lines.push(`${pad}${emitExpr(stmt.expression)};`);
+        lines.push(`${pad}${emitExpressionStatement(stmt.expression, stmt.loc)};`);
         break;
       case 'IfStatement':
-        emitIf(stmt, depth);
+        emitWithRuntimeErrorLoc(stmt.loc, () => emitIf(stmt, depth));
+        break;
+      case 'OnceStatement':
+        emitWithRuntimeErrorLoc(stmt.loc, () => emitOnce(stmt, depth));
         break;
       case 'ForStatement':
-        emitFor(stmt, depth);
+        emitWithRuntimeErrorLoc(stmt.loc, () => emitFor(stmt, depth));
         break;
       case 'WhileStatement':
-        emitWhile(stmt, depth);
+        emitWithRuntimeErrorLoc(stmt.loc, () => emitWhile(stmt, depth));
         break;
       case 'BreakStatement':
         lines.push(`${pad}break;`);
@@ -627,42 +2177,149 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   function emitVarDecl(stmt: VariableDeclaration, depth: number): void {
     const pad = indent(depth);
     if (stmt.names.type === 'TupleDeclarator') {
-      if (stmt.init.type === 'IfStatement') return;
-      const rhs = emitExpr(stmt.init);
-      const tmpVar = `_tup_${stmt.names.names.map((n) => n.name).join('_')}`;
-      lines.push(`${pad}const ${tmpVar} = ${rhs};`);
+      const tmpVar = `_tup_${stmt.names.names.map((n) => n.name).join('_')}_${lines.length}`;
+      if (stmt.init.type === 'IfStatement') {
+        lines.push(`${pad}let ${tmpVar} = [];`);
+        emitIf(stmt.init, depth, tmpVar);
+      } else if (stmt.init.type === 'ForStatement') {
+        lines.push(`${pad}let ${tmpVar} = [];`);
+        emitFor(stmt.init, depth, tmpVar);
+      } else if (stmt.init.type === 'WhileStatement') {
+        lines.push(`${pad}let ${tmpVar} = [];`);
+        emitWhile(stmt.init, depth, tmpVar);
+      } else {
+        lines.push(`${pad}const ${tmpVar} = ${emitExpr(stmt.init)};`);
+      }
       for (let i = 0; i < stmt.names.names.length; i++) {
         const name = stmt.names.names[i].name;
-        if (ctx.seriesVars.has(name)) {
-          lines.push(`${pad}this._sv_${name}.push(${tmpVar}[${i}]);`);
+        const localDeclName = currentLocalName(name);
+        const isRootRegular = rootRegularVars.has(name) && depth === 2 && functionNameStack.length === 0;
+        if (localDeclName) {
+          lines.push(`${pad}let ${localDeclName} = ${tmpVar}[${i}];`);
+          emitLocalHistoryPush(pad, name, localDeclName);
+          emitFieldHistoryPush(pad, name, localDeclName);
+        } else if (ctx.seriesVars.has(name)) {
+          emitSeriesVarWrite(pad, name, `${tmpVar}[${i}]`);
+          emitLocalHistoryPush(pad, name, `this._sv_${name}.get(0)`);
+          emitFieldHistoryPush(pad, name, `this._sv_${name}.get(0)`);
+        } else if (isRootRegular) {
+          lines.push(`${pad}this._g_${name} = ${tmpVar}[${i}];`);
+          emitLocalHistoryPush(pad, name, `this._g_${name}`);
+          emitFieldHistoryPush(pad, name, `this._g_${name}`);
         } else {
           lines.push(`${pad}let ${name} = ${tmpVar}[${i}];`);
+          emitLocalHistoryPush(pad, name, name);
+          emitFieldHistoryPush(pad, name, name);
         }
       }
       return;
     }
 
     const name = stmt.names.name.name;
+    const isRootExecutionScope = depth === 2 && functionNameStack.length === 0;
 
     if (stmt.kind === 'var' || stmt.kind === 'varip') {
+      const persistentStart = `_drawStart_${name}`;
+      const localPersistent = currentPersistentLocalName(name);
+      if (localPersistent) {
+        const initFlag = `_state.__init_${name}`;
+        lines.push(`${pad}if (!${initFlag}) {`);
+        lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
+        if (stmt.init.type === 'IfStatement') {
+          lines.push(`${pad}  ${localPersistent} = NaN;`);
+          emitIf(stmt.init, depth + 1, localPersistent);
+        } else if (stmt.init.type === 'ForStatement') {
+          lines.push(`${pad}  ${localPersistent} = NaN;`);
+          emitFor(stmt.init, depth + 1, localPersistent);
+        } else if (stmt.init.type === 'WhileStatement') {
+          lines.push(`${pad}  ${localPersistent} = NaN;`);
+          emitWhile(stmt.init, depth + 1, localPersistent);
+        } else {
+          lines.push(`${pad}  ${localPersistent} = ${emitExpr(stmt.init)};`);
+        }
+        lines.push(`${pad}  ctx.markPersistentRuntimeValue(${localPersistent});`);
+        lines.push(`${pad}  ${initFlag} = true;`);
+        lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
+        lines.push(`${pad}}`);
+        return;
+      }
       if (stmt.init.type === 'IfStatement') {
-        lines.push(`${pad}if (ctx.barIndex === 0) {`);
+        lines.push(`${pad}if (!this.__init_${name}) {`);
+        lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
         lines.push(`${pad}  this._v_${name} = NaN;`);
         emitIf(stmt.init, depth + 1, `this._v_${name}`);
+        lines.push(`${pad}  ctx.markPersistentRuntimeValue(this._v_${name});`);
+        lines.push(`${pad}  this.__init_${name} = true;`);
+        lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
+        lines.push(`${pad}}`);
+      } else if (stmt.init.type === 'ForStatement') {
+        lines.push(`${pad}if (!this.__init_${name}) {`);
+        lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
+        lines.push(`${pad}  this._v_${name} = NaN;`);
+        emitFor(stmt.init, depth + 1, `this._v_${name}`);
+        lines.push(`${pad}  ctx.markPersistentRuntimeValue(this._v_${name});`);
+        lines.push(`${pad}  this.__init_${name} = true;`);
+        lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
+        lines.push(`${pad}}`);
+      } else if (stmt.init.type === 'WhileStatement') {
+        lines.push(`${pad}if (!this.__init_${name}) {`);
+        lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
+        lines.push(`${pad}  this._v_${name} = NaN;`);
+        emitWhile(stmt.init, depth + 1, `this._v_${name}`);
+        lines.push(`${pad}  ctx.markPersistentRuntimeValue(this._v_${name});`);
+        lines.push(`${pad}  this.__init_${name} = true;`);
+        lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
         lines.push(`${pad}}`);
       } else {
-        lines.push(`${pad}if (ctx.barIndex === 0) this._v_${name} = ${emitExpr(stmt.init)};`);
+        lines.push(`${pad}if (!this.__init_${name}) {`);
+        lines.push(`${pad}  const ${persistentStart} = ctx.drawingCount();`);
+        lines.push(`${pad}  this._v_${name} = ${emitExpr(stmt.init)};`);
+        lines.push(`${pad}  ctx.markPersistentRuntimeValue(this._v_${name});`);
+        lines.push(`${pad}  this.__init_${name} = true;`);
+        lines.push(`${pad}  ctx.markDrawingsPersistentFrom(${persistentStart});`);
+        lines.push(`${pad}}`);
+      }
+      if (ctx.seriesVars.has(name)) {
+        emitSeriesVarWrite(pad, name, `ctx.barIndex === 0 ? this._v_${name} : this._sv_${name}.get(0)`);
       }
       return;
     }
 
     // Regular variable
     if (stmt.init.type === 'IfStatement') {
-      lines.push(`${pad}let ${name} = NaN;`);
-      emitIf(stmt.init, depth, name);
+      const localDeclName = currentLocalName(name);
+      const target = localDeclName ?? (rootRegularVars.has(name) && isRootExecutionScope ? `this._g_${name}` : name);
+      lines.push(rootRegularVars.has(name) && isRootExecutionScope ? `${pad}${target} = NaN;` : `${pad}let ${target} = NaN;`);
+      emitIf(stmt.init, depth, target);
       if (ctx.seriesVars.has(name)) {
-        lines.push(`${pad}this._sv_${name}.push(${name});`);
+        emitSeriesVarWrite(pad, name, target);
       }
+      emitLocalHistoryPush(pad, name, target);
+      emitFieldHistoryPush(pad, name, target);
+      return;
+    }
+    if (stmt.init.type === 'ForStatement') {
+      const localDeclName = currentLocalName(name);
+      const target = localDeclName ?? (rootRegularVars.has(name) && isRootExecutionScope ? `this._g_${name}` : name);
+      lines.push(rootRegularVars.has(name) && isRootExecutionScope ? `${pad}${target} = NaN;` : `${pad}let ${target} = NaN;`);
+      emitFor(stmt.init, depth, target);
+      if (ctx.seriesVars.has(name)) {
+        emitSeriesVarWrite(pad, name, target);
+      }
+      emitLocalHistoryPush(pad, name, target);
+      emitFieldHistoryPush(pad, name, target);
+      return;
+    }
+    if (stmt.init.type === 'WhileStatement') {
+      const localDeclName = currentLocalName(name);
+      const target = localDeclName ?? (rootRegularVars.has(name) && isRootExecutionScope ? `this._g_${name}` : name);
+      lines.push(rootRegularVars.has(name) && isRootExecutionScope ? `${pad}${target} = NaN;` : `${pad}let ${target} = NaN;`);
+      emitWhile(stmt.init, depth, target);
+      if (ctx.seriesVars.has(name)) {
+        emitSeriesVarWrite(pad, name, target);
+      }
+      emitLocalHistoryPush(pad, name, target);
+      emitFieldHistoryPush(pad, name, target);
       return;
     }
 
@@ -674,46 +2331,115 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       return;
     }
 
-    if (ctx.seriesVars.has(name)) {
-      lines.push(`${pad}this._sv_${name}.push(${rhs});`);
+    const localDeclName = currentLocalName(name);
+    if (localDeclName) {
+      lines.push(`${pad}let ${localDeclName} = ${rhs};`);
+      emitLocalHistoryPush(pad, name, localDeclName);
+      emitFieldHistoryPush(pad, name, localDeclName);
+    } else if (ctx.seriesVars.has(name)) {
+      emitSeriesVarWrite(pad, name, rhs);
+      emitLocalHistoryPush(pad, name, `this._sv_${name}.get(0)`);
+      emitFieldHistoryPush(pad, name, `this._sv_${name}.get(0)`);
+    } else if (rootRegularVars.has(name) && isRootExecutionScope) {
+      lines.push(`${pad}this._g_${name} = ${rhs};`);
+      emitFieldHistoryPush(pad, name, `this._g_${name}`);
     } else {
       lines.push(`${pad}let ${name} = ${rhs};`);
+      emitLocalHistoryPush(pad, name, name);
+      emitFieldHistoryPush(pad, name, name);
     }
   }
 
   function emitAssignment(stmt: AssignmentStatement, depth: number): void {
     const pad = indent(depth);
     if (stmt.right.type === 'IfStatement') {
-      const target = stmt.left.type === 'Identifier' ? emitIdentifier(stmt.left) : emitExpr(stmt.left);
-      emitIf(stmt.right, depth, target);
+      const tmpVar = `_if_${lines.length}`;
+      lines.push(`${pad}let ${tmpVar} = NaN;`);
+      emitIf(stmt.right, depth, tmpVar);
+      emitAssignmentWithValue(stmt, depth, tmpVar);
       return;
     }
+    if (stmt.right.type === 'ForStatement' || stmt.right.type === 'WhileStatement') {
+      const tmpVar = `_loop_${lines.length}`;
+      lines.push(`${pad}let ${tmpVar} = NaN;`);
+      if (stmt.right.type === 'ForStatement') emitFor(stmt.right, depth, tmpVar);
+      else emitWhile(stmt.right, depth, tmpVar);
+      emitAssignmentWithValue(stmt, depth, tmpVar);
+      return;
+    }
+    emitAssignmentWithValue(stmt, depth, emitExpr(stmt.right));
+  }
 
-    const rhs = emitExpr(stmt.right);
-
+  function emitAssignmentWithValue(stmt: AssignmentStatement, depth: number, rhs: string): void {
+    const pad = indent(depth);
     if (stmt.left.type === 'Identifier') {
       const name = stmt.left.name;
-      if (ctx.seriesVars.has(name)) {
+      const persistentAssignmentStart = isPersistentAssignmentTarget(name) ? `_drawStart_assign_${name}_${lines.length}` : undefined;
+      if (persistentAssignmentStart) {
+        lines.push(`${pad}const ${persistentAssignmentStart} = ctx.drawingCount();`);
+      }
+      const localName = currentLocalName(name);
+      if (localName && !currentPersistentLocalName(name)) {
         if (stmt.operator === ':=') {
-          lines.push(`${pad}this._sv_${name}.update(${rhs});`);
+          lines.push(`${pad}${localName} = ${rhs};`);
+        } else {
+          lines.push(`${pad}${localName} ${stmt.operator} ${rhs};`);
+        }
+        emitLocalHistoryPush(pad, name, localName);
+        if (persistentAssignmentStart) {
+          lines.push(`${pad}ctx.markPersistentRuntimeValue(${localName});`);
+          lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
+        }
+        return;
+      }
+      if (ctx.seriesVars.has(name)) {
+        const tmpVar = `_assign_${name}_${lines.length}`;
+        if (stmt.operator === ':=') {
+          lines.push(`${pad}const ${tmpVar} = ${rhs};`);
         } else {
           const op = stmt.operator.charAt(0);
-          lines.push(`${pad}this._sv_${name}.update(this._sv_${name}.get(0) ${op} ${rhs});`);
+          lines.push(`${pad}const ${tmpVar} = this._sv_${name}.get(0) ${op} ${rhs};`);
+        }
+        emitSeriesVarWrite(pad, name, tmpVar);
+        if (persistentAssignmentStart) {
+          lines.push(`${pad}ctx.markPersistentRuntimeValue(${tmpVar});`);
+          lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
         }
         return;
       }
       if (ctx.varDecls.some((v) => v.name === name)) {
+        const localPersistent = currentPersistentLocalName(name);
+        if (localPersistent) {
+          if (stmt.operator === ':=') {
+            lines.push(`${pad}${localPersistent} = ${rhs};`);
+          } else {
+            lines.push(`${pad}${localPersistent} ${stmt.operator} ${rhs};`);
+          }
+          if (persistentAssignmentStart) {
+            lines.push(`${pad}ctx.markPersistentRuntimeValue(${localPersistent});`);
+            lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
+          }
+          return;
+        }
         if (stmt.operator === ':=') {
           lines.push(`${pad}this._v_${name} = ${rhs};`);
         } else {
           lines.push(`${pad}this._v_${name} ${stmt.operator} ${rhs};`);
         }
+        if (persistentAssignmentStart) {
+          lines.push(`${pad}ctx.markPersistentRuntimeValue(this._v_${name});`);
+          lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
+        }
         return;
       }
       if (stmt.operator === ':=') {
-        lines.push(`${pad}${name} = ${rhs};`);
+        lines.push(`${pad}${emitAssignmentTarget(name)} = ${rhs};`);
       } else {
-        lines.push(`${pad}${name} ${stmt.operator} ${rhs};`);
+        lines.push(`${pad}${emitAssignmentTarget(name)} ${stmt.operator} ${rhs};`);
+      }
+      if (persistentAssignmentStart) {
+        lines.push(`${pad}ctx.markPersistentRuntimeValue(${emitAssignmentTarget(name)});`);
+        lines.push(`${pad}if (${persistentAssignmentStart} !== undefined) ctx.markDrawingsPersistentFrom(${persistentAssignmentStart});`);
       }
       return;
     }
@@ -727,6 +2453,10 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         const op = stmt.operator.charAt(0);
         lines.push(`${pad}_setField(${obj}, "${field}", _getField(${obj}, "${field}") ${op} ${rhs});`);
       }
+      lines.push(`${pad}ctx.markPersistentUdtField(${obj}, "${field}");`);
+      if (stmt.left.object.type === 'Identifier') {
+        emitFieldHistoryPush(pad, stmt.left.object.name, obj);
+      }
       return;
     }
     lines.push(`${pad}${emitExpr(stmt.left)} ${stmt.operator === ':=' ? '=' : stmt.operator} ${rhs};`);
@@ -734,17 +2464,39 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   function emitTupleAssignment(stmt: TupleAssignment, depth: number): void {
     const pad = indent(depth);
-    const rhs = emitExpr(stmt.right);
-    const tmpVar = `_tup_${stmt.names.map((n) => n.name).join('_')}`;
-    lines.push(`${pad}const ${tmpVar} = ${rhs};`);
+    const tmpVar = `_tup_${stmt.names.map((n) => n.name).join('_')}_${lines.length}`;
+    if (stmt.right.type === 'IfStatement') {
+      lines.push(`${pad}let ${tmpVar} = [];`);
+      emitIf(stmt.right, depth, tmpVar);
+    } else if (stmt.right.type === 'ForStatement') {
+      lines.push(`${pad}let ${tmpVar} = [];`);
+      emitFor(stmt.right, depth, tmpVar);
+    } else if (stmt.right.type === 'WhileStatement') {
+      lines.push(`${pad}let ${tmpVar} = [];`);
+      emitWhile(stmt.right, depth, tmpVar);
+    } else {
+      lines.push(`${pad}const ${tmpVar} = ${emitExpr(stmt.right)};`);
+    }
     for (let i = 0; i < stmt.names.length; i++) {
       const name = stmt.names[i].name;
-      if (ctx.seriesVars.has(name)) {
-        lines.push(`${pad}this._sv_${name}.update(${tmpVar}[${i}]);`);
-      } else if (ctx.varDecls.some((v) => v.name === name)) {
-        lines.push(`${pad}this._v_${name} = ${tmpVar}[${i}];`);
+      const localName = currentLocalName(name);
+      if (localName && !currentPersistentLocalName(name)) {
+        lines.push(`${pad}${localName} = ${tmpVar}[${i}];`);
+        emitLocalHistoryPush(pad, name, localName);
+        emitFieldHistoryPush(pad, name, localName);
+      } else if (ctx.seriesVars.has(name)) {
+        emitSeriesVarWrite(pad, name, `${tmpVar}[${i}]`);
+        emitLocalHistoryPush(pad, name, `this._sv_${name}.get(0)`);
+        emitFieldHistoryPush(pad, name, `this._sv_${name}.get(0)`);
       } else {
-        lines.push(`${pad}${name} = ${tmpVar}[${i}];`);
+        const localPersistent = currentPersistentLocalName(name);
+        if (localPersistent) {
+          lines.push(`${pad}${localPersistent} = ${tmpVar}[${i}];`);
+        } else if (ctx.varDecls.some((v) => v.name === name)) {
+          lines.push(`${pad}this._v_${name} = ${tmpVar}[${i}];`);
+        } else {
+          lines.push(`${pad}${emitAssignmentTarget(name)} = ${tmpVar}[${i}];`);
+        }
       }
     }
   }
@@ -791,7 +2543,53 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
   }
 
-  function emitFor(stmt: ForStatement, depth: number): void {
+  function onceStateMember(stmt: OnceStatement): string {
+    const start = stmt.loc?.start;
+    return `_once_${start?.offset ?? start?.line ?? 0}_${start?.column ?? 0}`;
+  }
+
+  function emitOnce(stmt: OnceStatement, depth: number): void {
+    const pad = indent(depth);
+    const member = onceStateMember(stmt);
+    onceStateMembers.add(member);
+    const condition = stmt.test ? `_isTruthy(${emitExpr(stmt.test)})` : 'true';
+    lines.push(`${pad}if (!this.${member} && ${condition}) {`);
+    lines.push(`${indent(depth + 1)}this.${member} = true;`);
+    for (const s of stmt.body) emitStmt(s, depth + 1);
+    lines.push(`${pad}}`);
+  }
+
+  function emitTailAssignment(stmt: Statement, depth: number, assignTarget: string): boolean {
+    if (stmt.type === 'ExpressionStatement') {
+      lines.push(`${indent(depth)}${assignTarget} = ${emitExpr(stmt.expression)};`);
+      return true;
+    }
+    if (stmt.type === 'IfStatement') {
+      emitIf(stmt, depth, assignTarget);
+      return true;
+    }
+    if (stmt.type === 'ForStatement') {
+      emitFor(stmt, depth, assignTarget);
+      return true;
+    }
+    if (stmt.type === 'WhileStatement') {
+      emitWhile(stmt, depth, assignTarget);
+      return true;
+    }
+    return false;
+  }
+
+  function emitLoopBody(stmts: Statement[], depth: number, assignTarget?: string): void {
+    if (!assignTarget || stmts.length === 0) {
+      for (const s of stmts) emitStmt(s, depth);
+      return;
+    }
+    const lastStmt = stmts[stmts.length - 1];
+    for (let i = 0; i < stmts.length - 1; i++) emitStmt(stmts[i], depth);
+    if (!emitTailAssignment(lastStmt, depth, assignTarget)) emitStmt(lastStmt, depth);
+  }
+
+  function emitFor(stmt: ForStatement, depth: number, assignTarget?: string): void {
     const pad = indent(depth);
     if (stmt.kind === 'numeric') {
       const counter = stmt.counter.name;
@@ -800,7 +2598,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
       const step = stmt.step ? emitExpr(stmt.step) : '1';
       lines.push(`${pad}for (let ${counter} = ${start}, _end = ${end}, _step = ${step}, _iter = 0; _step > 0 ? ${counter} <= _end : ${counter} >= _end; ${counter} += _step, _iter++) {`);
       lines.push(`${indent(depth + 1)}if (_iter >= ${ITERATION_CAP}) break;`);
-      for (const s of stmt.body) emitStmt(s, depth + 1);
+      localNameStack.push(new Map([[counter, counter]]));
+      emitLoopBody(stmt.body, depth + 1, assignTarget);
+      localNameStack.pop();
       lines.push(`${pad}}`);
     } else {
       const counter = stmt.counter.name;
@@ -812,20 +2612,96 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
         lines.push(`${pad}for (let _i = 0; _i < ${entriesVar}.length && _i < ${ITERATION_CAP}; _i++) {`);
         lines.push(`${indent(depth + 1)}let ${stmt.indexCounter.name} = ${entriesVar}[_i][0];`);
         lines.push(`${indent(depth + 1)}let ${counter} = ${entriesVar}[_i][1];`);
+        localNameStack.push(new Map([[stmt.indexCounter.name, stmt.indexCounter.name], [counter, counter]]));
       } else {
         lines.push(`${pad}{ const ${iterVar} = ${iterable}; for (let _i = 0; _i < _iterSize(${iterVar}) && _i < ${ITERATION_CAP}; _i++) {`);
         lines.push(`${indent(depth + 1)}let ${counter} = _iterGet(${iterVar}, _i);`);
+        localNameStack.push(new Map([[counter, counter]]));
       }
-      for (const s of stmt.body) emitStmt(s, depth + 1);
+      emitLoopBody(stmt.body, depth + 1, assignTarget);
+      localNameStack.pop();
       lines.push(`${pad}}}`)
     }
   }
 
-  function emitWhile(stmt: WhileStatement, depth: number): void {
+  function emitWhile(stmt: WhileStatement, depth: number, assignTarget?: string): void {
     const pad = indent(depth);
     lines.push(`${pad}for (let _iter = 0; _iter < ${ITERATION_CAP} && _isTruthy(${emitExpr(stmt.test)}); _iter++) {`);
-    for (const s of stmt.body) emitStmt(s, depth + 1);
+    emitLoopBody(stmt.body, depth + 1, assignTarget);
     lines.push(`${pad}}`);
+  }
+
+  function collectFunctionLocalNames(stmts: Statement[]): Map<string, string> {
+    const names = new Map<string, string>();
+    const visit = (stmt: Statement): void => {
+      if (stmt.type === 'VariableDeclaration') {
+        if (stmt.kind === 'var' || stmt.kind === 'varip') return;
+        if (stmt.names.type === 'VariableDeclarator') {
+          names.set(stmt.names.name.name, stmt.names.name.name);
+        } else {
+          for (const name of stmt.names.names) names.set(name.name, name.name);
+        }
+      } else if (stmt.type === 'MultiDeclaration') {
+        for (const declaration of stmt.declarations) visit(declaration);
+      } else if (stmt.type === 'IfStatement') {
+        for (const child of stmt.consequent) visit(child);
+        if (Array.isArray(stmt.alternate)) {
+          for (const child of stmt.alternate) visit(child);
+        } else if (stmt.alternate) {
+          visit(stmt.alternate);
+        }
+      } else if (stmt.type === 'ForStatement' || stmt.type === 'WhileStatement') {
+        for (const child of stmt.body) visit(child);
+      }
+    };
+    for (const stmt of stmts) visit(stmt);
+    return names;
+  }
+
+  function emitsFunctionNameReturn(stmt: Statement, functionName: string): boolean {
+    if (stmt.type === 'VariableDeclaration' && stmt.names.type === 'VariableDeclarator') {
+      return stmt.names.name.name === functionName;
+    }
+    return stmt.type === 'AssignmentStatement'
+      && stmt.left.type === 'Identifier'
+      && stmt.left.name === functionName;
+  }
+
+  function emitFunctionBody(stmts: Statement[], functionName: string): void {
+    if (stmts.length === 0) return;
+    const functionLocals = collectFunctionLocalNames(stmts);
+    localNameStack.push(functionLocals);
+    const lastStmt = stmts[stmts.length - 1];
+    for (let i = 0; i < stmts.length - 1; i++) {
+      emitStmt(stmts[i], 2);
+    }
+    if (lastStmt.type === 'ExpressionStatement') {
+      lines.push(`    return ${emitExpr(lastStmt.expression)};`);
+      localNameStack.pop();
+      return;
+    }
+    if (lastStmt.type === 'IfStatement') {
+      const retName = `_fn_ret_${lines.length}`;
+      lines.push(`    let ${retName} = NaN;`);
+      emitIf(lastStmt, 2, retName);
+      lines.push(`    return ${retName};`);
+      localNameStack.pop();
+      return;
+    }
+    if (lastStmt.type === 'ForStatement' || lastStmt.type === 'WhileStatement') {
+      const retName = `_fn_ret_${lines.length}`;
+      lines.push(`    let ${retName} = NaN;`);
+      if (lastStmt.type === 'ForStatement') emitFor(lastStmt, 2, retName);
+      else emitWhile(lastStmt, 2, retName);
+      lines.push(`    return ${retName};`);
+      localNameStack.pop();
+      return;
+    }
+    emitStmt(lastStmt, 2);
+    if (emitsFunctionNameReturn(lastStmt, functionName)) {
+      lines.push(`    return ${currentLocalName(functionName) ?? emitAssignmentTarget(functionName)};`);
+    }
+    localNameStack.pop();
   }
 
   // --- Generate the class ---
@@ -852,32 +2728,193 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
 
   // Series vars
   for (const name of ctx.seriesVars) {
-    lines.push(`    this._sv_${name} = new deps.NumericSeries(deps.maxBarsBack);`);
+    lines.push(`    this._sv_${name} = new deps.ValueSeries(deps.maxBarsBack);`);
+    lines.push(`    this._sv_bar_${name} = -1;`);
+  }
+  for (const [objectName, fields] of fieldHistory) {
+    for (const field of fields) {
+      lines.push(`    this.${fieldHistoryMemberName(objectName, field)} = new deps.ValueSeries(deps.maxBarsBack);`);
+    }
   }
 
   // Var/varip
   for (const v of ctx.varDecls) {
     lines.push(`    this._v_${v.name} = NaN;`);
+    lines.push(`    this.__init_${v.name} = false;`);
+  }
+  for (const name of rootRegularVars) {
+    if (!ctx.seriesVars.has(name) && !ctx.varDecls.some((v) => v.name === name)) {
+      lines.push(`    this._g_${name} = NaN;`);
+    }
+  }
+  for (const [callExpr, id] of functionEmitContext.callSites) {
+    const localVars = callSiteLocalVars(callExpr);
+    const hasTACalls = callSiteHasTACalls(callExpr);
+    if (callSiteNeedsState(callExpr)) {
+      lines.push(`    this._fn_state_${id} = {`);
+      for (const localVar of localVars) {
+        lines.push(`      _v_${localVar.name}: NaN,`);
+        lines.push(`      __init_${localVar.name}: false,`);
+      }
+      if (hasTACalls) {
+        lines.push('      __taCache: new Map(),');
+        lines.push('      __taSeries: new Map(),');
+      }
+      lines.push('    };');
+    }
+    for (const param of callSiteHistoryParams(callExpr)) {
+      lines.push(`    this._fn_param_series_${id}_${param} = new deps.ValueSeries(deps.maxBarsBack);`);
+    }
+    for (const local of callSiteHistoryLocals(callExpr)) {
+      lines.push(`    this._fn_local_series_${id}_${local} = new deps.ValueSeries(deps.maxBarsBack);`);
+    }
   }
 
   // TA members
   for (const site of ctx.taCallSites) {
+    if (site.dynamicCtorArgExprs) continue;
     const argsStr = site.ctorArgs.map((a) => JSON.stringify(a)).join(', ');
     lines.push(`    this.${site.memberName} = new deps.${site.className}(${argsStr});`);
+  }
+  for (const site of ctx.taCallSites) {
+    lines.push(`    this._ta_result_${site.memberName} = new deps.NumericSeries(deps.maxBarsBack);`);
+  }
+  for (const site of ctx.taVarSites) {
+    lines.push(`    this.${site.memberName} = new deps.${site.className}();`);
+    lines.push(`    this.${site.seriesName} = new deps.NumericSeries(deps.maxBarsBack);`);
   }
 
   // Placeholder for fixnan members (filled after body emission)
   const fixnanPlaceholderIdx = lines.length;
+  lines.push('    this._dynamicTACache = new Map();');
+  lines.push('  }');
+
+  lines.push('  _dynamicTA(memberName, className, args) {');
+  lines.push('    const key = memberName + ":" + args.map((arg) => typeof arg + "=" + String(arg)).join("|");');
+  lines.push('    let entry = this._dynamicTACache.get(key);');
+  lines.push('    if (!entry) {');
+  lines.push('      entry = { className, args, instance: new this._deps[className](...args) };');
+  lines.push('      this._dynamicTACache.set(key, entry);');
+  lines.push('    }');
+  lines.push('    return entry.instance;');
+  lines.push('  }');
+  lines.push('  _scopedTA(state, memberName, className, args) {');
+  lines.push('    if (!state) return this._dynamicTA(memberName, className, args);');
+  lines.push('    if (!state.__taCache) state.__taCache = new Map();');
+  lines.push('    const key = memberName + ":" + args.map((arg) => typeof arg + "=" + String(arg)).join("|");');
+  lines.push('    let entry = state.__taCache.get(key);');
+  lines.push('    if (!entry) {');
+  lines.push('      entry = { className, args, instance: new this._deps[className](...args) };');
+  lines.push('      state.__taCache.set(key, entry);');
+  lines.push('    }');
+  lines.push('    return entry.instance;');
+  lines.push('  }');
+  lines.push('  _scopedTASeries(state, memberName) {');
+  lines.push('    if (!state) return this[`_ta_result_${memberName}`];');
+  lines.push('    if (!state.__taSeries) state.__taSeries = new Map();');
+  lines.push('    let series = state.__taSeries.get(memberName);');
+  lines.push('    if (!series) {');
+  lines.push('      series = new this._deps.NumericSeries(this._deps.maxBarsBack);');
+  lines.push('      state.__taSeries.set(memberName, series);');
+  lines.push('    }');
+  lines.push('    return series;');
+  lines.push('  }');
+  lines.push('  _childFnState(parentState, callSiteId, localNames, hasTACalls) {');
+  lines.push('    if (!parentState) return undefined;');
+  lines.push('    if (!parentState.__fnStates) parentState.__fnStates = new Map();');
+  lines.push('    let state = parentState.__fnStates.get(callSiteId);');
+  lines.push('    if (!state) {');
+  lines.push('      state = {};');
+  lines.push('      for (const name of localNames) {');
+  lines.push('        state[`_v_${name}`] = NaN;');
+  lines.push('        state[`__init_${name}`] = false;');
+  lines.push('      }');
+  lines.push('      if (hasTACalls) {');
+  lines.push('        state.__taCache = new Map();');
+  lines.push('        state.__taSeries = new Map();');
+  lines.push('      }');
+  lines.push('      parentState.__fnStates.set(callSiteId, state);');
+  lines.push('    }');
+  lines.push('    return state;');
+  lines.push('  }');
+  lines.push('  _saveChildFnStates(states) {');
+  lines.push('    return Array.from((states ?? new Map()).entries()).map(([key, state]) => [key, this._saveFnState(state)]);');
+  lines.push('  }');
+  lines.push('  _saveFnState(state) {');
+  lines.push('    const snap = {};');
+  lines.push('    for (const [key, value] of Object.entries(state)) {');
+  lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__fnStates") snap[key] = value;');
+  lines.push('    }');
+  lines.push('    if (state.__taCache) snap.__taCache = Array.from(state.__taCache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]);');
+  lines.push('    if (state.__taSeries) snap.__taSeries = Array.from(state.__taSeries.entries()).map(([key, series]) => [key, series.save()]);');
+  lines.push('    if (state.__fnStates) snap.__fnStates = this._saveChildFnStates(state.__fnStates);');
+  lines.push('    return snap;');
+  lines.push('  }');
+  lines.push('  _restoreChildFnStates(snapshots) {');
+  lines.push('    const states = new Map();');
+  lines.push('    for (const [key, snap] of snapshots ?? []) {');
+  lines.push('      const state = {};');
+  lines.push('      this._restoreFnState(state, snap);');
+  lines.push('      states.set(key, state);');
+  lines.push('    }');
+  lines.push('    return states;');
+  lines.push('  }');
+  lines.push('  _restoreFnState(state, snap) {');
+  lines.push('    for (const [key, value] of Object.entries(snap ?? {})) {');
+  lines.push('      if (key !== "__taCache" && key !== "__taSeries" && key !== "__fnStates") state[key] = value;');
+  lines.push('    }');
+  lines.push('    state.__taCache = new Map();');
+  lines.push('    for (const [key, className, args, saved] of snap?.__taCache ?? []) {');
+  lines.push('      const instance = new this._deps[className](...args);');
+  lines.push('      instance.restore(saved);');
+  lines.push('      state.__taCache.set(key, { className, args, instance });');
+  lines.push('    }');
+  lines.push('    state.__taSeries = new Map();');
+  lines.push('    for (const [key, saved] of snap?.__taSeries ?? []) {');
+  lines.push('      const series = new this._deps.NumericSeries(this._deps.maxBarsBack);');
+  lines.push('      series.restore(saved);');
+  lines.push('      state.__taSeries.set(key, series);');
+  lines.push('    }');
+  lines.push('    state.__fnStates = this._restoreChildFnStates(snap?.__fnStates);');
   lines.push('  }');
 
   // User-defined functions
   for (const [name, fi] of ctx.funcInfos) {
-    lines.push(`  _fn_${name}(${fi.params.join(', ')}) {`);
+    const paramNames = fi.params.map(localParamName);
+    const sourceParamNames = fi.params.map(localSourceParamName);
+    const historyParamNames = fi.params.map(localHistoryParamName);
+    const localHistoryVars = [...(functionEmitContext.localHistory.get(name) ?? new Set())];
+    const localHistoryParamNames = localHistoryVars.map(localVariableHistoryParamName);
+    const localNames = new Map(fi.params.map((param) => [param, localParamName(param)]));
+    const localSourceNames = new Map(fi.params.map((param) => [param, localSourceParamName(param)]));
+    const localHistoryNames = new Map([
+      ...fi.params.map((param) => [param, localHistoryParamName(param)] as [string, string]),
+      ...localHistoryVars.map((local) => [local, localVariableHistoryParamName(local)] as [string, string]),
+    ]);
+    const localVars = new Map((functionEmitContext.localVars.get(name) ?? []).map((v) => [v.name, `_state._v_${v.name}`]));
+    const functionParams = ['ctx', '_state', ...paramNames, ...sourceParamNames, ...historyParamNames, ...localHistoryParamNames].join(', ');
+    lines.push(`  _fn_${name}(${functionParams}) {`);
+    functionNameStack.push(name);
+    localNameStack.push(localNames);
+    localSourceNameStack.push(localSourceNames);
+    localHistoryNameStack.push(localHistoryNames);
+    persistentLocalStack.push(localVars);
+    for (let i = 0; i < fi.params.length; i++) {
+      const defaultExpr = fi.paramDefaults[i];
+      if (defaultExpr) {
+        lines.push(`    if (${paramNames[i]} === undefined) ${paramNames[i]} = ${emitExpr(defaultExpr)};`);
+      }
+    }
     if (Array.isArray(fi.body)) {
-      for (const s of fi.body) emitStmt(s, 2);
+      emitFunctionBody(fi.body, name);
     } else {
       lines.push(`    return ${emitExpr(fi.body)};`);
     }
+    persistentLocalStack.pop();
+    localHistoryNameStack.pop();
+    localSourceNameStack.pop();
+    localNameStack.pop();
+    functionNameStack.pop();
     lines.push('  }');
   }
 
@@ -904,6 +2941,11 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
   }
 
+  // Update TA variable series
+  for (const site of ctx.taVarSites) {
+    lines.push(`    this.${site.seriesName}.push(this.${site.memberName}.compute(ctx.bar.open, ctx.bar.high, ctx.bar.low, ctx.bar.close, ctx.bar.volume));`);
+  }
+
   // Emit body
   for (const stmt of ast.body) {
     emitStmt(stmt, 2);
@@ -919,6 +2961,9 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
     }
     lines.splice(fixnanPlaceholderIdx, 0, ...fixnanLines);
   }
+  for (const member of onceStateMembers) {
+    lines.splice(fixnanPlaceholderIdx, 0, `    this.${member} = false;`);
+  }
 
   // save/restore for realtime rollback
   lines.push('  save() {');
@@ -933,15 +2978,63 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
   for (const name of ctx.seriesVars) {
     lines.push(`      _sv_${name}: this._sv_${name}.save(),`);
+    lines.push(`      _sv_bar_${name}: this._sv_bar_${name},`);
+  }
+  for (const [objectName, fields] of fieldHistory) {
+    for (const field of fields) {
+      const member = fieldHistoryMemberName(objectName, field);
+      lines.push(`      ${member}: this.${member}.save(),`);
+    }
   }
   for (const v of ctx.varDecls) {
     lines.push(`      _v_${v.name}: this._v_${v.name},`);
+    lines.push(`      __init_${v.name}: this.__init_${v.name},`);
+  }
+  for (const name of rootRegularVars) {
+    if (!ctx.seriesVars.has(name) && !ctx.varDecls.some((v) => v.name === name)) {
+      lines.push(`      _g_${name}: this._g_${name},`);
+    }
+  }
+  for (const [callExpr, id] of functionEmitContext.callSites) {
+    const localVars = callSiteLocalVars(callExpr);
+    const hasTACalls = callSiteHasTACalls(callExpr);
+    if (callSiteNeedsState(callExpr)) {
+      lines.push(`      _fn_state_${id}: {`);
+      for (const localVar of localVars) {
+        lines.push(`        _v_${localVar.name}: this._fn_state_${id}._v_${localVar.name},`);
+        lines.push(`        __init_${localVar.name}: this._fn_state_${id}.__init_${localVar.name},`);
+      }
+      if (hasTACalls) {
+        lines.push(`        __taCache: Array.from(this._fn_state_${id}.__taCache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]),`);
+        lines.push(`        __taSeries: Array.from(this._fn_state_${id}.__taSeries.entries()).map(([key, series]) => [key, series.save()]),`);
+      }
+      lines.push(`        __fnStates: this._saveChildFnStates(this._fn_state_${id}.__fnStates),`);
+      lines.push('      },');
+    }
+    for (const param of callSiteHistoryParams(callExpr)) {
+      lines.push(`      _fn_param_series_${id}_${param}: this._fn_param_series_${id}_${param}.save(),`);
+    }
+    for (const local of callSiteHistoryLocals(callExpr)) {
+      lines.push(`      _fn_local_series_${id}_${local}: this._fn_local_series_${id}_${local}.save(),`);
+    }
   }
   for (const site of ctx.taCallSites) {
+    if (site.dynamicCtorArgExprs) continue;
     lines.push(`      ${site.memberName}: this.${site.memberName}.save(),`);
+  }
+  for (const site of ctx.taCallSites) {
+    lines.push(`      _ta_result_${site.memberName}: this._ta_result_${site.memberName}.save(),`);
+  }
+  lines.push('      _dynamicTACache: Array.from(this._dynamicTACache.entries()).map(([key, entry]) => [key, entry.className, entry.args, entry.instance.save()]),');
+  for (const site of ctx.taVarSites) {
+    lines.push(`      ${site.memberName}: this.${site.memberName}.save(),`);
+    lines.push(`      ${site.seriesName}: this.${site.seriesName}.save(),`);
   }
   for (let i = 0; i < fixnanIndex; i++) {
     lines.push(`      _fixnan_${i}: this._fixnan_${i},`);
+  }
+  for (const member of onceStateMembers) {
+    lines.push(`      ${member}: this.${member},`);
   }
   lines.push('    };');
   lines.push('  }');
@@ -957,17 +3050,81 @@ export function emit(ast: Program, ctx: AnalysisContext): string {
   }
   for (const name of ctx.seriesVars) {
     lines.push(`    this._sv_${name}.restore(snap._sv_${name});`);
+    lines.push(`    this._sv_bar_${name} = snap._sv_bar_${name};`);
+  }
+  for (const [objectName, fields] of fieldHistory) {
+    for (const field of fields) {
+      const member = fieldHistoryMemberName(objectName, field);
+      lines.push(`    this.${member}.restore(snap.${member});`);
+    }
   }
   for (const v of ctx.varDecls) {
     if (v.kind !== 'varip') {
       lines.push(`    this._v_${v.name} = snap._v_${v.name};`);
+      lines.push(`    this.__init_${v.name} = snap.__init_${v.name};`);
+    }
+  }
+  for (const name of rootRegularVars) {
+    if (!ctx.seriesVars.has(name) && !ctx.varDecls.some((v) => v.name === name)) {
+      lines.push(`    this._g_${name} = snap._g_${name};`);
+    }
+  }
+  for (const [callExpr, id] of functionEmitContext.callSites) {
+    const localVars = callSiteLocalVars(callExpr);
+    const hasTACalls = callSiteHasTACalls(callExpr);
+    if (callSiteNeedsState(callExpr)) {
+      lines.push(`    if (snap._fn_state_${id}) {`);
+      for (const localVar of localVars) {
+        if (localVar.kind === 'varip') continue;
+        lines.push(`      this._fn_state_${id}._v_${localVar.name} = snap._fn_state_${id}._v_${localVar.name};`);
+        lines.push(`      this._fn_state_${id}.__init_${localVar.name} = snap._fn_state_${id}.__init_${localVar.name};`);
+      }
+      if (hasTACalls) {
+        lines.push(`      this._fn_state_${id}.__taCache = new Map();`);
+        lines.push(`      for (const [key, className, args, state] of snap._fn_state_${id}.__taCache ?? []) {`);
+        lines.push('        const instance = new this._deps[className](...args);');
+        lines.push('        instance.restore(state);');
+        lines.push(`        this._fn_state_${id}.__taCache.set(key, { className, args, instance });`);
+        lines.push('      }');
+        lines.push(`      this._fn_state_${id}.__taSeries = new Map();`);
+        lines.push(`      for (const [key, state] of snap._fn_state_${id}.__taSeries ?? []) {`);
+        lines.push('        const series = new this._deps.NumericSeries(this._deps.maxBarsBack);');
+        lines.push('        series.restore(state);');
+        lines.push(`        this._fn_state_${id}.__taSeries.set(key, series);`);
+        lines.push('      }');
+      }
+      lines.push(`      this._fn_state_${id}.__fnStates = this._restoreChildFnStates(snap._fn_state_${id}.__fnStates);`);
+      lines.push('    }');
+    }
+    for (const param of callSiteHistoryParams(callExpr)) {
+      lines.push(`    this._fn_param_series_${id}_${param}.restore(snap._fn_param_series_${id}_${param});`);
+    }
+    for (const local of callSiteHistoryLocals(callExpr)) {
+      lines.push(`    this._fn_local_series_${id}_${local}.restore(snap._fn_local_series_${id}_${local});`);
     }
   }
   for (const site of ctx.taCallSites) {
+    if (site.dynamicCtorArgExprs) continue;
     lines.push(`    this.${site.memberName}.restore(snap.${site.memberName});`);
+  }
+  for (const site of ctx.taCallSites) {
+    lines.push(`    this._ta_result_${site.memberName}.restore(snap._ta_result_${site.memberName});`);
+  }
+  lines.push('    this._dynamicTACache = new Map();');
+  lines.push('    for (const [key, className, args, state] of snap._dynamicTACache ?? []) {');
+  lines.push('      const instance = new this._deps[className](...args);');
+  lines.push('      instance.restore(state);');
+  lines.push('      this._dynamicTACache.set(key, { className, args, instance });');
+  lines.push('    }');
+  for (const site of ctx.taVarSites) {
+    lines.push(`    this.${site.memberName}.restore(snap.${site.memberName});`);
+    lines.push(`    this.${site.seriesName}.restore(snap.${site.seriesName});`);
   }
   for (let i = 0; i < fixnanIndex; i++) {
     lines.push(`    this._fixnan_${i} = snap._fixnan_${i};`);
+  }
+  for (const member of onceStateMembers) {
+    lines.push(`    this.${member} = snap.${member};`);
   }
   lines.push('  }');
 
@@ -980,7 +3137,7 @@ export const RUNTIME_HELPERS = `
 function _isNa(v) { return v !== v || v === undefined || v === null; }
 function _isTruthy(v) { return v !== false && v !== 0 && !_isNa(v); }
 function _eq(a, b) { return _isNa(a) || _isNa(b) ? false : a === b; }
-function _neq(a, b) { return _isNa(a) || _isNa(b) ? true : a !== b; }
+function _neq(a, b) { return _isNa(a) || _isNa(b) ? false : a !== b; }
 function _cmp(a, b, op) {
   if (_isNa(a) || _isNa(b)) return false;
   switch (op) {
@@ -999,6 +3156,28 @@ function _idx(obj, i) {
   if (obj && obj.__tealscriptMatrix) return deps._mtx.row(obj, i);
   return obj[i];
 }
+function _pivotPointLevels(developing, currentHigh, currentLow, currentClose, previousHigh, previousLow, previousClose) {
+  const usePrevious = !_isTruthy(developing) && !_isNa(previousHigh) && !_isNa(previousLow) && !_isNa(previousClose);
+  const high = usePrevious ? previousHigh : currentHigh;
+  const low = usePrevious ? previousLow : currentLow;
+  const close = usePrevious ? previousClose : currentClose;
+  if (_isNa(high) || _isNa(low) || _isNa(close)) {
+    return deps._arr.from(NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN);
+  }
+  const range = high - low;
+  const p = (high + low + close) / 3;
+  const r1 = 2 * p - low;
+  const s1 = 2 * p - high;
+  const r2 = p + range;
+  const s2 = p - range;
+  const r3 = high + 2 * (p - low);
+  const s3 = low - 2 * (high - p);
+  const r4 = r3 + range;
+  const s4 = s3 - range;
+  const r5 = r4 + range;
+  const s5 = s4 - range;
+  return deps._arr.from(p, s1, r1, s2, r2, s3, r3, s4, r4, s5, r5);
+}
 function _getField(obj, name) {
   if (obj && obj.__tealscriptUdt) return deps._udt.getField(obj, name);
   if (obj && typeof obj === 'object') return obj[name];
@@ -1007,6 +3186,12 @@ function _getField(obj, name) {
 function _setField(obj, name, val) {
   if (obj && obj.__tealscriptUdt) { deps._udt.setField(obj, name, val); return; }
   if (obj && typeof obj === 'object') obj[name] = val;
+}
+function _callCollectionMethod(kind, obj, name, args) {
+  if (kind === 'array') return deps._arr[name](obj, ...args);
+  if (kind === 'map') return deps._map[name](obj, ...args);
+  if (kind === 'matrix') return deps._mtx[name](obj, ...args);
+  return undefined;
 }
 function _iterSize(obj) {
   if (obj && obj.__tealscriptArray) return deps._arr.size(obj);

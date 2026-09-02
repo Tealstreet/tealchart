@@ -158,6 +158,7 @@ export function NativeChartCanvasLayersImpl({
           />
 
           <NativeCandleVolumeLayer
+            barColorPlots={indicatorPlots.filter((plot) => plot.type === 'barcolor')}
             frame={frame}
             options={options}
             sharedViewport={sharedViewport}

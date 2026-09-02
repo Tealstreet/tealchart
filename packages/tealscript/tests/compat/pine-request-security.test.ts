@@ -6,6 +6,7 @@ import {
   economicRequestKey,
   financialRequestKey,
   InMemoryRequestDatafeed,
+  seedEconomicSeries,
   seedRequestSymbol,
   type Bar,
 } from '../../src/runtime';
@@ -788,18 +789,18 @@ plot(request.currency_rate("USD", "EUR", ignore_invalid_currency=true), title="M
     expect(getPlot(result, 'Missing').values).toEqual([null]);
   });
 
-  it('reports missing conversion fixtures when ignore_invalid_currency is false', () => {
+  it('returns na for missing conversion fixtures when ignore_invalid_currency is false', () => {
     const result = runCompatScript(`
-indicator("Missing currency request error")
-plot(request.currency_rate("USD", "EUR"), title="Missing")
+indicator("Missing currency request")
+rate = request.currency_rate("USD", "EUR")
+plot(na(rate) ? 1 : 0, title="Missing")
 `, {
       bars: [chartBars[0]!],
       engineOptions: { requestDatafeed: currencyRateDatafeed() },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'request.currency_rate failed: No request series context for currency_rate USD\u0000EUR',
-    ]);
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Missing').values).toEqual([1]);
   });
 
   it('caps unique request.currency_rate contexts', () => {
@@ -902,18 +903,39 @@ plot(economic, title="Economic")
     expect(getPlot(result, 'Economic').values).toEqual([null]);
   });
 
-  it('reports missing optional request series when ignore_invalid_symbol is false', () => {
+  it('returns na for missing economic request series when ignore_invalid_symbol is false', () => {
     const result = runCompatScript(`
-indicator("Missing optional request error")
-plot(request.economic("ZZ", "GDP"), title="Economic")
+indicator("Missing optional request economic")
+economic = request.economic("ZZ", "GDP")
+plot(na(economic) ? 1 : 0, title="Economic")
 `, {
       bars: [chartBars[0]!],
       engineOptions: { requestDatafeed: pointSeriesDatafeed() },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'request.economic failed: No request series context for economic ZZ\u0000GDP',
-    ]);
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Economic').values).toEqual([1]);
+  });
+
+  it('resolves seeded provider economic series', () => {
+    const result = runCompatScript(`
+indicator("Seeded provider economic")
+gdp = request.economic("US", "GDP")
+plot(gdp, title="GDP")
+`, {
+      bars: chartBars,
+      engineOptions: {
+        requestDatafeed: new InMemoryRequestDatafeed([], [], [], [
+          seedEconomicSeries('US', 'GDP', [
+            { time: chartBars[0]!.time, value: 3.1 },
+            { time: chartBars[3]!.time, value: 3.3 },
+          ]),
+        ]),
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'GDP').values).toEqual([3.1, 3.1, 3.1, 3.3, 3.3, 3.3]);
   });
 });
 

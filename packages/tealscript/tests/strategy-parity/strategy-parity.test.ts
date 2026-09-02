@@ -2,6 +2,11 @@
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import {
+  measureRealtimeReentryParity,
+  type ProductionWorkerCase,
+} from '../compat/productionWorkerHarness';
+import { summarizeRealtimeParityMismatches } from '../../src/compat/productionWorkerFallbackBaseline';
 import { loadCorpus, runCorpusEntry, type CorpusEntry } from './corpus-runner';
 import {
   alignTrades,
@@ -13,6 +18,18 @@ import {
 } from './trade-comparison';
 
 const CORPUS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corpus');
+const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
+const REALTIME_SWEEP_BACKEND = process.env.TEALSCRIPT_REALTIME_BACKEND === 'closure' ? 'closure' : 'worker';
+const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
+
+function toProductionWorkerCase(entry: CorpusEntry): ProductionWorkerCase {
+  return {
+    scriptId: entry.id,
+    source: entry.pineSource,
+    bars: entry.bars,
+    engineOptions: entry.engineOptions,
+  };
+}
 
 describe('trade comparison utilities', () => {
   it('parses a TradingView trades CSV', () => {
@@ -111,4 +128,59 @@ describe('strategy parity corpus', () => {
       expect(result.parity.grade).toMatch(/excellent|strong/);
     });
   }
+
+  it('checks representative strategy realtime re-entry parity', async () => {
+    const representativeIds = new Set([
+      '006-pyramiding',
+      '011-bidirectional',
+      '003-bracket-exit',
+    ]);
+    const representative = fastCorpus.filter((entry) => representativeIds.has(entry.id));
+    expect(representative.map((entry) => entry.id).sort()).toEqual([...representativeIds].sort());
+
+    const measurement = await measureRealtimeReentryParity(representative.map(toProductionWorkerCase), {
+      includeStrategy: true,
+      backend: REALTIME_SWEEP_BACKEND,
+    });
+
+    expect(measurement.backend).toBe(REALTIME_SWEEP_BACKEND);
+    expect(measurement.totalUpdates).toBe(9);
+    expect(measurement.workerMatched).toBe(9);
+    expect(measurement.workerMismatches).toEqual([]);
+    expect(measurement.interpreterMismatches).toEqual([]);
+    expect(measurement.interpreterMatched).toBe(9);
+    if (REALTIME_SWEEP_BACKEND === 'closure') {
+      expect(measurement.closureMatched).toBe(9);
+      expect(measurement.closureMismatches).toEqual([]);
+    }
+  });
+
+  realtimeSweepIt('tracks strategy realtime re-entry parity for the full fast corpus', async () => {
+    const measurement = await measureRealtimeReentryParity(fastCorpus.map(toProductionWorkerCase), {
+      includeStrategy: true,
+      backend: REALTIME_SWEEP_BACKEND,
+    });
+    const workerMismatches = summarizeRealtimeParityMismatches(measurement.workerMismatches);
+    const interpreterMismatches = summarizeRealtimeParityMismatches(measurement.interpreterMismatches);
+
+    expect({
+      backend: measurement.backend,
+      totalUpdates: measurement.totalUpdates,
+      workerMatched: measurement.workerMatched,
+      workerMismatches,
+      interpreterMatched: measurement.interpreterMatched,
+      interpreterMismatches,
+    }).toEqual({
+      backend: REALTIME_SWEEP_BACKEND,
+      totalUpdates: 36,
+      workerMatched: 36,
+      workerMismatches: [],
+      interpreterMatched: 36,
+      interpreterMismatches: [],
+    });
+    if (REALTIME_SWEEP_BACKEND === 'closure') {
+      expect(measurement.closureMatched).toBe(36);
+      expect(measurement.closureMismatches).toEqual([]);
+    }
+  });
 });

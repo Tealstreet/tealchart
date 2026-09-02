@@ -2,6 +2,7 @@ import { getUdtField, isPineUdtObject, type PineUdtObject } from './objects';
 
 export interface PineArray<T = unknown> {
   readonly __tealscriptArray: true;
+  persistent?: boolean;
   values: T[];
   view?: {
     parent: PineArray<T>;
@@ -10,8 +11,16 @@ export interface PineArray<T = unknown> {
   };
 }
 
+const MAX_ARRAY_SIZE = 100_000;
+
 export function createPineArray<T = unknown>(size: number = 0, initialValue?: T): PineArray<T> {
-  const safeSize = Math.max(0, Math.trunc(size));
+  const safeSize = Math.trunc(Number(size));
+  if (!Number.isFinite(safeSize) || safeSize < 0) {
+    throw new Error('Cannot create an array with a negative size');
+  }
+  if (safeSize > MAX_ARRAY_SIZE) {
+    throw new Error(`Array is too large. Maximum size is ${MAX_ARRAY_SIZE}`);
+  }
   return {
     __tealscriptArray: true,
     values: Array.from({ length: safeSize }, () => initialValue as T),
@@ -79,27 +88,30 @@ export function pushArrayValue<T = unknown>(array: PineArray<T>, value: T): numb
     array.view.to += 1;
     return getArraySize(array);
   }
+  assertCanGrowArray(array, 1);
   return array.values.push(value);
 }
 
 export function popArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
   if (array.view) {
     const size = getArraySize(array);
-    if (size === 0) return undefined;
+    if (size === 0) throw new Error('Cannot use pop() if array is empty.');
     const value = removeArrayValue(array.view.parent, array.view.from + size - 1);
     array.view.to -= 1;
     return value;
   }
+  if (array.values.length === 0) throw new Error('Cannot use pop() if array is empty.');
   return array.values.pop();
 }
 
 export function shiftArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
   if (array.view) {
-    if (getArraySize(array) === 0) return undefined;
+    if (getArraySize(array) === 0) throw new Error('Cannot use shift() if array is empty.');
     const value = removeArrayValue(array.view.parent, array.view.from);
     array.view.to -= 1;
     return value;
   }
+  if (array.values.length === 0) throw new Error('Cannot use shift() if array is empty.');
   return array.values.shift();
 }
 
@@ -109,6 +121,7 @@ export function unshiftArrayValue<T = unknown>(array: PineArray<T>, value: T): n
     array.view.to += 1;
     return getArraySize(array);
   }
+  assertCanGrowArray(array, 1);
   return array.values.unshift(value);
 }
 
@@ -125,18 +138,17 @@ export function clearArray(array: PineArray): void {
 export function copyArray<T = unknown>(array: PineArray<T>): PineArray<T> {
   return {
     __tealscriptArray: true,
+    persistent: array.persistent,
     values: getArrayValues(array),
   };
 }
 
 export function firstArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
-  const size = getArraySize(array);
-  return size === 0 ? undefined : getArrayValue(array, 0);
+  return getArrayValue(array, 0);
 }
 
 export function lastArrayValue<T = unknown>(array: PineArray<T>): T | undefined {
-  const size = getArraySize(array);
-  return size === 0 ? undefined : getArrayValue(array, size - 1);
+  return getArrayValue(array, -1);
 }
 
 export function includesArrayValue<T = unknown>(array: PineArray<T>, value: T): boolean {
@@ -169,6 +181,7 @@ export function insertArrayValue<T = unknown>(array: PineArray<T>, index: number
     return getArraySize(array);
   }
 
+  assertCanGrowArray(array, 1);
   array.values.splice(normalizedIndex, 0, value);
   return getArraySize(array);
 }
@@ -225,6 +238,7 @@ export function joinArray(array: PineArray, separator: unknown = ''): string {
 }
 
 export function concatArray<T = unknown>(array: PineArray<T>, other: PineArray<T>): PineArray<T> {
+  assertCanGrowArray(array, getArraySize(other));
   getArrayValues(other).forEach((value) => pushArrayValue(array, value));
   return array;
 }
@@ -244,6 +258,7 @@ export function sliceArray<T = unknown>(array: PineArray<T>, from: number, to: n
 
   return {
     __tealscriptArray: true,
+    persistent: array.persistent,
     values: [],
     view: {
       parent: array,
@@ -296,6 +311,12 @@ function getUdtFieldByIndex(object: PineUdtObject, fieldIndex: number): unknown 
     throw new Error(`Array sort_field index ${normalizedIndex} is out of bounds for type ${object.typeName}`);
   }
   return Array.from(object.fields.values())[normalizedIndex];
+}
+
+function assertCanGrowArray(array: PineArray, additionalElements: number): void {
+  if (getArraySize(array) + additionalElements > MAX_ARRAY_SIZE) {
+    throw new Error(`Array is too large. Maximum size is ${MAX_ARRAY_SIZE}`);
+  }
 }
 
 export function absArrayValue(array: PineArray): PineArray<number> {

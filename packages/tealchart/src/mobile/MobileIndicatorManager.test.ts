@@ -1,11 +1,14 @@
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type { Bar } from '../types';
 
+import { executeSelectedTealscriptBackend, InMemoryRequestDatafeed, parse } from '@tealstreet/tealscript';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getIndicatorById } from '../indicators/builtinIndicators';
 import { clearChartStoreCache } from '../state/chartState';
 import { MobileIndicatorManager } from './MobileIndicatorManager';
+import { MOBILE_TEALSCRIPT_CAPABILITY_BASELINE } from './mobileTealscriptCapabilityBaseline';
+import { runMobileTealscriptClosureSmoke } from './mobileTealscriptClosureSmoke';
 
 function makeBars(count: number): Bar[] {
   return Array.from({ length: count }, (_, index) => ({
@@ -52,7 +55,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       id: 'ai-wma',
       name: 'AI WMA',
       overlay: true,
-      code: 'indicator("AI WMA", overlay=true)\nplot(close)',
+      code: 'indicator("AI WMA", overlay=true, format=format.volume, precision=0, scale=scale.right)\nplot(close)',
     });
 
     expect(instanceId).toBe('ai-wma');
@@ -60,6 +63,9 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getIndicatorPaneInfo()[instanceId]).toMatchObject({
       name: 'AI WMA',
       overlay: true,
+      format: 'volume',
+      precision: 0,
+      scale: 'right',
     });
     expect(manager.getPlots()).toHaveLength(1);
     expect(manager.getPlots()[0]).toMatchObject({
@@ -70,10 +76,31 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getDeclaration(instanceId)).toMatchObject({
       title: 'AI WMA',
       overlay: true,
+      format: 'volume',
+      precision: 0,
+      scale: 'right',
     });
     expect(manager.getIndicator(instanceId)?.declaration).toMatchObject({
       title: 'AI WMA',
       overlay: true,
+    });
+  });
+
+  it('selects the closure backend through the shared runtime selector', () => {
+    const manager = new MobileIndicatorManager({ enableTealscriptClosureBackend: true });
+    manager.setBars(makeBars(3));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'closure-mobile',
+      name: 'Closure Mobile',
+      code: 'indicator("Closure Mobile")\nplot(close + 1)',
+    });
+
+    expect(manager.getPlots()[0]?.values).toEqual([102, 103, 104]);
+    expect(manager.getIndicator(instanceId)?.runtimeProfile).toMatchObject({
+      executionMode: 'closure',
+      selectedBackend: 'closure',
+      backendSelectionSource: 'flag',
     });
   });
 
@@ -166,6 +193,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       instanceId,
       expect.objectContaining({
         type: 'parse',
+        severity: 'error',
         message: expect.any(String),
         line: expect.any(Number),
         column: expect.any(Number),
@@ -194,6 +222,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       instanceId,
       expect.objectContaining({
         type: 'parse',
+        severity: 'error',
         message: expect.any(String),
       }),
     );
@@ -286,9 +315,197 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       instanceId,
       expect.objectContaining({
         type: 'runtime',
+        severity: 'error',
         message: expect.stringContaining('missingRuntime'),
       }),
     );
+  });
+
+  it('reports missing request data on mobile as a provider warning, not a script failure', () => {
+    const manager = new MobileIndicatorManager();
+    const onError = vi.fn();
+    manager.onErrorSubscribe(onError);
+    manager.setBars(makeBars(2));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-request-provider',
+      code: 'indicator("Mobile Request")\nplot(request.security("EXT", "D", close))',
+    });
+
+    expect(instanceId).toBe('mobile-request-provider');
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'runtime',
+        severity: 'warning',
+        code: 'request-data-unavailable',
+        message: expect.stringContaining('request.security'),
+      }),
+    );
+    const error = onError.mock.calls[0]?.[1];
+    expect(error.message).toContain('not supported in this chart');
+    expect(error.message).toContain('The script is valid');
+    expect(error.message.toLowerCase()).not.toContain('script failed');
+    expect(error.message.toLowerCase()).not.toContain('script is invalid');
+  });
+
+  it('resolves request-backed scripts from a mobile host request datafeed', () => {
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'EXT',
+        timeframe: '1',
+        bars: makeBars(3).map((bar, index) => ({
+          ...bar,
+          open: 200 + index,
+          high: 205 + index,
+          low: 195 + index,
+          close: 201 + index,
+        })),
+      },
+    ]);
+    const manager = new MobileIndicatorManager({ getRequestDatafeed: () => requestDatafeed });
+    const onError = vi.fn();
+    manager.onErrorSubscribe(onError);
+    manager.setBars(makeBars(3));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-request-provider',
+      code: 'indicator("Mobile Request")\nplot(request.security("EXT", "1", close, lookahead=barmerge.lookahead_on))',
+    });
+
+    expect(instanceId).toBe('mobile-request-provider');
+    expect(onError).not.toHaveBeenCalled();
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0]?.values).toEqual([201, 202, 203]);
+  });
+
+  it('pins the measured mobile Tealscript capability gap against the web path', () => {
+    expect(
+      MOBILE_TEALSCRIPT_CAPABILITY_BASELINE.map(({ capability, mobileStatus, webStatus }) => ({
+        capability,
+        mobileStatus,
+        webStatus,
+      })),
+    ).toEqual([
+      {
+        capability: 'custom-source save and plot handoff',
+        mobileStatus: 'supported',
+        webStatus: 'supported',
+      },
+      {
+        capability: 'drawing render handoff',
+        mobileStatus: 'supported',
+        webStatus: 'supported',
+      },
+      {
+        capability: 'parse and runtime diagnostics',
+        mobileStatus: 'supported',
+        webStatus: 'supported',
+      },
+      {
+        capability: 'request-backed scripts',
+        mobileStatus: 'supported',
+        webStatus: 'supported',
+      },
+      {
+        capability: 'imported Pine libraries',
+        mobileStatus: 'supported',
+        webStatus: 'supported',
+      },
+      {
+        capability: 'on-device closure execution proof',
+        mobileStatus: 'visible-gap',
+        webStatus: 'supported',
+      },
+    ]);
+  });
+
+  it('reports imported-library scripts without a mobile registry as runtime errors', () => {
+    const manager = new MobileIndicatorManager();
+    const onError = vi.fn();
+    manager.onErrorSubscribe(onError);
+    manager.setBars(makeBars(2));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-imported-library',
+      code: `
+import TestUser/RangeTools/1 as rt
+indicator("Mobile Imported Library")
+plot(rt.adjusted(close))
+`,
+    });
+
+    expect(instanceId).toBe('mobile-imported-library');
+    expect(manager.getPlots()).toHaveLength(0);
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'runtime',
+        severity: 'error',
+        message: expect.stringContaining('import not found in deterministic library registry'),
+      }),
+    );
+  });
+
+  it('resolves imported libraries from a mobile host registry', () => {
+    const library = parse(`
+library("RangeTools")
+export adjusted(float source) => source + 10
+`);
+    const libraries = new Map([['TestUser/RangeTools/1', library]]);
+    const manager = new MobileIndicatorManager({ getLibraries: () => libraries });
+    const onError = vi.fn();
+    manager.onErrorSubscribe(onError);
+    manager.setBars(makeBars(3));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-imported-library',
+      code: `
+import TestUser/RangeTools/1 as rt
+indicator("Mobile Imported Library")
+plot(rt.adjusted(close))
+`,
+    });
+
+    expect(instanceId).toBe('mobile-imported-library');
+    expect(onError).not.toHaveBeenCalled();
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0]?.values).toEqual([111, 112, 113]);
+  });
+
+  it('runs the closure smoke helper through the mobile manager path', () => {
+    const bars = makeBars(3);
+    const source = 'indicator("Mobile Closure Smoke")\nplot(close + 1)';
+    const reference = executeSelectedTealscriptBackend(parse(source), bars, undefined, {
+      runtime: {
+        backend: {
+          executionBackendOverride: 'closure',
+          defaultBackend: 'compiled',
+        },
+      },
+    });
+
+    const result = runMobileTealscriptClosureSmoke({
+      cases: [
+        {
+          id: 'mobile-closure-smoke',
+          source,
+          bars,
+          expectedOutput: {
+            plots: reference.plots,
+            drawings: reference.drawings,
+          },
+        },
+      ],
+      now: () => 0,
+    });
+
+    expect(result.total).toBe(1);
+    expect(result.matched).toBe(1);
+    expect(result.failed).toBe(0);
+    expect(result.mismatched).toBe(0);
+    expect(result.results[0]?.executionMode).toBe('closure');
+    expect(result.results[0]?.selectedBackend).toBe('closure');
   });
 });
 

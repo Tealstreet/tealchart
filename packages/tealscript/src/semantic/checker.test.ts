@@ -1,9 +1,206 @@
 import { describe, expect, it } from 'vitest';
 
+import { PINE_V6_KNOWN_MISSING_BUILTINS, PINE_V6_REFERENCE_BUILTINS } from '../compat/pineV6BuiltinReference';
+import {
+  PINE_V6_KNOWN_MISSING_SIGNATURES,
+  PINE_V6_REFERENCE_SIGNATURES,
+  PINE_V6_SIGNATURELESS_BUILTINS,
+  type PineV6ReferenceSignature,
+} from '../compat/pineV6BuiltinSignatures';
 import { parse } from '../parser';
-import { checkProgram } from './checker';
+import { executeScript } from '../runtime/engine';
+import {
+  builtinSignatureForCoverage,
+  builtinSignaturesWithoutNamedFormForCoverage,
+  checkProgram,
+  PINE_V6_BUILTIN_NAMED_FORM_FORBIDDEN_SIGNATURES,
+  resolvesBuiltinReferenceNameForCoverage,
+} from './checker';
 
 describe('semantic checker', () => {
+  it('reports paste-fix diagnostics with precise locations and actionable symbols', () => {
+    const library = parse(`
+library("Helper")
+export value(float src) => src
+`);
+    const cases = [
+      {
+        name: 'v4/v5 declaration argument in v6',
+        source: `//@version=6
+indicator("Legacy", resolution="60")
+plot(close)`,
+        options: undefined,
+        expected: {
+          code: 'unknown-argument',
+          message: "Unknown argument 'resolution' for indicator(); use 'timeframe' in Pine v6",
+          line: 2,
+          column: 32,
+        },
+      },
+      {
+        name: 'unknown builtin',
+        source: `//@version=6
+indicator("Unknown")
+plot(ta.not_a_function(close))`,
+        options: undefined,
+        expected: {
+          code: 'unknown-function',
+          message: "Unknown function 'ta.not_a_function'; check the namespace/name or add a library import that defines it",
+          line: 3,
+          column: 6,
+        },
+      },
+      {
+        name: 'wrong argument count',
+        source: `//@version=6
+indicator("Arity")
+plot(ta.sma(close))`,
+        options: undefined,
+        expected: {
+          code: 'argument-count',
+          message: "ta.sma() expects at least 2 arguments (source, length); got 1",
+          line: 3,
+          column: 13,
+        },
+      },
+      {
+        name: 'wrong named argument',
+        source: `//@version=6
+indicator("Named")
+plot(ta.sma(source=close, bogus=14))`,
+        options: undefined,
+        expected: {
+          code: 'unknown-argument',
+          message: "Unknown argument 'bogus' for ta.sma(); expected one of: source, length",
+          line: 3,
+          column: 27,
+        },
+      },
+      {
+        name: 'series where simple is required',
+        source: `//@version=6
+indicator("Qualifier")
+len = close > open ? 10 : 20
+smooth(src, length) => ta.sma(src, length)
+plot(smooth(close, len))`,
+        options: undefined,
+        expected: {
+          code: 'qualifier-mismatch',
+          message: "Cannot pass series value to simple parameter 'length' for function smooth; use an input/simple value or declare a compatible parameter",
+          line: 5,
+          column: 20,
+        },
+      },
+      {
+        name: 'unresolved import',
+        source: `//@version=6
+indicator("Import")
+import Missing/Nope/1 as nope
+plot(nope.value)`,
+        options: undefined,
+        expected: {
+          code: 'unresolved-import',
+          message: "Import 'Missing/Nope/1' as alias 'nope' was not supplied by the host library registry; provide Pine library source for Missing/Nope version 1, or remove/change the import",
+          line: 3,
+          column: 1,
+        },
+      },
+      {
+        name: 'type mismatch',
+        source: `//@version=6
+indicator("Types")
+float bad = "x"
+plot(close)`,
+        options: undefined,
+        expected: {
+          code: 'type-mismatch',
+          message: "Cannot assign string value to float variable 'bad'",
+          line: 3,
+          column: 1,
+        },
+      },
+      {
+        name: 'imported alias member type mismatch',
+        source: `//@version=6
+indicator("Import Type")
+import PublicUser/PublicHelper/1 as helper
+float bad = helper.value
+plot(close)`,
+        options: { libraries: new Map([['PublicUser/PublicHelper/1', library]]) },
+        expected: {
+          code: 'invalid-imported-member-reference',
+          message: 'Imported library member helper.value is a function; call it as helper.value(...)',
+          line: 4,
+          column: 13,
+        },
+      },
+    ];
+
+    for (const testCase of cases) {
+      const result = checkProgram(parse(testCase.source), testCase.options);
+      expect(result.diagnostics[0], testCase.name).toEqual(expect.objectContaining(testCase.expected));
+    }
+  });
+
+  it('tracks Pine v6 reference builtin coverage through checker resolution', () => {
+    const referenceNames = Object.values(PINE_V6_REFERENCE_BUILTINS).flat();
+    const knownMissing = new Set<string>(PINE_V6_KNOWN_MISSING_BUILTINS);
+    const unresolved = referenceNames.filter((name) => !resolvesBuiltinReferenceNameForCoverage(name));
+
+    expect([...unresolved].sort()).toEqual([...knownMissing].sort());
+  });
+
+  it('tracks named-form support for every builtin signature with parameters', () => {
+    expect(PINE_V6_BUILTIN_NAMED_FORM_FORBIDDEN_SIGNATURES).toEqual([]);
+    expect(builtinSignaturesWithoutNamedFormForCoverage()).toEqual([]);
+  });
+
+  it('tracks Pine v6 reference builtin signature shapes through checker resolution', () => {
+    const knownMissing = new Set<string>(PINE_V6_KNOWN_MISSING_SIGNATURES);
+    const knownMissingBuiltins = new Set<string>(PINE_V6_KNOWN_MISSING_BUILTINS);
+    const signatureless = new Set<string>(PINE_V6_SIGNATURELESS_BUILTINS);
+    const signatureNames = new Set(Object.values(PINE_V6_REFERENCE_SIGNATURES).flatMap((namespace) => Object.keys(namespace)));
+    const trackedNamespaces = new Set(Object.keys(PINE_V6_REFERENCE_SIGNATURES));
+    const untrackedReferenceNames = Object.entries(PINE_V6_REFERENCE_BUILTINS).flatMap(([namespace, names]) => {
+      if (!trackedNamespaces.has(namespace)) return [];
+      return names.filter(
+        (name) =>
+          !signatureNames.has(name)
+          && !signatureless.has(name)
+          && !knownMissing.has(name)
+          && !knownMissingBuiltins.has(name),
+      );
+    });
+    const mismatches: string[] = [];
+    for (const [namespace, signatures] of Object.entries(PINE_V6_REFERENCE_SIGNATURES)) {
+      for (const [name, expected] of Object.entries(signatures) as [string, PineV6ReferenceSignature][]) {
+        const actual = builtinSignatureForCoverage(name);
+        if (!actual) {
+          if (!knownMissing.has(name)) mismatches.push(`${namespace}.${name}: missing signature`);
+          continue;
+        }
+        if (JSON.stringify(actual.params) !== JSON.stringify(expected.params)) {
+          mismatches.push(`${namespace}.${name}: params ${JSON.stringify(actual.params)} != ${JSON.stringify(expected.params)}`);
+        }
+        if (actual.minArgs !== expected.minArgs) {
+          mismatches.push(`${namespace}.${name}: minArgs ${actual.minArgs} != ${expected.minArgs}`);
+        }
+        if (actual.maxArgs !== expected.maxArgs) {
+          mismatches.push(`${namespace}.${name}: maxArgs ${actual.maxArgs} != ${expected.maxArgs}`);
+        }
+        if (JSON.stringify(actual.requiredParams ?? []) !== JSON.stringify(expected.requiredParams ?? [])) {
+          mismatches.push(`${namespace}.${name}: requiredParams ${JSON.stringify(actual.requiredParams ?? [])} != ${JSON.stringify(expected.requiredParams ?? [])}`);
+        }
+        if (JSON.stringify(actual.overloads ?? []) !== JSON.stringify(expected.overloads ?? [])) {
+          mismatches.push(`${namespace}.${name}: overloads ${JSON.stringify(actual.overloads ?? [])} != ${JSON.stringify(expected.overloads ?? [])}`);
+        }
+      }
+    }
+
+    expect(untrackedReferenceNames).toEqual([]);
+    expect(mismatches).toEqual([]);
+  });
+
   it('accepts legacy study resolution declaration aliases', () => {
     const result = checkProgram(parse(`
 //@version=4
@@ -36,6 +233,22 @@ plot(isCross ? requested + momentum + rangeHigh - rangeLow + smooth + events + m
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts legacy v3/v4 ticker constructors and bare ticker symbol', () => {
+    const result = checkProgram(parse(`//@version=4
+study("Legacy Ticker Constructors")
+sessionInput = input("D", "Session", type=input.resolution)
+baseTicker = tickerid(syminfo.prefix, ticker, sessionInput)
+renkoTicker = renko(baseTicker, "close", "ATR", 14)
+heikinashiTicker = heikinashi(baseTicker)
+kagiTicker = kagi(baseTicker, "ATR", 14)
+linebreakTicker = linebreak(baseTicker, 3)
+pointfigureTicker = pointfigure(baseTicker, "close", "ATR", 14, 3)
+plot(close)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
   });
 
   it('validates legacy security alias arguments like request.security', () => {
@@ -105,8 +318,8 @@ plot(scalar + anchored)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign float value to string variable',
-      'Cannot assign float value to string variable',
+      "Cannot assign float value to string variable 'badScalar'",
+      "Cannot assign float value to string variable 'badAnchored'",
     ]);
   });
 
@@ -153,6 +366,23 @@ plot(time_close("60", "0930-1600", 1, 2))
 plot(time_close("60", "0930-1600", "America/New_York", 1))
 plot(time_close("60", "0930-1600", "America/New_York", 1, 2))
 plot(stamp + prefixStamp + defaultTimezoneStamp + dateStamp)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts variable timezone arguments for timestamp and time filters', () => {
+    const result = checkProgram(parse(`
+indicator("Variable Timezone")
+TZ = "America/New_York"
+sess = "0930-1600"
+y = year(time, TZ)
+m = month(time, TZ)
+d = dayofmonth(time, TZ)
+sessionStart = timestamp(TZ, y, m, d, 18, 0)
+inSession = not na(time(timeframe.period, sess, TZ))
+inCloseSession = not na(time_close(timeframe.period, sess, TZ))
+plot(inSession and inCloseSession ? sessionStart : na)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -362,7 +592,7 @@ plot(converted ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign na value to bool variable',
+      "Cannot assign na value to bool variable 'initialized'",
       'Cannot assign na value to bool variable reassigned',
     ]);
   });
@@ -591,6 +821,8 @@ log.warning("bar {0}", bar_index)
 log.warning(message="named bar {0}", bar_index)
 log.error("done")
 log.error(message="named done {0}", close)
+if false
+    runtime.error(message="named stop")
 plot(close)
 `));
 
@@ -657,17 +889,27 @@ plot(close)
     ]);
   });
 
-  it('reports planned unsupported Pine builtin calls explicitly', () => {
+  it('accepts request footprint calls and reports normal argument diagnostics', () => {
+    expect(checkProgram(parse(`
+indicator("Footprint")
+request.footprint(10, 70)
+plot(close)
+`)).diagnostics).toEqual([]);
+
     const result = checkProgram(parse(`
-indicator("Planned Unsupported Calls")
+indicator("Footprint Argument Error")
 request.footprint(syminfo.tickerid)
 plot(close)
 `));
 
     expect(result.diagnostics).toEqual([
       expect.objectContaining({
-        code: 'unsupported-feature',
-        message: 'request.footprint is not supported yet: footprint data requires a host-provided footprint/intrabar volume model',
+        code: 'argument-count',
+        message: 'request.footprint() expects at least 2 arguments',
+      }),
+      expect.objectContaining({
+        code: 'argument-count',
+        message: "request.footprint() missing required argument 'va_percent'",
       }),
     ]);
   });
@@ -791,6 +1033,21 @@ alert(1, message="ok")
     ]);
   });
 
+  it('treats decimal and exponent numeric literals as float initializers', () => {
+    const result = checkProgram(parse(`
+indicator("Float Literal Accumulators")
+sum = 0.0
+scaled = 1e0
+values = array.from(close, open)
+for item in values
+    sum += item
+    scaled += item
+plot(sum + scaled)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports invalid Pine built-in argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid Built-in Bindings")
@@ -817,9 +1074,9 @@ max_bars_back(close, 10, 20)
       'fill() expects at least 3 arguments',
       "fill() missing required argument 'plot2'",
       "Unknown argument 'caption' for plotshape()",
-      'ta.sma() expects at least 2 arguments',
+      'ta.sma() expects at least 2 arguments (source, length); got 1',
       "ta.sma() missing required argument 'length'",
-      'strategy.opentrades.entry_price() cannot use positional arguments after named arguments',
+      'strategy.opentrades.entry_price() expects at most 1 argument',
       'max_bars_back() expects at most 2 arguments',
     ]);
   });
@@ -910,6 +1167,7 @@ request.dividends("NASDAQ:AAPL", dividends.gross, gaps="bad_gaps")
 request.earnings("NASDAQ:AAPL", earnings.actual, lookahead="bad_lookahead")
 request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps="bad_gaps")
 request.economic("US", "GDP", gaps="bad_gaps")
+request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", gaps="bad_gaps")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -919,6 +1177,7 @@ request.economic("US", "GDP", gaps="bad_gaps")
       'Invalid request.earnings lookahead mode: bad_lookahead',
       'Invalid request.financial gaps mode: bad_gaps',
       'Invalid request.economic gaps mode: bad_gaps',
+      'Invalid request.quandl gaps mode: bad_gaps',
     ]);
   });
 
@@ -977,10 +1236,10 @@ plotarrow(close - open, format=format.bad, precision=3.5)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Invalid plot format: bad',
       'plot precision must be a non-negative integer',
-      'Invalid plotbar format: format.bad',
-      'plotbar precision must be a non-negative integer',
-      'Invalid plotcandle format: ticks',
-      'plotcandle precision must be a non-negative integer',
+      "Unknown argument 'format' for plotbar()",
+      "Unknown argument 'precision' for plotbar()",
+      "Unknown argument 'format' for plotcandle()",
+      "Unknown argument 'precision' for plotcandle()",
       'Invalid plotshape format: format.bad',
       'plotshape precision must be a non-negative integer',
       'Invalid plotchar format: invalid',
@@ -1027,8 +1286,8 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
   });
 
   it('accepts legacy visual transp arguments', () => {
-    const result = checkProgram(parse(`
-indicator("Legacy Visual Transparency", overlay=true)
+    const result = checkProgram(parse(`//@version=4
+study("Legacy Visual Transparency", overlay=true)
 linePlot = plot(close, color=color.blue, transp=25)
 basePlot = plot(open, color=color.red)
 fill(linePlot, basePlot, color=color.green, transp=50)
@@ -1041,7 +1300,25 @@ plotbar(open, high, low, close, color=color.purple, transp=50)
 plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bordercolor=color.blue, transp=60)
 `));
 
-    expect(result.diagnostics).toEqual([]);
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(9).fill('legacy-argument'));
+  });
+
+  it('accepts v5 deprecated visual transp arguments with info diagnostics', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("V5 Visual Transparency", overlay=true)
+linePlot = plot(close, color=color.blue, transp=25)
+basePlot = plot(open, color=color.red)
+fill(linePlot, basePlot, color=color.green, transp=50)
+plotshape(close > open, color=color.green, transp=20)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "plot() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
+      "fill() accepted legacy argument 'transp' for compatibility",
+      "plotshape() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
+    ]);
   });
 
   it('accepts v4 positional visual transp arguments', () => {
@@ -1054,6 +1331,85 @@ bgcolor(color.yellow, 75, 0, true, 3, "Background")
 plotshape(close > open, "Shape", shape.circle, location.abovebar, color.blue, 20, 0, "S", color.white, true, size.small, 3)
 plotchar(close > open, "Char", "C", location.belowbar, color.green, 40, 0, "T", color.white, true, size.tiny, 3)
 plotarrow(close - open, "Arrow", color.green, color.red, 60, 0, 5, 15, true, 3)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts legacy v2/v3 bare tickerid and n globals', () => {
+    const result = checkProgram(parse(`//@version=3
+study("Legacy globals")
+tf = input(defval="60", title="Timeframe", type=string)
+remote = security(tickerid, tf, close)
+limited = n <= 10 ? sma(close, 3) : close
+plot(remote + limited)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('treats unversioned study scripts as legacy without loosening explicit v6 input signatures', () => {
+    const legacy = checkProgram(parse(`
+study("Unversioned legacy")
+length = input(8, title="Length", minval=1, maxval=100)
+plot(length)
+`));
+    const modern = checkProgram(parse(`//@version=6
+indicator("Modern strict")
+length = input(8, title="Length", minval=1, maxval=100)
+plot(length)
+`));
+
+    expect(legacy.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modern.diagnostics.map((diagnostic) => diagnostic.message)).toContain("Unknown argument 'minval' for input()");
+  });
+
+  it('accepts na casts for color and drawing object handles', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Object Casts")
+var color transparent = color(na)
+var box b = box(na)
+var label lb = label(na)
+var line ln = line(na)
+var linefill lf = linefill(na)
+var table t = table(na)
+plot(na(transparent) and na(b) and na(lb) and na(ln) and na(lf) and na(t) ? 1 : 0)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts v3/v4 numeric expressions in boolean built-in arguments', () => {
+    const result = checkProgram(parse(`//@version=4
+study("Legacy numeric bool")
+changeValue = change(close)
+plot(valuewhen(changeValue, close, 1))
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('accepts v4 boolean strategy directions without loosening modern signatures', () => {
+    const legacy = checkProgram(parse(`//@version=4
+strategy("Legacy Strategy Direction")
+strategy.entry("Long", true, when=close > open)
+strategy.entry("Short", false, when=close < open)
+`));
+    const modern = checkProgram(parse(`//@version=6
+strategy("Modern Strategy Direction")
+strategy.entry("Long", true)
+`));
+
+    expect(legacy.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modern.diagnostics.map((diagnostic) => diagnostic.message)).toContain('strategy.entry direction must be a string, got bool');
+  });
+
+  it('accepts v5 numeric boolean expressions', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("V5 Numeric Bool")
+plot(close)
+if close - open
+    plot(open)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1073,16 +1429,16 @@ plot(close, "V6", color.blue, 1, plot.style_line, false, 25)
 indicator("Invalid Visual Numeric Values")
 linePlot = plot(close)
 basePlot = plot(open)
-badPlot = plot(close, linewidth="2", histbase="0", offset="1", show_last="10", precision="2", transp="25")
+badPlot = plot(close, linewidth="2", histbase="0", offset="1", show_last="10", precision="2")
 hline(price="100", linewidth="2")
-fill(linePlot, basePlot, color.red, show_last="10", transp="50")
-barcolor(color.red, offset="1", show_last=false, transp="10")
-bgcolor(color.blue, offset=false, show_last="10", transp="75")
-plotbar(open="o", high=true, low="l", close=false, show_last="10", precision="2", transp="30")
-plotcandle(open="o", high=true, low="l", close=false, show_last="10", precision="2", transp="40")
-plotshape(close > open, offset="1", show_last=false, precision="2", transp="20")
-plotchar(close > open, offset=false, show_last="10", precision="2", transp="30")
-plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_last="10", precision="2", transp="40")
+fill(linePlot, basePlot, color.red, show_last="10")
+barcolor(color.red, offset="1", show_last=false)
+bgcolor(color.blue, offset=false, show_last="10")
+plotbar(open="o", high=true, low="l", close=false, show_last="10")
+plotcandle(open="o", high=true, low="l", close=false, show_last="10")
+plotshape(close > open, offset="1", show_last=false, precision="2")
+plotchar(close > open, offset=false, show_last="10", precision="2")
+plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_last="10", precision="2")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -1091,46 +1447,63 @@ plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_la
       'plot offset must be a number, got string',
       'plot show_last must be a number, got string',
       'plot precision must be a number, got string',
-      'plot transp must be a number, got string',
       'hline price must be a number, got string',
       'hline linewidth must be a number, got string',
       'fill show_last must be a number, got string',
-      'fill transp must be a number, got string',
       'barcolor offset must be a number, got string',
       'barcolor show_last must be a number, got bool',
-      'barcolor transp must be a number, got string',
       'bgcolor offset must be a number, got bool',
       'bgcolor show_last must be a number, got string',
-      'bgcolor transp must be a number, got string',
       'plotbar open must be a number, got string',
       'plotbar high must be a number, got bool',
       'plotbar low must be a number, got string',
       'plotbar close must be a number, got bool',
       'plotbar show_last must be a number, got string',
-      'plotbar precision must be a number, got string',
-      'plotbar transp must be a number, got string',
       'plotcandle open must be a number, got string',
       'plotcandle high must be a number, got bool',
       'plotcandle low must be a number, got string',
       'plotcandle close must be a number, got bool',
       'plotcandle show_last must be a number, got string',
-      'plotcandle precision must be a number, got string',
-      'plotcandle transp must be a number, got string',
       'plotshape offset must be a number, got string',
       'plotshape show_last must be a number, got bool',
       'plotshape precision must be a number, got string',
-      'plotshape transp must be a number, got string',
       'plotchar offset must be a number, got bool',
       'plotchar show_last must be a number, got string',
       'plotchar precision must be a number, got string',
-      'plotchar transp must be a number, got string',
       'plotarrow series must be a number, got string',
       'plotarrow offset must be a number, got bool',
       'plotarrow minheight must be a number, got string',
       'plotarrow maxheight must be a number, got bool',
       'plotarrow show_last must be a number, got string',
       'plotarrow precision must be a number, got string',
-      'plotarrow transp must be a number, got string',
+    ]);
+  });
+
+  it('rejects legacy visual transp arguments in v6 signatures', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("V6 Visual Transparency Rejection", overlay=true)
+linePlot = plot(close, color=color.blue, transp=25)
+basePlot = plot(open, color=color.red)
+fill(linePlot, basePlot, color=color.green, transp=50)
+barcolor(color.red, transp=10)
+bgcolor(color.blue, transp=75)
+plotshape(close > open, color=color.green, transp=20)
+plotchar(close > open, color=color.blue, transp=30)
+plotarrow(close - open, colorup=color.green, colordown=color.red, transp=40)
+plotbar(open, high, low, close, color=color.purple, transp=50)
+plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bordercolor=color.blue, transp=60)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'transp' for plot(); use color.new(color, transparency) in Pine v6",
+      "Unknown argument 'transp' for fill()",
+      "Unknown argument 'transp' for barcolor()",
+      "Unknown argument 'transp' for bgcolor()",
+      "Unknown argument 'transp' for plotshape(); use color.new(color, transparency) in Pine v6",
+      "Unknown argument 'transp' for plotchar(); use color.new(color, transparency) in Pine v6",
+      "Unknown argument 'transp' for plotarrow(); use color.new(color, transparency) in Pine v6",
+      "Unknown argument 'transp' for plotbar()",
+      "Unknown argument 'transp' for plotcandle()",
     ]);
   });
 
@@ -1144,7 +1517,7 @@ fill(linePlot, basePlot, color.red, editable="yes", fillgaps=1)
 barcolor(color.red, editable="yes")
 bgcolor(color.blue, editable=1, force_overlay="yes")
 plotbar(open, high, low, close, editable=1, force_overlay="yes")
-plotcandle(open, high, low, close, editable="yes", force_overlay=1)
+plotcandle(open, high, low, close, editable="yes")
 plotshape(close > open, editable=1, force_overlay="yes")
 plotchar(close > open, editable="yes", force_overlay=1)
 plotarrow(close - open, editable=1, force_overlay="yes")
@@ -1164,7 +1537,6 @@ plotarrow(close - open, editable=1, force_overlay="yes")
       'plotbar editable must be a boolean, got int',
       'plotbar force_overlay must be a boolean, got string',
       'plotcandle editable must be a boolean, got string',
-      'plotcandle force_overlay must be a boolean, got int',
       'plotshape editable must be a boolean, got int',
       'plotshape force_overlay must be a boolean, got string',
       'plotchar editable must be a boolean, got string',
@@ -2169,10 +2541,10 @@ pair(float value, string title) => [value, title]
 markerPair(float value) =>
     marker = label.new(bar_index, value)
     [value, marker]
-recursiveTuple(float value) => recursiveTuple(value)
+unknownTuple(float value) => [na, na]
 [seriesValue, constTitle] = pair(close, "Close")
 [markerValue, marker] = markerPair(close)
-[unknownValue, unknownTitle] = recursiveTuple(close)
+[unknownValue, unknownTitle] = unknownTuple(close)
 seriesValue := "bad"
 constTitle := 1
 marker := line.new(bar_index, low, bar_index, high)
@@ -2683,9 +3055,9 @@ plot(close)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign string value to float variable',
-      'Cannot assign string value to float variable',
-      'Cannot assign string value to float variable',
+      "Cannot assign string value to float variable 'ternaryValue'",
+      "Cannot assign string value to float variable 'switchValue'",
+      "Cannot assign string value to float variable 'ifValue'",
     ]);
   });
 
@@ -3249,7 +3621,6 @@ identity(float value) => value
 price(float value) => value + close
 marker(float value) => label.new(bar_index, value)
 values(float value) => array.from(value)
-recursive(float value) => recursive(value)
 inputValue = input.float(1)
 constIdentity = identity(1)
 inputIdentity = identity(inputValue)
@@ -3257,8 +3628,6 @@ seriesIdentity = identity(close)
 seriesPrice = price(1)
 seriesMarker = marker(close)
 seriesValues = values(close)
-constRecursive = recursive(1)
-seriesRecursive = recursive(close)
 plot(seriesPrice + array.size(seriesValues))
 `));
 
@@ -3271,8 +3640,6 @@ plot(seriesPrice + array.size(seriesValues))
     expect(types.get('seriesPrice')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('seriesMarker')).toMatchObject({ kind: 'label' });
     expect(types.get('seriesValues')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
-    expect(types.get('constRecursive')).toMatchObject({ kind: 'unknown', qualifier: 'const' });
-    expect(types.get('seriesRecursive')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
   it('records value and reference types from annotations', () => {
@@ -5047,7 +5414,6 @@ unknownPoint = box.new(top_left=topLeft, bottom_right=bottomRight, left=bar_inde
       "box.new() missing required argument 'bottom'",
       "Argument 'top_left' for box.new() was supplied multiple times",
       'box.new() expects at most 17 arguments',
-      'Invalid box.new text_valign: center',
       'Invalid box.new text_wrap: wrap',
       "Unknown argument 'left' for box.new()",
     ]);
@@ -5547,7 +5913,7 @@ missingColor = linefill.get_color()
   it('resolves table.new named arguments and positional tails', () => {
     const result = checkProgram(parse(`
 indicator("Table Signatures")
-dashboard = table.new(position=position.top_right, 2, 3, color.new(color.black, 80), color.gray, 1, color.white, 1)
+dashboard = table.new(position=position.top_right, 2, 3, color.new(color.black, 80), color.gray, 1, color.white, 1, force_overlay=true)
 compact = table.new(position.bottom_left, columns=1, rows=1, bgcolor=color.blue)
 defaulted = table.new(columns=2, rows=2)
 tables = array.from(dashboard, compact, defaulted)
@@ -5600,7 +5966,7 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
       "Unknown argument 'frame' for table.new()",
       "table.new() missing required argument 'rows'",
       "Argument 'position' for table.new() was supplied multiple times",
-      'table.new() expects at most 8 arguments',
+      'table.new force_overlay must be a boolean, got int',
     ]);
   });
 
@@ -5727,6 +6093,7 @@ indicator("Table Cell Signatures")
 dashboard = table.new(columns=2, rows=2)
 table.cell(table_id=dashboard, 0, 0, "Entry", 10, 2, color.white, "left", "top", size.small, color.blue)
 table.cell(dashboard, column=1, row=0, text="Exit", bgcolor=color.orange, tooltip="Exit details")
+table.cell(table_id=dashboard, column=0, row=1, text="Center", text_valign=text.align_center)
 plot(1)
 `));
 
@@ -5925,6 +6292,73 @@ input float badAverage = ta.sma(close, 3)
     ]);
   });
 
+  it('widens inferred variable qualifiers across reassignment and compound assignment', () => {
+    const result = checkProgram(parse(`
+indicator("Inferred Widening")
+total = 0.0
+total += close
+copy = 0.0
+copy := ta.sma(close, 3)
+latest = -1
+for i = 0 to 3
+    if close > open
+        latest := i
+simple float strict = 0.0
+strict += close
+plot(total + copy + latest)
+`));
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign series value to simple float variable strict',
+    ]);
+    expect(types.get('total')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('copy')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('latest')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('strict')).toMatchObject({ kind: 'float', qualifier: 'simple' });
+  });
+
+  it('requires simple UDF parameters when they feed stateful TA lengths', () => {
+    const result = checkProgram(parse(`
+indicator("UDF TA Length Qualifiers")
+smooth(series float source, int length) => ta.sma(source, length)
+dynamicLength = bar_index + 1
+plot(smooth(close, dynamicLength))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Cannot pass series value to simple parameter 'length' for function smooth; use an input/simple value or declare a compatible parameter",
+    ]);
+  });
+
+  it('propagates simple UDF parameter requirements through nested helper calls', () => {
+    const result = checkProgram(parse(`
+indicator("Nested UDF Qualifiers")
+smooth(series float source, int length) => ta.ema(source, length)
+wrapped(series float source, int window) => smooth(source, window)
+dynamicLength = bar_index + 1
+plot(wrapped(close, dynamicLength))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Cannot pass series value to simple parameter 'window' for function wrapped; use an input/simple value or declare a compatible parameter",
+    ]);
+  });
+
+  it('preserves const UDF parameter requirements for input defaults', () => {
+    const result = checkProgram(parse(`
+indicator("Const UDF Input Defaults")
+configured(const int length) => input.int(length, "Length")
+ok = configured(14)
+bad = configured(input.int(10))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Cannot pass input value to const parameter 'length' for function configured; use an input/simple value or declare a compatible parameter",
+    ]);
+  });
+
   it('reports invalid built-in argument names, counts, and ordering', () => {
     const result = checkProgram(parse(`
 indicator("Bad Builtins")
@@ -5934,7 +6368,7 @@ three = color.new(color.red, 10, 20)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'ta.sma() expects at least 2 arguments',
+      'ta.sma() expects at least 2 arguments (source, length); got 1',
       "ta.sma() missing required argument 'length'",
       "Unknown argument 'bad' for ta.rsi()",
       'color.new() expects at most 2 arguments',
@@ -6006,8 +6440,8 @@ hline badLine = plot(high)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign hline value to plot variable upper',
       'Cannot assign plot value to hline variable level',
-      'Cannot assign hline value to plot variable',
-      'Cannot assign plot value to hline variable',
+      "Cannot assign hline value to plot variable 'badPlot'",
+      "Cannot assign plot value to hline variable 'badLine'",
     ]);
   });
 
@@ -6108,6 +6542,7 @@ plot(since + highestOffset + highestInt + defaultHighest + average + spread + (c
   it('infers TA series variable member return types for downstream diagnostics', () => {
     const result = checkProgram(parse(`
 indicator("TA Variable Return Types")
+ad = ta.accdist
 iii = ta.iii
 nvi = ta.nvi
 obv = ta.obv
@@ -6116,6 +6551,7 @@ pvt = ta.pvt
 tr = ta.tr
 wad = ta.wad
 wvad = ta.wvad
+ad := "bad"
 iii := "bad"
 nvi := "bad"
 obv := "bad"
@@ -6130,6 +6566,7 @@ plot(iii + nvi + obv + pvi + pvt + tr + wad + wvad)
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable ad',
       'Cannot assign string value to float variable iii',
       'Cannot assign string value to float variable nvi',
       'Cannot assign string value to float variable obv',
@@ -6139,7 +6576,7 @@ plot(iii + nvi + obv + pvi + pvt + tr + wad + wvad)
       'Cannot assign string value to float variable wad',
       'Cannot assign string value to float variable wvad',
     ]);
-    for (const name of ['iii', 'nvi', 'obv', 'pvi', 'pvt', 'tr', 'wad', 'wvad']) {
+    for (const name of ['ad', 'iii', 'nvi', 'obv', 'pvi', 'pvt', 'tr', 'wad', 'wvad']) {
       expect(types.get(name)).toMatchObject({ kind: 'float', qualifier: 'series' });
     }
   });
@@ -6147,14 +6584,16 @@ plot(iii + nvi + obv + pvi + pvt + tr + wad + wvad)
   it('reports TA variables used as callable functions', () => {
     const result = checkProgram(parse(`
 indicator("Bad TA Variables")
+adCall = ta.accdist()
 iiiCall = ta.iii()
 nviCall = ta.nvi()
 pvtCall = ta.pvt()
 wadCall = ta.wad()
-plot(iiiCall + nviCall + pvtCall + wadCall)
+plot(adCall + iiiCall + nviCall + pvtCall + wadCall)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Unknown function: ta.accdist',
       'Unknown function: ta.iii',
       'Unknown function: ta.nvi',
       'Unknown function: ta.pvt',
@@ -6697,6 +7136,7 @@ text = "BTC-USDT-USDT"
 formatted = str.tostring(value=close, format="#.0")
 prefixFormatted = str.tostring(value=close, "#.00")
 parsed = str.tonumber(string="42.5")
+parsedInt = str.tointeger(string="42.9")
 timeText = str.format_time(time=time, format="yyyy-MM-dd", timezone=syminfo.timezone)
 prefixTimeText = str.format_time(time=time, "yyyy-MM-dd", syminfo.timezone)
 message = str.format(format="close={0}", close)
@@ -6723,7 +7163,7 @@ replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occu
 prefixReplaceOne = str.replace(source=text, "USDT", "PERP", 1)
 replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
 prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
-plot(parsed + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + officialRepeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
+plot(parsed + parsedInt + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + officialRepeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -6737,6 +7177,7 @@ seriesText = str.tostring(close)
 formatted = str.format(format="close={0}", close)
 timeText = str.format_time(time=time)
 parsed = str.tonumber("42.5")
+parsedInt = str.tointeger("42.9")
 length = str.length(text)
 position = str.pos(source=text, str="USDT")
 hasUsdt = str.contains(source=text, str="USDT")
@@ -6750,6 +7191,7 @@ seriesText := 1
 formatted := 2
 timeText := 3
 parsed := "bad"
+parsedInt := "bad"
 length := "bad"
 position := "bad"
 hasUsdt := 1
@@ -6769,6 +7211,7 @@ plot(hasUsdt and starts ? 1 : 0)
       'Cannot assign int value to string variable formatted',
       'Cannot assign int value to string variable timeText',
       'Cannot assign string value to float variable parsed',
+      'Cannot assign string value to int variable parsedInt',
       'Cannot assign string value to int variable length',
       'Cannot assign string value to int variable position',
       'Cannot assign int value to bool variable hasUsdt',
@@ -7225,9 +7668,11 @@ revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps=barmerge.
 prefixRevenue = request.financial(symbol="NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", barmerge.gaps_off, false, "USD")
 econ = request.economic("US", "GDP", gaps=barmerge.gaps_off, ignore_invalid_symbol=false)
 prefixEcon = request.economic(country_code="US", "GDP", barmerge.gaps_off, false)
+quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", gaps=barmerge.gaps_off, index=0, ignore_invalid_symbol=false)
+prefixQuandl = request.quandl(ticker="MULTPL/SP500_PE_RATIO_MONTH", barmerge.gaps_on, 0, true)
 seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol=false, calc_bars_count=2)
 prefixSeeded = request.seed(source="seed", "SYM", close, false, 2)
-plot(rate + dividend + earning + split + revenue + econ + seeded)
+plot(rate + dividend + earning + split + revenue + econ + quandl + seeded)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -7247,6 +7692,7 @@ earning = request.earnings("NASDAQ:AAPL", earnings.actual, currency="USD")
 split = request.splits("NASDAQ:AAPL", splits.denominator)
 revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency="USD")
 econ = request.economic("US", "GDP")
+quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", barmerge.gaps_off, 0)
 htfFloat := "bad"
 htfString := 1
 ltfFirst := "bad"
@@ -7257,7 +7703,8 @@ earning := "bad"
 split := "bad"
 revenue := "bad"
 econ := "bad"
-plot(htfFloat + ltfFirst + seeded + rate + dividend + earning + split + revenue + econ + str.length(htfString))
+quandl := "bad"
+plot(htfFloat + ltfFirst + seeded + rate + dividend + earning + split + revenue + econ + quandl + str.length(htfString))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -7273,6 +7720,7 @@ plot(htfFloat + ltfFirst + seeded + rate + dividend + earning + split + revenue 
       'Cannot assign string value to float variable split',
       'Cannot assign string value to float variable revenue',
       'Cannot assign string value to float variable econ',
+      'Cannot assign string value to float variable quandl',
     ]);
     expect(types.get('htfFloat')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('htfString')).toMatchObject({ kind: 'string', qualifier: 'series' });
@@ -7285,6 +7733,7 @@ plot(htfFloat + ltfFirst + seeded + rate + dividend + earning + split + revenue 
     expect(types.get('split')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('revenue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('econ')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('quandl')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid request helper named arguments', () => {
@@ -7293,12 +7742,14 @@ indicator("Bad Request Signatures")
 rate = request.currency_rate("USD", "GBP", from="EUR")
 split = request.splits("NASDAQ:AAPL", splits.denominator, currency="USD")
 econ = request.economic("US", "GDP", unexpected=1)
+quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", unexpected=1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Argument 'from' for request.currency_rate() was supplied multiple times",
       "Unknown argument 'currency' for request.splits()",
       "Unknown argument 'unexpected' for request.economic()",
+      "Unknown argument 'unexpected' for request.quandl()",
     ]);
   });
 
@@ -7337,9 +7788,10 @@ earning = request.earnings("NASDAQ:AAPL", earnings.actual, ignore_invalid_symbol
 split = request.splits("NASDAQ:AAPL", splits.denominator, ignore_invalid_symbol=1)
 revenue = request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", ignore_invalid_symbol="yes")
 econ = request.economic("US", "GDP", ignore_invalid_symbol=1)
+quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", ignore_invalid_symbol="yes")
 seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol="yes")
 duplicate = request.security("NASDAQ:AAPL", "2", close, symbol="NASDAQ:MSFT", ignore_invalid_symbol=1)
-plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + seeded + duplicate)
+plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + quandl + seeded + duplicate)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -7352,6 +7804,7 @@ plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ 
       'request.splits ignore_invalid_symbol must be a boolean, got int',
       'request.financial ignore_invalid_symbol must be a boolean, got string',
       'request.economic ignore_invalid_symbol must be a boolean, got int',
+      'request.quandl ignore_invalid_symbol must be a boolean, got string',
       'request.seed ignore_invalid_symbol must be a boolean, got string',
       "Argument 'symbol' for request.security() was supplied multiple times",
     ]);
@@ -7368,9 +7821,10 @@ earning = request.earnings(1, earnings.actual, currency=2)
 split = request.splits(1, splits.denominator)
 revenue = request.financial(1, 2, 3, currency=4)
 econ = request.economic(1, 2)
+quandl = request.quandl(1)
 seeded = request.seed(1, 2, close)
 duplicate = request.security(1, "2", close, symbol="NASDAQ:MSFT")
-plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + seeded + duplicate)
+plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ + quandl + seeded + duplicate)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -7392,6 +7846,7 @@ plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ 
       'request.financial currency must be a string, got int',
       'request.economic country_code must be a string, got int',
       'request.economic field must be a string, got int',
+      'request.quandl ticker must be a string, got int',
       'request.seed source must be a string, got int',
       'request.seed symbol must be a string, got int',
       "Argument 'symbol' for request.security() was supplied multiple times",
@@ -7616,6 +8071,10 @@ optionLength = input.int(14, "Length", options=[7, 21])
 optionFloat = input.float(2.5, "Multiplier", options=[1.0, 2.0])
 mode = input.string("VWAP", "Mode", options=["SMA", "EMA"])
 tf = input.timeframe("240", "Timeframe", ["15", "60"])
+enum Direction
+    long = "Long"
+    short = "Short"
+badDirection = input.enum(Direction.long, "Direction", options=[Direction.short])
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -7626,6 +8085,7 @@ tf = input.timeframe("240", "Timeframe", ["15", "60"])
       'input.float defval must be one of options',
       'input.string defval must be one of options',
       'input.timeframe defval must be one of options',
+      'input.enum defval must be one of options',
     ]);
   });
 
@@ -7696,7 +8156,7 @@ plot(badTitle + badTooltip + badGroup + okGroup + badGenericTitle)
       'input.enum inline must be a string, got int',
       'input.source group must be a string, got bool',
       'input title must be a string, got int',
-      'input confirm must be a boolean, got int',
+      "Unknown argument 'confirm' for input()",
     ]);
   });
 
@@ -7887,8 +8347,8 @@ plot(validPivot.y)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign Mode value to Direction variable',
-      'Cannot assign Other value to Pivot variable',
+      "Cannot assign Mode value to Direction variable 'badDirection'",
+      "Cannot assign Other value to Pivot variable 'badPivot'",
     ]);
   });
 
@@ -7907,12 +8367,12 @@ plot(validFloat)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign int value to string variable',
-      'Cannot assign int value to bool variable',
-      'Cannot assign line value to label variable',
-      'Cannot assign array<string> value to array<float> variable',
-      'Cannot assign matrix<float> value to matrix<int> variable',
-      'Cannot assign map<int, float> value to map<string, float> variable',
+      "Cannot assign int value to string variable 'badString'",
+      "Cannot assign int value to bool variable 'badBool'",
+      "Cannot assign line value to label variable 'badLabel'",
+      "Cannot assign array<string> value to array<float> variable 'badValues'",
+      "Cannot assign matrix<float> value to matrix<int> variable 'badGrid'",
+      "Cannot assign map<int, float> value to map<string, float> variable 'badPrices'",
     ]);
   });
 
@@ -7935,6 +8395,12 @@ plot(intKind + str.length(floatKind))
   });
 
   it('selects user-defined imported enum receiver methods', () => {
+    const library = parse(`
+library("Signal")
+export enum State
+    long = "Long"
+    short = "Short"
+`);
     const result = checkProgram(parse(`
 indicator("Imported Enum Method Receivers")
 import TestUser/Signal/1 as sig
@@ -7947,7 +8413,9 @@ stateLabel = sig.State.short.label()
 priceLabel = close.label()
 shadowValue = shadow(1)
 plot(str.length(stateLabel) + str.length(priceLabel) + shadowValue)
-`));
+`), {
+      libraries: new Map([['TestUser/Signal/1', library]]),
+    });
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
@@ -8063,10 +8531,11 @@ shadow(int sig) => sig.State.sideways
 sig.State selected = sig.State.long
 validDescription = sig.describe(sig.State.short)
 validLabel = sig.State.long.label()
+validTitle = sig.State.long.title()
 missing = sig.State.sideways
 hidden = sig.Hidden.private
 missingEnum = sig.Missing.fast
-plot(str.length(validDescription) + str.length(validLabel) + str.length(str.tostring(shadow(1))))
+plot(str.length(validDescription) + str.length(validLabel) + str.length(validTitle) + str.length(str.tostring(shadow(1))))
 `), {
       libraries: new Map([['TestUser/SignalTools/1', library]]),
     });
@@ -8081,6 +8550,7 @@ plot(str.length(validDescription) + str.length(validLabel) + str.length(str.tost
     expect(types.get('selected')).toMatchObject({ kind: 'udt', name: 'sig.State' });
     expect(types.get('validDescription')).toMatchObject({ kind: 'string' });
     expect(types.get('validLabel')).toMatchObject({ kind: 'string' });
+    expect(types.get('validTitle')).toMatchObject({ kind: 'string' });
     expect(types.get('hidden')).toMatchObject({ kind: 'unknown' });
   });
 
@@ -8112,7 +8582,7 @@ plot(weighted + fast + (isBull ? 1 : 0) + str.length(description))
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign string value to float variable',
+      "Cannot assign string value to float variable 'badPeriod'",
     ]);
     expect(types.get('fast')).toMatchObject({ kind: 'int', qualifier: 'const' });
     expect(types.get('weighted')).toMatchObject({ kind: 'float' });
@@ -8211,6 +8681,49 @@ plot(validLocal + missingFunction + privateFunction + missingConstructor.value +
       'Unknown library constructor: tools.Hidden.new',
       'Unknown function: p.secret',
     ]);
+  });
+
+  it('reports imported library functions used as bare values semantically', () => {
+    const library = parse(`
+library("FunctionValues", true)
+export value(series float source) => source
+`);
+    const result = checkProgram(parse(`
+indicator("Imported Function Value")
+import TestUser/FunctionValues/1 as helper
+float bad = helper.value
+plot(bad)
+`), {
+      libraries: new Map([['TestUser/FunctionValues/1', library]]),
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Imported library member helper.value is a function; call it as helper.value(...)',
+    ]);
+  });
+
+  it('reports colliding import aliases as duplicate declarations', () => {
+    const left = parse(`
+library("Left", true)
+export value(series float source) => source
+`);
+    const right = parse(`
+library("Right", true)
+export value(series float source) => source
+`);
+    const result = checkProgram(parse(`
+indicator("Duplicate Import Alias")
+import TestUser/Left/1 as helper
+import TestUser/Right/1 as helper
+plot(helper.value(close))
+`), {
+      libraries: new Map([
+        ['TestUser/Left/1', left],
+        ['TestUser/Right/1', right],
+      ]),
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toContain('Duplicate declaration: helper');
   });
 
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
@@ -8493,12 +9006,24 @@ y = input.int(5, "length", minval = 1, step = 1)
   });
 
   it('does not report unknown-argument for v4 input() with minval/maxval/step', () => {
-    const result = checkProgram(parse(`
-indicator("V4 Input")
+    const result = checkProgram(parse(`//@version=4
+study("V4 Input")
 overbought = input(70, "Overbought", minval=0, maxval=100)
 step_input = input(0.5, "Step", minval=0.0, maxval=1.0, step=0.1)
 `));
 
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(5).fill('legacy-argument'));
+  });
+
+  it('accepts v4 generic input type and options metadata', () => {
+    const result = checkProgram(parse(`//@version=4
+study("Legacy Generic Input Type")
+mode = input("EMA", "Mode", type=input.string, options=["SMA", "EMA"])
+length = input(14, "Length", type=input.integer, minval=1, maxval=100, step=1)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
     expect(result.diagnostics).toEqual([]);
   });
 
@@ -8522,6 +9047,53 @@ plot(val)
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('warns for direct recursive user-defined functions with a precise diagnostic', () => {
+    const result = checkProgram(parse(`
+indicator("Direct Recursive UDF")
+countdown(value) => value <= 0 ? 0 : countdown(value - 1)
+plot(countdown(2))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Recursive user-defined function calls run in TealScript but are not supported by Pine v6, so this script will not run on TradingView: countdown -> countdown',
+    ]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.severity)).toEqual(['warning']);
+  });
+
+  it('warns for mutual recursive user-defined functions with a precise diagnostic', () => {
+    const result = checkProgram(parse(`
+indicator("Mutual Recursive UDF")
+even(value) => value <= 0 ? 1 : odd(value - 1)
+odd(value) => value <= 0 ? 0 : even(value - 1)
+plot(even(4))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Recursive user-defined function calls run in TealScript but are not supported by Pine v6, so this script will not run on TradingView: even -> odd -> even',
+    ]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.severity)).toEqual(['warning']);
+  });
+
+  it('allows recursion warnings without execution errors', () => {
+    const script = `
+indicator("Recursive Warning")
+factorial(n) => n <= 1 ? 1 : n * factorial(n - 1)
+plot(factorial(4))
+`;
+    const ast = parse(script);
+    const result = checkProgram(ast);
+    expect(result.diagnostics).toMatchObject([
+      {
+        code: 'recursive-function',
+        severity: 'warning',
+        message: 'Recursive user-defined function calls run in TealScript but are not supported by Pine v6, so this script will not run on TradingView: factorial -> factorial',
+      },
+    ]);
+    const executed = executeScript(ast, [{ time: 1, open: 1, high: 1, low: 1, close: 1, volume: 1 }]);
+    expect(executed.errors).toEqual([]);
+    expect(executed.plots[0]?.values).toEqual([24]);
   });
 
   it('accepts collection constructor calls as UDT field defaults', () => {
@@ -8562,5 +9134,37 @@ plot(isMonday or isSunday ? 1 : 0)
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('joins inferred variable qualifiers across reassignment and compound assignment', () => {
+    const result = checkProgram(parse(`
+indicator("Reassignment Qualifier Join")
+plain = 0.0
+plain := nz(plain[1]) + close
+var persistent = 0
+persistent := nz(persistent[1]) + bar_index
+varip intrabar = 0
+intrabar += bar_index
+float typed = na
+typed := close
+const float fixed = 0
+fixed := close
+plot(plain + persistent + intrabar + typed + fixed)
+`));
+
+    const errors = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    expect(errors).toMatchObject([
+      {
+        code: 'qualifier-mismatch',
+        message: 'Cannot assign series value to const float variable fixed',
+      },
+    ]);
+
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+    expect(types.get('plain')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('persistent')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('intrabar')).toMatchObject({ kind: 'int', qualifier: 'series' });
+    expect(types.get('typed')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('fixed')).toMatchObject({ kind: 'float', qualifier: 'const' });
   });
 });
