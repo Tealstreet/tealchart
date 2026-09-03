@@ -46,7 +46,7 @@ namespace, and enforcement for the one-call-per-script limit.
 ## Current TealScript Behavior
 
 `request.footprint()` accepts positional and named v6 arguments in the
-interpreter and compiled path. It resolves seeded footprint contexts through
+compiled path. It resolves seeded footprint contexts through
 `RequestDatafeed.getFootprint()` and returns Pine `na` when no context is
 available.
 

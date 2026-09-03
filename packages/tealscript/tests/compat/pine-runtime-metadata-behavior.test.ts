@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { PINE_V6_KNOWN_MISSING_BUILTINS } from '../../src/compat/pineV6BuiltinReference';
 import { PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX } from '../../src/compat/pineV6ReferenceManualIndex';
 import { parse } from '../../src/parser';
-import type { Bar, ExecutionResult, TealscriptEngineOptions } from '../../src/runtime';
+import type { Bar, ExecutionResult, TealscriptExecutionOptions } from '../../src/runtime';
 import { executeScript } from '../../src/runtime';
 import { executeCompiled, type CompiledExecutionOptions, tryCompile } from '../../src/runtime/codegen/execute';
 import {
@@ -23,7 +23,7 @@ interface RuntimeMetadataCase extends ExpectedValueProvenanceDeclaration {
   covers: readonly string[];
   source: string;
   bars?: Bar[];
-  options?: TealscriptEngineOptions & CompiledExecutionOptions;
+  options?: TealscriptExecutionOptions & CompiledExecutionOptions;
   expectedPlots: Record<string, ExpectedSeries>;
 }
 
@@ -52,7 +52,7 @@ const simpleBars: Bar[] = Array.from({ length: 4 }, (_, index) => ({
   volume: 1_000 + index,
 }));
 
-const metadataOptions: TealscriptEngineOptions & CompiledExecutionOptions = {
+const metadataOptions: TealscriptExecutionOptions & CompiledExecutionOptions = {
   runtime: {
     syminfo: {
       ticker: 'AAPL',
@@ -91,7 +91,7 @@ const metadataOptions: TealscriptEngineOptions & CompiledExecutionOptions = {
   },
 };
 
-const sessionOptions: TealscriptEngineOptions & CompiledExecutionOptions = {
+const sessionOptions: TealscriptExecutionOptions & CompiledExecutionOptions = {
   runtime: {
     syminfo: { timezone: 'America/New_York' },
     timeframe: {

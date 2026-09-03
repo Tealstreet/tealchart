@@ -352,6 +352,13 @@ export const STRATEGY_HISTORY_PROPS = [
   'grossprofit',
   'grossloss',
   'openprofit',
+  'avg_trade',
+  'avg_trade_percent',
+  'avg_winning_trade',
+  'avg_winning_trade_percent',
+  'avg_losing_trade',
+  'avg_losing_trade_percent',
+  'percent_profitable',
   'max_runup',
   'max_drawdown',
   'opentrades.capital_held',
@@ -373,6 +380,10 @@ export function isStrategyHistoryProp(name: string): name is StrategyHistoryProp
 }
 
 export function readStrategyHistoryProp(ledger: StrategyLedger, name: StrategyHistoryProp): unknown {
+  const tradeProfitPercent = (trade: StrategyTrade): number => {
+    const notional = Math.abs(trade.entryPrice * trade.qty);
+    return notional === 0 ? 0 : (trade.profit / notional) * 100;
+  };
   switch (name) {
     case 'position_entry_name':
       return ledger.openTrades[0]?.entryOrderId ?? '';
@@ -392,6 +403,30 @@ export function readStrategyHistoryProp(ledger: StrategyLedger, name: StrategyHi
       return ledger.grossLoss;
     case 'openprofit':
       return ledger.position.openProfit;
+    case 'avg_trade':
+      return ledger.closedTrades.length === 0 ? Number.NaN : ledger.netProfit / ledger.closedTrades.length;
+    case 'avg_trade_percent':
+      return ledger.closedTrades.length === 0
+        ? Number.NaN
+        : ledger.closedTrades.reduce((total, trade) => total + tradeProfitPercent(trade), 0) / ledger.closedTrades.length;
+    case 'avg_winning_trade': {
+      const winning = ledger.closedTrades.filter((trade) => trade.profit > 0);
+      return winning.length === 0 ? Number.NaN : winning.reduce((total, trade) => total + trade.profit, 0) / winning.length;
+    }
+    case 'avg_winning_trade_percent': {
+      const winning = ledger.closedTrades.filter((trade) => trade.profit > 0);
+      return winning.length === 0 ? Number.NaN : winning.reduce((total, trade) => total + tradeProfitPercent(trade), 0) / winning.length;
+    }
+    case 'avg_losing_trade': {
+      const losing = ledger.closedTrades.filter((trade) => trade.profit < 0);
+      return losing.length === 0 ? Number.NaN : losing.reduce((total, trade) => total + trade.profit, 0) / losing.length;
+    }
+    case 'avg_losing_trade_percent': {
+      const losing = ledger.closedTrades.filter((trade) => trade.profit < 0);
+      return losing.length === 0 ? Number.NaN : losing.reduce((total, trade) => total + tradeProfitPercent(trade), 0) / losing.length;
+    }
+    case 'percent_profitable':
+      return ledger.closedTrades.length === 0 ? Number.NaN : (ledger.closedTrades.filter((trade) => trade.profit > 0).length / ledger.closedTrades.length) * 100;
     case 'max_runup':
       return ledger.maxRunup;
     case 'max_drawdown':

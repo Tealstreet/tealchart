@@ -1202,8 +1202,6 @@ export interface TealchartWidgetOptions {
   createTealscriptWorker?: () => Worker;
   /** Explicit TealScript backend override. Intended for tests, CLI harnesses and controlled cutover. */
   tealscriptExecutionBackend?: TealscriptExecutionBackend;
-  /** Feature-flag hook for closure backend rollout. False/undefined keeps the compiled default. */
-  enableTealscriptClosureBackend?: boolean | (() => boolean);
   /**
    * Host-registered Pine libraries available to TealScript imports.
    */

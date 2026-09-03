@@ -82,6 +82,11 @@ export type { BuiltinIndicator } from './indicators';
 // React Native Skia component
 export { SkiaTealchart } from './SkiaTealchart';
 export type { SkiaTealchartHandle, SkiaTealchartProps } from './SkiaTealchart';
+export { TealscriptWebViewWorkerBridge, useTealscriptWebViewWorkerBridge } from './mobile/TealscriptWebViewWorkerHost';
+export {
+  parseTealscriptWebViewBridgeMessage,
+  stringifyTealscriptWebViewBridgeMessage,
+} from './mobile/tealscriptWebViewBridgeCodec';
 export { createAsyncStorageKeyValueStorage, StorageSaveLoadAdapter } from './transformer/storageSaveLoadAdapter';
 export type { ISaveLoadAdapter, LayoutMetadata } from './transformer/saveLoadIntegration';
 export type { AsyncStorageLike, TealchartKeyValueStorage } from './transformer/storageSaveLoadAdapter';
@@ -90,12 +95,3 @@ export type { AsyncStorageLike, TealchartKeyValueStorage } from './transformer/s
 export { AVAILABLE_TIMEFRAMES as MOBILE_TIMEFRAMES } from './state/chartState';
 export type { TimeframeOption as MobileTimeframeOption } from './state/chartState';
 export type { ITealchartWidget } from './widgetContract';
-
-export { runMobileTealscriptClosureSmoke } from './mobile/mobileTealscriptClosureSmoke';
-export type {
-  MobileTealscriptClosureSmokeCase,
-  MobileTealscriptClosureSmokeCaseResult,
-  MobileTealscriptClosureSmokeExpectedOutput,
-  MobileTealscriptClosureSmokeOptions,
-  MobileTealscriptClosureSmokeResult,
-} from './mobile/mobileTealscriptClosureSmoke';

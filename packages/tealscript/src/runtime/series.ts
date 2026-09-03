@@ -53,6 +53,7 @@ export class Series<T> {
    * Returns undefined if offset goes beyond available history
    */
   get(offset: number = 0): T | undefined {
+    offset = Math.trunc(offset);
     if (offset < 0) {
       // Can't look into the future
       return undefined;

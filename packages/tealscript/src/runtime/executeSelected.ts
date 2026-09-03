@@ -1,14 +1,13 @@
 import type { Program } from '../parser/ast';
 import type { Bar } from './context';
-import { TealscriptEngine, type ExecutionResult, type TealscriptEngineOptions } from './engine';
+import type { ExecutionResult, TealscriptExecutionOptions } from './types';
 import {
   applyTealscriptBackendSelectionProfile,
   selectTealscriptExecutionBackend,
 } from './backendSelection';
 import { tryExecuteScript, type CompiledExecutionOptions } from './codegen/execute';
-import { executeClosureScript, type ClosureExecutionOptions } from './closure/execute';
 
-export interface SelectedTealscriptExecutionOptions extends TealscriptEngineOptions {
+export interface SelectedTealscriptExecutionOptions extends TealscriptExecutionOptions {
   maxBarsBack?: number;
   realtimeLastBar?: CompiledExecutionOptions['realtimeLastBar'];
   confirmedRealtimeBarIndex?: CompiledExecutionOptions['confirmedRealtimeBarIndex'];
@@ -22,16 +21,6 @@ export function executeSelectedTealscriptBackend(
   options: SelectedTealscriptExecutionOptions = {},
 ): ExecutionResult {
   const selection = selectTealscriptExecutionBackend(options.runtime?.backend);
-  if (selection.backend === 'closure') {
-    return applyTealscriptBackendSelectionProfile(
-      executeClosureScript(ast, bars, inputs, options as ClosureExecutionOptions),
-      selection,
-    );
-  }
-
-  if (selection.backend === 'interpreter') {
-    return applyTealscriptBackendSelectionProfile(new TealscriptEngine(options).execute(ast, bars, inputs), selection);
-  }
 
   let fallbackReason: string | undefined;
   const compiledResult = tryExecuteScript(ast, bars, inputs, {
@@ -46,12 +35,8 @@ export function executeSelectedTealscriptBackend(
       fallbackReason = reason;
     },
   });
-  const result = compiledResult ?? new TealscriptEngine(options).execute(ast, bars, inputs);
-  if (!compiledResult && fallbackReason) {
-    result.profile = {
-      ...result.profile,
-      fallbackReason,
-    };
+  if (!compiledResult) {
+    throw new Error(`Compiled TealScript execution failed${fallbackReason ? `: ${fallbackReason}` : ''}`);
   }
-  return applyTealscriptBackendSelectionProfile(result, selection);
+  return applyTealscriptBackendSelectionProfile(compiledResult, selection);
 }

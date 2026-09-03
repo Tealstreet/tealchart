@@ -3,7 +3,7 @@
  *
  * This class mirrors web's TealchartWidget indicator management:
  * - Web: TealchartWidget uses TealscriptManager (WebWorker-based)
- * - Mobile: MobileIndicatorManager uses TealscriptEngine (sync, main thread)
+ * - Mobile: MobileIndicatorManager requires the compiled WebView host
  *
  * Usage in React:
  * ```typescript
@@ -17,29 +17,39 @@
  */
 import type {
   DrawingOutput,
+  FromWorkerMessage,
   IndicatorDeclarationMetadata,
   InputDefinition,
   PlotOutput,
   Program,
+  RequestCorporateActionQuery,
+  RequestCurrencyRateQuery,
+  RequestDatafeedErrorCode,
   RequestDatafeed,
+  RequestEconomicSeriesQuery,
+  RequestFinancialMetricQuery,
+  RequestFootprintQuery,
+  RequestQuandlSeriesQuery,
+  RequestSeriesQuery,
   RuntimeProfile,
+  TealscriptRuntimeOptions,
   TealscriptExecutionBackend,
   WorkerError,
 } from '@tealstreet/tealscript';
+import type { TealscriptRequestDataResolver } from '../types';
 import type { EventCallback } from '../events/EventEmitter';
 import type { IndicatorInstance, PlotStyleOverride } from '../state/chartState';
 import type { Bar, UnifiedPaneLayout } from '../types';
 
 import {
-  executeSelectedTealscriptBackend,
   parse,
   TealscriptParseError,
-  selectTealscriptExecutionBackend,
 } from '@tealstreet/tealscript';
 import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
 import { EventEmitter } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
+import { TealscriptManager } from '../tealscript/TealscriptManager';
 
 /**
  * An active indicator instance
@@ -100,76 +110,23 @@ export interface MobileTealscriptIndicatorOptions {
 }
 
 export interface MobileIndicatorManagerOptions {
+  createWorker?: () => Worker;
   tealscriptExecutionBackend?: TealscriptExecutionBackend;
-  enableTealscriptClosureBackend?: boolean | (() => boolean);
+  getRuntimeOptions?: () => TealscriptRuntimeOptions | undefined;
   getLibraries?: () => Map<string, Program> | undefined;
   getRequestDatafeed?: () => RequestDatafeed | undefined;
-}
-
-/**
- * One indicator's last execution, reusable while its script, inputs and bars
- * are all unchanged. Plots are stored already tagged with `scriptId`, so a
- * reused entry also keeps the PlotOutput identities React memoisation keys on.
- */
-interface CachedIndicatorResult {
-  ast: Program;
-  barsEpoch: number;
-  backendSelectionKey: string;
-  drawings: DrawingOutput[];
-  inputsKey: string;
-  libraries: Map<string, Program> | undefined;
-  plots: PlotOutput[];
-  requestDatafeed: RequestDatafeed | undefined;
-}
-
-let uncacheableInputsCounter = 0;
-
-/** Order-independent, so a re-minted inputs object is not a false cache miss. */
-function createIndicatorInputsKey(inputs: Record<string, unknown> | undefined): string {
-  const entries = Object.entries(inputs ?? {});
-  if (entries.length === 0) return '';
-  try {
-    return JSON.stringify(entries.sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0)));
-  } catch {
-    // Cyclic, BigInt or a throwing toJSON. A key that never matches costs this
-    // indicator its cache; throwing here would kill every later bar tick.
-    uncacheableInputsCounter += 1;
-    return `uncacheable:${uncacheableInputsCounter}`;
-  }
 }
 
 export type MobileIndicatorErrorCallback = (scriptId: string, error: WorkerError) => void;
 
 const MOBILE_INDICATOR_ERROR_EVENT = 'indicator:error';
-const REQUEST_DATA_UNAVAILABLE_ERROR_CODE = 'request-data-unavailable';
-const REQUEST_DATAFEED_REQUIRED_PATTERN = /^(request\.[A-Za-z0-9_]+) requires a request datafeed$/;
-
-function resolveBooleanOption(value: boolean | (() => boolean) | undefined): boolean | undefined {
-  return typeof value === 'function' ? value() : value;
-}
-
-function formatMissingRequestDatafeedError(error: { message: string; line?: number; column?: number }): WorkerError | null {
-  const match = error.message.match(REQUEST_DATAFEED_REQUIRED_PATTERN);
-  if (!match) return null;
-  return {
-    type: 'runtime',
-    severity: 'warning',
-    code: REQUEST_DATA_UNAVAILABLE_ERROR_CODE,
-    message:
-      `Tealscript request data unavailable for ${match[1]}: not supported in this chart because no Tealscript request data resolver is configured. ` +
-      'The script is valid, but Tealstreet cannot supply that data here. Provider detail: No Tealscript request data resolver configured',
-    line: error.line,
-    column: error.column,
-  };
-}
+type RequestDataMessage = Extract<FromWorkerMessage, { type: 'requestData' }>;
 
 /**
  * MobileIndicatorManager - React-agnostic class for managing indicators
  *
- * Key differences from web's TealscriptManager:
- * - Synchronous execution on main thread (no WebWorkers)
- * - Simpler - no message passing or async coordination
- * - Suitable for mobile where we have fewer indicators
+ * Mobile TealScript execution is intentionally unavailable until the compiled
+ * WebView host lands. Inline execution was removed.
  */
 export class MobileIndicatorManager {
   private _paneManager: PaneManager;
@@ -188,50 +145,64 @@ export class MobileIndicatorManager {
   });
   private _lastErrorKeys: Map<string, string> = new Map();
   private _instanceCounter = 0;
-  private _resultCache: Map<string, CachedIndicatorResult> = new Map();
-  private _barsEpoch = 0;
   private _plotsRevision = 0;
   private _indicatorsRevision = 0;
   private _getLibraries: (() => Map<string, Program> | undefined) | undefined;
+  private _getRuntimeOptions: (() => TealscriptRuntimeOptions | undefined) | undefined;
   private _getRequestDatafeed: (() => RequestDatafeed | undefined) | undefined;
   private _tealscriptExecutionBackend: TealscriptExecutionBackend | undefined;
-  private _enableTealscriptClosureBackend: boolean | (() => boolean) | undefined;
+  private _tealscriptManager: TealscriptManager | undefined;
 
   constructor(options: MobileIndicatorManagerOptions = {}) {
     this._paneManager = new PaneManager();
+    this._getRuntimeOptions = options.getRuntimeOptions;
     this._getLibraries = options.getLibraries;
     this._getRequestDatafeed = options.getRequestDatafeed;
     this._tealscriptExecutionBackend = options.tealscriptExecutionBackend;
-    this._enableTealscriptClosureBackend = options.enableTealscriptClosureBackend;
+    if (options.createWorker) {
+      this._tealscriptManager = new TealscriptManager({
+        createWorker: options.createWorker,
+        getLibraries: () => this._getLibraries?.() ?? new Map(),
+        getRuntimeOptions: this._createRuntimeOptions,
+        onDeclarationDiscovered: this._handleDeclarationDiscovered,
+        onDrawingsUpdated: this._handleDrawingsUpdated,
+        onError: this._emitError,
+        onInputsDiscovered: this._handleInputsDiscovered,
+        onPlotsUpdated: this._handlePlotsUpdated,
+        resolveRequestData: this._resolveRequestData,
+      });
+    }
   }
 
   setLibrariesProvider(getLibraries: (() => Map<string, Program> | undefined) | undefined): void {
     if (this._getLibraries === getLibraries) return;
     this._getLibraries = getLibraries;
-    this._resultCache.clear();
+    this._restartWorkerScripts();
+    this._recomputePlots();
+  }
+
+  setRuntimeOptionsProvider(getRuntimeOptions: (() => TealscriptRuntimeOptions | undefined) | undefined): void {
+    if (this._getRuntimeOptions === getRuntimeOptions) return;
+    this._getRuntimeOptions = getRuntimeOptions;
+    this._restartWorkerScripts();
     this._recomputePlots();
   }
 
   setRequestDatafeedProvider(getRequestDatafeed: (() => RequestDatafeed | undefined) | undefined): void {
     if (this._getRequestDatafeed === getRequestDatafeed) return;
     this._getRequestDatafeed = getRequestDatafeed;
-    this._resultCache.clear();
+    this._restartWorkerScripts();
     this._recomputePlots();
   }
 
   setTealscriptBackendSelection(options: {
     tealscriptExecutionBackend?: TealscriptExecutionBackend;
-    enableTealscriptClosureBackend?: boolean | (() => boolean);
   }): void {
-    if (
-      this._tealscriptExecutionBackend === options.tealscriptExecutionBackend &&
-      this._enableTealscriptClosureBackend === options.enableTealscriptClosureBackend
-    ) {
+    if (this._tealscriptExecutionBackend === options.tealscriptExecutionBackend) {
       return;
     }
     this._tealscriptExecutionBackend = options.tealscriptExecutionBackend;
-    this._enableTealscriptClosureBackend = options.enableTealscriptClosureBackend;
-    this._resultCache.clear();
+    this._restartWorkerScripts();
     this._recomputePlots();
   }
 
@@ -260,7 +231,7 @@ export class MobileIndicatorManager {
     // Epoch, not array identity: ChartWidgetCore appends a live bar in place and
     // hands back the same array, which reference equality would read as no change.
     this._bars = bars;
-    this._barsEpoch += 1;
+    this._tealscriptManager?.setBars(bars);
     this._recomputePlots(silent);
   }
 
@@ -323,6 +294,7 @@ export class MobileIndicatorManager {
       ast,
       isVisible: true,
     });
+    this._addWorkerScript(instanceId, indicator.code, inputs);
 
     // Recompute plots with new indicator
     this._indicatorsRevision += 1;
@@ -334,8 +306,8 @@ export class MobileIndicatorManager {
   /**
    * Add a caller-provided Tealscript indicator.
    *
-   * This mirrors the worker-backed web path for mobile, but executes
-   * synchronously through TealscriptEngine so Skia can render the plots.
+   * This mirrors the worker-backed web path metadata for mobile.
+   * TealScript execution now requires the compiled WebView host.
    */
   addTealscriptIndicator(options: MobileTealscriptIndicatorOptions): string {
     const instanceId = options.id?.trim() || `custom_${++this._instanceCounter}`;
@@ -375,6 +347,7 @@ export class MobileIndicatorManager {
       ast,
       isVisible: true,
     });
+    this._addWorkerScript(instanceId, indicator.code, options.inputs);
 
     this._indicatorsRevision += 1;
     this._recomputePlots();
@@ -411,7 +384,7 @@ export class MobileIndicatorManager {
     this._declarationCache.delete(instanceId);
     this._astCache.delete(instanceId);
     this._lastErrorKeys.delete(instanceId);
-    this._resultCache.delete(instanceId);
+    this._tealscriptManager?.removeScript(instanceId);
 
     // Recompute plots without this indicator
     this._indicatorsRevision += 1;
@@ -425,6 +398,7 @@ export class MobileIndicatorManager {
     const indicator = this._indicators.find((ind) => ind.instanceId === instanceId);
     if (indicator) {
       indicator.inputs = inputs;
+      this._tealscriptManager?.setInputs(instanceId, inputs);
       this._indicatorsRevision += 1;
       this._recomputePlots();
     }
@@ -438,6 +412,7 @@ export class MobileIndicatorManager {
     if (!indicator || indicator.isVisible === isVisible) return;
 
     indicator.isVisible = isVisible;
+    this._tealscriptManager?.setScriptVisibility(instanceId, isVisible);
     this._indicatorsRevision += 1;
     this._recomputePlots();
   }
@@ -601,19 +576,6 @@ export class MobileIndicatorManager {
     };
   }
 
-  private _toExecutionError(error: { message: string; line?: number; column?: number }): WorkerError {
-    const requestDatafeedError = formatMissingRequestDatafeedError(error);
-    if (requestDatafeedError) return requestDatafeedError;
-
-    return {
-      type: 'runtime',
-      severity: 'error',
-      message: error.message,
-      line: error.line,
-      column: error.column,
-    };
-  }
-
   private _emitError(instanceId: string, error: WorkerError): void {
     const key = `${error.type}:${error.line ?? ''}:${error.column ?? ''}:${error.message}`;
     if (this._lastErrorKeys.get(instanceId) === key) {
@@ -628,12 +590,159 @@ export class MobileIndicatorManager {
     this._lastErrorKeys.delete(instanceId);
   }
 
+  private _addWorkerScript(instanceId: string, code: string | undefined, inputs: Record<string, unknown> | undefined): void {
+    if (!code || !this._tealscriptManager) return;
+    void this._tealscriptManager.addScript(instanceId, code, inputs).catch((error: unknown) => {
+      this._emitError(instanceId, this._toRuntimeError(error));
+    });
+  }
+
+  private _restartWorkerScripts(): void {
+    if (!this._tealscriptManager) return;
+    for (const indicator of this._indicators) {
+      this._tealscriptManager.setInputs(indicator.instanceId, indicator.inputs ?? {});
+    }
+  }
+
+  private _handlePlotsUpdated = (plots: PlotOutput[]): void => {
+    if (this._plotsMatchCurrent(plots)) return;
+    this._plots = plots;
+    this._plotsRevision += 1;
+    this._updateAutoPaneRanges(plots);
+    this._onUpdate?.();
+  };
+
+  private _handleDrawingsUpdated = (drawings: DrawingOutput[]): void => {
+    if (this._drawingsMatchCurrent(drawings)) return;
+    this._drawings = drawings;
+    this._plotsRevision += 1;
+    this._onUpdate?.();
+  };
+
+  private _handleInputsDiscovered = (instanceId: string, inputs: InputDefinition[]): void => {
+    this._inputDefsCache.set(instanceId, inputs);
+  };
+
+  private _handleDeclarationDiscovered = (instanceId: string, declaration: IndicatorDeclarationMetadata): void => {
+    this._declarationCache.set(instanceId, declaration);
+    const indicator = this._indicators.find((candidate) => candidate.instanceId === instanceId);
+    if (indicator) indicator.declaration = declaration;
+    this._indicatorsRevision += 1;
+    this._onUpdate?.();
+  };
+
+  private _resolveRequestData: TealscriptRequestDataResolver = (request) => {
+    const datafeed = this._getRequestDatafeed?.();
+    if (!datafeed) {
+      return {
+        ok: false,
+        error: {
+          code: 'missing-provider',
+          message: 'No Tealscript request data resolver configured',
+        },
+      };
+    }
+
+    return this._resolveRequestDataFromDatafeed(request, datafeed);
+  };
+
+  private _createRuntimeOptions = (): TealscriptRuntimeOptions => {
+    const runtime = this._getRuntimeOptions?.();
+    return {
+      ...runtime,
+      backend: {
+        ...runtime?.backend,
+        executionBackendOverride: this._tealscriptExecutionBackend,
+      },
+    };
+  };
+
+  private _resolveRequestDataFromDatafeed(
+    request: RequestDataMessage,
+    datafeed: RequestDatafeed,
+  ): ReturnType<TealscriptRequestDataResolver> {
+    switch (request.kind) {
+      case 'bars': {
+        const result = datafeed.getBars(request.query as Parameters<RequestDatafeed['getBars']>[0]);
+        return result.ok
+          ? { ok: true, value: result.context }
+          : { ok: false, error: { code: this._mapRequestDatafeedErrorCode(result.code), message: result.message } };
+      }
+      case 'series': {
+        const result = datafeed.getSeries?.(request.query as RequestSeriesQuery);
+        if (!result) return this._missingRequestData('series');
+        return result.ok
+          ? { ok: true, value: result.context.points }
+          : { ok: false, error: { code: this._mapRequestDatafeedErrorCode(result.code), message: result.message } };
+      }
+      case 'currency_rate':
+        return this._optionalRequestDataValue(
+          datafeed.getCurrencyRate?.(request.query as RequestCurrencyRateQuery),
+          'currency_rate',
+        );
+      case 'corporate_action':
+        return this._optionalRequestDataValue(
+          datafeed.getCorporateAction?.(request.query as RequestCorporateActionQuery),
+          'corporate_action',
+        );
+      case 'economic':
+        return this._optionalRequestDataValue(
+          datafeed.getEconomicSeries?.(request.query as RequestEconomicSeriesQuery),
+          'economic',
+        );
+      case 'financial':
+        return this._optionalRequestDataValue(
+          datafeed.getFinancialMetric?.(request.query as RequestFinancialMetricQuery),
+          'financial',
+        );
+      case 'quandl':
+        return this._optionalRequestDataValue(
+          datafeed.getQuandlSeries?.(request.query as RequestQuandlSeriesQuery),
+          'quandl',
+        );
+      case 'footprint':
+        return this._optionalRequestDataValue(
+          datafeed.getFootprint?.(request.query as RequestFootprintQuery),
+          'footprint',
+        );
+    }
+  }
+
+  private _optionalRequestDataValue(value: unknown, kind: RequestDataMessage['kind']): ReturnType<TealscriptRequestDataResolver> {
+    return value === undefined
+      ? this._missingRequestData(kind)
+      : { ok: true, value: value as never };
+  }
+
+  private _missingRequestData(kind: RequestDataMessage['kind']): ReturnType<TealscriptRequestDataResolver> {
+    return {
+      ok: false,
+      error: {
+        code: 'not-found',
+        message: `No mobile Tealscript request data available for ${kind}`,
+      },
+    };
+  }
+
+  private _mapRequestDatafeedErrorCode(
+    code: RequestDatafeedErrorCode,
+  ): 'invalid-query' | 'not-found' | 'provider-error' {
+    if (code === 'invalid_currency' || code === 'invalid_symbol' || code === 'invalid_timeframe') return 'invalid-query';
+    if (code === 'missing_context') return 'not-found';
+    return 'provider-error';
+  }
+
   /**
    * Recompute all indicator plots
    * Called when bars change or indicators are added/removed
    * @param silent - If true, don't trigger onUpdate callback (for RAF batching)
    */
   private _recomputePlots(silent = false): void {
+    if (this._tealscriptManager) {
+      if (!silent) this._onUpdate?.();
+      return;
+    }
+
     if (this._bars.length === 0) {
       if (this._plots.length > 0 || this._drawings.length > 0) {
         this._plots = [];
@@ -659,95 +768,13 @@ export class MobileIndicatorManager {
         continue;
       }
 
-      // Nothing this indicator's output depends on has moved, so re-running the
-      // engine over every bar would only mint identical results. Hiding one
-      // indicator or adding another must not re-execute the ones left alone.
-      const inputsKey = createIndicatorInputsKey(inputs);
-      const libraries = this._getLibraries?.();
-      const requestDatafeed = this._getRequestDatafeed?.();
-      const backend = selectTealscriptExecutionBackend({
-        executionBackendOverride: this._tealscriptExecutionBackend,
-        enableClosureBackend: resolveBooleanOption(this._enableTealscriptClosureBackend),
-        defaultBackend: 'interpreter',
+      this._emitError(instanceId, {
+        type: 'runtime',
+        severity: 'error',
+        code: 'mobile-tealscript-webview-required',
+        message: 'Mobile TealScript execution requires the compiled WebView host.',
       });
-      const backendSelectionKey = `${backend.backend}:${backend.source}`;
-      const cached = this._resultCache.get(instanceId);
-      if (
-        cached &&
-        cached.ast === ast &&
-        cached.barsEpoch === this._barsEpoch &&
-        cached.backendSelectionKey === backendSelectionKey &&
-        cached.inputsKey === inputsKey &&
-        cached.libraries === libraries &&
-        cached.requestDatafeed === requestDatafeed
-      ) {
-        allPlots.push(...cached.plots);
-        allDrawings.push(...cached.drawings);
-        continue;
-      }
-
-      try {
-        // Convert inputs to Map
-        const inputsMap = new Map<string, unknown>();
-        if (inputs) {
-          for (const [key, value] of Object.entries(inputs)) {
-            inputsMap.set(key, value);
-          }
-        }
-
-        // Execute the script
-        const result = executeSelectedTealscriptBackend(ast, this._bars, inputsMap, {
-          libraries,
-          requestDatafeed,
-          runtime: {
-            backend: {
-              executionBackendOverride: this._tealscriptExecutionBackend,
-              enableClosureBackend: resolveBooleanOption(this._enableTealscriptClosureBackend),
-              defaultBackend: 'interpreter',
-            },
-          },
-        });
-        const firstError = result.errors[0];
-        if (firstError) {
-          this._emitError(instanceId, this._toExecutionError(firstError));
-        } else {
-          this._clearError(instanceId);
-        }
-
-        // Cache input definitions for settings modal
-        if (result.inputs && result.inputs.length > 0) {
-          this._inputDefsCache.set(instanceId, result.inputs as InputDefinition[]);
-        }
-
-        this._declarationCache.set(instanceId, result.declaration);
-        if (ind.declaration?.explicitPlotZOrder !== result.declaration?.explicitPlotZOrder) {
-          this._indicatorsRevision += 1;
-        }
-        ind.declaration = result.declaration;
-        ind.runtimeProfile = result.profile;
-
-        // Tag plots with the instance ID so renderer knows which pane to use
-        const taggedPlots = result.plots.map((plot) => ({ ...plot, scriptId: instanceId }));
-        const taggedDrawings = result.drawings.map((drawing) => ({ ...drawing, scriptId: instanceId }));
-        this._resultCache.set(instanceId, {
-          ast,
-          barsEpoch: this._barsEpoch,
-          backendSelectionKey,
-          drawings: taggedDrawings,
-          inputsKey,
-          libraries,
-          plots: taggedPlots,
-          requestDatafeed,
-        });
-        allPlots.push(...taggedPlots);
-        allDrawings.push(...taggedDrawings);
-      } catch (err) {
-        this._logger.error(LogCategory.Indicators, 'Error executing indicator', {
-          indicatorId: indicator.id,
-          error: err,
-        });
-        this._emitError(instanceId, this._toRuntimeError(err));
-      }
+      continue;
     }
 
     // Identical output means the pane ranges cannot have moved either, and

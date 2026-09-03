@@ -9,9 +9,9 @@ Do not edit this block by hand; rerun the generator when committed audit or base
 
 - Pine v6 builtin names: 844/860 official manual names implemented/resolved; 16 known-missing official names; 39 labelled aliases/local extensions excluded from official coverage.
 - Pine v6 grammar inventory: 74/74 official manual-index entries covered by 63 committed snippets; 0 known grammar gaps.
-- Production worker load baseline: 81/89 compiled; 8/89 visible interpreter fallbacks.
-- Production worker live-update baseline: 243/267 compiled same-bar updates; 24/267 visible fallbacks; 267/267 worker updates match fresh execution.
-- Mobile TealScript capability baseline: 5/6 measured capability rows supported; remaining gap: on-device closure execution proof.
+- Production worker load baseline: 89/89 compiled; 0/89 loud compiled-unsupported rows.
+- Production worker live-update baseline: 267/267 compiled same-bar updates; 0/267 loud compiled-unsupported rows; 267/267 worker updates match fresh execution for supported rows.
+- Mobile TealScript capability baseline: 5/5 measured capability rows supported; remaining gap: none.
 
 <!-- END GENERATED PINE PARITY HEADLINE METRICS -->
 
@@ -26,16 +26,11 @@ The headline result is that the production worker path now measures the same
 realistic 89-script corpus/composite set that the compiler baseline measures,
 instead of only calling `tryCompile()` in-package. Runtime request discovery
 closed the original bridge gap from 60/89 compiled product executions to 89/89
-for request/import support. The final session-safe baseline is 81/89 compiled
-on load plus 8 visible interpreter fallbacks for realtime-unsafe intrabar
-state, and 243/267 compiled live updates plus 24 visible fallbacks across three
-same-bar ticks per script. Those are web worker path numbers. Native mobile
-uses Tealchart's synchronous interpreter-only `MobileIndicatorManager` today,
-so mobile benefits from correctness fixes, diagnostics, host-provided request
-data, and host-provided Pine libraries, but not from compiled worker speedups
-until a native compiled execution path is explicitly built with a non-eval
-backend, a separate JS engine, or a proven native Hermes runtime path for
-generated Function-constructor code.
+for request/import support, and the old product-worker realtime safety gate was
+removed after direct compiled replay plus worker composite tests proved the
+classified stateful intrabar rows execute and match as compiled. Native mobile
+now intentionally has no inline TealScript executor until the bundled WebView
+compiled host lands.
 
 ## What Changed
 
@@ -55,70 +50,34 @@ generated Function-constructor code.
   worker runs a hidden compiled discovery pass, records concrete requests,
   warms the cache, discards hidden plots/drawings/alerts/logs/strategy state,
   and reruns the visible pass.
-- Realtime safety fallback is surfaced to Tealchart users as a nonfatal
-  diagnostic naming the source construct and line/column that costs compiled
-  live-tick execution.
+- Unsupported compiled execution surfaces as fatal diagnostics instead of
+  falling back to another engine.
 - User-facing TealScript diagnostics have a structural taxonomy: true
-  script/runtime failures are `severity: 'error'`, provider absence and
-  realtime compiled fallback are `severity: 'warning'`, and save validation
-  preserves stable failure kind plus checker diagnostic codes.
+  script/runtime failures and compiled realtime unsupported constructs are
+  `severity: 'error'`, provider absence is `severity: 'warning'`, and save
+  validation preserves stable failure kind plus checker diagnostic codes.
 - Web worker telemetry uses that taxonomy without shipping private TealScript
   messages, symbols, source constructs, arbitrary tags, or extra data to Sentry.
 - The native TealScript path now follows the same diagnostic taxonomy where it
   applies: mobile request-data provider absence is a nonfatal warning, while
   parse/runtime script failures remain errors.
 - Mobile hosts can supply a deterministic Pine library registry to
-  `SkiaTealchart`, so imported-library scripts resolve on the interpreter path.
-  The no-eval closure backend now dominates the current compiled backend on the
-  committed historical-bar corpus gate, but mobile still needs explicit
-  `MobileIndicatorManager` closure selection, closure-specific realtime proof,
-  and a native Hermes/Metro smoke before closure execution can be claimed.
+  `SkiaTealchart`; the hidden WebView compiled host is the mobile execution path
+  that will consume it.
 - Mobile hosts can also supply a synchronous `RequestDatafeed`, so
   request-backed scripts receive real provider data on native; the no-provider
   case remains a nonfatal `request-data-unavailable` warning.
-- Because mobile is interpreter-only with the current `new Function(...)`
-  compiled backend, the interpreter was profiled against the existing composite
-  benchmarks. Direct global scalar `input.*` declarations are now cached after
-  bar-0 registration/validation, and UDF/imported-UDF execution caches immutable
-  call metadata while preserving per-callsite state. TA-window and ordered-call
-  helpers now avoid avoidable per-call allocation. Measured interpreter cost
-  moved from 1817 to 1421 us/bar, 683 to 554 us/bar, and 887 to 727 us/bar
+- Before the legacy runtime was removed, it was profiled against the existing
+  composite benchmarks. Direct global scalar `input.*` declarations were cached
+  after bar-0 registration/validation, and UDF/imported-UDF execution cached
+  immutable call metadata while preserving per-callsite state. TA-window and
+  ordered-call helpers avoided avoidable per-call allocation. Measured legacy
+  runtime cost moved from 1817 to 1421 us/bar, 683 to 554 us/bar, and 887 to 727 us/bar
   respectively on the shared Mac benchmark runs.
-- T90/T91/T92 priced the "delete the interpreter and go all-in on codegen" endgame
-  against mobile. The valid prototype bound expressions, UDFs, and loops without
-  eval and measured 29.9 us/bar steady state against 28.0 for current compiled
-  execution and 41.8 for the interpreter on its handled sample. T96-T100 then
-  promoted that idea into a production closure backend and a three-way corpus
-  differential. The current cutover gate is historical-bar only, but it is now
-  closed for the compiled-dominated set: v1 139/139 and v2 86/86 matched with
-  zero exceptions, plus 33 and seven corroborated gains where closure agrees with
-  the interpreter on scripts compiled does not render.
-- T102 measured the real production closure backend rather than the prototype.
-  T103 corrected the headline from aggregate totals to per-script ratios, since
-  the v1 aggregate is dominated by a few pathological scanner rows. Later
-  request-replay correctness work regressed that tail, and T132 recovered part
-  of it by dependency-selecting closure request-local replay and excluding only
-  scalar requested-context-invariant declarations from request dependency
-  replay. The current web-cost number is still a slowdown: v1 median
-  closure/compiled is 2.11x (q1 1.48, q3 4.14), with five scripts faster,
-  134 slower, and 73 at least 2x slower; v1 aggregate remains 5.88x because
-  scanner rows dominate total time. v2 median is 1.73x (q1 1.33, q3 2.22), with
-  nine scripts faster, 77 slower, 33 at least 2x slower, and aggregate 1.62x.
-  Mobile's comparison is different because it currently uses the interpreter:
-  closure/interpreter is 0.53x on v1 and 0.48x on v2 in the same Node-host
-  measurement. The remaining tail is scanner/request-heavy and appears tied to
-  closure request expressions still running through the interpreter request
-  sub-engine, not to broad prior-statement replay.
-- T104/T107/T109 profiled the initial production slowdown on
-  middle-of-distribution scripts.
-  Slot binding and builtin call-shape binding moved the long-chart
-  closure/compiled curve to 1.42x at 160 bars, 1.37x at 1,000, 1.59x at 5,000,
-  1.62x at 10,000 and 1.65x at 20,000. The curve plateaus rather than growing
-  unbounded. Builtin-inclusive probe time fell from about 78.7 us/bar to
-  27.8 us/bar after safe positional routes for timestamp/calendar helpers,
-  `color.new`, and `array.get`; the remaining costs are split across visual,
-  drawing, input and TA bodies rather than one generic dispatch bucket.
-- T110 made the staged closure rollout observable without changing defaults:
+- Sam chose compiled as the single TealScript engine. The no-eval backend and
+  legacy runtime are being removed by direct cutover; mobile will run compiled in a
+  hidden WebView rather than through inline `MobileIndicatorManager` execution.
+- T110 made backend execution observable without changing defaults:
   Tealchart emits a compact backend/timing/output summary for every accepted
   worker execution result and runtime halt, and apps/web reports it through the
   existing Sentry path with local sampling/caps and a static fingerprinted
@@ -131,7 +90,7 @@ generated Function-constructor code.
   `TealchartDirectWeb.tsx`, so imported Pine libraries reach compiled worker
   execution instead of staying latent package support.
 - Added an end-to-end paste journey test: save validation with imports, worker
-  execution through a seeded bridge, plot parity against the interpreter,
+  execution through a seeded bridge, plot parity against the legacy runtime,
   Tealchart render handoff, and actionable save diagnostics with line/symbol
   context.
 
@@ -162,7 +121,7 @@ generated Function-constructor code.
   current TealScript output, and 15 regression pins are local diagnostic string
   wording rather than reference-value claims.
 - Added grammar-driven differential tests that generate deterministic programs
-  and compare interpreter vs compiled output. Default run explores 48
+  and compare legacy runtime vs compiled output. Default run explores 48
   full-execution programs and 12 realtime programs; soak mode explores 384 and
   96. Full execution is clean; realtime unsafe shapes are classified as visible
   fallbacks instead of being served compiled.
@@ -171,12 +130,12 @@ generated Function-constructor code.
 
 - Routed safe same-bar `updateBar` worker updates through compiled execution
   while preserving request caches and imported-library state.
-- Added realtime output parity sweeps comparing worker and interpreter
+- Added realtime output parity sweeps comparing worker and legacy runtime
   `updateBar(...)` against fresh full execution over the same bar window,
   covering plots, drawings, alerts, logs, and strategy ledger state.
-- Fixed interpreter fallback re-entry for imported libraries, because fallback
+- Fixed legacy runtime fallback re-entry for imported libraries, because fallback
   scripts still depend on that path.
-- Added a minimal deterministic strategy position model for both interpreter
+- Added a minimal deterministic strategy position model for both legacy runtime
   and compiled execution: position size, average price, net/open/gross profit,
   win/loss/even trades, open/closed trade counts, and selected accessors move
   under fixed expected values.
@@ -188,7 +147,7 @@ generated Function-constructor code.
   `plotbar`, `plotarrow`, drawing objects, labels, lines, boxes, tables,
   polylines, linefills, colours/transparency, scale, and precision.
 - Added deterministic render-path differential testing: generated Pine visual
-  programs execute through interpreter and compiled TealScript outputs, render
+  programs execute through compiled TealScript outputs, render
   through the production plot/drawing renderers, and compare normalized canvas
   commands. The same test compares realtime `updateBar` rendering against a
   fresh full execution over the same updated bar window.
@@ -216,15 +175,15 @@ generated Function-constructor code.
   29/89 visible `unpreloadable-request-data:*` fallbacks.
 - Production worker baseline after request discovery: 89/89 compiled for the
   same eligible set.
-- Final session-safe load baseline after realtime safety classification:
-  81/89 compiled, 8/89 visible
-  `compiled-worker-stateless-intrabar-reentry:*` interpreter fallbacks.
-- Final live-update baseline: 243/267 compiled same-bar updates, 24/267 visible
-  realtime safety fallbacks across three ticks per script.
-- Forced-compiled audit of realtime safety fallbacks: 4/18 scripts and 12/54
-  ticks genuinely diverged; 14/18 scripts and 42/54 ticks were conservative
-  over-triggers before sharpening. Sharpening recovered 10 scripts and 30 live
-  ticks while keeping the genuine divergence family classified.
+- Final compiled-only worker load baseline: 89/89 compiled, zero loud
+  compiled-unsupported rows.
+- Final compiled-only live-update baseline: 267/267 compiled same-bar updates
+  and 267/267 worker updates matching fresh execution across three ticks per
+  script.
+- The former realtime safety inventory is retained as historical evidence only:
+  all 45 old product-path fallback rows appear in the current direct compiled
+  realtime denominator and match, and the 8 composite rows / 24 live updates
+  refused by the old gate now execute and match as compiled.
 
 ### Coverage
 
@@ -249,7 +208,7 @@ generated Function-constructor code.
 - Input: 14/14 official input functions covered.
 - Alert/log/runtime: 9/9 official names covered.
 - Tealchart render differential: 12 generated programs by default and 96 under
-  `TEALSCRIPT_GRAMMAR_DIFF_SOAK=1`, with zero interpreter-vs-compiled render
+  `TEALSCRIPT_GRAMMAR_DIFF_SOAK=1`, with zero legacy runtime-vs-compiled render
   diffs and zero realtime-vs-fresh render diffs.
 
 ### Latest Gates
@@ -258,7 +217,7 @@ generated Function-constructor code.
   56 files.
 - `yarn workspace @tealstreet/tealscript typecheck`: clean.
 - `TEALSCRIPT_GRAMMAR_DIFF_SOAK=1 yarn vitest run
-  packages/tealscript/tests/compat/pine-grammar-differential.test.ts`:
+  packages/tealscript/tests/compat/pine-grammar-coverage.test.ts`:
   3 passed.
 - `TEALSCRIPT_REALTIME_SWEEP=1 yarn vitest run ...`: 61 passed.
 - `yarn workspace @tealstreet/tealchart test-ci`: 2690 passed / 187 files.
@@ -286,7 +245,7 @@ fixtures could miss.
   isolation.
 - `input.source()` overrides were ignored in compiled request/subprogram paths.
 - Compiled input validation accepted defaults outside `options`, below
-  `minval`, and above `maxval` while the interpreter rejected them.
+  `minval`, and above `maxval` while the legacy runtime rejected them.
 - `runtime.error()` inside compiled `request.security()` expressions was
   swallowed as a per-request-bar failure and returned `na` instead of halting.
 - Compiled request expressions could also swallow unresolved request-scope
@@ -338,7 +297,7 @@ Realtime re-entry bugs/classes fixed or classified:
   forever.
 - The incremental compiled VM was assessed and deliberately not built. The
   current compiled realtime path reconstructs from the bar window, while the
-  interpreter maintains incremental same-bar state. A robust compiled VM would
+  legacy runtime maintains incremental same-bar state. A robust compiled VM would
   require a session runtime owning generated instances, execution context,
   plots, drawings, alerts, logs, strategy ledger, request caches, inputs,
   library state, rollback/commit, and discovery fork semantics. Estimated cost:
@@ -346,7 +305,7 @@ Realtime re-entry bugs/classes fixed or classified:
   if strategy and drawing lifecycle are completed in the same pass.
 - Instead of building that VM now, this branch uses a conservative realtime
   safety detector. False positives cost realtime speed; false negatives corrupt
-  intrabar values. The detector therefore biases toward interpreter fallback
+  intrabar values. The detector therefore biases toward legacy runtime fallback
   when unsure, and the residual cost is measured.
 
 ## Honest Remaining Gaps
@@ -369,16 +328,16 @@ Realtime re-entry bugs/classes fixed or classified:
   the current ceiling. T81 resolved every supported parse syntax gap in corpus v1; the sole
   remaining parse failure is a scraped source with a raw line break inside a
   string literal. The pre-parity-output funnel had 159/220 scripts producing
-  visible output; the calibrated compiled/interpreter comparator still finds 38
-  compiled outputs that do not match the interpreter, so they are execute-stage
+  visible output; the calibrated compiled-only comparator still finds 38
+  compiled outputs that do not match the legacy runtime, so they are execute-stage
   gaps rather than counted as success. The current mismatch split is 23 plot-value,
   ten drawing, two alert, one plot-structure, one runtime-error, and one log
   difference. The 358-name manual member-value audit closes the `ta.tr`-style
   emitter class by forcing builtin namespace members through `ctx.callBuiltin(...)`
   instead of emitting nonexistent JS namespace objects. The first calibrated
-  corpus mismatch fix was interpreter-owned: tuple-returning `request.security()`
+  corpus mismatch fix was legacy runtime-owned: tuple-returning `request.security()`
   expressions now preserve tuple arity on unaligned bars for the
-  interpreter/fallback/mobile path. The second was compiled-owned: `bar_index[n]`
+  legacy runtime/fallback/mobile path. The second was compiled-owned: `bar_index[n]`
   now emits the historical bar index instead of generic scalar indexing, moving
   v1 output 85→87 and v2 output 60→62.
   The latest T85 cluster fixed legacy bare UDF precedence and return semantics:
@@ -390,7 +349,7 @@ Realtime re-entry bugs/classes fixed or classified:
   named global `array.*` calls, where `array.push(id=..., value=...)` and
   related calls were lowered as zero-argument helpers. It left v1 flat and
   moved v2 output 65→66.
-  The second T88 cluster fixed an interpreter-owned input identity collision:
+  The second T88 cluster fixed an legacy runtime-owned input identity collision:
   duplicate titles now remain distinct by call site while unique `input_Title`
   override IDs stay stable. That moved v1 output 103→109 and v2 output 66→74.
   The third T88 cluster fixed compiled block-local persistent drawing
@@ -468,42 +427,24 @@ Realtime re-entry bugs/classes fixed or classified:
   `Author/Library/1` need a product surface to paste/install that exact library
   source. Until then they remain host-dependency gaps with actionable
   `unresolved-import` diagnostics.
-- Realtime compiled execution falls back visibly for stateful intrabar shapes
-  that require incremental VM semantics. Users get correct interpreter values
-  at slower realtime speed rather than fast, silently wrong compiled output.
-- Mobile TealScript execution is not included in the compiled-path numbers.
-  The native path is synchronous interpreter execution; the current compiler
-  relies on generated JavaScript instantiated with `new Function(...)`. React
-  Native documents Hermes as the default engine. T90's local React Native 0.87
-  `hermesc` probe accepts `new Function` and emits bytecode constructing the
-  global `Function` object, while Hermes source still documents a runtime
-  `enableEval` flag for `eval` and the Function constructor. This repo has no
-  consuming native app runtime smoke proving that generated Function code
-  executes, or that it is fast enough, on simulator/device. Mobile compiled
-  support is therefore unclaimed rather than proven impossible: supporting
-  compiled pasted scripts on mobile first requires that native proof. If the
-  current generated-Function path fails or lands near interpreter speed, the
-  remaining options are a non-eval backend or a separate JS engine such as
-  QuickJS. T92's bound-UDF-and-loop closure prototype handled 22/24 target
-  scripts and measured 29.9 us/bar steady state against 28.0 for current
-  compiled execution and 41.8 for the interpreter. It still rejects imports,
-  method dispatch, UDT/collection mutation, requests, drawings, strategy, and
-  realtime state, but T92 showed the direction of that remaining bias is unknown
-  rather than assumed optimistic.
+- The old product-worker realtime safety gate is removed. Unsupported compiled
+  execution must still fail loudly through normal compiled diagnostics rather
+  than falling back to another engine.
+- Mobile TealScript execution is moving to a hidden WebView compiled host. The
+  native `MobileIndicatorManager` inline legacy runtime path is being removed
+  rather than treated as the long-term mobile execution strategy.
 - Mobile capability was measured separately through `MobileIndicatorManager`.
   Custom source save, plot/drawing handoff, pane metadata, true parse/runtime
   diagnostics, host-backed request data, and host-provided Pine libraries are
-  supported through the interpreter path. Request-backed scripts without a
+  supported through the legacy inline path. Request-backed scripts without a
   native provider still surface a nonfatal `request-data-unavailable` warning.
-  Compiled execution and web realtime fallback diagnostics are the remaining
-  mobile gap because mobile remains interpreter-only under the current
-  Tealchart wiring.
+  Hidden-WebView compiled execution is the remaining mobile implementation gap.
 
 ## Reviewer Notes
 
 The central risk on this branch was repeatedly the same: tests written from our
 own output can certify our own bugs. This branch now treats that as an explicit
 hazard. The meaningful claims are backed by independent manual-index audits,
-literal expected values with declared provenance, compiled-vs-interpreter
+literal expected values with declared provenance, compiled-only
 oracles that exercise the real path under test, and production-path baselines
 through the worker, request bridge, web library registry, and render layer.

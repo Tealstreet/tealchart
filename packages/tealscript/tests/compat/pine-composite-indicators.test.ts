@@ -10,22 +10,23 @@ import {
   type Bar,
   type ExecutionResult,
   type PlotOutput,
-  type TealscriptEngineOptions,
+  type TealscriptExecutionOptions,
 } from '../../src';
 import { summarizeCompiledFallbackReasons } from '../../src/compat/compiledFallbackBaseline';
 import {
   getProductionWorkerFallbackBaselineGroup,
+  isProductionWorkerFallbackMeasurement,
   summarizeRealtimeParityMismatches,
   summarizeProductionWorkerExecutionModes,
   summarizeProductionWorkerFallbackReasons,
 } from '../../src/compat/productionWorkerFallbackBaseline';
 import { checkProgram } from '../../src/semantic/checker';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen';
-import { measureForcedCompiledRealtimeSafety, measureProductionWorkerSessions, measureRealtimeReentryParity, type ProductionWorkerCase } from './productionWorkerHarness';
+import { measureProductionWorkerSessions, measureRealtimeReentryParity, type ProductionWorkerCase } from './productionWorkerHarness';
 
 const LONG_COMPOSITE_TIMEOUT_MS = 30_000;
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
-const REALTIME_SWEEP_BACKEND = process.env.TEALSCRIPT_REALTIME_BACKEND === 'closure' ? 'closure' : 'worker';
+const REALTIME_SWEEP_BACKEND = 'worker';
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 
 function makeBars(closes: number[], start = 1_700_000_000_000, step = 60_000): Bar[] {
@@ -57,7 +58,7 @@ function findPlot(result: ExecutionResult, title: string): PlotOutput {
   return plot;
 }
 
-function assertCompositeParity(source: string, options: TealscriptEngineOptions = {}, bars: Bar[] = chartBars) {
+function assertCompositeParity(source: string, options: TealscriptExecutionOptions = {}, bars: Bar[] = chartBars) {
   const ast = parse(source);
   const semantic = checkProgram(ast, { libraries: options.libraries });
   if (semantic.diagnostics.length > 0) {
@@ -94,7 +95,7 @@ function assertCompositeParity(source: string, options: TealscriptEngineOptions 
         return Math.abs(value - other) > 1e-10;
       });
       throw new Error(
-        `${compiledPlot.title} mismatch at ${firstDiff}: compiled=${compiledPlot.values[firstDiff]}, interpreter=${interpretedPlot.values[firstDiff]}`,
+        `${compiledPlot.title} mismatch at ${firstDiff}: compiled=${compiledPlot.values[firstDiff]}, reference=${interpretedPlot.values[firstDiff]}`,
       );
     }
   }
@@ -191,7 +192,7 @@ export wrapSecurity(simple string symbol, simple string tf, series float source,
     request.security(symbol, tf, ta.sma(source, len), lookahead=barmerge.lookahead_on)
 `);
 
-const engineOptions: TealscriptEngineOptions = {
+const engineOptions: TealscriptExecutionOptions = {
   libraries: new Map([['PublicUser/CompositeHelpers/1', compositeLibrary]]),
   requestDatafeed: new InMemoryRequestDatafeed([
     {
@@ -238,7 +239,7 @@ const engineOptions: TealscriptEngineOptions = {
   },
 };
 
-const longEngineOptions: TealscriptEngineOptions = {
+const longEngineOptions: TealscriptExecutionOptions = {
   ...engineOptions,
   requestDatafeed: new InMemoryRequestDatafeed([
     {
@@ -1561,8 +1562,8 @@ plotshape(condition, title="Awkward Imported Condition", style=shape.square)`);
       const session = await measureProductionWorkerSessions(cases, { includeLiveUpdates: true });
       const measurements = session.loadMeasurements;
       const updateMeasurements = session.updateMeasurements;
-      const fallbacks = measurements.filter((measurement) => measurement.executionMode !== 'compiled');
-      const updateFallbacks = updateMeasurements.filter((measurement) => measurement.executionMode !== 'compiled');
+      const fallbacks = measurements.filter(isProductionWorkerFallbackMeasurement);
+      const updateFallbacks = updateMeasurements.filter(isProductionWorkerFallbackMeasurement);
 
       expect(cases.length).toBe(baseline.scriptCount);
       expect(cases.length).toBe(baseline.eligible);
@@ -1579,42 +1580,6 @@ plotshape(condition, title="Awkward Imported Condition", style=shape.square)`);
       expect(summarizeProductionWorkerFallbackReasons(updateMeasurements)).toEqual(baseline.liveUpdates.knownFallbackReasons);
     }
   });
-
-  it('classifies composite realtime safety fallbacks by forced compiled behaviour', () => {
-    const trueLengthIds = [
-      'True Length MTF Confluence Dashboard',
-      'True Length Volume Signal Matrix',
-      'True Length Structure Lifecycle',
-    ];
-    const awkwardIds = [
-      'Awkward Multiline Request',
-      'Awkward UDT Chains',
-      'Awkward Tuple Branches',
-      'Awkward Collections',
-      'Awkward Interleaved Drawings',
-    ];
-    const cases = [...trueLengthCompositeProductionCases, ...awkwardCompositeProductionCases]
-      .filter((testCase) => [...trueLengthIds, ...awkwardIds].includes(testCase.scriptId));
-    const measurement = measureForcedCompiledRealtimeSafety(cases, { includeSafe: true });
-
-    expect(measurement.scripts.map((entry) => ({
-      scriptId: entry.scriptId,
-      classification: entry.classification,
-    }))).toEqual([
-      { scriptId: 'True Length MTF Confluence Dashboard', classification: 'overtrigger-matched' },
-      { scriptId: 'True Length Structure Lifecycle', classification: 'overtrigger-matched' },
-      { scriptId: 'True Length Volume Signal Matrix', classification: 'overtrigger-matched' },
-      { scriptId: 'Awkward Multiline Request', classification: 'overtrigger-matched' },
-      { scriptId: 'Awkward UDT Chains', classification: 'overtrigger-matched' },
-      { scriptId: 'Awkward Tuple Branches', classification: 'overtrigger-matched' },
-      { scriptId: 'Awkward Collections', classification: 'overtrigger-matched' },
-      { scriptId: 'Awkward Interleaved Drawings', classification: 'overtrigger-matched' },
-    ]);
-    expect(measurement.updates).toHaveLength(24);
-    expect(measurement.updates.filter((entry) => entry.classification === 'genuine-divergence')).toHaveLength(0);
-    expect(measurement.updates.filter((entry) => entry.classification === 'overtrigger-matched')).toHaveLength(24);
-  });
-
   realtimeSweepIt('tracks realtime re-entry output parity for composite indicators', async () => {
     for (const [groupId, cases] of [
       ['true-length-composites', trueLengthCompositeProductionCases],
@@ -1624,31 +1589,16 @@ plotshape(condition, title="Awkward Imported Condition", style=shape.square)`);
       const measurement = await measureRealtimeReentryParity(cases, {
         backend: REALTIME_SWEEP_BACKEND,
       });
-      const expected = REALTIME_SWEEP_BACKEND === 'closure'
-        ? {
-            totalUpdates: baseline.totalUpdates,
-            workerMatched: baseline.totalUpdates,
-            workerMismatches: [],
-            interpreterMatched: baseline.totalUpdates,
-            interpreterMismatches: [],
-          }
-        : baseline;
 
       expect({
         backend: measurement.backend,
         totalUpdates: measurement.totalUpdates,
         workerMatched: measurement.workerMatched,
         workerMismatches: summarizeRealtimeParityMismatches(measurement.workerMismatches),
-        interpreterMatched: measurement.interpreterMatched,
-        interpreterMismatches: summarizeRealtimeParityMismatches(measurement.interpreterMismatches),
       }).toEqual({
         backend: REALTIME_SWEEP_BACKEND,
-        ...expected,
+        ...baseline,
       });
-      if (REALTIME_SWEEP_BACKEND === 'closure') {
-        expect(measurement.closureMatched).toBe(baseline.totalUpdates);
-        expect(measurement.closureMismatches).toEqual([]);
-      }
     }
   }, 30_000);
 });

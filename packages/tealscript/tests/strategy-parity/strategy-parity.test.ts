@@ -19,7 +19,7 @@ import {
 
 const CORPUS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corpus');
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
-const REALTIME_SWEEP_BACKEND = process.env.TEALSCRIPT_REALTIME_BACKEND === 'closure' ? 'closure' : 'worker';
+const REALTIME_SWEEP_BACKEND = 'worker';
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 
 function toProductionWorkerCase(entry: CorpusEntry): ProductionWorkerCase {
@@ -147,12 +147,6 @@ describe('strategy parity corpus', () => {
     expect(measurement.totalUpdates).toBe(9);
     expect(measurement.workerMatched).toBe(9);
     expect(measurement.workerMismatches).toEqual([]);
-    expect(measurement.interpreterMismatches).toEqual([]);
-    expect(measurement.interpreterMatched).toBe(9);
-    if (REALTIME_SWEEP_BACKEND === 'closure') {
-      expect(measurement.closureMatched).toBe(9);
-      expect(measurement.closureMismatches).toEqual([]);
-    }
   });
 
   realtimeSweepIt('tracks strategy realtime re-entry parity for the full fast corpus', async () => {
@@ -161,26 +155,17 @@ describe('strategy parity corpus', () => {
       backend: REALTIME_SWEEP_BACKEND,
     });
     const workerMismatches = summarizeRealtimeParityMismatches(measurement.workerMismatches);
-    const interpreterMismatches = summarizeRealtimeParityMismatches(measurement.interpreterMismatches);
 
     expect({
       backend: measurement.backend,
       totalUpdates: measurement.totalUpdates,
       workerMatched: measurement.workerMatched,
       workerMismatches,
-      interpreterMatched: measurement.interpreterMatched,
-      interpreterMismatches,
     }).toEqual({
       backend: REALTIME_SWEEP_BACKEND,
       totalUpdates: 36,
       workerMatched: 36,
       workerMismatches: [],
-      interpreterMatched: 36,
-      interpreterMismatches: [],
     });
-    if (REALTIME_SWEEP_BACKEND === 'closure') {
-      expect(measurement.closureMatched).toBe(36);
-      expect(measurement.closureMismatches).toEqual([]);
-    }
   });
 });
