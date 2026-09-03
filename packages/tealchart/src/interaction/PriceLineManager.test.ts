@@ -127,6 +127,24 @@ function makePositionBound(price: number): PriceLineLabelBounds {
   };
 }
 
+function makeLastTradeBound(price: number): PriceLineLabelBounds {
+  return {
+    lineId: 'last-trade',
+    price,
+    originalY: price,
+    adjustedY: price,
+    width: 84,
+    height: 18,
+    color: '#cccccc',
+    label: { primaryText: '77,090.0', textColor: '#101418' },
+    lineStyle: 'dotted',
+    type: 'price',
+    fixed: true,
+    priority: 100,
+    lineWidth: 1,
+  };
+}
+
 function makeOrderBound(price: number): PriceLineLabelBounds {
   return {
     lineId: 'order-1',
@@ -710,7 +728,7 @@ describe('PriceLineManager trade line draw order', () => {
 
     // Deliberately input-ordered position-first: the tier, not arrival order,
     // is what has to put the position label on top.
-    manager.update([makePositionBound(108), makeOrderBound(100)]);
+    manager.update([makePositionBound(108), makeOrderBound(100), makeLastTradeBound(104)]);
 
     const groups = (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
     const orderAbovePosition = () =>
@@ -718,6 +736,19 @@ describe('PriceLineManager trade line draw order', () => {
 
     return { manager, orderAbovePosition, stage };
   }
+
+  it('draws the last-trade tag above every trade line label', () => {
+    const { manager, stage } = setup();
+
+    const groups = (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
+    const lastTrade = groups.get('last-trade')?.zIndex() ?? -1;
+
+    expect(lastTrade).toBeGreaterThan(groups.get('position-1')?.zIndex() ?? -1);
+    expect(lastTrade).toBeGreaterThan(groups.get('order-1')?.zIndex() ?? -1);
+
+    manager.dispose();
+    stage.destroy();
+  });
 
   it('draws position labels above order labels', () => {
     const { manager, orderAbovePosition, stage } = setup();

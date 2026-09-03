@@ -351,3 +351,45 @@ describe('resolveLabelCollisionsWithinBounds', () => {
     assertNoOverlaps(labels);
   });
 });
+
+describe('fixed label is never overlapped', () => {
+  beforeEach(() => {
+    clearCollisionCache();
+  });
+
+  function stackOverflowingItsBand(): LabelBounds[] {
+    const height = 32;
+    return [
+      ...Array.from({ length: 18 }, (_, index) => ({
+        id: `order-${index}`,
+        originalY: 240 + index * 4,
+        adjustedY: 240 + index * 4,
+        height,
+      })),
+      { id: 'last-trade', originalY: 380, adjustedY: 380, height, fixed: true, priority: 100 },
+    ];
+  }
+
+  it('keeps a stack taller than its band off the last-trade tag', () => {
+    const labels = stackOverflowingItsBand();
+
+    resolveLabelCollisionsWithinBounds(labels, 0, 400);
+
+    const lastTrade = labels.find((current) => current.id === 'last-trade')!;
+    expect(lastTrade.adjustedY).toBe(380);
+    for (const current of labels) {
+      if (current === lastTrade) continue;
+      expect(Math.abs(current.adjustedY - lastTrade.adjustedY)).toBeGreaterThanOrEqual(current.height - 0.1);
+    }
+  });
+
+  it('leaves the band rather than covering the last-trade tag', () => {
+    const labels = stackOverflowingItsBand();
+
+    resolveLabelCollisionsWithinBounds(labels, 0, 400);
+
+    // Something has to give when the stack does not fit; it is the movable
+    // labels, which the caller then culls as off-screen.
+    expect(Math.min(...labels.map((current) => current.adjustedY))).toBeLessThan(0);
+  });
+});

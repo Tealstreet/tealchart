@@ -274,6 +274,46 @@ function enforceOrdering<T extends LabelBounds>(labels: T[]): void {
 }
 
 /**
+ * Push every movable label clear of the fixed ones, cascading outward.
+ *
+ * A fixed label is the last-trade tag and it is never overlapped. When the
+ * stack no longer fits its band something has to leave, and it is the movable
+ * labels: they keep stacking past the band edge, where the caller's off-screen
+ * filter drops them.
+ */
+function evictOverlapsWithFixed<T extends LabelBounds>(labels: T[]): void {
+  const anchors = labels.filter((label) => label.fixed);
+  if (anchors.length === 0) return;
+  const movable = labels.filter((label) => !label.fixed);
+  if (movable.length === 0) return;
+
+  for (const anchor of anchors) {
+    const above = movable
+      .filter((label) => label.originalY < anchor.originalY)
+      .sort((a, b) => b.adjustedY - a.adjustedY);
+    const below = movable
+      .filter((label) => label.originalY >= anchor.originalY)
+      .sort((a, b) => a.adjustedY - b.adjustedY);
+
+    let ceiling = anchor.adjustedY - anchor.height / 2;
+    for (const label of above) {
+      if (label.adjustedY + label.height / 2 > ceiling) {
+        label.adjustedY = ceiling - label.height / 2;
+      }
+      ceiling = Math.min(ceiling, label.adjustedY - label.height / 2);
+    }
+
+    let floor = anchor.adjustedY + anchor.height / 2;
+    for (const label of below) {
+      if (label.adjustedY - label.height / 2 < floor) {
+        label.adjustedY = floor + label.height / 2;
+      }
+      floor = Math.max(floor, label.adjustedY + label.height / 2);
+    }
+  }
+}
+
+/**
  * Prune old entries from cache
  */
 function pruneCache(): void {
@@ -355,6 +395,7 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
 
   // Early exit: if no overlaps after cluster stacking, skip Phase 3
   if (!hasAnyOverlaps(labels)) {
+    evictOverlapsWithFixed(labels);
     // Cache the result
     pruneCache();
     collisionCache.set(cacheKey, {
@@ -432,6 +473,7 @@ export function resolveLabelCollisions<T extends LabelBounds>(labels: T[]): T[] 
   // Labels sorted by originalY must have non-decreasing adjustedY.
   // Phase 3 can violate this when pushing labels by "closest to original" direction.
   enforceOrdering(labels);
+  evictOverlapsWithFixed(labels);
 
   // Cache the result
   pruneCache();
@@ -499,6 +541,10 @@ export function resolveLabelCollisionsWithinBounds<T extends LabelBounds>(
 
     if (!changed) break;
   }
+
+  // The band clamp can only trade overlap for overflow, and when the stack no
+  // longer fits it parks a label on the fixed tag. Fixed wins over the band.
+  evictOverlapsWithFixed(labels);
 
   return labels;
 }
