@@ -42,7 +42,6 @@ interface ManagedScript {
   isReady: boolean;
   isVisible: boolean;
   error?: WorkerError;
-  reportedRuntimeProfileDiagnostics: Set<string>;
 }
 
 /**
@@ -114,7 +113,6 @@ type RequestDataMessage = Extract<FromWorkerMessage, { type: 'requestData' }>;
 type RequestDataResultMessage = Extract<ToWorkerMessage, { type: 'requestDataResult' }>;
 type RequestDataFailure = Extract<RequestDataResultMessage, { ok: false }>['error'];
 const REQUEST_DATA_UNAVAILABLE_ERROR_CODE = 'request-data-unavailable' as const;
-const REALTIME_COMPILED_FALLBACK_ERROR_CODE = 'realtime-compiled-fallback' as const;
 const REALTIME_STATELESS_FALLBACK_PREFIX = 'compiled-worker-stateless-intrabar-reentry';
 
 interface TealscriptWorkerWrapperOptions extends TealscriptWorkerOptions {
@@ -206,34 +204,6 @@ function formatRequestDataDiagnostic(message: RequestDataMessage, error: Request
     message:
       `Tealscript request data unavailable for ${queryDescription}: ${classifyRequestDataFailure(error)}. ` +
       `The script is valid, but Tealstreet cannot supply that data here. Provider detail: ${error.message}`,
-  };
-}
-
-function formatRealtimeCompiledFallbackDiagnostic(result: WorkerResult): WorkerError | undefined {
-  const profile = result.profile;
-  const reason = profile?.fallbackReason;
-  if (!profile || !reason?.startsWith(REALTIME_STATELESS_FALLBACK_PREFIX)) return undefined;
-
-  const diagnostics = profile.fallbackDiagnostics ?? [];
-  const primary = diagnostics[0];
-  const location = primary?.line === undefined
-    ? ''
-    : ` at line ${primary.line}${primary.column === undefined ? '' : `, column ${primary.column}`}`;
-  const trigger = primary ? `${primary.construct}${location}` : reason;
-  const additional = diagnostics.length > 1
-    ? ` ${diagnostics.length - 1} more realtime stateful construct(s) also contributed.`
-    : '';
-
-  return {
-    type: 'runtime',
-    severity: 'warning',
-    code: REALTIME_COMPILED_FALLBACK_ERROR_CODE,
-    line: primary?.line,
-    column: primary?.column,
-    message:
-      `Tealscript is using the interpreter for realtime updates so this script's output stays correct; live ticks can be slower. ` +
-      `Trigger: ${trigger}. ${primary?.message ?? 'The compiled worker cannot prove this intrabar state shape is safe.'}${additional} ` +
-      `To keep compiled realtime execution, remove or rewrite that stateful intrabar construct. Fallback reason: ${reason}`,
   };
 }
 
@@ -586,7 +556,6 @@ export class TealscriptManager {
       inputValues: { ...inputs },
       isReady: false,
       isVisible: true,
-      reportedRuntimeProfileDiagnostics: new Set(),
     };
     this.scripts.set(scriptId, managedScript);
 
@@ -912,7 +881,6 @@ export class TealscriptManager {
     this.notifyPlotsUpdated();
     this.notifyDrawingsUpdated();
     this.options.onExecution?.(summarizeResultExecution(scriptId, result, script.plots.length, script.drawings.length));
-    this.reportRuntimeProfileDiagnostic(scriptId, script, result);
   }
 
   private handleError(scriptId: string, workerGeneration: number, error: WorkerError): void {
@@ -920,7 +888,7 @@ export class TealscriptManager {
     if (!script) return;
 
     script.error = error;
-    if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE && error.code !== REALTIME_COMPILED_FALLBACK_ERROR_CODE) {
+    if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE) {
       script.plots = []; // Clear plots on fatal errors
       script.drawings = []; // Clear drawings on fatal errors
     }
@@ -933,21 +901,10 @@ export class TealscriptManager {
     if (error.type === 'runtime' && error.severity === 'error') {
       this.options.onExecution?.(summarizeRuntimeErrorExecution(scriptId, error));
     }
-    if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE && error.code !== REALTIME_COMPILED_FALLBACK_ERROR_CODE) {
+    if (error.code !== REQUEST_DATA_UNAVAILABLE_ERROR_CODE) {
       this.notifyPlotsUpdated();
       this.notifyDrawingsUpdated();
     }
-  }
-
-  private reportRuntimeProfileDiagnostic(scriptId: string, script: ManagedScript, result: WorkerResult): void {
-    const error = formatRealtimeCompiledFallbackDiagnostic(result);
-    if (!error) return;
-
-    const key = `${error.code}\u0000${error.message}`;
-    if (script.reportedRuntimeProfileDiagnostics.has(key)) return;
-    script.reportedRuntimeProfileDiagnostics.add(key);
-    script.error = error;
-    this.options.onError?.(scriptId, error);
   }
 
   private handleReady(scriptId: string, workerGeneration: number): void {

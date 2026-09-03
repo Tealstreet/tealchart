@@ -1,6 +1,6 @@
 # CLAUDE.md — @tealstreet/tealscript
 
-TealScript is a PineScript-like indicator scripting language that runs in Web Workers. It provides a PEG parser, interpreter, compiled execution path, and series-based execution model for technical indicators in Tealchart.
+TealScript is a PineScript-like indicator scripting language that runs in Web Workers. It provides a PEG parser, compiled execution path, and series-based execution model for technical indicators in Tealchart.
 
 ## Architecture
 
@@ -32,33 +32,24 @@ into structural block indentation.
 
 ### Runtime (`src/runtime/`)
 
-- `engine.ts` — Core interpreter. Evaluates AST bar-by-bar.
+- `compiledOnly.ts` — Public compiled execution wrapper that fails loudly when codegen cannot run a script.
+- `types.ts` — Shared execution result/profile/options types.
 - `context.ts` — Execution state: OHLCV series, `barstate`, `syminfo`, `timeframe`, plots, inputs
 - `series.ts` — `Series<T>` class: time-series values with history access
 - `scope.ts` — Variable scoping with `var`/`varip`/regular semantics
-- `codegen/` — Compiled execution path. Emits and runs a generated script class, with parity tests against the interpreter.
-- `closure/` — No-eval bound-closure backend under construction. It must bind supported AST shapes into directly invoked closures, fail unsupported constructs loudly, and avoid per-bar AST-dispatch fallbacks except where explicitly recorded as a temporary bridge.
-- Do not wire incremental closure realtime by keeping a closure-installed
-  `TealscriptEngine` alive and calling `updateBar(...)`.
-  `installBoundExecution(...)` currently overrides only
-  `executeHistoricalStatements`; `updateBar(...)` calls the separate realtime
-  statement runner. Naive wiring would silently execute interpreter realtime
-  statements while profiles and host code report the closure backend. A real
-  incremental closure path must bind/install the realtime runner too and be
-  proven by closure-selected realtime sweep and corpus replay.
+- `codegen/` — Compiled execution path. Emits and runs a generated script class.
 - Backend selection is centralized in `src/runtime/backendSelection.ts` and
   `executeSelectedTealscriptBackend(...)`. Hosts pass an explicit override first,
-  then a boolean closure-rollout flag, then their safe default. Web/worker/CLI
-  default to compiled; mobile passes its current interpreter default until
-  closure is deliberately selected. `RuntimeProfile` keeps `executionMode` as
-  the actual path that ran and adds
+  then their safe default. Web/worker/CLI default to compiled. Mobile must fail
+  loudly until the hidden-WebView compiled host lands. `RuntimeProfile` keeps
+  `executionMode` as the actual path that ran and adds
   `selectedBackend`/`backendSelectionSource` so fallback and rollout state are
   visible without inferring from messages.
 - `src/semantic/checker.ts` — Semantic diagnostics for pasted scripts. Unresolved imports, builtin binding errors, UDF qualifier mismatches, and typed assignment errors must retain line/column and symbol-specific messages.
-- Source-aware values passed from closure-bound expressions into shared engine
-  builtins must use the engine-recognized `__tealscriptKnownSource` wrapper.
-  Do not add a closure-private marker: TA/input helpers rely on that shared
-  wrapper to recover the backing series for calls like `ta.ema(close, n)`.
+- Source-aware values passed into shared engine builtins must use the
+  engine-recognized `__tealscriptKnownSource` wrapper. TA/input helpers rely on
+  that shared wrapper to recover the backing series for calls like
+  `ta.ema(close, n)`.
   Generic legacy `input(close, ...)` preserves source identity through its
   first positional `defval` argument; treating it like an ordinary scalar input
   silently flattens downstream TA output.
@@ -67,11 +58,12 @@ into structural block indentation.
   `undefined`. Public legacy accumulators rely on `nz(local[1])` seeding from
   zero on the first bar, and drawing constructors rely on `bar_index[1]`
   resolving to the previous bar coordinate instead of `na`.
+- History offsets are Pine integer offsets. Truncate fractional offsets toward
+  zero before reading history; negative offsets still return `na`.
 - Non-identifier history expressions in generated backends, such as
   `ta.highest(high, 2)[1]` or `(close - open)[1]`, are per-call-site series.
   Treating them as unsupported runtime errors drops plots/alerts on public
-  scripts even though the interpreter and string codegen already produce
-  values.
+  scripts.
 - Generated backend bar runners must not treat ordinary statement return
   values as halt signals. Historical execution stops for `runtime.error`
   exceptions, not because a plotting or expression statement evaluated to
@@ -81,6 +73,20 @@ into structural block indentation.
   emitted read expression. History-read variables and UDT fields can compile to
   reads such as `series.get(0)` or field getters; those are values, not
   JavaScript lvalues.
+- Compiled collection lowering must preserve Pine collection wrappers and Pine
+  argument ordering. Array literals are Pine arrays, collection receiver
+  methods use the same ordered arguments as namespace calls, and collection
+  history reads must not be confused with array element indexing.
+- Local method overloads keep distinct generated identities by receiver type
+  and arity. Resolve user/imported methods before generic collection method
+  fallback so script methods named like `copy` or `size` are not swallowed.
+- Enum values keep stable runtime identities for equality; `.title()` on a
+  variable-held enum value must look up that identity's display title instead
+  of replacing the enum value with its title string.
+- Compiled builtin argument binding must preserve Pine alias/default-source
+  overloads. `source`/`series` aliases share one argument slot, but length-only
+  overloads such as `ta.highestbars(4)` and `ta.pivothigh(2, 2)` must not treat
+  their first numeric argument as a source series.
 - Generated backends must mark drawings created while initializing `var` and
   `varip` declarations as persistent. Tables, labels, lines, boxes, polylines,
   and linefills created this way survive rollback/truncation; omitting the mark
@@ -91,7 +97,7 @@ into structural block indentation.
   snapshot, not merely truncate non-persistent drawings; otherwise confirmed
   assignment handles from a discarded same-time bar leak forward, or unconfirmed
   replay handles differ from a fresh execution. Keep this snapshot-backed rule
-  aligned across interpreter, string codegen, and closure backends.
+  in the shared generated runtime, not per call site.
 - Realtime scope rollback must also be an exact non-`varip` restore. If a
   UDF-local `var` drawing handle is first initialized on the replaceable last
   bar, retaining that variable after the drawing store rolls back leaves a stale
@@ -121,8 +127,7 @@ into structural block indentation.
   removes a replacement tick's event, restore the output-level
   `message`/`frequency` from the latest retained event, and remove direct alert
   outputs with no retained events. Keeping metadata from a discarded tick makes
-  the interpreter disagree with reconstructed generated backends while showing
-  the same event count.
+  realtime output diverge while showing the same event count.
 - Realtime parity harnesses compare a long-lived session after each same-time
   replacement against an independent fresh session loaded from the original
   confirmed window plus that one replacement tick. Do not compare replacement
@@ -158,8 +163,7 @@ into structural block indentation.
   global plot declarations still count. A `plotshape(false)` or sparse
   `plotcandle(...)` defines a user-visible output control even when every
   sampled value is `na`.
-- Missing Pine declaration precision is represented as `undefined` across
-  interpreter, string codegen, and closure. Do not replace it with a backend
+- Missing Pine declaration precision is represented as `undefined`. Do not replace it with a backend
   default such as `4`; Tealchart decides display precision at label render time
   from the pane and instrument tick precision.
 - `table.merge_cells()` is idempotent for an already-merged identical range and
@@ -167,14 +171,8 @@ into structural block indentation.
   it inside repeated `barstate.islast` realtime updates on a persistent table;
   treating the identical re-merge as overlap drops later alerts or records
   backend-specific runtime errors.
-- Closure-bound builtin fast paths may pre-bind the target and positional
-  argument shape only after user/imported functions and methods have had
-  precedence, and only when the call has no Pine named arguments, source-series
-  preservation, or input metadata side effects. Calendar/timestamp helpers,
-  `color.new`, and positional `array.get` are the current direct routes; keep
-  all named/source/input shapes on the shared engine builtin path.
 - Bare legacy `color(...)` needs the same overload split as string codegen and
-  the interpreter: one or two arguments, or `color`/`transp` named arguments,
+  Pine semantics: one or two arguments, or `color`/`transp` named arguments,
   are a transparency cast (`color.new`); RGB channel construction stays
   `color.rgb`. Do not canonicalize bare `color` to `color.rgb` before that
   split or `color(na)` becomes opaque black instead of transparent.
@@ -183,8 +181,7 @@ into structural block indentation.
   `RuntimeProfile.swallowedErrors` with a stable site id, first bar index, and
   first message, and surface the same summary in external corpus rows. This
   applies to compiled top-level bar execution and compiled request-expression
-  evaluation; interpreter/closure statement errors are already recorded as
-  execution errors, while loop-control catches are not error swallowing.
+  evaluation; loop-control catches are not error swallowing.
 - Request-expression replay must be dependency-selected for both globals and
   request-local statements. Replaying every prior statement is correct-looking
   but unaffordable: one public scanner request sat after 100+ replayable
@@ -197,12 +194,29 @@ into structural block indentation.
   capturing the chart-context value makes request expressions use the chart's
   source instead of the requested series. Unknown or series-like dependencies
   stay replayed.
+- Compiled imported-library support has two symbol surfaces: exported API for
+  importing scripts, and private library-local helpers/types/methods for code
+  executing inside that library. Keep those identities distinct. Request
+  subprograms created from an imported function must retain the imported alias
+  context so bare library-local helpers still resolve inside the requested bars,
+  while external calls to private members fail loudly.
+- TA calls that consume imported/UDF source expressions need a real source
+  series at the call site. Do not sparse-call stateful TA helpers under
+  conditionals or switch blocks; push the resolved source once per bar and have
+  the TA read that series history.
+- Generated UDFs must create local history series for function-local values
+  later consumed as TA source inputs; TA source locals are series, not globals.
+- VWAP argument binding must preserve missing/default `source` and named
+  `anchor` slots. Do not filter missing args before positional/named binding.
+- Highest/lowest window helpers do not clamp non-positive lengths to one.
+  `ta.highest`, `ta.lowest`, `ta.highestbars`, and `ta.lowestbars` return `na`
+  for zero or negative lengths after consuming the current bar.
 
 **Execution flow:**
 
 1. Parse script → AST
 2. Run semantic checks and metadata extraction
-3. Prefer compiled execution when supported; fall back to the interpreter where needed
+3. Execute with compiled codegen, failing loudly when unsupported
 4. Create `ExecutionContext` with bar data
 5. Iterate bar-by-bar, evaluating statements
 6. Collect plot, drawing, alert, log, and strategy outputs per bar
@@ -240,11 +254,14 @@ series[n]   // n bars ago
 - Unary numeric literals such as `-1` and `+1` are numeric literals for type inference, not `unknown`; sentinel locals initialized that way must still widen when reassigned from loop or series values.
 - Bare user/imported function calls resolve before builtins and before legacy
   global compatibility aliases. Public v3/v4 scripts often define helpers named
-  like later builtins (`median`, `sum`, `dema`); compiled analysis/emission and
-  the interpreter must both preserve the script-local binding.
+  like later builtins (`median`, `sum`, `dema`); compiled analysis/emission
+  must preserve the script-local binding.
 - Bare legacy value aliases such as `ticker`, `tickerid`, `n`, and `tr` are
   fallback names, not reserved words. Script locals and inputs with the same
   name must win before those aliases resolve to runtime values.
+- Only documented ticker constructors may lower through the ticker runtime
+  helpers. Unknown `ticker.*` calls must fail loudly; do not route them through
+  `ticker.new` as a default constructor.
 - Qualified official namespace calls that explicitly pass the same-named value,
   such as `array.unshift(array, value)`, remain namespace calls even when a UDF
   parameter is named `array`; user/imported methods still get first chance
@@ -280,11 +297,11 @@ trim the ledger after the fact. Confirmed realtime close replay must mirror the
 historical pre-statement fill/mark ordering so closed-trade runup/drawdown sees
 the confirmed bar OHLC excursion before exit fills are replayed.
 
-**Realtime updates:** `commit()` finalizes a bar; `rollback()` reverts to last commit for intrabar recalculation. The interpreter `updateBar(...)` path is still the fallback runtime for scripts that cannot stay compiled, so it must rebuild imported-library bindings during realtime re-entry. Same-time replacement of the loaded final bar restores a pre-last-bar scope snapshot, including plain array-backed builtin caches, then replays the bar; newly appended realtime strategy bars still honor `calc_on_every_tick=false`. Reconstructed realtime executions in string codegen and closure mode must apply the same rule only for the appended realtime segment: unconfirmed appended strategy bars do not execute top-level statements unless `calc_on_every_tick=true`, while indicators still calculate every tick and same-time replacement of the loaded final bar still executes. Worker `confirmedRealtimeBarStartIndex` metadata marks the appended realtime segment only; setting it for loaded-bar replacement makes generated backends skip strategy updates they must replay. Static outputs such as `hline` must not gain per-bar values during truncation, while per-bar visual arrays such as `plotarrow` colors must be replaced at `bar_index` rather than appended. Source-aware values returned from imported/user helpers preserve series identity for history-sensitive calls, but normal binary arithmetic/comparison must unwrap them before operating.
+**Realtime updates:** `commit()` finalizes a bar; `rollback()` reverts to last commit for intrabar recalculation. Same-time replacement of the loaded final bar restores a pre-last-bar scope snapshot, including plain array-backed builtin caches, then replays the bar; newly appended realtime strategy bars still honor `calc_on_every_tick=false`. Reconstructed realtime executions in string codegen must apply the same rule only for the appended realtime segment: unconfirmed appended strategy bars do not execute top-level statements unless `calc_on_every_tick=true`, while indicators still calculate every tick and same-time replacement of the loaded final bar still executes. Worker `confirmedRealtimeBarStartIndex` metadata marks the appended realtime segment only; setting it for loaded-bar replacement makes generated backends skip strategy updates they must replay. Static outputs such as `hline` must not gain per-bar values during truncation, while per-bar visual arrays such as `plotarrow` colors must be replaced at `bar_index` rather than appended. Source-aware values returned from imported/user helpers preserve series identity for history-sensitive calls, but normal binary arithmetic/comparison must unwrap them before operating.
 
 ## Built-in Functions
 
-Registered in `engine.ts` via `registerBuiltins()`:
+Registered through the shared compiled runtime helpers:
 
 | Category           | Functions                                                                                                                                                                          |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -296,7 +313,7 @@ Registered in `engine.ts` via `registerBuiltins()`:
 | Color              | `color.red`, `color.green`, ...; `color.new(color, transparency)`                                                                                                                  |
 | Utility            | `nz()`, `na()`, `str.*`, `timeframe.*`, `ticker.*`, `request.*` host-backed families, `footprint.*`/`volume_row.*` accessors, selected strategy helpers                            |
 
-**Adding a new built-in:** Add to the appropriate `register*Builtins()` method in `engine.ts`, then add tests.
+**Adding a new built-in:** Add it to the shared compiled runtime helper surface, then add tests.
 
 Array runtime errors intentionally follow Pine v6 for destructive edge cases:
 negative constructor sizes, sizes above 100,000, growth past 100,000, empty
@@ -306,8 +323,7 @@ reads throw instead of returning `na`, `undefined`, or silently clamping.
 TA compatibility has two separate guards: the compiled warmup sweep in
 `src/runtime/codegen/execute.test.ts` pins first-valid-bar/`na` behavior, and
 `tests/compat/pine-ta-value-behavior.test.ts` pins fixed numeric/boolean values
-for every official `ta.*` manual-index name across interpreter and compiled
-execution. `ta.cum(na)` returns `na` for that bar without advancing the saved
+for every official `ta.*` manual-index name. `ta.cum(na)` returns `na` for that bar without advancing the saved
 sum; treating it as the previous sum makes `na` indistinguishable from zero in
 OBV-style expressions. Keep both current when changing TA formulas or compiled
 TA classes.
@@ -315,13 +331,13 @@ TA classes.
 Strategy value compatibility is pinned by
 `tests/compat/pine-strategy-value-behavior.test.ts`, which uses fixed bars and
 literal expected values for position/profit readouts plus open/closed trade
-accessors across interpreter and compiled execution. Keep it current when
+accessors. Keep it current when
 changing the deterministic ledger, compiled strategy loop, or strategy accessors.
 
 Runtime metadata compatibility is pinned by
 `tests/compat/pine-runtime-metadata-behavior.test.ts`, covering official
 `timeframe.*`, `session.*`, implemented `syminfo.*`, and chart metadata fields
-across interpreter and compiled execution. Provider-owned `syminfo.*` values
+for runtime metadata behavior. Provider-owned `syminfo.*` values
 should either surface host metadata unchanged or remain in the reasoned
 known-missing allowlist; do not fake provider series in the runtime.
 `syminfo.prefix(symbol)` and `syminfo.ticker(symbol)` are callable helpers as
@@ -337,21 +353,20 @@ as numeric date or bars-back slots.
 Barstate compatibility is pinned by
 `tests/compat/pine-barstate-behavior.test.ts`, which asserts literal
 historical load, same-bar realtime replacement, and next-bar confirmation
-sequences for all official `barstate.*` flags across the interpreter and the
-production compiled worker path. Worker `updateBar` keeps explicit realtime
+sequences for all official `barstate.*` flags across the production compiled worker path. Worker `updateBar` keeps explicit realtime
 phase state so compiled output preserves the previous realtime bar's confirmed
-closing evaluation before opening the next realtime bar. Closure execution must
-receive the same reconstructed realtime phase hints as compiled execution
-(`confirmedRealtimeBarStartIndex`, `confirmedRealtimeBarIndex`, and
-`realtimeLastBar`) in workers, selected-backend helpers, and corpus harnesses.
+  closing evaluation before opening the next realtime bar. Compiled execution must
+  receive reconstructed realtime phase hints (`confirmedRealtimeBarStartIndex`,
+  `confirmedRealtimeBarIndex`, and `realtimeLastBar`) in workers,
+  selected-backend helpers, and corpus harnesses.
 Generated reconstruction must replay the original loaded last historical bar
 and every confirmed realtime append as `barstate.islast`; otherwise ordinary
 `barstate.islast` drawing constructors disappear on live charts even though the
-incremental interpreter keeps them.
+fresh compiled reconstruction keeps them.
 
 Input behavior compatibility is pinned by
 `tests/compat/pine-input-behavior.test.ts`, covering all official input
-functions across interpreter and compiled execution. `options`, `minval`, and
+functions. `options`, `minval`, and
 `maxval` reject invalid defaults rather than clamping; `step` is widget metadata
 only. `input.source` must keep resolving price composites and plot-source
 overrides as series values. Runtime input identity is declaration-based, not
@@ -360,8 +375,8 @@ display-title-based: repeated public-script titles such as multiple
 while unique titles keep the stable `input_Title` override ID. Source-aware
 input defaults are for preserving `input.source` identity only. Explicit scalar
 legacy inputs such as `input(type=float, defval=-0.5)` must validate and
-register the unwrapped scalar default; otherwise valid v3/v4 scripts turn unary
-numeric defaults into source-wrapper objects on interpreter/closure paths.
+	register the unwrapped scalar default; otherwise valid v3/v4 scripts turn unary
+	numeric defaults into source-wrapper objects.
 Cached global input declarations and skipped initialized `var`/`varip`
 declarations must still reserve the sequential builtin call-id slots they
 consumed when first evaluated. The IDs are part of persisted chart/study input
@@ -370,7 +385,7 @@ keys and keep later uncached input expressions aligned with bar 0.
 
 Request/ticker option compatibility is pinned by
 `tests/compat/pine-request-ticker-option-behavior.test.ts`, which asserts
-literal values across interpreter and compiled execution using a seeded
+literal values using a seeded
 `RequestDatafeed`. It covers `ignore_invalid_symbol`/`ignore_invalid_currency`,
 request-level `currency` and `calc_bars_count` routing, declaration-level
 `calc_bars_count` metadata, repainting-safe higher-timeframe lookahead
@@ -397,12 +412,12 @@ argument binding before emission. Global `array.*` calls are the known guard:
 `array.push(id=..., value=...)`, `array.get(id=..., index=...)`, and related
 helpers must emit arguments in the declared Pine signature order, otherwise
 public scripts that store drawing or snapshot state in arrays compile to
-zero-argument helper calls and silently diverge from the interpreter.
+zero-argument helper calls and silently diverge.
 
 Alert/log/runtime compatibility is pinned by
 `tests/compat/pine-alert-log-runtime-behavior.test.ts`, covering all official
 `alert`, `alertcondition`, `alert.freq_*`, `log.*`, and `runtime.error` names
-across interpreter and compiled execution. It asserts per-frequency alert event
+for compiled execution. It asserts per-frequency alert event
 counts, alertcondition placeholder rendering, log placeholder formatting, and
 runtime-error halt semantics inside UDFs and compiled request-expression
 subprograms.
@@ -410,17 +425,13 @@ subprograms.
 The external corpus historical reports prove fixed-window execution only. The
 real-script realtime replay is a separate measurement generated with
 `yarn workspace @tealstreet/tealscript pine:external-corpus:realtime`; it starts
-from the full historical closure-cutover dominated set and
-records append, same-time replacement, and confirmation output parity across
-interpreter, compiled, and closure backends. A nonzero mismatch count in
+from the compiled historical output set and records append, same-time
+replacement, and confirmation output parity for compiled execution. A nonzero mismatch count in
 `reports/external-pine-corpus-realtime.report.json` is a known measurement
 finding, not a stale report to smooth over.
-`pine:closure:cutover` and `pine:external-corpus:realtime` accept labelled
-source reports as `--reports label:path`; the default with no `--reports`
-remains the v1/v2 indicator-focused corpus pair. Realtime replay refuses a
-cutover gate with dominated exceptions by default. `--allow-gate-exceptions` is
-measurement-only for exploratory corpora such as the strategy-focused sample;
-never use it for a cutover-readiness claim.
+`pine:external-corpus:realtime` accepts labelled source reports as
+`--reports label:path`; the default with no `--reports` remains the v1/v2
+indicator-focused corpus pair.
 For inner-loop debugging, the realtime runner supports development subsets with
 `--mismatched-only`, repeatable `--only-script`, or `--limit-per-corpus`.
 Subset reports are labelled `DEVELOPMENT SUBSET`, must write to an explicit
@@ -446,11 +457,9 @@ do not collapse this into a generic checker error. Obvious non-script files
 classify as `corpus-hygiene` and are excluded from the achievable ceiling. Rows
 that execute without plots, drawings, alerts, or logs are not all equivalent
 failures. The runner traces
-source-level output calls, compares the compiled
-path with the interpreter on the same 160-bar synthetic series, and fails the
-execute stage when core plot values, drawings, alerts, logs, or runtime
-diagnostics disagree. The output comparator compares finite numeric values with
-a 1e-8 absolute tolerance,
+source-level output calls and records compiled runtime output. Future product
+or reference comparisons must reuse the same output comparator. That comparator
+compares finite numeric values with a 1e-8 absolute tolerance,
 canonicalizes drawing IDs, omits undefined object fields, and stays strict on
 plot/drawing/alert/log order, series lengths, `na`/null versus zero, and
 side-effect presence. It then uses a 2,880-bar probe to separate TealScript gaps
@@ -459,9 +468,9 @@ artifacts) and conditional/data-gated silence. Conditional/data-gated silence
 that remains undecided after the probe stays counted as `tealscript-gap` in row
 validity unless a stronger oracle proves correct silence. The corpus output parity
 guard is stricter than "compiled produced something"; mismatches are product
-correctness gaps until fixed or routed to a visible interpreter fallback. Keep
-that three-way split and output-parity summary current when changing the corpus
-harness or output collection.
+correctness gaps until fixed or reported as loud unsupported compiled cases. Keep
+that split and output-parity summary current when changing the corpus harness or
+output collection.
 Compiled execution still swallows ordinary per-bar JavaScript errors so one bad
 bar does not abort the run, but those swallowed errors must remain measurable:
 `RuntimeProfile.compiledBarErrors` and the external corpus report retain the
@@ -469,41 +478,11 @@ count plus first bar/message. A script that silently throws before every output
 call is a diagnosable corpus/runtime gap, not an empty-output mystery. Current
 v1 instrumentation is zero; any future nonzero count is a finding to investigate.
 
-Closure backend performance has two separate reports. Use
-`scripts/benchmark-production-closure-backend.ts` for the per-script web cutover
-cost distribution across both corpora; aggregate totals are outlier-weighted and
-not the user-cost headline. Use `scripts/profile-production-closure-costs.ts`
-for cost attribution on middle-of-distribution scripts. The T107 profile curve
-must be read at long-window sizes, not just the 160-bar corpus window: after
-slot binding it rose from 1.40x at 1,000 bars to 1.72x at 5,000, then plateaued
-at 1.77x/1.76x for 10,000/20,000 bars. The measured mechanism is not
-full-history copying (`Series.snapshot()` was 0.09 us/bar at 5,000 and
-`Series.toArray()` was unused); it is longer-window workload activation plus
-remaining builtin argument marshalling/shared dispatch and runtime-scope mirror
-traffic. The profile uses inclusive temporary monkey patches and restores them
-before exit; its buckets rank cost centers and must not be summed as wall-clock
-shares.
-Realtime event cost is measured separately by
-`scripts/profile-realtime-event-costs.ts`. Historical per-bar performance is not
-a proxy for live ticks: the interpreter measures warmed incremental
-`updateBar(...)`, while compiled and closure currently reconstruct the active
-bar window. On ordinary public scripts in the T121 profile, a same-time
-replacement at 5,000 bars cost about 58-77x warmed interpreter updateBar for
-compiled and 339-358x for closure; the alert-heavy scanner row is pathological
-even incrementally and should be treated as its own class. Do not claim mobile
-closure cutover realtime cost from historical closure-vs-compiled ratios alone.
 The default `pine-composite-performance.test.ts` cases are smoke checks only;
 full assertions stay behind `TEALSCRIPT_PERF_ASSERT=1`. Do not increase the
-default smoke workload to make a timeout pass. The request-backed worker and
-realtime safety smokes have 10s local timeouts because the CI-shaped Turbo run
-stretches sub-second isolated checks under package concurrency.
-T106 bound closure variables to static slots for globals, UDF call-site frames,
-and block/loop locals while mirroring the runtime scope for shared builtins,
-history, request replay and diagnostics. That cut scope/lifecycle probe volume
-from about 43M to 8.6M calls on the 1,000-bar middle-ratio sample. Do not remove
-the scope mirror until those seams have direct slot-aware replacements, and keep
-recursive UDFs on the conservative scope path unless a real frame stack is
-added.
+default smoke workload to make a timeout pass. The request-backed worker smokes
+have 10s local timeouts because the CI-shaped Turbo run stretches sub-second
+isolated checks under package concurrency.
 
 Behavior tables that assert literal expected values must declare provenance for
 those values: independently derived from Pine v6/reference semantics, taken
@@ -511,36 +490,16 @@ from a published worked example, or a TealScript regression pin. Values captured
 from current TealScript output are not correctness assertions; keep them labelled
 as regression pins with a note explaining what local behavior they freeze.
 
-Grammar-driven compiled/interpreter differential testing is pinned by
-`tests/compat/pine-grammar-differential.test.ts`. The default gate generates 48
-deterministic full-execution programs and 12 realtime programs from grammar
-feature blocks plus deeper generated shapes: nested expression trees,
-multi-call-site UDFs/methods, UDTs stored in arrays/maps, request-wrapped UDFs,
-and `varip`/history combinations. `TEALSCRIPT_GRAMMAR_DIFF_SOAK=1` raises the
-same seeded run to 384 full-execution programs and 96 realtime programs.
-Full-execution compiled/interpreter output is currently clean. Realtime
-generation intentionally records the known
-`compiled-worker-stateless-intrabar-reentry` classification for stateful
-intrabar shapes the stateless compiled worker cannot prove safe: `varip`,
-persistent mutable tuple state, persistent collection mutation, and compound
-mutation of persistent state. Standalone stateful TA calls and persistent
-mutable declarations are not sufficient to force fallback after the T43/T44
-forced-compiled audit showed they matched in the production corpus. The
-production worker must not serve stateless compiled realtime output for
-classified shapes: it conservatively routes them through the interpreter with
-that fallback reason visible in `RuntimeProfile`. New unclassified realtime
-findings or unsafe generated programs that reach compiled realtime should fail
-the test.
-Realtime safety fallbacks carry structured `RuntimeProfile.fallbackDiagnostics`
-with the triggering construct and source line/column. Tealchart surfaces these
-as nonfatal `realtime-compiled-fallback` diagnostics: the script is valid and
-output remains correct, but live ticks run through the interpreter unless the
-user removes or rewrites the named stateful intrabar construct.
+The product-worker realtime safety gate was removed after direct compiled
+replay and worker composite tests proved the classified stateful intrabar rows
+execute and match as compiled. Unsupported compiled execution still fails
+loudly through the normal compile/execute path with `RuntimeProfile` diagnostics;
+do not add a quiet fallback to another engine.
 Worker-facing errors carry `severity`: parse, semantic, worker, and
-`runtime.error` failures are `error`; host-data absence and realtime compiled
-fallback advisories are `warning` at the Tealchart boundary. Keep stable
-`code`/`type` fields authoritative for UI branching; message wording is for
-humans and must not be the only classifier.
+`runtime.error` failures are `error`; host-data absence is a `warning` at the
+Tealchart boundary. Keep stable `code`/`type` and profile fields authoritative
+for UI branching; message wording is for humans and must not be the only
+classifier.
 
 Drawing/object compatibility has a behavior coverage assertion in
 `tests/compat/pine-drawings.test.ts`: every implemented official manual-index
@@ -561,11 +520,14 @@ pushes valid Pine into the semantic-failure bucket.
 **Main → Worker:** `init`, `updateBars`, `updateBar`, `setInputs`, `requestDataResult`, `dispose`
 **Worker → Main:** `ready`, `requestData`, `result` (plots + inputs), `error`, `parseError`
 
-The worker keeps compiled request execution synchronous by using a message-backed
-cache. It statically preloads literal/simple `request.*` calls, then uses hidden
-compiled runtime discovery for series-varying request routing arguments. Discovery
-posts concrete `requestData` misses, discards plots/drawings/alerts/logs from
-the hidden pass, and retries the same output generation with a warm cache.
+The worker keeps request execution synchronous by using a message-backed cache.
+It statically preloads literal/simple `request.*` calls, then uses hidden
+non-codegen runtime discovery for series-varying request routing arguments.
+Discovery posts concrete `requestData` misses, discards
+plots/drawings/alerts/logs from the hidden pass, and retries the same output
+generation with a warm cache. Dynamic discovery runs before backend selection,
+so it must stay backend-agnostic and must report discovery errors instead of
+silently deciding no request data is needed.
 Host provider failures returned through `requestDataResult` are cached as
 missing values for script execution, not as script runtime failures; Tealchart
 surfaces the provider diagnostic on the main thread while Pine-side request
@@ -574,15 +536,7 @@ Same-bar `updateBar` messages also route through the compiled worker bridge and
 reuse the worker request cache; stale in-flight misses are cancelled per update.
 Realtime re-entry correctness has a fast representative default test and a full
 corpus sweep behind `TEALSCRIPT_REALTIME_SWEEP=1`; keep the full sweep opt-in so
-the package gate stays cheap enough to run routinely. Add
-`TEALSCRIPT_REALTIME_BACKEND=closure` when the sweep needs to prove the no-eval
-closure backend was selected; that variant checks closure full-window same-bar
-replacement parity, not an incremental closure `updateBar` VM.
-The product-path corpus runner exercises Tealchart in headless Chrome rather
-than calling the engine directly. It must use existing product seams only:
-plots/drawings from the widget manager state and alerts/logs/strategy from the
-worker result message payload. Do not add shipped widget getters or host-facing
-API solely so the harness can observe more fields.
+the package gate stays cheap enough to run routinely.
 
 ## Grammar Features
 
@@ -598,10 +552,9 @@ omit or include that the manual does not. Keep that audit current when changing
 grammar or builtin reference data; it is the guard against measuring only a list
 we wrote ourselves.
 
-**Important current gaps:** imported Pine libraries are parsed/checked, and compiled execution supports host-provided exported constants, expression/block-bodied pure functions, methods, UDT constructors/fields, local/imported enum members and `.title()`, versioned aliases, export-to-export calls, and transitive host-provided imports inside compiled security expression subprograms; host-backed request data depends on the caller's datafeed, with `request.currency_rate()`, `request.economic()`, `request.financial()`, legacy `request.quandl()`, `request.footprint()`, `footprint.*`/`volume_row.*` object accessors, and corporate-action requests routed through provider seams and returning `na` when unseeded; `request.*` calls inside user-defined wrapper functions compile for direct source parameters, captured computed expressions, root-scope regular values, `input.source()` aliases, imported tuple helpers, UDF parameter/local history, UDT field history, indexed TA call-result history, and nested UDF call-chain-local `ta.*` state; timeframe parsing follows v6 bounds and `timeframe.change()` uses calendar-aware timeframe buckets; compiled drawing objects use the same declaration `max_*_count` limits and oldest-first eviction as the interpreter; the strategy ledger tracks deterministic position accounting but is not an exact TradingView broker emulator.
+**Important current gaps:** imported Pine libraries are parsed/checked, and compiled execution supports host-provided exported constants, expression/block-bodied pure functions, methods, UDT constructors/fields, local/imported enum members and `.title()`, versioned aliases, export-to-export calls, and transitive host-provided imports inside compiled security expression subprograms; host-backed request data depends on the caller's datafeed, with `request.currency_rate()`, `request.economic()`, `request.financial()`, legacy `request.quandl()`, `request.footprint()`, `footprint.*`/`volume_row.*` object accessors, and corporate-action requests routed through provider seams and returning `na` when unseeded; `request.*` calls inside user-defined wrapper functions compile for direct source parameters, captured computed expressions, root-scope regular values, `input.source()` aliases, imported tuple helpers, UDF parameter/local history, UDT field history, indexed TA call-result history, and nested UDF call-chain-local `ta.*` state; timeframe parsing follows v6 bounds and `timeframe.change()` uses calendar-aware timeframe buckets; compiled drawing objects use declaration `max_*_count` limits and oldest-first eviction; the strategy ledger tracks deterministic position accounting but is not an exact TradingView broker emulator.
 
-Legacy Pine compatibility is version-conditional in the checker and must stay
-paired with interpreter and compiled execution behavior. v2/v3/v4 scripts accept
+Legacy Pine compatibility is version-conditional in the checker and compiled execution. v2/v3/v4 scripts accept
 legacy `input()` type selectors, bare color/style constants, old ticker helpers,
 bare `tickerid`, v3 `n` as `bar_index`, numeric truthiness in boolean built-in
 parameters, legacy visual `transp`, and boolean `strategy.entry()`/`order()`
@@ -633,7 +586,8 @@ yarn lint             # ESLint
 
 | File                             | Purpose                                    |
 | -------------------------------- | ------------------------------------------ |
-| `src/runtime/engine.ts`          | Core interpreter                           |
+| `src/runtime/compiledOnly.ts`    | Public compiled execution wrapper          |
+| `src/runtime/types.ts`           | Shared execution result/profile types      |
 | `src/runtime/codegen/`           | Compiled execution path and parity harness |
 | `src/parser/generated.js`        | Auto-generated parser                      |
 | `src/parser/grammar.peggy`       | PEG grammar                                |
@@ -647,3 +601,4 @@ yarn lint             # ESLint
 - `na` is represented as `NaN` internally; `na == na` is false (PineScript semantics)
 - ESLint ignores generated parser files (configured in `eslint.config.mjs`)
 - The worker entry point requires bundler URL resolution: `new URL('@tealstreet/tealscript/worker', import.meta.url)`
+- Compiled tuple/control codegen must treat `_` as discard-only, read tuple elements through runtime indexing, and propagate expression-result assignment through nested if/loop tails.

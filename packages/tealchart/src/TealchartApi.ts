@@ -849,7 +849,7 @@ export class TealchartApi {
     const moveWrapper: OemsPriceActionCallback = (price: number) => _onMoveCallback?.(price);
     const movingWrapper: OemsPriceActionCallback = (price: number) => _onMovingCallback?.(price);
 
-    // Capture references for closure
+    // Stable references for snapshot callbacks.
     const orderLines = this._orderLines;
     const onOrderPriceChanged = () => this._onOrderPriceChanged;
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
@@ -1302,7 +1302,7 @@ export class TealchartApi {
     let _onTPMoveEnd: OemsPriceActionCallback | null = null;
     let _onSLMoveEnd: OemsPriceActionCallback | null = null;
 
-    // Capture references for closure
+    // Stable references for snapshot callbacks.
     const positionLines = this._positionLines;
     // Debounce notifyChange to batch multiple setter calls (e.g., during initial line setup)
     const notifyChange = () => {

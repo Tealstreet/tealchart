@@ -5,7 +5,7 @@ import { PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX } from '../../src/compat/pineV6R
 import { parse } from '../../src/parser';
 import { executeCompiled, tryCompile } from '../../src/runtime/codegen/execute';
 import type { Bar } from '../../src/runtime/context';
-import { executeScript } from '../../src/runtime/engine';
+import { executeScript } from '../../src/runtime/compiledOnly';
 import { resolvesBuiltinReferenceNameForCoverage } from '../../src/semantic/checker';
 
 const bars: Bar[] = [
@@ -61,19 +61,19 @@ log.info("ok")
       }
 
       const compiledResult = executeCompiled(compiled, bars, undefined, executionOptions);
-      const interpreterResult = executeScript(ast, bars, undefined, executionOptions);
+      const expectedResult = executeScript(ast, bars, undefined, executionOptions);
       if (!compiledResult) {
         failures.push(`${name}: compiled execution returned no result`);
         continue;
       }
 
-      if (compiledResult.errors.length > 0 || interpreterResult.errors.length > 0) {
-        failures.push(`${name}: compiled errors=${compiledResult.errors.length}, interpreter errors=${interpreterResult.errors.length}`);
+      if (compiledResult.errors.length > 0 || expectedResult.errors.length > 0) {
+        failures.push(`${name}: compiled errors=${compiledResult.errors.length}, reference errors=${expectedResult.errors.length}`);
         continue;
       }
 
-      if (compiledResult.logs.length !== interpreterResult.logs.length) {
-        failures.push(`${name}: compiled logs=${compiledResult.logs.length}, interpreter logs=${interpreterResult.logs.length}`);
+      if (compiledResult.logs.length !== expectedResult.logs.length) {
+        failures.push(`${name}: compiled logs=${compiledResult.logs.length}, reference logs=${expectedResult.logs.length}`);
       }
     }
 

@@ -32,7 +32,7 @@ describe('external Pine corpus runner', () => {
     expect(outputCounts(result)).toMatchObject({ produced: true, plots: 2 });
   });
 
-  it('classifies parse, semantic, compiled, fallback, and output outcomes without storing source in the report', async () => {
+  it('classifies parse, semantic, datafeed, and output outcomes without storing source in the report', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'tealscript-external-corpus-runner-'));
     try {
       await writeFile(
@@ -55,7 +55,7 @@ describe('external Pine corpus runner', () => {
       await writeFile(join(dir, 'parse.pine'), '//@version=6\nindicator("Parse"\nplot(close)\n', 'utf8');
       await writeFile(
         join(dir, 'fallback.pine'),
-        '//@version=6\nlibrary("Fallback")\nexport f(float v) => v + 1\nplot(f(close))\n',
+        '//@version=6\nindicator("Request Data")\nplot(request.security("EXT", "1", close))\n',
         'utf8',
       );
       await writeFile(join(dir, 'invalid.pine'), '//@version=6\nindicator("Invalid")\nplot(close, title="A", title="B")\n', 'utf8');
@@ -82,30 +82,16 @@ describe('external Pine corpus runner', () => {
         'tealscript-gap': 2,
       });
       expect(report.summary.outputSilence).toEqual({ 'correct-silence': 1 });
-      expect(report.summary.outputParity).toEqual({ matched: 3, 'not-run': 4 });
+      expect(report.summary.outputParity).toEqual({ 'not-run': 7 });
       expect(report.summary.strategyLedgerParity).toEqual({
         strategies: 1,
-        executableStrategies: 1,
-        activeStrategies: 1,
-        allThreeMatched: 1,
-        compiledAgainstInterpreter: { matched: 1 },
-        closureAgainstInterpreter: { matched: 1 },
-        closureAgainstCompiled: { matched: 1 },
+        executableStrategies: 0,
+        activeStrategies: 0,
+        matched: 0,
+        compiledLedger: { 'not-run': 1 },
         currentlyPassingRowsWithLedgerMismatch: 0,
         differenceKinds: {},
       });
-      expect(report.summary.closure.funnel).toEqual({
-        compile: { count: 4, percent: 57.14 },
-        execute: { count: 4, percent: 57.14 },
-        output: { count: 3, percent: 42.86 },
-      });
-      expect(report.summary.closure.agreement).toEqual({
-        'all-three': 3,
-        'closure-interpreter-only': 1,
-        'closure-not-run': 3,
-      });
-      expect(report.summary.closure.parityAgainstInterpreter).toEqual({ matched: 4, 'not-run': 3 });
-      expect(report.summary.closure.parityAgainstCompiled).toEqual({ matched: 3, 'not-run': 4 });
       expect(report.summary.compiledBarErrors).toEqual({
         scripts: 0,
         totalErrors: 0,
@@ -116,15 +102,13 @@ describe('external Pine corpus runner', () => {
         totalErrors: 0,
         firstCauses: [],
       });
-      expect(report.summary.executionModes.compiled).toBe(3);
-      expect(report.summary.executionModes['interpreter-fallback']).toBe(1);
-      expect(report.rows.find((row) => row.localPath === 'strategy.pine')?.strategyLedgerParity.compiledAgainstInterpreter.status).toBe('matched');
+      expect(report.summary.executionModes.compiled).toBe(4);
+      expect(report.rows.find((row) => row.localPath === 'strategy.pine')?.strategyLedgerParity.compiledLedger.status).toBe('not-run');
       expect(report.rows.find((row) => row.localPath === 'compiled.pine')?.outcome).toBe('produced-output-compiled');
-      expect(report.rows.find((row) => row.localPath === 'compiled.pine')?.outputParity.status).toBe('matched');
-      expect(report.rows.find((row) => row.localPath === 'compiled.pine')?.closure.agreement).toBe('all-three');
-      expect(report.rows.find((row) => row.localPath === 'fallback.pine')?.outcome).toBe('produced-output-interpreter-fallback');
+      expect(report.rows.find((row) => row.localPath === 'compiled.pine')?.outputParity.status).toBe('not-run');
+      expect(report.rows.find((row) => row.localPath === 'fallback.pine')?.outcome).toBe('produced-output-compiled');
+      expect(report.rows.find((row) => row.localPath === 'fallback.pine')?.validity.bucket).toBe('supported');
       expect(report.rows.find((row) => row.localPath === 'fallback.pine')?.outputParity.status).toBe('not-run');
-      expect(report.rows.find((row) => row.localPath === 'fallback.pine')?.closure.agreement).toBe('closure-interpreter-only');
       expect(report.rows.find((row) => row.localPath === 'semantic.pine')?.firstFailedStage).toBe('semantic');
       expect(report.rows.find((row) => row.localPath === 'semantic.pine')?.validity.bucket).toBe('tealscript-gap');
       expect(report.rows.find((row) => row.localPath === 'parse.pine')?.firstFailedStage).toBe('parse');

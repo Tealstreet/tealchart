@@ -9,7 +9,7 @@ import {
   WilliamsAccumulationDistribution, WilliamsVariableAccumulationDistribution, BarIndex,
 } from './ta-classes';
 import { parse } from '../../parser';
-import { executeScript } from '../engine';
+import { executeScript } from '../compiledOnly';
 import type { Bar } from '../context';
 
 function makeBars(closes: number[]): Bar[] {
@@ -47,12 +47,12 @@ function assertParity(classValues: (number | null)[], interpValues: (number | nu
   }
 }
 
-describe('TA Classes vs Interpreter Parity', () => {
+describe('TA Classes vs Reference Parity', () => {
   const closes = [10, 11, 12, 11.5, 13, 12, 14, 15, 13, 12, 11, 14, 16, 15, 13, 12, 14, 15, 16, 17];
   const bars = makeBars(closes);
 
   describe('Event helpers', () => {
-    it('matches interpreter for barssince and valuewhen occurrences', () => {
+    it('matches expected for barssince and valuewhen occurrences', () => {
       const barsSince = new BarsSince();
       const currentValue = new ValueWhen(0);
       const previousValue = new ValueWhen(1);
@@ -90,7 +90,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('SMA', () => {
-    it('matches interpreter for length=5', () => {
+    it('matches expected for length=5', () => {
       const sma = new SMA(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = sma.compute(c);
@@ -105,7 +105,7 @@ describe('TA Classes vs Interpreter Parity', () => {
       assertParity(classValues, interpValues, 'SMA(5)');
     });
 
-    it('matches interpreter for length=1', () => {
+    it('matches expected for length=1', () => {
       const sma = new SMA(1);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = sma.compute(c);
@@ -122,7 +122,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('EMA', () => {
-    it('matches interpreter for length=5', () => {
+    it('matches expected for length=5', () => {
       const ema = new EMA(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = ema.compute(c);
@@ -139,7 +139,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('RSI', () => {
-    it('matches interpreter for length=14', () => {
+    it('matches expected for length=14', () => {
       const rsi = new RSI(14);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = rsi.compute(c);
@@ -156,7 +156,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('Crossover', () => {
-    it('matches interpreter', () => {
+    it('matches expected', () => {
       const cross = new Crossover();
       const sma3 = new SMA(3);
       const sma5 = new SMA(5);
@@ -176,7 +176,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('Crossunder', () => {
-    it('matches interpreter', () => {
+    it('matches expected', () => {
       const cross = new Crossunder();
       const sma3 = new SMA(3);
       const sma5 = new SMA(5);
@@ -196,7 +196,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('Cross', () => {
-    it('matches interpreter for either-direction crosses', () => {
+    it('matches expected for either-direction crosses', () => {
       const cross = new Cross();
       const classValues: (number | null)[] = bars.map((bar) => (
         cross.compute(bar.close, 104) ? 1 : 0
@@ -212,7 +212,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('Range/Rising/Falling', () => {
-    it('matches interpreter for available-window range', () => {
+    it('matches expected for available-window range', () => {
       const range = new Range(4);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = range.compute(c);
@@ -227,7 +227,7 @@ describe('TA Classes vs Interpreter Parity', () => {
       assertParity(classValues, interpValues, 'Range(4)');
     });
 
-    it('matches interpreter for rising and falling lookbacks', () => {
+    it('matches expected for rising and falling lookbacks', () => {
       const rising = new Rising(2);
       const falling = new Falling(2);
       const risingValues: (number | null)[] = [];
@@ -253,7 +253,7 @@ describe('TA Classes vs Interpreter Parity', () => {
   });
 
   describe('Max/Min', () => {
-    it('matches interpreter for element-wise series comparisons', () => {
+    it('matches expected for element-wise series comparisons', () => {
       const max = new Max();
       const min = new Min();
       const maxValues: (number | null)[] = [];
@@ -277,7 +277,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('HighestBars/LowestBars', () => {
-    it('matches interpreter for explicit sources', () => {
+    it('matches expected for explicit sources', () => {
       const highestBars = new HighestBars(4);
       const lowestBars = new LowestBars(4);
       const highestValues: (number | null)[] = [];
@@ -305,7 +305,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('Variance/Dev', () => {
-    it('matches interpreter for biased and unbiased variance', () => {
+    it('matches expected for biased and unbiased variance', () => {
       const biased = new Variance(4);
       const unbiased = new Variance(4, false);
       const biasedValues: (number | null)[] = [];
@@ -331,7 +331,7 @@ plot(ta.min(close, open))`), bars);
       assertParity(unbiasedValues, unbiasedInterpValues, 'Variance(4, false)');
     });
 
-    it('matches interpreter for mean absolute deviation', () => {
+    it('matches expected for mean absolute deviation', () => {
       const dev = new Dev(4);
       const classValues: (number | null)[] = closes.map((close) => {
         const value = dev.compute(close);
@@ -348,7 +348,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('Covariance/Correlation', () => {
-    it('matches interpreter for paired covariance and correlation windows', () => {
+    it('matches expected for paired covariance and correlation windows', () => {
       const covariance = new Covariance(4);
       const correlation = new Correlation(4);
       const covarianceValues: (number | null)[] = [];
@@ -374,7 +374,7 @@ plot(ta.min(close, open))`), bars);
       assertParity(correlationValues, correlationInterpValues, 'Correlation(4)');
     });
 
-    it('matches interpreter for flat correlation denominator', () => {
+    it('matches expected for flat correlation denominator', () => {
       const correlation = new Correlation(4);
       const classValues: (number | null)[] = bars.map((bar) => {
         const value = correlation.compute(bar.close, 1);
@@ -391,7 +391,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('COG', () => {
-    it('matches interpreter for center of gravity', () => {
+    it('matches expected for center of gravity', () => {
       const cog = new COG(4);
       const classValues: (number | null)[] = closes.map((close) => {
         const value = cog.compute(close);
@@ -408,7 +408,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('Median/Mode', () => {
-    it('matches interpreter for odd and even median windows', () => {
+    it('matches expected for odd and even median windows', () => {
       const odd = new Median(3);
       const even = new Median(4);
       const oddValues: (number | null)[] = [];
@@ -434,7 +434,7 @@ plot(ta.min(close, open))`), bars);
       assertParity(evenValues, evenInterpValues, 'Median(4)');
     });
 
-    it('matches interpreter for mode tie behavior', () => {
+    it('matches expected for mode tie behavior', () => {
       const values = [3, 1, 3, 1, 2, 2, 1, 3];
       const mode = new Mode(4);
       const classValues: (number | null)[] = values.map((value) => {
@@ -453,7 +453,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('Percentiles', () => {
-    it('matches interpreter for percentile and percent-rank helpers', () => {
+    it('matches expected for percentile and percent-rank helpers', () => {
       const nearest = new PercentileNearestRank(4, 75);
       const linear = new PercentileLinearInterpolation(4, 75);
       const rank = new PercentRank(4);
@@ -490,7 +490,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('LinReg', () => {
-    it('matches interpreter for offset and derived-source regression', () => {
+    it('matches expected for offset and derived-source regression', () => {
       const current = new LinReg(3, 0);
       const offset = new LinReg(3, 1);
       const derived = new LinReg(3, 0);
@@ -527,7 +527,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('TrueRange', () => {
-    it('matches interpreter handle_na behavior', () => {
+    it('matches expected handle_na behavior', () => {
       const handle = new TrueRange(true);
       const strict = new TrueRange(false);
       const handleValues: (number | null)[] = [];
@@ -555,7 +555,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('MFI', () => {
-    it('matches interpreter for source and derived-source money flow', () => {
+    it('matches expected for source and derived-source money flow', () => {
       const typical = new MFI(3);
       const derived = new MFI(3);
       const typicalValues: (number | null)[] = [];
@@ -583,7 +583,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('TSI', () => {
-    it('matches interpreter for source and derived-source double smoothing', () => {
+    it('matches expected for source and derived-source double smoothing', () => {
       const closeTsi = new TSI(2, 3);
       const derivedTsi = new TSI(2, 3);
       const closeValues: (number | null)[] = [];
@@ -611,7 +611,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('BBW', () => {
-    it('matches interpreter for Bollinger Band width', () => {
+    it('matches expected for Bollinger Band width', () => {
       const bbw = new BBW(3, 2);
       const classValues: (number | null)[] = [];
 
@@ -630,7 +630,7 @@ plot(ta.min(close, open))`), bars);
   });
 
   describe('KC/KCW', () => {
-    it('matches interpreter for Keltner channel and width', () => {
+    it('matches expected for Keltner channel and width', () => {
       const kc = new KC(3, 1.25);
       const kcw = new KCW(3, 1.25);
       const basisValues: (number | null)[] = [];
@@ -664,7 +664,7 @@ plot(ta.kcw(close, 3, 1.25))`);
   });
 
   describe('DMI/ADX', () => {
-    it('matches interpreter for directional movement tuple and scalar ADX', () => {
+    it('matches expected for directional movement tuple and scalar ADX', () => {
       const dmi = new DMI(5, 4);
       const adx = new ADX(5, 4);
       const plusValues: (number | null)[] = [];
@@ -697,7 +697,7 @@ plot(ta.adx(5, 4))`), bars);
   });
 
   describe('Supertrend', () => {
-    it('matches interpreter for ATR-seeded trend bands', () => {
+    it('matches expected for ATR-seeded trend bands', () => {
       const supertrend = new Supertrend(2, 3);
       const trendValues: (number | null)[] = [];
       const directionValues: (number | null)[] = [];
@@ -720,7 +720,7 @@ plot(direction)`), bars);
   });
 
   describe('SAR', () => {
-    it('matches interpreter for parabolic stop-and-reverse state', () => {
+    it('matches expected for parabolic stop-and-reverse state', () => {
       const sar = new SAR(0.02, 0.02, 0.2);
       const sarValues: (number | null)[] = [];
 
@@ -739,7 +739,7 @@ plot(direction)`), bars);
   });
 
   describe('KST', () => {
-    it('matches interpreter for smoothed ROC tuple output', () => {
+    it('matches expected for smoothed ROC tuple output', () => {
       const kst = new KST(2, 3, 4, 5, 2, 2, 2, 3, 2);
       const kstValues: (number | null)[] = [];
       const signalValues: (number | null)[] = [];
@@ -762,7 +762,7 @@ plot(signal)`), bars);
   });
 
   describe('VWAP', () => {
-    it('matches interpreter for anchored scalar and band output', () => {
+    it('matches expected for anchored scalar and band output', () => {
       const scalar = new VWAP(false, NaN);
       const bands = new VWAP(true, 1.5);
       const scalarValues: (number | null)[] = [];
@@ -797,7 +797,7 @@ plot(lower)`), bars);
   });
 
   describe('TA volume variables', () => {
-    it('match interpreter values for accumulation and volume index series', () => {
+    it('match expected values for accumulation and volume index series', () => {
       const volumeBars = bars.map((bar, index) => ({
         ...bar,
         volume: [100, 80, 120, 90, 140, 130, 160, 110, 180, 150][index % 10],
@@ -843,7 +843,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('BarIndex', () => {
-    it('matches interpreter for the last non-na source bar', () => {
+    it('matches expected for the last non-na source bar', () => {
       const barIndex = new BarIndex();
       const classValues: (number | null)[] = [];
 
@@ -863,7 +863,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('RCI', () => {
-    it('matches interpreter for rank correlation windows', () => {
+    it('matches expected for rank correlation windows', () => {
       const rci = new RCI(5);
       const derivedRci = new RCI(5);
       const rciValues: (number | null)[] = [];
@@ -891,7 +891,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('Pivots', () => {
-    it('matches interpreter for confirmed high and low pivots', () => {
+    it('matches expected for confirmed high and low pivots', () => {
       const high = new PivotHigh(2, 2);
       const low = new PivotLow(1, 1);
       const highValues: (number | null)[] = [];
@@ -919,7 +919,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('Momentum helpers', () => {
-    it('matches interpreter default lengths for momentum and rate of change', () => {
+    it('matches expected default lengths for momentum and rate of change', () => {
       const mom = new Mom(10);
       const roc = new ROC(1);
       const momValues: (number | null)[] = [];
@@ -947,7 +947,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('MACD', () => {
-    it('MACD line matches interpreter', () => {
+    it('MACD line matches expected', () => {
       const macd = new MACD(12, 26, 9);
       const classValues: (number | null)[] = closes.map((c) => {
         const r = macd.compute(c);
@@ -964,7 +964,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('ATR', () => {
-    it('matches interpreter for length=5', () => {
+    it('matches expected for length=5', () => {
       const atr = new ATR(5);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = atr.compute(bar.high, bar.low, bar.close);
@@ -981,7 +981,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('Highest', () => {
-    it('matches interpreter for length=5', () => {
+    it('matches expected for length=5', () => {
       const h = new Highest(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = h.compute(c);
@@ -996,7 +996,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'Highest(5)');
     });
 
-    it('matches interpreter for default-source length=5', () => {
+    it('matches expected for default-source length=5', () => {
       const h = new Highest(5);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = h.compute(bar.high);
@@ -1013,7 +1013,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('Lowest', () => {
-    it('matches interpreter for length=5', () => {
+    it('matches expected for length=5', () => {
       const l = new Lowest(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = l.compute(c);
@@ -1028,7 +1028,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'Lowest(5)');
     });
 
-    it('matches interpreter for default-source length=5', () => {
+    it('matches expected for default-source length=5', () => {
       const l = new Lowest(5);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = l.compute(bar.low);
@@ -1045,7 +1045,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('Change', () => {
-    it('matches interpreter for length=1', () => {
+    it('matches expected for length=1', () => {
       const ch = new Change(1);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = ch.compute(c, 1);
@@ -1060,7 +1060,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'Change(1)');
     });
 
-    it('matches interpreter for explicit length=4', () => {
+    it('matches expected for explicit length=4', () => {
       const ch = new Change(4);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = ch.compute(c, 4);
@@ -1077,7 +1077,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('Stoch', () => {
-    it('matches interpreter full-window output for length=4', () => {
+    it('matches expected full-window output for length=4', () => {
       const stoch = new Stoch(4);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = stoch.compute(bar.close, bar.high, bar.low);
@@ -1094,7 +1094,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('HMA', () => {
-    it('matches interpreter for length=7', () => {
+    it('matches expected for length=7', () => {
       const hma = new HMA(7);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = hma.compute(c);
@@ -1111,7 +1111,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('SMMA/VWMA', () => {
-    it('matches interpreter SMMA through RMA state', () => {
+    it('matches expected SMMA through RMA state', () => {
       const rma = new RMA(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = rma.compute(c);
@@ -1126,7 +1126,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'SMMA(5)');
     });
 
-    it('matches interpreter VWMA for length=5', () => {
+    it('matches expected VWMA for length=5', () => {
       const vwma = new VWMA(5);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = vwma.compute(bar.close, bar.volume);
@@ -1143,7 +1143,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('SWMA', () => {
-    it('matches interpreter', () => {
+    it('matches expected', () => {
       const swma = new SWMA();
       const classValues: (number | null)[] = closes.map((c) => {
         const v = swma.compute(c);
@@ -1160,7 +1160,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('ALMA', () => {
-    it('matches interpreter for default floor behavior', () => {
+    it('matches expected for default floor behavior', () => {
       const alma = new ALMA(5, 0.85, 6);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = alma.compute(c);
@@ -1177,7 +1177,7 @@ plot(ta.wvad)`), volumeBars);
   });
 
   describe('CCI/CMO/WPR', () => {
-    it('matches interpreter for CCI length=5', () => {
+    it('matches expected for CCI length=5', () => {
       const cci = new CCI(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = cci.compute(c);
@@ -1190,7 +1190,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'CCI(5)');
     });
 
-    it('matches interpreter for CCI default length', () => {
+    it('matches expected for CCI default length', () => {
       const cci = new CCI(20);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = cci.compute(c);
@@ -1203,7 +1203,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'CCI(20)');
     });
 
-    it('matches interpreter for CMO length=5', () => {
+    it('matches expected for CMO length=5', () => {
       const cmo = new CMO(5);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = cmo.compute(c);
@@ -1216,7 +1216,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'CMO(5)');
     });
 
-    it('matches interpreter for CMO default length', () => {
+    it('matches expected for CMO default length', () => {
       const cmo = new CMO(14);
       const classValues: (number | null)[] = closes.map((c) => {
         const v = cmo.compute(c);
@@ -1229,7 +1229,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'CMO(14)');
     });
 
-    it('matches interpreter for WPR length=5', () => {
+    it('matches expected for WPR length=5', () => {
       const wpr = new WPR(5);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = wpr.compute(bar.high, bar.low, bar.close);
@@ -1242,7 +1242,7 @@ plot(ta.wvad)`), volumeBars);
       assertParity(classValues, interpValues, 'WPR(5)');
     });
 
-    it('matches interpreter for WPR default length', () => {
+    it('matches expected for WPR default length', () => {
       const wpr = new WPR(14);
       const classValues: (number | null)[] = bars.map((bar) => {
         const v = wpr.compute(bar.high, bar.low, bar.close);
