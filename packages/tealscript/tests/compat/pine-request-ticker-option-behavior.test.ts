@@ -29,7 +29,7 @@ import {
   type RequestQuandlSeriesQuery,
   type RequestSeriesQuery,
   type RequestSeriesResult,
-  type TealscriptExecutionOptions,
+  type TealscriptEngineOptions,
 } from '../../src/runtime';
 import { executeScript } from '../../src/runtime';
 import { executeCompiled, type CompiledExecutionOptions, tryCompile } from '../../src/runtime/codegen/execute';
@@ -41,7 +41,7 @@ interface RequestTickerOptionCase {
   name: string;
   source: string;
   bars?: Bar[];
-  options?: TealscriptExecutionOptions & CompiledExecutionOptions;
+  options?: TealscriptEngineOptions & CompiledExecutionOptions;
   expectedPlots: Record<string, ExpectedSeries>;
   assertResult?(result: ExecutionResult): void;
   assertDatafeed?(datafeed: RecordingRequestDatafeed): void;

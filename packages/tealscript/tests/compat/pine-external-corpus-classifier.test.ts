@@ -19,23 +19,22 @@ import {
   seedRequestSymbol,
   type Bar,
   type PineScriptLedgerEntry,
-  type TealscriptExecutionOptions,
+  type TealscriptEngineOptions,
 } from '../../src';
 import { summarizeCompiledFallbackReasons } from '../../src/compat/compiledFallbackBaseline';
 import {
   getProductionWorkerFallbackBaselineGroup,
-  isProductionWorkerFallbackMeasurement,
   summarizeRealtimeParityMismatches,
   summarizeProductionWorkerExecutionModes,
   summarizeProductionWorkerFallbackReasons,
 } from '../../src/compat/productionWorkerFallbackBaseline';
 import { tryCompile } from '../../src/runtime/codegen';
 import { compatibilityBars } from './fixtures';
-import { measureProductionWorkerSessions, measureRealtimeReentryParity } from './productionWorkerHarness';
+import { measureForcedCompiledRealtimeSafety, measureProductionWorkerSessions, measureRealtimeReentryParity } from './productionWorkerHarness';
 
 const chartBars: Bar[] = compatibilityBars.slice(0, 6);
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
-const REALTIME_SWEEP_BACKEND = 'worker';
+const REALTIME_SWEEP_BACKEND = process.env.TEALSCRIPT_REALTIME_BACKEND === 'closure' ? 'closure' : 'worker';
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 const htfBars: Bar[] = [
   { time: chartBars[0]!.time, open: 10, high: 13, low: 9, close: 12, volume: 5_000 },
@@ -217,10 +216,10 @@ interface ExternalCorpusFixture {
   expectedPassed?: boolean;
   expectedFirstFailureClass?: string;
   excludedFailureReason?: 'classifier_self_test' | 'intentional_negative';
-  engineOptions?: TealscriptExecutionOptions;
+  engineOptions?: TealscriptEngineOptions;
 }
 
-const defaultEngineOptions: TealscriptExecutionOptions = {
+const defaultEngineOptions: TealscriptEngineOptions = {
   requestDatafeed,
   runtime: {
     now: Date.UTC(2024, 0, 5, 8, 15),
@@ -1173,7 +1172,7 @@ describe('Pine external corpus source classifier', () => {
         throw new Error(`${outcome.scriptId} failure class mismatch: ${JSON.stringify(outcome.stages)}`);
       }
     }
-  }, 15_000);
+  });
 
   it('renders a deterministic corpus summary for review artifacts', () => {
     const ledger = createPineScriptLedger(corpus.map(entryFor));
@@ -1224,8 +1223,8 @@ describe('Pine external corpus source classifier', () => {
     })), { includeLiveUpdates: true });
     const measurements = session.loadMeasurements;
     const updateMeasurements = session.updateMeasurements;
-    const fallbacks = measurements.filter(isProductionWorkerFallbackMeasurement);
-    const updateFallbacks = updateMeasurements.filter(isProductionWorkerFallbackMeasurement);
+    const fallbacks = measurements.filter((measurement) => measurement.executionMode !== 'compiled');
+    const updateFallbacks = updateMeasurements.filter((measurement) => measurement.executionMode !== 'compiled');
 
     expect(corpus.length).toBe(baseline.scriptCount);
     expect(eligible.length).toBe(baseline.eligible);
@@ -1240,6 +1239,39 @@ describe('Pine external corpus source classifier', () => {
     expect(updateFallbacks.length / updateMeasurements.length).toBe(baseline.liveUpdates.fallbackRate);
     expect(summarizeProductionWorkerExecutionModes(updateMeasurements)).toEqual(baseline.liveUpdates.executionModes);
     expect(summarizeProductionWorkerFallbackReasons(updateMeasurements)).toEqual(baseline.liveUpdates.knownFallbackReasons);
+  });
+
+  it('classifies external realtime safety fallbacks by forced compiled behaviour', () => {
+    const fallbackScriptIds = [
+      'external-security-lower-tf-root-input-wrapper',
+      'external-seed-request',
+      'external-seed-root-input-wrapper',
+      'external-request-mtf-wrapper-computed-ta',
+      'external-request-mtf-wrapper-root-input',
+      'external-request-mtf-wrapper-tuple',
+      'external-request-data-table',
+    ];
+    const eligible = fallbackScriptIds.map((id) => {
+      const fixture = corpus.find((candidate) => candidate.id === id);
+      expect(fixture).toBeDefined();
+      return fixture!;
+    });
+    const measurement = measureForcedCompiledRealtimeSafety(eligible.map((fixture) => ({
+      scriptId: fixture.id,
+      source: fixture.source,
+      bars: fixture.bars ?? chartBars,
+      engineOptions: fixture.engineOptions ?? defaultEngineOptions,
+    })), { includeSafe: true });
+
+    expect(measurement.scripts.map((entry) => ({
+      scriptId: entry.scriptId,
+      classification: entry.classification,
+    }))).toEqual(fallbackScriptIds.map((scriptId) => ({
+      scriptId,
+      classification: 'overtrigger-matched',
+    })));
+    expect(measurement.updates).toHaveLength(21);
+    expect(measurement.updates.every((entry) => entry.classification === 'overtrigger-matched')).toBe(true);
   });
 
   it('checks representative realtime re-entry output parity through requests and imports', async () => {
@@ -1269,12 +1301,20 @@ describe('Pine external corpus source classifier', () => {
       totalUpdates: measurement.totalUpdates,
       workerMatched: measurement.workerMatched,
       workerMismatches: summarizeRealtimeParityMismatches(measurement.workerMismatches),
+      interpreterMatched: measurement.interpreterMatched,
+      interpreterMismatches: summarizeRealtimeParityMismatches(measurement.interpreterMismatches),
     }).toEqual({
       backend: REALTIME_SWEEP_BACKEND,
       totalUpdates: representative.length * 3,
       workerMatched: representative.length * 3,
       workerMismatches: [],
+      interpreterMatched: representative.length * 3,
+      interpreterMismatches: [],
     });
+    if (REALTIME_SWEEP_BACKEND === 'closure') {
+      expect(measurement.closureMatched).toBe(representative.length * 3);
+      expect(measurement.closureMismatches).toEqual([]);
+    }
   });
 
   realtimeSweepIt('tracks realtime re-entry output parity for external fixtures expected to run', async () => {
@@ -1288,14 +1328,30 @@ describe('Pine external corpus source classifier', () => {
     })), {
       backend: REALTIME_SWEEP_BACKEND,
     });
+    const expected = REALTIME_SWEEP_BACKEND === 'closure'
+      ? {
+          totalUpdates: baseline.totalUpdates,
+          workerMatched: baseline.totalUpdates,
+          workerMismatches: [],
+          interpreterMatched: baseline.totalUpdates,
+          interpreterMismatches: [],
+        }
+      : baseline;
+
     expect({
       backend: measurement.backend,
       totalUpdates: measurement.totalUpdates,
       workerMatched: measurement.workerMatched,
       workerMismatches: summarizeRealtimeParityMismatches(measurement.workerMismatches),
+      interpreterMatched: measurement.interpreterMatched,
+      interpreterMismatches: summarizeRealtimeParityMismatches(measurement.interpreterMismatches),
     }).toEqual({
       backend: REALTIME_SWEEP_BACKEND,
-      ...baseline,
+      ...expected,
     });
+    if (REALTIME_SWEEP_BACKEND === 'closure') {
+      expect(measurement.closureMatched).toBe(baseline.totalUpdates);
+      expect(measurement.closureMismatches).toEqual([]);
+    }
   }, 30_000);
 });

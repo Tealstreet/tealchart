@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
-import { executeScript } from '../compiledOnly';
+import { executeScript } from '../engine';
 import { compile, ARRAY_HELPERS, MAP_HELPERS, UDT_HELPERS, MATRIX_HELPERS } from './compile';
 import type { Bar } from '../context';
 import type { PineArray } from '../arrays';
@@ -265,12 +265,13 @@ plot(ta.lowest(close, 5))`;
   it('rejects unsupported features', () => {
     const pine = `//@version=6
 indicator("test")
-plot(ta.this_does_not_exist(close, 3))`;
+import TraderSamwise/someLib/1 as lib
+plot(close)`;
 
     const ast = parse(pine);
     const compiled = compile(ast);
     expect(compiled.success).toBe(false);
-    expect(compiled.unsupported).toEqual(['ta.this_does_not_exist not yet supported by transpiler']);
+    expect(compiled.unsupported.length).toBeGreaterThan(0);
   });
 
   it('compiles exported library block functions, methods, types, enums, and constants', () => {
@@ -318,9 +319,9 @@ plot(timeframe.in_seconds(helper.HTF), "Seconds")`;
     expect(compiled.analysis.importedFunctions.get('helper.value')).toBe('helper__value');
     expect(compiled.analysis.importedFunctions.get('helper.extended')).toBe('helper__extended');
     expect(compiled.analysis.importedFunctions.get('helper.blockValue')).toBe('helper__blockValue');
-    expect(compiled.analysis.importedMethods.get('lifted')).toBe('helper__Pivot__lifted__3');
+    expect(compiled.analysis.importedMethods.get('lifted')).toBe('helper__Pivot__lifted');
     expect(compiled.analysis.importedMethodOverloads.get('lifted')).toEqual([
-      { receiverType: 'helper.Pivot', internalName: 'helper__Pivot__lifted__3' },
+      { receiverType: 'helper.Pivot', internalName: 'helper__Pivot__lifted' },
     ]);
     expect(compiled.analysis.typeDecls.has('helper.Pivot')).toBe(true);
     expect(compiled.analysis.importedEnumValues.get('helper.Mode.strict')).toBe('PublicUser/PublicHelper/1.Mode.strict');

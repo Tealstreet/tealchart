@@ -685,3 +685,75 @@ describe('PriceLineManager TP/SL gating while an action is unconfirmed', () => {
     stage.destroy();
   });
 });
+
+describe('PriceLineManager trade line draw order', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.unstubAllGlobals();
+  });
+
+  function setup() {
+    stubCanvasContext();
+    const container = createContainer();
+    const stage = new Konva.Stage({ container, width: 800, height: 600 });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    const manager = new PriceLineManager({
+      layer,
+      width: 800,
+      height: 600,
+      margins: { top: 0, right: 80, bottom: 0, left: 0 },
+      priceToY: (price) => price,
+      yToPrice: (y) => y,
+    });
+
+    // Deliberately input-ordered position-first: the tier, not arrival order,
+    // is what has to put the position label on top.
+    manager.update([makePositionBound(108), makeOrderBound(100)]);
+
+    const groups = (manager as unknown as PriceLineManagerProbe).cachedLineGroups;
+    const orderAbovePosition = () =>
+      (groups.get('order-1')?.zIndex() ?? -1) > (groups.get('position-1')?.zIndex() ?? -1);
+
+    return { manager, orderAbovePosition, stage };
+  }
+
+  it('draws position labels above order labels', () => {
+    const { manager, orderAbovePosition, stage } = setup();
+
+    expect(orderAbovePosition()).toBe(false);
+
+    manager.dispose();
+    stage.destroy();
+  });
+
+  it('lifts a hovered order above positions and drops it back on unhover', () => {
+    const { manager, orderAbovePosition, stage } = setup();
+
+    expect(manager.updateHoverAt(400, 100)).toBe('passive');
+    expect(orderAbovePosition()).toBe(true);
+
+    manager.clearHover();
+    expect(orderAbovePosition()).toBe(false);
+
+    manager.dispose();
+    stage.destroy();
+  });
+
+  it('keeps a selected order above positions until it is deselected', () => {
+    const { manager, orderAbovePosition, stage } = setup();
+
+    manager.selectLine('order-1');
+    expect(orderAbovePosition()).toBe(true);
+
+    manager.clearHover();
+    expect(orderAbovePosition()).toBe(true);
+
+    manager.clearSelectedLine();
+    expect(orderAbovePosition()).toBe(false);
+
+    manager.dispose();
+    stage.destroy();
+  });
+});

@@ -13,15 +13,15 @@ export const MOBILE_TEALSCRIPT_CAPABILITY_BASELINE: MobileTealscriptCapabilityRo
     capability: 'custom-source save and plot handoff',
     mobileStatus: 'supported',
     webStatus: 'supported',
-    measuredBy: 'MobileIndicatorManager + supplied WebView-backed createWorker fixture',
-    notes: 'Mobile preserves caller study metadata and hands TealScript execution to the bundled compiled WebView host.',
+    measuredBy: 'MobileIndicatorManager.addTealscriptIndicator -> getPlots/getIndicatorPaneInfo',
+    notes: 'Mobile parses caller source, executes through the interpreter, tags plots with the script id, and exposes pane metadata for Skia rendering.',
   },
   {
     capability: 'drawing render handoff',
     mobileStatus: 'supported',
     webStatus: 'supported',
-    measuredBy: 'MobileIndicatorManager worker-result handoff',
-    notes: 'Mobile stores drawing payloads emitted by the compiled WebView host for the native Skia renderer.',
+    measuredBy: 'MobileIndicatorManager.addTealscriptIndicator -> getDrawings',
+    notes: 'Mobile returns tagged drawing outputs for native rendering.',
   },
   {
     capability: 'parse and runtime diagnostics',
@@ -34,14 +34,24 @@ export const MOBILE_TEALSCRIPT_CAPABILITY_BASELINE: MobileTealscriptCapabilityRo
     capability: 'request-backed scripts',
     mobileStatus: 'supported',
     webStatus: 'supported',
-    measuredBy: 'MobileIndicatorManager requestData adapter fixture',
-    notes: 'Mobile adapts its RequestDatafeed seam to the same worker requestData messages web resolves.',
+    measuredBy: 'MobileIndicatorManager request.security fixture',
+    notes: 'Mobile hosts can supply a synchronous RequestDatafeed to the interpreter path; without one, request-backed scripts still emit a nonfatal request-data-unavailable warning.',
   },
   {
     capability: 'imported Pine libraries',
     mobileStatus: 'supported',
     webStatus: 'supported',
-    measuredBy: 'MobileIndicatorManager getLibraries provider passed to TealscriptManager',
-    notes: 'Mobile passes host-registered Pine library ASTs into the bundled compiled WebView host.',
+    measuredBy: 'MobileIndicatorManager import fixture',
+    notes: 'Mobile hosts can supply a deterministic Pine library registry to the interpreter path, so imported scripts resolve and render without compiled execution.',
+  },
+  {
+    capability: 'on-device closure execution proof',
+    mobileStatus: 'visible-gap',
+    webStatus: 'supported',
+    measuredBy: 'Closure cutover gate plus mobile:tealscript-closure-smoke',
+    notes:
+      'MobileIndicatorManager can select the no-eval closure backend through the shared selector and exposes the selected/actual backend on runtimeProfile. ' +
+      'The package smoke runs corpus scripts through MobileIndicatorManager with closure forced and compares rendered output against direct web closure output. ' +
+      'The remaining visible gap is proof outside this repo: a consuming mobile app still needs a Hermes/Metro simulator or device smoke plus a device performance check before mobile closure execution is fully claimed.',
   },
 ];

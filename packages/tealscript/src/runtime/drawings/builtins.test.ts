@@ -1,0 +1,1746 @@
+import { describe, it, expect } from 'vitest';
+import { TealscriptEngine, executeScript } from '../engine';
+import { parse } from '../../parser/parser';
+import type { Bar } from '../context';
+
+function createBars(count: number, startPrice = 100): Bar[] {
+  const bars: Bar[] = [];
+  const baseTime = Date.now() - count * 60000;
+
+  for (let i = 0; i < count; i++) {
+    const price = startPrice + i * 0.5;
+    bars.push({
+      time: baseTime + i * 60000,
+      open: price,
+      high: price + 0.5,
+      low: price - 0.3,
+      close: price + 0.2,
+      volume: 1000 + i * 10,
+    });
+  }
+
+  return bars;
+}
+
+  describe('Pine drawing object outputs', () => {
+    it('records basic drawing outputs', () => {
+      const script = `//@version=6
+indicator("Drawing calls")
+label.new(bar_index, close, text="x", xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_down, color=color.red, textcolor=color.white, size=size.small)
+line.new(bar_index - 1, close[1], bar_index, close)
+table.new(position.top_right, 1, 1, force_overlay=true)
+box.new(bar_index - 1, high, bar_index, low)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'x',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#F23645',
+          textColor: '#FFFFFF',
+          size: 'small',
+          tooltip: undefined,
+        },
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          barIndex: 0,
+          x1: -1,
+          y1: null,
+          x2: 0,
+          y2: 100.2,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'table_table.new_0_0',
+          type: 'table',
+          barIndex: 0,
+          position: 'top_right',
+          columns: 1,
+          rows: 1,
+          bgcolor: null,
+          frameColor: null,
+          frameWidth: 0,
+          borderColor: null,
+          borderWidth: 0,
+          forceOverlay: true,
+          cells: [],
+        },
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          barIndex: 0,
+          left: -1,
+          top: 100.5,
+          right: 0,
+          bottom: 99.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: '#2196F3',
+          text: '',
+          textColor: '#363A45',
+          textSize: 'auto',
+        },
+      ]);
+    });
+
+    it('preserves legacy positional label force_overlay slot', () => {
+      const script = `//@version=6
+indicator("Legacy Label Force Overlay")
+label.new(bar_index, close, "legacy", xloc.bar_index, yloc.price, color.red, label.style_label_left, color.white, size.normal, text.align_center, "tip", true)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'legacy',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_left',
+          color: '#F23645',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          textAlign: 'center',
+          tooltip: 'tip',
+          forceOverlay: true,
+        },
+      ]);
+    });
+
+    it('supports the Pine centered label style constant', () => {
+      const script = `//@version=6
+indicator("Centered Label")
+label.new(bar_index, close, "centered", style=label.style_label_center)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          barIndex: 0,
+          x: 0,
+          y: 100.2,
+          text: 'centered',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_center',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+    });
+
+    it('mutates, reads, copies, and deletes label drawings by handle', () => {
+      const script = `//@version=6
+indicator("Label mutators")
+var anchor = label.new(0, close, text="seed")
+if barstate.islast
+    label.set_xy(anchor, bar_index, high)
+    label.set_text(anchor, "last")
+    label.set_style(anchor, label.style_label_up)
+    label.set_color(anchor, color.green)
+    label.set_textcolor(anchor, color.black)
+    label.set_size(anchor, size.large)
+    label.set_textalign(anchor, text.align_right)
+    label.set_text_font_family(anchor, font.family_monospace)
+    label.set_text_formatting(anchor, text.format_bold + text.format_italic)
+    label.set_tooltip(anchor, "updated")
+    clone = label.copy(anchor)
+    label.set_text(clone, "copy")
+    label.delete(clone)
+plot(label.get_x(anchor), title="Label X")
+plot(label.get_y(anchor), title="Label Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 2,
+          x: 2,
+          y: 101.5,
+          text: 'last',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_up',
+          color: '#4CAF50',
+          textColor: '#363A45',
+          size: 'large',
+          textAlign: 'right',
+          textFontFamily: 'monospace',
+          textFormatting: 'bolditalic',
+          tooltip: 'updated',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Label X')?.values).toEqual([0, 0, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
+
+    it('preserves persistent label handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime label")
+var marker = label.new(0, close, text="")
+if barstate.islast
+    label.set_xy(marker, bar_index, close)
+    label.set_text(marker, str.tostring(close))
+plot(label.get_x(marker), title="Label X")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 201,
+        close: 200,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 2,
+          x: 2,
+          y: 200,
+          text: '200',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+    });
+
+    it('replaces assignment-created persistent drawings on same-time realtime updates', () => {
+      const script = `//@version=6
+indicator("Realtime assigned label")
+var marker = na
+if barstate.islast
+    marker := label.new(bar_index, high, text=str.tostring(high))
+plot(label.get_y(marker), title="Label Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 201,
+        close: 200,
+      });
+
+      const labels = engine.getDrawings().filter((drawing) => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect(labels[0]).toMatchObject({
+        persistent: true,
+        barIndex: 2,
+        x: 2,
+        y: 201,
+        text: '201',
+      });
+      expect(engine.getCurrentExecutionResult().plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([
+        null,
+        null,
+        201,
+      ]);
+    });
+
+    it('covers label coordinate setters and scalar getters', () => {
+      const script = `//@version=6
+indicator("Label getter coverage")
+var marker = label.new(0, close, text="seed")
+var yonly = label.new(1, close, text="y", textalign=text.align_left, text_font_family=font.family_monospace, text_formatting=text.format_bold)
+if barstate.islast
+    label.set_x(marker, bar_index + 3)
+    label.set_y(marker, high)
+    label.set_xloc(marker, bar_index + 5, xloc.bar_time)
+    label.set_yloc(marker, yloc.abovebar)
+    label.set_text(marker, "updated")
+    label.set_style(marker, label.style_label_down)
+    label.set_color(marker, color.blue)
+    label.set_textcolor(marker, color.white)
+    label.set_size(marker, size.tiny)
+    label.set_tooltip(marker, "tip")
+    label.set_yloc(yonly, yloc.belowbar)
+    label.new(na, na, text=str.format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}", label.get_text(marker), label.get_xloc(marker), label.get_yloc(marker), label.get_style(marker), label.get_color(marker), label.get_textcolor(marker), label.get_size(marker), label.get_tooltip(marker)))
+plot(label.get_x(marker), title="Label X")
+plot(label.get_y(marker), title="Label Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 2,
+          x: 7,
+          y: 101.5,
+          text: 'updated',
+          xloc: 'bar_time',
+          yloc: 'abovebar',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'tiny',
+          tooltip: 'tip',
+        },
+        {
+          id: 'label_label.new_1_0',
+          type: 'label',
+          persistent: true,
+          barIndex: 0,
+          x: 1,
+          y: 100.2,
+          text: 'y',
+          xloc: 'bar_index',
+          yloc: 'belowbar',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          textAlign: 'left',
+          textFontFamily: 'monospace',
+          textFormatting: 'bold',
+          tooltip: undefined,
+        },
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: null,
+          y: null,
+          text: 'updated|bar_time|abovebar|label_down|#2196F3|#FFFFFF|tiny|tip',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Label X')?.values).toEqual([0, 0, 7]);
+      expect(result.plots.find((plot) => plot.title === 'Label Y')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
+
+    it('mutates, reads, copies, and deletes line drawings by handle', () => {
+      const script = `//@version=6
+indicator("Line mutators")
+var trend = line.new(0, close, 1, close + 1, color=color.red, style=line.style_dotted, width=2)
+if barstate.islast
+    line.set_xy1(trend, bar_index - 2, low)
+    line.set_xy2(trend, bar_index, high)
+    line.set_extend(trend, extend.right)
+    line.set_color(trend, color.green)
+    line.set_style(trend, line.style_dashed)
+    line.set_width(trend, 3)
+    clone = line.copy(trend)
+    line.set_color(clone, color.blue)
+    line.delete(clone)
+plot(line.get_x1(trend), title="Line X1")
+plot(line.get_y2(trend), title="Line Y2")
+plot(line.get_price(trend, bar_index - 1), title="Line Mid")`;
+
+      const ast = parse(script);
+      const bars = createBars(4);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 3,
+          x1: 1,
+          y1: 101.2,
+          x2: 3,
+          y2: 102,
+          xloc: 'bar_index',
+          extend: 'right',
+          color: '#4CAF50',
+          style: 'dashed',
+          width: 3,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Line X1')?.values).toEqual([0, 0, 0, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Line Y2')?.values).toEqual([101.2, 101.2, 101.2, 102]);
+      expect(result.plots.find((plot) => plot.title === 'Line Mid')?.values).toEqual([99.2, 100.2, 101.2, 101.6]);
+    });
+
+    it('covers line coordinate setters and xloc updates', () => {
+      const script = `//@version=6
+indicator("Line coordinate coverage")
+var trend = line.new(0, close, 1, close)
+if barstate.islast
+    line.set_x1(trend, time[1])
+    line.set_y1(trend, low)
+    line.set_x2(trend, time)
+    line.set_y2(trend, high)
+    line.set_xloc(trend, time[1], time, xloc.bar_time)
+plot(line.get_x1(trend), title="Line X1")
+plot(line.get_x2(trend), title="Line X2")
+plot(line.get_y1(trend), title="Line Y1")
+plot(line.get_y2(trend), title="Line Y2")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: bars[1]!.time,
+          y1: 100.7,
+          x2: bars[2]!.time,
+          y2: 101.5,
+          xloc: 'bar_time',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Line X1')?.values).toEqual([0, 0, bars[1]!.time]);
+      expect(result.plots.find((plot) => plot.title === 'Line X2')?.values).toEqual([1, 1, bars[2]!.time]);
+      expect(result.plots.find((plot) => plot.title === 'Line Y1')?.values).toEqual([100.2, 100.2, 100.7]);
+      expect(result.plots.find((plot) => plot.title === 'Line Y2')?.values).toEqual([100.2, 100.2, 101.5]);
+    });
+
+    it('updates line endpoints from chart points', () => {
+      const script = `//@version=6
+indicator("Line point setters")
+var trend = line.new(na, na, na, na)
+if barstate.islast
+    firstPoint = chart.point.from_index(bar_index - 1, low)
+    secondPoint = chart.point.now(high)
+    line.set_first_point(id=trend, first_point=firstPoint)
+    line.set_second_point(trend, second_point=secondPoint)
+plot(line.get_x1(trend), title="Line First X")
+plot(line.get_y1(trend), title="Line First Y")
+plot(line.get_x2(trend), title="Line Second X")
+plot(line.get_y2(trend), title="Line Second Y")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 100.7,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Line First X')?.values).toEqual([null, null, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Line First Y')?.values).toEqual([null, null, 100.7]);
+      expect(result.plots.find((plot) => plot.title === 'Line Second X')?.values).toEqual([null, null, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Line Second Y')?.values).toEqual([null, null, 101.5]);
+    });
+
+    it('preserves persistent line handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime line")
+var trend = line.new(0, close, 1, close)
+if barstate.islast
+    line.set_xy1(trend, bar_index - 1, low)
+    line.set_xy2(trend, bar_index, high)
+plot(line.get_y2(trend), title="Line Y2")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 250,
+        low: 190,
+        close: 220,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 190,
+          x2: 2,
+          y2: 250,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+    });
+
+    it('preserves UDF-local persistent drawing handles during realtime re-entry', () => {
+      const script = `//@version=6
+indicator("Realtime UDF drawings", overlay=true)
+drawRange() =>
+    var line range = na
+    var label marker = na
+    if barstate.islast
+        if na(range)
+            range := line.new(bar_index - 1, low, bar_index, high)
+            marker := label.new(bar_index, high, "range")
+        else
+            line.set_xy1(range, bar_index - 1, low)
+            line.set_xy2(range, bar_index, high)
+            label.set_x(marker, bar_index)
+            label.set_y(marker, high)
+    line.get_y2(range)
+plot(drawRange(), title="Range Top")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const firstRealtimeBar = {
+        ...bars[2],
+        time: bars[2].time + 60000,
+        high: 250,
+        low: 190,
+        close: 220,
+      };
+      engine.updateBar(ast, firstRealtimeBar);
+      engine.updateBar(ast, {
+        ...firstRealtimeBar,
+        high: 255,
+        low: 192,
+        close: 225,
+      });
+      const nextBar = engine.updateBar(ast, {
+        ...bars[2],
+        time: bars[2].time + 120000,
+        high: 260,
+        low: 195,
+        close: 230,
+      });
+
+      expect(engine.getDrawings()).toMatchObject([
+        {
+          type: 'line',
+          persistent: true,
+          x1: 3,
+          y1: 195,
+          x2: 4,
+          y2: 260,
+        },
+        {
+          type: 'label',
+          persistent: true,
+          x: 4,
+          y: 260,
+        },
+      ]);
+      expect(nextBar.find((plot) => plot.title === 'Range Top')?.values.at(-1)).toBe(260);
+    });
+
+    it('recreates UDF-local var drawings first reached on the replaceable realtime bar', () => {
+      const script = `//@version=6
+indicator("Realtime last-bar UDF labels", overlay=true, max_labels_count=10)
+drawMarker(_text) =>
+    var id = label.new(bar_index, close, _text)
+    label.set_text(id, _text)
+    label.set_xy(id, bar_index, close)
+if barstate.islast
+    drawMarker("last")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 201,
+        close: 200,
+      });
+
+      const labels = engine.getDrawings().filter((drawing) => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect(labels[0]).toMatchObject({
+        persistent: true,
+        barIndex: 2,
+        x: 2,
+        y: 200,
+        text: 'last',
+      });
+    });
+
+    it('preserves confirmed drawing handles stored in persistent arrays', () => {
+      const script = `//@version=6
+indicator("Realtime persistent array handles", overlay=true)
+var line[] levels = array.new_line()
+if barstate.islast
+    if bar_index == 3
+        first = line.new(bar_index - 1, low, bar_index, high)
+        second = line.new(bar_index, low, bar_index + 1, high)
+        array.push(levels, first)
+        array.push(levels, second)
+plot(array.size(levels), "Level Count")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const firstRealtimeBar = { ...bars[2], time: bars[2].time + 60000, high: 250, low: 190, close: 220 };
+      engine.updateBar(ast, firstRealtimeBar);
+      engine.updateBar(ast, { ...firstRealtimeBar, high: 255, close: 225 });
+      const nextRealtimeBar = { ...bars[2], time: bars[2].time + 120000, high: 260, low: 195, close: 230 };
+      engine.updateBar(ast, nextRealtimeBar);
+      engine.updateBar(ast, { ...nextRealtimeBar, high: 265, close: 235 });
+      engine.updateBar(ast, { ...bars[2], time: bars[2].time + 180000, high: 270, low: 200, close: 240 });
+
+      const lines = engine.getDrawings().filter((drawing) => drawing.type === 'line');
+      expect(lines).toHaveLength(2);
+      expect(lines.map((drawing) => drawing.persistent)).toEqual([true, true]);
+      expect(lines.map((drawing) => drawing.x2)).toEqual([3, 4]);
+    });
+
+    it('preserves drawings created during confirmed realtime close', () => {
+      const script = `//@version=6
+indicator("Realtime confirmed close drawings", overlay=true)
+if barstate.isconfirmed and barstate.isrealtime and bar_index == 2
+    label.new(bar_index, high, "confirmed")
+plot(close, "Close")`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      const firstRealtimeBar = { ...bars[1], time: bars[1].time + 60000, high: 250, close: 220 };
+      engine.updateBar(ast, firstRealtimeBar);
+      engine.updateBar(ast, { ...firstRealtimeBar, high: 255, close: 225 });
+      const nextRealtimeBar = { ...bars[1], time: bars[1].time + 120000, high: 260, close: 230 };
+      engine.updateBar(ast, nextRealtimeBar);
+      engine.updateBar(ast, { ...nextRealtimeBar, high: 265, close: 235 });
+
+      const labels = engine.getDrawings().filter((drawing) => drawing.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect(labels[0]).toMatchObject({ persistent: true, text: 'confirmed', x: 2, y: 255 });
+    });
+
+    it('creates, reads, mutates, and deletes linefill drawings by handle', () => {
+      const script = `//@version=6
+indicator("Linefill objects")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var mid = line.new(0, hl2, 1, hl2)
+var channel = linefill.new(upper, lower, color=color.red)
+var deleted = linefill.new(upper, mid, color=color.blue)
+if barstate.islast
+    line.set_xy1(upper, bar_index - 1, high[1])
+    line.set_xy2(upper, bar_index, high)
+    line.set_xy1(lower, bar_index - 1, low[1])
+    line.set_xy2(lower, bar_index, low)
+    line.set_xy1(mid, bar_index - 1, hl2[1])
+    line.set_xy2(mid, bar_index, hl2)
+    linefill.set_color(channel, color.green)
+    linefill.delete(deleted)
+    label.new(na, na, text=str.format("{0}|{1}", linefill.get_line1(channel), linefill.get_line2(channel)))
+plot(close)
+plot(array.size(linefill.all), title="Linefills")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Linefills')?.values).toEqual([2, 2, 1]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 101,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_1_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 100.2,
+          x2: 2,
+          y2: 100.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_2_0',
+          type: 'line',
+          persistent: true,
+          barIndex: 2,
+          x1: 1,
+          y1: 100.6,
+          x2: 2,
+          y2: 101.1,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'linefill_linefill.new_0_0',
+          type: 'linefill',
+          persistent: true,
+          barIndex: 0,
+          line1: 'line_line.new_0_0',
+          line2: 'line_line.new_1_0',
+          color: '#4CAF50',
+        },
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: null,
+          y: null,
+          text: 'line_line.new_0_0|line_line.new_1_0',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+    });
+
+    it('rejects linefill drawings created with non-line handles', () => {
+      const script = `//@version=6
+indicator("Linefill handle validation")
+var marker = label.new(0, close, text="not-line")
+var upper = line.new(0, high, 1, high)
+linefill.new(marker, upper, color=color.red)
+linefill.new("missing", upper, color=color.blue)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings.map((drawing) => drawing.type)).toEqual(['label', 'line']);
+    });
+
+    it('replaces existing linefill drawings for the same line pair', () => {
+      const script = `//@version=6
+indicator("Linefill pair replacement")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var first = linefill.new(upper, lower, color=color.red)
+if barstate.islast
+    linefill.new(lower, upper, color=color.green)
+plot(array.size(linefill.all), title="Linefills")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings.filter((drawing) => drawing.type === 'linefill')).toEqual([
+        {
+          id: 'linefill_linefill.new_0_2',
+          type: 'linefill',
+          barIndex: 2,
+          line1: 'line_line.new_1_0',
+          line2: 'line_line.new_0_0',
+          color: '#4CAF50',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Linefills')?.values).toEqual([1, 1, 1]);
+    });
+
+    it('returns the color of a linefill via get_color', () => {
+      const script = `//@version=6
+indicator("Linefill get_color")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var lf = linefill.new(upper, lower, color=color.red)
+if barstate.islast
+    label.new(bar_index, close, text=str.tostring(linefill.get_color(lf)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      const labels = result.drawings.filter((d) => d.type === 'label');
+      expect(labels).toHaveLength(1);
+      expect((labels[0] as { text: string }).text).toBe('#F23645');
+    });
+
+    it('copies a linefill to a new handle', () => {
+      const script = `//@version=6
+indicator("Linefill copy")
+var upper = line.new(0, high, 1, high)
+var lower = line.new(0, low, 1, low)
+var lf = linefill.new(upper, lower, color=color.red)
+var lf2 = linefill.copy(lf)
+linefill.set_color(lf2, color.green)
+plot(array.size(linefill.all), title="Linefills")`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((p) => p.title === 'Linefills')?.values).toEqual([2]);
+      const linefills = result.drawings.filter((d) => d.type === 'linefill');
+      expect(linefills).toHaveLength(2);
+      expect((linefills[0] as { color: string | null }).color).toBe('#F23645');
+      expect((linefills[1] as { color: string | null }).color).toBe('#4CAF50');
+    });
+
+    it('mutates, reads, copies, and deletes box drawings by handle', () => {
+      const script = `//@version=6
+indicator("Box objects")
+var zone = box.new(0, high, 1, low, border_color=color.red, border_width=2, border_style=line.style_dotted, bgcolor=color.blue, text="seed")
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 2, high)
+    box.set_rightbottom(zone, bar_index, low)
+    box.set_bgcolor(zone, color.green)
+    box.set_border_color(zone, color.white)
+    box.set_border_width(zone, 3)
+    box.set_border_style(zone, line.style_dashed)
+    box.set_extend(zone, extend.right)
+    box.set_text(zone, "last")
+    box.set_text_color(zone, color.black)
+    box.set_text_size(zone, size.large)
+    box.set_text_formatting(zone, text.format_bold + text.format_italic)
+    clone = box.copy(zone)
+    box.set_text(clone, "copy")
+    box.delete(clone)
+plot(box.get_left(zone), title="Box Left")
+plot(box.get_top(zone), title="Box Top")
+if barstate.islast
+    label.new(na, na, text=str.format("{0}|{1}|{2}", box.get_text(zone), box.get_bgcolor(zone), box.get_border_color(zone)))`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: 0,
+          top: 101.5,
+          right: 2,
+          bottom: 100.7,
+          xloc: 'bar_index',
+          extend: 'right',
+          borderColor: '#FFFFFF',
+          borderWidth: 3,
+          borderStyle: 'dashed',
+          bgcolor: '#4CAF50',
+          text: 'last',
+          textColor: '#363A45',
+          textSize: 'large',
+          textFormatting: 'bolditalic',
+        },
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: null,
+          y: null,
+          text: 'last|#4CAF50|#FFFFFF',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Box Left')?.values).toEqual([0, 0, 0]);
+      expect(result.plots.find((plot) => plot.title === 'Box Top')?.values).toEqual([100.5, 100.5, 101.5]);
+    });
+
+    it('updates box xloc and horizontal coordinates', () => {
+      const script = `//@version=6
+indicator("Box xloc")
+var zone = box.new(na, na, na, na)
+if barstate.islast
+    box.set_xloc(id=zone, left=time[1], right=time, xloc=xloc.bar_time)
+    box.set_top(zone, high)
+    box.set_bottom(zone, low)
+plot(box.get_left(zone), title="Box Time Left")
+plot(box.get_right(zone), title="Box Time Right")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: bars[1]!.time,
+          top: 101.5,
+          right: bars[2]!.time,
+          bottom: 100.7,
+          xloc: 'bar_time',
+          extend: 'none',
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: '#2196F3',
+          text: '',
+          textColor: '#363A45',
+          textSize: 'auto',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Box Time Left')?.values).toEqual([null, null, bars[1]!.time]);
+      expect(result.plots.find((plot) => plot.title === 'Box Time Right')?.values).toEqual([null, null, bars[2]!.time]);
+    });
+
+    it('updates box corners from chart points', () => {
+      const script = `//@version=6
+indicator("Box point setters")
+var zone = box.new(na, na, na, na)
+if barstate.islast
+    topLeft = chart.point.from_index(bar_index - 1, high)
+    bottomRight = chart.point.now(low)
+    box.set_top_left_point(id=zone, point=topLeft)
+    box.set_bottom_right_point(zone, point=bottomRight)
+plot(box.get_left(zone), title="Box Point Left")
+plot(box.get_top(zone), title="Box Point Top")
+plot(box.get_right(zone), title="Box Point Right")
+plot(box.get_bottom(zone), title="Box Point Bottom")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: 1,
+          top: 101.5,
+          right: 2,
+          bottom: 100.7,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: '#2196F3',
+          text: '',
+          textColor: '#363A45',
+          textSize: 'auto',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Left')?.values).toEqual([null, null, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Top')?.values).toEqual([null, null, 101.5]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Right')?.values).toEqual([null, null, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Box Point Bottom')?.values).toEqual([null, null, 100.7]);
+    });
+
+    it('preserves persistent box handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime box")
+var zone = box.new(0, high, 1, low)
+if barstate.islast
+    box.set_lefttop(zone, bar_index - 1, high)
+    box.set_rightbottom(zone, bar_index, low)
+plot(box.get_bottom(zone), title="Box Bottom")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 250,
+        low: 190,
+        close: 220,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'box_box.new_0_0',
+          type: 'box',
+          persistent: true,
+          barIndex: 2,
+          left: 1,
+          top: 250,
+          right: 2,
+          bottom: 190,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: '#2196F3',
+          text: '',
+          textColor: '#363A45',
+          textSize: 'auto',
+        },
+      ]);
+    });
+
+    it('maps positional box text_size before text_color', () => {
+      const script = `//@version=6
+indicator("Box positional args")
+box.new(0, high, 1, low, color.red, 1, line.style_solid, extend.none, xloc.bar_index, color.green, "txt", size.large, color.black, text.align_center, text.align_middle, text.wrap_none, font.family_monospace, false, text.format_bold)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).toMatchObject({
+        type: 'box',
+        text: 'txt',
+        textSize: 'large',
+        textColor: '#363A45',
+        textHalign: 'center',
+        textValign: 'middle',
+        textWrap: 'none',
+        textFontFamily: 'monospace',
+        textFormatting: 'bold',
+      });
+    });
+
+    it('uses Pine centered defaults for box text alignment getters', () => {
+      const script = `//@version=6
+indicator("Box text defaults")
+zone = box.new(0, high, 1, low, text="seed")
+label.new(na, na, text=str.format("{0}|{1}", box.get_text_halign(zone), box.get_text_valign(zone)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).not.toHaveProperty('textHalign');
+      expect(result.drawings[0]).not.toHaveProperty('textValign');
+      expect(result.drawings[1]).toMatchObject({
+        type: 'label',
+        text: 'center|center',
+      });
+    });
+
+    it('records force-overlay labels and box text layout metadata', () => {
+      const script = `//@version=6
+indicator("Drawing layout", overlay=false)
+label.new(bar_index, close, text="forced", force_overlay=true)
+zone = box.new(0, high, 1, low, text="seed", text_halign=text.align_center, text_valign=text.align_middle, text_wrap=text.wrap_auto, text_font_family=font.family_monospace, force_overlay=true, text_formatting=text.format_bold)
+box.set_text_halign(zone, text.align_right)
+box.set_text_valign(zone, text.align_bottom)
+box.set_text_wrap(zone, text.wrap_none)
+box.set_text_font_family(zone, font.family_default)
+box.set_text_formatting(zone, text.format_italic)
+label.new(na, na, text=str.format("{0}|{1}", box.get_text_halign(zone), box.get_text_valign(zone)))
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings[0]).toMatchObject({
+        type: 'label',
+        text: 'forced',
+        forceOverlay: true,
+      });
+      expect(result.drawings[1]).toMatchObject({
+        type: 'box',
+        text: 'seed',
+        textHalign: 'right',
+        textValign: 'bottom',
+        textWrap: 'none',
+        textFontFamily: 'default',
+        textFormatting: 'italic',
+        forceOverlay: true,
+      });
+      expect(result.drawings[2]).toMatchObject({
+        type: 'label',
+        text: 'right|bottom',
+      });
+    });
+
+    it('applies declaration object limits and exposes all-id arrays', () => {
+      const script = `//@version=6
+indicator("Drawing limits", overlay=true, max_labels_count=2, max_lines_count=1, max_boxes_count=1)
+label.new(bar_index, close, text="old")
+line.new(bar_index - 1, low, bar_index, high)
+box.new(bar_index - 1, high, bar_index, low)
+if barstate.islast
+    label.new(bar_index, high, text="mid")
+    label.new(bar_index, low, text="new")
+    line.new(bar_index - 1, close, bar_index, close)
+    box.new(bar_index - 1, high + 1, bar_index, low - 1)
+plot(array.size(label.all), title="Labels")
+plot(array.size(line.all), title="Lines")
+plot(array.size(box.all), title="Boxes")`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings.map((drawing) => drawing.type)).toEqual(['label', 'label', 'line', 'box']);
+      expect(result.drawings.filter((drawing) => drawing.type === 'label').map((drawing) => drawing.text)).toEqual(['mid', 'new']);
+      expect(result.plots.find((plot) => plot.title === 'Labels')?.values).toEqual([1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Lines')?.values).toEqual([1, 1]);
+      expect(result.plots.find((plot) => plot.title === 'Boxes')?.values).toEqual([1, 1]);
+    });
+
+    it('supports chart.point constructors and line/box point overloads', () => {
+      const script = `//@version=6
+indicator("Chart points", overlay=true)
+current = chart.point.now(high)
+if barstate.islast
+    left = chart.point.from_index(0, close[2])
+    right = chart.point.now(high)
+    timedLeft = chart.point.from_time(time[1], low[1])
+    timedRight = chart.point.new(time, bar_index, high)
+    copied = chart.point.copy(right)
+    line.new(left, copied, color=color.green, width=2)
+    line.new(timedLeft, timedRight, xloc.bar_time, extend.none, color.red)
+    box.new(left, copied, color.blue, 1, line.style_solid, extend.none, xloc.bar_index, color.new(color.blue, 80), "zone")
+plot(current.index, title="Point Index")
+plot(current.price, title="Point Price")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_2',
+          type: 'line',
+          barIndex: 2,
+          x1: 0,
+          y1: 100.2,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#4CAF50',
+          style: 'solid',
+          width: 2,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_1_2',
+          type: 'line',
+          barIndex: 2,
+          x1: bars[1]!.time,
+          y1: 100.2,
+          x2: bars[2]!.time,
+          y2: 101.5,
+          xloc: 'bar_time',
+          extend: 'none',
+          color: '#F23645',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'box_box.new_0_2',
+          type: 'box',
+          barIndex: 2,
+          left: 0,
+          top: 100.2,
+          right: 2,
+          bottom: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          borderColor: '#2196F3',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          bgcolor: '#2196F333',
+          text: 'zone',
+          textColor: '#363A45',
+          textSize: 'auto',
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Point Index')?.values).toEqual([0, 1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Point Price')?.values).toEqual([100.5, 101, 101.5]);
+    });
+
+    it('supports label.new chart.point overloads', () => {
+      const script = `//@version=6
+indicator("Label chart points", overlay=true)
+if barstate.islast
+    indexPoint = chart.point.from_index(bar_index - 1, low)
+    timePoint = chart.point.now(high)
+    label.new(indexPoint, "index", style=label.style_label_up, textcolor=color.white)
+    label.new(timePoint, "time", xloc.bar_time, yloc.price, color.blue, label.style_label_down, color.white, size.small, text.align_right, "tip")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'label_label.new_0_2',
+          type: 'label',
+          barIndex: 2,
+          x: 1,
+          y: 100.7,
+          text: 'index',
+          xloc: 'bar_index',
+          yloc: 'price',
+          style: 'label_up',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'normal',
+          tooltip: undefined,
+        },
+        {
+          id: 'label_label.new_1_2',
+          type: 'label',
+          barIndex: 2,
+          x: bars[2]!.time,
+          y: 101.5,
+          text: 'time',
+          xloc: 'bar_time',
+          yloc: 'price',
+          style: 'label_down',
+          color: '#2196F3',
+          textColor: '#FFFFFF',
+          size: 'small',
+          textAlign: 'right',
+          tooltip: 'tip',
+        },
+      ]);
+    });
+
+    it('supports named chart.point constructors', () => {
+      const script = `//@version=6
+indicator("Named chart points", overlay=true)
+current = chart.point.now(price=high)
+timed = chart.point.new(time=time, index=bar_index, price=close)
+mixedTime = chart.point.from_time(time=time[1], close)
+if barstate.islast
+    left = chart.point.from_index(index=bar_index - 1, price=low)
+    right = chart.point.now(price=high)
+    prefix = chart.point.new(time=time, bar_index - 2, low)
+    copied = chart.point.copy(id=right)
+    line.new(left, copied)
+    line.new(prefix, mixedTime, xloc=xloc.bar_time)
+plot(current.index, title="Named Point Index")
+plot(timed.price, title="Named New Price")
+plot(mixedTime.price, title="Mixed Time Price")`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'line_line.new_0_2',
+          type: 'line',
+          barIndex: 2,
+          x1: 1,
+          y1: 100.7,
+          x2: 2,
+          y2: 101.5,
+          xloc: 'bar_index',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+        {
+          id: 'line_line.new_1_2',
+          type: 'line',
+          barIndex: 2,
+          x1: bars[2]!.time,
+          y1: 100.7,
+          x2: bars[1]!.time,
+          y2: 101.2,
+          xloc: 'bar_time',
+          extend: 'none',
+          color: '#2196F3',
+          style: 'solid',
+          width: 1,
+          forceOverlay: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Named Point Index')?.values).toEqual([0, 1, 2]);
+      expect(result.plots.find((plot) => plot.title === 'Named New Price')?.values).toEqual([100.2, 100.7, 101.2]);
+      expect(result.plots.find((plot) => plot.title === 'Mixed Time Price')?.values).toEqual([100.2, 100.7, 101.2]);
+    });
+
+    it('records, copies, deletes, limits, and exposes polyline drawings', () => {
+      const script = `//@version=6
+indicator("Polylines", overlay=true, max_polylines_count=1)
+points = array.from(chart.point.from_index(0, low), chart.point.from_index(1, high), chart.point.from_index(2, close))
+poly = polyline.new(points, curved=false, closed=true, line_color=color.red, fill_color=color.new(color.blue, 80), line_style=line.style_dotted, line_width=2, force_overlay=true)
+clone = polyline.copy(poly)
+polyline.delete(poly)
+plot(array.size(polyline.all), title="Polylines")`;
+
+      const ast = parse(script);
+      const bars = createBars(1);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'polyline_polyline.copy_0_0',
+          type: 'polyline',
+          barIndex: 0,
+          points: [
+            { type: 'chart.point', time: null, index: 0, price: 99.7 },
+            { type: 'chart.point', time: null, index: 1, price: 100.5 },
+            { type: 'chart.point', time: null, index: 2, price: 100.2 },
+          ],
+          curved: false,
+          closed: true,
+          xloc: 'bar_index',
+          lineColor: '#F23645',
+          fillColor: '#2196F333',
+          lineStyle: 'dotted',
+          lineWidth: 2,
+          forceOverlay: true,
+          persistent: false,
+        },
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Polylines')?.values).toEqual([1]);
+    });
+
+    it('does not duplicate transient polyline drawings during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime polyline", overlay=true)
+if barstate.islast
+    points = array.from(chart.point.from_index(bar_index - 1, low), chart.point.from_index(bar_index, close))
+    polyline.new(points, line_color=color.green)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        low: 190,
+        close: 200,
+      });
+      engine.updateBar(ast, {
+        ...bars[2],
+        low: 280,
+        close: 300,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'polyline_polyline.new_0_2',
+          type: 'polyline',
+          barIndex: 2,
+          points: [
+            { type: 'chart.point', time: null, index: 1, price: 280 },
+            { type: 'chart.point', time: null, index: 2, price: 300 },
+          ],
+          curved: false,
+          closed: false,
+          xloc: 'bar_index',
+          lineColor: '#4CAF50',
+          fillColor: null,
+          lineStyle: 'solid',
+          lineWidth: 1,
+        },
+      ]);
+    });
+
+    it('records table cells and common cell setters', () => {
+      const script = `//@version=6
+indicator("Tables", overlay=true)
+var stats = table.new(position.bottom_right, 2, 2, bgcolor=color.new(color.black, 80), frame_color=color.white, frame_width=2, border_color=color.blue, border_width=1)
+var stale = table.new(position.top_right, 1, 1)
+if barstate.islast
+    table.set_position(stats, position.top_left)
+    table.set_bgcolor(stats, color.new(color.red, 70))
+    table.set_frame_color(stats, color.green)
+    table.set_frame_width(stats, 3)
+    table.set_border_color(stats, color.white)
+    table.set_border_width(stats, 2)
+    table.cell(stats, 0, 0, "ATR", text_color=color.white, bgcolor=color.blue, tooltip="ATR details")
+    table.cell(stats, 1, 0, str.tostring(close), text_halign=text.align_right, text_size=size.large)
+    table.cell_set_text(stats, 1, 0, "last")
+    table.cell_set_bgcolor(stats, 1, 0, color.green)
+    table.cell_set_text_color(stats, 1, 0, color.black)
+    table.cell_set_width(stats, 1, 0, 72)
+    table.cell_set_height(stats, 1, 0, 28)
+    table.cell_set_text_halign(stats, 1, 0, text.align_center)
+    table.cell_set_text_valign(stats, 1, 0, text.align_bottom)
+    table.cell_set_text_font_family(stats, 1, 0, font.family_monospace)
+    table.cell_set_text_formatting(stats, 1, 0, text.format_bold + text.format_italic)
+    table.cell_set_tooltip(stats, 1, 0, "Close details")
+    table.cell_set_tooltip(stats, 0, 1, "Created details")
+    table.cell_set_tooltip(stats, 0, 1, na)
+    table.cell_set_text(stats, 0, 1, "created")
+    table.merge_cells(stats, 0, 0, 1, 0)
+    table.delete(stale)
+plot(close)
+plot(array.size(table.all), title="Tables")`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.plots.find((plot) => plot.title === 'Tables')?.values).toEqual([2, 1]);
+      expect(result.drawings).toEqual([
+        {
+          id: 'table_table.new_0_0',
+          type: 'table',
+          persistent: true,
+          barIndex: 0,
+          position: 'top_left',
+          columns: 2,
+          rows: 2,
+          bgcolor: '#F236454D',
+          frameColor: '#4CAF50',
+          frameWidth: 3,
+          borderColor: '#FFFFFF',
+          borderWidth: 2,
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: 'ATR',
+              width: undefined,
+              height: undefined,
+              textColor: '#FFFFFF',
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              tooltip: 'ATR details',
+              bgcolor: '#2196F3',
+            },
+            {
+              column: 1,
+              row: 0,
+              text: 'last',
+              width: 72,
+              height: 28,
+              textColor: '#363A45',
+              textHalign: 'center',
+              textValign: 'bottom',
+              textFontFamily: 'monospace',
+              textFormatting: 'bolditalic',
+              textSize: 'large',
+              tooltip: 'Close details',
+              bgcolor: '#4CAF50',
+            },
+            {
+              column: 0,
+              row: 1,
+              text: 'created',
+              width: undefined,
+              height: undefined,
+              textColor: null,
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              tooltip: undefined,
+              bgcolor: null,
+            },
+          ],
+          mergedCells: [
+            {
+              startColumn: 0,
+              startRow: 0,
+              endColumn: 1,
+              endRow: 0,
+            },
+          ],
+        },
+      ]);
+    });
+
+    it('preserves persistent table handles during realtime rollback', () => {
+      const script = `//@version=6
+indicator("Realtime table", overlay=true)
+var stats = table.new(position.top_right, 1, 1, bgcolor=color.blue)
+if barstate.islast
+    table.set_position(stats, position.bottom_left)
+    table.set_bgcolor(stats, color.green)
+    table.cell(stats, 0, 0, str.tostring(close), width=close, height=high - low, text_color=color.white, bgcolor=color.red)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        high: 310,
+        low: 290,
+        close: 300,
+      });
+
+      expect(engine.getDrawings()).toEqual([
+        {
+          id: 'table_table.new_0_0',
+          type: 'table',
+          persistent: true,
+          barIndex: 0,
+          position: 'bottom_left',
+          columns: 1,
+          rows: 1,
+          bgcolor: '#4CAF50',
+          frameColor: null,
+          frameWidth: 0,
+          borderColor: null,
+          borderWidth: 0,
+          cells: [
+            {
+              column: 0,
+              row: 0,
+              text: '300',
+              width: 300,
+              height: 20,
+              textColor: '#FFFFFF',
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              bgcolor: '#F23645',
+            },
+          ],
+        },
+      ]);
+    });
+
+    it('reports table cell coordinates outside the declared grid', () => {
+      const script = `//@version=6
+indicator("Tables", overlay=true)
+var stats = table.new(position.bottom_right, 1, 1)
+if barstate.islast
+    table.cell(stats, 1, 0, "outside")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Table cell coordinates out of bounds: column 1, row 0');
+    });
+
+    it('reports overlapping merged table cell ranges', () => {
+      const script = `//@version=6
+indicator("Table merged cell overlap", overlay=true)
+var stats = table.new(position.bottom_right, 3, 2)
+if barstate.islast
+    table.merge_cells(stats, 0, 0, 1, 0)
+    table.merge_cells(stats, 1, 0, 2, 1)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors[0]?.message).toBe('Table merged cell range overlaps existing merged cells: columns 1-2, rows 0-1');
+    });
+
+    it('keeps identical table cell merges idempotent during realtime re-entry', () => {
+      const script = `//@version=6
+indicator("Realtime table merge", overlay=true)
+var stats = table.new(position.top_right, 2, 1)
+if barstate.islast
+    table.cell(stats, 0, 0, "Header")
+    table.merge_cells(stats, 0, 0, 1, 0)
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(3);
+      const engine = new TealscriptEngine();
+      engine.execute(ast, bars);
+
+      engine.updateBar(ast, {
+        ...bars[2],
+        close: bars[2].close + 1,
+      });
+
+      expect(engine.getCurrentExecutionResult().errors).toEqual([]);
+      expect(engine.getDrawings()).toEqual([
+        expect.objectContaining({
+          type: 'table',
+          mergedCells: [
+            {
+              startColumn: 0,
+              startRow: 0,
+              endColumn: 1,
+              endRow: 0,
+            },
+          ],
+        }),
+      ]);
+    });
+
+    it('clears merged table cell ranges touched by table.clear', () => {
+      const script = `//@version=6
+indicator("Table merged cell clear", overlay=true)
+var stats = table.new(position.bottom_right, 2, 1)
+if barstate.islast
+    table.cell(stats, 0, 0, "Header")
+    table.merge_cells(stats, 0, 0, 1, 0)
+    table.clear(stats, 0, 0, 1, 0)
+    table.cell(stats, 1, 0, "Value")
+plot(close)`;
+
+      const ast = parse(script);
+      const bars = createBars(2);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toEqual([]);
+      expect(result.drawings).toEqual([
+        expect.objectContaining({
+          type: 'table',
+          cells: [
+            {
+              column: 1,
+              row: 0,
+              text: 'Value',
+              width: undefined,
+              height: undefined,
+              textColor: null,
+              textHalign: 'center',
+              textValign: 'middle',
+              textSize: 'normal',
+              bgcolor: null,
+            },
+          ],
+          mergedCells: [],
+        }),
+      ]);
+    });
+
+    it('caps declared table cell capacity across live tables', () => {
+      const script = `//@version=6
+indicator("Table cell limit", overlay=true)
+first = table.new(position.top_left, 100, 100)
+second = table.new(position.top_right, 1, 1)
+plot(close)`;
+
+      const ast = parse(script);
+      const result = executeScript(ast, createBars(1));
+
+      expect(result.errors.map((error) => error.message)).toEqual(['Too many table cells: maximum is 10000']);
+      expect(result.drawings.filter((drawing) => drawing.type === 'table')).toHaveLength(1);
+    });
+  });

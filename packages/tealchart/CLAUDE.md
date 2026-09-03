@@ -244,14 +244,6 @@ getChartStore(chartKey).uiPreferences → shared UI preference store
 
 ## Tealscript Integration
 
-**Planned convergence — read [`MOBILE_RUNTIME_v1.md`](MOBILE_RUNTIME_v1.md)
-before changing backend selection, `MobileIndicatorManager` execution, or the
-worker message protocol.** Tealchart is converging on a single execution
-backend (`compiled`), with mobile hosting it in a hidden WebView instead of
-executing inline on the React Native JS thread. That doc records why, the
-loading contract (candles never block on the runtime), the `na`/`NaN`-across-
-JSON bridge hazard, and the one unproven step.
-
 1. User selects indicator → `TealchartWidget.createStudy()`
 2. `TealscriptManager` creates a Web Worker with the indicator code
 3. Bar data pushed to worker → plots returned
@@ -265,32 +257,53 @@ manager must answer every `requestData` worker message, including a typed
 `missing-provider` result when no resolver is configured, so scripts do not hang
 waiting for data that cannot cross structured clone.
 TealScript backend selection is host-configurable. Web/worker paths default to
-compiled. Native must not run TealScript inline after the compiled-only cutover;
-it should host the compiled worker model in a hidden WebView. Keep
+compiled; native passes its current interpreter default until closure is
+deliberately selected. Web and native hosts pass `tealscriptExecutionBackend`
+only for an explicit override and `enableTealscriptClosureBackend` as the
+boolean rollout flag; both flow into the shared TealScript selector. Do not
+hard-code backend choices in new host paths, and keep
 `RuntimeProfile.selectedBackend` visible alongside the actual `executionMode`
-because runtime routing can make those differ.
+because fallback can make those differ.
+Runtime-profile fallback diagnostics from the worker are user-facing but
+nonfatal. A `realtime-compiled-fallback` diagnostic means the script is valid
+and output is still correct because live ticks are using the interpreter; the
+message must name the source construct and line/column that forced the fallback
+instead of presenting it like a script or data error.
 Tealscript user-facing diagnostics carry a structural taxonomy: true parse,
 semantic, worker, and `runtime.error` failures use `severity: 'error'`;
-provider-data absence uses `severity: 'warning'` with stable code
-`request-data-unavailable`. Compiled realtime unsupported constructs are fatal:
-the worker reports `severity: 'error'`, preserves `RuntimeProfile.fallbackReason`
-and `fallbackDiagnostics`, and clears script output. UI should branch on `type`,
-`code`, profile fields, and `severity`, never on message wording.
+provider-data absence and realtime compiled fallback use `severity: 'warning'`
+with stable `code` values (`request-data-unavailable` and
+`realtime-compiled-fallback`). UI should branch on `type`, `code`, and
+`severity`, never on message wording.
 Tealscript execution observability is host-owned but Tealchart is the
 per-execution summary boundary. `TealscriptManager.onExecution` fires only for
 accepted worker results and runtime halts after stale responses have been
-discarded. Keep that
+discarded and preserved incremental plots have been accounted for. Keep that
 summary compact: backend selected, backend actually run, timing/profile counts,
-request kind, output counts, and closed unsupported family. Do not add source text,
-script code, traded symbols, line/column, or raw unsupported diagnostics to the
-execution summary; web Sentry telemetry must be able to report runtime health
-without receiving private Pine or instrument identifiers.
-Native TealScript execution uses the hidden-WebView compiled host. The runtime
-is a self-contained bundled HTML asset in this package; do not replace it with
-a hosted URL or make consumers host TealScript code. `react-native-webview` is
-an optional peer/dev-only dependency, never a runtime dependency for web
-consumers. If a native caller constructs `MobileIndicatorManager` without a
-worker factory, TealScript studies must fail loudly instead of executing inline.
+request kind, output counts, and closed fallback family. Do not add source text,
+script code, traded symbols, line/column, or raw fallback diagnostics to the
+execution summary; web Sentry telemetry must be able to report closure rollout
+health without receiving private Pine or instrument identifiers.
+Native TealScript execution is synchronous through `MobileIndicatorManager`, so
+there is no compiled-worker realtime fallback class on mobile today. Mobile
+still emits the same taxonomy for classes it can produce: parse/runtime
+failures are errors, and missing request-data providers are nonfatal
+`request-data-unavailable` warnings before `SkiaTealchart` forwards them through
+`onTealscriptError`. Do not assume the web compiled-path baselines describe
+mobile: the current TealScript compiler instantiates generated JavaScript with
+`new Function(...)`. React Native documents Hermes as the default engine. T90's
+local React Native 0.87 `hermesc` probe accepts `new Function` and emits
+bytecode constructing the global `Function` object, while Hermes source still
+documents a runtime `enableEval` flag for `eval` and the Function constructor.
+This repo has no consuming native app runtime smoke proving that generated
+Function code executes, or that it is fast enough, on simulator/device. Treat
+mobile compiled execution as unclaimed until that native proof exists. The
+no-eval closure backend now dominates the current compiled backend on the
+committed public-corpus historical-bar cutover gate, and the closure-selected
+realtime corpus differential is clean. Its remaining mobile unknowns are
+Metro/Hermes execution and device speed rather than Tealchart-side wiring or
+basic historical coverage. The production closure performance report is
+Node-host data, not a mobile-device claim.
 The measured native TealScript capability baseline lives in
 `src/mobile/mobileTealscriptCapabilityBaseline.ts` and is pinned by
 `src/mobile/MobileIndicatorManager.test.ts`: custom source save, plot/drawing
@@ -298,9 +311,43 @@ handoff, pane metadata, parse/runtime diagnostics, imported Pine libraries, and
 request-backed scripts are supported when the native host supplies the relevant
 seams (`getTealscriptLibraries` and `getTealscriptRequestDatafeed`). Request
 scripts without a native provider still emit a visible
-`request-data-unavailable` warning. `ChartWidgetCore` still calls `setBars(...)`
-on realtime ticks; the hidden WebView owns compiled execution off the React
-Native JS thread.
+`request-data-unavailable` warning. `MobileIndicatorManager` can select the
+closure backend through the shared selector and exposes the last
+`runtimeProfile` on each active indicator; the remaining unclaimed part is the
+consuming mobile app's on-device Hermes/Metro smoke and device performance
+check, not Tealchart-side wiring. Do not read "mobile interpreter default" as
+"mobile incremental TealScript update": `MobileIndicatorManager` currently does
+not implement `updateBar(...)`, so `ChartWidgetCore` calls `setBars(...)` on
+realtime ticks and `_recomputePlots(...)` executes the selected backend over the
+full bar window. Enabling closure on mobile would keep that full-window product
+model while changing the backend; it would not automatically use the
+interpreter's cheaper incremental `TealscriptEngine.updateBar(...)` path.
+
+Run the mobile closure smoke before claiming device support:
+
+```bash
+yarn workspace @tealstreet/tealchart mobile:tealscript-closure-smoke
+```
+
+The package command reads `/tmp/pine-corpus-v1` and `/tmp/pine-corpus-v2`,
+selects a deterministic subset from the committed closure-dominated corpus
+rows, computes direct web closure output on the same synthetic bars, then runs
+the same source through `MobileIndicatorManager` with
+`tealscriptExecutionBackend: 'closure'`. It exits nonzero on any mismatch or if
+the mobile manager does not report `executionMode: 'closure'`; the JSON report
+is written to `/tmp/mobile-tealscript-closure-smoke.json` by default. This
+proves the Tealchart mobile manager path under the current JS host. It does not
+prove Hermes/Metro execution or phone performance.
+
+The consuming mobile app should run the same exported helper
+`runMobileTealscriptClosureSmoke(...)` from `@tealstreet/tealchart/native`
+inside a simulator/device bundle, with corpus sources and expected web closure
+outputs supplied by the host test harness. Passing means every case reports
+`status: 'matched'`, `executionMode: 'closure'`, and `environment.hermes: true`,
+with device timings captured from the returned per-case `elapsedMs`. Failure is
+reported per script with the first output-difference path or first mobile
+manager error. This repo cannot run that final smoke because the
+`tealstreet-mobile` app target and simulator command are not present here.
 
 Tealscript render routing carries `indicator()` declaration `format`,
 `precision`, and `scale` into the pane-info map. Plot-level format/precision
@@ -318,8 +365,13 @@ colors, transparency, fills, OHLC/arrow skip rules, overlay-vs-pane routing,
 axis label scale/precision, and drawing command order/styles. Keep broad pixel
 snapshots for regression smoke coverage, but add new user-visible TealScript
 render semantics to that matrix so failures name the broken behavior directly.
-New rendering parity checks must reuse the shared TealScript output comparator
-rather than introducing a second definition of equivalent output.
+`src/rendering/tealscriptRenderingDifferential.test.ts` is the deterministic
+generator for render-path parity. It executes generated Pine visual programs
+through interpreter and compiled TealScript output, renders both through the
+production canvas/drawing renderers, and also compares same-bar realtime
+`updateBar` render output against a fresh full execution over the same updated
+bar window. The default run stays small; `TEALSCRIPT_GRAMMAR_DIFF_SOAK=1`
+expands the same seeded render differential.
 Visual snapshot tests may write `__visual_snapshots__/*.diff.png` actual-output
 comparison artifacts when PNG bytes differ; those files are generated diagnostics
 only and are ignored locally. Do not promote a `.diff.png` into a baseline or
@@ -800,6 +852,16 @@ other instance of the same shape.
 - `PaneManager` treats main chart as "just another pane" (type: `'main'`)
 - Gap detection has exponential backoff — don't remove the debounce
 - Generated Konva layers must Z-order correctly: canvas → price lines → context menu
+- Trade-line draw order is a base tier plus a promotion, and the promotion has to
+  be rebuilt rather than stacked. Base order is plain price lines → order lines →
+  position lines, so a position label always covers an order label it overlaps.
+  Hover, selection and an active drag lift one line above that tier — on web in
+  `PriceLineManager.applyFloatingLineOrder`, on native through
+  `promoteNativeSelectedTradeLineGeometry` (native has no hover). Web used to do
+  it with bare `moveToTop()` calls, which nothing ever undid: hovering an order
+  once left it permanently above the positions it covered. Each line group now
+  carries a `baseOrder` attr assigned at render time and the whole order is
+  re-applied by `zIndex` on every hover/selection change.
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
 - Trading-line labels and line segments must be clamped after the overlaid left drawing rail (`leftToolRailInset + leftToolRailWidth`) in both web and mobile paths. Do not place labels or left-extending line segments at raw `margins.left`.
 - TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.

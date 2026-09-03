@@ -1,10 +1,4 @@
-import type {
-  Program,
-  RequestDatafeed,
-  TealscriptExecutionBackend,
-  TealscriptRuntimeOptions,
-  WorkerError,
-} from '@tealstreet/tealscript';
+import type { Program, RequestDatafeed, TealscriptExecutionBackend, WorkerError } from '@tealstreet/tealscript';
 import type { IIndicatorManager } from '../core/ChartWidgetCore';
 import type { ChartThemeInput } from '../theme';
 import type { IBasicDataFeed } from '../types';
@@ -22,8 +16,8 @@ export interface NativeTealchartCoreRuntimeInput {
   onIntervalChange?: (interval: string) => void;
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
-  createTealscriptWorker?: () => Worker;
   tealscriptExecutionBackend?: TealscriptExecutionBackend;
+  enableTealscriptClosureBackend?: boolean | (() => boolean);
   getTealscriptLibraries?: () => Map<string, Program> | undefined;
   getTealscriptRequestDatafeed?: () => RequestDatafeed | undefined;
   propInterval: string;
@@ -38,8 +32,8 @@ export function useNativeTealchartCoreRuntime({
   onIntervalChange,
   onSymbolChange,
   onTealscriptError,
-  createTealscriptWorker,
   tealscriptExecutionBackend,
+  enableTealscriptClosureBackend,
   getTealscriptLibraries,
   getTealscriptRequestDatafeed,
   propInterval,
@@ -59,8 +53,7 @@ export function useNativeTealchartCoreRuntime({
   if (!indicatorManagerRef.current) {
     indicatorManagerRef.current = new MobileIndicatorManager({
       tealscriptExecutionBackend,
-      createWorker: createTealscriptWorker,
-      getRuntimeOptions: () => createNativeTealscriptRuntimeOptions(propSymbol, propInterval, tealscriptExecutionBackend),
+      enableTealscriptClosureBackend,
       getLibraries: getTealscriptLibraries,
       getRequestDatafeed: getTealscriptRequestDatafeed,
     });
@@ -119,12 +112,6 @@ export function useNativeTealchartCoreRuntime({
   }, [onTealscriptError]);
 
   useEffect(() => {
-    indicatorManagerRef.current?.setRuntimeOptionsProvider(() =>
-      createNativeTealscriptRuntimeOptions(propSymbol, propInterval, tealscriptExecutionBackend),
-    );
-  }, [propInterval, propSymbol, tealscriptExecutionBackend]);
-
-  useEffect(() => {
     indicatorManagerRef.current?.setLibrariesProvider(getTealscriptLibraries);
   }, [getTealscriptLibraries]);
 
@@ -135,8 +122,9 @@ export function useNativeTealchartCoreRuntime({
   useEffect(() => {
     indicatorManagerRef.current?.setTealscriptBackendSelection({
       tealscriptExecutionBackend,
+      enableTealscriptClosureBackend,
     });
-  }, [tealscriptExecutionBackend]);
+  }, [tealscriptExecutionBackend, enableTealscriptClosureBackend]);
 
   // Keyed on the PROP, in a layout effect, so `chartApi.symbol()` answers with
   // the market the host asked for in the same commit the host asked for it.
@@ -180,56 +168,5 @@ export function useNativeTealchartCoreRuntime({
     requestMoreBars,
     setImperativeTheme,
     symbol,
-  };
-}
-
-function createNativeTealscriptRuntimeOptions(
-  symbol: string,
-  interval: string,
-  tealscriptExecutionBackend: TealscriptExecutionBackend | undefined,
-): TealscriptRuntimeOptions {
-  return {
-    backend: {
-      executionBackendOverride: tealscriptExecutionBackend,
-    },
-    syminfo: {
-      ticker: symbol,
-      description: symbol,
-      timezone: 'UTC',
-    },
-    timeframe: createNativeTealscriptTimeframeInfo(interval),
-  };
-}
-
-function createNativeTealscriptTimeframeInfo(period: string): TealscriptRuntimeOptions['timeframe'] {
-  const normalized = String(period).trim().toUpperCase();
-  const numericMinutes = Number(normalized);
-  if (Number.isFinite(numericMinutes) && numericMinutes > 0) {
-    return {
-      period: String(period),
-      multiplier: numericMinutes,
-      isminutes: true,
-      isdaily: false,
-      isweekly: false,
-      ismonthly: false,
-      isintraday: true,
-      isseconds: false,
-      isticks: false,
-    };
-  }
-
-  const match = /^(\d+)?([STDWM])$/.exec(normalized);
-  const multiplier = match?.[1] === undefined ? 1 : Number(match[1]);
-  const unit = match?.[2];
-  return {
-    period: String(period),
-    multiplier: Number.isFinite(multiplier) ? multiplier : 1,
-    isminutes: false,
-    isdaily: unit === 'D',
-    isweekly: unit === 'W',
-    ismonthly: unit === 'M',
-    isintraday: unit === 'S' || unit === 'T',
-    isseconds: unit === 'S',
-    isticks: unit === 'T',
   };
 }

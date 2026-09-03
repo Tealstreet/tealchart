@@ -55,11 +55,11 @@ interface LongBarCorpusParityRun {
   };
   summary: {
     scripts: number;
-    visualMatched: number;
+    visualAllThreeMatched: number;
     visualMismatched: number;
     visualFailedOrNoOutput: number;
     strategyRows: number;
-    strategyLedgerMatched: number;
+    strategyLedgerAllThreeMatched: number;
     strategyLedgerMismatched: number;
     strategyLedgerNotRun: number;
     swallowedErrors: ExternalCorpusReport['summary']['swallowedErrors'];
@@ -82,13 +82,14 @@ interface LongBarCorpusParityException {
   strategyLedgerStatus: 'matched' | 'mismatched' | 'not-run';
   firstDifference?: {
     dimension: 'visual-output' | 'strategy-ledger';
-    backendPair: 'compiled/fresh-compiled';
+    backendPair: 'compiled/interpreter' | 'closure/interpreter' | 'closure/compiled';
     path: string;
     kind: string;
   };
   firstVisualDifference?: ExternalCorpusReportRow['outputParity']['firstDifference'];
-  firstStrategyLedgerDifference?: ExternalCorpusReportRow['strategyLedgerParity']['compiledLedger']['firstDifference'];
+  firstStrategyLedgerDifference?: ExternalCorpusReportRow['strategyLedgerParity']['compiledAgainstInterpreter']['firstDifference'];
   compiledOutput: ExternalCorpusReportRow['output'];
+  closureOutput: ExternalCorpusReportRow['closure']['output'];
 }
 
 const DEFAULT_SOURCE_REPORTS: SourceReportSpec[] = [
@@ -143,11 +144,11 @@ async function main(): Promise<void> {
       ? {
           kind: 'deterministic-dominated-subset',
           maxPerCorpus: options.maxPerCorpus,
-          note: 'All dominated strategy rows are retained first, then the remaining dominated rows are sampled evenly by corpus order. In compiled-only mode this is a long-history health oracle; independent parity fields remain not-run unless another reference backend exists.',
+          note: 'All dominated strategy rows are retained first, then the remaining dominated rows are sampled evenly by corpus order. Use no --max-per-corpus for the full dominated set.',
         }
       : {
           kind: 'full-dominated-set',
-          note: 'Every row whose current source report outcome is produced-output-compiled is re-run at each bar count. In compiled-only mode this is a long-history health oracle; independent parity fields remain not-run unless another reference backend exists.',
+          note: 'Every row whose current source report outcome is produced-output-compiled is re-run at each bar count.',
         },
     generator: {
       name: 'plausible-long-bars-v1',
@@ -202,11 +203,11 @@ function summarizeRun(
     bars: summarizeBars(bars),
     summary: {
       scripts: rows.length,
-      visualMatched: rows.filter((row) => visualStatus(row) === 'matched').length,
+      visualAllThreeMatched: rows.filter((row) => visualStatus(row) === 'matched').length,
       visualMismatched: rows.filter((row) => visualStatus(row) === 'mismatched').length,
       visualFailedOrNoOutput: rows.filter((row) => visualStatus(row) === 'failed-or-no-output').length,
       strategyRows: strategyRows.length,
-      strategyLedgerMatched: strategyLedgerStatuses.filter((status) => status === 'matched').length,
+      strategyLedgerAllThreeMatched: strategyLedgerStatuses.filter((status) => status === 'matched').length,
       strategyLedgerMismatched: strategyLedgerStatuses.filter((status) => status === 'mismatched').length,
       strategyLedgerNotRun: strategyLedgerStatuses.filter((status) => status === 'not-run').length,
       swallowedErrors: report.summary.swallowedErrors,
@@ -236,9 +237,14 @@ function rowException(row: ExternalCorpusReportRow): LongBarCorpusParityExceptio
     firstDifference,
     firstVisualDifference:
       row.outputParity.firstDifference
-      ?? undefined,
-    firstStrategyLedgerDifference: row.strategyLedgerParity.compiledLedger.firstDifference,
+      ?? row.closure.parityAgainstInterpreter.firstDifference
+      ?? row.closure.parityAgainstCompiled.firstDifference,
+    firstStrategyLedgerDifference:
+      row.strategyLedgerParity.compiledAgainstInterpreter.firstDifference
+      ?? row.strategyLedgerParity.closureAgainstInterpreter.firstDifference
+      ?? row.strategyLedgerParity.closureAgainstCompiled.firstDifference,
     compiledOutput: row.output,
+    closureOutput: row.closure.output,
   };
 }
 
@@ -246,13 +252,33 @@ function firstLongBarDifference(row: ExternalCorpusReportRow): LongBarCorpusPari
   const candidates = [
     {
       dimension: 'visual-output' as const,
-      backendPair: 'compiled/fresh-compiled' as const,
+      backendPair: 'compiled/interpreter' as const,
       analysis: row.outputParity,
     },
     {
+      dimension: 'visual-output' as const,
+      backendPair: 'closure/interpreter' as const,
+      analysis: row.closure.parityAgainstInterpreter,
+    },
+    {
+      dimension: 'visual-output' as const,
+      backendPair: 'closure/compiled' as const,
+      analysis: row.closure.parityAgainstCompiled,
+    },
+    {
       dimension: 'strategy-ledger' as const,
-      backendPair: 'compiled/fresh-compiled' as const,
-      analysis: row.strategyLedgerParity.compiledLedger,
+      backendPair: 'compiled/interpreter' as const,
+      analysis: row.strategyLedgerParity.compiledAgainstInterpreter,
+    },
+    {
+      dimension: 'strategy-ledger' as const,
+      backendPair: 'closure/interpreter' as const,
+      analysis: row.strategyLedgerParity.closureAgainstInterpreter,
+    },
+    {
+      dimension: 'strategy-ledger' as const,
+      backendPair: 'closure/compiled' as const,
+      analysis: row.strategyLedgerParity.closureAgainstCompiled,
     },
   ];
   const first = candidates.find((candidate) => candidate.analysis.status === 'mismatched' && candidate.analysis.firstDifference);
@@ -266,11 +292,12 @@ function firstLongBarDifference(row: ExternalCorpusReportRow): LongBarCorpusPari
 }
 
 function visualStatus(row: ExternalCorpusReportRow): LongBarCorpusParityException['visualStatus'] {
-  if (!row.output.produced) return 'failed-or-no-output';
-  if (row.outputParity.status === 'matched') {
-    return 'matched';
-  }
-  if (row.outputParity.status === 'not-run') {
+  if (!row.output.produced || !row.closure.output.produced) return 'failed-or-no-output';
+  if (
+    row.outputParity.status === 'matched'
+    && row.closure.parityAgainstInterpreter.status === 'matched'
+    && row.closure.parityAgainstCompiled.status === 'matched'
+  ) {
     return 'matched';
   }
   return 'mismatched';
@@ -280,12 +307,16 @@ function strategyLedgerStatus(row: ExternalCorpusReportRow): LongBarCorpusParity
   if (row.declarationKind !== 'strategy') return 'not-run';
   const parity = row.strategyLedgerParity;
   if (
-    parity.compiledLedger.status === 'matched'
+    parity.compiledAgainstInterpreter.status === 'matched'
+    && parity.closureAgainstInterpreter.status === 'matched'
+    && parity.closureAgainstCompiled.status === 'matched'
   ) {
     return 'matched';
   }
   if (
-    parity.compiledLedger.status === 'mismatched'
+    parity.compiledAgainstInterpreter.status === 'mismatched'
+    || parity.closureAgainstInterpreter.status === 'mismatched'
+    || parity.closureAgainstCompiled.status === 'mismatched'
   ) {
     return 'mismatched';
   }
@@ -339,8 +370,8 @@ function summarizeReport(report: LongBarCorpusParityReport): unknown {
       measuredScripts: corpus.measuredScripts,
       runs: corpus.runs.map((run) => ({
         barCount: run.barCount,
-        visual: `${run.summary.visualMatched}/${run.summary.scripts}`,
-        strategyLedger: `${run.summary.strategyLedgerMatched}/${run.summary.strategyRows}`,
+        visual: `${run.summary.visualAllThreeMatched}/${run.summary.scripts}`,
+        strategyLedger: `${run.summary.strategyLedgerAllThreeMatched}/${run.summary.strategyRows}`,
         exceptions: run.exceptions.length,
         exceptionKinds: countBy(run.exceptions, (entry) => entry.firstDifference?.kind ?? 'unclassified'),
         swallowedErrors: run.summary.swallowedErrors.totalErrors,

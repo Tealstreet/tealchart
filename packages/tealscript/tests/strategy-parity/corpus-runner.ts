@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { parse } from '../../src/parser';
-import { executeScript, type Bar, type TealscriptExecutionOptions } from '../../src/runtime';
+import { executeScript, type Bar, type TealscriptEngineOptions } from '../../src/runtime';
 import type { StrategyTrade } from '../../src/runtime/strategy';
 import {
   computeParity,
@@ -16,7 +16,7 @@ export interface CorpusEntry {
   pineSource: string;
   referenceCsv: string;
   bars: Bar[];
-  engineOptions?: TealscriptExecutionOptions;
+  engineOptions?: TealscriptEngineOptions;
   meta?: CorpusEntryMeta;
 }
 

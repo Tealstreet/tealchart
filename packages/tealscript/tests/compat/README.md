@@ -5,11 +5,6 @@ They should be small enough to review directly and stable enough to run in CI
 without TradingView, network access, live market data, or public scripts at test
 time.
 
-After the compiled-only cutover, legacy runtime golden fixtures that asserted
-against the removed interpreter are retained as specification material but are
-not part of the default package CI gate. Compiled runtime behavior is guarded by
-the codegen tests, worker tests, and generated corpus/report checks.
-
 Source-linked real Pine checkpoint provenance is tracked in
 [`PINE_CHECKPOINTS.md`](./PINE_CHECKPOINTS.md).
 

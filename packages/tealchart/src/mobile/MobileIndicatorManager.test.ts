@@ -1,14 +1,14 @@
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
-import type { Bar, TealscriptRequestDataMessage } from '../types';
-import type { PlotOutput } from '@tealstreet/tealscript';
+import type { Bar } from '../types';
 
+import { executeSelectedTealscriptBackend, InMemoryRequestDatafeed, parse } from '@tealstreet/tealscript';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getIndicatorById } from '../indicators/builtinIndicators';
-import { createResultMessage } from '@tealstreet/tealscript';
 import { clearChartStoreCache } from '../state/chartState';
 import { MobileIndicatorManager } from './MobileIndicatorManager';
 import { MOBILE_TEALSCRIPT_CAPABILITY_BASELINE } from './mobileTealscriptCapabilityBaseline';
+import { runMobileTealscriptClosureSmoke } from './mobileTealscriptClosureSmoke';
 
 function makeBars(count: number): Bar[] {
   return Array.from({ length: count }, (_, index) => ({
@@ -21,50 +21,13 @@ function makeBars(count: number): Bar[] {
   }));
 }
 
-function expectWebViewRequired(onError: ReturnType<typeof vi.fn>, scriptId: string): void {
-  expect(onError).toHaveBeenCalledWith(
-    scriptId,
-    expect.objectContaining({
-      type: 'runtime',
-      severity: 'error',
-      code: 'mobile-tealscript-webview-required',
-      message: 'Mobile TealScript execution requires the compiled WebView host.',
-    }),
-  );
-}
-
-class FakeWorker {
-  onmessage: ((event: MessageEvent) => void) | null = null;
-  onerror: ((event: ErrorEvent) => void) | null = null;
-  messages: unknown[] = [];
-  terminated = false;
-
-  postMessage(message: unknown): void {
-    this.messages.push(message);
-  }
-
-  terminate(): void {
-    this.terminated = true;
-  }
-
-  emit(data: unknown): void {
-    this.onmessage?.({ data } as MessageEvent);
-  }
-}
-
-function flushWorkerInit(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 0));
-}
-
 describe('MobileIndicatorManager custom Tealscript indicators', () => {
   afterEach(() => {
     clearChartStoreCache();
   });
 
-  it('fails loudly for built-in TealScript indicators until the WebView host lands', () => {
+  it('renders built-in Momentum and Bollinger Bands plots', () => {
     const manager = new MobileIndicatorManager();
-    const onError = vi.fn();
-    manager.onErrorSubscribe(onError);
     manager.setBars(makeBars(40));
 
     const momentum = getIndicatorById('momentum');
@@ -72,18 +35,20 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(momentum).toBeDefined();
     expect(bollingerBands).toBeDefined();
 
-    const momentumId = manager.addIndicator(momentum!);
-    const bollingerBandsId = manager.addIndicator(bollingerBands!);
+    const momentumId = manager.addIndicator(momentum!, { length: 10 });
+    const bollingerBandsId = manager.addIndicator(bollingerBands!, { length: 20, mult: 2 });
 
-    expect(manager.getPlots()).toHaveLength(0);
-    expectWebViewRequired(onError, momentumId);
-    expectWebViewRequired(onError, bollingerBandsId);
+    const plots = manager.getPlots();
+    const momentumPlots = plots.filter((plot) => plot.scriptId === momentumId);
+    const bollingerBandsPlots = plots.filter((plot) => plot.scriptId === bollingerBandsId);
+
+    expect(momentumPlots.some((plot) => plot.values.some((value) => typeof value === 'number'))).toBe(true);
+    expect(bollingerBandsPlots).toHaveLength(3);
+    expect(bollingerBandsPlots.every((plot) => plot.values.some((value) => typeof value === 'number'))).toBe(true);
   });
 
-  it('adds caller-provided TealScript metadata while failing execution loudly', () => {
+  it('adds caller-provided Tealscript and tags plots with the returned instance ID', () => {
     const manager = new MobileIndicatorManager();
-    const onError = vi.fn();
-    manager.onErrorSubscribe(onError);
     manager.setBars(makeBars(3));
 
     const instanceId = manager.addTealscriptIndicator({
@@ -98,16 +63,49 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getIndicatorPaneInfo()[instanceId]).toMatchObject({
       name: 'AI WMA',
       overlay: true,
+      format: 'volume',
+      precision: 0,
+      scale: 'right',
     });
-    expect(manager.getPlots()).toHaveLength(0);
-    expect(manager.getDrawings()).toHaveLength(0);
-    expectWebViewRequired(onError, instanceId);
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0]).toMatchObject({
+      scriptId: instanceId,
+      type: 'plot',
+    });
+    expect(manager.getPlots()[0].values).toEqual([101, 102, 103]);
+    expect(manager.getDeclaration(instanceId)).toMatchObject({
+      title: 'AI WMA',
+      overlay: true,
+      format: 'volume',
+      precision: 0,
+      scale: 'right',
+    });
+    expect(manager.getIndicator(instanceId)?.declaration).toMatchObject({
+      title: 'AI WMA',
+      overlay: true,
+    });
   });
 
-  it('does not expose stale drawings when TealScript execution is unavailable', () => {
+  it('selects the closure backend through the shared runtime selector', () => {
+    const manager = new MobileIndicatorManager({ enableTealscriptClosureBackend: true });
+    manager.setBars(makeBars(3));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'closure-mobile',
+      name: 'Closure Mobile',
+      code: 'indicator("Closure Mobile")\nplot(close + 1)',
+    });
+
+    expect(manager.getPlots()[0]?.values).toEqual([102, 103, 104]);
+    expect(manager.getIndicator(instanceId)?.runtimeProfile).toMatchObject({
+      executionMode: 'closure',
+      selectedBackend: 'closure',
+      backendSelectionSource: 'flag',
+    });
+  });
+
+  it('retains Tealscript drawings and tags them with the returned instance ID', () => {
     const manager = new MobileIndicatorManager();
-    const onError = vi.fn();
-    manager.onErrorSubscribe(onError);
     manager.setBars(makeBars(2));
 
     const instanceId = manager.addTealscriptIndicator({
@@ -117,11 +115,19 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       code: 'indicator("Drawing Study", overlay=true)\nlabel.new(bar_index, close, text="mark")',
     });
 
-    expect(manager.getDrawings()).toHaveLength(0);
-    expectWebViewRequired(onError, instanceId);
+    expect(manager.getDrawings()).toHaveLength(2);
+    expect(manager.getDrawings()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          scriptId: instanceId,
+          type: 'label',
+          text: 'mark',
+        }),
+      ]),
+    );
   });
 
-  it('removes custom TealScript pane metadata by instance ID', () => {
+  it('removes custom Tealscript plots and pane metadata by instance ID', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(2));
 
@@ -130,7 +136,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       code: 'indicator("AI Close")\nplot(close)',
     });
 
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(manager.getPlots()).toHaveLength(1);
 
     manager.removeIndicator(instanceId);
 
@@ -140,7 +146,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(manager.getIndicatorPaneInfo()[instanceId]).toBeUndefined();
   });
 
-  it('toggles custom TealScript visibility without removing layout metadata', () => {
+  it('toggles custom Tealscript visibility without removing layout metadata', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(2));
 
@@ -149,10 +155,11 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       code: 'indicator("Toggle Study")\nplot(close)',
     });
 
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(manager.getPlots()).toHaveLength(1);
 
     manager.setIndicatorVisibility(instanceId, false);
 
+    expect(manager.getPlots()).toHaveLength(0);
     expect(manager.getIndicator(instanceId)).toBeDefined();
     expect(manager.getLayoutIndicators()[0]).toMatchObject({
       id: instanceId,
@@ -161,14 +168,14 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
 
     manager.toggleIndicatorVisibility(instanceId);
 
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(manager.getPlots()).toHaveLength(1);
     expect(manager.getLayoutIndicators()[0]).toMatchObject({
       id: instanceId,
       isVisible: true,
     });
   });
 
-  it('returns an instance ID and reports parse errors for invalid TealScript', () => {
+  it('returns an instance ID and reports parse errors for invalid Tealscript', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
     manager.onErrorSubscribe(onError);
@@ -221,7 +228,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     );
   });
 
-  it('upserts caller-stable custom TealScript IDs without stale output', () => {
+  it('upserts caller-stable custom Tealscript IDs', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(2));
 
@@ -239,10 +246,12 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(secondId).toBe(firstId);
     expect(manager.getIndicators()).toHaveLength(1);
     expect(manager.getIndicator(secondId)?.indicator.name).toBe('Second');
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0].scriptId).toBe(secondId);
+    expect(manager.getPlots()[0].values).toEqual([100, 101]);
   });
 
-  it('keeps non-overlay indicator panes present even when execution is unavailable', () => {
+  it('auto-scales non-overlay indicator panes from computed plot values', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(3));
 
@@ -257,6 +266,8 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
       .panes.find((pane) => pane.type === 'indicator' && pane.indicatorIds?.includes(instanceId));
 
     expect(indicatorPane).toBeDefined();
+    expect(indicatorPane?.yMin).toBeLessThan(101);
+    expect(indicatorPane?.yMax).toBeGreaterThan(103);
   });
 
   it('exports built-in indicator metadata for layout persistence', () => {
@@ -284,7 +295,7 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     ]);
   });
 
-  it('reports the WebView requirement once until the error changes', () => {
+  it('reports runtime errors once until the error changes', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
     manager.onErrorSubscribe(onError);
@@ -300,10 +311,17 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     expect(instanceId).toBe('broken-runtime');
     expect(manager.getPlots()).toHaveLength(0);
     expect(onError).toHaveBeenCalledTimes(1);
-    expectWebViewRequired(onError, instanceId);
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'runtime',
+        severity: 'error',
+        message: expect.stringContaining('missingRuntime'),
+      }),
+    );
   });
 
-  it('fails loudly for request-backed scripts until the WebView host lands', () => {
+  it('reports missing request data on mobile as a provider warning, not a script failure', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
     manager.onErrorSubscribe(onError);
@@ -315,114 +333,53 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     });
 
     expect(instanceId).toBe('mobile-request-provider');
-    expectWebViewRequired(onError, instanceId);
-  });
-
-  it('executes TealScript through a supplied WebView worker factory', async () => {
-    const worker = new FakeWorker();
-    const manager = new MobileIndicatorManager({
-      createWorker: () => worker as unknown as Worker,
-    });
-    manager.setBars(makeBars(2));
-
-    const instanceId = manager.addTealscriptIndicator({
-      id: 'mobile-webview-study',
-      code: 'indicator("Mobile WebView")\nplot(close)',
-      inputs: { length: 2 },
-    });
-
-    worker.emit({ type: 'ready' });
-    await flushWorkerInit();
-
-    expect(worker.messages[0]).toMatchObject({
-      type: 'init',
-      scriptId: instanceId,
-      inputs: { length: 2 },
-      bars: makeBars(2),
-      runtime: {
-        backend: {},
-      },
-    });
-
-    const plot: PlotOutput = {
-      id: 'plot_close',
-      type: 'plot',
-      title: 'Close',
-      values: [101, 102],
-      color: '#ffffff',
-    };
-    worker.emit(createResultMessage(instanceId, {
-      alerts: [],
-      drawings: [],
-      inputs: [],
-      plots: [plot],
-      profile: {
-        executionMode: 'compiled',
-        selectedBackend: 'compiled',
-        backendSelectionSource: 'default',
-        elapsedMs: 2,
-        bars: 2,
-        statements: 1,
-        expressions: 1,
-        builtinCalls: 1,
-        requestContexts: 0,
-        maxBarsBack: 0,
-        errors: 0,
-      },
-    }));
-
-    expect(manager.getPlots()).toEqual([{ ...plot, scriptId: instanceId }]);
-  });
-
-  it('adapts mobile request datafeeds to worker requestData messages', async () => {
-    const worker = new FakeWorker();
-    const manager = new MobileIndicatorManager({
-      createWorker: () => worker as unknown as Worker,
-      getRequestDatafeed: () => ({
-        getBars: () => ({
-          ok: true,
-          context: {
-            symbol: 'EXT',
-            timeframe: 'D',
-            bars: makeBars(2),
-          },
-        }),
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'runtime',
+        severity: 'warning',
+        code: 'request-data-unavailable',
+        message: expect.stringContaining('request.security'),
       }),
-    });
-    manager.setBars(makeBars(2));
+    );
+    const error = onError.mock.calls[0]?.[1];
+    expect(error.message).toContain('not supported in this chart');
+    expect(error.message).toContain('The script is valid');
+    expect(error.message.toLowerCase()).not.toContain('script failed');
+    expect(error.message.toLowerCase()).not.toContain('script is invalid');
+  });
+
+  it('resolves request-backed scripts from a mobile host request datafeed', () => {
+    const requestDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'EXT',
+        timeframe: '1',
+        bars: makeBars(3).map((bar, index) => ({
+          ...bar,
+          open: 200 + index,
+          high: 205 + index,
+          low: 195 + index,
+          close: 201 + index,
+        })),
+      },
+    ]);
+    const manager = new MobileIndicatorManager({ getRequestDatafeed: () => requestDatafeed });
+    const onError = vi.fn();
+    manager.onErrorSubscribe(onError);
+    manager.setBars(makeBars(3));
+
     const instanceId = manager.addTealscriptIndicator({
       id: 'mobile-request-provider',
-      code: 'indicator("Mobile Request")\nplot(request.security("EXT", "D", close))',
+      code: 'indicator("Mobile Request")\nplot(request.security("EXT", "1", close, lookahead=barmerge.lookahead_on))',
     });
 
-    worker.emit({ type: 'ready' });
-    await flushWorkerInit();
-    worker.emit({
-      type: 'requestData',
-      scriptId: instanceId,
-      requestId: 7,
-      generation: 1,
-      kind: 'bars',
-      query: { symbol: 'EXT', timeframe: 'D' },
-    } satisfies TealscriptRequestDataMessage);
-    await flushWorkerInit();
-
-    expect(worker.messages.at(-1)).toMatchObject({
-      type: 'requestDataResult',
-      scriptId: instanceId,
-      requestId: 7,
-      generation: 1,
-      kind: 'bars',
-      ok: true,
-      value: {
-        symbol: 'EXT',
-        timeframe: 'D',
-        bars: makeBars(2),
-      },
-    });
+    expect(instanceId).toBe('mobile-request-provider');
+    expect(onError).not.toHaveBeenCalled();
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0]?.values).toEqual([201, 202, 203]);
   });
 
-  it('pins the measured mobile TealScript capability gap against the web path', () => {
+  it('pins the measured mobile Tealscript capability gap against the web path', () => {
     expect(
       MOBILE_TEALSCRIPT_CAPABILITY_BASELINE.map(({ capability, mobileStatus, webStatus }) => ({
         capability,
@@ -455,10 +412,15 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
         mobileStatus: 'supported',
         webStatus: 'supported',
       },
+      {
+        capability: 'on-device closure execution proof',
+        mobileStatus: 'visible-gap',
+        webStatus: 'supported',
+      },
     ]);
   });
 
-  it('fails loudly for imported-library scripts until the WebView host lands', () => {
+  it('reports imported-library scripts without a mobile registry as runtime errors', () => {
     const manager = new MobileIndicatorManager();
     const onError = vi.fn();
     manager.onErrorSubscribe(onError);
@@ -466,12 +428,84 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
 
     const instanceId = manager.addTealscriptIndicator({
       id: 'mobile-imported-library',
-      code: '\nimport TestUser/RangeTools/1 as rt\nindicator("Mobile Imported Library")\nplot(rt.adjusted(close))\n',
+      code: `
+import TestUser/RangeTools/1 as rt
+indicator("Mobile Imported Library")
+plot(rt.adjusted(close))
+`,
     });
 
     expect(instanceId).toBe('mobile-imported-library');
     expect(manager.getPlots()).toHaveLength(0);
-    expectWebViewRequired(onError, instanceId);
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'runtime',
+        severity: 'error',
+        message: expect.stringContaining('import not found in deterministic library registry'),
+      }),
+    );
+  });
+
+  it('resolves imported libraries from a mobile host registry', () => {
+    const library = parse(`
+library("RangeTools")
+export adjusted(float source) => source + 10
+`);
+    const libraries = new Map([['TestUser/RangeTools/1', library]]);
+    const manager = new MobileIndicatorManager({ getLibraries: () => libraries });
+    const onError = vi.fn();
+    manager.onErrorSubscribe(onError);
+    manager.setBars(makeBars(3));
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-imported-library',
+      code: `
+import TestUser/RangeTools/1 as rt
+indicator("Mobile Imported Library")
+plot(rt.adjusted(close))
+`,
+    });
+
+    expect(instanceId).toBe('mobile-imported-library');
+    expect(onError).not.toHaveBeenCalled();
+    expect(manager.getPlots()).toHaveLength(1);
+    expect(manager.getPlots()[0]?.values).toEqual([111, 112, 113]);
+  });
+
+  it('runs the closure smoke helper through the mobile manager path', () => {
+    const bars = makeBars(3);
+    const source = 'indicator("Mobile Closure Smoke")\nplot(close + 1)';
+    const reference = executeSelectedTealscriptBackend(parse(source), bars, undefined, {
+      runtime: {
+        backend: {
+          executionBackendOverride: 'closure',
+          defaultBackend: 'compiled',
+        },
+      },
+    });
+
+    const result = runMobileTealscriptClosureSmoke({
+      cases: [
+        {
+          id: 'mobile-closure-smoke',
+          source,
+          bars,
+          expectedOutput: {
+            plots: reference.plots,
+            drawings: reference.drawings,
+          },
+        },
+      ],
+      now: () => 0,
+    });
+
+    expect(result.total).toBe(1);
+    expect(result.matched).toBe(1);
+    expect(result.failed).toBe(0);
+    expect(result.mismatched).toBe(0);
+    expect(result.results[0]?.executionMode).toBe('closure');
+    expect(result.results[0]?.selectedBackend).toBe('closure');
   });
 });
 
@@ -494,36 +528,39 @@ describe('MobileIndicatorManager recomputation cache', () => {
     return { left, right };
   }
 
-  it('leaves indicators registered when one is hidden', () => {
+  function plotsFor(manager: MobileIndicatorManager, scriptId: string) {
+    return manager.getPlots().filter((plot) => plot.scriptId === scriptId);
+  }
+
+  it('leaves the other indicators untouched when one is hidden', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(4));
     const { left, right } = addTwo(manager);
+    const beforeLeft = plotsFor(manager, left);
 
     manager.setIndicatorVisibility(right, false);
 
-    expect(manager.getPlots()).toHaveLength(0);
-    expect(manager.getIndicator(left)).toBeDefined();
-    expect(manager.getIndicator(right)).toBeDefined();
-    expect(manager.getLayoutIndicators().find((indicator) => indicator.id === right)).toMatchObject({
-      isVisible: false,
-    });
+    expect(plotsFor(manager, right)).toHaveLength(0);
+    expect(plotsFor(manager, left)).toEqual(beforeLeft);
+    // Reference identity is the assertion: a re-execution would mint new objects.
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft[0]);
   });
 
-  it('leaves existing indicators registered when another is added or removed', () => {
+  it('leaves the existing indicators untouched when another is added or removed', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(4));
     const { left } = addTwo(manager);
+    const beforeLeft = plotsFor(manager, left)[0];
 
     const added = manager.addTealscriptIndicator({ id: 'third', code: 'indicator("Third")\nplot(high)' });
-    expect(manager.getIndicator(left)).toBeDefined();
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft);
 
     manager.removeIndicator(added);
-    expect(manager.getIndicator(left)).toBeDefined();
-    expect(manager.getIndicator(added)).toBeUndefined();
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft);
+    expect(plotsFor(manager, added)).toHaveLength(0);
   });
 
-  it('updates metadata without producing stale plots when inputs change', () => {
+  it('re-executes only the indicator whose inputs changed', () => {
     const manager = new MobileIndicatorManager();
     manager.setBars(makeBars(6));
     const { left } = addTwo(manager);
@@ -531,25 +568,32 @@ describe('MobileIndicatorManager recomputation cache', () => {
       id: 'tuned',
       code: 'indicator("Tuned")\nlength = input.int(2, "length")\nplot(ta.sma(close, length))',
     });
+    const beforeLeft = plotsFor(manager, left)[0];
+    const beforeTuned = plotsFor(manager, tuned)[0];
 
+    // The engine registers inputs as `input_<title>`, so a bare `length` key
+    // would re-execute with the default and prove nothing.
     manager.updateInputs(tuned, { input_length: 4 });
 
-    expect(manager.getIndicator(left)).toBeDefined();
-    expect(manager.getIndicator(tuned)?.inputs).toEqual({ input_length: 4 });
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(plotsFor(manager, left)[0]).toBe(beforeLeft);
+    expect(plotsFor(manager, tuned)[0]).not.toBe(beforeTuned);
+    expect(plotsFor(manager, tuned)[0]?.values).not.toEqual(beforeTuned?.values);
   });
 
-  it('keeps TealScript unavailable when bars advance', () => {
+  it('re-executes everything when bars advance, including an appended live bar', () => {
     const manager = new MobileIndicatorManager();
     const bars = makeBars(4);
     manager.setBars(bars);
     const { left } = addTwo(manager);
+    const beforeLeft = plotsFor(manager, left)[0];
 
+    // ChartWidgetCore appends the live bar in place and re-passes the same array,
+    // so an identity-keyed cache would freeze the plots here.
     bars.push({ time: 1_700_000_240_000, open: 104, high: 106, low: 103, close: 105, volume: 1004 });
     manager.setBars(bars);
 
-    expect(manager.getIndicator(left)).toBeDefined();
-    expect(manager.getPlots()).toHaveLength(0);
+    expect(plotsFor(manager, left)[0]).not.toBe(beforeLeft);
+    expect(plotsFor(manager, left)[0]?.values).toHaveLength(5);
   });
 
   it('separates the plot revision from the indicator revision', () => {
@@ -562,10 +606,12 @@ describe('MobileIndicatorManager recomputation cache', () => {
 
     manager.setBars(makeBars(5));
     expect(manager.getIndicatorsRevision()).toBe(indicatorsAfterAdd);
-    expect(manager.getPlotsRevision()).toBe(plotsAfterAdd);
+    expect(manager.getPlotsRevision()).toBeGreaterThan(plotsAfterAdd);
 
+    const plotsAfterBars = manager.getPlotsRevision();
     manager.setIndicatorVisibility(right, false);
     expect(manager.getIndicatorsRevision()).toBeGreaterThan(indicatorsAfterAdd);
+    expect(manager.getPlotsRevision()).toBeGreaterThan(plotsAfterBars);
   });
 
   it('advances the indicator revision for a style override', () => {
@@ -600,7 +646,6 @@ describe('MobileIndicatorManager recomputation cache', () => {
 
     manager.updateInputs(left, {});
 
-    expect(manager.getIndicator(left)).toBeDefined();
     expect(manager.getPlots()).toBe(before);
     expect(manager.getPlotsRevision()).toBe(revisionBefore);
   });

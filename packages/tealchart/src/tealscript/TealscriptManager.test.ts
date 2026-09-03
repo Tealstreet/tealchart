@@ -276,9 +276,9 @@ describe('TealscriptManager', () => {
       inputs: [],
       metadata: initMessage?.metadata,
       profile: runtimeProfile({
-        executionMode: 'compiled',
-        selectedBackend: 'compiled',
-        backendSelectionSource: 'explicit',
+        executionMode: 'closure',
+        selectedBackend: 'closure',
+        backendSelectionSource: 'flag',
         elapsedMs: 8,
         bars: 2,
       }),
@@ -289,9 +289,9 @@ describe('TealscriptManager', () => {
         scriptId: 'study-1',
         status: 'ok',
         outputKind: 'visual',
-        executionMode: 'compiled',
-        selectedBackend: 'compiled',
-        backendSelectionSource: 'explicit',
+        executionMode: 'closure',
+        selectedBackend: 'closure',
+        backendSelectionSource: 'flag',
         fallbackKind: 'none',
         elapsedMs: 8,
         bars: 2,
@@ -371,8 +371,8 @@ describe('TealscriptManager', () => {
         column: 1,
       },
       profile: runtimeProfile({
-        executionMode: 'compiled',
-        selectedBackend: 'compiled',
+        executionMode: 'closure',
+        selectedBackend: 'closure',
         backendSelectionSource: 'explicit',
         elapsedMs: 3,
         bars: 1,
@@ -388,8 +388,8 @@ describe('TealscriptManager', () => {
         severity: 'error',
         code: 'runtime.error',
         profile: {
-          executionMode: 'compiled',
-          selectedBackend: 'compiled',
+          executionMode: 'closure',
+          selectedBackend: 'closure',
         },
       },
     });
@@ -398,8 +398,8 @@ describe('TealscriptManager', () => {
         scriptId: 'study-1',
         status: 'runtime-error',
         outputKind: 'empty',
-        executionMode: 'compiled',
-        selectedBackend: 'compiled',
+        executionMode: 'closure',
+        selectedBackend: 'closure',
         backendSelectionSource: 'explicit',
         fallbackKind: 'runtime-error',
         elapsedMs: 3,
@@ -413,7 +413,7 @@ describe('TealscriptManager', () => {
     ]);
   });
 
-  it('surfaces unsupported compiled realtime constructs as fatal diagnostics', async () => {
+  it('surfaces realtime compiled fallbacks as actionable nonfatal diagnostics', async () => {
     const worker = new FakeWorker();
     const plotUpdates: PlotOutput[][] = [];
     const errors: Array<{ scriptId: string; error: WorkerError }> = [];
@@ -429,15 +429,14 @@ describe('TealscriptManager', () => {
     await addScript;
 
     const [initMessage] = worker.messages as PostedWorkerMessage[];
-    worker.emit({
-      type: 'error',
-      scriptId: 'study-1',
-      message: 'Compiled realtime execution does not support this script: compiled-worker-stateless-intrabar-reentry: varip-declaration',
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
       metadata: initMessage?.metadata,
       profile: {
-        executionMode: 'compiled',
-        selectedBackend: 'compiled',
-        backendSelectionSource: 'default',
+        executionMode: 'interpreter',
         fallbackReason: 'compiled-worker-stateless-intrabar-reentry: varip-declaration',
         fallbackDiagnostics: [
           {
@@ -448,28 +447,66 @@ describe('TealscriptManager', () => {
             column: 1,
           },
         ],
-        elapsedMs: 0,
+        elapsedMs: 1,
         bars: 2,
         statements: 0,
         expressions: 0,
         builtinCalls: 0,
         requestContexts: 0,
         maxBarsBack: 0,
-        errors: 1,
+        errors: 0,
       },
-    });
+    }));
+    worker.emit(createResultMessage('study-1', {
+      plots: [plot],
+      drawings: [],
+      alerts: [],
+      inputs: [],
+      metadata: initMessage?.metadata,
+      profile: {
+        executionMode: 'interpreter',
+        fallbackReason: 'compiled-worker-stateless-intrabar-reentry: varip-declaration',
+        fallbackDiagnostics: [
+          {
+            reason: 'varip-declaration',
+            construct: 'varip declaration ticks',
+            message: 'varip declaration ticks keeps intrabar state between realtime ticks.',
+            line: 2,
+            column: 1,
+          },
+        ],
+        elapsedMs: 1,
+        bars: 2,
+        statements: 0,
+        expressions: 0,
+        builtinCalls: 0,
+        requestContexts: 0,
+        maxBarsBack: 0,
+        errors: 0,
+      },
+    }));
 
-    expect(plotUpdates).toEqual([[]]);
+    expect(plotUpdates).toEqual([
+      [{ ...plot, scriptId: 'study-1' }],
+      [{ ...plot, scriptId: 'study-1' }],
+    ]);
     expect(errors).toHaveLength(1);
     expect(errors[0]).toMatchObject({
       scriptId: 'study-1',
       error: {
         type: 'runtime',
-        severity: 'error',
+        severity: 'warning',
+        code: 'realtime-compiled-fallback',
+        line: 2,
+        column: 1,
       },
     });
-    expect(errors[0]!.error.message).toContain('Compiled realtime execution does not support this script');
-    expect(manager.getAllPlots()).toEqual([]);
+    expect(errors[0]!.error.message).toContain("output stays correct");
+    expect(errors[0]!.error.message).toContain("live ticks can be slower");
+    expect(errors[0]!.error.message).toContain("Trigger: varip declaration ticks at line 2, column 1");
+    expect(errors[0]!.error.message).toContain("remove or rewrite that stateful intrabar construct");
+    expectNonErrorDiagnosticMessage(errors[0]!.error.message);
+    expect(manager.getAllPlots()).toEqual([{ ...plot, scriptId: 'study-1' }]);
   });
 
   it('surfaces unsettled init errors when a live update is already pending', async () => {

@@ -169,14 +169,15 @@ export type {
 export { Scope, createRootScope, type VarKind, type VariableEntry, type ScopeSnapshot } from './scope';
 
 export {
+  TealscriptEngine,
   executeScript,
   type ExecutionResult,
   type ExecutionError,
   type RuntimeProfile,
   type IndicatorDeclarationMetadata,
-  type TealscriptExecutionOptions,
+  type TealscriptEngineOptions,
   type TealscriptRuntimeOptions,
-} from './compiledOnly';
+} from './engine';
 
 export {
   DEFAULT_TEALSCRIPT_EXECUTION_BACKEND,
@@ -192,6 +193,14 @@ export {
   executeSelectedTealscriptBackend,
   type SelectedTealscriptExecutionOptions,
 } from './executeSelected';
+
+export {
+  executeClosure,
+  executeClosureScript,
+  tryCompileClosure,
+  type ClosureCompiledScript,
+  type ClosureExecutionOptions,
+} from './closure/execute';
 
 export {
   CacheBackedRequestDatafeed,

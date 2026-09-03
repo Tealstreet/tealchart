@@ -1,0 +1,1177 @@
+/**
+ * Tealscript Runtime Tests
+ */
+
+import { describe, expect, it } from 'vitest';
+
+import { parse } from '../../src/parser';
+import {
+  Series,
+  seriesFrom,
+  ExecutionContext,
+  Scope,
+  TealscriptEngine,
+  createPineArray,
+  createPineMatrix,
+  getArraySize,
+  getArrayValue,
+  getMatrixValue,
+  pushArrayValue,
+  setMatrixValue,
+  executeScript,
+  type Bar,
+} from '../../src/runtime';
+
+// Helper to create test bars
+function createBars(count: number, startPrice: number = 100): Bar[] {
+  const bars: Bar[] = [];
+  let price = startPrice;
+
+  for (let i = 0; i < count; i++) {
+    const open = price;
+    const change = (Math.random() - 0.5) * 2; // Random change between -1 and 1
+    const close = price + change;
+    const high = Math.max(open, close) + Math.random();
+    const low = Math.min(open, close) - Math.random();
+
+    bars.push({
+      time: Date.now() - (count - i) * 60000,
+      open,
+      high,
+      low,
+      close,
+      volume: Math.floor(Math.random() * 1000) + 100,
+    });
+
+    price = close;
+  }
+
+  return bars;
+}
+
+// Helper to create predictable bars
+function createPredictableBars(): Bar[] {
+  return [
+    { time: 1000, open: 100, high: 105, low: 95, close: 102, volume: 1000 },
+    { time: 2000, open: 102, high: 108, low: 100, close: 106, volume: 1200 },
+    { time: 3000, open: 106, high: 110, low: 104, close: 108, volume: 800 },
+    { time: 4000, open: 108, high: 112, low: 106, close: 104, volume: 1500 },
+    { time: 5000, open: 104, high: 107, low: 101, close: 103, volume: 900 },
+  ];
+}
+
+describe('Series', () => {
+  describe('basic operations', () => {
+    it('starts empty', () => {
+      const series = new Series<number>();
+      expect(series.isEmpty).toBe(true);
+      expect(series.length).toBe(0);
+    });
+
+    it('stores and retrieves values', () => {
+      const series = new Series<number>();
+      series.advance();
+      series.set(10);
+
+      expect(series.get(0)).toBe(10);
+      expect(series.isEmpty).toBe(false);
+    });
+
+    it('supports history access', () => {
+      const series = new Series<number>();
+
+      series.advance();
+      series.set(10);
+      series.commit();
+
+      series.advance();
+      series.set(20);
+      series.commit();
+
+      series.advance();
+      series.set(30);
+
+      expect(series.get(0)).toBe(30); // Current
+      expect(series.get(1)).toBe(20); // Previous
+      expect(series.get(2)).toBe(10); // 2 bars ago
+      expect(series.get(3)).toBeUndefined(); // Beyond history
+    });
+
+    it('handles rollback', () => {
+      const series = new Series<number>();
+
+      series.advance();
+      series.set(10);
+      series.commit();
+
+      series.advance();
+      series.set(20);
+      // Don't commit - simulate realtime
+
+      expect(series.get(0)).toBe(20);
+
+      series.rollback();
+
+      // After rollback, uncommitted value is discarded
+      expect(series.getCommitted()).toBe(undefined);
+    });
+
+    it('converts to array', () => {
+      const series = new Series<number>();
+
+      series.advance();
+      series.set(1);
+      series.commit();
+
+      series.advance();
+      series.set(2);
+      series.commit();
+
+      series.advance();
+      series.set(3);
+      series.commit();
+
+      const arr = series.toArray();
+      expect(arr).toEqual([1, 2, 3]);
+    });
+  });
+
+  describe('seriesFrom helper', () => {
+    it('creates series from array', () => {
+      const series = seriesFrom([10, 20, 30, 40, 50]);
+
+      expect(series.get(0)).toBe(50);
+      expect(series.get(1)).toBe(40);
+      expect(series.get(2)).toBe(30);
+      expect(series.get(3)).toBe(20);
+      expect(series.get(4)).toBe(10);
+    });
+  });
+});
+
+describe('ExecutionContext', () => {
+  it('loads bars correctly', () => {
+    const bars = createPredictableBars();
+    const ctx = new ExecutionContext();
+    ctx.loadBars(bars);
+
+    expect(ctx.last_bar_index).toBe(4);
+    expect(ctx.bar_index).toBe(-1);
+  });
+
+  it('advances through bars', () => {
+    const bars = createPredictableBars();
+    const ctx = new ExecutionContext();
+    ctx.loadBars(bars);
+
+    ctx.advanceBar();
+    expect(ctx.bar_index).toBe(0);
+    expect(ctx.close.get(0)).toBe(102);
+
+    ctx.advanceBar();
+    expect(ctx.bar_index).toBe(1);
+    expect(ctx.close.get(0)).toBe(106);
+    expect(ctx.close.get(1)).toBe(102); // History access
+  });
+
+  it('computes hl2, hlc3, ohlc4', () => {
+    const bars = createPredictableBars();
+    const ctx = new ExecutionContext();
+    ctx.loadBars(bars);
+
+    ctx.advanceBar();
+
+    // First bar: open=100, high=105, low=95, close=102
+    expect(ctx.hl2).toBe((105 + 95) / 2); // 100
+    expect(ctx.hlc3).toBe((105 + 95 + 102) / 3); // 100.67
+    expect(ctx.ohlc4).toBe((100 + 105 + 95 + 102) / 4); // 100.5
+  });
+
+  it('tracks barstate correctly', () => {
+    const bars = createPredictableBars();
+    const ctx = new ExecutionContext();
+    ctx.loadBars(bars);
+
+    ctx.advanceBar();
+    expect(ctx.barstate.isfirst).toBe(true);
+    expect(ctx.barstate.islast).toBe(false);
+    expect(ctx.barstate.ishistory).toBe(true);
+    expect(ctx.barstate.isrealtime).toBe(false);
+    expect(ctx.barstate.isnew).toBe(true);
+    expect(ctx.barstate.isconfirmed).toBe(true);
+    expect(ctx.barstate.islastconfirmedhistory).toBe(false);
+
+    while (ctx.advanceBar()) {
+      // Continue
+    }
+
+    // At last bar
+    expect(ctx.barstate.islast).toBe(true);
+    expect(ctx.barstate.isfirst).toBe(false);
+    expect(ctx.barstate.islastconfirmedhistory).toBe(true);
+
+    ctx.updateCurrentBar({ ...bars[bars.length - 1], close: 120 });
+    expect(ctx.barstate.islast).toBe(true);
+    expect(ctx.barstate.ishistory).toBe(false);
+    expect(ctx.barstate.isrealtime).toBe(true);
+    expect(ctx.barstate.isnew).toBe(false);
+    expect(ctx.barstate.isconfirmed).toBe(false);
+    expect(ctx.barstate.islastconfirmedhistory).toBe(false);
+  });
+});
+
+describe('Scope', () => {
+  it('declares and gets variables', () => {
+    const scope = new Scope();
+    scope.declare('x', 'none', 42);
+
+    expect(scope.get('x')).toBe(42);
+    expect(scope.has('x')).toBe(true);
+    expect(scope.has('y')).toBe(false);
+  });
+
+  it('handles child scopes', () => {
+    const parent = new Scope();
+    parent.declare('x', 'none', 10);
+
+    const child = parent.createChild();
+    child.declare('y', 'none', 20);
+
+    // Child can access parent
+    expect(child.get('x')).toBe(10);
+    expect(child.get('y')).toBe(20);
+
+    // Parent cannot access child
+    expect(parent.get('y')).toBeUndefined();
+  });
+
+  it('var persists across advanceBar', () => {
+    const scope = new Scope();
+
+    // First bar
+    scope.declare('counter', 'var', 0);
+    scope.commit();
+
+    // Second bar
+    scope.advanceBar();
+
+    // var should persist
+    expect(scope.getEntry('counter')?.initialized).toBe(true);
+  });
+
+  it('regular var resets on advanceBar', () => {
+    const scope = new Scope();
+
+    scope.declare('temp', 'none', 100);
+    expect(scope.get('temp')).toBe(100);
+
+    scope.commit();
+    scope.advanceBar();
+
+    // Regular var is reset
+    const entry = scope.getEntry('temp');
+    expect(entry?.initialized).toBe(false);
+  });
+
+  it('rolls back in-place matrix mutations', () => {
+    const scope = new Scope();
+    const matrix = createPineMatrix<number>(1, 1, 1);
+    scope.declare('matrix', 'var', matrix);
+    scope.commit(true);
+
+    setMatrixValue(matrix, 0, 0, 9);
+    scope.rollback();
+
+    const restored = scope.get('matrix');
+    expect(getMatrixValue(restored as typeof matrix, 0, 0)).toBe(1);
+    expect(restored).not.toBe(matrix);
+  });
+
+  it('rolls back in-place array mutations', () => {
+    const scope = new Scope();
+    const array = createPineArray<number>();
+    pushArrayValue(array, 1);
+    scope.declare('array', 'var', array);
+    scope.commit(true);
+
+    pushArrayValue(array, 2);
+    scope.rollback();
+
+    const restored = scope.get('array') as typeof array;
+    expect(getArrayValue(restored, 0)).toBe(1);
+    expect(getArraySize(restored)).toBe(1);
+    expect(restored).not.toBe(array);
+  });
+});
+
+describe('TealscriptEngine', () => {
+  const bars = createPredictableBars();
+
+  describe('basic execution', () => {
+    it('executes empty program', () => {
+      const ast = parse('//@version=6\n');
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(0);
+    });
+
+    it('executes indicator declaration', () => {
+      const code = `//@version=6
+indicator("My Test Indicator", overlay=true)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.indicatorTitle).toBe('My Test Indicator');
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('executes legacy study declarations as indicators', () => {
+      const code = `//@version=4
+study("Legacy Study", shorttitle="LS", overlay=true, resolution="60", resolution_gaps=false)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.indicatorTitle).toBe('Legacy Study');
+      expect(result.declaration.shortTitle).toBe('LS');
+      expect(result.declaration.overlay).toBe(true);
+      expect(result.indicatorTimeframe).toBe('60');
+      expect(result.indicatorTimeframeGaps).toBe(false);
+      expect(result.declaration.timeframe).toBe('60');
+      expect(result.declaration.timeframeGaps).toBe(false);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('executes variable declarations', () => {
+      const code = `//@version=6
+indicator("Test")
+x = 42
+y = x + 8
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('accesses built-in series', () => {
+      const code = `//@version=6
+indicator("Test")
+x = close
+y = open + high
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+
+  describe('expressions', () => {
+    it('evaluates arithmetic', () => {
+      const code = `//@version=6
+indicator("Test")
+a = 10 + 5
+b = 10 - 5
+c = 10 * 5
+d = 10 / 5
+e = 10 % 3
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('division by zero produces na (null plot values), not Infinity', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(1 / 0, "pos")
+plot(0 / 0, "zero")
+plot(-1 / 0, "neg")
+plot(na(1 / 0) ? 1 : 0, "na_check")
+plot(nz(1 / 0, 99), "nz_check")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+      // All bars should be null (na) for div-by-zero plots
+      expect(result.plots[0].values.every((v) => v === null)).toBe(true);
+      expect(result.plots[1].values.every((v) => v === null)).toBe(true);
+      expect(result.plots[2].values.every((v) => v === null)).toBe(true);
+      // na(1 / 0) should be true → plots 1
+      expect(result.plots[3].values.every((v) => v === 1)).toBe(true);
+      // nz(1 / 0, 99) should be 99
+      expect(result.plots[4].values.every((v) => v === 99)).toBe(true);
+    });
+
+    it('compound /= by zero produces na', () => {
+      const code = `//@version=6
+indicator("Test")
+x = 10.0
+x /= 0
+plot(na(x) ? 1 : 0, "na_check")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.every((v) => v === 1)).toBe(true);
+    });
+
+    it('normal division still works', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(10 / 2, "result")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.every((v) => v === 5)).toBe(true);
+    });
+
+    it('evaluates comparisons', () => {
+      const code = `//@version=6
+indicator("Test")
+a = 10 > 5
+b = 10 < 5
+c = 10 == 10
+d = 10 != 5
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('evaluates ternary', () => {
+      const code = `//@version=6
+indicator("Test")
+x = close > open ? 1 : 0
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('evaluates logical operators', () => {
+      const code = `//@version=6
+indicator("Test")
+a = true and false
+b = true or false
+c = not true
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+
+  describe('history access', () => {
+    it('accesses previous bar values', () => {
+      const code = `//@version=6
+indicator("Test")
+prev = close[1]
+change = close - close[1]
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+
+  describe('control flow', () => {
+    it('executes if statements', () => {
+      const code = `//@version=6
+indicator("Test")
+var x = 0
+if close > open
+    x := 1
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('executes for loops', () => {
+      const code = `//@version=6
+indicator("Test")
+var sum = 0
+for i = 0 to 5
+    sum := sum + i
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+
+  describe('built-in functions', () => {
+    it('executes math functions', () => {
+      const code = `//@version=6
+indicator("Test")
+a = math.abs(-10)
+b = math.max(5, 10)
+c = math.min(5, 10)
+d = math.sqrt(16)
+e = math.round(3.7)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('executes Pine math constants and scalar helpers', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(math.pi, "Pi")
+plot(math.e, "Euler")
+plot(math.phi, "Phi")
+plot(math.rphi, "Rphi")
+plot(math.avg(1, 2, 3, 4), "Average")
+plot(math.round(1.2345, 2), "Rounded")
+plot(math.trunc(-1.9), "Truncated")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual(Array(bars.length).fill(Math.PI));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(Math.E));
+      expect(result.plots[2].values).toEqual(Array(bars.length).fill((1 + Math.sqrt(5)) / 2));
+      expect(result.plots[3].values).toEqual(Array(bars.length).fill(2 / (1 + Math.sqrt(5))));
+      expect(result.plots[4].values).toEqual(Array(bars.length).fill(2.5));
+      expect(result.plots[5].values).toEqual(Array(bars.length).fill(1.23));
+      expect(result.plots[6].values).toEqual(Array(bars.length).fill(-1));
+    });
+
+    it('executes Pine math angle conversion helpers', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(math.toradians(180), "Radians")
+plot(math.todegrees(math.pi / 2), "Degrees")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.map((value) => (value === null ? null : Math.round(value * 1e6) / 1e6))).toEqual(Array(bars.length).fill(3.141593));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(90));
+    });
+
+    it('executes nz function', () => {
+      const code = `//@version=6
+indicator("Test")
+x = nz(na, 0)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+
+  describe('plotting', () => {
+    it('creates plot output', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(close)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].type).toBe('plot');
+      expect(result.plots[0].values).toHaveLength(bars.length);
+    });
+
+    it('creates plot with options', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(close, "Close Price", color=color.blue, linewidth=2)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].title).toBe('Close Price');
+      // color is per-bar array, every bar should be color.blue
+      const colors = result.plots[0].color;
+      expect(Array.isArray(colors)).toBe(true);
+      expect((colors as string[]).every((c) => c === '#2196F3')).toBe(true);
+      expect(result.plots[0].linewidth).toBe(2);
+    });
+
+    it('creates colors from RGB channels and transparency', () => {
+      const code = `//@version=6
+indicator("Test")
+base = color.rgb(10, 20, 30)
+transparent = color.rgb(255, 128, 0, 50)
+updated = color.new(color.blue, 25)
+named = color.rgb(red=1, green=2, blue=3, transp=25)
+namedUpdated = color.new(color=named, transp=40)
+namedAlias = color.new(color=named, transparency=50)
+plot(close, "Base", color=base)
+plot(open, "Transparent", color=transparent)
+plot(high, "Updated", color=updated)
+plot(low, "Named", color=named)
+plot(volume, "Named Updated", color=namedUpdated)
+plot(open, "Named Alias", color=namedAlias)
+plot(close, "None", color=color.none)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#0A141EFF'));
+      expect(result.plots[1].color).toEqual(Array(bars.length).fill('#FF800080'));
+      expect(result.plots[2].color).toEqual(Array(bars.length).fill('#2196F3BF'));
+      expect(result.plots[3].color).toEqual(Array(bars.length).fill('#010203BF'));
+      expect(result.plots[4].color).toEqual(Array(bars.length).fill('#01020399'));
+      expect(result.plots[5].color).toEqual(Array(bars.length).fill('#01020380'));
+      expect(result.plots[6].color).toEqual(Array(bars.length).fill(null));
+    });
+
+    it('applies legacy visual transp arguments to colors', () => {
+      const code = `//@version=4
+study("Legacy Transparency", overlay=true)
+lineA = plot(close, "A", color=color.blue, transp=25)
+lineB = plot(open, "B", color=color.red)
+fill(lineA, lineB, color=color.green, title="Band", transp=50)
+bgcolor(color=color.yellow, transp=75, title="Background")
+barcolor(color=color.purple, transp=10, title="Bars")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'A')?.color).toEqual(Array(bars.length).fill('#2196F3BF'));
+      expect(result.plots.find((plot) => plot.title === 'Band')?.color).toEqual(Array(bars.length).fill('#4CAF5080'));
+      expect(result.plots.find((plot) => plot.title === 'Background')?.color).toEqual(Array(bars.length).fill('#FDD83540'));
+      expect(result.plots.find((plot) => plot.title === 'Bars')?.color).toEqual(Array(bars.length).fill('#9C27B0E6'));
+    });
+
+    it('applies legacy marker and OHLC transp arguments to visual colors', () => {
+      const code = `//@version=4
+study("Legacy Visual Transparency Channels", overlay=true)
+plotshape(true, title="Shape", color=color.blue, textcolor=color.white, transp=20)
+plotchar(true, title="Char", color=color.green, textcolor=color.white, transp=40)
+plotarrow(1, title="Arrow Up", colorup=color.green, colordown=color.red, transp=60)
+plotarrow(-1, title="Arrow Down", colorup=color.green, colordown=color.red, transp=60)
+plotbar(1, 2, 0, 1.5, title="Bars", color=color.purple, transp=30)
+plotcandle(1, 2, 0, 1.5, title="Candles", color=color.yellow, wickcolor=color.black, bordercolor=color.blue, transp=50)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.color).toEqual(Array(bars.length).fill('#2196F3CC'));
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.textColor).toBe('#FFFFFF');
+      expect(result.plots.find((plot) => plot.title === 'Char')?.color).toEqual(Array(bars.length).fill('#4CAF5099'));
+      expect(result.plots.find((plot) => plot.title === 'Char')?.textColor).toBe('#FFFFFF');
+      expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.color).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.colorup).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Up')?.colordown).toEqual(Array(bars.length).fill(null));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.color).toEqual(Array(bars.length).fill('#F2364566'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.colorup).toEqual(Array(bars.length).fill(null));
+      expect(result.plots.find((plot) => plot.title === 'Arrow Down')?.colordown).toEqual(Array(bars.length).fill('#F2364566'));
+      expect(result.plots.find((plot) => plot.title === 'Bars')?.color).toEqual(Array(bars.length).fill('#9C27B0B3'));
+      expect(result.plots.find((plot) => plot.title === 'Candles')?.color).toEqual(Array(bars.length).fill('#FDD83580'));
+      expect(result.plots.find((plot) => plot.title === 'Candles')?.wickColor).toEqual(Array(bars.length).fill('#363A4580'));
+      expect(result.plots.find((plot) => plot.title === 'Candles')?.borderColor).toEqual(Array(bars.length).fill('#2196F380'));
+    });
+
+    it('preserves plotarrow up and down color channels per visible arrow bar', () => {
+      const code = `//@version=6
+indicator("Dynamic Arrow Colors")
+upColor = bar_index % 2 == 0 ? color.green : color.lime
+downColor = bar_index % 2 == 0 ? color.red : color.orange
+signal = bar_index == 0 ? 1 : bar_index == 1 ? -1 : bar_index == 2 ? 0 : na
+plotarrow(signal, title="Signal", colorup=upColor, colordown=downColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'Signal')?.color).toEqual([
+        '#4CAF50',
+        '#FF9800',
+        null,
+        ...Array(bars.length - 3).fill(null),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Signal')?.colorup).toEqual([
+        '#4CAF50',
+        null,
+        null,
+        ...Array(bars.length - 3).fill(null),
+      ]);
+      expect(result.plots.find((plot) => plot.title === 'Signal')?.colordown).toEqual([
+        null,
+        '#FF9800',
+        null,
+        ...Array(bars.length - 3).fill(null),
+      ]);
+    });
+
+    it('maps v4 positional transp arguments before later visual options', () => {
+      const code = `//@version=4
+study("Legacy Positional Transparency", overlay=true)
+lineA = plot(close, "A", color.blue, 1, plot.style_line, false, 25, 0, 1)
+lineB = plot(open, "B", color.red)
+fill(lineA, lineB, color.green, 50, "Band", true, 3, false)
+bgcolor(color.yellow, 75, 0, true, 3, "Background")
+plotshape(true, "Shape", shape.circle, location.abovebar, color.blue, 20, 0, "S", color.white, true, size.small, 3)
+plotchar(true, "Char", "C", location.belowbar, color.green, 40, 0, "T", color.white, true, size.tiny, 3)
+plotarrow(1, "Arrow", color.green, color.red, 60, 0, 5, 15, true, 3)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'A')?.color).toEqual(Array(bars.length).fill('#2196F3BF'));
+      expect(result.plots.find((plot) => plot.title === 'A')?.histbase).toBe(0);
+      expect(result.plots.find((plot) => plot.title === 'A')?.offset).toBe(1);
+      expect(result.plots.find((plot) => plot.title === 'Band')?.color).toEqual(Array(bars.length).fill('#4CAF5080'));
+      expect(result.plots.find((plot) => plot.title === 'Band')?.showLast).toBe(3);
+      expect(result.plots.find((plot) => plot.title === 'Background')?.color).toEqual(Array(bars.length).fill('#FDD83540'));
+      expect(result.plots.find((plot) => plot.title === 'Background')?.showLast).toBe(3);
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.color).toEqual(Array(bars.length).fill('#2196F3CC'));
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.text).toBe('S');
+      expect(result.plots.find((plot) => plot.title === 'Shape')?.size).toBe('small');
+      expect(result.plots.find((plot) => plot.title === 'Char')?.color).toEqual(Array(bars.length).fill('#4CAF5099'));
+      expect(result.plots.find((plot) => plot.title === 'Char')?.char).toBe('C');
+      expect(result.plots.find((plot) => plot.title === 'Char')?.size).toBe('tiny');
+      expect(result.plots.find((plot) => plot.title === 'Arrow')?.color).toEqual(Array(bars.length).fill('#4CAF5066'));
+      expect(result.plots.find((plot) => plot.title === 'Arrow')?.minHeight).toBe(5);
+      expect(result.plots.find((plot) => plot.title === 'Arrow')?.maxHeight).toBe(15);
+    });
+
+    it('keeps v6 positional plot histbase distinct from legacy transp', () => {
+      const code = `//@version=6
+indicator("V6 Positional Plot")
+plot(close, "V6", color.blue, 1, plot.style_line, false, 25)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots.find((plot) => plot.title === 'V6')?.color).toEqual(Array(bars.length).fill('#2196F3'));
+      expect(result.plots.find((plot) => plot.title === 'V6')?.histbase).toBe(25);
+    });
+
+    it('extracts color channels and transparency', () => {
+      const code = `//@version=6
+indicator("Test")
+sample = color.rgb(10, 20, 30, 40)
+plot(color.r(sample), "Red")
+plot(color.g(sample), "Green")
+plot(color.b(sample), "Blue")
+plot(color.t(sample), "Transparency")
+plot(color.r(color=sample), "Named Red")
+plot(color.t(color=sample), "Named Transparency")
+plot(color.r(color.blue), "Blue Red")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values).toEqual(Array(bars.length).fill(10));
+      expect(result.plots[1].values).toEqual(Array(bars.length).fill(20));
+      expect(result.plots[2].values).toEqual(Array(bars.length).fill(30));
+      expect(result.plots[3].values).toEqual(Array(bars.length).fill(40));
+      expect(result.plots[4].values).toEqual(Array(bars.length).fill(10));
+      expect(result.plots[5].values).toEqual(Array(bars.length).fill(40));
+      expect(result.plots[6].values).toEqual(Array(bars.length).fill(33));
+    });
+
+    it('creates colors from gradients', () => {
+      const code = `//@version=6
+indicator("Test")
+lowColor = color.from_gradient(-10, 0, 100, color.red, color.green)
+midColor = color.from_gradient(50, 0, 100, color.rgb(255, 0, 0), color.rgb(0, 255, 0, 50))
+highColor = color.from_gradient(120, 0, 100, color.red, color.green)
+namedColor = color.from_gradient(value=25, bottom_value=0, top_value=100, bottom_color=color.rgb(0, 0, 0), top_color=color.rgb(100, 100, 100))
+plot(close, "Low", color=lowColor)
+plot(open, "Mid", color=midColor)
+plot(high, "High", color=highColor)
+plot(low, "Named", color=namedColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].color).toEqual(Array(bars.length).fill('#F23645FF'));
+      expect(result.plots[1].color).toEqual(Array(bars.length).fill('#808000BF'));
+      expect(result.plots[2].color).toEqual(Array(bars.length).fill('#4CAF50FF'));
+      expect(result.plots[3].color).toEqual(Array(bars.length).fill('#191919FF'));
+    });
+
+    it('creates hline', () => {
+      const code = `//@version=6
+indicator("Test")
+hline(100, "Level", color=color.red)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].type).toBe('hline');
+      expect(result.plots[0].price).toBe(100);
+    });
+
+    it('creates bar color output', () => {
+      const code = `//@version=6
+indicator("Test")
+candleColor = close >= open ? color.green : na
+barcolor(candleColor)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].type).toBe('barcolor');
+      expect(result.plots[0].color).toEqual(['#4CAF50', '#4CAF50', '#4CAF50', null, null]);
+      expect(result.plots[0].values).toEqual([null, null, null, null, null]);
+    });
+
+    it('aligns conditional bar color output to bar indexes', () => {
+      const code = `//@version=6
+indicator("Test")
+if bar_index >= 2
+    barcolor(color.red)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+      expect(result.plots[0].type).toBe('barcolor');
+      expect(result.plots[0].color).toEqual([null, null, '#F23645', '#F23645', '#F23645']);
+      expect(result.plots[0].values).toEqual([null, null, null, null, null]);
+    });
+
+    it('creates multiple plots', () => {
+      const code = `//@version=6
+indicator("Test")
+plot(high, "High")
+plot(low, "Low")
+plot(close, "Close")
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.plots).toHaveLength(3);
+    });
+  });
+
+  describe('inputs', () => {
+    it('registers inputs', () => {
+      const code = `//@version=6
+indicator("Test")
+length = input.int(14, "Length", minval=1)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.inputs).toHaveLength(1);
+      expect(result.inputs[0].type).toBe('int');
+      expect(result.inputs[0].defval).toBe(14);
+    });
+
+    it('uses input values', () => {
+      const code = `//@version=6
+indicator("Test")
+length = input.int(14, "Length")
+plot(length)
+`;
+      const ast = parse(code);
+      const inputs = new Map([['input_Length', 20]]);
+      const result = executeScript(ast, bars, inputs);
+
+      // All plot values should be 20 (the overridden input)
+      expect(result.plots[0].values.every((v) => v === 20)).toBe(true);
+    });
+  });
+
+  describe('technical indicators', () => {
+    it('calculates SMA', () => {
+      const code = `//@version=6
+indicator("Test")
+sma = ta.sma(close, 3)
+plot(sma)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+
+      // First 2 bars should be NaN (not enough data)
+      expect(result.plots[0].values[0]).toBeNull();
+      expect(result.plots[0].values[1]).toBeNull();
+
+      // Third bar and beyond should have values
+      expect(result.plots[0].values[2]).not.toBeNull();
+    });
+
+    it('calculates EMA', () => {
+      const code = `//@version=6
+indicator("Test")
+ema = ta.ema(close, 3)
+plot(ema)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots[0].values.length).toBe(bars.length);
+    });
+
+    it('calculates RSI', () => {
+      const code = `//@version=6
+indicator("Test")
+rsi = ta.rsi(close, 14)
+plot(rsi)
+`;
+      const ast = parse(code);
+      // Use more bars for RSI
+      const moreBars = createBars(20);
+      const result = executeScript(ast, moreBars);
+
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('calculates ta.change', () => {
+      const code = `//@version=6
+indicator("Test")
+change = ta.change(close, 1)
+plot(change)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+      // First bar should be NaN
+      expect(result.plots[0].values[0]).toBeNull();
+    });
+
+    it('calculates ta.highest', () => {
+      const code = `//@version=6
+indicator("Test")
+highest = ta.highest(high, 3)
+plot(highest)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('calculates ta.lowest', () => {
+      const code = `//@version=6
+indicator("Test")
+lowest = ta.lowest(low, 3)
+plot(lowest)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, bars);
+
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it('calculates MACD', () => {
+      const code = `//@version=6
+indicator("Test")
+[macdLine, signalLine, hist] = ta.macd(close, 12, 26, 9)
+plot(macdLine)
+plot(signalLine)
+plot(hist)
+`;
+      const ast = parse(code);
+      const moreBars = createBars(30);
+      const result = executeScript(ast, moreBars);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
+
+    it('accesses ta.bb results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+bb = ta.bb(close, 20, 2)
+plot(bb.upper)
+plot(bb.basis)
+plot(bb.lower)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+      // On bars with enough history the values should be finite numbers
+      const lastUpper = result.plots[0]!.values.at(-1);
+      const lastBasis = result.plots[1]!.values.at(-1);
+      const lastLower = result.plots[2]!.values.at(-1);
+      expect(typeof lastUpper).toBe('number');
+      expect(typeof lastBasis).toBe('number');
+      expect(typeof lastLower).toBe('number');
+      // upper >= basis >= lower
+      expect(lastUpper).toBeGreaterThanOrEqual(lastBasis as number);
+      expect(lastBasis).toBeGreaterThanOrEqual(lastLower as number);
+    });
+
+    it('accesses ta.bb results via member syntax including .middle alias', () => {
+      const code = `//@version=6
+indicator("Test")
+bb = ta.bb(close, 20, 2)
+plot(bb.middle)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(1);
+    });
+
+    it('accesses ta.macd results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+m = ta.macd(close, 12, 26, 9)
+plot(m.macd)
+plot(m.signal)
+plot(m.hist)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
+
+    it('accesses ta.dmi results via member syntax and matches destructuring', () => {
+      const memberCode = `//@version=6
+indicator("Test")
+dmi = ta.dmi(14, 14)
+plot(dmi.plus)
+plot(dmi.minus)
+plot(dmi.adx)
+`;
+      const destructureCode = `//@version=6
+indicator("Test")
+[a, b, c] = ta.dmi(14, 14)
+plot(a)
+plot(b)
+plot(c)
+`;
+      const bars = createBars(30);
+      const memberResult = executeScript(parse(memberCode), bars);
+      const destructureResult = executeScript(parse(destructureCode), bars);
+
+      expect(memberResult.errors).toHaveLength(0);
+      expect(destructureResult.errors).toHaveLength(0);
+      expect(memberResult.plots).toHaveLength(3);
+      // Values from member access and destructuring must be identical
+      for (let p = 0; p < 3; p++) {
+        const mVals = memberResult.plots[p]!.values;
+        const dVals = destructureResult.plots[p]!.values;
+        expect(mVals).toEqual(dVals);
+      }
+    });
+
+    it('accesses ta.supertrend results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+st = ta.supertrend(3, 10)
+plot(st.supertrend)
+plot(st.direction)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(2);
+    });
+
+    it('accesses ta.kc results via member syntax', () => {
+      const code = `//@version=6
+indicator("Test")
+kc = ta.kc(close, 20, 1.5)
+plot(kc.upper)
+plot(kc.middle)
+plot(kc.lower)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
+
+    it('accesses ta.vwap results via member syntax when stdev_mult is provided', () => {
+      const code = `//@version=6
+indicator("Test")
+v = ta.vwap(hlc3, false, 1.0)
+plot(v.vwap)
+plot(v.upper)
+plot(v.lower)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(10));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3);
+    });
+  });
+
+  describe('complete indicators', () => {
+    it('runs basic SMA indicator', () => {
+      const code = `//@version=6
+indicator("Simple SMA", overlay=true)
+length = input.int(14, "Length")
+sma = ta.sma(close, length)
+plot(sma, "SMA", color=color.blue)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(20));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.indicatorTitle).toBe('Simple SMA');
+      expect(result.plots).toHaveLength(1);
+      expect(result.inputs).toHaveLength(1);
+    });
+
+    it('runs RSI indicator with levels', () => {
+      const code = `//@version=6
+indicator("RSI")
+length = input.int(14, "Length")
+rsi = ta.rsi(close, length)
+plot(rsi, "RSI", color=color.purple)
+hline(70, "Overbought", color=color.red)
+hline(30, "Oversold", color=color.green)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(3); // RSI + 2 hlines
+    });
+
+    it('runs EMA crossover indicator', () => {
+      const code = `//@version=6
+indicator("EMA Cross", overlay=true)
+fast = input.int(9, "Fast EMA")
+slow = input.int(21, "Slow EMA")
+fastEMA = ta.ema(close, fast)
+slowEMA = ta.ema(close, slow)
+plot(fastEMA, "Fast", color=color.green)
+plot(slowEMA, "Slow", color=color.red)
+`;
+      const ast = parse(code);
+      const result = executeScript(ast, createBars(30));
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.plots).toHaveLength(2);
+      expect(result.inputs).toHaveLength(2);
+    });
+  });
+});

@@ -8,7 +8,7 @@ import {
   type PineV6ReferenceSignature,
 } from '../compat/pineV6BuiltinSignatures';
 import { parse } from '../parser';
-import { executeScript } from '../runtime/compiledOnly';
+import { executeScript } from '../runtime/engine';
 import {
   builtinSignatureForCoverage,
   builtinSignaturesWithoutNamedFormForCoverage,

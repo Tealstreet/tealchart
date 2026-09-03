@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 
 import {
   InMemoryRequestDatafeed,
+  TealscriptEngine,
   corporateActionRequestKey,
   currencyRateRequestKey,
   economicRequestKey,
@@ -17,9 +18,12 @@ import {
   type RequestFinancialMetricQuery,
   type RequestFootprintQuery,
   type RequestQuandlSeriesQuery,
-  type TealscriptExecutionOptions,
+  type TealscriptEngineOptions,
 } from '../../src';
 import { parse } from '../../src/parser';
+import { executeCompiled, tryCompile } from '../../src/runtime/codegen';
+import { executeClosure, tryCompileClosure } from '../../src/runtime/closure/execute';
+import { analyzeCompiledRealtimeSafety } from '../../src/runtime/realtimeSafety';
 import type {
   ErrorMessage,
   FromWorkerMessage,
@@ -36,7 +40,7 @@ export interface ProductionWorkerCase {
   scriptId: string;
   source: string;
   bars: Bar[];
-  engineOptions?: TealscriptExecutionOptions;
+  engineOptions?: TealscriptEngineOptions;
   liveUpdateBars?: Bar[];
 }
 
@@ -68,17 +72,43 @@ export interface RealtimeOutputSnapshot {
 export interface RealtimeParityMismatch {
   scriptId: string;
   updateIndex: number;
-  path: 'worker';
+  path: 'worker' | 'closure' | 'interpreter';
   reason: string;
 }
 
-export type RealtimeParityBackend = 'worker';
+export type RealtimeParityBackend = 'worker' | 'closure';
 
 export interface RealtimeParityGroupMeasurement {
   backend: RealtimeParityBackend;
   totalUpdates: number;
   workerMatched: number;
   workerMismatches: RealtimeParityMismatch[];
+  interpreterMatched: number;
+  interpreterMismatches: RealtimeParityMismatch[];
+  closureMatched?: number;
+  closureMismatches?: RealtimeParityMismatch[];
+}
+
+export type ForcedCompiledRealtimeClassification = 'genuine-divergence' | 'overtrigger-matched' | 'compiled-unavailable';
+
+export interface ForcedCompiledRealtimeUpdateMeasurement {
+  scriptId: string;
+  updateIndex: number;
+  fallbackReason: string;
+  classification: ForcedCompiledRealtimeClassification;
+  reason?: string;
+}
+
+export interface ForcedCompiledRealtimeScriptMeasurement {
+  scriptId: string;
+  fallbackReason: string;
+  classification: ForcedCompiledRealtimeClassification;
+  reason?: string;
+}
+
+export interface ForcedCompiledRealtimeSafetyMeasurement {
+  scripts: ForcedCompiledRealtimeScriptMeasurement[];
+  updates: ForcedCompiledRealtimeUpdateMeasurement[];
 }
 
 function isRequestDataMessage(message: FromWorkerMessage): message is RequestDataMessage {
@@ -299,14 +329,6 @@ async function waitForTerminalMeasurement(args: {
           output: includeOutput ? normalizeWorkerResult(terminal, includeStrategyOutput) : undefined,
         };
       }
-      if (terminal.type === 'error') {
-        return {
-          scriptId,
-          executionMode: terminal.profile?.executionMode ?? 'error',
-          fallbackReason: terminal.profile?.fallbackReason,
-          error: terminal.message,
-        };
-      }
       return {
         scriptId,
         executionMode: 'error',
@@ -357,6 +379,8 @@ export async function measureRealtimeReentryParity(
   cases: ProductionWorkerCase[],
   options: { includeStrategy?: boolean; backend?: RealtimeParityBackend } = {},
 ): Promise<RealtimeParityGroupMeasurement> {
+  if (options.backend === 'closure') return measureClosureRealtimeReconstructionParity(cases, options);
+
   const includeStrategy = options.includeStrategy === true;
   const workerSession = await measureProductionWorkerSessions(cases.map((testCase) => ({
     ...testCase,
@@ -387,12 +411,16 @@ export async function measureRealtimeReentryParity(
   });
   const freshWorkerByScript = new Map(freshWorkerSession.updateMeasurements.map((measurement) => [measurement.scriptId, measurement]));
   const workerMismatches: RealtimeParityMismatch[] = [];
+  const interpreterMismatches: RealtimeParityMismatch[] = [];
   let totalUpdates = 0;
 
   for (const testCase of cases) {
     const ticks = liveUpdateBarsForCase(testCase);
+    const interpreter = new TealscriptEngine(testCase.engineOptions);
+    const ast = parse(testCase.source);
+    interpreter.execute(ast, testCase.bars);
 
-    for (const [updateIndex] of ticks.entries()) {
+    for (const [updateIndex, bar] of ticks.entries()) {
       totalUpdates += 1;
 
       const workerUpdate = workerByScript.get(testCase.scriptId)?.find((measurement) => measurement.updateIndex === updateIndex);
@@ -412,6 +440,45 @@ export async function measureRealtimeReentryParity(
           reason: workerUpdate?.error ?? firstSnapshotDifference(workerUpdate?.output, workerExpected.output),
         });
       }
+
+      let interpreterOutput: RealtimeOutputSnapshot | undefined;
+      try {
+        const plots = interpreter.updateBar(ast, bar);
+        interpreterOutput = normalizeExecutionSnapshot({
+          plots,
+          drawings: interpreter.getDrawings(),
+          alerts: interpreter.getAlerts(),
+          logs: interpreter.getLogs(),
+          strategy: (interpreter as unknown as { ctx: { strategyLedger: unknown } }).ctx.strategyLedger,
+        }, includeStrategy);
+      } catch (error) {
+        interpreterMismatches.push({
+          scriptId: testCase.scriptId,
+          updateIndex,
+          path: 'interpreter',
+          reason: error instanceof Error ? error.message : String(error),
+        });
+        continue;
+      }
+
+      const freshInterpreter = new TealscriptEngine(testCase.engineOptions);
+      freshInterpreter.execute(ast, cloneBars(testCase.bars));
+      const freshPlots = freshInterpreter.updateBar(ast, { ...bar });
+      const interpreterExpected = normalizeExecutionSnapshot({
+        plots: freshPlots,
+        drawings: freshInterpreter.getDrawings(),
+        alerts: freshInterpreter.getAlerts(),
+        logs: freshInterpreter.getLogs(),
+        strategy: (freshInterpreter as unknown as { ctx: { strategyLedger: unknown } }).ctx.strategyLedger,
+      }, includeStrategy);
+      if (!snapshotsEqual(interpreterOutput, interpreterExpected)) {
+        interpreterMismatches.push({
+          scriptId: testCase.scriptId,
+          updateIndex,
+          path: 'interpreter',
+          reason: firstSnapshotDifference(interpreterOutput, interpreterExpected),
+        });
+      }
     }
   }
 
@@ -420,7 +487,180 @@ export async function measureRealtimeReentryParity(
     totalUpdates,
     workerMatched: totalUpdates - workerMismatches.length,
     workerMismatches,
+    interpreterMatched: totalUpdates - interpreterMismatches.length,
+    interpreterMismatches,
   };
+}
+
+function measureClosureRealtimeReconstructionParity(
+  cases: ProductionWorkerCase[],
+  options: { includeStrategy?: boolean } = {},
+): RealtimeParityGroupMeasurement {
+  const includeStrategy = options.includeStrategy === true;
+  const closureMismatches: RealtimeParityMismatch[] = [];
+  const interpreterMismatches: RealtimeParityMismatch[] = [];
+  let totalUpdates = 0;
+
+  for (const testCase of cases) {
+    const ast = parse(testCase.source);
+    const closure = tryCompileClosure(ast, { libraries: testCase.engineOptions?.libraries });
+    if (!closure.success) {
+      for (const [updateIndex] of liveUpdateBarsForCase(testCase).entries()) {
+        totalUpdates += 1;
+        closureMismatches.push({
+          scriptId: testCase.scriptId,
+          updateIndex,
+          path: 'closure',
+          reason: `closure-unsupported: ${closure.unsupported.join('; ')}`,
+        });
+      }
+      continue;
+    }
+
+    for (const [updateIndex, bar] of liveUpdateBarsForCase(testCase).entries()) {
+      totalUpdates += 1;
+      const updatedBars = [...cloneBars(testCase.bars.slice(0, -1)), { ...bar }];
+      const closureOptions: TealscriptEngineOptions = {
+        ...testCase.engineOptions,
+        realtimeLastBar: { isNew: false },
+      };
+      const closureUpdate = executeClosure(closure, updatedBars, undefined, closureOptions);
+      if (closureUpdate.profile.executionMode !== 'closure') {
+        closureMismatches.push({
+          scriptId: testCase.scriptId,
+          updateIndex,
+          path: 'closure',
+          reason: `closure-selected-sweep-used-${closureUpdate.profile.executionMode}`,
+        });
+        continue;
+      }
+
+      const closureFresh = executeClosure(closure, updatedBars, undefined, closureOptions);
+      const closureOutput = normalizeExecutionResult(closureUpdate, includeStrategy);
+      const closureExpected = normalizeExecutionResult(closureFresh, includeStrategy);
+      if (!snapshotsEqual(closureOutput, closureExpected)) {
+        closureMismatches.push({
+          scriptId: testCase.scriptId,
+          updateIndex,
+          path: 'closure',
+          reason: firstSnapshotDifference(closureOutput, closureExpected),
+        });
+      }
+
+      const freshInterpreter = new TealscriptEngine(testCase.engineOptions);
+      freshInterpreter.execute(ast, cloneBars(testCase.bars));
+      const freshPlots = freshInterpreter.updateBar(ast, { ...bar });
+      const interpreterExpected = normalizeExecutionSnapshot({
+        plots: freshPlots,
+        drawings: freshInterpreter.getDrawings(),
+        alerts: freshInterpreter.getAlerts(),
+        logs: freshInterpreter.getLogs(),
+        strategy: (freshInterpreter as unknown as { ctx: { strategyLedger: unknown } }).ctx.strategyLedger,
+      }, includeStrategy);
+      if (!snapshotsEqual(closureOutput, interpreterExpected)) {
+        interpreterMismatches.push({
+          scriptId: testCase.scriptId,
+          updateIndex,
+          path: 'interpreter',
+          reason: firstSnapshotDifference(closureOutput, interpreterExpected),
+        });
+      }
+    }
+  }
+
+  return {
+    backend: 'closure',
+    totalUpdates,
+    workerMatched: totalUpdates - closureMismatches.length,
+    workerMismatches: closureMismatches,
+    interpreterMatched: totalUpdates - interpreterMismatches.length,
+    interpreterMismatches,
+    closureMatched: totalUpdates - closureMismatches.length,
+    closureMismatches,
+  };
+}
+
+export function measureForcedCompiledRealtimeSafety(
+  cases: ProductionWorkerCase[],
+  options: { includeStrategy?: boolean; includeSafe?: boolean } = {},
+): ForcedCompiledRealtimeSafetyMeasurement {
+  const includeStrategy = options.includeStrategy === true;
+  const includeSafe = options.includeSafe === true;
+  const scripts: ForcedCompiledRealtimeScriptMeasurement[] = [];
+  const updates: ForcedCompiledRealtimeUpdateMeasurement[] = [];
+
+  for (const testCase of cases) {
+    const ast = parse(testCase.source);
+    const safety = analyzeCompiledRealtimeSafety(ast);
+    if (!includeSafe && (safety.safe || !safety.fallbackReason)) continue;
+
+    const fallbackReason = safety.fallbackReason ?? 'realtime-safe-after-detector-sharpening';
+    const compiled = tryCompile(ast, undefined, { libraries: testCase.engineOptions?.libraries });
+    const ticks = createLiveUpdateBars(testCase.bars);
+    if (!compiled.success) {
+      const reason = `compile-unsupported: ${compiled.unsupported.join('; ')}`;
+      scripts.push({ scriptId: testCase.scriptId, fallbackReason, classification: 'compiled-unavailable', reason });
+      updates.push(...ticks.map((_, updateIndex) => ({
+        scriptId: testCase.scriptId,
+        updateIndex,
+        fallbackReason,
+        classification: 'compiled-unavailable' as const,
+        reason,
+      })));
+      continue;
+    }
+
+    const interpreter = new TealscriptEngine(testCase.engineOptions);
+    interpreter.execute(ast, cloneBars(testCase.bars));
+    let scriptClassification: ForcedCompiledRealtimeClassification = 'overtrigger-matched';
+    const scriptReasons: string[] = [];
+
+    for (const [updateIndex, bar] of ticks.entries()) {
+      const compiledResult = executeCompiled(
+        compiled,
+        [...cloneBars(testCase.bars.slice(0, -1)), { ...bar }],
+        undefined,
+        {
+          ...testCase.engineOptions,
+          realtimeLastBar: { isNew: false },
+        },
+      );
+      if (!compiledResult) {
+        const reason = 'compiled execution returned null';
+        scriptClassification = 'compiled-unavailable';
+        scriptReasons.push(`#tick${updateIndex + 1}:${reason}`);
+        updates.push({ scriptId: testCase.scriptId, updateIndex, fallbackReason, classification: 'compiled-unavailable', reason });
+        continue;
+      }
+
+      const plots = interpreter.updateBar(ast, { ...bar });
+      const interpreterOutput = normalizeExecutionSnapshot({
+        plots,
+        drawings: interpreter.getDrawings(),
+        alerts: interpreter.getAlerts(),
+        logs: interpreter.getLogs(),
+        strategy: (interpreter as unknown as { ctx: { strategyLedger: unknown } }).ctx.strategyLedger,
+      }, includeStrategy);
+      const compiledOutput = normalizeExecutionResult(compiledResult, includeStrategy);
+      if (snapshotsEqual(compiledOutput, interpreterOutput)) {
+        updates.push({ scriptId: testCase.scriptId, updateIndex, fallbackReason, classification: 'overtrigger-matched' });
+      } else {
+        const reason = firstSnapshotDifference(compiledOutput, interpreterOutput);
+        scriptClassification = scriptClassification === 'compiled-unavailable' ? scriptClassification : 'genuine-divergence';
+        scriptReasons.push(`#tick${updateIndex + 1}:${reason}`);
+        updates.push({ scriptId: testCase.scriptId, updateIndex, fallbackReason, classification: 'genuine-divergence', reason });
+      }
+    }
+
+    scripts.push({
+      scriptId: testCase.scriptId,
+      fallbackReason,
+      classification: scriptClassification,
+      reason: scriptReasons.length > 0 ? scriptReasons.join('; ') : undefined,
+    });
+  }
+
+  return { scripts, updates };
 }
 
 function reentryCaseId(scriptId: string, updateIndex: number): string {
@@ -435,6 +675,16 @@ function normalizeWorkerResult(message: ResultMessage, includeStrategy = false):
     alerts: output.alerts,
     logs: output.logs,
     strategy: output.strategy,
+  }, includeStrategy);
+}
+
+function normalizeExecutionResult(result: ExecutionResult, includeStrategy = false): RealtimeOutputSnapshot {
+  return normalizeExecutionSnapshot({
+    plots: result.plots,
+    drawings: result.drawings,
+    alerts: result.alerts,
+    logs: result.logs,
+    strategy: result.strategy,
   }, includeStrategy);
 }
 

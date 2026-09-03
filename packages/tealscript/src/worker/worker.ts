@@ -8,14 +8,16 @@
  */
 
 import { parse, TealscriptParseError } from '../parser';
-import { createRuntimeErrorPayload } from '../runtime/types';
-import type { ExecutionResult, RuntimeFallbackDiagnostic, TealscriptRuntimeOptions } from '../runtime/types';
+import { createRuntimeErrorPayload, TealscriptEngine } from '../runtime/engine';
+import type { RuntimeFallbackDiagnostic, TealscriptRuntimeOptions } from '../runtime/engine';
 import {
   applyTealscriptBackendSelectionProfile,
   selectTealscriptExecutionBackend,
 } from '../runtime/backendSelection';
 import { collectCompiledRequestDataQueryCollection, tryExecuteScript } from '../runtime/codegen';
 import type { CompiledRequestDataQuery } from '../runtime/codegen';
+import { executeClosureScript } from '../runtime/closure/execute';
+import { analyzeCompiledRealtimeSafety } from '../runtime/realtimeSafety';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
 import type { Bar, InputDefinition } from '../runtime/context';
@@ -46,6 +48,7 @@ import type {
 interface ScriptState {
   scriptId: string;
   ast: Program;
+  engine: TealscriptEngine;
   bars: Bar[];
   inputs: Record<string, unknown>;
   runtime?: TealscriptRuntimeOptions;
@@ -63,6 +66,9 @@ interface ScriptState {
   confirmedRealtimeBarStartIndex?: number;
   requestDiscoveryGeneration?: number;
   requestDiscoveryFetchRounds: number;
+  realtimeInterpreterFallbackReason?: string;
+  realtimeInterpreterFallbackDiagnostics: RuntimeFallbackDiagnostic[];
+  realtimeInterpreterReady: boolean;
 }
 
 // Current script state
@@ -147,11 +153,16 @@ function handleInit(
       return;
     }
 
+    // Create engine
+    const engine = new TealscriptEngine({ runtime, libraries });
+    const realtimeSafety = analyzeCompiledRealtimeSafety(ast);
+
     // Store state
     pendingRequestData.clear();
     state = {
       scriptId,
       ast,
+      engine,
       bars,
       inputs,
       runtime,
@@ -163,6 +174,9 @@ function handleInit(
       confirmedRealtimeBarIndex: undefined,
       confirmedRealtimeBarStartIndex: undefined,
       requestDiscoveryFetchRounds: 0,
+      realtimeInterpreterFallbackReason: realtimeSafety.fallbackReason,
+      realtimeInterpreterFallbackDiagnostics: realtimeSafety.diagnostics,
+      realtimeInterpreterReady: false,
     };
 
     // Execute and send results
@@ -205,6 +219,7 @@ function handleUpdateBars(bars: Bar[], metadata?: WorkerOutputMetadata): void {
   state.realtimeLastBar = undefined;
   state.confirmedRealtimeBarIndex = undefined;
   state.confirmedRealtimeBarStartIndex = undefined;
+  state.realtimeInterpreterReady = false;
   state.requestCache.clear();
   resetPendingRequests();
   resetRequestDiscovery();
@@ -260,6 +275,7 @@ function handleSetInputs(inputs: Record<string, unknown>, metadata?: WorkerOutpu
   state.realtimeLastBar = undefined;
   state.confirmedRealtimeBarIndex = undefined;
   state.confirmedRealtimeBarStartIndex = undefined;
+  state.realtimeInterpreterReady = false;
   state.requestCache.clear();
   resetPendingRequests();
   resetRequestDiscovery();
@@ -329,19 +345,29 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
       : undefined;
     const backendSelection = selectTealscriptExecutionBackend(state.runtime?.backend);
     if (preloadCollection.hasUnpreloadableQueries) {
-      const discovery = discoverRuntimeRequestDataMisses(inputsMap);
-      const discoveredMisses = discovery.misses;
+      const discoveryDatafeed = new CacheDiscoveringRequestDatafeed(state.requestCache);
+      tryExecuteScript(state.ast, state.bars, inputsMap, {
+        runtime: state.runtime,
+        libraries: state.libraries,
+        requestDatafeed: discoveryDatafeed,
+        realtimeLastBar: state.realtimeLastBar,
+        confirmedRealtimeBarIndex: state.confirmedRealtimeBarIndex,
+        confirmedRealtimeBarStartIndex: state.confirmedRealtimeBarStartIndex,
+      });
+
+      const discoveredMisses = discoveryDatafeed.discoveredQueries
+        .filter(({ cacheKey }) => !state?.requestCache.has(cacheKey));
       if (discoveredMisses.length > 0) {
         const fetchRounds = state.requestDiscoveryGeneration === generation
           ? state.requestDiscoveryFetchRounds
           : 0;
         if (fetchRounds >= MAX_RUNTIME_REQUEST_DISCOVERY_FETCH_ROUNDS) {
-          postCompiledUnsupported(
-            backendSelection,
+          const result = executeInterpreterFallback(
+            cacheBackedRequestDatafeed,
+            inputsMap,
             `unpreloadable-request-data: discovery-not-converged: ${summarizeRequestDataKinds(discoveredMisses)}; static: ${preloadCollection.unpreloadableReasons.join('; ')}`,
-            [],
-            metadata,
           );
+          sendExecutionResult(applyTealscriptBackendSelectionProfile(result, backendSelection), metadata);
           return;
         }
 
@@ -351,15 +377,50 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
         return;
       }
 
-      if (discovery.errors.length > 0) {
-        const firstError = discovery.errors[0]!;
-        throw new Error(`Runtime request discovery failed before request data could be resolved: ${firstError.message}`);
-      }
-
       state.requestDiscoveryGeneration = undefined;
       state.requestDiscoveryFetchRounds = 0;
     }
 
+    const realtimeFallbackReason = state.realtimeInterpreterFallbackReason;
+    if (backendSelection.backend === 'compiled' && realtimeFallbackReason) {
+      const realtimeFallbackDiagnostics = state.realtimeInterpreterFallbackDiagnostics;
+      const result = state.realtimeLastBar
+        ? executeRealtimeInterpreterFallback(
+          cacheBackedRequestDatafeed,
+          inputsMap,
+          realtimeFallbackReason,
+          realtimeFallbackDiagnostics,
+        )
+        : executeInitialRealtimeInterpreterFallback(
+          cacheBackedRequestDatafeed,
+          inputsMap,
+          realtimeFallbackReason,
+          realtimeFallbackDiagnostics,
+        );
+      sendExecutionResult(applyTealscriptBackendSelectionProfile(result, backendSelection), metadata);
+      return;
+    }
+
+    if (backendSelection.backend === 'closure') {
+      const result = executeClosureScript(state.ast, state.bars, inputsMap, {
+        runtime: state.runtime,
+        libraries: state.libraries,
+        requestDatafeed: cacheBackedRequestDatafeed,
+        realtimeLastBar: state.realtimeLastBar,
+        confirmedRealtimeBarIndex: state.confirmedRealtimeBarIndex,
+        confirmedRealtimeBarStartIndex: state.confirmedRealtimeBarStartIndex,
+      });
+      sendExecutionResult(applyTealscriptBackendSelectionProfile(result, backendSelection), metadata);
+      return;
+    }
+
+    if (backendSelection.backend === 'interpreter') {
+      const result = state.engine.execute(state.ast, state.bars, inputsMap);
+      sendExecutionResult(applyTealscriptBackendSelectionProfile(result, backendSelection), metadata);
+      return;
+    }
+
+    // Try compiled path first, fall back to interpreter
     let fallbackReason: string | undefined;
     const compiledResult = tryExecuteScript(state.ast, state.bars, inputsMap, {
       runtime: state.runtime,
@@ -372,35 +433,17 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
         fallbackReason = reason;
       },
     });
-    if (!compiledResult) {
-      postCompiledUnsupported(backendSelection, fallbackReason ?? 'compiled-execution-unavailable', [], metadata);
-      return;
+    const result = compiledResult ?? state.engine.execute(state.ast, state.bars, inputsMap);
+    if (!compiledResult && fallbackReason) {
+      result.profile = {
+        ...result.profile,
+        fallbackReason,
+      };
     }
-    sendExecutionResult(applyTealscriptBackendSelectionProfile(compiledResult, backendSelection), metadata);
+    sendExecutionResult(applyTealscriptBackendSelectionProfile(result, backendSelection), metadata);
   } catch (error) {
     handleError(error, metadata);
   }
-}
-
-function discoverRuntimeRequestDataMisses(
-  inputsMap: Map<string, unknown>,
-): { misses: WorkerRequestDataDiscoveryQuery[]; errors: ExecutionResult['errors'] } {
-  if (!state) throw new Error('Worker not initialized');
-
-  const discoveryDatafeed = new CacheDiscoveringRequestDatafeed(state.requestCache);
-  const discoveryResult = tryExecuteScript(state.ast, state.bars, inputsMap, {
-    runtime: state.runtime,
-    libraries: state.libraries,
-    requestDatafeed: discoveryDatafeed,
-    realtimeLastBar: state.realtimeLastBar,
-    confirmedRealtimeBarIndex: state.confirmedRealtimeBarIndex,
-    confirmedRealtimeBarStartIndex: state.confirmedRealtimeBarStartIndex,
-  });
-
-  return {
-    misses: discoveryDatafeed.discoveredQueries.filter(({ cacheKey }) => !state?.requestCache.has(cacheKey)),
-    errors: discoveryResult?.errors ?? [{ message: 'Compiled runtime request discovery failed' }],
-  };
 }
 
 function postRequestDataMisses(
@@ -431,41 +474,82 @@ function postRequestDataMisses(
   }
 }
 
-function postCompiledUnsupported(
-  backendSelection: ReturnType<typeof selectTealscriptExecutionBackend>,
-  reason: string,
+function executeInitialRealtimeInterpreterFallback(
+  requestDatafeed: CacheBackedRequestDatafeed | undefined,
+  inputsMap: Map<string, unknown>,
+  fallbackReason: string,
   fallbackDiagnostics: RuntimeFallbackDiagnostic[],
-  metadata?: WorkerOutputMetadata,
+): ReturnType<TealscriptEngine['execute']> {
+  initializeRealtimeInterpreter(requestDatafeed, inputsMap);
+  const result = state!.engine.getCurrentExecutionResult();
+  result.profile = {
+    ...result.profile,
+    fallbackReason,
+    fallbackDiagnostics,
+  };
+  return result;
+}
+
+function initializeRealtimeInterpreter(
+  requestDatafeed: CacheBackedRequestDatafeed | undefined,
+  inputsMap: Map<string, unknown>,
 ): void {
-  if (!state) return;
-  postResult({
-    type: 'error',
-    scriptId: state.scriptId,
-    message: `Compiled TealScript execution does not support this script: ${reason}`,
-    profile: {
-      executionMode: 'compiled',
-      selectedBackend: backendSelection.backend,
-      backendSelectionSource: backendSelection.source,
-      fallbackReason: reason,
-      fallbackDiagnostics,
-      elapsedMs: 0,
-      bars: state.bars.length,
-      statements: 0,
-      expressions: 0,
-      builtinCalls: 0,
-      requestContexts: 0,
-      maxBarsBack: 0,
-      errors: 1,
-    },
-    metadata,
+  if (!state) throw new Error('Worker not initialized');
+  state.engine = new TealscriptEngine({
+    runtime: state.runtime,
+    libraries: state.libraries,
+    requestDatafeed,
   });
+  state.engine.execute(state.ast, state.bars, inputsMap);
+  state.realtimeInterpreterReady = true;
+}
+
+function executeRealtimeInterpreterFallback(
+  requestDatafeed: CacheBackedRequestDatafeed | undefined,
+  inputsMap: Map<string, unknown>,
+  fallbackReason: string,
+  fallbackDiagnostics: RuntimeFallbackDiagnostic[],
+): ReturnType<TealscriptEngine['execute']> {
+  if (!state) throw new Error('Worker not initialized');
+  if (!state.realtimeInterpreterReady) {
+    initializeRealtimeInterpreter(requestDatafeed, inputsMap);
+  } else {
+    const bar = state.bars[state.bars.length - 1];
+    if (bar) state.engine.updateBar(state.ast, bar);
+  }
+
+  const result = state.engine.getCurrentExecutionResult();
+  result.profile = {
+    ...result.profile,
+    fallbackReason,
+    fallbackDiagnostics,
+  };
+  return result;
+}
+
+function executeInterpreterFallback(
+  requestDatafeed: CacheBackedRequestDatafeed | undefined,
+  inputsMap: Map<string, unknown>,
+  fallbackReason: string,
+): ReturnType<TealscriptEngine['execute']> {
+  if (!state) throw new Error('Worker not initialized');
+  const result = new TealscriptEngine({
+    runtime: state.runtime,
+    libraries: state.libraries,
+    requestDatafeed,
+  }).execute(state.ast, state.bars, inputsMap);
+  result.profile = {
+    ...result.profile,
+    fallbackReason,
+  };
+  return result;
 }
 
 function summarizeRequestDataKinds(misses: Array<{ kind: string }>): string {
   return [...new Set(misses.map((miss) => miss.kind))].sort().join(', ');
 }
 
-function sendExecutionResult(result: ExecutionResult, metadata?: WorkerOutputMetadata): void {
+function sendExecutionResult(result: ReturnType<TealscriptEngine['execute']>, metadata?: WorkerOutputMetadata): void {
   if (!state) return;
 
   const runtimeError = result.errors.find((error) => error.runtimeError)?.runtimeError;
