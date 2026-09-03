@@ -110,14 +110,16 @@ const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
 
 /**
- * Base draw tier: a position label covers an order label it overlaps. Only
- * hover, selection or an active drag lifts a line out of its tier, and
- * `applyFloatingLineOrder` restores this order the moment that ends.
+ * Base draw tier: a position label covers an order label it overlaps, and a
+ * fixed line — the last trade — covers both. Only hover, selection or an
+ * active drag lifts a line out of its tier, and `applyFloatingLineOrder`
+ * restores this order the moment that ends.
  */
 const TRADE_LINE_BASE_DRAW_TIER: Record<string, number> = { order: 1, position: 2 };
 
 function baseDrawRank(bound: PriceLineLabelBounds): number {
-  return (bound.floatingLabel ? 10 : 0) + (TRADE_LINE_BASE_DRAW_TIER[bound.type ?? 'price'] ?? 0);
+  const tier = bound.fixed ? 3 : (TRADE_LINE_BASE_DRAW_TIER[bound.type ?? 'price'] ?? 0);
+  return (bound.floatingLabel ? 10 : 0) + tier;
 }
 
 interface CachedLineContentRefs {

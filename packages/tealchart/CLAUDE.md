@@ -862,6 +862,15 @@ other instance of the same shape.
   once left it permanently above the positions it covered. Each line group now
   carries a `baseOrder` attr assigned at render time and the whole order is
   re-applied by `zIndex` on every hover/selection change.
+- The last-trade tag is king: it is the only `fixed` price line, it never moves
+  in collision resolution, nothing is drawn over it, and the crosshair is the
+  only thing allowed to cover it. Both halves had holes. Its draw tier sits
+  above orders and positions in `baseDrawRank`. And when a stack of order and
+  position tags grows taller than its band, something has to give —
+  `resolveLabelCollisionsWithinBounds` used to trade the overlap for a clamp and
+  park a label right on the fixed tag. `evictOverlapsWithFixed` runs last and
+  pushes the movable labels clear instead, past the band edge if that is what it
+  takes, where the caller's off-screen filter drops them.
 - Crosshair overlay canvas has `z-index: 3` — above interactive line container (`z-index: 2`)
 - Trading-line labels and line segments must be clamped after the overlaid left drawing rail (`leftToolRailInset + leftToolRailWidth`) in both web and mobile paths. Do not place labels or left-extending line segments at raw `margins.left`.
 - TP/SL drag hit rects must convert with absolute Konva coordinates. Cached line groups shift on price updates, so local rect `x`/`y` can be stale relative to the chart.
