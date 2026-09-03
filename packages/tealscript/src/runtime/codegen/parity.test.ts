@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
-import { executeScript } from '../compiledOnly';
+import { executeScript } from '../engine';
 import type { Bar } from '../context';
 import { tryCompile, executeCompiled } from './execute';
 
@@ -49,7 +49,7 @@ function assertParity(pine: string, label: string, tol = 1e-6, skipWarmup = 0) {
   }
 }
 
-describe('Compiled vs Reference parity sweep', () => {
+describe('Compiled vs Interpreter parity sweep', () => {
   const scripts: [string, string, number?][] = [
     ['SMA', `//@version=6\nindicator("test")\nplot(ta.sma(close, 3))`],
     ['Mixed source-length helpers', `//@version=6\nindicator("test")\nplot(ta.sma(source=close, 3))\nplot(ta.ema(source=close, 3))\nplot(ta.rma(source=close, 3))\nplot(ta.smma(source=close, 3))\nplot(ta.rsi(source=close, 5))\nplot(ta.wma(source=close, 5))\nplot(ta.hma(source=close, 7))\nplot(ta.stdev(source=close, 5))\nplot(ta.dev(source=close, 5))\nplot(ta.range(source=close, 4))\nplot(ta.rising(source=close, 2) ? 1 : 0)\nplot(ta.falling(source=close, 2) ? 1 : 0)`],

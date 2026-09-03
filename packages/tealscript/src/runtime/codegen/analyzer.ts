@@ -1,7 +1,6 @@
 import type {
   Program, Statement, Expression,
   IndicatorDeclaration,
-  LibraryDeclaration,
   IfStatement,
   CallExpression,
   CallArgument,
@@ -59,9 +58,9 @@ export interface FuncInfo {
 }
 
 export interface DeclarationInfo {
-  kind: 'indicator' | 'strategy' | 'library';
+  kind: 'indicator' | 'strategy';
   title: string;
-  node: IndicatorDeclaration | LibraryDeclaration;
+  node: IndicatorDeclaration;
 }
 
 export interface TypeDeclInfo {
@@ -71,11 +70,6 @@ export interface TypeDeclInfo {
 }
 
 export interface ImportedMethodOverloadInfo {
-  receiverType: string | null;
-  internalName: string;
-}
-
-export interface LocalMethodOverloadInfo {
   receiverType: string | null;
   internalName: string;
 }
@@ -98,8 +92,6 @@ export interface SecurityCallSite {
   expressionSourceParam?: string;
   expressionCaptureParams?: string[];
   expressionLocalStatements?: Statement[];
-  importedAliasContext?: string;
-  requiresDynamicRequestsReason?: 'local-scope' | 'conditional-operand' | 'nested-request';
 }
 
 export interface AnalysisContext {
@@ -123,13 +115,8 @@ export interface AnalysisContext {
   importedNamespaces: Set<string>;
   importedFunctions: Map<string, string>;
   importedMethods: Map<string, string>;
-  localMethodOverloads: Map<string, LocalMethodOverloadInfo[]>;
   importedMethodOverloads: Map<string, ImportedMethodOverloadInfo[]>;
-  importedLocalMethods: Map<string, ImportedMethodOverloadInfo[]>;
-  importedLocalTypes: Map<string, string>;
   importedConstants: Map<string, Expression>;
-  importDiagnostics: string[];
-  importedAliasContext?: string;
   enumValues: Map<string, string>;
   enumTitles: Map<string, string>;
   importedEnumValues: Map<string, string>;
@@ -139,7 +126,6 @@ export interface AnalysisContext {
 export interface AnalyzeOptions {
   libraries?: Map<string, Program>;
   capturedParams?: Set<string>;
-  importedAliasContext?: string;
 }
 
 const BAR_FIELDS = new Set([
@@ -223,7 +209,6 @@ const TA_VAR_CLASS_MAP: Record<string, string> = {
   'ta.nvi': 'NegativeVolumeIndex',
   'ta.pvi': 'PositiveVolumeIndex',
   'ta.pvt': 'PriceVolumeTrend',
-  'ta.obv': 'OBV',
   'ta.wad': 'WilliamsAccumulationDistribution',
   'ta.wvad': 'WilliamsVariableAccumulationDistribution',
 };
@@ -367,21 +352,6 @@ function readOrderedArg(args: CallArgument[], names: string[], name: string, ind
   return positional[positionalIndex];
 }
 
-function readAliasedOrderedArg(args: CallArgument[], namesByIndex: readonly (readonly string[])[], index: number): Expression | undefined {
-  const names = namesByIndex[index] ?? [];
-  const named = args.find((arg) => arg.name && names.includes(arg.name.name))?.value;
-  if (named) return named;
-  const positional = args.filter((arg) => !arg.name).map((arg) => arg.value);
-  const priorNamedCount = namesByIndex
-    .slice(0, index)
-    .filter((priorNames) => args.some((arg) => arg.name && priorNames.includes(arg.name.name))).length;
-  return positional[index - priorNamedCount];
-}
-
-function isDefinedExpression(expr: Expression | undefined): expr is Expression {
-  return expr !== undefined;
-}
-
 function vwapHasStdevMult(args: CallArgument[]): boolean {
   return Boolean(readOrderedArg(args, ['source', 'anchor', 'stdev_mult'], 'stdev_mult', 2));
 }
@@ -408,13 +378,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     importedNamespaces: new Set(),
     importedFunctions: new Map(),
     importedMethods: new Map(),
-    localMethodOverloads: new Map(),
     importedMethodOverloads: new Map(),
-    importedLocalMethods: new Map(),
-    importedLocalTypes: new Map(),
     importedConstants: new Map(),
-    importDiagnostics: [],
-    importedAliasContext: options.importedAliasContext,
     enumValues: new Map(),
     enumTitles: new Map(),
     importedEnumValues: new Map(),
@@ -431,9 +396,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   let activeFunctionParams: Set<string> | null = null;
   let activeFunctionLocals: Set<string> | null = null;
   let activeFunctionPriorLocalStatements: Map<string, Statement> | null = null;
-  let localScopeDepth = 0;
-  let conditionalOperandDepth = 0;
-  let requestExpressionDepth = 0;
 
   function addUnsupported(message: string): void {
     if (!ctx.unsupported.includes(message)) ctx.unsupported.push(message);
@@ -445,32 +407,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
 
   function importedMethodExportName(alias: string, receiverType: string | null, exportName: string): string {
     return receiverType ? `${alias}__${receiverType}__${exportName}` : importedExportName(alias, exportName);
-  }
-
-  function importedMethodInternalName(alias: string, receiverType: string | null, exportName: string, paramCount: number): string {
-    return `${importedMethodExportName(alias, receiverType, exportName)}__${paramCount}`;
-  }
-
-  function importedTypeName(alias: string, typeName: string): string {
-    return `${alias}__type__${typeName}`;
-  }
-
-  function currentImportedAlias(): string | undefined {
-    return activeFunctionName?.includes('__') ? activeFunctionName.split('__')[0] : options.importedAliasContext;
-  }
-
-  function sameImportedLibraryFunctionName(calleeName: string): string | undefined {
-    const alias = currentImportedAlias();
-    if (!alias) return undefined;
-    const candidate = importedExportName(alias, calleeName);
-    return ctx.funcInfos.has(candidate) ? candidate : undefined;
-  }
-
-  function sameImportedLibraryMethodOverloads(methodName: string): ImportedMethodOverloadInfo[] | undefined {
-    const alias = currentImportedAlias();
-    if (!alias) return undefined;
-    const overloads = ctx.importedLocalMethods.get(`${alias}.${methodName}`);
-    return overloads && overloads.length > 0 ? overloads : undefined;
   }
 
   function receiverTypeName(fn: FunctionDeclaration): string | null {
@@ -492,10 +428,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       hasSeriesVars: false,
       callSiteCount: 0,
     });
-  }
-
-  function localMethodInternalName(receiverType: string | null, methodName: string, paramCount: number): string {
-    return `${receiverType ?? 'any'}__${methodName}__${paramCount}`;
   }
 
   function walkFunctionBody(name: string, params: string[], body: Expression | Statement[]): void {
@@ -637,8 +569,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
 
     const libraryAst = options.libraries?.get(stmt.path);
     if (!libraryAst) {
-      ctx.importDiagnostics.push(`import not found in deterministic library registry: ${stmt.path} as ${stmt.alias.name}`);
-      ctx.importedNamespaces.add(stmt.alias.name);
+      addUnsupported('Import declarations not yet supported by transpiler');
       return;
     }
 
@@ -647,68 +578,39 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     }
 
     ctx.importedNamespaces.add(stmt.alias.name);
-
     for (const libraryStmt of libraryAst.body) {
-      if (libraryStmt.type === 'TypeDeclaration') {
+      if (libraryStmt.type === 'FunctionDeclaration' && libraryStmt.exported) {
+        if (libraryStmt.isMethod) {
+          const receiverType = receiverTypeName(libraryStmt);
+          const internalName = importedMethodExportName(stmt.alias.name, receiverType, libraryStmt.name.name);
+          ctx.importedMethods.set(libraryStmt.name.name, internalName);
+          const overloads = ctx.importedMethodOverloads.get(libraryStmt.name.name) ?? [];
+          overloads.push({
+            receiverType: receiverType ? `${stmt.alias.name}.${receiverType}` : null,
+            internalName,
+          });
+          ctx.importedMethodOverloads.set(libraryStmt.name.name, overloads);
+          registerFunctionInfo(internalName, libraryStmt);
+          walkFunctionBody(internalName, libraryStmt.params.map((p) => p.name), libraryStmt.body);
+        } else {
+          const internalName = importedExportName(stmt.alias.name, libraryStmt.name.name);
+          ctx.importedFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
+          registerFunctionInfo(internalName, libraryStmt);
+          walkFunctionBody(internalName, libraryStmt.params.map((p) => p.name), libraryStmt.body);
+        }
+        continue;
+      }
+
+      if (libraryStmt.type === 'TypeDeclaration' && libraryStmt.exported) {
+        const typeName = `${stmt.alias.name}.${libraryStmt.name.name}`;
         const fields = libraryStmt.fields.map((f) => ({
           name: f.name.name,
           defaultExpr: f.defaultValue ?? null,
           varip: f.varip ?? false,
         }));
-        const runtimeName = `${stmt.alias.name}.${libraryStmt.name.name}`;
-        const typeInfo = { name: runtimeName, fields, node: libraryStmt };
-        const localKey = importedTypeName(stmt.alias.name, libraryStmt.name.name);
-        ctx.typeDecls.set(localKey, typeInfo);
-        ctx.importedLocalTypes.set(`${stmt.alias.name}.${libraryStmt.name.name}`, localKey);
-        if (libraryStmt.exported) {
-          ctx.typeDecls.set(runtimeName, typeInfo);
-        }
-      }
-    }
-
-    for (const libraryStmt of libraryAst.body) {
-      if (libraryStmt.type === 'FunctionDeclaration') {
-        if (libraryStmt.isMethod) {
-          const receiverType = receiverTypeName(libraryStmt);
-          const internalName = importedMethodInternalName(stmt.alias.name, receiverType, libraryStmt.name.name, libraryStmt.params.length);
-          const localOverload = {
-            receiverType: receiverType ? importedTypeName(stmt.alias.name, receiverType) : null,
-            internalName,
-          };
-          const publicOverload = {
-            receiverType: receiverType ? `${stmt.alias.name}.${receiverType}` : null,
-            internalName,
-          };
-          const localOverloads = ctx.importedLocalMethods.get(`${stmt.alias.name}.${libraryStmt.name.name}`) ?? [];
-          localOverloads.push(localOverload);
-          ctx.importedLocalMethods.set(`${stmt.alias.name}.${libraryStmt.name.name}`, localOverloads);
-          if (libraryStmt.exported) {
-            ctx.importedMethods.set(libraryStmt.name.name, internalName);
-            const overloads = ctx.importedMethodOverloads.get(libraryStmt.name.name) ?? [];
-            overloads.push(publicOverload);
-            ctx.importedMethodOverloads.set(libraryStmt.name.name, overloads);
-          }
-          registerFunctionInfo(internalName, libraryStmt);
-        } else {
-          const internalName = importedExportName(stmt.alias.name, libraryStmt.name.name);
-          if (libraryStmt.exported) {
-            ctx.importedFunctions.set(`${stmt.alias.name}.${libraryStmt.name.name}`, internalName);
-          }
-          registerFunctionInfo(internalName, libraryStmt);
-        }
-      }
-    }
-
-    for (const libraryStmt of libraryAst.body) {
-      if (libraryStmt.type === 'FunctionDeclaration') {
-        const internalName = libraryStmt.isMethod
-          ? importedMethodInternalName(stmt.alias.name, receiverTypeName(libraryStmt), libraryStmt.name.name, libraryStmt.params.length)
-          : importedExportName(stmt.alias.name, libraryStmt.name.name);
-        walkFunctionBody(internalName, libraryStmt.params.map((p) => p.name), libraryStmt.body);
-        continue;
-      }
-
-      if (libraryStmt.type === 'TypeDeclaration') {
+        const typeInfo = { name: typeName, fields, node: libraryStmt };
+        ctx.typeDecls.set(typeName, typeInfo);
+        ctx.typeDecls.set(libraryStmt.name.name, typeInfo);
         for (const f of libraryStmt.fields) {
           if (f.defaultValue) walkExpr(f.defaultValue);
         }
@@ -784,6 +686,15 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         const taFullName = isBareUserFunctionCall ? fullName : canonicalTACallName(fullName);
         const taNamespace = taFullName.split('.')[0] ?? '';
 
+        if (
+          namespace
+          && ctx.importedNamespaces.has(namespace)
+          && !ctx.importedFunctions.has(fullName)
+          && !(expr.callee.type === 'MemberExpression' && expr.callee.property.name === 'new' && ctx.typeDecls.has(resolveCallee(expr.callee.object).fullName))
+        ) {
+          addUnsupported(`Imported library function ${fullName} not yet supported by transpiler`);
+        }
+
         if (UNSUPPORTED_REQUEST_FUNCS.has(fullName)) {
           addUnsupported(`${fullName} not yet supported by transpiler`);
         }
@@ -803,15 +714,11 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           const ignoreInvalidTimeframeExpr = isLowerTf ? orderedCallExprArg(expr.arguments, requestArgs, 5) ?? null : null;
           const calcBarsCountExpr = orderedCallExprArg(expr.arguments, requestArgs, isLowerTf ? 6 : 7) ?? null;
           if (symbolExpr && timeframeExpr && expressionExpr) {
+            const secId = ctx.securitySites.length;
             const taCallSitesBefore = ctx.taCallSites.length;
             walkExpr(symbolExpr);
             walkExpr(timeframeExpr);
-            requestExpressionDepth += 1;
-            try {
-              walkExpr(expressionExpr);
-            } finally {
-              requestExpressionDepth -= 1;
-            }
+            walkExpr(expressionExpr);
             if (gapsExpr) walkExpr(gapsExpr);
             if (lookaheadExpr) walkExpr(lookaheadExpr);
             if (ignoreInvalidSymbolExpr) walkExpr(ignoreInvalidSymbolExpr);
@@ -831,12 +738,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
             const securityNodeSet = new Set(securityTASites.map((s) => s.node));
             ctx.taCallSites = ctx.taCallSites.filter((s) => !securityNodeSet.has(s.node));
             for (const s of securityTASites) ctx.taCallSiteMap.delete(s.node);
-            const requiresDynamicRequestsReason =
-              requestExpressionDepth > 0 ? 'nested-request'
-                : localScopeDepth > 0 ? 'local-scope'
-                  : conditionalOperandDepth > 0 ? 'conditional-operand'
-                    : undefined;
-            const secId = ctx.securitySites.length;
             ctx.securitySites.push({
               id: secId,
               kind: isLowerTf ? 'security_lower_tf' : 'security',
@@ -855,8 +756,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
               expressionSourceParam,
               expressionCaptureParams: expressionCaptures.params.length > 0 ? expressionCaptures.params : undefined,
               expressionLocalStatements: expressionCaptures.locals.length > 0 ? expressionCaptures.locals : undefined,
-              importedAliasContext: currentImportedAlias(),
-              requiresDynamicRequestsReason,
             });
           }
           break;
@@ -870,6 +769,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           const ignoreInvalidSymbolExpr = orderedCallExprArg(expr.arguments, requestArgs, 3) ?? null;
           const calcBarsCountExpr = orderedCallExprArg(expr.arguments, requestArgs, 4) ?? null;
           if (sourceExpr && symbolExpr && expressionExpr) {
+            const secId = ctx.securitySites.length;
             const taCallSitesBefore = ctx.taCallSites.length;
             walkExpr(sourceExpr);
             walkExpr(symbolExpr);
@@ -887,7 +787,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
             const securityNodeSet = new Set(securityTASites.map((s) => s.node));
             ctx.taCallSites = ctx.taCallSites.filter((s) => !securityNodeSet.has(s.node));
             for (const s of securityTASites) ctx.taCallSiteMap.delete(s.node);
-            const secId = ctx.securitySites.length;
             ctx.securitySites.push({
               id: secId,
               kind: 'seed',
@@ -906,7 +805,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
               expressionSourceParam,
               expressionCaptureParams: expressionCaptures.params.length > 0 ? expressionCaptures.params : undefined,
               expressionLocalStatements: expressionCaptures.locals.length > 0 ? expressionCaptures.locals : undefined,
-              importedAliasContext: currentImportedAlias(),
             });
           }
           break;
@@ -937,11 +835,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
             tupleFields: taFullName === 'ta.vwap' ? ['middle', 'upper', 'lower'] : info.tupleFields,
             node: expr,
           };
-          for (const arg of site.computeArgExprs) {
-            if (arg.type === 'Identifier' && !BAR_FIELDS.has(arg.name)) {
-              ctx.seriesVars.add(arg.name);
-            }
-          }
           ctx.taCallSites.push(site);
           ctx.taCallSiteMap.set(expr, site);
         }
@@ -965,16 +858,13 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           });
         }
 
-        const sameLibraryFunction = expr.callee.type === 'Identifier'
-          ? sameImportedLibraryFunctionName(fullName)
-          : undefined;
         const methodNames = expr.callee.type === 'MemberExpression' && !ctx.funcInfos.has(expr.callee.property.name)
-          ? ((sameImportedLibraryMethodOverloads(expr.callee.property.name) ?? ctx.importedMethodOverloads.get(expr.callee.property.name))?.map((overload) => overload.internalName)
+          ? (ctx.importedMethodOverloads.get(expr.callee.property.name)?.map((overload) => overload.internalName)
             ?? (ctx.importedMethods.has(expr.callee.property.name) ? [ctx.importedMethods.get(expr.callee.property.name)!] : []))
           : [];
         const callableNames = methodNames.length > 0
           ? methodNames
-          : [ctx.importedFunctions.get(fullName) ?? sameLibraryFunction ?? fullName];
+          : [ctx.importedFunctions.get(fullName) ?? fullName];
         for (const callableName of callableNames) {
           if (ctx.funcInfos.has(callableName)) {
             const fi = ctx.funcInfos.get(callableName)!;
@@ -991,16 +881,6 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       }
       case 'BinaryExpression':
-        if (expr.operator === 'and' || expr.operator === 'or') {
-          conditionalOperandDepth += 1;
-          try {
-            walkExpr(expr.left);
-            walkExpr(expr.right);
-          } finally {
-            conditionalOperandDepth -= 1;
-          }
-          break;
-        }
         walkExpr(expr.left);
         walkExpr(expr.right);
         break;
@@ -1009,13 +889,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       case 'ConditionalExpression':
         walkExpr(expr.test);
-        conditionalOperandDepth += 1;
-        try {
-          walkExpr(expr.consequent);
-          walkExpr(expr.alternate);
-        } finally {
-          conditionalOperandDepth -= 1;
-        }
+        walkExpr(expr.consequent);
+        walkExpr(expr.alternate);
         break;
       case 'SwitchExpression':
         if (expr.discriminant) walkExpr(expr.discriminant);
@@ -1034,6 +909,15 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           if (fullName in TA_VAR_CLASS_MAP) {
             registerTAVarSite(expr, fullName);
             break;
+          }
+          if (
+            ctx.importedNamespaces.has(expr.object.name)
+            && !ctx.importedConstants.has(fullName)
+            && !ctx.importedFunctions.has(fullName)
+            && !ctx.typeDecls.has(fullName)
+            && !isImportedEnumPrefix(fullName)
+          ) {
+            addUnsupported(`Imported library member ${fullName} not yet supported by transpiler`);
           }
         }
         walkExpr(expr.object);
@@ -1132,28 +1016,18 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       case 'IfStatement':
         walkExpr(stmt.test);
-        localScopeDepth += 1;
-        try {
-          for (const s of stmt.consequent) walkStmt(s);
-          if (stmt.alternate) {
-            if (Array.isArray(stmt.alternate)) {
-              for (const s of stmt.alternate) walkStmt(s);
-            } else {
-              walkStmt(stmt.alternate);
-            }
+        for (const s of stmt.consequent) walkStmt(s);
+        if (stmt.alternate) {
+          if (Array.isArray(stmt.alternate)) {
+            for (const s of stmt.alternate) walkStmt(s);
+          } else {
+            walkStmt(stmt.alternate);
           }
-        } finally {
-          localScopeDepth -= 1;
         }
         break;
       case 'OnceStatement':
         if (stmt.test) walkExpr(stmt.test);
-        localScopeDepth += 1;
-        try {
-          for (const s of stmt.body) walkStmt(s);
-        } finally {
-          localScopeDepth -= 1;
-        }
+        for (const s of stmt.body) walkStmt(s);
         break;
       case 'ForStatement':
         if (stmt.kind === 'numeric') {
@@ -1163,35 +1037,15 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         } else {
           walkExpr(stmt.iterable);
         }
-        localScopeDepth += 1;
-        try {
-          for (const s of stmt.body) walkStmt(s);
-        } finally {
-          localScopeDepth -= 1;
-        }
+        for (const s of stmt.body) walkStmt(s);
         break;
       case 'WhileStatement':
         walkExpr(stmt.test);
-        localScopeDepth += 1;
-        try {
-          for (const s of stmt.body) walkStmt(s);
-        } finally {
-          localScopeDepth -= 1;
-        }
+        for (const s of stmt.body) walkStmt(s);
         break;
       case 'FunctionDeclaration': {
-        if (stmt.isMethod) {
-          const receiverType = receiverTypeName(stmt);
-          const internalName = localMethodInternalName(receiverType, stmt.name.name, stmt.params.length);
-          const overloads = ctx.localMethodOverloads.get(stmt.name.name) ?? [];
-          overloads.push({ receiverType, internalName });
-          ctx.localMethodOverloads.set(stmt.name.name, overloads);
-          registerFunctionInfo(internalName, stmt);
-          walkFunctionBody(internalName, stmt.params.map((p) => p.name), stmt.body);
-        } else {
-          registerFunctionInfo(stmt.name.name, stmt);
-          walkFunctionBody(stmt.name.name, stmt.params.map((p) => p.name), stmt.body);
-        }
+        registerFunctionInfo(stmt.name.name, stmt);
+        walkFunctionBody(stmt.name.name, stmt.params.map((p) => p.name), stmt.body);
         break;
       }
       case 'ImportDeclaration': {
@@ -1199,13 +1053,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
         break;
       }
       case 'LibraryDeclaration': {
-        let title = '';
-        if (stmt.title.type === 'StringLiteral') title = stmt.title.value;
-        ctx.declarationInfo = {
-          kind: 'library',
-          title,
-          node: stmt,
-        };
+        const msg = 'Library declarations not yet supported by transpiler';
+        addUnsupported(msg);
         break;
       }
       case 'TypeDeclaration': {
@@ -1422,6 +1271,7 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
     case 'ta.cog':
     case 'ta.median':
     case 'ta.mode':
+    case 'ta.stdev':
     case 'ta.dema':
     case 'ta.tema':
     case 'ta.wma':
@@ -1547,15 +1397,6 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
     case 'ta.percentrank': {
       const len = extractStaticNumber(args.find((a) => a.name?.name === 'length')?.value ?? positional[1]);
       if (len !== null) return [len];
-      return [];
-    }
-    case 'ta.stdev': {
-      const names = ['source', 'length', 'biased'];
-      const lengthArg = readOrderedArg(args, names, 'length', 1);
-      const len = extractStaticNumber(lengthArg);
-      const biasedArg = readOrderedArg(args, names, 'biased', 2);
-      const biased = biasedArg ? extractStaticBoolean(biasedArg) : true;
-      if (len !== null && biased !== null) return [len, biased];
       return [];
     }
     case 'ta.linreg': {
@@ -1730,7 +1571,7 @@ function extractCtorArgs(fullName: string, args: CallArgument[]): unknown[] {
       return handleNa === null ? [] : [handleNa];
     }
     case 'ta.change': {
-      const lengthArg = readOrderedArg(args, ['source', 'length'], 'length', 1);
+      const lengthArg = args.find((a) => a.name?.name === 'length')?.value ?? positional[1];
       if (!lengthArg) return [1];
       const len = extractStaticNumber(lengthArg);
       return len !== null ? [len] : [];
@@ -1770,6 +1611,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
     case 'ta.cog':
     case 'ta.median':
     case 'ta.mode':
+    case 'ta.stdev':
     case 'ta.dema':
     case 'ta.tema':
     case 'ta.wma':
@@ -1780,12 +1622,6 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       const lengthExpr = args.find((a) => a.name?.name === 'length')?.value
         ?? positional[args.some((a) => a.name?.name === 'source') ? 0 : 1];
       return lengthExpr ? [lengthExpr] : [];
-    }
-    case 'ta.stdev': {
-      const names = ['source', 'length', 'biased'];
-      const lengthExpr = readAliasedArg(names, 'length', 1);
-      const biasedExpr = readAliasedArg(names, 'biased', 2) ?? booleanLiteral(true);
-      return [lengthExpr, biasedExpr].filter(isDefinedExpression);
     }
     case 'ta.atr': {
       const lengthExpr = args.find((a) => a.name?.name === 'length')?.value ?? positional[0];
@@ -1834,7 +1670,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       const names = ['source', 'length'];
       const fallback = fullName === 'ta.cci' ? 20 : fullName === 'ta.mom' ? 10 : fullName === 'ta.roc' ? 1 : null;
       const lengthExpr = readAliasedArg(names, 'length', 1) ?? (fallback === null ? undefined : numericLiteral(fallback));
-      return [lengthExpr].filter(isDefinedExpression);
+      return [lengthExpr].filter(Boolean) as Expression[];
     }
     case 'ta.mfi': {
       const names = ['source', 'length'];
@@ -1842,20 +1678,20 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       const lengthExpr = args.find((a) => a.name?.name === 'length')?.value
         ?? positional[sourceNamed ? 0 : 1]
         ?? undefined;
-      return [lengthExpr].filter(isDefinedExpression);
+      return [lengthExpr].filter(Boolean) as Expression[];
     }
     case 'ta.tsi': {
       const names = ['source', 'short_length', 'long_length'];
       return [
         readAliasedArg(names, 'short_length', 1),
         readAliasedArg(names, 'long_length', 2),
-      ].filter(isDefinedExpression);
+      ].filter(Boolean) as Expression[];
     }
     case 'ta.variance': {
       const names = ['source', 'length', 'biased'];
       const lengthExpr = readAliasedArg(names, 'length', 1);
       const biasedExpr = readAliasedArg(names, 'biased', 2) ?? booleanLiteral(true);
-      return [lengthExpr, biasedExpr].filter(isDefinedExpression);
+      return [lengthExpr, biasedExpr].filter(Boolean) as Expression[];
     }
     case 'ta.covariance':
     case 'ta.correlation': {
@@ -1869,7 +1705,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       return [
         readAliasedArg(names, 'length', 1),
         readAliasedArg(names, 'percentage', 2),
-      ].filter(isDefinedExpression);
+      ].filter(Boolean) as Expression[];
     }
     case 'ta.percentrank': {
       const names = ['source', 'length'];
@@ -1881,23 +1717,23 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       return [
         readAliasedArg(names, 'length', 1),
         readAliasedArg(names, 'offset', 2),
-      ].filter(isDefinedExpression);
+      ].filter(Boolean) as Expression[];
     }
     case 'ta.alma': {
-      const names = [['source', 'series'], ['length'], ['offset'], ['sigma'], ['floor']] as const;
+      const names = ['source', 'length', 'offset', 'sigma', 'floor'];
       return [
-        readAliasedOrderedArg(args, names, 1),
-        readAliasedOrderedArg(args, names, 2),
-        readAliasedOrderedArg(args, names, 3),
-        readAliasedOrderedArg(args, names, 4) ?? booleanLiteral(true),
-      ].filter(isDefinedExpression);
+        readAliasedArg(names, 'length', 1),
+        readAliasedArg(names, 'offset', 2),
+        readAliasedArg(names, 'sigma', 3),
+        readAliasedArg(names, 'floor', 4) ?? booleanLiteral(true),
+      ].filter(Boolean) as Expression[];
     }
     case 'ta.bbw': {
       const names = ['series', 'length', 'mult'];
       return [
         readAliasedArg(names, 'length', 1),
         readAliasedArg(names, 'mult', 2),
-      ].filter(isDefinedExpression);
+      ].filter(Boolean) as Expression[];
     }
     case 'ta.valuewhen': {
       const names = ['condition', 'source', 'occurrence'];
@@ -1936,12 +1772,12 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       const fast = readArg('fastlen', 1);
       const slow = readArg('slowlen', 2);
       const sig = readArg('siglen', 3);
-      return [fast, slow, sig].filter(isDefinedExpression);
+      return [fast, slow, sig].filter(Boolean) as Expression[];
     }
     case 'ta.bb': {
       const len = args.find((a) => a.name?.name === 'length')?.value ?? positional[1];
       const mult = args.find((a) => a.name?.name === 'mult')?.value ?? positional[2];
-      return [len, mult].filter(isDefinedExpression);
+      return [len, mult].filter(Boolean) as Expression[];
     }
     case 'ta.kc':
     case 'ta.kcw': {
@@ -1955,7 +1791,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       const len = readArg('length', 1);
       const mult = readArg('mult', 2);
       const useTrueRange = readArg('useTrueRange', 3);
-      return [len, mult, useTrueRange].filter(isDefinedExpression);
+      return [len, mult, useTrueRange].filter(Boolean) as Expression[];
     }
     case 'ta.supertrend': {
       const names = ['factor', 'atrPeriod'];
@@ -1965,7 +1801,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
         const positionalIndex = index - names.slice(0, index).filter((param) => args.some((a) => a.name?.name === param)).length;
         return positional[positionalIndex];
       };
-      return [readArg('factor', 0), readArg('atrPeriod', 1)].filter(isDefinedExpression);
+      return [readArg('factor', 0), readArg('atrPeriod', 1)].filter(Boolean) as Expression[];
     }
     case 'ta.dmi':
     case 'ta.adx': {
@@ -1978,7 +1814,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
       };
       const diLength = readArg('diLength', 0);
       const adxSmoothing = readArg('adxSmoothing', 1) ?? (fullName === 'ta.adx' ? numericLiteral(14) : undefined);
-      return [diLength, adxSmoothing].filter(isDefinedExpression);
+      return [diLength, adxSmoothing].filter(Boolean) as Expression[];
     }
     case 'ta.sar': {
       const names = ['start', 'inc', 'max'];
@@ -1988,7 +1824,7 @@ function extractCtorArgExprs(fullName: string, args: CallArgument[]): Expression
         const positionalIndex = index - names.slice(0, index).filter((param) => args.some((a) => a.name?.name === param)).length;
         return positional[positionalIndex];
       };
-      return [readArg('start', 0), readArg('inc', 1), readArg('max', 2)].filter(isDefinedExpression);
+      return [readArg('start', 0), readArg('inc', 1), readArg('max', 2)].filter(Boolean) as Expression[];
     }
     case 'ta.kst': {
       const names = ['source', 'roclength1', 'roclength2', 'roclength3', 'roclength4', 'smalen1', 'smalen2', 'smalen3', 'smalen4', 'signalLength'];
@@ -2020,12 +1856,12 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
   const positional = args.filter((a) => !a.name).map((a) => a.value);
   switch (fullName) {
     case 'ta.barssince':
-      return [args.find((a) => a.name?.name === 'condition')?.value ?? positional[0]].filter(isDefinedExpression);
+      return [args.find((a) => a.name?.name === 'condition')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.valuewhen': {
       const hasNamedCondition = args.some((a) => a.name?.name === 'condition');
       const condition = args.find((a) => a.name?.name === 'condition')?.value ?? positional[0];
       const source = args.find((a) => a.name?.name === 'source')?.value ?? positional[hasNamedCondition ? 0 : 1];
-      return [condition, source].filter(isDefinedExpression);
+      return [condition, source].filter(Boolean) as Expression[];
     }
     case 'ta.sma':
     case 'ta.ema':
@@ -2062,55 +1898,56 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
     case 'ta.rci':
     case 'ta.cum':
     case 'ta.kst':
-      return [readAliasedOrderedArg(args, [['source', 'series']], 0)].filter(isDefinedExpression);
+      return [args.find((a) => a.name?.name === 'source')?.value ?? args.find((a) => a.name?.name === 'series')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.vwap': {
       const source = readOrderedArg(args, ['source', 'anchor', 'stdev_mult'], 'source', 0);
       const anchor = readOrderedArg(args, ['source', 'anchor', 'stdev_mult'], 'anchor', 1);
-      return [source, anchor].filter(isDefinedExpression);
+      return [source, anchor].filter(Boolean) as Expression[];
     }
     case 'ta.highest':
     case 'ta.lowest': {
       const source = args.find((a) => a.name?.name === 'source')?.value ?? (positional.length >= 2 ? positional[0] : undefined);
-      return [source].filter(isDefinedExpression);
+      return [source].filter(Boolean) as Expression[];
     }
     case 'ta.obv': {
-      const source = readOrderedArg(args, ['source', 'volume'], 'source', 0);
-      const volume = readOrderedArg(args, ['source', 'volume'], 'volume', 1);
-      return [source, volume].filter(isDefinedExpression);
+      const source = args.find((a) => a.name?.name === 'source')?.value ?? positional[0];
+      const volume = args.find((a) => a.name?.name === 'volume')?.value ?? positional[1];
+      return [source, volume].filter(Boolean) as Expression[];
     }
     case 'ta.bar_index':
-      return [readOrderedArg(args, ['source'], 'source', 0)].filter(isDefinedExpression);
+      return [args.find((a) => a.name?.name === 'source')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.macd':
-      return [readOrderedArg(args, ['source', 'fastlen', 'slowlen', 'siglen'], 'source', 0)].filter(isDefinedExpression);
+      return [args.find((a) => a.name?.name === 'source')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.bb':
-      return [readOrderedArg(args, ['series', 'length', 'mult'], 'series', 0)].filter(isDefinedExpression);
+      return [args.find((a) => a.name?.name === 'series')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.kc':
     case 'ta.kcw':
-      return [readOrderedArg(args, ['series', 'length', 'mult', 'useTrueRange'], 'series', 0)].filter(isDefinedExpression);
+      return [args.find((a) => a.name?.name === 'series')?.value ?? positional[0]].filter(Boolean) as Expression[];
     case 'ta.crossover':
     case 'ta.cross':
     case 'ta.crossunder': {
-      const a = readOrderedArg(args, ['source1', 'source2'], 'source1', 0);
-      const b = readOrderedArg(args, ['source1', 'source2'], 'source2', 1);
-      return [a, b].filter(isDefinedExpression);
+      const a = args.find((a) => a.name?.name === 'source1')?.value ?? positional[0];
+      const b = args.find((a) => a.name?.name === 'source2')?.value ?? positional[1];
+      return [a, b].filter(Boolean) as Expression[];
     }
     case 'ta.max':
     case 'ta.min': {
-      const a = readOrderedArg(args, ['source1', 'source2'], 'source1', 0);
-      const b = readOrderedArg(args, ['source1', 'source2'], 'source2', 1);
-      return [a, b].filter(isDefinedExpression);
+      const a = args.find((a) => a.name?.name === 'source1')?.value ?? positional[0];
+      const hasNamedSource1 = args.some((a) => a.name?.name === 'source1');
+      const b = args.find((a) => a.name?.name === 'source2')?.value ?? positional[hasNamedSource1 ? 0 : 1];
+      return [a, b].filter(Boolean) as Expression[];
     }
     case 'ta.covariance':
     case 'ta.correlation': {
-      const a = readOrderedArg(args, ['source1', 'source2', 'length'], 'source1', 0);
-      const b = readOrderedArg(args, ['source1', 'source2', 'length'], 'source2', 1);
-      return [a, b].filter(isDefinedExpression);
+      const a = args.find((a) => a.name?.name === 'source1')?.value ?? positional[0];
+      const b = args.find((a) => a.name?.name === 'source2')?.value ?? positional[1];
+      return [a, b].filter(Boolean) as Expression[];
     }
     case 'ta.change': {
       return [
-        readOrderedArg(args, ['source', 'length'], 'source', 0),
-        readOrderedArg(args, ['source', 'length'], 'length', 1),
-      ].filter(isDefinedExpression);
+        args.find((a) => a.name?.name === 'source')?.value ?? positional[0],
+        args.find((a) => a.name?.name === 'length')?.value ?? positional[1],
+      ].filter(Boolean) as Expression[];
     }
     case 'ta.atr':
     case 'ta.tr':
@@ -2122,19 +1959,19 @@ function extractComputeArgs(fullName: string, args: CallArgument[]): Expression[
       return []; // OHLC classes read high/low/close from bar directly
     case 'ta.highestbars':
     case 'ta.lowestbars': {
-      const source = args.find((a) => a.name?.name === 'source')?.value ?? (positional.length >= 2 ? positional[0] : undefined);
-      return [source].filter(isDefinedExpression);
+      const source = args.find((a) => a.name?.name === 'source')?.value ?? (positional[1] ? positional[0] : undefined);
+      return [source].filter(Boolean) as Expression[];
     }
     case 'ta.pivothigh':
     case 'ta.pivotlow': {
       const source = args.find((a) => a.name?.name === 'source')?.value ?? (positional.length >= 3 ? positional[0] : undefined);
-      return [source].filter(isDefinedExpression);
+      return [source].filter(Boolean) as Expression[];
     }
     case 'ta.stoch': {
-      const src = readOrderedArg(args, ['source', 'high', 'low', 'length'], 'source', 0);
-      const high = readOrderedArg(args, ['source', 'high', 'low', 'length'], 'high', 1);
-      const low = readOrderedArg(args, ['source', 'high', 'low', 'length'], 'low', 2);
-      return [src, high, low].filter(isDefinedExpression);
+      const src = args.find((a) => a.name?.name === 'source')?.value ?? positional[0];
+      const high = args.find((a) => a.name?.name === 'high')?.value ?? positional[1];
+      const low = args.find((a) => a.name?.name === 'low')?.value ?? positional[2];
+      return [src, high, low].filter(Boolean) as Expression[];
     }
     default:
       return positional;

@@ -21,20 +21,20 @@ was used as behavioral context only; no PineTS source was copied or ported.
 - Composite public-style indicator coverage now runs twenty-one original dense
   indicators, including five 150-300 line composites and six awkward valid
   style composites, through parse, semantic
-  checks, legacy runtime execution, compiled execution, request datafeed routing,
+  checks, interpreter execution, compiled execution, request datafeed routing,
   and normalized plot/drawing/alert output parity. These fixtures combine
   imports, block-bodied UDFs, request wrappers, session/timeframe/chart gates,
   arrays/maps/UDTs, var state, tables/labels/lines/boxes, plots/fills/hlines/
   bgcolor/plotshape/plotarrow/plotbar/plotcandle, alertconditions, multiline
   calls, nested ternaries, long boolean chains, method chaining, tuple branch
   reassignment, and awkward indentation/comment placement.
-- Compiled Pine Logs formatting now matches the legacy runtime for numeric
+- Compiled Pine Logs formatting now matches the interpreter for numeric
   placeholders such as `{0:#.0}` in `log.info()`, `log.warning()`, and
   `log.error()` output.
 - Compiled logical `and`/`or` now short-circuit with Pine truthiness, matching
-  the legacy runtime for public guard idioms that place `runtime.error()` on an
+  the interpreter for public guard idioms that place `runtime.error()` on an
   unreachable operand.
-- `runtime.error(message=...)` is covered in compiled execution;
+- `runtime.error(message=...)` is covered in interpreter and compiled execution;
   named-message guards in copied indicators no longer classify as runtime gaps.
 - Compiled request wrapper parity covers common UDF helpers where
   `request.security()`, legacy `security()`, `request.security_lower_tf()`, or
@@ -68,8 +68,8 @@ was used as behavioral context only; no PineTS source was copied or ported.
   `macd` with named-leading and positional-following arguments.
 - Compiled MACD parity accepts all-positional, all-named, and mixed
   `ta.macd(source=..., fastlen, slowlen, siglen)` argument forms, matching the
-  legacy runtime for public tail-TA helper idioms.
-- The compiled-only parity sweep is strict: every listed script must
+  interpreter for public tail-TA helper idioms.
+- The compiled-vs-interpreter parity sweep is strict: every listed script must
   compile and execute through the compiled path before plot values are compared,
   so unsupported regressions cannot silently pass.
 - Compiled fallback rate is now tracked as committed data for the 84-fixture
@@ -77,12 +77,12 @@ was used as behavioral context only; no PineTS source was copied or ported.
   three performance composites: 87 eligible scripts, 87 compiled, zero fallback
   reasons.
 - Compiled ATR parity accepts Pine's length-only `ta.atr(5)` and named
-  `ta.atr(length=5)` forms, matching expected output for the common
+  `ta.atr(length=5)` forms, matching interpreter output for the common
   indicator primitive instead of treating the positional length as a source.
 - Compiled formatted-string drawing parity covers `str.format()` OHLC/close text
   and `str.tostring(..., "#.####")` table-cell text flowing through normalized
   `label` and `table` drawing payloads, not only plot-based string predicates.
-- Compiled recursive UDF parity has a direct compiled-behavior harness for
+- Compiled recursive UDF parity has a direct interpreter-matching harness for
   self-recursive expression-body and block-body helper calls, covering reduced
   factorial and Fibonacci Pine idioms.
 - Compiled recursive `var` series parity covers history-referenced persistent
@@ -93,7 +93,7 @@ was used as behavioral context only; no PineTS source was copied or ported.
   through nested `if`, `switch`, and loop bodies.
 - Compiled chart-point drawing parity covers named `chart.point.from_index()`,
   named `chart.point.from_time()`, `chart.point.copy()`, and `label.new(point,
-  ...)` overloads against legacy runtime drawing output.
+  ...)` overloads against interpreter drawing output.
 - Compiled OHLC visual parity covers `plotbar()` and `plotcandle()` normalized
   open/high/low/close arrays, body/wick/border colors, editable/show-last/
   display/format/precision/force-overlay metadata, color masking on bars where
@@ -101,12 +101,12 @@ was used as behavioral context only; no PineTS source was copied or ported.
   indexes.
 - Compiled drawing lifecycle parity covers `label.all`, `line.all`, `box.all`,
   `table.all`, named delete calls, and final drawing payloads against the
-  legacy runtime. `polyline.all`/delete and linefill all/delete remain covered by
+  interpreter. `polyline.all`/delete and linefill all/delete remain covered by
   existing compiled fixtures.
 - Compiled table drawing parity covers Pine named constructor/setter arguments,
   table frame/border/background mutators, cell text/color/size/width/height/
   alignment/font/formatting/tooltip mutators, merged cells, `table.clear()`,
-  and `table.all` counts against expected output.
+  and `table.all` counts against interpreter output.
 
 ## Partially Supported
 
@@ -140,15 +140,15 @@ was used as behavioral context only; no PineTS source was copied or ported.
 - Pine v5 global `security()` requires a request datafeed at runtime, matching
   the `request.security()` host dependency.
 - Compiled request hard errors halt after the primary request error, while the
-  legacy runtime can currently also record a secondary unknown-identifier error
+  interpreter can currently also record a secondary unknown-identifier error
   after the failed assignment.
 - Compiled `max_bars_back()` invalid hints halt after the first runtime error,
-  while the legacy runtime currently records the validation error on each bar.
+  while the interpreter currently records the validation error on each bar.
 
 ## Tests Added
 
 - `src/runtime/codegen/execute.test.ts`: compiled mixed tail-TA helper forms now
-  match expected output for `supertrend`, `dmi`, `sar`, pivots, `linreg`, and
+  match interpreter output for `supertrend`, `dmi`, `sar`, pivots, `linreg`, and
   `macd`.
 - `tests/compat/pine-external-corpus-classifier.test.ts`: external-style
   request/ticker/session/runtime corpus classifies 70 reduced raw Pine sources
@@ -158,21 +158,21 @@ was used as behavioral context only; no PineTS source was copied or ported.
   compiled imported-library support covers host-provided `alias.CONST`,
   `alias.exportedFunction(...)`, block-bodied helpers, methods, imported UDT
   construction/field access, enum members and `.title()`, and imported helpers inside request
-  expression subprograms against expected output.
+  expression subprograms against interpreter output.
 - `src/runtime/codegen/compile.test.ts`: compiled request analysis accepts
   direct source-parameter and captured computed-expression request wrappers.
 - `src/runtime/codegen/execute.test.ts`: compiled request execution matches the
-  legacy runtime for source-parameter UDF wrappers around `request.security()`,
+  interpreter for source-parameter UDF wrappers around `request.security()`,
   `request.security_lower_tf()`, and `request.seed()`.
 - `src/runtime/codegen/execute.test.ts` and
   `tests/compat/pine-composite-indicators.test.ts`: compiled execution matches
-  the legacy runtime for source aliases inside imported request wrappers, imported
+  the interpreter for source aliases inside imported request wrappers, imported
   function locals inside tuple request expressions, UDF parameter history, UDT
   field history, UDF local-variable history, indexed TA call-result history,
   request-expression UDF locals built from arrays, nested UDF call-chain TA
   state, and twenty-one dense composite public-style indicators.
 - `src/runtime/codegen/execute.test.ts`: compiled log formatting now matches
-  legacy runtime logs for numeric placeholder formats.
+  interpreter logs for numeric placeholder formats.
 - `src/runtime/codegen/execute.test.ts`: compiled logical `and`/`or`
-  short-circuiting now matches expected output when unreachable operands
+  short-circuiting now matches interpreter output when unreachable operands
   contain `runtime.error()`.

@@ -8,25 +8,24 @@ import {
   seedRequestSymbol,
   type Bar,
   type ExecutionResult,
-  type TealscriptExecutionOptions,
+  type TealscriptEngineOptions,
 } from '../../src';
 import { summarizeCompiledFallbackReasons } from '../../src/compat/compiledFallbackBaseline';
 import {
   getProductionWorkerFallbackBaselineGroup,
-  isProductionWorkerFallbackMeasurement,
   summarizeRealtimeParityMismatches,
   summarizeProductionWorkerExecutionModes,
   summarizeProductionWorkerFallbackReasons,
 } from '../../src/compat/productionWorkerFallbackBaseline';
 import { executeCompiled, tryCompile, type CompiledScript } from '../../src/runtime/codegen';
 import type { Program } from '../../src/parser/ast';
-import { measureProductionWorkerSessions, measureRealtimeReentryParity } from './productionWorkerHarness';
+import { measureForcedCompiledRealtimeSafety, measureProductionWorkerSessions, measureRealtimeReentryParity } from './productionWorkerHarness';
 
 interface BenchmarkCase {
   name: string;
   source: string;
   bars: Bar[];
-  options?: TealscriptExecutionOptions;
+  options?: TealscriptEngineOptions;
   iterations: number;
   provenance: {
     measuredAt: string;
@@ -38,13 +37,13 @@ interface BenchmarkCase {
   };
   thresholds: {
     compileMs: number;
-    referenceUsPerBar: number;
+    interpreterUsPerBar: number;
     compiledUsPerBar: number;
     heapDeltaMb?: number;
   };
   baseline: {
     compileMs: number;
-    referenceUsPerBar: number;
+    interpreterUsPerBar: number;
     compiledUsPerBar: number;
     heapDeltaMb?: number;
   };
@@ -52,7 +51,7 @@ interface BenchmarkCase {
 
 const ASSERT_PERFORMANCE_THRESHOLDS = process.env.TEALSCRIPT_PERF_ASSERT === '1';
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
-const REALTIME_SWEEP_BACKEND = 'worker';
+const REALTIME_SWEEP_BACKEND = process.env.TEALSCRIPT_REALTIME_BACKEND === 'closure' ? 'closure' : 'worker';
 const fullPerformanceIt = ASSERT_PERFORMANCE_THRESHOLDS ? it : it.skip;
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 const SMOKE_BAR_COUNT = 12;
@@ -87,7 +86,7 @@ function measureMedian(iterations: number, fn: () => void): number {
   return median(samples);
 }
 
-function compileOrThrow(ast: Program, options?: TealscriptExecutionOptions): CompiledScript {
+function compileOrThrow(ast: Program, options?: TealscriptEngineOptions): CompiledScript {
   const compiled = tryCompile(ast, undefined, { libraries: options?.libraries });
   if (!compiled.success) {
     throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
@@ -95,7 +94,7 @@ function compileOrThrow(ast: Program, options?: TealscriptExecutionOptions): Com
   return compiled;
 }
 
-function executeCompiledOrThrow(compiled: CompiledScript, bars: Bar[], options?: TealscriptExecutionOptions): ExecutionResult {
+function executeCompiledOrThrow(compiled: CompiledScript, bars: Bar[], options?: TealscriptEngineOptions): ExecutionResult {
   const result = executeCompiled(compiled, bars, undefined, options);
   if (!result) throw new Error('Compiled execution returned null');
   return result;
@@ -122,7 +121,7 @@ function runBenchmarkCase(testCase: BenchmarkCase): void {
   });
   const compiled = compileOrThrow(ast, testCase.options);
 
-  const referenceMs = measureMedian(testCase.iterations, () => {
+  const interpreterMs = measureMedian(testCase.iterations, () => {
     assertResultClean(executeScript(ast, testCase.bars, undefined, testCase.options));
   });
 
@@ -139,14 +138,14 @@ function runBenchmarkCase(testCase: BenchmarkCase): void {
   assertPlotShapeParity(compiledResult, interpretedResult);
 
   const bars = testCase.bars.length;
-  const referenceUsPerBar = (referenceMs * 1_000) / bars;
+  const interpreterUsPerBar = (interpreterMs * 1_000) / bars;
   const compiledUsPerBar = (compiledMs * 1_000) / bars;
   const heapDeltaMb = Math.max(0, heapAfter - heapBefore) / 1024 / 1024;
-  const speedup = referenceUsPerBar / compiledUsPerBar;
+  const speedup = interpreterUsPerBar / compiledUsPerBar;
 
   if (process.env.TEALSCRIPT_PERF_LOG === '1') {
     console.info(
-      `${testCase.name}: compile=${compileMs.toFixed(1)}ms reference=${referenceUsPerBar.toFixed(1)}us/bar compiled=${compiledUsPerBar.toFixed(1)}us/bar speedup=${speedup.toFixed(1)}x heap=${heapDeltaMb.toFixed(1)}MB`,
+      `${testCase.name}: compile=${compileMs.toFixed(1)}ms interpreter=${interpreterUsPerBar.toFixed(1)}us/bar compiled=${compiledUsPerBar.toFixed(1)}us/bar speedup=${speedup.toFixed(1)}x heap=${heapDeltaMb.toFixed(1)}MB`,
     );
   }
 
@@ -154,7 +153,7 @@ function runBenchmarkCase(testCase: BenchmarkCase): void {
   expect(testCase.provenance.iterations).toBe(testCase.iterations);
   if (ASSERT_PERFORMANCE_THRESHOLDS) {
     expect(compileMs, `${testCase.name} compile ms`).toBeLessThanOrEqual(testCase.thresholds.compileMs);
-    expect(referenceUsPerBar, `${testCase.name} reference us/bar`).toBeLessThanOrEqual(testCase.thresholds.referenceUsPerBar);
+    expect(interpreterUsPerBar, `${testCase.name} interpreter us/bar`).toBeLessThanOrEqual(testCase.thresholds.interpreterUsPerBar);
     expect(compiledUsPerBar, `${testCase.name} compiled us/bar`).toBeLessThanOrEqual(testCase.thresholds.compiledUsPerBar);
     if (testCase.thresholds.heapDeltaMb !== undefined) {
       expect(heapDeltaMb, `${testCase.name} heap delta MB`).toBeLessThanOrEqual(testCase.thresholds.heapDeltaMb);
@@ -162,7 +161,7 @@ function runBenchmarkCase(testCase: BenchmarkCase): void {
   }
 
   expect(testCase.baseline.compileMs).toBeLessThanOrEqual(testCase.thresholds.compileMs);
-  expect(testCase.baseline.referenceUsPerBar).toBeLessThanOrEqual(testCase.thresholds.referenceUsPerBar);
+  expect(testCase.baseline.interpreterUsPerBar).toBeLessThanOrEqual(testCase.thresholds.interpreterUsPerBar);
   expect(testCase.baseline.compiledUsPerBar).toBeLessThanOrEqual(testCase.thresholds.compiledUsPerBar);
   if (testCase.baseline.heapDeltaMb !== undefined && testCase.thresholds.heapDeltaMb !== undefined) {
     expect(testCase.baseline.heapDeltaMb).toBeLessThanOrEqual(testCase.thresholds.heapDeltaMb);
@@ -241,7 +240,7 @@ const requestDatafeed = new InMemoryRequestDatafeed([
   })),
 ]);
 
-const engineOptions: TealscriptExecutionOptions = {
+const engineOptions: TealscriptEngineOptions = {
   libraries: new Map([['PublicUser/BenchmarkHelpers/1', helperLibrary]]),
   requestDatafeed,
   runtime: {
@@ -430,10 +429,10 @@ describe('composite performance baselines', () => {
         composite: 'Performance Dense Computation',
         bars: 900,
         iterations: 3,
-        note: 'Remeasured after reference global scalar input declaration caching, UDF call metadata/frame fast paths, and TA window/ordered-argument helper allocation trims. This script is reference-heavy because it evaluates 76 UDF/imported-helper/TA metric chains per bar; profiling showed call/declaration overhead dominates direct TA and array/map builtin cost.',
+        note: 'Remeasured after interpreter global scalar input declaration caching, UDF call metadata/frame fast paths, and TA window/ordered-argument helper allocation trims. This script is interpreter-heavy because it evaluates 76 UDF/imported-helper/TA metric chains per bar; profiling showed call/declaration overhead dominates direct TA and array/map builtin cost.',
       },
-      baseline: { compileMs: 6, referenceUsPerBar: 1_421, compiledUsPerBar: 281 },
-      thresholds: { compileMs: 250, referenceUsPerBar: 2_800, compiledUsPerBar: 700 },
+      baseline: { compileMs: 6, interpreterUsPerBar: 1_421, compiledUsPerBar: 281 },
+      thresholds: { compileMs: 250, interpreterUsPerBar: 2_800, compiledUsPerBar: 700 },
     },
     {
       name: 'drawing lifecycle composite',
@@ -447,10 +446,10 @@ describe('composite performance baselines', () => {
         composite: 'Performance Drawing Churn',
         bars: 2_400,
         iterations: 3,
-        note: 'Remeasured after reference global scalar input declaration caching, UDF call metadata/frame fast paths, and TA window/ordered-argument helper allocation trims. Heap delta is measured without forcing GC, so the threshold intentionally allows shared-machine and collector timing variance.',
+        note: 'Remeasured after interpreter global scalar input declaration caching, UDF call metadata/frame fast paths, and TA window/ordered-argument helper allocation trims. Heap delta is measured without forcing GC, so the threshold intentionally allows shared-machine and collector timing variance.',
       },
-      baseline: { compileMs: 4, referenceUsPerBar: 554, compiledUsPerBar: 138, heapDeltaMb: 0 },
-      thresholds: { compileMs: 250, referenceUsPerBar: 1_500, compiledUsPerBar: 700, heapDeltaMb: 192 },
+      baseline: { compileMs: 4, interpreterUsPerBar: 554, compiledUsPerBar: 138, heapDeltaMb: 0 },
+      thresholds: { compileMs: 250, interpreterUsPerBar: 1_500, compiledUsPerBar: 700, heapDeltaMb: 192 },
     },
     {
       name: 'request fanout composite',
@@ -464,10 +463,10 @@ describe('composite performance baselines', () => {
         composite: 'Performance Request Fanout',
         bars: 720,
         iterations: 3,
-        note: 'Remeasured after reference global scalar input declaration caching, UDF call metadata/frame fast paths, and TA window/ordered-argument helper allocation trims. Covers 24 scalar request.security calls, 12 tuple request.security calls, and one request.seed call against seeded in-memory contexts.',
+        note: 'Remeasured after interpreter global scalar input declaration caching, UDF call metadata/frame fast paths, and TA window/ordered-argument helper allocation trims. Covers 24 scalar request.security calls, 12 tuple request.security calls, and one request.seed call against seeded in-memory contexts.',
       },
-      baseline: { compileMs: 11, referenceUsPerBar: 727, compiledUsPerBar: 184 },
-      thresholds: { compileMs: 300, referenceUsPerBar: 2_500, compiledUsPerBar: 2_000 },
+      baseline: { compileMs: 11, interpreterUsPerBar: 727, compiledUsPerBar: 184 },
+      thresholds: { compileMs: 300, interpreterUsPerBar: 2_500, compiledUsPerBar: 2_000 },
     },
   ];
 
@@ -488,7 +487,7 @@ describe('composite performance baselines', () => {
     expect(summarizeCompiledFallbackReasons(fallbacks)).toEqual(baseline.knownFallbackReasons);
   });
 
-  it('smoke-runs performance composites through reference and compiled execution', () => {
+  it('smoke-runs performance composites through interpreter and compiled execution', () => {
     const smokeCases = cases.map(makeSmokeCase);
     for (const testCase of smokeCases) {
       runSmokeCase(testCase);
@@ -510,6 +509,21 @@ describe('composite performance baselines', () => {
     expect(workerSession.loadMeasurements.every((measurement) => measurement.executionMode !== undefined)).toBe(true);
     expect(workerSession.updateMeasurements.every((measurement) => measurement.executionMode !== undefined)).toBe(true);
   }, 10_000);
+
+  it('smoke-runs a request-backed performance composite through realtime safety classification', () => {
+    const requestCase = cases.find((testCase) => testCase.name === 'request fanout composite');
+    expect(requestCase).toBeDefined();
+    const smokeCases = [makeSmokeCase(requestCase!)];
+    const safetyMeasurement = measureForcedCompiledRealtimeSafety(smokeCases.map((testCase) => ({
+      scriptId: testCase.name,
+      source: testCase.source,
+      bars: testCase.bars,
+      engineOptions: testCase.options,
+    })), { includeSafe: true });
+    expect(safetyMeasurement.scripts).toHaveLength(smokeCases.length);
+    expect(safetyMeasurement.updates).toHaveLength(smokeCases.length * 3);
+  }, 10_000);
+
   fullPerformanceIt('tracks production worker fallback rate for performance composites', async () => {
     const baseline = getProductionWorkerFallbackBaselineGroup('performance-composites');
     const session = await measureProductionWorkerSessions(cases.map((testCase) => ({
@@ -520,8 +534,8 @@ describe('composite performance baselines', () => {
     })), { includeLiveUpdates: true });
     const measurements = session.loadMeasurements;
     const updateMeasurements = session.updateMeasurements;
-    const fallbacks = measurements.filter(isProductionWorkerFallbackMeasurement);
-    const updateFallbacks = updateMeasurements.filter(isProductionWorkerFallbackMeasurement);
+    const fallbacks = measurements.filter((measurement) => measurement.executionMode !== 'compiled');
+    const updateFallbacks = updateMeasurements.filter((measurement) => measurement.executionMode !== 'compiled');
 
     expect(cases.length).toBe(baseline.scriptCount);
     expect(cases.length).toBe(baseline.eligible);
@@ -537,6 +551,28 @@ describe('composite performance baselines', () => {
     expect(summarizeProductionWorkerExecutionModes(updateMeasurements)).toEqual(baseline.liveUpdates.executionModes);
     expect(summarizeProductionWorkerFallbackReasons(updateMeasurements)).toEqual(baseline.liveUpdates.knownFallbackReasons);
   }, 30_000);
+
+  fullPerformanceIt('classifies performance realtime safety fallbacks by forced compiled behaviour', () => {
+    const measurement = measureForcedCompiledRealtimeSafety(cases.map((testCase) => ({
+      scriptId: testCase.name,
+      source: testCase.source,
+      bars: testCase.bars,
+      engineOptions: testCase.options,
+    })), { includeSafe: true });
+
+    expect(measurement.scripts.map((entry) => ({
+      scriptId: entry.scriptId,
+      classification: entry.classification,
+    }))).toEqual([
+      { scriptId: 'dense computation composite', classification: 'overtrigger-matched' },
+      { scriptId: 'drawing lifecycle composite', classification: 'genuine-divergence' },
+      { scriptId: 'request fanout composite', classification: 'genuine-divergence' },
+    ]);
+    expect(measurement.updates).toHaveLength(9);
+    expect(measurement.updates.filter((entry) => entry.classification === 'genuine-divergence')).toHaveLength(6);
+    expect(measurement.updates.filter((entry) => entry.classification === 'overtrigger-matched')).toHaveLength(3);
+  }, 30_000);
+
   realtimeSweepIt('tracks realtime re-entry output parity for performance composites', async () => {
     const baseline = getProductionWorkerFallbackBaselineGroup('performance-composites').realtimeParity;
     const measurement = await measureRealtimeReentryParity(cases.map((testCase) => ({
@@ -547,15 +583,31 @@ describe('composite performance baselines', () => {
     })), {
       backend: REALTIME_SWEEP_BACKEND,
     });
+    const expected = REALTIME_SWEEP_BACKEND === 'closure'
+      ? {
+          totalUpdates: baseline.totalUpdates,
+          workerMatched: baseline.totalUpdates,
+          workerMismatches: [],
+          interpreterMatched: baseline.totalUpdates,
+          interpreterMismatches: [],
+        }
+      : baseline;
+
     expect({
       backend: measurement.backend,
       totalUpdates: measurement.totalUpdates,
       workerMatched: measurement.workerMatched,
       workerMismatches: summarizeRealtimeParityMismatches(measurement.workerMismatches),
+      interpreterMatched: measurement.interpreterMatched,
+      interpreterMismatches: summarizeRealtimeParityMismatches(measurement.interpreterMismatches),
     }).toEqual({
       backend: REALTIME_SWEEP_BACKEND,
-      ...baseline,
+      ...expected,
     });
+    if (REALTIME_SWEEP_BACKEND === 'closure') {
+      expect(measurement.closureMatched).toBe(baseline.totalUpdates);
+      expect(measurement.closureMismatches).toEqual([]);
+    }
   }, 120_000);
 
   for (const testCase of cases) {

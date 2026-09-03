@@ -43,7 +43,6 @@ export class NumericSeries {
   }
 
   get(offset: number): number {
-    offset = Math.trunc(offset);
     if (offset < 0 || offset >= this.size) return NaN;
     let idx = this.head + offset;
     if (idx >= this.capacity) idx -= this.capacity;
@@ -131,7 +130,6 @@ export class ValueSeries {
   }
 
   get(offset: number): unknown {
-    offset = Math.trunc(offset);
     if (offset < 0 || offset >= this.size) return NaN;
     let idx = this.head + offset;
     if (idx >= this.capacity) idx -= this.capacity;

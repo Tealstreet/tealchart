@@ -132,7 +132,6 @@ import {
   resolveNativeSelectedDrawingActionHitTargets,
   resolveNativeSelectedDrawingActionOverlayModel,
 } from './mobile/render/NativeUserDrawingSelectionActionOverlay';
-import { useTealscriptWebViewWorkerBridge } from './mobile/TealscriptWebViewWorkerHost';
 import { useNativeCountdownClock } from './mobile/render/useNativeCountdownClock';
 import { useNativeSkiaLayoutRuntime } from './mobile/render/useNativeSkiaLayoutRuntime';
 import { useNativeSkiaRenderModel } from './mobile/render/useNativeSkiaRenderModel';
@@ -242,6 +241,7 @@ export interface SkiaTealchartProps {
   onSymbolChange?: (symbol: string) => void;
   onTealscriptError?: (scriptId: string, error: WorkerError) => void;
   tealscriptExecutionBackend?: TealscriptExecutionBackend;
+  enableTealscriptClosureBackend?: boolean | (() => boolean);
   getTealscriptLibraries?: () => Map<string, Program> | undefined;
   getTealscriptRequestDatafeed?: () => RequestDatafeed | undefined;
   onUserDrawingCommand?: UserDrawingCommandEventListener;
@@ -282,6 +282,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onSymbolChange,
     onTealscriptError,
     tealscriptExecutionBackend,
+    enableTealscriptClosureBackend,
     getTealscriptLibraries,
     getTealscriptRequestDatafeed,
     onUserDrawingCommand,
@@ -380,7 +381,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   );
   const [nativeChartSettingsOpen, setNativeChartSettingsOpen] = useState(false);
   const [nativeIndicatorsOpen, setNativeIndicatorsOpen] = useState(false);
-  const nativeTealscriptWebViewWorker = useTealscriptWebViewWorkerBridge();
   useEffect(() => {
     setNativeAutoScaleEnabled(chartStore.settings.get().autoScale);
     setNativeChartProperties(chartStore.settings.get().chartProperties);
@@ -459,8 +459,8 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onLayoutDirty: markNativeLayoutDirtyIfReady,
     onSymbolChange: handleNativeSymbolChangeForLayout,
     onTealscriptError,
-    createTealscriptWorker: nativeTealscriptWebViewWorker.createWorker,
     tealscriptExecutionBackend,
+    enableTealscriptClosureBackend,
     getTealscriptLibraries,
     getTealscriptRequestDatafeed,
     propInterval,
@@ -2382,7 +2382,6 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           textColor={chromeTheme.textColor}
         />
       ) : null}
-      {nativeTealscriptWebViewWorker.hostElement}
     </View>
   );
 });

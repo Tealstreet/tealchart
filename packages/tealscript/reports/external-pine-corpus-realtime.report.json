@@ -1,13 +1,14 @@
 {
-  "schemaVersion": 3,
-  "generatedAt": "2026-09-03T07:19:03.474Z",
-  "scope": "All scripts from each compiled historical output set, comparing compiled realtime reconstruction against reference realtime update.",
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-02T01:26:49.191Z",
+  "sourceGateReport": "reports/closure-cutover-gate.report.json",
+  "scope": "All scripts from each closure cutover dominated set: compiled produced visible historical output and closure matches compiled.",
   "replay": {
     "seedBars": 148,
     "realtimeTailBars": 12,
     "sameTimeReplacements": 24,
     "confirmationBars": 1,
-    "comparison": "After a historical seed, the reference receives realtime updateBar events while compiled receives reconstructed windows for realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; outputs are compared with the historical corpus comparator."
+    "comparison": "After a historical seed, each backend receives realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; interpreter, compiled, and closure outputs are compared pairwise with the historical corpus comparator."
   },
   "corpora": [
     {
@@ -20,25 +21,25 @@
       "confirmationBars": 1,
       "summary": {
         "corpus": "v1",
-        "dominatedScripts": 178,
+        "dominatedScripts": 157,
         "realtimeEventsPerScript": 37,
-        "totalBackendPairComparisons": 6586,
-        "matchedScripts": 178,
+        "totalBackendPairComparisons": 17427,
+        "matchedScripts": 157,
         "mismatchedScripts": 0,
         "failedScripts": 0,
-        "matchedComparisons": 6586,
+        "matchedComparisons": 17427,
         "mismatchedComparisons": 0,
         "failedComparisons": 0,
         "mismatchKinds": {},
         "firstCauses": [],
         "strategyLedger": {
-          "strategies": 17,
-          "activeStrategies": 6,
-          "totalBackendPairComparisons": 629,
-          "matchedScripts": 17,
+          "strategies": 12,
+          "activeStrategies": 5,
+          "totalBackendPairComparisons": 1332,
+          "matchedScripts": 12,
           "mismatchedScripts": 0,
           "failedScripts": 0,
-          "matchedComparisons": 629,
+          "matchedComparisons": 1332,
           "mismatchedComparisons": 0,
           "failedComparisons": 0,
           "mismatchKinds": {},
@@ -55,7 +56,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -64,6 +65,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -84,7 +93,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -93,6 +102,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -113,7 +130,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -122,6 +139,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -142,7 +167,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -151,6 +176,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -171,7 +204,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 15,
               "drawings": 0,
@@ -180,6 +213,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 15,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 15,
               "drawings": 0,
@@ -200,7 +241,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 8,
               "drawings": 0,
@@ -209,6 +250,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 8,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 8,
               "drawings": 0,
@@ -229,7 +278,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -238,6 +287,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -258,7 +315,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -267,6 +324,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -287,7 +352,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -296,6 +361,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -316,7 +389,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -325,6 +398,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -345,7 +426,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -354,6 +435,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -374,7 +463,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 10,
               "drawings": 0,
@@ -383,6 +472,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 10,
               "drawings": 0,
@@ -403,7 +500,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -412,6 +509,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -432,7 +537,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 13,
               "drawings": 0,
@@ -441,6 +546,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 13,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 13,
               "drawings": 0,
@@ -461,7 +574,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -470,6 +583,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -490,7 +611,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -499,6 +620,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -519,7 +648,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -528,6 +657,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -548,7 +685,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -557,6 +694,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -577,7 +722,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -592,32 +737,11 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0022:https://github.com/ArunKBhaskar/PineScript:[Indicator] Magnetic Zones - Multi Timeframe.txt",
-          "localPath": "sources/0022__ArunKBhaskar__PineScript.txt",
-          "sourceRepoUrl": "https://github.com/ArunKBhaskar/PineScript",
-          "sourceFilePath": "[Indicator] Magnetic Zones - Multi Timeframe.txt",
-          "commitSha": "c6821225c466494b01eee08f9dd88bf84d2b24ba",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 4,
-              "drawings": 36,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 4,
-              "drawings": 36,
+              "plots": 2,
+              "drawings": 0,
               "alerts": 0,
               "logs": 0,
               "errors": 0
@@ -635,7 +759,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 1,
@@ -644,6 +768,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 1,
@@ -664,7 +796,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -673,6 +805,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -693,7 +833,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 12,
@@ -702,6 +842,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 12,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 12,
@@ -722,7 +870,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 13,
@@ -731,6 +879,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 13,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 13,
@@ -751,7 +907,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -760,6 +916,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -780,7 +944,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -789,6 +953,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -809,7 +981,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 6,
@@ -818,6 +990,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 6,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 6,
@@ -838,7 +1018,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 6,
@@ -847,6 +1027,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 6,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 6,
@@ -867,7 +1055,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 12,
@@ -876,6 +1064,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 12,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 12,
@@ -896,7 +1092,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -905,6 +1101,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -925,7 +1129,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -934,6 +1138,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -954,7 +1166,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 1,
@@ -963,6 +1175,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 1,
@@ -983,7 +1203,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -992,6 +1212,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -1012,7 +1240,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 14,
@@ -1021,6 +1249,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 14,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 14,
@@ -1041,7 +1277,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -1050,6 +1286,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -1070,7 +1314,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -1079,6 +1323,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -1099,7 +1351,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1108,6 +1360,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1128,7 +1388,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -1137,6 +1397,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -1157,7 +1425,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 16,
@@ -1166,6 +1434,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 16,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 16,
@@ -1186,7 +1462,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1195,6 +1471,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1215,7 +1499,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1224,6 +1508,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1244,7 +1536,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1253,6 +1545,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1273,7 +1573,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1282,6 +1582,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1302,7 +1610,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1311,6 +1619,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -1331,7 +1647,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -1346,31 +1662,10 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0052:https://github.com/everget/tradingview-pinescript-indicators:bands_and_channels/vortex_bands.pine",
-          "localPath": "sources/0052__everget__tradingview-pinescript-indicators.pine",
-          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
-          "sourceFilePath": "bands_and_channels/vortex_bands.pine",
-          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 5,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 5,
+              "plots": 3,
               "drawings": 0,
               "alerts": 0,
               "logs": 0,
@@ -1389,7 +1684,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1398,6 +1693,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1418,7 +1721,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -1427,6 +1730,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -1447,7 +1758,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 8,
               "drawings": 0,
@@ -1456,6 +1767,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 8,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 8,
               "drawings": 0,
@@ -1476,7 +1795,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1485,6 +1804,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1505,7 +1832,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1514,6 +1841,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1534,7 +1869,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1543,6 +1878,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1563,7 +1906,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1572,6 +1915,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1592,7 +1943,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1601,6 +1952,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1621,7 +1980,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1630,6 +1989,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1650,7 +2017,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1659,6 +2026,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1679,7 +2054,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1688,6 +2063,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -1708,7 +2091,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 16,
               "drawings": 1,
@@ -1717,6 +2100,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 16,
+              "drawings": 1,
+              "alerts": 5,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 16,
               "drawings": 1,
@@ -1737,7 +2128,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 16,
               "drawings": 1,
@@ -1746,6 +2137,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 16,
+              "drawings": 1,
+              "alerts": 5,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 16,
               "drawings": 1,
@@ -1766,7 +2165,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 13,
               "drawings": 1,
@@ -1775,6 +2174,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 13,
+              "drawings": 1,
+              "alerts": 7,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 13,
               "drawings": 1,
@@ -1795,7 +2202,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 13,
               "drawings": 1,
@@ -1804,6 +2211,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 13,
+              "drawings": 1,
+              "alerts": 7,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 13,
               "drawings": 1,
@@ -1824,7 +2239,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 1,
@@ -1833,6 +2248,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 1,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 1,
@@ -1853,7 +2276,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 1,
@@ -1862,6 +2285,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 1,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 1,
@@ -1882,7 +2313,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 13,
               "drawings": 1,
@@ -1897,89 +2328,10 @@
               "alerts": 4,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0075:https://github.com/gocaman/Indicators:6. DIP FINDER MIX.txt",
-          "localPath": "sources/0075__gocaman__Indicators.txt",
-          "sourceRepoUrl": "https://github.com/gocaman/Indicators",
-          "sourceFilePath": "6. DIP FINDER MIX.txt",
-          "commitSha": "40c9fd8c8fe2568c9be97ef84b3c6a5817fa7d08",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 22,
-              "drawings": 1,
-              "alerts": 5,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 22,
-              "drawings": 1,
-              "alerts": 5,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0076:https://github.com/gocaman/Indicators:6A. DIP FINDER MIX KRIPTO.txt",
-          "localPath": "sources/0076__gocaman__Indicators.txt",
-          "sourceRepoUrl": "https://github.com/gocaman/Indicators",
-          "sourceFilePath": "6A. DIP FINDER MIX KRIPTO.txt",
-          "commitSha": "40c9fd8c8fe2568c9be97ef84b3c6a5817fa7d08",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 22,
-              "drawings": 1,
-              "alerts": 5,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 22,
-              "drawings": 1,
-              "alerts": 5,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0077:https://github.com/gocaman/Indicators:ALMA TARAMA.txt",
-          "localPath": "sources/0077__gocaman__Indicators.txt",
-          "sourceRepoUrl": "https://github.com/gocaman/Indicators",
-          "sourceFilePath": "ALMA TARAMA.txt",
-          "commitSha": "40c9fd8c8fe2568c9be97ef84b3c6a5817fa7d08",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 4,
-              "drawings": 1,
-              "alerts": 4,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 4,
+              "plots": 13,
               "drawings": 1,
               "alerts": 4,
               "logs": 0,
@@ -1998,7 +2350,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 7,
               "drawings": 1,
@@ -2007,6 +2359,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 1,
+              "alerts": 8,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 7,
               "drawings": 1,
@@ -2027,7 +2387,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 19,
               "drawings": 11,
@@ -2036,6 +2396,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 19,
+              "drawings": 11,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 19,
               "drawings": 11,
@@ -2056,7 +2424,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 1,
@@ -2065,6 +2433,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 1,
+              "alerts": 11,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 1,
@@ -2085,7 +2461,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 1,
@@ -2100,32 +2476,11 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0084:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:ADX-Hist.pine",
-          "localPath": "sources/0084__harryguiacorn__TradingView-Proprietary-Indicators.pine",
-          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
-          "sourceFilePath": "ADX-Hist.pine",
-          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 1,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 1,
-              "drawings": 0,
+              "plots": 12,
+              "drawings": 1,
               "alerts": 0,
               "logs": 0,
               "errors": 0
@@ -2143,7 +2498,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -2152,6 +2507,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -2172,7 +2535,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 11,
@@ -2181,6 +2544,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 11,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 11,
@@ -2201,7 +2572,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2210,6 +2581,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2230,7 +2609,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2239,6 +2618,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2259,7 +2646,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2268,6 +2655,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2288,7 +2683,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2297,6 +2692,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2317,7 +2720,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -2332,89 +2735,10 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0092:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:Cloud.pine",
-          "localPath": "sources/0092__harryguiacorn__TradingView-Proprietary-Indicators.pine",
-          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
-          "sourceFilePath": "Cloud.pine",
-          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 8,
-              "drawings": 1,
-              "alerts": 3,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 8,
-              "drawings": 1,
-              "alerts": 3,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0093:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:CommitmentGauge.pine",
-          "localPath": "sources/0093__harryguiacorn__TradingView-Proprietary-Indicators.pine",
-          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
-          "sourceFilePath": "CommitmentGauge.pine",
-          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 3,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 3,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0094:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:Flip Flop.pine",
-          "localPath": "sources/0094__harryguiacorn__TradingView-Proprietary-Indicators.pine",
-          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
-          "sourceFilePath": "Flip Flop.pine",
-          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 7,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 7,
+              "plots": 12,
               "drawings": 0,
               "alerts": 0,
               "logs": 0,
@@ -2433,7 +2757,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -2448,31 +2772,10 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0096:https://github.com/harryguiacorn/TradingView-Proprietary-Indicators:QuantityQualityCommitment.pine",
-          "localPath": "sources/0096__harryguiacorn__TradingView-Proprietary-Indicators.pine",
-          "sourceRepoUrl": "https://github.com/harryguiacorn/TradingView-Proprietary-Indicators",
-          "sourceFilePath": "QuantityQualityCommitment.pine",
-          "commitSha": "d4cb27f1150aa63830f9cda84861e2278391ba26",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 7,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 7,
+              "plots": 6,
               "drawings": 0,
               "alerts": 0,
               "logs": 0,
@@ -2491,7 +2794,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2500,6 +2803,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2520,7 +2831,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2529,6 +2840,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -2549,7 +2868,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -2558,6 +2877,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -2578,7 +2905,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 22,
               "drawings": 1,
@@ -2587,6 +2914,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 22,
+              "drawings": 1,
+              "alerts": 6,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 22,
               "drawings": 1,
@@ -2607,7 +2942,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 1,
@@ -2616,6 +2951,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 1,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 12,
               "drawings": 1,
@@ -2636,7 +2979,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -2645,6 +2988,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -2665,7 +3016,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -2674,6 +3025,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -2694,7 +3053,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -2703,6 +3062,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -2723,7 +3090,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -2732,6 +3099,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -2752,7 +3127,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -2761,6 +3136,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -2781,7 +3164,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 9,
               "drawings": 1,
@@ -2790,6 +3173,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 9,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 1,
@@ -2810,7 +3201,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -2819,6 +3210,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 1,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -2839,7 +3238,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 15,
               "drawings": 1,
@@ -2848,6 +3247,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 15,
+              "drawings": 1,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 15,
               "drawings": 1,
@@ -2868,7 +3275,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 7,
               "drawings": 1,
@@ -2877,6 +3284,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 7,
               "drawings": 1,
@@ -2897,7 +3312,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 7,
               "drawings": 1,
@@ -2906,6 +3321,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 7,
               "drawings": 1,
@@ -2926,7 +3349,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 8,
               "drawings": 1,
@@ -2935,6 +3358,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 8,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 8,
               "drawings": 1,
@@ -2955,7 +3386,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 15,
@@ -2970,33 +3401,12 @@
               "alerts": 10,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0127:https://github.com/SENEMBERK/Indicators:trendstop+boll.txt",
-          "localPath": "sources/0127__SENEMBERK__Indicators.txt",
-          "sourceRepoUrl": "https://github.com/SENEMBERK/Indicators",
-          "sourceFilePath": "trendstop+boll.txt",
-          "commitSha": "40c9fd8c8fe2568c9be97ef84b3c6a5817fa7d08",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 6,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 6,
-              "drawings": 0,
-              "alerts": 0,
+              "plots": 12,
+              "drawings": 15,
+              "alerts": 10,
               "logs": 0,
               "errors": 0
             }
@@ -3013,7 +3423,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -3022,6 +3432,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -3042,7 +3460,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 50,
@@ -3051,6 +3469,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 50,
+              "alerts": 44,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 50,
@@ -3071,7 +3497,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -3080,6 +3506,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -3100,7 +3534,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -3109,6 +3543,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -3129,7 +3571,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3144,61 +3586,11 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0133:https://github.com/TaichiS/pinescript_practice:#15-扣抵2.pine",
-          "localPath": "sources/0133__TaichiS__pinescript_practice.pine",
-          "sourceRepoUrl": "https://github.com/TaichiS/pinescript_practice",
-          "sourceFilePath": "#15-扣抵2.pine",
-          "commitSha": "83d0acf7bab91649781193411d6bf2ac4d6fcc34",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 0,
-              "drawings": 1,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 0,
-              "drawings": 1,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0134:https://github.com/TaichiS/pinescript_practice:#15-扣抵3.pine",
-          "localPath": "sources/0134__TaichiS__pinescript_practice.pine",
-          "sourceRepoUrl": "https://github.com/TaichiS/pinescript_practice",
-          "sourceFilePath": "#15-扣抵3.pine",
-          "commitSha": "83d0acf7bab91649781193411d6bf2ac4d6fcc34",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 0,
-              "drawings": 3,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 0,
-              "drawings": 3,
+              "plots": 1,
+              "drawings": 0,
               "alerts": 0,
               "logs": 0,
               "errors": 0
@@ -3216,7 +3608,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3225,6 +3617,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3245,7 +3645,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -3254,6 +3654,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -3274,7 +3682,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3283,6 +3691,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3303,7 +3719,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3312,6 +3728,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3332,7 +3756,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -3341,6 +3765,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -3361,7 +3793,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3370,6 +3802,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3390,7 +3830,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3399,6 +3839,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3419,7 +3867,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3428,6 +3876,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3448,7 +3904,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 5,
@@ -3457,6 +3913,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 5,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 5,
@@ -3477,7 +3941,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 11,
@@ -3486,6 +3950,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 11,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 11,
@@ -3506,7 +3978,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 16,
@@ -3515,6 +3987,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 16,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 16,
@@ -3535,7 +4015,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 22,
@@ -3544,6 +4024,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 22,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 22,
@@ -3564,7 +4052,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3573,6 +4061,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -3593,7 +4089,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -3602,6 +4098,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 9,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -3622,7 +4126,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3631,6 +4135,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3651,7 +4163,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3660,6 +4172,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -3680,7 +4200,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 8,
@@ -3689,6 +4209,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 8,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 8,
@@ -3709,7 +4237,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 50,
@@ -3724,33 +4252,12 @@
               "alerts": 4,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0154:https://github.com/TPCharts/TradingViewIndicators:Chad's Swing Points.pine",
-          "localPath": "sources/0154__TPCharts__TradingViewIndicators.pine",
-          "sourceRepoUrl": "https://github.com/TPCharts/TradingViewIndicators",
-          "sourceFilePath": "Chad's Swing Points.pine",
-          "commitSha": "1ed90ae22605b716fab2df62ca255427a168ea41",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 6,
-              "drawings": 1,
-              "alerts": 6,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 6,
-              "drawings": 1,
-              "alerts": 6,
+              "plots": 4,
+              "drawings": 50,
+              "alerts": 4,
               "logs": 0,
               "errors": 0
             }
@@ -3767,7 +4274,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -3776,6 +4283,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -3796,7 +4311,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 0,
@@ -3805,6 +4320,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 0,
+              "alerts": 16,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 0,
@@ -3825,7 +4348,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 92,
@@ -3834,6 +4357,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 92,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 92,
@@ -3854,7 +4385,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 6,
@@ -3863,6 +4394,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 6,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 6,
@@ -3883,7 +4422,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 50,
@@ -3892,6 +4431,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 50,
@@ -3912,7 +4459,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 10,
@@ -3921,6 +4468,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 10,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 10,
@@ -3941,7 +4496,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 66,
@@ -3950,6 +4505,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 66,
+              "alerts": 6,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 66,
@@ -3970,7 +4533,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 13,
@@ -3979,6 +4542,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 13,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 13,
@@ -3999,7 +4570,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -4008,6 +4579,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -4028,7 +4607,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -4043,10 +4622,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": true,
               "orders": 19,
               "fills": 19,
@@ -4057,6 +4644,16 @@
               "equity": 14493.060035378476
             },
             "compiled": {
+              "active": true,
+              "orders": 19,
+              "fills": 19,
+              "openTrades": 1,
+              "closedTrades": 9,
+              "positionSize": 100,
+              "equityCurve": 160,
+              "equity": 14493.060035378476
+            },
+            "closure": {
               "active": true,
               "orders": 19,
               "fills": 19,
@@ -4079,7 +4676,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -4094,10 +4691,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": true,
               "orders": 21,
               "fills": 21,
@@ -4108,6 +4713,16 @@
               "equity": 15330.508981919986
             },
             "compiled": {
+              "active": true,
+              "orders": 21,
+              "fills": 21,
+              "openTrades": 1,
+              "closedTrades": 10,
+              "positionSize": 100,
+              "equityCurve": 160,
+              "equity": 15330.508981919986
+            },
+            "closure": {
               "active": true,
               "orders": 21,
               "fills": 21,
@@ -4130,7 +4745,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -4145,10 +4760,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": true,
               "orders": 7,
               "fills": 5,
@@ -4167,57 +4790,16 @@
               "positionSize": 1,
               "equityCurve": 160,
               "equity": 100028.36716728708
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0173:https://github.com/geraked/tradingview:strategies/ABSAR.pine",
-          "localPath": "sources/0173__geraked__tradingview.pine",
-          "sourceRepoUrl": "https://github.com/geraked/tradingview",
-          "sourceFilePath": "strategies/ABSAR.pine",
-          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 8,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
-              "produced": true,
-              "plots": 8,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "strategyLedger": {
-            "reference": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
+            "closure": {
+              "active": true,
+              "orders": 7,
+              "fills": 5,
+              "openTrades": 1,
+              "closedTrades": 2,
+              "positionSize": 1,
               "equityCurve": 160,
-              "equity": 100000
-            },
-            "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
+              "equity": 100028.36716728708
             }
           },
           "mismatches": [],
@@ -4232,7 +4814,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -4247,53 +4829,10 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "strategyLedger": {
-            "reference": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
             },
-            "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0177:https://github.com/geraked/tradingview:strategies/DHLAOS.pine",
-          "localPath": "sources/0177__geraked__tradingview.pine",
-          "sourceRepoUrl": "https://github.com/geraked/tradingview",
-          "sourceFilePath": "strategies/DHLAOS.pine",
-          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
+            "closure": {
               "produced": true,
-              "plots": 4,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 4,
+              "plots": 3,
               "drawings": 0,
               "alerts": 0,
               "logs": 0,
@@ -4301,7 +4840,7 @@
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4312,6 +4851,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4334,7 +4883,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -4349,53 +4898,10 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "strategyLedger": {
-            "reference": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
             },
-            "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0180:https://github.com/geraked/tradingview:strategies/NWERSIASF.pine",
-          "localPath": "sources/0180__geraked__tradingview.pine",
-          "sourceRepoUrl": "https://github.com/geraked/tradingview",
-          "sourceFilePath": "strategies/NWERSIASF.pine",
-          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
+            "closure": {
               "produced": true,
-              "plots": 4,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "compiled": {
-              "produced": true,
-              "plots": 4,
+              "plots": 5,
               "drawings": 0,
               "alerts": 0,
               "logs": 0,
@@ -4403,7 +4909,7 @@
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4414,6 +4920,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4436,7 +4952,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -4451,10 +4967,18 @@
               "alerts": 0,
               "logs": 7,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 7,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": true,
               "orders": 15,
               "fills": 15,
@@ -4465,6 +4989,16 @@
               "equity": 100011.29509667685
             },
             "compiled": {
+              "active": true,
+              "orders": 15,
+              "fills": 15,
+              "openTrades": 1,
+              "closedTrades": 14,
+              "positionSize": -2,
+              "equityCurve": 160,
+              "equity": 100011.29509667685
+            },
+            "closure": {
               "active": true,
               "orders": 15,
               "fills": 15,
@@ -4487,7 +5021,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -4502,10 +5036,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": true,
               "orders": 80,
               "fills": 40,
@@ -4524,57 +5066,16 @@
               "positionSize": 1.6807970686776887e-10,
               "equityCurve": 160,
               "equity": 10260.863967140504
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0184:https://github.com/Pa1-Tiwari/Tradingview-Pinescript-indicators-strategies:source-code/Traffic-light-strategy--shubhasis-pani.txt",
-          "localPath": "sources/0184__Pa1-Tiwari__Tradingview-Pinescript-indicators-strategies.txt",
-          "sourceRepoUrl": "https://github.com/Pa1-Tiwari/Tradingview-Pinescript-indicators-strategies",
-          "sourceFilePath": "source-code/Traffic-light-strategy--shubhasis-pani.txt",
-          "commitSha": "b74947dacdc32e6dcc91e5f343955d5a46ab567b",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 10,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
-              "produced": true,
-              "plots": 10,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "strategyLedger": {
-            "reference": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
+            "closure": {
+              "active": true,
+              "orders": 80,
+              "fills": 40,
+              "openTrades": 1,
+              "closedTrades": 39,
+              "positionSize": 1.6807970686776887e-10,
               "equityCurve": 160,
-              "equity": 1000000
-            },
-            "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 1000000
+              "equity": 10260.863967140504
             }
           },
           "mismatches": [],
@@ -4589,7 +5090,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -4604,10 +5105,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4618,6 +5127,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4640,7 +5159,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -4655,10 +5174,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4669,6 +5196,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4691,7 +5228,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -4706,10 +5243,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -4728,57 +5273,16 @@
               "positionSize": 0,
               "equityCurve": 160,
               "equity": 100000
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0190:https://github.com/TPCharts/TradingViewIndicators:SwingScreener.v.0.1.pine",
-          "localPath": "sources/0190__TPCharts__TradingViewIndicators.pine",
-          "sourceRepoUrl": "https://github.com/TPCharts/TradingViewIndicators",
-          "sourceFilePath": "SwingScreener.v.0.1.pine",
-          "commitSha": "1ed90ae22605b716fab2df62ca255427a168ea41",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 1,
-              "drawings": 1,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
-              "produced": true,
-              "plots": 1,
-              "drawings": 1,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            }
-          },
-          "strategyLedger": {
-            "reference": {
-              "active": true,
-              "orders": 80,
-              "fills": 80,
+            "closure": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
               "openTrades": 0,
-              "closedTrades": 40,
+              "closedTrades": 0,
               "positionSize": 0,
               "equityCurve": 160,
-              "equity": 100028.9562231785
-            },
-            "compiled": {
-              "active": true,
-              "orders": 80,
-              "fills": 80,
-              "openTrades": 0,
-              "closedTrades": 40,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100028.9562231785
+              "equity": 100000
             }
           },
           "mismatches": [],
@@ -4793,7 +5297,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -4802,6 +5306,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -4822,7 +5334,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 50,
@@ -4837,33 +5349,12 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0193:https://github.com/Alorse/pinescript-strategies:multi/Multi MACD + BB + RSI.pine",
-          "localPath": "sources/0193__Alorse__pinescript-strategies.pine",
-          "sourceRepoUrl": "https://github.com/Alorse/pinescript-strategies",
-          "sourceFilePath": "multi/Multi MACD + BB + RSI.pine",
-          "commitSha": "8fb3837ddcd137f1450c3e82d654ff3df24d54d5",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 0,
-              "drawings": 50,
-              "alerts": 1,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 50,
-              "alerts": 1,
+              "alerts": 0,
               "logs": 0,
               "errors": 0
             }
@@ -4880,7 +5371,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 0,
@@ -4889,6 +5380,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 0,
@@ -4909,7 +5408,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 0,
@@ -4918,6 +5417,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 0,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 0,
@@ -4938,7 +5445,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 365,
@@ -4947,6 +5454,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 365,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 365,
@@ -4967,7 +5482,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 364,
@@ -4976,6 +5491,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 364,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 364,
@@ -4996,7 +5519,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 35,
               "drawings": 1,
@@ -5005,6 +5528,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 35,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 35,
               "drawings": 1,
@@ -5025,7 +5556,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 35,
               "drawings": 2,
@@ -5034,6 +5565,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 35,
+              "drawings": 2,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 35,
               "drawings": 2,
@@ -5054,7 +5593,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 15,
               "drawings": 357,
@@ -5063,6 +5602,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 15,
+              "drawings": 357,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 15,
               "drawings": 357,
@@ -5083,7 +5630,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 15,
               "drawings": 356,
@@ -5092,6 +5639,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 15,
+              "drawings": 356,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 15,
               "drawings": 356,
@@ -5112,7 +5667,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 1,
@@ -5121,6 +5676,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 12,
               "drawings": 1,
@@ -5141,7 +5704,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 2,
@@ -5150,6 +5713,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 2,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 12,
               "drawings": 2,
@@ -5170,7 +5741,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5179,6 +5750,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5199,7 +5778,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5208,6 +5787,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5228,7 +5815,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5237,6 +5824,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5257,7 +5852,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -5266,6 +5861,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -5286,7 +5889,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5301,29 +5904,8 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0211:https://github.com/everget/tradingview-pinescript-indicators:movings/distance_weighted_moving_average.pine",
-          "localPath": "sources/0211__everget__tradingview-pinescript-indicators.pine",
-          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
-          "sourceFilePath": "movings/distance_weighted_moving_average.pine",
-          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 1,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5344,7 +5926,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5353,6 +5935,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5373,7 +5963,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5382,6 +5972,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5402,7 +6000,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5411,6 +6009,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5431,7 +6037,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5440,6 +6046,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5460,7 +6074,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5469,6 +6083,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -5489,7 +6111,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 7,
               "drawings": 50,
@@ -5504,10 +6126,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 50,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -5518,6 +6148,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -5540,7 +6180,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -5555,10 +6195,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 12,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -5569,6 +6217,16 @@
               "equity": 1000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 1000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -5594,13 +6252,13 @@
       "confirmationBars": 1,
       "summary": {
         "corpus": "v2",
-        "dominatedScripts": 93,
+        "dominatedScripts": 89,
         "realtimeEventsPerScript": 37,
-        "totalBackendPairComparisons": 3441,
-        "matchedScripts": 93,
+        "totalBackendPairComparisons": 9879,
+        "matchedScripts": 89,
         "mismatchedScripts": 0,
         "failedScripts": 0,
-        "matchedComparisons": 3441,
+        "matchedComparisons": 9879,
         "mismatchedComparisons": 0,
         "failedComparisons": 0,
         "mismatchKinds": {},
@@ -5608,11 +6266,11 @@
         "strategyLedger": {
           "strategies": 4,
           "activeStrategies": 1,
-          "totalBackendPairComparisons": 148,
+          "totalBackendPairComparisons": 444,
           "matchedScripts": 4,
           "mismatchedScripts": 0,
           "failedScripts": 0,
-          "matchedComparisons": 148,
+          "matchedComparisons": 444,
           "mismatchedComparisons": 0,
           "failedComparisons": 0,
           "mismatchKinds": {},
@@ -5629,7 +6287,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -5638,6 +6296,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -5658,7 +6324,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 56,
@@ -5667,6 +6333,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 56,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 56,
@@ -5687,7 +6361,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 53,
@@ -5696,6 +6370,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 53,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 53,
@@ -5716,7 +6398,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 9,
@@ -5725,6 +6407,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 9,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 9,
@@ -5745,7 +6435,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 5,
               "drawings": 1,
@@ -5754,6 +6444,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 5,
+              "drawings": 1,
+              "alerts": 10,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 1,
@@ -5774,7 +6472,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -5783,6 +6481,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -5803,7 +6509,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 8,
               "drawings": 0,
@@ -5812,6 +6518,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 8,
+              "drawings": 0,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 8,
               "drawings": 0,
@@ -5832,7 +6546,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 10,
               "drawings": 1,
@@ -5841,6 +6555,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 1,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 10,
               "drawings": 1,
@@ -5861,7 +6583,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 24,
@@ -5870,6 +6592,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 24,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 24,
@@ -5890,7 +6620,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 7,
               "drawings": 0,
@@ -5905,33 +6635,12 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0021:https://github.com/eliasvictor-trading/multi-time-frame:matrix_v7.pine",
-          "localPath": "sources/0021-eliasvictor-trading-multi-time-frame-matrix_v7.pine",
-          "sourceRepoUrl": "https://github.com/eliasvictor-trading/multi-time-frame",
-          "sourceFilePath": "matrix_v7.pine",
-          "commitSha": "249d6f1958202983d8737e863c96ea74de2626eb",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 3,
-              "drawings": 1,
-              "alerts": 4,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 3,
-              "drawings": 1,
-              "alerts": 4,
+              "plots": 7,
+              "drawings": 0,
+              "alerts": 0,
               "logs": 0,
               "errors": 0
             }
@@ -5948,7 +6657,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -5957,6 +6666,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -5977,7 +6694,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 15,
@@ -5986,6 +6703,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 15,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 15,
@@ -6006,7 +6731,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 11,
               "drawings": 1,
@@ -6021,31 +6746,10 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0027:https://github.com/henryoliver/pinescript-indicators:fundamental-view-indicator.pine",
-          "localPath": "sources/0027-henryoliver-pinescript-indicators-fundamental-view-indicator.pine",
-          "sourceRepoUrl": "https://github.com/henryoliver/pinescript-indicators",
-          "sourceFilePath": "fundamental-view-indicator.pine",
-          "commitSha": "5f1f06f0f620064d5b139416bd533e078fb09129",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 0,
-              "drawings": 1,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 0,
+              "plots": 11,
               "drawings": 1,
               "alerts": 0,
               "logs": 0,
@@ -6064,7 +6768,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -6073,6 +6777,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -6093,7 +6805,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 9,
@@ -6102,6 +6814,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 9,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 9,
@@ -6122,7 +6842,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 12,
@@ -6131,6 +6851,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 12,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 12,
@@ -6151,7 +6879,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -6160,6 +6888,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -6180,7 +6916,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 56,
@@ -6189,6 +6925,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 56,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 56,
@@ -6209,7 +6953,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -6218,6 +6962,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -6238,7 +6990,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -6253,32 +7005,11 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0037:https://github.com/henryoliver/pinescript-indicators:support-resistance.pine",
-          "localPath": "sources/0037-henryoliver-pinescript-indicators-support-resistance.pine",
-          "sourceRepoUrl": "https://github.com/henryoliver/pinescript-indicators",
-          "sourceFilePath": "support-resistance.pine",
-          "commitSha": "5f1f06f0f620064d5b139416bd533e078fb09129",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 0,
-              "drawings": 75,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 0,
-              "drawings": 75,
+              "plots": 6,
+              "drawings": 0,
               "alerts": 0,
               "logs": 0,
               "errors": 0
@@ -6296,7 +7027,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 20,
@@ -6305,6 +7036,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 20,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 20,
@@ -6325,7 +7064,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -6334,6 +7073,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 1,
@@ -6354,7 +7101,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6363,6 +7110,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 12,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6383,7 +7138,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -6392,6 +7147,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -6412,7 +7175,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -6421,6 +7184,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -6441,7 +7212,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -6450,6 +7221,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -6470,7 +7249,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -6479,6 +7258,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 1,
@@ -6499,7 +7286,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6508,6 +7295,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 12,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6528,7 +7323,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6537,6 +7332,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 12,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6557,7 +7360,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6566,6 +7369,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 12,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6586,7 +7397,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6595,6 +7406,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 12,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6615,7 +7434,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6624,6 +7443,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 12,
+              "alerts": 1,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 12,
@@ -6644,7 +7471,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 21,
               "drawings": 5,
@@ -6653,6 +7480,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 21,
+              "drawings": 5,
+              "alerts": 19,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 21,
               "drawings": 5,
@@ -6673,7 +7508,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 2,
@@ -6682,6 +7517,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 2,
+              "alerts": 3,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 2,
@@ -6702,7 +7545,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 7,
               "drawings": 2,
@@ -6711,6 +7554,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 7,
+              "drawings": 2,
+              "alerts": 7,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 7,
               "drawings": 2,
@@ -6731,7 +7582,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -6740,6 +7591,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -6760,7 +7619,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -6769,6 +7628,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -6789,7 +7656,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 169,
@@ -6798,6 +7665,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 169,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 169,
@@ -6818,7 +7693,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -6833,32 +7708,11 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
-            }
-          },
-          "mismatches": [],
-          "strategyLedgerMismatches": []
-        },
-        {
-          "id": "0092:https://github.com/TyphooN-/Pinescript_Indicators:MTF_KAMA.pine",
-          "localPath": "sources/0092-TyphooN--Pinescript_Indicators-MTF_KAMA.pine",
-          "sourceRepoUrl": "https://github.com/TyphooN-/Pinescript_Indicators",
-          "sourceFilePath": "MTF_KAMA.pine",
-          "commitSha": "8a1b546a489476d9c34a6ff229386317e8832c8b",
-          "events": 37,
-          "status": "matched",
-          "output": {
-            "reference": {
-              "produced": true,
-              "plots": 5,
-              "drawings": 1,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
             },
-            "compiled": {
+            "closure": {
               "produced": true,
-              "plots": 5,
-              "drawings": 1,
+              "plots": 1,
+              "drawings": 0,
               "alerts": 0,
               "logs": 0,
               "errors": 0
@@ -6876,7 +7730,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -6885,6 +7739,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 1,
@@ -6905,7 +7767,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 10,
               "drawings": 23,
@@ -6914,6 +7776,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 23,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 10,
               "drawings": 23,
@@ -6934,7 +7804,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -6943,6 +7813,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -6963,7 +7841,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -6972,6 +7850,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -6992,7 +7878,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 0,
               "drawings": 7,
@@ -7001,6 +7887,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 7,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 0,
               "drawings": 7,
@@ -7021,7 +7915,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7030,6 +7924,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7050,7 +7952,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -7059,6 +7961,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -7079,7 +7989,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -7088,6 +7998,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -7108,7 +8026,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -7117,6 +8035,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -7137,7 +8063,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -7146,6 +8072,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -7166,7 +8100,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7175,6 +8109,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7195,7 +8137,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7204,6 +8146,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7224,7 +8174,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7233,6 +8183,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7253,7 +8211,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7262,6 +8220,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7282,7 +8248,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7291,6 +8257,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7311,7 +8285,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7320,6 +8294,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7340,7 +8322,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7349,6 +8331,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7369,7 +8359,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7378,6 +8368,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7398,7 +8396,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7407,6 +8405,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7427,7 +8433,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -7436,6 +8442,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -7456,7 +8470,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7465,6 +8479,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7485,7 +8507,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7494,6 +8516,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7514,7 +8544,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7523,6 +8553,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7543,7 +8581,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7552,6 +8590,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7572,7 +8618,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7581,6 +8627,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7601,7 +8655,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7610,6 +8664,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7630,7 +8692,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7639,6 +8701,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7659,7 +8729,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7668,6 +8738,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7688,7 +8766,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7697,6 +8775,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7717,7 +8803,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7726,6 +8812,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7746,7 +8840,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7755,6 +8849,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7775,7 +8877,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7784,6 +8886,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7804,7 +8914,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7813,6 +8923,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7833,7 +8951,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7842,6 +8960,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7862,7 +8988,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7871,6 +8997,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7891,7 +9025,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7900,6 +9034,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7920,7 +9062,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7929,6 +9071,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7949,7 +9099,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -7958,6 +9108,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -7978,7 +9136,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -7987,6 +9145,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8007,7 +9173,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8016,6 +9182,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8036,7 +9210,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8045,6 +9219,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8065,7 +9247,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8074,6 +9256,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8094,7 +9284,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8103,6 +9293,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8123,7 +9321,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8132,6 +9330,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8152,7 +9358,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8161,6 +9367,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8181,7 +9395,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8190,6 +9404,14 @@
               "errors": 0
             },
             "compiled": {
+              "produced": true,
+              "plots": 1,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -8210,7 +9432,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -8225,10 +9447,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": true,
               "orders": 3,
               "fills": 2,
@@ -8239,6 +9469,16 @@
               "equity": 100126.99809579337
             },
             "compiled": {
+              "active": true,
+              "orders": 3,
+              "fills": 2,
+              "openTrades": 0,
+              "closedTrades": 1,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100126.99809579337
+            },
+            "closure": {
               "active": true,
               "orders": 3,
               "fills": 2,
@@ -8261,7 +9501,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -8276,10 +9516,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -8290,6 +9538,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -8312,7 +9570,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -8327,10 +9585,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 2,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -8341,6 +9607,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -8363,7 +9639,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "reference": {
+            "interpreter": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -8378,10 +9654,18 @@
               "alerts": 0,
               "logs": 0,
               "errors": 0
+            },
+            "closure": {
+              "produced": true,
+              "plots": 3,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             }
           },
           "strategyLedger": {
-            "reference": {
+            "interpreter": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -8392,6 +9676,16 @@
               "equity": 100000
             },
             "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,

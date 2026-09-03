@@ -27,9 +27,6 @@ export function buildPineParityHeadlineMetricsBlock(): string {
   const productionBaseline = PINE_PRODUCTION_WORKER_FALLBACK_BASELINE.overall;
   const mobileSupported = MOBILE_TEALSCRIPT_CAPABILITY_BASELINE.filter((row) => row.mobileStatus === 'supported');
   const mobileMissing = MOBILE_TEALSCRIPT_CAPABILITY_BASELINE.filter((row) => row.mobileStatus !== 'supported');
-  const mobileGap = mobileMissing.length === 0
-    ? 'none'
-    : mobileMissing.map((row) => row.capability).join('; ');
 
   const resolvedOfficialBuiltins = manualAudit.officialBuiltinNames - manualAudit.unresolvedManualBuiltinNamesCount;
   const coveredGrammarEntries =
@@ -43,9 +40,9 @@ export function buildPineParityHeadlineMetricsBlock(): string {
     '',
     `- Pine v6 builtin names: ${resolvedOfficialBuiltins}/${manualAudit.officialBuiltinNames} official manual names implemented/resolved; ${manualAudit.unresolvedManualBuiltinNamesCount} known-missing official names; ${manualAudit.committedBuiltinNamesAbsentFromManualCount} labelled aliases/local extensions excluded from official coverage.`,
     `- Pine v6 grammar inventory: ${coveredGrammarEntries}/${manualAudit.manualGrammarEntries} official manual-index entries covered by ${manualAudit.committedGrammarConstructs} committed snippets; ${manualAudit.grammarEntriesAbsentFromCommittedListCount} known grammar gaps.`,
-    `- Production worker load baseline: ${productionBaseline.compiled}/${productionBaseline.eligible} compiled; ${productionBaseline.fallback}/${productionBaseline.eligible} loud compiled-unsupported rows.`,
-    `- Production worker live-update baseline: ${productionBaseline.liveUpdates.compiled}/${productionBaseline.liveUpdates.total} compiled same-bar updates; ${productionBaseline.liveUpdates.fallback}/${productionBaseline.liveUpdates.total} loud compiled-unsupported rows; ${productionBaseline.realtimeParity.workerMatched}/${productionBaseline.realtimeParity.totalUpdates} worker updates match fresh execution for supported rows.`,
-    `- Mobile TealScript capability baseline: ${mobileSupported.length}/${MOBILE_TEALSCRIPT_CAPABILITY_BASELINE.length} measured capability rows supported; remaining gap: ${mobileGap}.`,
+    `- Production worker load baseline: ${productionBaseline.compiled}/${productionBaseline.eligible} compiled; ${productionBaseline.fallback}/${productionBaseline.eligible} visible interpreter fallbacks.`,
+    `- Production worker live-update baseline: ${productionBaseline.liveUpdates.compiled}/${productionBaseline.liveUpdates.total} compiled same-bar updates; ${productionBaseline.liveUpdates.fallback}/${productionBaseline.liveUpdates.total} visible fallbacks; ${productionBaseline.realtimeParity.workerMatched}/${productionBaseline.realtimeParity.totalUpdates} worker updates match fresh execution.`,
+    `- Mobile TealScript capability baseline: ${mobileSupported.length}/${MOBILE_TEALSCRIPT_CAPABILITY_BASELINE.length} measured capability rows supported; remaining gap: ${mobileMissing.map((row) => row.capability).join('; ')}.`,
     '',
     `<!-- ${PINE_PARITY_HEADLINE_METRICS_END}`,
   ].join('\n');

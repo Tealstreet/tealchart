@@ -14,7 +14,7 @@ thread.
 - **Parser** — a hand-written [Peggy](https://peggyjs.org/) grammar
   (`src/parser/grammar.peggy`) compiled to JS. Produces a typed AST
   defined in `src/parser/ast.ts`.
-- **Runtime** — a bar-by-bar legacy runtime (`src/runtime/compiledOnly.ts`) that
+- **Runtime** — a bar-by-bar interpreter (`src/runtime/engine.ts`) that
   evaluates the AST against OHLCV series, manages `var` / `varip` /
   regular scoping, and collects plot outputs.
 - **Worker** — a Web Worker entry (`src/worker/worker.ts`) plus a

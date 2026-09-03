@@ -4,9 +4,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import type { CompiledScript } from '../src/runtime/codegen/compile.ts';
 import { executeCompiled, tryCompile } from '../src/runtime/codegen/execute.ts';
+import type { ClosureCompiledScript } from '../src/runtime/closure/execute.ts';
+import { executeClosure, tryCompileClosure } from '../src/runtime/closure/execute.ts';
 import type { Bar } from '../src/runtime/context.ts';
-import type { ExecutionResult, TealscriptExecutionOptions } from '../src/runtime/types.ts';
+import type { ExecutionResult, TealscriptEngineOptions } from '../src/runtime/engine.ts';
+import { TealscriptEngine } from '../src/runtime/engine.ts';
 import { parse } from '../src/parser/parser.ts';
+import type { Program } from '../src/parser/ast.ts';
+import type { ClosureCutoverGateReport } from './update-closure-cutover-gate.ts';
 import type { ExternalCorpusReport, ExternalCorpusReportRow } from './run-external-pine-corpus.ts';
 import {
   compareStrategyLedger,
@@ -18,8 +23,9 @@ import {
 } from './run-external-pine-corpus.ts';
 import type { ExternalCorpusStrategyLedgerCounts } from './run-external-pine-corpus.ts';
 
-export const EXTERNAL_PINE_CORPUS_REALTIME_REPORT_SCHEMA_VERSION = 3;
+export const EXTERNAL_PINE_CORPUS_REALTIME_REPORT_SCHEMA_VERSION = 2;
 
+type BackendName = 'interpreter' | 'compiled' | 'closure';
 type CorpusLabel = string;
 type RealtimeEventKind = 'append' | 'replace' | 'confirm-next';
 type RealtimeParityStatus = 'matched' | 'mismatched' | 'failed' | 'not-run';
@@ -46,7 +52,7 @@ export interface ExternalCorpusRealtimeMismatch {
   localPath: string;
   eventIndex: number;
   eventKind: RealtimeEventKind;
-  backendPair: 'compiled/fresh-compiled';
+  backendPair: 'compiled/interpreter' | 'closure/interpreter' | 'closure/compiled';
   dimension: 'visual-output' | 'strategy-ledger';
   status: RealtimeParityStatus;
   diagnostic: string;
@@ -65,12 +71,14 @@ export interface ExternalCorpusRealtimeScriptRow {
   events: number;
   status: 'matched' | 'mismatched' | 'failed';
   output: {
-    reference: ReturnType<typeof outputCounts>;
+    interpreter: ReturnType<typeof outputCounts>;
     compiled: ReturnType<typeof outputCounts>;
+    closure: ReturnType<typeof outputCounts>;
   };
   strategyLedger?: {
-    reference: ExternalCorpusStrategyLedgerCounts;
+    interpreter: ExternalCorpusStrategyLedgerCounts;
     compiled: ExternalCorpusStrategyLedgerCounts;
+    closure: ExternalCorpusStrategyLedgerCounts;
   };
   mismatches: ExternalCorpusRealtimeMismatch[];
   strategyLedgerMismatches: ExternalCorpusRealtimeMismatch[];
@@ -131,6 +139,7 @@ export interface ExternalCorpusRealtimeCorpusReport {
 export interface ExternalCorpusRealtimeReport {
   schemaVersion: number;
   generatedAt: string;
+  sourceGateReport: string;
   scope: string;
   subset?: {
     mode: 'development-subset';
@@ -148,6 +157,7 @@ export interface ExternalCorpusRealtimeReport {
   corpora: ExternalCorpusRealtimeCorpusReport[];
 }
 
+const DEFAULT_GATE_REPORT = 'reports/closure-cutover-gate.report.json';
 const DEFAULT_SOURCE_REPORTS: SourceReportConfig[] = [
   { corpus: 'v1', reportPath: 'reports/external-pine-corpus-v1.report.json' },
   { corpus: 'v2', reportPath: 'reports/external-pine-corpus-v2.report.json' },
@@ -163,17 +173,24 @@ const REPO_ROOT = resolve(PACKAGE_ROOT, '../..');
 const COMMITTED_OUTPUT = resolve(PACKAGE_ROOT, DEFAULT_OUTPUT);
 
 export async function buildExternalCorpusRealtimeReport(options: {
+  gateReportPath?: string;
   sourceReports?: SourceReportConfig[];
   subset?: RealtimeSubset;
   allowGateExceptions?: boolean;
 } = {}): Promise<ExternalCorpusRealtimeReport> {
+  const gateReportPath = options.gateReportPath ?? DEFAULT_GATE_REPORT;
   const sourceReports = options.sourceReports ?? DEFAULT_SOURCE_REPORTS;
+  const gateReport = await readJson<ClosureCutoverGateReport>(resolveReportPath(gateReportPath));
   const corpora: ExternalCorpusRealtimeCorpusReport[] = [];
   const subsetSelection = options.subset ? await buildSubsetSelection(options.subset) : undefined;
   const selectedScripts: Record<string, string[]> = {};
 
   for (const source of sourceReports) {
     const report = await readJson<ExternalCorpusReport>(resolveReportPath(source.reportPath));
+    const gateCorpus = gateReport.corpora.find((entry) => entry.corpus === source.corpus);
+    if (!gateCorpus || (!options.allowGateExceptions && gateCorpus.dominated.exceptions.length > 0)) {
+      throw new Error(`Closure cutover gate must be clean before realtime corpus replay for ${source.corpus}`);
+    }
     const dominatedIds = new Set(report.rows.filter((row) => row.outcome === 'produced-output-compiled').map((row) => row.id));
     const dominatedRows = report.rows.filter((candidate) => dominatedIds.has(candidate.id));
     const selectedRows = selectRealtimeRows(source.corpus, dominatedRows, subsetSelection);
@@ -205,9 +222,10 @@ export async function buildExternalCorpusRealtimeReport(options: {
   return {
     schemaVersion: EXTERNAL_PINE_CORPUS_REALTIME_REPORT_SCHEMA_VERSION,
     generatedAt: new Date().toISOString(),
+    sourceGateReport: gateReportPath,
     scope:
       subsetSelection === undefined
-        ? 'All scripts from each compiled historical output set, comparing compiled realtime reconstruction against reference realtime update.'
+        ? 'All scripts from each closure cutover dominated set: compiled produced visible historical output and closure matches compiled.'
         : `DEVELOPMENT SUBSET (${subsetSelection.selection}): not a denominator for claims and must not overwrite the committed realtime corpus report.`,
     subset: subsetSelection
       ? {
@@ -223,7 +241,7 @@ export async function buildExternalCorpusRealtimeReport(options: {
       sameTimeReplacements: DEFAULT_REALTIME_TAIL_BARS * DEFAULT_REPLACEMENTS_PER_REALTIME_BAR,
       confirmationBars: DEFAULT_CONFIRMATION_BARS,
       comparison:
-        'After a historical seed, the reference receives realtime updateBar events while compiled receives reconstructed windows for realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; outputs are compared with the historical corpus comparator.',
+        'After a historical seed, each backend receives realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; interpreter, compiled, and closure outputs are compared pairwise with the historical corpus comparator.',
     },
     corpora,
   };
@@ -236,14 +254,15 @@ async function runRealtimeScriptRow(
   const source = await readFile(resolve(inputDir, row.localPath), 'utf8');
   const ast = parse(source, { grammarSource: row.sourceFilePath ?? row.localPath });
   const compiled = tryCompile(ast);
+  const closure = tryCompileClosure(ast);
   const bars = createSyntheticBars(DEFAULT_SEED_BARS + DEFAULT_REALTIME_TAIL_BARS + DEFAULT_CONFIRMATION_BARS);
   const requestDatafeed = new SyntheticExternalCorpusRequestDatafeed(bars);
-  const options: TealscriptExecutionOptions = { requestDatafeed, runtime: { now: REALTIME_RUNTIME_NOW } };
+  const options: TealscriptEngineOptions = { requestDatafeed, runtime: { now: REALTIME_RUNTIME_NOW } };
   const events = createRealtimeEvents(bars);
   const mismatches: ExternalCorpusRealtimeMismatch[] = [];
   const strategyLedgerMismatches: ExternalCorpusRealtimeMismatch[] = [];
 
-  if (!compiled.success) {
+  if (!compiled.success || !closure.success) {
     return {
       id: row.id,
       localPath: row.localPath,
@@ -253,8 +272,9 @@ async function runRealtimeScriptRow(
       events: events.length,
       status: 'failed',
       output: {
-        reference: outputCounts(null),
+        interpreter: outputCounts(null),
         compiled: outputCounts(null),
+        closure: outputCounts(null),
       },
       strategyLedger: undefined,
       mismatches: [{
@@ -262,10 +282,12 @@ async function runRealtimeScriptRow(
         localPath: row.localPath,
         eventIndex: 0,
         eventKind: 'append',
-        backendPair: 'compiled/fresh-compiled',
+        backendPair: 'closure/compiled',
         dimension: 'visual-output',
         status: 'failed',
-        diagnostic: `compiled unsupported during realtime replay: ${compiled.unsupported.join('; ')}`,
+        diagnostic: !compiled.success
+          ? `compiled unsupported during realtime replay: ${compiled.unsupported.join('; ')}`
+          : `closure unsupported during realtime replay: ${closure.unsupported.join('; ')}`,
       }],
       strategyLedgerMismatches: [],
       firstMismatch: {
@@ -273,18 +295,24 @@ async function runRealtimeScriptRow(
         localPath: row.localPath,
         eventIndex: 0,
         eventKind: 'append',
-        backendPair: 'compiled/fresh-compiled',
+        backendPair: 'closure/compiled',
         dimension: 'visual-output',
         status: 'failed',
-        diagnostic: `compiled unsupported during realtime replay: ${compiled.unsupported.join('; ')}`,
+        diagnostic: !compiled.success
+          ? `compiled unsupported during realtime replay: ${compiled.unsupported.join('; ')}`
+          : `closure unsupported during realtime replay: ${closure.unsupported.join('; ')}`,
       },
     };
   }
 
+  const interpreter = new TealscriptEngine(options);
   const seedBars = bars.slice(0, DEFAULT_SEED_BARS);
+  interpreter.execute(ast, seedBars);
   let activeBars = seedBars.map((bar) => ({ ...bar }));
   let previousRealtimeTime: number | undefined;
+  let latestInterpreter = interpreter.getCurrentExecutionResult();
   let latestCompiled: ExecutionResult | null = null;
+  let latestClosure: ExecutionResult | null = null;
   let confirmedRealtimeBarStartIndex: number | undefined;
 
   for (const event of events) {
@@ -299,11 +327,27 @@ async function runRealtimeScriptRow(
       : [...activeBars, { ...event.bar }];
     previousRealtimeTime = event.bar.time;
 
-    latestCompiled = runCompiledRealtime(compiled, activeBars, options, event, confirmedRealtimeBarIndex, confirmedRealtimeBarStartIndex);
-    if (!latestCompiled) {
-      mismatches.push(failedMismatch(row, event, 'compiled/fresh-compiled', 'compiled returned no result'));
+    try {
+      interpreter.updateBar(ast, { ...event.bar });
+      latestInterpreter = interpreter.getCurrentExecutionResult();
+    } catch (error) {
+      mismatches.push(failedMismatch(row, event, 'compiled/interpreter', `interpreter threw: ${formatUnknown(error)}`));
       break;
     }
+
+    latestCompiled = runCompiledRealtime(compiled, activeBars, options, event, confirmedRealtimeBarIndex, confirmedRealtimeBarStartIndex);
+    latestClosure = runClosureRealtime(closure, activeBars, options, event, confirmedRealtimeBarIndex, confirmedRealtimeBarStartIndex);
+    if (!latestCompiled) {
+      mismatches.push(failedMismatch(row, event, 'compiled/interpreter', 'compiled returned no result'));
+      break;
+    }
+
+    collectPairMismatch(row, event, latestCompiled, latestInterpreter, 'compiled/interpreter', mismatches);
+    collectPairMismatch(row, event, latestClosure, latestInterpreter, 'closure/interpreter', mismatches);
+    collectPairMismatch(row, event, latestClosure, latestCompiled, 'closure/compiled', mismatches);
+    collectStrategyLedgerPairMismatch(row, event, latestCompiled, latestInterpreter, 'compiled/interpreter', strategyLedgerMismatches);
+    collectStrategyLedgerPairMismatch(row, event, latestClosure, latestInterpreter, 'closure/interpreter', strategyLedgerMismatches);
+    collectStrategyLedgerPairMismatch(row, event, latestClosure, latestCompiled, 'closure/compiled', strategyLedgerMismatches);
   }
 
   return {
@@ -319,13 +363,15 @@ async function runRealtimeScriptRow(
         ? 'mismatched'
         : 'matched',
     output: {
-      reference: outputCounts(latestCompiled),
+      interpreter: outputCounts(latestInterpreter),
       compiled: outputCounts(latestCompiled),
+      closure: outputCounts(latestClosure),
     },
-    strategyLedger: row.declarationKind === 'strategy' && latestCompiled
+    strategyLedger: row.declarationKind === 'strategy' && latestCompiled && latestClosure
       ? {
-          reference: strategyLedgerCounts(latestCompiled.strategy),
+          interpreter: strategyLedgerCounts(latestInterpreter.strategy),
           compiled: strategyLedgerCounts(latestCompiled.strategy),
+          closure: strategyLedgerCounts(latestClosure.strategy),
         }
       : undefined,
     mismatches,
@@ -338,7 +384,7 @@ async function runRealtimeScriptRow(
 function runCompiledRealtime(
   compiled: CompiledScript,
   bars: Bar[],
-  options: TealscriptExecutionOptions,
+  options: TealscriptEngineOptions,
   event: RealtimeEvent,
   confirmedRealtimeBarIndex: number | undefined,
   confirmedRealtimeBarStartIndex: number | undefined,
@@ -349,6 +395,23 @@ function runCompiledRealtime(
     confirmedRealtimeBarIndex,
     confirmedRealtimeBarStartIndex,
     libraries: options.libraries,
+    runtime: options.runtime,
+  });
+}
+
+function runClosureRealtime(
+  closure: ClosureCompiledScript,
+  bars: Bar[],
+  options: TealscriptEngineOptions,
+  event: RealtimeEvent,
+  confirmedRealtimeBarIndex: number | undefined,
+  confirmedRealtimeBarStartIndex: number | undefined,
+): ExecutionResult {
+  return executeClosure(closure, bars, undefined, {
+    ...options,
+    realtimeLastBar: { isNew: event.isNew },
+    confirmedRealtimeBarIndex,
+    confirmedRealtimeBarStartIndex,
     runtime: options.runtime,
   });
 }
@@ -458,7 +521,7 @@ function summarizeRealtimeCorpus(
   const mismatches = rows.flatMap((row) => row.mismatches);
 
   const events = rows[0]?.events ?? 0;
-  const totalPairComparisons = rows.length * events;
+  const totalPairComparisons = rows.length * events * 3;
   const failedComparisons = mismatches.filter((mismatch) => mismatch.status === 'failed').length;
   const mismatchedComparisons = mismatches.filter((mismatch) => mismatch.status === 'mismatched').length;
   return {
@@ -484,14 +547,15 @@ function summarizeRealtimeStrategyLedger(
 ): ExternalCorpusRealtimeCorpusSummary['strategyLedger'] {
   const strategyRows = rows.filter((row) => row.strategyLedger !== undefined);
   const mismatches = strategyRows.flatMap((row) => row.strategyLedgerMismatches);
-  const totalPairComparisons = strategyRows.length * events;
+  const totalPairComparisons = strategyRows.length * events * 3;
   const failedComparisons = mismatches.filter((mismatch) => mismatch.status === 'failed').length;
   const mismatchedComparisons = mismatches.filter((mismatch) => mismatch.status === 'mismatched').length;
   return {
     strategies: strategyRows.length,
     activeStrategies: strategyRows.filter((row) => (
-      row.strategyLedger?.reference.active
+      row.strategyLedger?.interpreter.active
       || row.strategyLedger?.compiled.active
+      || row.strategyLedger?.closure.active
     )).length,
     totalBackendPairComparisons: totalPairComparisons,
     matchedScripts: strategyRows.filter((row) => row.strategyLedgerMismatches.length === 0).length,
@@ -606,12 +670,18 @@ export function parseExternalCorpusRealtimeArgs(argv: string[]): {
   output: string;
   subset?: RealtimeSubset;
   sourceReports: SourceReportConfig[];
+  gateReportPath: string;
+  allowGateExceptions: boolean;
 } {
   const check = argv.includes('--check');
   const all = argv.includes('--all');
+  const allowGateExceptions = argv.includes('--allow-gate-exceptions');
   const outputIndex = argv.indexOf('--output');
   const output = outputIndex === -1 ? DEFAULT_OUTPUT : argv[outputIndex + 1];
   if (!output) throw new Error('--output requires a path');
+  const gateReportIndex = argv.indexOf('--gate-report');
+  const gateReportPath = gateReportIndex === -1 ? DEFAULT_GATE_REPORT : argv[gateReportIndex + 1];
+  if (!gateReportPath) throw new Error('--gate-report requires a path');
   const reportsIndex = argv.indexOf('--reports');
   const reports = reportsIndex === -1
     ? undefined
@@ -644,7 +714,7 @@ export function parseExternalCorpusRealtimeArgs(argv: string[]): {
   } else if (onlyScripts.length > 0) {
     subset = { kind: 'named', scripts: onlyScripts };
   }
-  return { check, output, subset, sourceReports };
+  return { check, output, subset, sourceReports, gateReportPath, allowGateExceptions };
 }
 
 function valuesAfterArg(argv: string[], index: number): string[] {
@@ -714,10 +784,10 @@ function resolveReportPath(path: string): string {
 }
 
 async function main(): Promise<void> {
-  const { check, output, subset, sourceReports } = parseExternalCorpusRealtimeArgs(process.argv.slice(2));
+  const { check, output, subset, sourceReports, gateReportPath, allowGateExceptions } = parseExternalCorpusRealtimeArgs(process.argv.slice(2));
   assertRealtimeSubsetOutputSafe({ check, output, subset });
   const outputPath = resolveReportPath(output);
-  const report = await buildExternalCorpusRealtimeReport({ subset, sourceReports });
+  const report = await buildExternalCorpusRealtimeReport({ subset, sourceReports, gateReportPath, allowGateExceptions });
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (check) {
     const current = JSON.parse(await readFile(outputPath, 'utf8')) as ExternalCorpusRealtimeReport;

@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "task": "T90",
+  "generatedAt": "2026-08-31T16:10:00+08:00",
+  "baseCommit": "5c9d60209c",
+  "question": "Can TealScript go all-in on codegen while keeping the React Native mobile port self-contained and at full feature parity?",
+  "closurePrototype": {
+    "description": "AST top-level statements are pre-bound to closures; expression and builtin semantics delegate to the existing engine so the prototype can run real external-corpus scripts without new Function.",
+    "supersededBy": "mobile-codegen-investigation-t91.json",
+    "limitations": [
+      "This prototype did not bind expression nodes. The per-bar hot path still used the interpreter's expression dispatcher, operator handling, and series lookup.",
+      "Its interpreter-speed result is retained as historical data but must not be used to conclude that a real closure backend is interpreter-speed."
+    ],
+    "sample": {
+      "corpus": "/tmp/pine-corpus-v1",
+      "scripts": 24,
+      "selection": "validity=supported, outputParity=matched, executionMode=compiled, no imports, no request/security calls",
+      "barsPerScript": 160,
+      "totalBars": 3840,
+      "declaredVersions": {
+        "3": 5,
+        "4": 8,
+        "5": 10,
+        "6": 1
+      },
+      "declarationKinds": {
+        "indicator": 11,
+        "study": 13
+      },
+      "generatedSourceBytes": {
+        "total": 400257,
+        "min": 6678,
+        "median": 12160,
+        "max": 50360
+      }
+    },
+    "results": [
+      {
+        "backend": "current-compiled-new-function",
+        "coldMs": 212.01,
+        "steadyMs": 84.58,
+        "coldUsPerBar": 55.2,
+        "steadyUsPerBar": 22.0
+      },
+      {
+        "backend": "current-interpreter",
+        "coldMs": 268.37,
+        "steadyMs": 173.44,
+        "coldUsPerBar": 69.9,
+        "steadyUsPerBar": 45.2
+      },
+      {
+        "backend": "closure-tree-prototype",
+        "coldMs": 270.12,
+        "steadyMs": 172.38,
+        "coldUsPerBar": 70.3,
+        "steadyUsPerBar": 44.9
+      }
+    ],
+    "conclusion": "Superseded by T91. This shallow closure-tree prototype measured an interpreter hot path with closured top-level statements, so it did not test the no-eval backend hypothesis."
+  },
+  "hermes": {
+    "reactNativePackageVersion": "0.87.0",
+    "tealchartReactNativePeerRange": ">=0.81.0",
+    "bundledHermesVersion": "hermes-v250829098.0.16",
+    "localCompiler": "node_modules/hermes-compiler/hermesc/osx-bin/hermesc",
+    "findings": [
+      "React Native documentation says Hermes is used by default and that release builds compile JavaScript to Hermes bytecode.",
+      "The bundled hermesc binary is compiler-only in this install and reports that -exec is unsupported, so this repo cannot execute a Hermes runtime smoke without a native host or separately built Hermes shell.",
+      "hermesc accepts new Function under the default compiler settings and emits bytecode that constructs the global Function object.",
+      "hermesc accepts eval but warns that direct local eval lexical scope is unsupported.",
+      "Hermes Runtime.h documents a runtime enableEval flag that controls eval and the Function constructor. React Native's local Hermes runtime builders in node_modules do not set that flag explicitly, so the default must be verified in the consuming native app before claiming current compiled support on mobile."
+    ],
+    "commands": [
+      "node_modules/hermes-compiler/hermesc/osx-bin/hermesc -version",
+      "node_modules/hermes-compiler/hermesc/osx-bin/hermesc -emit-binary -out /tmp/hermes-function-default.hbc -Weval-disabled -Werror=eval-disabled /tmp/hermes-function-test.js",
+      "node_modules/hermes-compiler/hermesc/osx-bin/hermesc -dump-bytecode /tmp/hermes-function-test.js",
+      "rg -n \"enableEval|EnableEval|RuntimeConfig|makeHermesRuntime|HermesRuntime\" node_modules/react-native node_modules"
+    ]
+  },
+  "quickJsProbe": {
+    "installedPackage": "@tootallnate/quickjs-emscripten",
+    "installedVersion": "0.23.0",
+    "installedSize": "1.8M",
+    "npmUnpackedSizeBytes": 1732565,
+    "reactNativeQuickJsNpmUnpackedSizeBytes": 2612537,
+    "generatedSourceCompileProbe": {
+      "scripts": 24,
+      "totalSourceBytes": 487809,
+      "compileTotalMs": 22.04,
+      "compileMsPerScript": 0.92
+    },
+    "primitiveBoundaryProbe": {
+      "iterations": 3840,
+      "compileMs": 0.09,
+      "callTotalMs": 3.98,
+      "ffiUsPerCall": 1.0
+    },
+    "limits": "Measured in Node through the existing WASM QuickJS package, not through a React Native native JSI binding. It proves source compile and simple boundary costs are plausible, but not full TealScript execution or device binary cost."
+  },
+  "stringEmitterDependencies": {
+    "sourceFiles": [
+      "src/runtime/codegen/compile.ts",
+      "src/runtime/codegen/emitter.ts"
+    ],
+    "requiresGeneratedJavaScriptSource": [
+      "Native arithmetic, comparison, logical short-circuit, ternary, and literal/object/array expression lowering emit JavaScript expressions directly.",
+      "Control flow emits JavaScript if/else, for, while, break, continue, and generated loop-limit checks rather than data structures interpreted by a VM.",
+      "User-defined functions and imported functions are emitted as JavaScript methods with direct positional arguments, per-callsite source descriptors, and generated local/history state slots.",
+      "Persistent variables, series history, UDT fields, request state, drawing state, and strategy state are laid out as generated class fields and helper calls.",
+      "TA state uses generated class members and direct compute/recompute calls keyed by first-tick and bar-index state.",
+      "Runtime side effects for plot, alert, log, runtime.error, time/session, request, arrays, maps, matrices, drawings, and strategy route through generated helper calls."
+    ],
+    "conclusion": "The current compiler's speed comes from JavaScript source lowering across expression, control flow, call, state, and side-effect paths. Removing new Function without losing speed requires a real second backend or VM, not only replacing the final factory call."
+  },
+  "recommendation": {
+    "primary": "Do not delete the interpreter until mobile compiled execution is proven in the native host. The cheapest next proof is a React Native Hermes smoke that directly runs TealScript's current generated Function path on-device/simulator, then benchmarks a representative corpus sample.",
+    "ifHermesFunctionWorks": {
+      "option": "Wire current source-codegen compiled execution into MobileIndicatorManager, without Worker, using the existing interpreter request/library seams and visible realtime fallback reasons.",
+      "estimateEngineeringDays": "5-8",
+      "risk": "Dynamic Function code is not precompiled into the app bundle and may run through a slower Hermes dynamic-eval/interpreter path; performance could be materially below web even if it executes."
+    },
+    "ifHermesFunctionFailsOrIsTooSlow": {
+      "option": "Build a true non-eval backend, or embed a separate JS engine such as QuickJS for generated-source execution.",
+      "closureBackendEstimateEngineeringDays": "25-45",
+      "quickJsBackendEstimateEngineeringDays": "10-18 plus native app integration/release-size validation",
+      "risk": "A fast closure backend effectively duplicates most of the current source emitter; QuickJS adds native dependency/release-size/JSI ownership risk and still needs a device benchmark."
+    },
+    "largestUncertainty": "The consuming mobile app's actual Hermes runtime behavior and performance for Function-constructor generated code; this repo has Tealchart source and RN packages but no app Podfile/Gradle runtime smoke."
+  }
+}

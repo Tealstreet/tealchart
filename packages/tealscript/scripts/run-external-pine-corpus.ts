@@ -5,8 +5,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkProgram } from '../src/semantic/checker.ts';
 import { parse, TealscriptParseError } from '../src/parser/parser.ts';
 import type { CallExpression, Expression, Program, Statement } from '../src/parser/ast.ts';
-import type { ExecutionError, ExecutionResult, RuntimeSwallowedErrorSummary, TealscriptExecutionOptions } from '../src/runtime/types.ts';
-import { executeScript } from '../src/runtime/compiledOnly.ts';
+import type { ExecutionError, ExecutionResult, RuntimeSwallowedErrorSummary, TealscriptEngineOptions } from '../src/runtime/engine.ts';
+import { executeScript } from '../src/runtime/engine.ts';
 import type { Bar, PlotOutput } from '../src/runtime/context.ts';
 import type {
   RequestCorporateActionEvent,
@@ -27,18 +27,30 @@ import type {
 import type { StrategyLedger } from '../src/runtime/strategy.ts';
 import { executeCompiled, tryCompile } from '../src/runtime/codegen/execute.ts';
 import type { CompiledScript } from '../src/runtime/codegen/compile.ts';
+import { executeClosure, tryCompileClosure } from '../src/runtime/closure/execute.ts';
+import type { ClosureCompiledScript } from '../src/runtime/closure/execute.ts';
 
-export const EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION = 12;
+export const EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION = 11;
 
 export type ExternalCorpusPipelineStage = 'parse' | 'semantic' | 'compile' | 'execute' | 'output';
 export type ExternalCorpusStageStatus = 'passed' | 'failed' | 'fallback' | 'not-run';
-export type ExternalCorpusExecutionMode = 'compiled' | 'not-run';
+export type ExternalCorpusExecutionMode = 'compiled' | 'interpreter-fallback' | 'not-run';
 export type ExternalCorpusValidityBucket = 'supported' | 'tealscript-gap' | 'host-dependency-gap' | 'invalid-pine' | 'corpus-hygiene' | 'undecided';
 export type ExternalCorpusOutputSilenceBucket = 'tealscript-gap' | 'correct-silence' | 'undecided';
 export type ExternalCorpusOutputParityStatus = 'matched' | 'mismatched' | 'not-run';
+export type ExternalCorpusClosureAgreement =
+  | 'all-three'
+  | 'compiled-interpreter-only'
+  | 'closure-interpreter-only'
+  | 'closure-compiled-only'
+  | 'three-way-mismatch'
+  | 'closure-unsupported'
+  | 'closure-not-run';
 export type ExternalCorpusOutcome =
   | 'produced-output-compiled'
+  | 'produced-output-interpreter-fallback'
   | 'no-output-compiled'
+  | 'no-output-interpreter-fallback'
   | 'failed';
 
 export interface ExternalCorpusManifestScript {
@@ -87,6 +99,7 @@ export interface ExternalCorpusReportRow {
     alerts: number;
     logs: number;
   };
+  closure: ExternalCorpusClosureAnalysis;
   outputParity: ExternalCorpusOutputParityAnalysis;
   strategyLedgerParity: ExternalCorpusStrategyLedgerParity;
   outputSilence?: ExternalCorpusOutputSilenceAnalysis;
@@ -141,21 +154,23 @@ export interface ExternalCorpusStrategyLedgerParityAnalysis {
 }
 
 export interface ExternalCorpusStrategyLedgerParity {
-  compiledLedger: ExternalCorpusStrategyLedgerParityAnalysis;
+  compiledAgainstInterpreter: ExternalCorpusStrategyLedgerParityAnalysis;
+  closureAgainstInterpreter: ExternalCorpusStrategyLedgerParityAnalysis;
+  closureAgainstCompiled: ExternalCorpusStrategyLedgerParityAnalysis;
 }
 
 export interface ExternalCorpusOutputSilenceAnalysis {
   bucket: ExternalCorpusOutputSilenceBucket;
   reason: string;
   sourceCalls: ExternalCorpusOutputCallTrace[];
-  sameBarsProbeOutput: ExternalCorpusOutputCounts;
+  sameBarsInterpreterOutput: ExternalCorpusOutputCounts;
   probeBars: {
     count: number;
     firstTime: number;
     lastTime: number;
     compiledOutput: ExternalCorpusOutputCounts;
-    probeOutput: ExternalCorpusOutputCounts;
-    probeStrategy: ExternalCorpusStrategyActivity;
+    interpreterOutput: ExternalCorpusOutputCounts;
+    interpreterStrategy: ExternalCorpusStrategyActivity;
   };
 }
 
@@ -167,9 +182,18 @@ export interface ExternalCorpusOutputParityAnalysis {
     kind: string;
   };
   comparedOutput?: {
-    reference: ExternalCorpusOutputCounts;
+    interpreter: ExternalCorpusOutputCounts;
     compiled: ExternalCorpusOutputCounts;
   };
+}
+
+export interface ExternalCorpusClosureAnalysis {
+  stages: Record<'compile' | 'execute' | 'output', ExternalCorpusStageResult>;
+  unsupported: string[];
+  output: ExternalCorpusOutputCounts;
+  parityAgainstInterpreter: ExternalCorpusOutputParityAnalysis;
+  parityAgainstCompiled: ExternalCorpusOutputParityAnalysis;
+  agreement: ExternalCorpusClosureAgreement;
 }
 
 export interface ExternalCorpusReportSummary {
@@ -192,10 +216,24 @@ export interface ExternalCorpusReportSummary {
     strategies: number;
     executableStrategies: number;
     activeStrategies: number;
-    matched: number;
-    compiledLedger: Record<string, number>;
+    allThreeMatched: number;
+    compiledAgainstInterpreter: Record<string, number>;
+    closureAgainstInterpreter: Record<string, number>;
+    closureAgainstCompiled: Record<string, number>;
     currentlyPassingRowsWithLedgerMismatch: number;
     differenceKinds: Record<string, number>;
+  };
+  closure: {
+    funnel: Record<'compile' | 'execute' | 'output', { count: number; percent: number }>;
+    agreement: Record<string, number>;
+    unsupportedCauses: Array<{
+      cause: string;
+      count: number;
+      representativeScript: string;
+      representativeDiagnostic: string;
+    }>;
+    parityAgainstInterpreter: Record<string, number>;
+    parityAgainstCompiled: Record<string, number>;
   };
   compiledBarErrors: {
     scripts: number;
@@ -246,6 +284,17 @@ export interface RunExternalPineCorpusOptions {
   outputPath?: string;
   bars?: Bar[];
   localPaths?: Set<string>;
+}
+
+interface ClosureCompileProbe {
+  compiled: ClosureCompiledScript | null;
+  stages: Record<'compile' | 'execute' | 'output', ExternalCorpusStageResult>;
+  unsupported: string[];
+}
+
+interface ClosureAnalysisRun {
+  analysis: ExternalCorpusClosureAnalysis;
+  result: ExecutionResult | null;
 }
 
 const SUPPORTED_EXTENSIONS = new Set(['.pine', '.txt', '.pinescript']);
@@ -361,6 +410,7 @@ export function summarizeExternalPineCorpus(rows: ExternalCorpusReportRow[]): Ex
       (row) => row.outputParity.firstDifference?.kind ?? 'unclassified',
     ),
     strategyLedgerParity: summarizeStrategyLedgerParity(rows),
+    closure: summarizeClosure(rows),
     compiledBarErrors: summarizeCompiledBarErrors(rows),
     swallowedErrors: summarizeSwallowedErrors(rows),
     executionModes: countBy(rows, (row) => row.executionMode),
@@ -369,42 +419,112 @@ export function summarizeExternalPineCorpus(rows: ExternalCorpusReportRow[]): Ex
   };
 }
 
+function summarizeClosure(rows: ExternalCorpusReportRow[]): ExternalCorpusReportSummary['closure'] {
+  const closureStages = ['compile', 'execute', 'output'] as const;
+  const unsupported = new Map<string, {
+    cause: string;
+    count: number;
+    representativeScript: string;
+    representativeDiagnostic: string;
+  }>();
+
+  for (const row of rows) {
+    if (row.closure.stages.compile.status !== 'failed') continue;
+    const diagnostic = row.closure.stages.compile.diagnostic ?? row.closure.unsupported[0] ?? 'unknown closure unsupported';
+    const cause = normalizeClosureUnsupportedCause(diagnostic);
+    const existing = unsupported.get(cause);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      unsupported.set(cause, {
+        cause,
+        count: 1,
+        representativeScript: row.localPath,
+        representativeDiagnostic: diagnostic,
+      });
+    }
+  }
+
+  return {
+    funnel: Object.fromEntries(
+      closureStages.map((stage) => {
+        const count = rows.filter((row) => row.closure.stages[stage].status === 'passed').length;
+        return [stage, { count, percent: percent(count, rows.length) }];
+      }),
+    ) as ExternalCorpusReportSummary['closure']['funnel'],
+    agreement: countBy(rows, (row) => row.closure.agreement),
+    unsupportedCauses: [...unsupported.values()].sort((left, right) => right.count - left.count || left.cause.localeCompare(right.cause)),
+    parityAgainstInterpreter: countBy(rows, (row) => row.closure.parityAgainstInterpreter.status),
+    parityAgainstCompiled: countBy(rows, (row) => row.closure.parityAgainstCompiled.status),
+  };
+}
+
 function summarizeStrategyLedgerParity(rows: ExternalCorpusReportRow[]): ExternalCorpusReportSummary['strategyLedgerParity'] {
   const strategyRows = rows.filter((row) => row.declarationKind === 'strategy');
   const executableStrategies = strategyRows.filter(
-    (row) => row.strategyLedgerParity.compiledLedger.status !== 'not-run',
+    (row) => row.strategyLedgerParity.compiledAgainstInterpreter.status !== 'not-run'
+      || row.strategyLedgerParity.closureAgainstInterpreter.status !== 'not-run'
+      || row.strategyLedgerParity.closureAgainstCompiled.status !== 'not-run',
   );
   const activeStrategies = executableStrategies.filter((row) => {
-    const compared = row.strategyLedgerParity.compiledLedger.comparedStrategy;
+    const compared =
+      row.strategyLedgerParity.compiledAgainstInterpreter.comparedStrategy
+      ?? row.strategyLedgerParity.closureAgainstInterpreter.comparedStrategy
+      ?? row.strategyLedgerParity.closureAgainstCompiled.comparedStrategy;
     return compared?.expected.active || compared?.actual.active;
   });
-  const matched = executableStrategies.filter((row) => row.strategyLedgerParity.compiledLedger.status === 'matched').length;
+  const allThreeMatched = executableStrategies.filter((row) => (
+    row.strategyLedgerParity.compiledAgainstInterpreter.status === 'matched'
+    && row.strategyLedgerParity.closureAgainstInterpreter.status === 'matched'
+    && row.strategyLedgerParity.closureAgainstCompiled.status === 'matched'
+  )).length;
   const currentlyPassingRowsWithLedgerMismatch = strategyRows.filter((row) => (
     row.outcome === 'produced-output-compiled'
-    && row.strategyLedgerParity.compiledLedger.status === 'mismatched'
+    && (
+      row.strategyLedgerParity.compiledAgainstInterpreter.status === 'mismatched'
+      || row.strategyLedgerParity.closureAgainstInterpreter.status === 'mismatched'
+      || row.strategyLedgerParity.closureAgainstCompiled.status === 'mismatched'
+    )
   )).length;
 
   return {
     strategies: strategyRows.length,
     executableStrategies: executableStrategies.length,
     activeStrategies: activeStrategies.length,
-    matched,
-    compiledLedger: countBy(strategyRows, (row) => row.strategyLedgerParity.compiledLedger.status),
+    allThreeMatched,
+    compiledAgainstInterpreter: countBy(strategyRows, (row) => row.strategyLedgerParity.compiledAgainstInterpreter.status),
+    closureAgainstInterpreter: countBy(strategyRows, (row) => row.strategyLedgerParity.closureAgainstInterpreter.status),
+    closureAgainstCompiled: countBy(strategyRows, (row) => row.strategyLedgerParity.closureAgainstCompiled.status),
     currentlyPassingRowsWithLedgerMismatch,
     differenceKinds: countBy(
-      strategyRows
-        .map((row) => row.strategyLedgerParity.compiledLedger)
-        .filter((analysis) => analysis.status === 'mismatched'),
+      strategyRows.flatMap((row) => [
+        row.strategyLedgerParity.compiledAgainstInterpreter,
+        row.strategyLedgerParity.closureAgainstInterpreter,
+        row.strategyLedgerParity.closureAgainstCompiled,
+      ]).filter((analysis) => analysis.status === 'mismatched'),
       (analysis) => analysis.firstDifference?.kind ?? 'unclassified',
     ),
   };
 }
 
 function buildStrategyLedgerParity(
-  _declarationKind: ExternalCorpusReportRow['declarationKind'],
-  _compiled: ExecutionResult | null,
+  declarationKind: ExternalCorpusReportRow['declarationKind'],
+  interpreter: ExecutionResult | null,
+  compiled: ExecutionResult | null,
+  closure: ExecutionResult | null,
 ): ExternalCorpusStrategyLedgerParity {
-  return strategyLedgerParityNotRun();
+  if (declarationKind !== 'strategy' || !interpreter) return strategyLedgerParityNotRun();
+  return {
+    compiledAgainstInterpreter: compiled
+      ? compareStrategyLedger(compiled, interpreter, 'Compiled', 'interpreter')
+      : { status: 'not-run' },
+    closureAgainstInterpreter: closure
+      ? compareStrategyLedger(closure, interpreter, 'Closure', 'interpreter')
+      : { status: 'not-run' },
+    closureAgainstCompiled: closure && compiled
+      ? compareStrategyLedger(closure, compiled, 'Closure', 'compiled')
+      : { status: 'not-run' },
+  };
 }
 
 export function compareStrategyLedger(
@@ -612,6 +732,7 @@ async function runExternalPineScript(
   }
   stages.semantic = { status: 'passed' };
 
+  const closureCompile = runClosureCompile(ast);
   let compiled: CompiledScript | null = null;
   const fallbackReasons: string[] = [];
   try {
@@ -620,45 +741,39 @@ async function runExternalPineScript(
       stages.compile = { status: 'passed' };
     } else {
       fallbackReasons.push(...compiled.unsupported);
-      stages.compile = { status: 'failed', diagnostic: compiled.unsupported.join('; ') || 'compiled backend did not support script' };
-      return {
-        ...classifyRow(failedRow(base, stages, 'compile')),
-        executionMode: 'not-run',
-        fallbackReasons,
-      };
+      stages.compile = { status: 'fallback', diagnostic: compiled.unsupported.join('; ') || 'compiled backend did not support script' };
     }
   } catch (error) {
     stages.compile = { status: 'failed', diagnostic: formatThrownDiagnostic(error) };
     return classifyRow(failedRow(base, stages, 'compile'));
   }
 
-  const engineOptions: TealscriptExecutionOptions = { requestDatafeed };
-  let result: ExecutionResult | null = null;
+  const engineOptions: TealscriptEngineOptions = { requestDatafeed };
+  let result: ExecutionResult;
+  let interpreterResult: ExecutionResult | null = null;
   let compiledResultForParity: ExecutionResult | null = null;
   let executionMode: ExternalCorpusExecutionMode = 'not-run';
   try {
-    const compiledResult = executeCompiled(compiled, bars, undefined, { requestDatafeed });
-    if (!compiledResult) {
-      stages.execute = { status: 'failed', diagnostic: 'Compiled execution returned no result' };
-      return {
-        ...classifyRow(failedRow(base, stages, 'execute')),
-        executionMode,
-        fallbackReasons,
-      };
+    if (compiled?.success) {
+      const compiledResult = executeCompiled(compiled, bars, undefined, { requestDatafeed });
+      if (!compiledResult) {
+        stages.execute = { status: 'failed', diagnostic: 'Compiled execution returned no result' };
+        return {
+          ...classifyRow(failedRow(base, stages, 'execute')),
+          executionMode,
+          fallbackReasons,
+        };
+      }
+      result = compiledResult;
+      compiledResultForParity = compiledResult;
+      executionMode = 'compiled';
+    } else {
+      result = executeScript(ast, bars, undefined, engineOptions);
+      interpreterResult = result;
+      executionMode = 'interpreter-fallback';
     }
-    result = compiledResult;
-    compiledResultForParity = compiledResult;
-    executionMode = 'compiled';
   } catch (error) {
     stages.execute = { status: 'failed', diagnostic: formatThrownDiagnostic(error) };
-    return {
-      ...classifyRow(failedRow(base, stages, 'execute')),
-      executionMode,
-      fallbackReasons,
-    };
-  }
-  if (!result) {
-    stages.execute = { status: 'failed', diagnostic: 'Compiled execution did not produce a result' };
     return {
       ...classifyRow(failedRow(base, stages, 'execute')),
       executionMode,
@@ -681,12 +796,40 @@ async function runExternalPineScript(
   }
   stages.execute = { status: 'passed' };
 
+  if (!interpreterResult) {
+    interpreterResult = executeScript(ast, bars, undefined, engineOptions);
+  }
+  const closureRun = runClosureAnalysis(closureCompile, bars, engineOptions, interpreterResult, compiledResultForParity);
+  const closure = closureRun.analysis;
   const strategyLedgerParity = buildStrategyLedgerParity(
     base.declarationKind,
+    interpreterResult,
     compiledResultForParity,
+    closureRun.result,
   );
 
-  const outputParity = { status: 'not-run' as const };
+  const outputParity = compiled?.success && executionMode === 'compiled'
+    ? compareExecutionOutput(result, interpreterResult, 'Compiled', 'interpreter')
+    : { status: 'not-run' as const };
+  if (outputParity.status === 'mismatched') {
+    stages.execute = { status: 'failed', diagnostic: outputParity.diagnostic };
+    return classifyRow({
+      ...base,
+      firstFailedStage: 'execute',
+      outcome: 'failed',
+      executionMode,
+      fallbackReasons,
+      compiledBarErrors,
+      swallowedErrors,
+      output: outputCountsForReport(result),
+      closure,
+      outputParity,
+      strategyLedgerParity,
+      outputSilence: undefined,
+      stages,
+    });
+  }
+
   const output = outputCountsForReport(result);
   if (!output.produced) {
     const outputSilence = analyzeOutputSilence(ast, bars, requestDatafeed, compiled?.success ? compiled : null);
@@ -694,12 +837,13 @@ async function runExternalPineScript(
     return classifyRow({
       ...base,
       firstFailedStage: 'output',
-      outcome: 'no-output-compiled',
+      outcome: executionMode === 'compiled' ? 'no-output-compiled' : 'no-output-interpreter-fallback',
       executionMode,
       fallbackReasons,
       compiledBarErrors,
       swallowedErrors,
       output,
+      closure,
       outputParity,
       strategyLedgerParity,
       outputSilence,
@@ -711,12 +855,13 @@ async function runExternalPineScript(
   return classifyRow({
     ...base,
     firstFailedStage: null,
-    outcome: 'produced-output-compiled',
+    outcome: executionMode === 'compiled' ? 'produced-output-compiled' : 'produced-output-interpreter-fallback',
     executionMode,
     fallbackReasons,
     compiledBarErrors,
     swallowedErrors,
     output,
+    closure,
     outputParity,
     strategyLedgerParity,
     outputSilence: undefined,
@@ -735,7 +880,7 @@ function initialStages(): Record<ExternalCorpusPipelineStage, ExternalCorpusStag
 }
 
 function failedRow(
-  base: Omit<ExternalCorpusReportRow, 'validity' | 'firstFailedStage' | 'outcome' | 'executionMode' | 'fallbackReasons' | 'output' | 'outputParity' | 'strategyLedgerParity' | 'stages'>,
+  base: Omit<ExternalCorpusReportRow, 'validity' | 'firstFailedStage' | 'outcome' | 'executionMode' | 'fallbackReasons' | 'output' | 'closure' | 'outputParity' | 'strategyLedgerParity' | 'stages'>,
   stages: Record<ExternalCorpusPipelineStage, ExternalCorpusStageResult>,
   firstFailedStage: ExternalCorpusPipelineStage,
 ): Omit<ExternalCorpusReportRow, 'validity'> {
@@ -752,6 +897,7 @@ function failedRow(
       alerts: 0,
       logs: 0,
     },
+    closure: closureNotRun(),
     outputParity: { status: 'not-run' },
     strategyLedgerParity: strategyLedgerParityNotRun(),
     outputSilence: undefined,
@@ -759,9 +905,26 @@ function failedRow(
   };
 }
 
+function closureNotRun(): ExternalCorpusClosureAnalysis {
+  return {
+    stages: {
+      compile: { status: 'not-run' },
+      execute: { status: 'not-run' },
+      output: { status: 'not-run' },
+    },
+    unsupported: [],
+    output: outputCounts(null),
+    parityAgainstInterpreter: { status: 'not-run' },
+    parityAgainstCompiled: { status: 'not-run' },
+    agreement: 'closure-not-run',
+  };
+}
+
 function strategyLedgerParityNotRun(): ExternalCorpusStrategyLedgerParity {
   return {
-    compiledLedger: { status: 'not-run' },
+    compiledAgainstInterpreter: { status: 'not-run' },
+    closureAgainstInterpreter: { status: 'not-run' },
+    closureAgainstCompiled: { status: 'not-run' },
   };
 }
 
@@ -804,69 +967,69 @@ function analyzeOutputSilence(
   compiled: CompiledScript | null,
 ): ExternalCorpusOutputSilenceAnalysis {
   const sourceCalls = collectOutputCallTraces(ast);
-  const sameBarsProbe = executeScript(ast, bars, undefined, { requestDatafeed });
+  const sameBarsInterpreter = executeScript(ast, bars, undefined, { requestDatafeed });
   const probeBars = createOutputProbeBars();
   const probeRequestDatafeed = new SyntheticExternalCorpusRequestDatafeed(probeBars);
   const probeCompiled = compiled ? executeCompiled(compiled, probeBars, undefined, { requestDatafeed: probeRequestDatafeed }) : null;
-  const probeResult = executeScript(ast, probeBars, undefined, { requestDatafeed: probeRequestDatafeed });
-  const sameBarsProbeOutput = outputCounts(sameBarsProbe);
+  const probeInterpreter = executeScript(ast, probeBars, undefined, { requestDatafeed: probeRequestDatafeed });
+  const sameBarsInterpreterOutput = outputCounts(sameBarsInterpreter);
   const probeCompiledOutput = outputCounts(probeCompiled);
-  const probeOutput = outputCounts(probeResult);
-  const probeStrategy = strategyActivity(probeResult);
+  const probeInterpreterOutput = outputCounts(probeInterpreter);
+  const interpreterStrategy = strategyActivity(probeInterpreter);
   const sourceCallKinds = new Set(sourceCalls.map((call) => call.kind));
   const onlyStrategyCalls = sourceCalls.length > 0 && sourceCalls.every((call) => call.kind.startsWith('strategy.'));
   const hasStrategyActivity =
-    probeStrategy.openTrades > 0
-    || probeStrategy.closedTrades > 0
-    || probeStrategy.positionSize !== 0;
+    interpreterStrategy.openTrades > 0
+    || interpreterStrategy.closedTrades > 0
+    || interpreterStrategy.positionSize !== 0;
 
-  if (sameBarsProbeOutput.produced) {
+  if (sameBarsInterpreterOutput.produced) {
     return {
       bucket: 'tealscript-gap',
-      reason: `Compiled output path produced nothing, but the reference produced ${formatOutputCounts(sameBarsProbeOutput)} on the same synthetic bars.`,
+      reason: `Compiled output path produced nothing, but the interpreter produced ${formatOutputCounts(sameBarsInterpreterOutput)} on the same synthetic bars.`,
       sourceCalls,
-      sameBarsProbeOutput,
+      sameBarsInterpreterOutput,
       probeBars: {
         count: probeBars.length,
         firstTime: probeBars[0]?.time ?? 0,
         lastTime: probeBars.at(-1)?.time ?? 0,
         compiledOutput: probeCompiledOutput,
-        probeOutput,
-        probeStrategy,
+        interpreterOutput: probeInterpreterOutput,
+        interpreterStrategy,
       },
     };
   }
 
-  if (probeOutput.produced && !probeCompiledOutput.produced) {
+  if (probeInterpreterOutput.produced && !probeCompiledOutput.produced) {
     return {
       bucket: 'tealscript-gap',
-      reason: `Compiled output path stayed empty on the extended probe, but the reference produced ${formatOutputCounts(probeOutput)}.`,
+      reason: `Compiled output path stayed empty on the extended probe, but the interpreter produced ${formatOutputCounts(probeInterpreterOutput)}.`,
       sourceCalls,
-      sameBarsProbeOutput,
+      sameBarsInterpreterOutput,
       probeBars: {
         count: probeBars.length,
         firstTime: probeBars[0]?.time ?? 0,
         lastTime: probeBars.at(-1)?.time ?? 0,
         compiledOutput: probeCompiledOutput,
-        probeOutput,
-        probeStrategy,
+        interpreterOutput: probeInterpreterOutput,
+        interpreterStrategy,
       },
     };
   }
 
-  if (probeCompiledOutput.produced || probeOutput.produced) {
+  if (probeCompiledOutput.produced || probeInterpreterOutput.produced) {
     return {
       bucket: 'correct-silence',
-      reason: `The default 160-bar synthetic window did not trigger visible output, but the extended probe produced ${formatOutputCounts(probeCompiledOutput.produced ? probeCompiledOutput : probeOutput)}.`,
+      reason: `The default 160-bar synthetic window did not trigger visible output, but the extended probe produced ${formatOutputCounts(probeCompiledOutput.produced ? probeCompiledOutput : probeInterpreterOutput)}.`,
       sourceCalls,
-      sameBarsProbeOutput,
+      sameBarsInterpreterOutput,
       probeBars: {
         count: probeBars.length,
         firstTime: probeBars[0]?.time ?? 0,
         lastTime: probeBars.at(-1)?.time ?? 0,
         compiledOutput: probeCompiledOutput,
-        probeOutput,
-        probeStrategy,
+        interpreterOutput: probeInterpreterOutput,
+        interpreterStrategy,
       },
     };
   }
@@ -876,14 +1039,14 @@ function analyzeOutputSilence(
       bucket: 'correct-silence',
       reason: 'The source has no plot, drawing, alert, or strategy order calls; empty output is expected.',
       sourceCalls,
-      sameBarsProbeOutput,
+      sameBarsInterpreterOutput,
       probeBars: {
         count: probeBars.length,
         firstTime: probeBars[0]?.time ?? 0,
         lastTime: probeBars.at(-1)?.time ?? 0,
         compiledOutput: probeCompiledOutput,
-        probeOutput,
-        probeStrategy,
+        interpreterOutput: probeInterpreterOutput,
+        interpreterStrategy,
       },
     };
   }
@@ -893,14 +1056,14 @@ function analyzeOutputSilence(
       bucket: 'correct-silence',
       reason: 'The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity.',
       sourceCalls,
-      sameBarsProbeOutput,
+      sameBarsInterpreterOutput,
       probeBars: {
         count: probeBars.length,
         firstTime: probeBars[0]?.time ?? 0,
         lastTime: probeBars.at(-1)?.time ?? 0,
         compiledOutput: probeCompiledOutput,
-        probeOutput,
-        probeStrategy,
+        interpreterOutput: probeInterpreterOutput,
+        interpreterStrategy,
       },
     };
   }
@@ -911,14 +1074,14 @@ function analyzeOutputSilence(
       bucket: 'undecided',
       reason: 'All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.',
       sourceCalls,
-      sameBarsProbeOutput,
+      sameBarsInterpreterOutput,
       probeBars: {
         count: probeBars.length,
         firstTime: probeBars[0]?.time ?? 0,
         lastTime: probeBars.at(-1)?.time ?? 0,
         compiledOutput: probeCompiledOutput,
-        probeOutput,
-        probeStrategy,
+        interpreterOutput: probeInterpreterOutput,
+        interpreterStrategy,
       },
     };
   }
@@ -927,14 +1090,14 @@ function analyzeOutputSilence(
     bucket: 'tealscript-gap',
     reason: 'The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series.',
     sourceCalls,
-    sameBarsProbeOutput,
+    sameBarsInterpreterOutput,
     probeBars: {
       count: probeBars.length,
       firstTime: probeBars[0]?.time ?? 0,
       lastTime: probeBars.at(-1)?.time ?? 0,
       compiledOutput: probeCompiledOutput,
-      probeOutput,
-      probeStrategy,
+      interpreterOutput: probeInterpreterOutput,
+      interpreterStrategy,
     },
   };
 }
@@ -978,6 +1141,115 @@ export function visiblePlotsForCorpus(plots: readonly PlotOutput[]): PlotOutput[
   });
 }
 
+function runClosureCompile(ast: Program): ClosureCompileProbe {
+  try {
+    const compiled = tryCompileClosure(ast);
+    if (compiled.success) {
+      return {
+        compiled,
+        stages: {
+          compile: { status: 'passed' },
+          execute: { status: 'not-run' },
+          output: { status: 'not-run' },
+        },
+        unsupported: [],
+      };
+    }
+    return {
+      compiled,
+      stages: {
+        compile: { status: 'failed', diagnostic: compiled.unsupported.join('; ') || 'closure backend did not support script' },
+        execute: { status: 'not-run' },
+        output: { status: 'not-run' },
+      },
+      unsupported: compiled.unsupported,
+    };
+  } catch (error) {
+    return {
+      compiled: null,
+      stages: {
+        compile: { status: 'failed', diagnostic: formatThrownDiagnostic(error) },
+        execute: { status: 'not-run' },
+        output: { status: 'not-run' },
+      },
+      unsupported: [formatThrownDiagnostic(error)],
+    };
+  }
+}
+
+function runClosureAnalysis(
+  closureCompile: ClosureCompileProbe,
+  bars: Bar[],
+  options: TealscriptEngineOptions,
+  interpreter: ExecutionResult,
+  compiled: ExecutionResult | null,
+): ClosureAnalysisRun {
+  if (closureCompile.stages.compile.status !== 'passed') {
+    return {
+      analysis: {
+        stages: closureCompile.stages,
+        unsupported: closureCompile.unsupported,
+        output: outputCounts(null),
+        parityAgainstInterpreter: { status: 'not-run' },
+        parityAgainstCompiled: { status: 'not-run' },
+        agreement: 'closure-unsupported',
+      },
+      result: null,
+    };
+  }
+
+  try {
+    const closureResult = executeClosure(closureCompile.compiled!, bars, undefined, options);
+    return {
+      analysis: closureAnalysisFromResult(closureCompile, closureResult, interpreter, compiled),
+      result: closureResult,
+    };
+  } catch (error) {
+    return {
+      analysis: {
+        stages: {
+          ...closureCompile.stages,
+          execute: { status: 'failed', diagnostic: formatThrownDiagnostic(error) },
+          output: { status: 'not-run' },
+        },
+        unsupported: closureCompile.unsupported,
+        output: outputCounts(null),
+        parityAgainstInterpreter: { status: 'not-run' },
+        parityAgainstCompiled: { status: 'not-run' },
+        agreement: 'closure-not-run',
+      },
+      result: null,
+    };
+  }
+}
+
+function closureAnalysisFromResult(
+  closureCompile: ClosureCompileProbe,
+  closureResult: ExecutionResult,
+  interpreter: ExecutionResult,
+  compiled: ExecutionResult | null,
+): ExternalCorpusClosureAnalysis {
+  const output = outputCounts(closureResult);
+  const executionError = closureResult.errors[0];
+  const parityAgainstInterpreter = compareExecutionOutput(closureResult, interpreter, 'Closure', 'interpreter');
+  const parityAgainstCompiled = compiled ? compareExecutionOutput(closureResult, compiled, 'Closure', 'compiled') : { status: 'not-run' as const };
+  const compiledAgainstInterpreter = compiled ? compareExecutionOutput(compiled, interpreter, 'Compiled', 'interpreter') : { status: 'not-run' as const };
+  return {
+    stages: {
+      ...closureCompile.stages,
+      execute: { status: executionError ? 'failed' : 'passed', diagnostic: executionError ? formatExecutionError(executionError) : undefined },
+      output: executionError
+        ? { status: 'not-run' }
+        : { status: output.produced ? 'passed' : 'failed', diagnostic: output.produced ? undefined : 'No plots, drawings, alerts, or logs were produced' },
+    },
+    unsupported: closureCompile.unsupported,
+    output,
+    parityAgainstInterpreter,
+    parityAgainstCompiled,
+    agreement: closureAgreement(parityAgainstInterpreter, parityAgainstCompiled, compiledAgainstInterpreter),
+  };
+}
+
 export function compareExecutionOutput(
   actual: ExecutionResult,
   expected: ExecutionResult,
@@ -997,7 +1269,7 @@ export function compareExecutionOutput(
       kind: classifyOutputParityDifference(firstDifference),
     },
     comparedOutput: {
-      reference: outputCounts(expected),
+      interpreter: outputCounts(expected),
       compiled: outputCounts(actual),
     },
     diagnostic: `${actualLabel}/${expectedLabel} output mismatch: ${summarizeOutputDiff(expectedJson, actualJson, expectedLabel, actualLabel)}`,
@@ -1137,7 +1409,26 @@ function classifyOutputParityDifference(path: string): string {
   return 'other';
 }
 
-function summarizeOutputDiff(expected: string, actual: string, expectedLabel = 'reference', actualLabel = 'compiled'): string {
+function closureAgreement(
+  againstInterpreter: ExternalCorpusOutputParityAnalysis,
+  againstCompiled: ExternalCorpusOutputParityAnalysis,
+  compiledAgainstInterpreter: ExternalCorpusOutputParityAnalysis,
+): ExternalCorpusClosureAgreement {
+  if (againstInterpreter.status === 'matched' && againstCompiled.status === 'matched') return 'all-three';
+  if (againstInterpreter.status === 'matched') return 'closure-interpreter-only';
+  if (againstCompiled.status === 'matched') return 'closure-compiled-only';
+  if (againstCompiled.status === 'not-run') return 'three-way-mismatch';
+  return compiledAgainstInterpreter.status === 'matched' ? 'compiled-interpreter-only' : 'three-way-mismatch';
+}
+
+function normalizeClosureUnsupportedCause(diagnostic: string): string {
+  const message = diagnostic.split(';')[0]?.trim() ?? diagnostic;
+  const unsupported = message.match(/unsupported (statement|expression|call|member|method call) ([^;\n]+)/i);
+  if (unsupported) return `unsupported-${unsupported[1]!.toLowerCase().replaceAll(' ', '-')}:${unsupported[2]!.split(/\s+/)[0]}`;
+  return message.split('\n')[0]?.slice(0, 120) || 'closure-unsupported';
+}
+
+function summarizeOutputDiff(expected: string, actual: string, expectedLabel = 'interpreter', actualLabel = 'compiled'): string {
   const limit = 500;
   let firstDiff = -1;
   const max = Math.max(expected.length, actual.length);

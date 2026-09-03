@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-03T07:43:39.196Z",
+  "generatedAt": "2026-09-02T01:38:43.123Z",
   "sourceReports": [
     "v1:reports/external-pine-corpus-v1.report.json",
     "v2:reports/external-pine-corpus-v2.report.json"
@@ -13,7 +13,7 @@
   "selection": {
     "kind": "deterministic-dominated-subset",
     "maxPerCorpus": 16,
-    "note": "All dominated strategy rows are retained first, then the remaining dominated rows are sampled evenly by corpus order. In compiled-only mode this is a long-history health oracle; independent parity fields remain not-run unless another reference backend exists."
+    "note": "All dominated strategy rows are retained first, then the remaining dominated rows are sampled evenly by corpus order. Use no --max-per-corpus for the full dominated set."
   },
   "generator": {
     "name": "plausible-long-bars-v1",
@@ -24,8 +24,8 @@
       "corpus": "v1",
       "inputDir": "/tmp/pine-corpus-v1",
       "sourceReport": "reports/external-pine-corpus-v1.report.json",
-      "dominatedScripts": 178,
-      "measuredScripts": 17,
+      "dominatedScripts": 157,
+      "measuredScripts": 16,
       "runs": [
         {
           "barCount": 1000,
@@ -39,14 +39,14 @@
             "maxClose": 130.41673649
           },
           "summary": {
-            "scripts": 17,
-            "visualMatched": 17,
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
             "visualMismatched": 0,
             "visualFailedOrNoOutput": 0,
-            "strategyRows": 17,
-            "strategyLedgerMatched": 0,
+            "strategyRows": 12,
+            "strategyLedgerAllThreeMatched": 12,
             "strategyLedgerMismatched": 0,
-            "strategyLedgerNotRun": 17,
+            "strategyLedgerNotRun": 0,
             "swallowedErrors": {
               "scripts": 0,
               "totalErrors": 0,
@@ -77,14 +77,14 @@
             "maxClose": 154.036172
           },
           "summary": {
-            "scripts": 17,
-            "visualMatched": 17,
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
             "visualMismatched": 0,
             "visualFailedOrNoOutput": 0,
-            "strategyRows": 17,
-            "strategyLedgerMatched": 0,
+            "strategyRows": 12,
+            "strategyLedgerAllThreeMatched": 12,
             "strategyLedgerMismatched": 0,
-            "strategyLedgerNotRun": 17,
+            "strategyLedgerNotRun": 0,
             "swallowedErrors": {
               "scripts": 0,
               "totalErrors": 0,
@@ -115,14 +115,14 @@
             "maxClose": 154.036172
           },
           "summary": {
-            "scripts": 17,
-            "visualMatched": 17,
+            "scripts": 16,
+            "visualAllThreeMatched": 16,
             "visualMismatched": 0,
             "visualFailedOrNoOutput": 0,
-            "strategyRows": 17,
-            "strategyLedgerMatched": 0,
+            "strategyRows": 12,
+            "strategyLedgerAllThreeMatched": 12,
             "strategyLedgerMismatched": 0,
-            "strategyLedgerNotRun": 17,
+            "strategyLedgerNotRun": 0,
             "swallowedErrors": {
               "scripts": 0,
               "totalErrors": 0,
@@ -147,7 +147,7 @@
       "corpus": "v2",
       "inputDir": "/tmp/pine-corpus-v2",
       "sourceReport": "reports/external-pine-corpus-v2.report.json",
-      "dominatedScripts": 93,
+      "dominatedScripts": 89,
       "measuredScripts": 16,
       "runs": [
         {
@@ -163,13 +163,13 @@
           },
           "summary": {
             "scripts": 16,
-            "visualMatched": 16,
+            "visualAllThreeMatched": 16,
             "visualMismatched": 0,
             "visualFailedOrNoOutput": 0,
             "strategyRows": 4,
-            "strategyLedgerMatched": 0,
+            "strategyLedgerAllThreeMatched": 4,
             "strategyLedgerMismatched": 0,
-            "strategyLedgerNotRun": 4,
+            "strategyLedgerNotRun": 0,
             "swallowedErrors": {
               "scripts": 0,
               "totalErrors": 0,
@@ -201,13 +201,13 @@
           },
           "summary": {
             "scripts": 16,
-            "visualMatched": 16,
+            "visualAllThreeMatched": 16,
             "visualMismatched": 0,
             "visualFailedOrNoOutput": 0,
             "strategyRows": 4,
-            "strategyLedgerMatched": 0,
+            "strategyLedgerAllThreeMatched": 4,
             "strategyLedgerMismatched": 0,
-            "strategyLedgerNotRun": 4,
+            "strategyLedgerNotRun": 0,
             "swallowedErrors": {
               "scripts": 0,
               "totalErrors": 0,
@@ -239,13 +239,13 @@
           },
           "summary": {
             "scripts": 16,
-            "visualMatched": 16,
+            "visualAllThreeMatched": 16,
             "visualMismatched": 0,
             "visualFailedOrNoOutput": 0,
             "strategyRows": 4,
-            "strategyLedgerMatched": 0,
+            "strategyLedgerAllThreeMatched": 4,
             "strategyLedgerMismatched": 0,
-            "strategyLedgerNotRun": 4,
+            "strategyLedgerNotRun": 0,
             "swallowedErrors": {
               "scripts": 0,
               "totalErrors": 0,

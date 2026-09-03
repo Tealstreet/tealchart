@@ -1,8 +1,8 @@
 import type { CallExpression, Expression, Program, Statement } from '../../parser/ast';
 import type { Bar, PlotOutput, InputDefinition, SessionClosureKind } from '../context';
 import { ExecutionContext } from '../context';
-import { TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS } from '../types';
-import type { ExecutionError, ExecutionResult, IndicatorDeclarationMetadata, RuntimeProfile, RuntimeSwallowedErrorSummary, TealscriptRuntimeOptions } from '../types';
+import { TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS } from '../engine';
+import type { ExecutionError, ExecutionResult, IndicatorDeclarationMetadata, RuntimeProfile, RuntimeSwallowedErrorSummary, TealscriptRuntimeOptions } from '../engine';
 import type { BuiltinRegistry } from '../builtins/registry';
 import type { SecurityCallSite } from './analyzer';
 import {
@@ -141,11 +141,6 @@ function createCompiledExecutionError(error: unknown): ExecutionError {
   return { message };
 }
 
-function isKnownPineRuntimeError(error: unknown): boolean {
-  if (!(error instanceof Error)) return false;
-  return /^(Array|Cannot create an array|Cannot use (pop|shift)\(\)|Slice is out of bounds|Map keys must|Matrix )/.test(error.message);
-}
-
 type RuntimeSwallowedErrorAccumulator = Map<string, RuntimeSwallowedErrorSummary>;
 
 function recordSwallowedRuntimeError(
@@ -191,6 +186,10 @@ export function tryExecuteScript(
   }
   if (!compiled.success) {
     options?.onFallback?.(`compile-unsupported: ${compiled.unsupported.join('; ')}`);
+    return null;
+  }
+  if (compiled.securityScripts.size > 0 && !options?.requestDatafeed) {
+    options?.onFallback?.('missing-request-datafeed');
     return null;
   }
   try {
@@ -258,7 +257,6 @@ function extractStrategySettings(compiled: CompiledScript): Partial<StrategyLedg
   const decl = compiled.analysis.declarationInfo;
   if (!decl || decl.kind !== 'strategy') return {};
   const node = decl.node;
-  if (node.type !== 'IndicatorDeclaration') return {};
   const settings: Partial<StrategyLedger['settings']> = { title: decl.title };
 
   const numVal = (expr: unknown): number | undefined => {
@@ -310,7 +308,7 @@ function extractStrategySettings(compiled: CompiledScript): Partial<StrategyLedg
   const rfr = numVal(node.risk_free_rate);
   if (rfr !== undefined) settings.riskFreeRate = rfr;
   const cur = strVal(node.currency);
-  if (cur !== undefined) settings.currency = cur.startsWith('currency.') ? cur.slice('currency.'.length) : cur;
+  if (cur !== undefined) settings.currency = cur;
 
   const dqt = strVal(node.default_qty_type);
   if (dqt !== undefined) {
@@ -2655,13 +2653,11 @@ function registerCompiledStringBuiltins(builtins: BuiltinRegistry): void {
       : toRuntimeString(value);
   });
   builtins.set('str.tonumber', (args, named) => {
-    const raw = toRuntimeString(orderedRuntimeAliasedArg(args, named, stringSourceArgs, 0)).trim();
-    const parsed = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw) ? Number(raw) : Number.NaN;
+    const parsed = Number(toRuntimeString(orderedRuntimeAliasedArg(args, named, stringSourceArgs, 0)));
     return Number.isFinite(parsed) ? parsed : Number.NaN;
   });
   builtins.set('str.tointeger', (args, named) => {
-    const raw = toRuntimeString(orderedRuntimeAliasedArg(args, named, stringSourceArgs, 0)).trim();
-    const parsed = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw) ? Number(raw) : Number.NaN;
+    const parsed = Number(toRuntimeString(orderedRuntimeAliasedArg(args, named, stringSourceArgs, 0)));
     return Number.isFinite(parsed) ? Math.trunc(parsed) : Number.NaN;
   });
   builtins.set('str.length', (args, named) => {
@@ -2948,7 +2944,6 @@ const PLOT_COLOR_NAMES: Record<string, string> = {
 function toPlotColor(value: unknown): string | null {
   if (value === undefined || value === null) return null;
   if (typeof value !== 'string') return null;
-  if (value === 'none') return null;
   if (value in PLOT_COLOR_NAMES) return PLOT_COLOR_NAMES[value];
   return value;
 }
@@ -2984,18 +2979,7 @@ function applyPlotTransparency(color: string | null, transparency: unknown): str
 }
 
 function toPlotValue(value: unknown): number | null {
-  if (typeof value === 'boolean') return value as unknown as number;
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
-
-function toNumericPlotValue(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
-
-function toInputOptions(value: unknown): unknown[] | undefined {
-  if (Array.isArray(value)) return value;
-  if (isPineArray(value)) return value.values;
-  return undefined;
 }
 
 function toMarkerValue(value: unknown): number | null {
@@ -3008,12 +2992,6 @@ function ensureColorArray(plot: PlotOutput | undefined): (string | null)[] | nul
   if (!plot) return null;
   if (!Array.isArray(plot.color)) plot.color = [];
   return plot.color;
-}
-
-function setPlotArrayValueAtBar<T>(values: T[] | undefined, barIndex: number, plotValue: T): void {
-  if (!values) return;
-  while (values.length < barIndex) values.push(null as T);
-  values[barIndex] = plotValue;
 }
 
 function setPlotTextColorValue(plot: PlotOutput | undefined, barIndex: number, color: string | null): void {
@@ -3061,10 +3039,6 @@ function evaluateSecuritySeries(
   maxBarsBack: number,
   captures?: Record<string, unknown>,
   recordSwallowedError?: (barIndex: number, error: unknown) => void,
-  requestDatafeed?: RequestDatafeed,
-  securityScripts?: Map<number, CompiledSecurityScript>,
-  securitySites?: SecurityCallSite[],
-  dynamicRequestsEnabled = true,
 ): unknown[] {
   const deps = {
     NumericSeries, ValueSeries, maxBarsBack,
@@ -3098,36 +3072,11 @@ function evaluateSecuritySeries(
   builtinCtx.chart = { ...builtinCtx.chart, ...runtimeOptions?.chart };
   builtinCtx.loadBars(requestBars);
   applyCompiledChartFallbacks(builtinCtx, requestBars);
-  const securityCache = new Map<string, { bars: Bar[]; values: unknown[] }>();
-  const seedCapturedSeriesParams = (requestBar: Bar, requestBarIndex: number): void => {
-    for (const name of Object.keys(captures ?? {})) {
-      const series = (inst as unknown as Record<string, unknown>)[`_sv_${name}`] as ValueSeries | undefined;
-      if (!series || typeof series.push !== 'function' || typeof series.update !== 'function') continue;
-      const barKey = `_sv_bar_${name}`;
-      const state = inst as unknown as Record<string, unknown>;
-      const value = resolveRuntimeCaptureValue(captures?.[name], requestBar);
-      if (state[barKey] !== requestBarIndex) {
-        series.push(value);
-        state[barKey] = requestBarIndex;
-      } else {
-        series.update(value);
-      }
-    }
-  };
-  const requestDisabledByDynamicRequests = (secId: number, name: string): boolean => {
-    if (dynamicRequestsEnabled) return false;
-    const reason = securitySites?.[secId]?.requiresDynamicRequestsReason;
-    if (!reason) return false;
-    throw new CompiledRuntimeErrorException(reason === 'nested-request'
-      ? `Nested request.* calls require dynamic_requests=true: ${name}`
-      : `request.* calls in local scopes require dynamic_requests=true: ${name}`);
-  };
 
   for (let i = 0; i < requestBars.length; i++) {
     builtinCtx.advanceBar();
     const b = requestBars[i];
     lastPlotValue = NaN;
-    seedCapturedSeriesParams(b, i);
     const secBarCtx = {
       bar: { open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume, time: b.time },
       barIndex: i,
@@ -3149,66 +3098,8 @@ function evaluateSecuritySeries(
       strategyPropHistory() { return NaN; },
       strategyTradeProp() { return NaN; },
       strategyRisk() { return undefined; },
-      requestSecurity(secId: number, symbol: unknown, timeframe: unknown, gaps: unknown, lookahead: unknown, ignoreInvalidSymbol: unknown, currency: unknown, calcBarsCount: unknown, sourceDescriptor?: unknown, nestedCaptures?: Record<string, unknown>) {
-        if (requestDisabledByDynamicRequests(secId, 'request.security')) return NaN;
-        if (!requestDatafeed) throw new CompiledRuntimeErrorException('request.security requires a request datafeed');
-        const symStr = String(symbol ?? '').trim();
-        const tfStr = normalizeRuntimeTimeframePeriod(String(timeframe ?? ''), String(builtinCtx.timeframe.period ?? ''));
-        const currencyStr = normalizeRuntimeRequestCurrency(currency);
-        const calcBars = normalizeRuntimePositiveInteger(calcBarsCount);
-        const sourceKey = runtimeSourceDescriptorKey(sourceDescriptor);
-        const capturesKey = runtimeCapturesKey(nestedCaptures);
-        const cacheKey = `security:${secId}:${symStr}:${tfStr}:${currencyStr ?? ''}:${calcBars ?? ''}:${sourceKey}:${capturesKey}`;
-        let cached = securityCache.get(cacheKey);
-        if (!cached) {
-          const result = requestDatafeed.getBars({ symbol: symStr, timeframe: tfStr, currency: currencyStr, calcBarsCount: calcBars });
-          if (!result.ok) {
-            if (isRuntimeTruthy(ignoreInvalidSymbol) && isInvalidOrUnavailableRequestContext(result.code)) return NaN;
-            throw new CompiledRuntimeErrorException(`request.security failed: ${result.message}`);
-          }
-          const nestedScript = securityScripts?.get(secId);
-          const nestedValues = nestedScript
-            ? evaluateSecuritySeries(nestedScript, result.context, builtinCtx.syminfo, runtimeOptions, maxBarsBack, nestedCaptures, recordSwallowedError, requestDatafeed, securityScripts, securitySites, dynamicRequestsEnabled)
-            : evaluateRequestedSourceSeries(result.context, sourceDescriptor);
-          cached = { bars: result.context.bars, values: nestedValues ?? [] };
-          securityCache.set(cacheKey, cached);
-        }
-        return mergeRequestedValue(cached.bars, cached.values, b.time, requestBars[i - 1]?.time, String(gaps ?? 'barmerge.gaps_off'), String(lookahead ?? 'barmerge.lookahead_off'), false);
-      },
-      requestSecurityLowerTf(secId: number, symbol: unknown, timeframe: unknown, ignoreInvalidSymbol: unknown, currency: unknown, ignoreInvalidTimeframe: unknown, calcBarsCount: unknown, sourceDescriptor?: unknown, nestedCaptures?: Record<string, unknown>) {
-        if (requestDisabledByDynamicRequests(secId, 'request.security_lower_tf')) return createPineArray();
-        const symStr = String(symbol ?? '').trim();
-        const tfStr = normalizeRuntimeTimeframePeriod(String(timeframe ?? ''), String(builtinCtx.timeframe.period ?? ''));
-        const requestDuration = getRuntimeTimeframeDurationMs(tfStr, String(builtinCtx.timeframe.period ?? ''));
-        const chartDuration = getRuntimeTimeframeDurationMs(String(builtinCtx.timeframe.period ?? ''), String(builtinCtx.timeframe.period ?? ''));
-        if (requestDuration === null || chartDuration === null || requestDuration >= chartDuration) {
-          if (isRuntimeTruthy(ignoreInvalidTimeframe)) return createPineArray();
-          throw new CompiledRuntimeErrorException(`request.security_lower_tf requires a lower timeframe than the chart timeframe: ${tfStr}`);
-        }
-        if (!requestDatafeed) throw new CompiledRuntimeErrorException('request.security_lower_tf requires a request datafeed');
-        const currencyStr = normalizeRuntimeRequestCurrency(currency);
-        const calcBars = normalizeRuntimePositiveInteger(calcBarsCount);
-        const sourceKey = runtimeSourceDescriptorKey(sourceDescriptor);
-        const capturesKey = runtimeCapturesKey(nestedCaptures);
-        const cacheKey = `lower:${secId}:${symStr}:${tfStr}:${currencyStr ?? ''}:${calcBars ?? ''}:${sourceKey}:${capturesKey}`;
-        let cached = securityCache.get(cacheKey);
-        if (!cached) {
-          const result = requestDatafeed.getBars({ symbol: symStr, timeframe: tfStr, currency: currencyStr, calcBarsCount: calcBars });
-          if (!result.ok) {
-            if (isRuntimeTruthy(ignoreInvalidSymbol) && isInvalidOrUnavailableRequestContext(result.code)) return createPineArray();
-            if (isRuntimeTruthy(ignoreInvalidTimeframe) && result.code === 'invalid_timeframe') return createPineArray();
-            throw new CompiledRuntimeErrorException(`request.security_lower_tf failed: ${result.message}`);
-          }
-          const nestedScript = securityScripts?.get(secId);
-          const nestedValues = nestedScript
-            ? evaluateSecuritySeries(nestedScript, result.context, builtinCtx.syminfo, runtimeOptions, maxBarsBack, nestedCaptures, recordSwallowedError, requestDatafeed, securityScripts, securitySites, dynamicRequestsEnabled)
-            : evaluateRequestedSourceSeries(result.context, sourceDescriptor);
-          cached = { bars: result.context.bars, values: nestedValues ?? [] };
-          securityCache.set(cacheKey, cached);
-        }
-        const chartEnd = requestBars[i + 1]?.time ?? b.time + chartDuration;
-        return collectLowerTimeframeValues(cached.bars, cached.values, b.time, chartEnd);
-      },
+      requestSecurity() { return NaN; },
+      requestSecurityLowerTf() { return createPineArray(); },
       requestCurrencyRate() { return NaN; },
       requestPointSeries() { return NaN; },
       requestFootprint() { return NaN; },
@@ -3600,23 +3491,17 @@ export function executeCompiled(
   }
 
   const declarationNode = compiled.analysis.declarationInfo?.node;
-  const dynamicRequestsEnabled = declarationNode && 'dynamic_requests' in declarationNode
-    ? staticBooleanValue(declarationNode.dynamic_requests) ?? true
-    : true;
-  const indicatorDeclarationNode = declarationNode?.type === 'IndicatorDeclaration'
-    ? declarationNode
-    : undefined;
-  const labelLimit = staticNumberValue(indicatorDeclarationNode?.max_labels_count);
-  const lineLimit = staticNumberValue(indicatorDeclarationNode?.max_lines_count);
-  const boxLimit = staticNumberValue(indicatorDeclarationNode?.max_boxes_count);
-  const polylineLimit = staticNumberValue(indicatorDeclarationNode?.max_polylines_count);
+  const labelLimit = staticNumberValue(declarationNode?.max_labels_count);
+  const lineLimit = staticNumberValue(declarationNode?.max_lines_count);
+  const boxLimit = staticNumberValue(declarationNode?.max_boxes_count);
+  const polylineLimit = staticNumberValue(declarationNode?.max_polylines_count);
   if (labelLimit !== undefined) ctx.setDrawingLimit('label', labelLimit);
   if (lineLimit !== undefined) ctx.setDrawingLimit('line', lineLimit);
   if (boxLimit !== undefined) ctx.setDrawingLimit('box', boxLimit);
   if (polylineLimit !== undefined) ctx.setDrawingLimit('polyline', polylineLimit);
 
   const declarationTimeframe = resolveDeclarationTimeframe(
-    indicatorDeclarationNode?.timeframe,
+    declarationNode?.timeframe,
     inputs,
     inputDefs,
     compiled.analysis.inputSites,
@@ -3659,7 +3544,7 @@ export function executeCompiled(
 
   const plotRegistered = new Map<number, string>();
   const plotArrays = new Map<number, (number | null)[]>();
-  const plotColors = new Map<number, string | null>();
+  const plotColors = new Map<number, string>();
   const alertRegistered = new Map<string, string>();
   const strategyPropHistories = new Map<string, ValueSeries>();
   const securityCache = new Map<string, { bars: Bar[]; values: unknown[] }>();
@@ -3669,18 +3554,6 @@ export function executeCompiled(
   const errors: ExecutionError[] = [];
   const swallowedErrors: RuntimeSwallowedErrorAccumulator = new Map();
   const runtimeBuiltinCallCounts = new Map<string, number>();
-  const recordRuntimeError = (message: string): void => {
-    errors.push(createCompiledExecutionError(new CompiledRuntimeErrorException(message)));
-  };
-  const requestDisabledByDynamicRequests = (secId: number, name: string): boolean => {
-    if (dynamicRequestsEnabled) return false;
-    const reason = compiled.analysis.securitySites[secId]?.requiresDynamicRequestsReason;
-    if (!reason) return false;
-    recordRuntimeError(reason === 'nested-request'
-      ? `Nested request.* calls require dynamic_requests=true: ${name}`
-      : `request.* calls in local scopes require dynamic_requests=true: ${name}`);
-    return true;
-  };
   const trackRequestContext = (key: string): void => {
     requestContextKeys.add(key);
     if (requestContextKeys.size > TEALSCRIPT_MAX_UNIQUE_REQUEST_CONTEXTS) {
@@ -3700,15 +3573,6 @@ export function executeCompiled(
       suffix += 1;
     }
     return id;
-  };
-  const resolveLegacyPlotReference = (value: unknown): string | undefined => {
-    if (typeof value !== 'string') return toOptionalString(value);
-    if (ctx.plots.has(value)) return value;
-    const legacyPlotId = `plot_${value}`;
-    const legacyHlineId = `hline_${value}`;
-    if (ctx.plots.has(legacyPlotId)) return legacyPlotId;
-    if (ctx.plots.has(legacyHlineId)) return legacyHlineId;
-    return value.startsWith('plot_') || value.startsWith('hline_') ? value : legacyPlotId;
   };
   const alertConditionOutputId = (callId: string | undefined, title: string): string => {
     const key = callId ?? title;
@@ -3839,8 +3703,8 @@ export function executeCompiled(
             type: 'fill',
             title,
             color: [],
-            plot1Id: resolveLegacyPlotReference(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'plot1')),
-            plot2Id: resolveLegacyPlotReference(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'plot2')),
+            plot1Id: toOptionalString(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'plot1')),
+            plot2Id: toOptionalString(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'plot2')),
             editable: toOptionalBoolean(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'editable')),
             showLast: toOptionalNumber(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'show_last')),
             fillgaps: toOptionalBoolean(plotArg(value, canonicalNamed, extraArgs, activeFillArgs, 'fillgaps')),
@@ -3972,11 +3836,8 @@ export function executeCompiled(
           toPlotColor(plotArg(value, named, extraArgs, args, 'color')),
           plotArg(value, named, extraArgs, args, 'transp'),
         );
-        const offset = Math.trunc(toRuntimeNumber(plotArg(value, named, extraArgs, args, 'offset', 0)));
-        const targetBar = ctx.bar_index + (Number.isFinite(offset) ? offset : 0);
-        const plot = ctx.getPlots().find((p) => p.id === plotRegistered.get(index));
-        setPlotArrayValueAtBar(ensureColorArray(plot) ?? undefined, targetBar, color);
-        setPlotArrayValueAtBar(arr, targetBar, funcName === 'bgcolor' && color !== null ? 1 : null);
+        ensureColorArray(ctx.getPlots().find((p) => p.id === plotRegistered.get(index)))?.push(color);
+        arr.push(funcName === 'bgcolor' && color !== null ? 1 : null);
         return value;
       }
 
@@ -4009,10 +3870,10 @@ export function executeCompiled(
           plotArrays.set(index, arr);
         }
 
-        const open = toNumericPlotValue(plotArg(value, named, extraArgs, args, 'open'));
-        const high = toNumericPlotValue(plotArg(value, named, extraArgs, args, 'high'));
-        const low = toNumericPlotValue(plotArg(value, named, extraArgs, args, 'low'));
-        const close = toNumericPlotValue(plotArg(value, named, extraArgs, args, 'close'));
+        const open = toPlotValue(plotArg(value, named, extraArgs, args, 'open'));
+        const high = toPlotValue(plotArg(value, named, extraArgs, args, 'high'));
+        const low = toPlotValue(plotArg(value, named, extraArgs, args, 'low'));
+        const close = toPlotValue(plotArg(value, named, extraArgs, args, 'close'));
         const hasGap = open === null || high === null || low === null || close === null;
         const normalizedOpen = hasGap ? null : open;
         const normalizedHigh = hasGap ? null : high;
@@ -4023,18 +3884,23 @@ export function executeCompiled(
         const color = applyPlotTransparency(toPlotColor(plotArg(value, named, extraArgs, args, 'color', defaultColor)) ?? defaultColor, transp) ?? defaultColor;
         const normalizedColor = hasGap ? null : color;
         const plot = ctx.getPlots().find((p) => p.id === plotRegistered.get(index));
-        setPlotArrayValueAtBar(plot?.openValues, ctx.bar_index, normalizedOpen);
-        setPlotArrayValueAtBar(plot?.highValues, ctx.bar_index, normalizedHigh);
-        setPlotArrayValueAtBar(plot?.lowValues, ctx.bar_index, normalizedLow);
-        setPlotArrayValueAtBar(plot?.closeValues, ctx.bar_index, normalizedClose);
-        setPlotArrayValueAtBar(ensureColorArray(plot) ?? undefined, ctx.bar_index, normalizedColor);
+        const setAtBar = <T>(values: T[] | undefined, barIndex: number, plotValue: T): void => {
+          if (!values) return;
+          while (values.length < barIndex) values.push(null as T);
+          values[barIndex] = plotValue;
+        };
+        setAtBar(plot?.openValues, ctx.bar_index, normalizedOpen);
+        setAtBar(plot?.highValues, ctx.bar_index, normalizedHigh);
+        setAtBar(plot?.lowValues, ctx.bar_index, normalizedLow);
+        setAtBar(plot?.closeValues, ctx.bar_index, normalizedClose);
+        setAtBar(ensureColorArray(plot) ?? undefined, ctx.bar_index, normalizedColor);
         if (funcName === 'plotcandle') {
           const wickColor = applyPlotTransparency(toPlotColor(plotArg(value, named, extraArgs, plotcandleArgs, 'wickcolor', color)) ?? color, transp) ?? color;
           const borderColor = applyPlotTransparency(toPlotColor(plotArg(value, named, extraArgs, plotcandleArgs, 'bordercolor', color)) ?? color, transp) ?? color;
-          if (plot && Array.isArray(plot.wickColor)) setPlotArrayValueAtBar(plot.wickColor, ctx.bar_index, hasGap ? null : wickColor);
-          if (plot && Array.isArray(plot.borderColor)) setPlotArrayValueAtBar(plot.borderColor, ctx.bar_index, hasGap ? null : borderColor);
+          if (plot && Array.isArray(plot.wickColor)) setAtBar(plot.wickColor, ctx.bar_index, hasGap ? null : wickColor);
+          if (plot && Array.isArray(plot.borderColor)) setAtBar(plot.borderColor, ctx.bar_index, hasGap ? null : borderColor);
         }
-        setPlotArrayValueAtBar(arr, ctx.bar_index, normalizedClose);
+        setAtBar(arr, ctx.bar_index, normalizedClose);
         return normalizedClose;
       }
 
@@ -4047,7 +3913,7 @@ export function executeCompiled(
         const color = applyPlotTransparency(
           toPlotColor(plotArg(value, named, extraArgs, activePlotArgs, 'color', 'blue')),
           plotArg(value, named, extraArgs, activePlotArgs, 'transp'),
-        );
+        ) ?? 'blue';
         plotColors.set(index, color);
 
         ctx.registerPlot({
@@ -4079,7 +3945,7 @@ export function executeCompiled(
       ensureColorArray(plot)?.push(applyPlotTransparency(
         toPlotColor(plotArg(value, named, extraArgs, activePlotArgs, 'color', 'blue')),
         plotArg(value, named, extraArgs, activePlotArgs, 'transp'),
-      ));
+      ) ?? 'blue');
       const numValue = toPlotValue(value);
       arr.push(numValue);
       return plotRegistered.get(index);
@@ -4116,8 +3982,8 @@ export function executeCompiled(
       const type = defaultInputType;
       const legacy = funcName === 'input' && explicitType !== undefined;
       const hasOptions = legacy
-        ? toInputOptions(inputArg(legacyInputArgs, 7)) !== undefined
-        : Object.prototype.hasOwnProperty.call(named, 'options') || toInputOptions(inputArg(inputOptionsArgs, 2)) !== undefined;
+        ? Array.isArray(inputArg(legacyInputArgs, 7))
+        : Object.prototype.hasOwnProperty.call(named, 'options') || Array.isArray(inputArg(inputOptionsArgs, 2));
       const metadataNames = legacy
         ? legacyInputArgs
         : (funcName === 'input' ? inputBareArgs : undefined)
@@ -4144,7 +4010,7 @@ export function executeCompiled(
       };
       const options = inputArg(metadataNames, legacy ? 7 : 2);
       if (type === 'int' || type === 'float' || type === 'string' || type === 'timeframe' || type === 'enum') {
-        metadata.options = toInputOptions(options);
+        metadata.options = Array.isArray(options) ? options : undefined;
       }
       if (!hasOptions && (type === 'int' || type === 'float')) {
         metadata.minval = optionalNumber(metadataNames, legacy ? 3 : 2);
@@ -4495,8 +4361,7 @@ export function executeCompiled(
         sourceDescriptor?: unknown,
         captures?: Record<string, unknown>,
       ): unknown {
-        if (requestDisabledByDynamicRequests(secId, 'request.security')) return NaN;
-        const symStr = String(symbol ?? '').trim();
+        const symStr = String(symbol ?? '');
         const tfStr = normalizeRuntimeTimeframePeriod(String(timeframe ?? ''), String(ctx.timeframe.period ?? ''));
         const gapsStr = String(gaps ?? 'barmerge.gaps_off');
         const laStr = String(lookahead ?? 'barmerge.lookahead_off');
@@ -4511,8 +4376,7 @@ export function executeCompiled(
         if (!cached) {
           const secScript = compiled.securityScripts.get(secId);
           if (!requestDatafeed) {
-            recordRuntimeError('request.security requires a request datafeed');
-            return NaN;
+            throwCompiledRuntimeError('request.security requires a request datafeed');
           }
 
           const result = requestDatafeed.getBars({
@@ -4528,8 +4392,7 @@ export function executeCompiled(
             ) {
               return NaN;
             }
-            recordRuntimeError(`request.security failed: ${result.message}`);
-            return NaN;
+            throwCompiledRuntimeError(`request.security failed: ${result.message}`);
           }
 
           const values = secScript
@@ -4546,10 +4409,6 @@ export function executeCompiled(
                 requestBarIndex,
                 error,
               ),
-              requestDatafeed,
-              compiled.securityScripts,
-              compiled.analysis.securitySites,
-              dynamicRequestsEnabled,
             )
             : evaluateRequestedSourceSeries(result.context, sourceDescriptor);
           if (!values) return NaN;
@@ -4575,8 +4434,7 @@ export function executeCompiled(
         sourceDescriptor?: unknown,
         captures?: Record<string, unknown>,
       ): unknown {
-        if (requestDisabledByDynamicRequests(secId, 'request.security_lower_tf')) return createPineArray();
-        const symStr = String(symbol ?? '').trim();
+        const symStr = String(symbol ?? '');
         const tfStr = normalizeRuntimeTimeframePeriod(String(timeframe ?? ''), String(ctx.timeframe.period ?? ''));
         const currencyStr = normalizeRuntimeRequestCurrency(currency);
         const calcBars = normalizeRuntimePositiveInteger(calcBarsCount);
@@ -4596,8 +4454,7 @@ export function executeCompiled(
         if (!cached) {
           const secScript = compiled.securityScripts.get(secId);
           if (!requestDatafeed) {
-            recordRuntimeError('request.security_lower_tf requires a request datafeed');
-            return createPineArray();
+            throwCompiledRuntimeError('request.security_lower_tf requires a request datafeed');
           }
 
           const result = requestDatafeed.getBars({
@@ -4616,8 +4473,7 @@ export function executeCompiled(
             if (isRuntimeTruthy(ignoreInvalidTimeframe) && result.code === 'invalid_timeframe') {
               return createPineArray();
             }
-            recordRuntimeError(`request.security_lower_tf failed: ${result.message}`);
-            return createPineArray();
+            throwCompiledRuntimeError(`request.security_lower_tf failed: ${result.message}`);
           }
 
           const values = secScript
@@ -4634,10 +4490,6 @@ export function executeCompiled(
                 requestBarIndex,
                 error,
               ),
-              requestDatafeed,
-              compiled.securityScripts,
-              compiled.analysis.securitySites,
-              dynamicRequestsEnabled,
             )
             : evaluateRequestedSourceSeries(result.context, sourceDescriptor);
           if (!values) return createPineArray();
@@ -4821,7 +4673,6 @@ export function executeCompiled(
         sourceDescriptor?: unknown,
         captures?: Record<string, unknown>,
       ): unknown {
-        if (requestDisabledByDynamicRequests(secId, 'request.seed')) return NaN;
         const sourceStr = toRuntimeString(source).trim();
         const symbolStr = toRuntimeString(symbol).trim();
         const requestSymbol = seedRequestSymbol(sourceStr, symbolStr);
@@ -4836,8 +4687,7 @@ export function executeCompiled(
         if (!cached) {
           const secScript = compiled.securityScripts.get(secId);
           if (!requestDatafeed) {
-            recordRuntimeError('request.seed requires a request datafeed');
-            return NaN;
+            throwCompiledRuntimeError('request.seed requires a request datafeed');
           }
 
           const result = requestDatafeed.getBars({
@@ -4852,8 +4702,7 @@ export function executeCompiled(
             ) {
               return NaN;
             }
-            recordRuntimeError(`request.seed failed: ${result.message}`);
-            return NaN;
+            throwCompiledRuntimeError(`request.seed failed: ${result.message}`);
           }
 
           const values = secScript
@@ -4870,10 +4719,6 @@ export function executeCompiled(
                 requestBarIndex,
                 error,
               ),
-              requestDatafeed,
-              compiled.securityScripts,
-              compiled.analysis.securitySites,
-              dynamicRequestsEnabled,
             )
             : evaluateRequestedSourceSeries(result.context, sourceDescriptor);
           if (!values) return NaN;
@@ -5158,7 +5003,7 @@ export function executeCompiled(
       try {
         inst.onBar(barCtx);
       } catch (error) {
-        if (error instanceof CompiledRuntimeErrorException || isKnownPineRuntimeError(error)) {
+        if (error instanceof CompiledRuntimeErrorException) {
           errors.push(createCompiledExecutionError(error));
           break;
         }
@@ -5225,17 +5070,12 @@ export function executeCompiled(
     behindChart: undefined,
     calcBarsCount: undefined,
     maxBarsBack: undefined,
-    dynamicRequests: dynamicRequestsEnabled,
+    dynamicRequests: false,
     drawingLimits: { ...DEFAULT_DRAWING_LIMITS },
   };
 
   // Parse indicator declaration metadata from the AST
-  if (decl?.node?.type === 'LibraryDeclaration') {
-    const node = decl.node;
-    declaration.overlay = staticBooleanValue(node.overlay) ?? declaration.overlay;
-    declaration.dynamicRequests = staticBooleanValue(node.dynamic_requests) ?? declaration.dynamicRequests;
-  }
-  if (decl?.node?.type === 'IndicatorDeclaration') {
+  if (decl?.node) {
     const node = decl.node;
     declaration.shortTitle = staticStringValue(node.shorttitle);
     declaration.overlay = staticBooleanValue(node.overlay) ?? declaration.overlay;

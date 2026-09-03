@@ -109,6 +109,17 @@ const DRAG_THRESHOLD = 5;
 const SEGMENT_HORIZONTAL_PADDING = 14;
 const ACTION_ICON_STROKE_WIDTH = 2;
 
+/**
+ * Base draw tier: a position label covers an order label it overlaps. Only
+ * hover, selection or an active drag lifts a line out of its tier, and
+ * `applyFloatingLineOrder` restores this order the moment that ends.
+ */
+const TRADE_LINE_BASE_DRAW_TIER: Record<string, number> = { order: 1, position: 2 };
+
+function baseDrawRank(bound: PriceLineLabelBounds): number {
+  return (bound.floatingLabel ? 10 : 0) + (TRADE_LINE_BASE_DRAW_TIER[bound.type ?? 'price'] ?? 0);
+}
+
 interface CachedLineContentRefs {
   priceAxisRect?: Konva.Rect;
   priceAxisPrimaryText?: Konva.Text;
@@ -718,18 +729,15 @@ export class PriceLineManager {
       this.countdownTimer = null;
     }
 
-    // Separate floating and non-floating labels
-    const nonFloating = this.labelBounds.filter((b) => !b.floatingLabel);
-    const floating = this.labelBounds.filter((b) => b.floatingLabel);
+    // Plain price lines, then orders, then positions; floating labels above
+    // their own tier. The rendered index is stored so a promoted line can be
+    // put back exactly where it belongs when the hover or selection ends.
+    const ordered = [...this.labelBounds].sort((a, b) => baseDrawRank(a) - baseDrawRank(b));
 
-    // Render non-floating first (underneath)
-    for (const bound of nonFloating) {
+    let baseOrder = 0;
+    for (const bound of ordered) {
       this.renderPriceLine(bound);
-    }
-
-    // Render floating on top
-    for (const bound of floating) {
-      this.renderPriceLine(bound);
+      this.cachedLineGroups.get(bound.lineId)?.setAttr('baseOrder', baseOrder++);
     }
 
     // Render crosshair vertical line
@@ -845,15 +853,29 @@ export class PriceLineManager {
   }
 
   private applyFloatingLineOrder(): void {
-    if (this.selectedLineId) {
-      this.cachedLineGroups.get(this.selectedLineId)?.moveToTop();
+    // Rebuilt from the base order every time rather than stacking moveToTop
+    // calls: a hover used to leave the order permanently above the positions
+    // it had covered, because nothing ever moved it back down.
+    const promoted: Konva.Group[] = [];
+    const promote = (lineId: string | null | undefined) => {
+      if (!lineId) return;
+      const group = this.cachedLineGroups.get(lineId);
+      if (group && !promoted.includes(group)) promoted.push(group);
+    };
+
+    promote(this.selectedLineId);
+    for (const lineId of this.hoveredLineIds) promote(lineId);
+    promote(this.activeDrag?.lineId);
+
+    const base = [...this.cachedLineGroups.values()]
+      .filter((group) => !promoted.includes(group))
+      .sort((a, b) => ((a.getAttr('baseOrder') as number) ?? 0) - ((b.getAttr('baseOrder') as number) ?? 0));
+
+    let index = 0;
+    for (const group of [...base, ...promoted]) {
+      group.zIndex(index++);
     }
-    for (const lineId of this.hoveredLineIds) {
-      this.cachedLineGroups.get(lineId)?.moveToTop();
-    }
-    if (this.activeDrag?.lineId) {
-      this.cachedLineGroups.get(this.activeDrag.lineId)?.moveToTop();
-    }
+
     this.crosshairVertical?.moveToTop();
     this.crosshairHorizontal?.moveToTop();
     this.layer.batchDraw();

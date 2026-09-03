@@ -6,6 +6,7 @@ import { NATIVE_PRICE_AXIS_TAG_SIZING, PriceAxisTagWidthCache } from '../../util
 import { createNativePriceAxisLane } from './nativePriceAxisLane';
 import {
   buildNativeTradeLineGeometries,
+  promoteNativeSelectedTradeLineGeometry,
   createNativeTradeLineRows,
   formatNativeTradeLinePrice,
   getNativeTradeLineActionButtonWidth,
@@ -721,5 +722,32 @@ describe('native trade line layout', () => {
       { objectId: 'position-b', objectType: 'position', price: 101, x1: 82, x2: 332 },
       { objectId: 'position-b', objectType: 'position', price: 101, x1: 336, x2: 386 },
     ]);
+  });
+});
+
+describe('native trade line draw order', () => {
+  const geometryInput = {
+    dimensions,
+    pricePrecision: 0.1,
+    textWidth: measureText,
+    smallTextWidth: measureText,
+    positiveColor: '#12c48b',
+    negativeColor: '#ff4d67',
+  };
+
+  it('draws position lines after order lines', () => {
+    const geometries = buildNativeTradeLineGeometries([createOrderLine()], [createPositionLine()], geometryInput);
+
+    expect(geometries.map((geometry) => geometry.objectType)).toEqual(['order', 'position']);
+  });
+
+  it('lifts a selected order above positions', () => {
+    const geometries = buildNativeTradeLineGeometries([createOrderLine()], [createPositionLine()], geometryInput);
+    const promoted = promoteNativeSelectedTradeLineGeometry(geometries, {
+      objectType: 'order',
+      objectId: 'adapter-order',
+    });
+
+    expect(promoted.map((geometry) => geometry.objectType)).toEqual(['position', 'order']);
   });
 });

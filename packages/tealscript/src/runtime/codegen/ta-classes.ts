@@ -1130,8 +1130,8 @@ export class Highest implements Saveable {
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.trunc(length);
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = Math.max(1, Math.trunc(length));
+    this.series = new NumericSeries(this.length);
   }
 
   compute(src: number): number {
@@ -1148,7 +1148,6 @@ export class Highest implements Saveable {
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.length <= 0) return NaN;
     const len = Math.min(this.length, this.series.length);
     let max = -Infinity;
     for (let i = 0; i < len; i++) {
@@ -1194,7 +1193,6 @@ export class Lowest implements Saveable {
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.length <= 0) return NaN;
     const len = Math.min(this.length, this.series.length);
     let min = Infinity;
     for (let i = 0; i < len; i++) {
@@ -1269,8 +1267,8 @@ export class HighestBars implements Saveable {
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.trunc(length);
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = Math.max(1, Math.trunc(length));
+    this.series = new NumericSeries(this.length);
   }
 
   compute(src: number): number {
@@ -1287,7 +1285,6 @@ export class HighestBars implements Saveable {
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.length <= 0) return NaN;
     let highest = -Infinity;
     let offset = NaN;
     for (let index = 0; index < this.series.length; index += 1) {
@@ -1318,8 +1315,8 @@ export class LowestBars implements Saveable {
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.trunc(length);
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = Math.max(1, Math.trunc(length));
+    this.series = new NumericSeries(this.length);
   }
 
   compute(src: number): number {
@@ -1336,7 +1333,6 @@ export class LowestBars implements Saveable {
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.length <= 0) return NaN;
     let lowest = Infinity;
     let offset = NaN;
     for (let index = 0; index < this.series.length; index += 1) {
@@ -2071,13 +2067,11 @@ interface StdDevSnapshot {
 export class StdDev implements Saveable {
   private series: NumericSeries;
   private readonly length: number;
-  private readonly biased: boolean;
 
   private snap: StdDevSnapshot | null = null;
 
-  constructor(length: number, biased = true) {
+  constructor(length: number) {
     this.length = Math.max(1, Math.trunc(length));
-    this.biased = biased;
     this.series = new NumericSeries(this.length);
   }
 
@@ -2108,8 +2102,7 @@ export class StdDev implements Saveable {
       const d = this.series.get(i) - mean;
       sumSq += d * d;
     }
-    const divisor = this.biased ? this.length : this.length - 1;
-    return divisor <= 0 ? NaN : Math.sqrt(sumSq / divisor);
+    return Math.sqrt(sumSq / this.length);
   }
 
   save(): StdDevSnapshot {
