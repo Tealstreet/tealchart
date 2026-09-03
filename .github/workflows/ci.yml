@@ -22,7 +22,11 @@ jobs:
         with:
           node-version: 22
           cache: yarn
+      # puppeteer is a devDependency of the product-path corpus script, which CI
+      # never runs — install its types without pulling a browser down.
       - run: yarn install --frozen-lockfile --network-timeout 600000
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
       - run: yarn typecheck
       - run: yarn lint
       - run: yarn test
