@@ -38,4 +38,38 @@ describe('tealscript WebView bridge codec', () => {
     expect(Number.isNaN(decoded.series[0])).toBe(true);
     expect(Object.is(decoded.series[1], -0)).toBe(true);
   });
+
+  it('round-trips negative zero without losing its sign bit', () => {
+    const encoded = stringifyTealscriptWebViewBridgeMessage({
+      zero: -0,
+      nested: { values: [-0] },
+    });
+
+    const decoded = parseTealscriptWebViewBridgeMessage(encoded) as {
+      zero: number;
+      nested: { values: number[] };
+    };
+    expect(Object.is(decoded.zero, -0)).toBe(true);
+    expect(Object.is(decoded.nested.values[0], -0)).toBe(true);
+  });
+
+  it('round-trips typed arrays without degrading them to plain arrays', () => {
+    const message = {
+      float32: new Float32Array([Number.NaN, -0, Infinity]),
+      int16: new Int16Array([-1, 0, 1]),
+      uint8: new Uint8Array([0, 1, 255]),
+    };
+
+    const decoded = parseTealscriptWebViewBridgeMessage(
+      stringifyTealscriptWebViewBridgeMessage(message),
+    ) as typeof message;
+    expect(decoded.float32).toBeInstanceOf(Float32Array);
+    expect(Number.isNaN(decoded.float32[0])).toBe(true);
+    expect(Object.is(decoded.float32[1], -0)).toBe(true);
+    expect(decoded.float32[2]).toBe(Infinity);
+    expect(decoded.int16).toBeInstanceOf(Int16Array);
+    expect(Array.from(decoded.int16)).toEqual([-1, 0, 1]);
+    expect(decoded.uint8).toBeInstanceOf(Uint8Array);
+    expect(Array.from(decoded.uint8)).toEqual([0, 1, 255]);
+  });
 });

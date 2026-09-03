@@ -199,13 +199,13 @@ persistent collection mutation, history-with-intrabar state — affecting 45 of
 246 corpus scripts, and that deleting the interpreter would strand them.
 
 Measured after deletion: **all 45 pass compiled-only realtime replay across 37
-events each.** The engine handles them. What refuses them is a **safety gate in
-the product worker**, not a capability gap — and with the gate no longer able to
-fall back, it now fails loudly on 8 composite scripts across 24 live updates.
+events each.** The engine handles them. What refused them was a **safety gate in
+the product worker**, not a capability gap. That gate is now removed; the worker
+composite, external-corpus, and performance-composite realtime tests prove the
+former fallback rows execute as compiled and match fresh compiled
+reconstruction.
 
-So the remaining question is not "teach compiled four construct classes." It is
-whether that safety gate is still justified now that the engine demonstrably
-computes these correctly. Inventory:
+So the answer is not "teach compiled four construct classes." Inventory:
 `packages/tealscript/reports/compiled-realtime-unsupported-inventory.md`.
 
 This does not block the WebView host, which is the next implementation step.
@@ -217,8 +217,7 @@ This does not block the WebView host, which is the next implementation step.
    realtime constructs now fail loudly instead of degrading silently.
 3. ~~Delete the interpreter.~~ Done.
 4. ~~Build the bundled WebView host and the `createWorker` factory.~~ Done.
-5. Adjudicate the product-worker realtime safety gate for the 8 remaining
-   composite scripts.
-6. Bridge conformance check.
+5. ~~Adjudicate and remove the product-worker realtime safety gate.~~ Done.
+6. ~~Bridge conformance check.~~ Done.
 7. On-device performance measurement — never yet taken. All existing timings are
    Node on a development machine.
