@@ -5,7 +5,7 @@ import {
   type Bar,
   type ExecutionError,
   type ExecutionResult,
-  type TealscriptEngineOptions,
+  type TealscriptExecutionOptions,
 } from '../runtime';
 import {
   executeCompiled,
@@ -22,7 +22,7 @@ import type {
 export interface PineSourceClassificationOptions {
   bars: Bar[];
   inputs?: Map<string, unknown>;
-  engineOptions?: TealscriptEngineOptions;
+  engineOptions?: TealscriptExecutionOptions;
   semanticOptions?: SemanticCheckOptions;
   requireCompiled?: boolean;
 }
@@ -133,7 +133,7 @@ export function classifyPineCompatibilitySource(
           stage: 'output',
           status: 'failed',
           failureClass: 'compiled_fallback',
-          message: 'Compiled execution returned null and would require interpreter fallback',
+          message: 'Compiled execution returned null and is unsupported',
         },
       ];
     }
@@ -228,47 +228,47 @@ function createRuntimeDiagnostic(error: ExecutionError): CompatibilityDiagnostic
 }
 
 function compareNormalizedOutputs(
-  interpreted: ExecutionResult,
+  expected: ExecutionResult,
   compiled: ExecutionResult,
 ): { outputMessage?: string; renderMessage?: string } {
-  const interpretedOutput = normalizeOutput(interpreted);
+  const expectedOutput = normalizeOutput(expected);
   const compiledOutput = normalizeOutput(compiled);
-  const interpretedOutputJson = JSON.stringify(interpretedOutput);
+  const expectedOutputJson = JSON.stringify(expectedOutput);
   const compiledOutputJson = JSON.stringify(compiledOutput);
-  if (interpretedOutputJson !== compiledOutputJson) {
+  if (expectedOutputJson !== compiledOutputJson) {
     return {
-      outputMessage: `Compiled output normalization differs from interpreter output: ${summarizeOutputDiff(interpretedOutputJson, compiledOutputJson)}`,
+      outputMessage: `Compiled output normalization differs from expected output: ${summarizeOutputDiff(expectedOutputJson, compiledOutputJson)}`,
     };
   }
 
-  const interpretedRender = normalizeRender(interpreted);
+  const expectedRender = normalizeRender(expected);
   const compiledRender = normalizeRender(compiled);
-  const interpretedRenderJson = JSON.stringify(interpretedRender);
+  const expectedRenderJson = JSON.stringify(expectedRender);
   const compiledRenderJson = JSON.stringify(compiledRender);
-  if (interpretedRenderJson !== compiledRenderJson) {
+  if (expectedRenderJson !== compiledRenderJson) {
     return {
-      renderMessage: `Compiled drawing normalization differs from interpreter drawing output: ${summarizeOutputDiff(interpretedRenderJson, compiledRenderJson)}`,
+      renderMessage: `Compiled drawing normalization differs from expected drawing output: ${summarizeOutputDiff(expectedRenderJson, compiledRenderJson)}`,
     };
   }
 
   return {};
 }
 
-function summarizeOutputDiff(interpreted: string, compiled: string): string {
+function summarizeOutputDiff(expected: string, compiled: string): string {
   const limit = 500;
   let firstDiff = -1;
-  const max = Math.max(interpreted.length, compiled.length);
+  const max = Math.max(expected.length, compiled.length);
   for (let i = 0; i < max; i += 1) {
-    if (interpreted[i] !== compiled[i]) {
+    if (expected[i] !== compiled[i]) {
       firstDiff = i;
       break;
     }
   }
-  if (firstDiff < 0) return `interpreter=${interpreted.slice(0, limit)} compiled=${compiled.slice(0, limit)}`;
+  if (firstDiff < 0) return `expected=${expected.slice(0, limit)} compiled=${compiled.slice(0, limit)}`;
 
   const start = Math.max(0, firstDiff - Math.floor(limit / 2));
   const end = firstDiff + Math.floor(limit / 2);
-  return `firstDiff=${firstDiff} interpreter=${interpreted.slice(start, end)} compiled=${compiled.slice(start, end)}`;
+  return `firstDiff=${firstDiff} expected=${expected.slice(start, end)} compiled=${compiled.slice(start, end)}`;
 }
 
 function normalizeOutput(result: ExecutionResult): unknown {

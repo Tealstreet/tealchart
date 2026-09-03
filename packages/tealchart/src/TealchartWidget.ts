@@ -2308,10 +2308,6 @@ export class TealchartWidget implements ITealchartWebWidget {
     return {
       backend: {
         executionBackendOverride: options?.tealscriptExecutionBackend,
-        enableClosureBackend:
-          typeof options?.enableTealscriptClosureBackend === 'function'
-            ? options.enableTealscriptClosureBackend()
-            : options?.enableTealscriptClosureBackend,
       },
       syminfo: {
         ticker: symbolInfo?.ticker ?? symbolInfo?.name ?? this._symbol,

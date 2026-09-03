@@ -1,6 +1,21 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { InMemoryRequestDatafeed, TealscriptEngine } from '../../src/runtime';
+const codegenMocks = vi.hoisted(() => ({
+  tryExecuteScript: vi.fn(),
+  actualTryExecuteScript: undefined as undefined | typeof import('../../src/runtime/codegen').tryExecuteScript,
+}));
+
+vi.mock('../../src/runtime/codegen', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/runtime/codegen')>();
+  codegenMocks.actualTryExecuteScript = actual.tryExecuteScript;
+  codegenMocks.tryExecuteScript.mockImplementation(actual.tryExecuteScript);
+  return {
+    ...actual,
+    tryExecuteScript: codegenMocks.tryExecuteScript,
+  };
+});
+
+import { InMemoryRequestDatafeed } from '../../src/runtime';
 import type { Bar } from '../../src/runtime';
 import { parse } from '../../src/parser';
 import type {
@@ -33,7 +48,14 @@ function isResultMessage(message: FromWorkerMessage): message is ResultMessage {
 }
 
 describe('worker requestData bridge', () => {
+  beforeEach(() => {
+    if (codegenMocks.actualTryExecuteScript) {
+      codegenMocks.tryExecuteScript.mockImplementation(codegenMocks.actualTryExecuteScript);
+    }
+  });
+
   afterEach(() => {
+    codegenMocks.tryExecuteScript.mockClear();
     vi.resetModules();
     vi.unstubAllGlobals();
   });
@@ -105,42 +127,6 @@ plot(reqClose, "Requested Close")`;
     expect(result?.plots[0]?.values).toEqual([null, 20, 20, 30, 30, 30]);
     expect(result?.plots[1]?.values).toEqual([null, 22, 22, 34, 34, 34]);
   });
-
-  it('selects closure execution through worker runtime options', async () => {
-    const posted: FromWorkerMessage[] = [];
-    const workerGlobal = {
-      onmessage: null as ((event: MessageEvent<ToWorkerMessage>) => void) | null,
-      postMessage: (message: FromWorkerMessage) => {
-        posted.push(message);
-      },
-    };
-    vi.stubGlobal('self', workerGlobal);
-
-    await import('../../src/worker/worker');
-
-    workerGlobal.onmessage?.({
-      data: {
-        type: 'init',
-        scriptId: 'study-closure-backend',
-        script: 'indicator("Closure Backend")\nplot(close + 1)',
-        bars: makeBars([10, 11, 12]),
-        inputs: {},
-        runtime: {
-          backend: {
-            enableClosureBackend: true,
-          },
-        },
-        metadata: { generation: 1, requestId: 1, requestKind: 'full' },
-      },
-    } as MessageEvent<ToWorkerMessage>);
-
-    const result = posted.find(isResultMessage);
-    expect(result?.profile?.executionMode).toBe('closure');
-    expect(result?.profile?.selectedBackend).toBe('closure');
-    expect(result?.profile?.backendSelectionSource).toBe('flag');
-    expect(result?.plots[0]?.values).toEqual([11, 12, 13]);
-  });
-
   it('preloads every supported request family and keeps compiled execution enabled', async () => {
     const posted: FromWorkerMessage[] = [];
     const workerGlobal = {
@@ -528,7 +514,7 @@ plot(na(rate) ? 1 : 0, "Rate NA")`;
     const chartBars = makeBars([10, 11, 12]);
     const script = `//@version=6
 indicator("Dynamic Request Discovery")
-dynSymbol = close > 11 ? "EXT" : "ALT"
+dynSymbol = close > 11 ? "EXT " : "ALT "
 dynTimeframe = close > 11 ? "D" : "W"
 securityValue = request.security(dynSymbol, dynTimeframe, close, ignore_invalid_symbol=true, lookahead=barmerge.lookahead_on)
 financialValue = request.financial(dynSymbol, "TOTAL_REVENUE", "FQ", ignore_invalid_symbol=true)
@@ -598,6 +584,7 @@ plot(financialValue, "Financial")`;
     expect(result?.alerts.flatMap((alert) => alert.events.map((event) => event.message))).toEqual(['discovery alert']);
   });
 
+
   it('keeps same-bar realtime updates compiled while reusing cached request data and libraries', async () => {
     const posted: FromWorkerMessage[] = [];
     const workerGlobal = {
@@ -626,13 +613,6 @@ indicator("Realtime Compiled Request Import")
 import TestUser/RealtimeTools/1 as rt
 remote = request.security("TEST", "D", close, lookahead=barmerge.lookahead_on)
 plot(rt.midpoint(high, low) + remote, "Combined")`;
-
-    const interpreter = new TealscriptEngine({
-      libraries,
-      requestDatafeed: new InMemoryRequestDatafeed([requestedContext]),
-    });
-    interpreter.execute(parse(script), chartBars);
-
     workerGlobal.onmessage?.({
       data: {
         type: 'init',
@@ -670,8 +650,8 @@ plot(rt.midpoint(high, low) + remote, "Combined")`;
     const firstUpdate = { ...chartBars[2]!, close: 13, high: 14 };
     const secondUpdate = { ...chartBars[2]!, close: 14, high: 15 };
     const updates = [
-      { bar: firstUpdate, expected: [...(interpreter.updateBar(parse(script), firstUpdate)[0]?.values ?? [])] },
-      { bar: secondUpdate, expected: [...(interpreter.updateBar(parse(script), secondUpdate)[0]?.values ?? [])] },
+      { bar: firstUpdate, expected: [110, 111, 112.5] },
+      { bar: secondUpdate, expected: [110, 111, 113] },
     ];
 
     for (const [index, update] of updates.entries()) {

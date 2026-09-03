@@ -252,7 +252,7 @@ Two related issues were resolved:
    edge cases where multi-level tab indentation (`\t\t`) might mismatch nested `Indent`
    tokens.
 
-2. **If/else scope promotion** (`src/runtime/engine.ts`): Variables declared inside
+2. **If/else scope promotion** (`src/runtime/compiledOnly.ts`): Variables declared inside
    `if`/`else` branch bodies are now promoted to the enclosing scope after the branch
    executes. This matches Pine's semantics where branch-local declarations are visible
    to subsequent statements at the same nesting level.
@@ -291,7 +291,7 @@ targeting untested idiom combinations. All 12 pass.
 
 **Status:** CLOSED. Tuple expression requests are evaluated in the requested context,
 merged per tuple element, and returned as a destructurable array aligned to chart bars.
-Both the interpreter path and compiled runtime path have regression coverage.
+Both the compiled runtime path have regression coverage.
 
 **Impact:** Public scripts can pass OHLC as a tuple to avoid 4 separate
 `request.security` calls.

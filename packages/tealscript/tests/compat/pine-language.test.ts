@@ -694,10 +694,7 @@ plot(p.value, title="Value")
       },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'Unknown library type: pivots.Hidden',
-      'Unknown identifier: p',
-    ]);
+    expect(result.errors.map((error) => error.message)).toEqual(['Unknown library type: pivots.Hidden']);
   });
 
   it('allows exported imported functions to construct library-local types', () => {
@@ -865,10 +862,7 @@ plot(q.value, title="Value")
       },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'Unknown function: p.hidden',
-      'Unknown identifier: q',
-    ]);
+    expect(result.errors.map((error) => error.message)).toEqual(['Unknown function: p.hidden']);
   });
 
   it('keeps non-exported imported method overloads private externally', () => {
@@ -895,10 +889,7 @@ plot(q.value, title="Value")
       },
     });
 
-    expect(result.errors.map((error) => error.message)).toEqual([
-      'Unknown function: p.choose',
-      'Unknown identifier: q',
-    ]);
+    expect(result.errors.map((error) => error.message)).toEqual(['Unknown function: p.choose']);
   });
 
   it('selects imported method overloads by receiver user-defined type', () => {

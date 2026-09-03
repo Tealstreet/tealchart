@@ -365,18 +365,28 @@ function fillArray(arr: arrFuncs.PineArray, val: unknown, from?: number, to?: nu
   }
 }
 
-function everyArray(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): boolean {
+function isPineTruthy(value: unknown): boolean {
+  return value !== false
+    && value !== 0
+    && value !== null
+    && value !== undefined
+    && !(typeof value === 'number' && Number.isNaN(value));
+}
+
+function everyArray(arr: arrFuncs.PineArray, fn?: (val: unknown) => boolean): boolean {
   const size = arrFuncs.getArraySize(arr);
   for (let i = 0; i < size; i++) {
-    if (!fn(arrFuncs.getArrayValue(arr, i))) return false;
+    const value = arrFuncs.getArrayValue(arr, i);
+    if (!(fn ? fn(value) : isPineTruthy(value))) return false;
   }
   return true;
 }
 
-function someArray(arr: arrFuncs.PineArray, fn: (val: unknown) => boolean): boolean {
+function someArray(arr: arrFuncs.PineArray, fn?: (val: unknown) => boolean): boolean {
   const size = arrFuncs.getArraySize(arr);
   for (let i = 0; i < size; i++) {
-    if (fn(arrFuncs.getArrayValue(arr, i))) return true;
+    const value = arrFuncs.getArrayValue(arr, i);
+    if (fn ? fn(value) : isPineTruthy(value)) return true;
   }
   return false;
 }
@@ -833,7 +843,8 @@ function isRequestReplayableGlobalStatement(
 function collectSecuritySiteReferences(site: SecurityCallSite): Set<string> {
   // Keep this list aligned with every expression/statement-bearing field on
   // SecurityCallSite. Non-expression metadata fields are `id`, `kind`, `node`,
-  // `taCallSites`, `expressionSourceParam`, and `expressionCaptureParams`.
+  // `taCallSites`, `expressionSourceParam`, `expressionCaptureParams`, and
+  // `importedAliasContext`.
   const references = collectExpressionReferences(site.expressionExpr);
   if (site.sourceExpr) collectExpressionReferences(site.sourceExpr, references);
   collectExpressionReferences(site.symbolExpr, references);
@@ -919,6 +930,7 @@ function compileSecurityExpression(
   const secAnalysis = analyze(secAST, {
     ...options,
     capturedParams: new Set(site.expressionCaptureParams ?? []),
+    importedAliasContext: site.importedAliasContext,
   });
   if (secAnalysis.unsupported.length > 0) return null;
 

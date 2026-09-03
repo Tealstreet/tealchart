@@ -18,7 +18,7 @@ ad hoc.
 
 The local count is generated from runtime registrations in:
 
-- `src/runtime/engine.ts`
+- `src/runtime/compiledOnly.ts`
 - `src/runtime/builtins/drawings.ts`
 
 Extraction pattern:
@@ -124,11 +124,11 @@ Current `ta.*` progress:
 - Common `ta.*` helpers accept Pine-style named arguments for covered
   parameters.
 - `ta.accdist` is available as a variable-only cumulative A/D series in both
-  interpreter and compiled execution, with history and callable-use diagnostics
+  compiled execution, with history and callable-use diagnostics
   matching the other TA variables.
-- A table-driven compiled/interpreter warmup sweep covers 64 implemented `ta.*`
+- A table-driven compiled-only warmup sweep covers 64 implemented `ta.*`
   state-machine and variable rows with explicit first-valid-bar expectations.
-  The sweep fixed `ta.adx(5)` so the interpreter applies the same
+  The sweep fixed `ta.adx(5)` so the legacy runtime applies the same
   `adxSmoothing=14` default as the compiled path.
 - Event and cross helpers accept Pine-style named arguments for covered
   `condition`/`source` parameters and cross helper `source1`/`source2`
@@ -136,17 +136,17 @@ Current `ta.*` progress:
 - `ta.highest`, `ta.lowest`, `ta.highestbars`, and `ta.lowestbars` support the
   one-argument default-source forms, including compiled coverage for the
   extrema helpers and offset helpers. Compiled `ta.highest()`/`ta.lowest()`
-  skip early `na` source values like the interpreter.
+  skip early `na` source values like the legacy runtime.
 - Common windowed helpers now track derived source expressions such as
   `ta.sma(close - open, length)` using call-local history instead of falling
   back to chart `close`.
 - Compiled indexed TA call results such as `ta.sma(source, length)[1]` keep
-  call-site history and match interpreter output inside UDF chains.
+  call-site history and match expected output inside UDF chains.
 - Stateful `ta.*` calls nested through UDF helper graphs keep call-chain-local
-  history in both interpreter and compiled execution.
+  history in both compiled execution.
 - The compiled runtime binds mixed `source=..., length` calls for common
   source/length helpers through the same ordered argument rule as the
-  interpreter.
+  legacy runtime.
 - `ta.stdev` and `ta.variance` support the `biased` parameter.
 - `ta.ema` and `ta.rma` use stable call-site state for recursive smoothing.
 - `ta.dmi`, `ta.sar`, `ta.pivothigh`, `ta.pivotlow`, and `ta.linreg`
@@ -182,95 +182,95 @@ Current `ta.*` progress:
   `ta.vwma()`, `ta.wma()`, `ta.alma()`, and `ta.hma()` overlay/ribbon routing
   over deterministic OHLCV bars.
 - The compiled runtime accepts `ta.hma()` with static length arguments and has
-  interpreter-parity coverage for the TA class and full compiled execution path.
+  compiled-behavior coverage for the TA class and full compiled execution path.
 - The compiled runtime parity sweep includes active `ta.atr()` coverage against
-  the interpreter, with matching TA-class coverage for first-bar true range and
+  the legacy runtime, with matching TA-class coverage for first-bar true range and
   RMA seeding behavior.
 - The compiled runtime accepts `ta.swma()` and `ta.alma()` with static
-  constructor arguments and has interpreter-parity coverage for both TA classes
+  constructor arguments and has compiled-behavior coverage for both TA classes
   and full compiled execution output.
 - The compiled runtime accepts `ta.cci()`, `ta.cmo()`, and `ta.wpr()` with
-  static and default length arguments and has interpreter-parity coverage for
+  static and default length arguments and has compiled-behavior coverage for
   the TA classes plus positional, mixed, and default full compiled execution
   output.
 - The compiled runtime accepts `ta.smma()` and `ta.vwma()` with static length
-  arguments and has interpreter-parity coverage for the reused RMA state, VWMA
+  arguments and has compiled-behavior coverage for the reused RMA state, VWMA
   class, and full compiled execution output.
-- The compiled runtime accepts `ta.cross()` and has interpreter-parity coverage
+- The compiled runtime accepts `ta.cross()` and has compiled-behavior coverage
   for either-direction threshold crossing behavior in the TA class and full
   compiled execution output.
 - The compiled runtime accepts `ta.range()`, `ta.rising()`, and `ta.falling()`
-  with static length arguments and has interpreter-parity coverage for the TA
+  with static length arguments and has compiled-behavior coverage for the TA
   classes and full compiled execution output.
 - The compiled runtime accepts `ta.highestbars()` and `ta.lowestbars()` with
   static length arguments, including Pine shorthand defaults to high/low, and
-  has interpreter-parity coverage for the TA classes and full compiled
+  has compiled-behavior coverage for the TA classes and full compiled
   execution output.
 - The compiled runtime accepts `ta.highest()` and `ta.lowest()` with explicit
   sources, default high/low sources, named length, mixed named-source static
-  length forms, and interpreter-matching early `na` handling.
+  length forms, and compiled-behavior early `na` handling.
 - The compiled runtime accepts element-wise `ta.max()` and `ta.min()` calls with
-  interpreter-parity coverage for positional, named, and mixed source arguments.
+  compiled-behavior coverage for positional, named, and mixed source arguments.
 - The compiled runtime accepts `ta.variance()` and `ta.dev()` with static
   length arguments, including static `biased=false` variance, and has
-  interpreter-parity coverage for the TA classes and full compiled execution
+  compiled-behavior coverage for the TA classes and full compiled execution
   output.
 - The compiled runtime accepts `ta.covariance()` and `ta.correlation()` with
-  static length arguments and has interpreter-parity coverage for paired source
+  static length arguments and has compiled-behavior coverage for paired source
   windows, including flat-correlation `na` output.
 - The compiled runtime accepts `ta.cog()` with static length arguments and has
-  interpreter-parity coverage for source and derived-source compiled execution
+  compiled-behavior coverage for source and derived-source compiled execution
   output.
 - The compiled runtime accepts `ta.median()` and `ta.mode()` with static length
-  arguments and has interpreter-parity coverage for odd/even median windows,
+  arguments and has compiled-behavior coverage for odd/even median windows,
   derived-source median, and mode tie behavior.
 - The compiled runtime accepts `ta.percentile_nearest_rank()`,
   `ta.percentile_linear_interpolation()`, and `ta.percentrank()` with static
-  arguments and has interpreter-parity coverage for the TA classes and full
+  arguments and has compiled-behavior coverage for the TA classes and full
   compiled execution output.
 - The compiled runtime accepts `ta.linreg()` with static length/offset
-  arguments and has interpreter-parity coverage for offset and derived-source
+  arguments and has compiled-behavior coverage for offset and derived-source
   regression through the TA class and full compiled execution output.
 - The compiled runtime accepts `ta.tr()` with static `handle_na` arguments and
-  has interpreter-parity coverage for handle-na and strict prior-close behavior.
+  has compiled-behavior coverage for handle-na and strict prior-close behavior.
 - The compiled runtime accepts `ta.mfi()` with static length arguments and has
-  interpreter-parity coverage for positional, named, mixed, and derived-source
+  compiled-behavior coverage for positional, named, mixed, and derived-source
   money-flow calls.
 - The compiled runtime accepts `ta.tsi()` with static short/long length
-  arguments and has interpreter-parity coverage for positional, named, mixed,
+  arguments and has compiled-behavior coverage for positional, named, mixed,
   and derived-source double-smoothing calls.
 - The compiled runtime accepts `ta.barssince()` and `ta.valuewhen()` with static
-  occurrence arguments and has interpreter-parity coverage for positional,
+  occurrence arguments and has compiled-behavior coverage for positional,
   named, and mixed event-memory calls.
 - The compiled runtime accepts `ta.bbw()` with static length/multiplier
-  arguments and has interpreter-parity coverage for positional, named, and mixed
+  arguments and has compiled-behavior coverage for positional, named, and mixed
   Bollinger Band width calls.
 - The compiled runtime accepts `ta.kc()` and `ta.kcw()` with static
-  length/multiplier/useTrueRange arguments and has interpreter-parity coverage
+  length/multiplier/useTrueRange arguments and has compiled-behavior coverage
   for tuple destructuring, width output, named calls, and mixed calls.
 - The compiled runtime accepts `ta.dmi()` and `ta.adx()` with static
-  diLength/adxSmoothing arguments and has interpreter-parity coverage for tuple
+  diLength/adxSmoothing arguments and has compiled-behavior coverage for tuple
   destructuring, scalar ADX output, named calls, mixed calls, and ADX's
   one-argument smoothing default.
 - The compiled runtime accepts `ta.supertrend()` with static factor/atrPeriod
-  arguments and has interpreter-parity coverage for tuple destructuring,
+  arguments and has compiled-behavior coverage for tuple destructuring,
   positional calls, named calls, and mixed calls.
 - The compiled runtime accepts `ta.sar()` with static start/inc/max arguments
-  and has interpreter-parity coverage for positional, named, and mixed calls.
+  and has compiled-behavior coverage for positional, named, and mixed calls.
 - The compiled runtime accepts `ta.kst()` with static ROC, smoothing, and signal
-  lengths and has interpreter-parity coverage for tuple destructuring,
+  lengths and has compiled-behavior coverage for tuple destructuring,
   positional calls, named calls, mixed calls, and default length arguments.
 - The compiled runtime accepts `ta.vwap()` scalar and `stdev_mult` band tuple
-  overloads with interpreter-parity coverage for default source, explicit
+  overloads with compiled-behavior coverage for default source, explicit
   source, anchored resets, named calls, and mixed calls.
 - The compiled runtime accepts `ta.rci()` with static length arguments and has
-  interpreter-parity coverage for positional, named, mixed, and derived-source
+  compiled-behavior coverage for positional, named, mixed, and derived-source
   rank-correlation calls.
 - The compiled runtime accepts `ta.pivothigh()` and `ta.pivotlow()` with static
-  left/right arguments and has interpreter-parity coverage for explicit,
+  left/right arguments and has compiled-behavior coverage for explicit,
   default-source, named, and mixed source calls.
 - The compiled runtime accepts default-length and mixed named-source
-  `ta.mom()` / `ta.roc()` calls and has interpreter-parity coverage for those
+  `ta.mom()` / `ta.roc()` calls and has compiled-behavior coverage for those
   call forms.
 - A source-linked public percentile-rank signal checkpoint locks common
   `ta.percentile_nearest_rank()`, `ta.percentile_linear_interpolation()`, and
@@ -356,7 +356,7 @@ Current `input.*` progress:
 - Advanced `indicator()` declaration settings for timeframe, gap handling,
   object limits, explicit plot z-order, behind-chart mode, calc bars count, and
   dynamic request mode are exposed on execution results.
-- Request-family built-ins are inventoried under Epic 8; interpreter and
+- Request-family built-ins are inventoried under Epic 8; legacy runtime and
   compiled execution support direct source-parameter and captured
   computed-expression request wrappers, including root-scope regular values
   referenced by compiled request subprograms.
@@ -372,12 +372,12 @@ Current `input.*` progress:
 Current `runtime.*` / `log.*` progress:
 
 - `runtime.error()` halts execution with a stable structured `runtime.error`
-  payload in interpreter and compiled results, including named
+  payload in compiled results, including named
   `message=` calls.
 - Compiled logical `and`/`or` short-circuit unreachable `runtime.error()`
-  operands with interpreter parity.
+  operands with legacy runtime parity.
 - `log.info()`, `log.warning()`, and `log.error()` emit level/bar/message
-  outputs without halting execution; compiled formatting matches interpreter
+  outputs without halting execution; compiled formatting matches legacy runtime
   numeric placeholders such as `{0:#.0}`.
 - `tests/compat/pine-external-corpus-classifier.test.ts` measures reduced
   public-style runtime/log idioms inside the external corpus classifier.

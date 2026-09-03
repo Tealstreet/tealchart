@@ -1,11 +1,10 @@
-import type { ExecutionResult } from './engine';
+import type { ExecutionResult } from './types';
 
-export type TealscriptExecutionBackend = 'compiled' | 'closure' | 'interpreter';
-export type TealscriptBackendSelectionSource = 'explicit' | 'flag' | 'default';
+export type TealscriptExecutionBackend = 'compiled';
+export type TealscriptBackendSelectionSource = 'explicit' | 'default';
 
 export interface TealscriptBackendSelectionOptions {
   executionBackendOverride?: TealscriptExecutionBackend;
-  enableClosureBackend?: boolean;
   defaultBackend?: TealscriptExecutionBackend;
 }
 
@@ -20,17 +19,17 @@ export function selectTealscriptExecutionBackend(
   options: TealscriptBackendSelectionOptions | undefined,
 ): TealscriptBackendSelection {
   if (options?.executionBackendOverride) {
+    if (options.executionBackendOverride !== 'compiled') {
+      throw new Error(`Unsupported TealScript execution backend: ${options.executionBackendOverride}`);
+    }
     return {
       backend: options.executionBackendOverride,
       source: 'explicit',
     };
   }
 
-  if (options?.enableClosureBackend) {
-    return {
-      backend: 'closure',
-      source: 'flag',
-    };
+  if (options?.defaultBackend && options.defaultBackend !== 'compiled') {
+    throw new Error(`Unsupported TealScript default execution backend: ${options.defaultBackend}`);
   }
 
   return {

@@ -1,14 +1,13 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-09-02T01:27:29.755Z",
-  "sourceGateReport": "reports/closure-cutover-gate-strategy-v1.report.json",
-  "scope": "All scripts from each closure cutover dominated set: compiled produced visible historical output and closure matches compiled.",
+  "schemaVersion": 3,
+  "generatedAt": "2026-09-03T07:19:30.774Z",
+  "scope": "All scripts from each compiled historical output set, comparing compiled realtime reconstruction against reference realtime update.",
   "replay": {
     "seedBars": 148,
     "realtimeTailBars": 12,
     "sameTimeReplacements": 24,
     "confirmationBars": 1,
-    "comparison": "After a historical seed, each backend receives realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; interpreter, compiled, and closure outputs are compared pairwise with the historical corpus comparator."
+    "comparison": "After a historical seed, the reference receives realtime updateBar events while compiled receives reconstructed windows for realtime append updates, two same-time replacements on every realtime tail bar, and one confirming next bar; outputs are compared with the historical corpus comparator."
   },
   "corpora": [
     {
@@ -21,25 +20,25 @@
       "confirmationBars": 1,
       "summary": {
         "corpus": "strategy",
-        "dominatedScripts": 24,
+        "dominatedScripts": 33,
         "realtimeEventsPerScript": 37,
-        "totalBackendPairComparisons": 2664,
-        "matchedScripts": 24,
+        "totalBackendPairComparisons": 1221,
+        "matchedScripts": 33,
         "mismatchedScripts": 0,
         "failedScripts": 0,
-        "matchedComparisons": 2664,
+        "matchedComparisons": 1221,
         "mismatchedComparisons": 0,
         "failedComparisons": 0,
         "mismatchKinds": {},
         "firstCauses": [],
         "strategyLedger": {
-          "strategies": 24,
+          "strategies": 33,
           "activeStrategies": 7,
-          "totalBackendPairComparisons": 2664,
-          "matchedScripts": 24,
+          "totalBackendPairComparisons": 1221,
+          "matchedScripts": 33,
           "mismatchedScripts": 0,
           "failedScripts": 0,
-          "matchedComparisons": 2664,
+          "matchedComparisons": 1221,
           "mismatchedComparisons": 0,
           "failedComparisons": 0,
           "mismatchKinds": {},
@@ -56,7 +55,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -65,14 +64,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 5,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -82,7 +73,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 2,
               "fills": 1,
@@ -93,16 +84,6 @@
               "equity": 1003.4467699266219
             },
             "compiled": {
-              "active": true,
-              "orders": 2,
-              "fills": 1,
-              "openTrades": 1,
-              "closedTrades": 0,
-              "positionSize": 0.6751066899836805,
-              "equityCurve": 160,
-              "equity": 1003.4467699266219
-            },
-            "closure": {
               "active": true,
               "orders": 2,
               "fills": 1,
@@ -125,7 +106,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -134,14 +115,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 9,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 0,
@@ -151,7 +124,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -162,16 +135,6 @@
               "equity": 1000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 1000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -194,7 +157,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -203,14 +166,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 12,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 12,
               "drawings": 0,
@@ -220,7 +175,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -231,16 +186,6 @@
               "equity": 1000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 1000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -263,7 +208,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 7,
               "drawings": 50,
@@ -272,14 +217,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 7,
-              "drawings": 50,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 7,
               "drawings": 50,
@@ -289,7 +226,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -300,16 +237,6 @@
               "equity": 100000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -332,7 +259,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -341,14 +268,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 4,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 0,
@@ -358,7 +277,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -369,16 +288,6 @@
               "equity": 1000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 1000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -401,7 +310,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 7,
               "drawings": 0,
@@ -410,14 +319,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 7,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 7,
               "drawings": 0,
@@ -427,7 +328,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -438,16 +339,6 @@
               "equity": 1000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 1000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -470,7 +361,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -479,14 +370,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 6,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -496,7 +379,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -507,16 +390,6 @@
               "equity": 1000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 1000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -539,7 +412,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -548,14 +421,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 5,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -565,7 +430,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 7,
               "fills": 5,
@@ -576,16 +441,6 @@
               "equity": 100028.36716728708
             },
             "compiled": {
-              "active": true,
-              "orders": 7,
-              "fills": 5,
-              "openTrades": 1,
-              "closedTrades": 2,
-              "positionSize": 1,
-              "equityCurve": 160,
-              "equity": 100028.36716728708
-            },
-            "closure": {
               "active": true,
               "orders": 7,
               "fills": 5,
@@ -600,6 +455,57 @@
           "strategyLedgerMismatches": []
         },
         {
+          "id": "0026:https://github.com/geraked/tradingview:strategies/ABSAR.pine",
+          "localPath": "sources/0026-geraked_tradingview-strategies_ABSAR.pine",
+          "sourceRepoUrl": "https://github.com/geraked/tradingview",
+          "sourceFilePath": "strategies/ABSAR.pine",
+          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 8,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 8,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
           "id": "0028:https://github.com/geraked/tradingview:strategies/CEZLSMA.pine",
           "localPath": "sources/0028-geraked_tradingview-strategies_CEZLSMA.pine",
           "sourceRepoUrl": "https://github.com/geraked/tradingview",
@@ -608,7 +514,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -617,14 +523,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 3,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -634,7 +532,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -653,8 +551,49 @@
               "positionSize": 0,
               "equityCurve": 160,
               "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0030:https://github.com/geraked/tradingview:strategies/DHLAOS.pine",
+          "localPath": "sources/0030-geraked_tradingview-strategies_DHLAOS.pine",
+          "sourceRepoUrl": "https://github.com/geraked/tradingview",
+          "sourceFilePath": "strategies/DHLAOS.pine",
+          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             },
-            "closure": {
+            "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -677,7 +616,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -686,14 +625,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 5,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -703,7 +634,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -722,8 +653,49 @@
               "positionSize": 0,
               "equityCurve": 160,
               "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0033:https://github.com/geraked/tradingview:strategies/NWERSIASF.pine",
+          "localPath": "sources/0033-geraked_tradingview-strategies_NWERSIASF.pine",
+          "sourceRepoUrl": "https://github.com/geraked/tradingview",
+          "sourceFilePath": "strategies/NWERSIASF.pine",
+          "commitSha": "49382943d461ccb6fa20c241c2824d8a41fd4b82",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             },
-            "closure": {
+            "compiled": {
+              "produced": true,
+              "plots": 4,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -746,7 +718,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -755,14 +727,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 1,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 7,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 1,
               "drawings": 0,
@@ -772,7 +736,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 15,
               "fills": 15,
@@ -783,16 +747,6 @@
               "equity": 100011.29509667685
             },
             "compiled": {
-              "active": true,
-              "orders": 15,
-              "fills": 15,
-              "openTrades": 1,
-              "closedTrades": 14,
-              "positionSize": -2,
-              "equityCurve": 160,
-              "equity": 100011.29509667685
-            },
-            "closure": {
               "active": true,
               "orders": 15,
               "fills": 15,
@@ -815,7 +769,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -824,14 +778,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 3,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -841,7 +787,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 80,
               "fills": 40,
@@ -852,16 +798,6 @@
               "equity": 10260.863967140504
             },
             "compiled": {
-              "active": true,
-              "orders": 80,
-              "fills": 40,
-              "openTrades": 1,
-              "closedTrades": 39,
-              "positionSize": 1.6807970686776887e-10,
-              "equityCurve": 160,
-              "equity": 10260.863967140504
-            },
-            "closure": {
               "active": true,
               "orders": 80,
               "fills": 40,
@@ -884,7 +820,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -893,14 +829,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 6,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -910,7 +838,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -929,15 +857,56 @@
               "positionSize": 0,
               "equityCurve": 160,
               "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0042:https://github.com/hirawatt/pineScripts:strategy/defaultStrategy.pine",
+          "localPath": "sources/0042-hirawatt_pineScripts-strategy_defaultStrategy.pine",
+          "sourceRepoUrl": "https://github.com/hirawatt/pineScripts",
+          "sourceFilePath": "strategy/defaultStrategy.pine",
+          "commitSha": "254d17ebb449d8ea3048f2cff60526375f2b2dff",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             },
-            "closure": {
+            "compiled": {
+              "produced": true,
+              "plots": 0,
+              "drawings": 1,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
               "openTrades": 0,
               "closedTrades": 0,
               "positionSize": 0,
-              "equityCurve": 160,
+              "equityCurve": 161,
+              "equity": 100000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 161,
               "equity": 100000
             }
           },
@@ -953,7 +922,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -962,14 +931,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 6,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -979,7 +940,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -998,8 +959,49 @@
               "positionSize": 0,
               "equityCurve": 160,
               "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0045:https://github.com/hirawatt/pineScripts:strategy/simpleEMAStrategy.pine",
+          "localPath": "sources/0045-hirawatt_pineScripts-strategy_simpleEMAStrategy.pine",
+          "sourceRepoUrl": "https://github.com/hirawatt/pineScripts",
+          "sourceFilePath": "strategy/simpleEMAStrategy.pine",
+          "commitSha": "254d17ebb449d8ea3048f2cff60526375f2b2dff",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
             },
-            "closure": {
+            "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 0,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1022,7 +1024,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -1031,14 +1033,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 2,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 2,
               "drawings": 0,
@@ -1048,7 +1042,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1059,16 +1053,6 @@
               "equity": 100000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1091,7 +1075,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -1100,14 +1084,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 5,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 5,
               "drawings": 0,
@@ -1117,7 +1093,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1136,8 +1112,49 @@
               "positionSize": 0,
               "equityCurve": 160,
               "equity": 100000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0052:https://github.com/NinjaView/Pinescript:UTBOT(ES5min).txt",
+          "localPath": "sources/0052-NinjaView_Pinescript-UTBOT_ES5min_.txt",
+          "sourceRepoUrl": "https://github.com/NinjaView/Pinescript",
+          "sourceFilePath": "UTBOT(ES5min).txt",
+          "commitSha": "8752c9c8bde07753e3e0d778fcafbbe2e768c90f",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
             },
-            "closure": {
+            "compiled": {
+              "produced": true,
+              "plots": 6,
+              "drawings": 0,
+              "alerts": 2,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 100000
+            },
+            "compiled": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1160,7 +1177,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 10,
               "drawings": 0,
@@ -1169,14 +1186,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 10,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 10,
               "drawings": 0,
@@ -1186,7 +1195,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1197,16 +1206,6 @@
               "equity": 5000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 5000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1229,7 +1228,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -1238,14 +1237,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 3,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 3,
               "drawings": 0,
@@ -1255,7 +1246,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1266,16 +1257,6 @@
               "equity": 10000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 10000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1298,7 +1279,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 4,
               "drawings": 50,
@@ -1307,14 +1288,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 4,
-              "drawings": 50,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 4,
               "drawings": 50,
@@ -1324,7 +1297,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1335,16 +1308,6 @@
               "equity": 100
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1367,7 +1330,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 9,
               "drawings": 7,
@@ -1376,14 +1339,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 9,
-              "drawings": 7,
-              "alerts": 2,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 7,
@@ -1393,7 +1348,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1404,16 +1359,6 @@
               "equity": 100000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1428,6 +1373,159 @@
           "strategyLedgerMismatches": []
         },
         {
+          "id": "0079:https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy:crypto/Crypto ICT Liquidity Sweep Reversal Strategy v1/strategy/crypto_ict_liquidity_sweep_reversal_v1.pine",
+          "localPath": "sources/0079-pranay123-stack_Tradingview_Pinescript_Strategy-crypto_Crypto_ICT_Liquidity_Sweep_Reversal_Strategy_v1_strategy_crypto_ict_liquidity_sweep_reversal_v1.pine",
+          "sourceRepoUrl": "https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy",
+          "sourceFilePath": "crypto/Crypto ICT Liquidity Sweep Reversal Strategy v1/strategy/crypto_ict_liquidity_sweep_reversal_v1.pine",
+          "commitSha": "7082d3b50a71ab616cb60424f166f399153b0d1b",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 34,
+              "drawings": 19,
+              "alerts": 11,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 34,
+              "drawings": 19,
+              "alerts": 11,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0080:https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy:crypto/ICT Volume Profile Continuation Strategy v1/ICT_Volume_Profile_Continuation_v1.pine",
+          "localPath": "sources/0080-pranay123-stack_Tradingview_Pinescript_Strategy-crypto_ICT_Volume_Profile_Continuation_Strategy_v1_ICT_Volume_Profile_Continuation_v1.pine",
+          "sourceRepoUrl": "https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy",
+          "sourceFilePath": "crypto/ICT Volume Profile Continuation Strategy v1/ICT_Volume_Profile_Continuation_v1.pine",
+          "commitSha": "7082d3b50a71ab616cb60424f166f399153b0d1b",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 17,
+              "drawings": 1,
+              "alerts": 12,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 17,
+              "drawings": 1,
+              "alerts": 12,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 10000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
+          "id": "0084:https://github.com/Arisamin/Pinescript_Strategy_Framework:Strategies/MeanReversion.pine",
+          "localPath": "sources/0084-Arisamin_Pinescript_Strategy_Framework-Strategies_MeanReversion.pine",
+          "sourceRepoUrl": "https://github.com/Arisamin/Pinescript_Strategy_Framework",
+          "sourceFilePath": "Strategies/MeanReversion.pine",
+          "commitSha": "7ab38a72d061c0cf706c49977248cd30c8ae8490",
+          "events": 37,
+          "status": "matched",
+          "output": {
+            "reference": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 1,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            },
+            "compiled": {
+              "produced": true,
+              "plots": 10,
+              "drawings": 1,
+              "alerts": 4,
+              "logs": 0,
+              "errors": 0
+            }
+          },
+          "strategyLedger": {
+            "reference": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 20000
+            },
+            "compiled": {
+              "active": false,
+              "orders": 0,
+              "fills": 0,
+              "openTrades": 0,
+              "closedTrades": 0,
+              "positionSize": 0,
+              "equityCurve": 160,
+              "equity": 20000
+            }
+          },
+          "mismatches": [],
+          "strategyLedgerMismatches": []
+        },
+        {
           "id": "0086:https://github.com/danielhyuncoder/PineScriptStrategiesAndIndicators:TrippleSupertrendStrategy.pine",
           "localPath": "sources/0086-danielhyuncoder_PineScriptStrategiesAndIndicators-TrippleSupertrendStrategy.pine",
           "sourceRepoUrl": "https://github.com/danielhyuncoder/PineScriptStrategiesAndIndicators",
@@ -1436,7 +1534,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -1445,14 +1543,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 6,
-              "drawings": 0,
-              "alerts": 0,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 6,
               "drawings": 0,
@@ -1462,7 +1552,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 1,
               "fills": 1,
@@ -1473,16 +1563,6 @@
               "equity": 100039.55730657715
             },
             "compiled": {
-              "active": true,
-              "orders": 1,
-              "fills": 1,
-              "openTrades": 1,
-              "closedTrades": 0,
-              "positionSize": 1,
-              "equityCurve": 160,
-              "equity": 100039.55730657715
-            },
-            "closure": {
               "active": true,
               "orders": 1,
               "fills": 1,
@@ -1505,7 +1585,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 16,
               "drawings": 159,
@@ -1514,14 +1594,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 16,
-              "drawings": 159,
-              "alerts": 0,
-              "logs": 9,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 16,
               "drawings": 159,
@@ -1531,7 +1603,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1542,16 +1614,6 @@
               "equity": 2000
             },
             "compiled": {
-              "active": false,
-              "orders": 0,
-              "fills": 0,
-              "openTrades": 0,
-              "closedTrades": 0,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 2000
-            },
-            "closure": {
               "active": false,
               "orders": 0,
               "fills": 0,
@@ -1574,7 +1636,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 9,
               "drawings": 1,
@@ -1583,14 +1645,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 9,
-              "drawings": 1,
-              "alerts": 2,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 1,
@@ -1600,7 +1654,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 3,
               "fills": 2,
@@ -1611,16 +1665,6 @@
               "equity": 100038.36813682961
             },
             "compiled": {
-              "active": true,
-              "orders": 3,
-              "fills": 2,
-              "openTrades": 0,
-              "closedTrades": 1,
-              "positionSize": 0,
-              "equityCurve": 160,
-              "equity": 100038.36813682961
-            },
-            "closure": {
               "active": true,
               "orders": 3,
               "fills": 2,
@@ -1643,7 +1687,7 @@
           "events": 37,
           "status": "matched",
           "output": {
-            "interpreter": {
+            "reference": {
               "produced": true,
               "plots": 9,
               "drawings": 6,
@@ -1652,14 +1696,6 @@
               "errors": 0
             },
             "compiled": {
-              "produced": true,
-              "plots": 9,
-              "drawings": 6,
-              "alerts": 1,
-              "logs": 0,
-              "errors": 0
-            },
-            "closure": {
               "produced": true,
               "plots": 9,
               "drawings": 6,
@@ -1669,7 +1705,7 @@
             }
           },
           "strategyLedger": {
-            "interpreter": {
+            "reference": {
               "active": true,
               "orders": 1,
               "fills": 1,
@@ -1680,16 +1716,6 @@
               "equity": 95209.63963093693
             },
             "compiled": {
-              "active": true,
-              "orders": 1,
-              "fills": 1,
-              "openTrades": 1,
-              "closedTrades": 0,
-              "positionSize": -95.06272814200894,
-              "equityCurve": 160,
-              "equity": 95209.63963093693
-            },
-            "closure": {
               "active": true,
               "orders": 1,
               "fills": 1,

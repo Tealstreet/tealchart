@@ -152,7 +152,7 @@ fetching GitHub data at runtime.
 ## Integration Path
 
 The engine accepts an optional `RequestDatafeed` through
-`TealscriptEngineOptions`. Tealchart or another host can provide request
+`TealscriptExecutionOptions`. Tealchart or another host can provide request
 contexts from its chart datafeed/cache while tests continue to use
 `InMemoryRequestDatafeed`.
 
