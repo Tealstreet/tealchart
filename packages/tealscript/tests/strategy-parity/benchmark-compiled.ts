@@ -37,7 +37,7 @@ console.log(`Bars: ${bars.length}`);
 console.log(`Warmup: ${warmup}, Iterations: ${iterations}`);
 console.log('---');
 
-// Interpreter benchmark
+// Reference benchmark
 for (let i = 0; i < warmup; i++) {
   executeScript(ast, bars);
 }
@@ -86,7 +86,7 @@ console.log(`  Median: ${compiledMedian.toFixed(1)}ms`);
 console.log(`  Bars/s: ${compiledBps.toLocaleString()}`);
 
 console.log(`\nSpeedup: ${(interpMedian / compiledMedian).toFixed(1)}x`);
-console.log(`  Interpreter: ${interpBps.toLocaleString()} bps`);
+console.log(`  Reference: ${interpBps.toLocaleString()} bps`);
 console.log(`  Compiled:    ${compiledBps.toLocaleString()} bps`);
 
 // Verify parity

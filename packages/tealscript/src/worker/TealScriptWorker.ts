@@ -6,7 +6,14 @@
  */
 
 import type { AlertOutput, Bar, DrawingOutput, PlotOutput, InputDefinition, LogOutput } from '../runtime/context';
-import type { IndicatorDeclarationMetadata, RuntimeErrorCode, RuntimeErrorPayload, RuntimeProfile, TealscriptRuntimeOptions } from '../runtime/engine';
+import type {
+  IndicatorDeclarationMetadata,
+  RuntimeErrorCode,
+  RuntimeErrorPayload,
+  RuntimeInfrastructureErrorCode,
+  RuntimeProfile,
+  TealscriptRuntimeOptions,
+} from '../runtime/types';
 import type { Program } from '../parser/ast';
 import type { SemanticDiagnostic } from '../semantic';
 import { getResultOutput } from './protocol';
@@ -41,7 +48,7 @@ export interface WorkerError {
   type: 'parse' | 'semantic' | 'runtime';
   severity: 'error' | 'warning';
   message: string;
-  code?: RuntimeErrorCode | 'request-data-unavailable' | 'realtime-compiled-fallback';
+  code?: RuntimeErrorCode | RuntimeInfrastructureErrorCode;
   line?: number;
   column?: number;
   runtimeError?: RuntimeErrorPayload;

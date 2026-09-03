@@ -486,8 +486,7 @@ describe('TealchartWidget', () => {
       const worker = new TealscriptTestWorker();
       const widget = createWidget(datafeed, {
         createTealscriptWorker: () => worker as unknown as Worker,
-        tealscriptExecutionBackend: 'closure',
-        enableTealscriptClosureBackend: () => false,
+        tealscriptExecutionBackend: 'compiled',
       });
       completeInit(datafeed);
 
@@ -500,8 +499,7 @@ describe('TealchartWidget', () => {
       });
       expect(initMessage?.runtime).toMatchObject({
         backend: {
-          executionBackendOverride: 'closure',
-          enableClosureBackend: false,
+          executionBackendOverride: 'compiled',
         },
       });
       widget.remove();

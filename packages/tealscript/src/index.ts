@@ -117,7 +117,6 @@ export {
 // Runtime
 export {
   // Engine
-  TealscriptEngine,
   executeScript,
   executeSelectedTealscriptBackend,
   DEFAULT_TEALSCRIPT_EXECUTION_BACKEND,
@@ -127,7 +126,7 @@ export {
   type ExecutionError,
   type RuntimeProfile,
   type IndicatorDeclarationMetadata,
-  type TealscriptEngineOptions,
+  type TealscriptExecutionOptions,
   type TealscriptRuntimeOptions,
   type SelectedTealscriptExecutionOptions,
   type TealscriptBackendSelection,

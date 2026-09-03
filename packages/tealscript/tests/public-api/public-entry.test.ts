@@ -30,7 +30,6 @@ import {
   runPineCompatibilityCorpus,
   runPineCompatibilityLedger,
   seedRequestSymbol,
-  TealscriptEngine,
   TealscriptWorker,
   validate,
   validatePineScriptLedger,
@@ -43,7 +42,7 @@ import {
   type PineCompatibilityCorpusRun,
   type PineScriptLedgerEntry,
   type Statement,
-  type TealscriptEngineOptions,
+  type TealscriptExecutionOptions,
   type ToWorkerMessage,
   type NormalizedWorkerOutputBundle,
   type RequestDatafeed,
@@ -69,7 +68,7 @@ describe('public package entrypoints', () => {
     const message: ToWorkerMessage = { type: 'dispose' };
     const output: WorkerOutputBundle = { plots: [], drawings: [], alerts: [], logs: [], inputs: [] };
     const datafeed: RequestDatafeed = new InMemoryRequestDatafeed();
-    const engineOptions: TealscriptEngineOptions = { requestDatafeed: datafeed };
+    const engineOptions: TealscriptExecutionOptions = { requestDatafeed: datafeed };
     const resultMessage = createResultMessage('script-1', output);
     const normalizedOutput: NormalizedWorkerOutputBundle = getResultOutput(resultMessage);
     const compatibilityOutcome: CompatibilityRunOutcome = createCompatibilityRunOutcome({
@@ -111,7 +110,6 @@ describe('public package entrypoints', () => {
     expect(formatPineCompatibilityCorpusMarkdown(corpusRun)).toContain('Pass rate: 100.0%');
     expect(validatePineScriptLedger(ledger)).toEqual({});
     expect(validatePineScriptLedgerEntry(ledgerEntry)).toEqual([]);
-    expect(typeof TealscriptEngine).toBe('function');
     expect(typeof TealscriptWorker).toBe('function');
     expect(typeof InMemoryRequestDatafeed).toBe('function');
     expect(requestDatafeedKey('A', '1D')).toBe('A\u00001D');

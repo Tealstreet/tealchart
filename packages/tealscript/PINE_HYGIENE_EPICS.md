@@ -50,7 +50,7 @@ worker protocol, renderer, tests, and docs drift apart.
 
 Current pressure points:
 
-- `src/runtime/engine.ts` owns interpreter flow, builtin dispatch, drawing APIs,
+- `src/runtime/compiledOnly.ts` owns legacy runtime flow, builtin dispatch, drawing APIs,
   coercions, TA helpers, time/session behavior, plot output, and runtime object
   handling.
 - `src/runtime/context.ts` owns execution state plus drawing storage and
@@ -119,7 +119,7 @@ Phases:
 4. Harden handle validation where existing behavior is clearly incomplete,
    especially object-id checks between drawing namespaces.
 
-Done means new namespaces can be added without expanding the core interpreter.
+Done means new namespaces can be added without expanding the core legacy runtime.
 
 ## Epic 4: Test And Docs Inventory Cleanup
 
