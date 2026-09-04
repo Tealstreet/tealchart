@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import type { WebViewMessageEvent, WebViewProps } from 'react-native-webview';
 
 import React, { useMemo, useRef } from 'react';
+
 import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
 
@@ -12,6 +13,22 @@ import {
 } from './tealscriptWebViewBridgeCodec';
 
 const NativeWebView = WebView as unknown as React.ComponentType<WebViewProps & React.RefAttributes<WebView>>;
+
+// Device-visible trace for the WebView runtime. The bridge queues silently when
+// the page never reports ready, so without this a dead runtime is indistinguishable
+// from an indicator that simply drew nothing.
+export function logTealscriptWebView(message: string): void {
+  const scope = globalThis as unknown as {
+    __TEALSCRIPT_LOG__?: string[];
+    __TEALSCRIPT_LOG_NOTIFY__?: () => void;
+  };
+  const buffer = (scope.__TEALSCRIPT_LOG__ ??= []);
+  buffer.push(`${new Date().toISOString().slice(11, 23)} ${message}`);
+  if (buffer.length > 300) buffer.shift();
+  scope.__TEALSCRIPT_LOG_NOTIFY__?.();
+}
+const DEFAULT_READY_TIMEOUT_MS = 10_000;
+const RUNTIME_HTML_BYTES = TEALSCRIPT_WEBVIEW_RUNTIME_HTML.length;
 
 type BridgeToWebViewMessage =
   | { type: 'create-worker'; workerId: string }
@@ -25,6 +42,13 @@ type BridgeFromWebViewMessage =
 
 type WebViewWorkerListener = (event: MessageEvent) => void;
 type WebViewWorkerErrorListener = (event: ErrorEvent) => void;
+type NativeWebViewErrorEvent = Parameters<NonNullable<WebViewProps['onError']>>[0];
+type NativeWebViewHttpErrorEvent = Parameters<NonNullable<WebViewProps['onHttpError']>>[0];
+type NativeWebViewLoadEvent = Parameters<NonNullable<WebViewProps['onLoadEnd']>>[0];
+
+interface TealscriptWebViewWorkerBridgeOptions {
+  readyTimeoutMs?: number;
+}
 
 class WebViewBackedWorker implements Worker {
   onmessage: ((this: Worker, event: MessageEvent) => unknown) | null = null;
@@ -107,12 +131,19 @@ class WebViewBackedWorker implements Worker {
 export class TealscriptWebViewWorkerBridge {
   private webView: WebView | null = null;
   private ready = false;
+  private didLoadEnd = false;
+  private didLoadError = false;
+  private didHttpError = false;
+  private readyTimeout: ReturnType<typeof setTimeout> | null = null;
   private nextWorkerId = 0;
   private readonly workers = new Map<string, WebViewBackedWorker>();
   private readonly pendingMessages: BridgeToWebViewMessage[] = [];
 
+  constructor(private readonly options: TealscriptWebViewWorkerBridgeOptions = {}) {}
+
   createWorker = (): Worker => {
     const workerId = `tealscript-${++this.nextWorkerId}`;
+    logTealscriptWebView(`createWorker ${workerId}`);
     const worker = new WebViewBackedWorker(workerId, this.postToWebView);
     this.workers.set(workerId, worker);
     this.postToWebView({ type: 'create-worker', workerId });
@@ -121,12 +152,31 @@ export class TealscriptWebViewWorkerBridge {
 
   setWebView = (webView: WebView | null): void => {
     this.webView = webView;
+    if (webView && !this.ready) {
+      logTealscriptWebView('WebView attached');
+      this.startReadyTimeout();
+    } else if (!webView) {
+      logTealscriptWebView('WebView detached');
+      this.clearReadyTimeout();
+    }
   };
 
   handleMessage = (event: WebViewMessageEvent): void => {
-    const message = parseTealscriptWebViewBridgeMessage(event.nativeEvent.data) as BridgeFromWebViewMessage;
+    let message: BridgeFromWebViewMessage;
+    try {
+      message = parseTealscriptWebViewBridgeMessage(event.nativeEvent.data) as BridgeFromWebViewMessage;
+    } catch (error) {
+      this.reportBridgeError(
+        `Tealscript WebView bridge posted an invalid message: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return;
+    }
+
     if (message.type === 'runtime-ready') {
+      const flushedCount = this.pendingMessages.length;
+      logTealscriptWebView(`runtime-ready flush=${flushedCount}`);
       this.ready = true;
+      this.clearReadyTimeout();
       this.flushPendingMessages();
       return;
     }
@@ -141,7 +191,31 @@ export class TealscriptWebViewWorkerBridge {
     }
   };
 
+  handleLoadEnd = (_event: NativeWebViewLoadEvent): void => {
+    this.didLoadEnd = true;
+    logTealscriptWebView('WebView loadEnd');
+  };
+
+  handleWebViewError = (event: NativeWebViewErrorEvent): void => {
+    this.didLoadError = true;
+    const nativeEvent = event.nativeEvent;
+    logTealscriptWebView(`WebView error ${nativeEvent.description || nativeEvent.domain || 'unknown'}`);
+    this.reportBridgeError(
+      `Tealscript WebView runtime failed to load: ${nativeEvent.description || nativeEvent.domain || 'unknown WebView error'}`,
+    );
+  };
+
+  handleWebViewHttpError = (event: NativeWebViewHttpErrorEvent): void => {
+    this.didHttpError = true;
+    const nativeEvent = event.nativeEvent;
+    logTealscriptWebView(`WebView http ${nativeEvent.statusCode}`);
+    this.reportBridgeError(
+      `Tealscript WebView runtime returned HTTP ${nativeEvent.statusCode} while loading ${nativeEvent.url || 'inline HTML'}`,
+    );
+  };
+
   terminate(): void {
+    this.clearReadyTimeout();
     for (const workerId of this.workers.keys()) {
       this.postToWebView({ type: 'terminate-worker', workerId });
     }
@@ -154,6 +228,7 @@ export class TealscriptWebViewWorkerBridge {
   private postToWebView = (message: BridgeToWebViewMessage): void => {
     if (!this.ready || !this.webView) {
       this.pendingMessages.push(message);
+      logTealscriptWebView(`queued ${message.type} count=${this.pendingMessages.length}`);
       return;
     }
 
@@ -166,6 +241,40 @@ export class TealscriptWebViewWorkerBridge {
   private flushPendingMessages(): void {
     const messages = this.pendingMessages.splice(0);
     for (const message of messages) this.postToWebView(message);
+  }
+
+  private startReadyTimeout(): void {
+    if (this.readyTimeout) return;
+    this.readyTimeout = setTimeout(() => {
+      const loadState = this.didLoadError
+        ? 'WebView load error fired'
+        : this.didHttpError
+          ? 'WebView HTTP error fired'
+          : this.didLoadEnd
+            ? 'WebView load ended but runtime-ready did not post'
+            : 'WebView load did not finish';
+      logTealscriptWebView(`ready timeout queued=${this.pendingMessages.length}`);
+      this.reportBridgeError(
+        `Tealscript WebView runtime did not become ready within ${this.readyTimeoutMs()}ms (${loadState}; htmlBytes=${RUNTIME_HTML_BYTES}; pendingMessages=${this.pendingMessages.length})`,
+      );
+    }, this.readyTimeoutMs());
+  }
+
+  private readyTimeoutMs(): number {
+    return this.options.readyTimeoutMs ?? DEFAULT_READY_TIMEOUT_MS;
+  }
+
+  private clearReadyTimeout(): void {
+    if (!this.readyTimeout) return;
+    clearTimeout(this.readyTimeout);
+    this.readyTimeout = null;
+  }
+
+  private reportBridgeError(message: string): void {
+    this.pendingMessages.length = 0;
+    for (const worker of this.workers.values()) {
+      worker.dispatchError({ message });
+    }
   }
 }
 
@@ -182,6 +291,9 @@ export function useTealscriptWebViewWorkerBridge(): {
       <View pointerEvents="none" style={styles.host}>
         <NativeWebView
           javaScriptEnabled
+          onError={bridge.handleWebViewError}
+          onHttpError={bridge.handleWebViewHttpError}
+          onLoadEnd={bridge.handleLoadEnd}
           onMessage={bridge.handleMessage}
           originWhitelist={['*']}
           ref={bridge.setWebView}
