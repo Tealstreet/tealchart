@@ -46,6 +46,7 @@ type WebViewWorkerErrorListener = (event: ErrorEvent) => void;
 type NativeWebViewErrorEvent = Parameters<NonNullable<WebViewProps['onError']>>[0];
 type NativeWebViewHttpErrorEvent = Parameters<NonNullable<WebViewProps['onHttpError']>>[0];
 type NativeWebViewLoadEvent = Parameters<NonNullable<WebViewProps['onLoadEnd']>>[0];
+type NativeWebViewNavigationEvent = Parameters<NonNullable<WebViewProps['onNavigationStateChange']>>[0];
 
 interface TealscriptWebViewWorkerBridgeOptions {
   readyTimeoutMs?: number;
@@ -154,7 +155,7 @@ export class TealscriptWebViewWorkerBridge {
   setWebView = (webView: WebView | null): void => {
     this.webView = webView;
     if (webView && !this.ready) {
-      logTealscriptWebView('WebView attached');
+      logTealscriptWebView(`WebView attached htmlBytes=${RUNTIME_HTML_BYTES}`);
       this.startReadyTimeout();
     } else if (!webView) {
       logTealscriptWebView('WebView detached');
@@ -196,6 +197,11 @@ export class TealscriptWebViewWorkerBridge {
     } else {
       worker.dispatchError(message);
     }
+  };
+
+  handleNavigationStateChange = (event: NativeWebViewNavigationEvent): void => {
+    const title = typeof event.title === 'string' && event.title.length > 0 ? event.title : '(no title)';
+    logTealscriptWebView(`WebView title ${title}`);
   };
 
   handleLoadEnd = (_event: NativeWebViewLoadEvent): void => {
@@ -302,6 +308,7 @@ export function useTealscriptWebViewWorkerBridge(): {
           onHttpError={bridge.handleWebViewHttpError}
           onLoadEnd={bridge.handleLoadEnd}
           onMessage={bridge.handleMessage}
+          onNavigationStateChange={bridge.handleNavigationStateChange}
           originWhitelist={['*']}
           ref={bridge.setWebView}
           source={{ html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
