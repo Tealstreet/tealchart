@@ -17,6 +17,8 @@ const workerScript = __WORKER_SCRIPT__;
 const workers = new Map();
 let nextWorkerId = 0;
 
+document.title = 'tealscript:top';
+
 function formatErrorMessage(error) {
   if (!error) return 'unknown error';
   if (typeof error === 'string') return error;
@@ -35,6 +37,7 @@ function postNative(message) {
 }
 
 window.onerror = function(message, source, lineno, colno, error) {
+  document.title = 'tealscript:error:' + (formatErrorMessage(error) || String(message)).slice(0, 80);
   postNative({
     type: 'runtime-error',
     message: formatErrorMessage(error) || String(message),
@@ -145,6 +148,7 @@ window.__TEALCHART_HANDLE_NATIVE_TEALSCRIPT_MESSAGE__ = function(serialized) {
   }
 };
 
+document.title = 'tealscript:worker-setup';
 postNative({ type: 'runtime-ready' });
 `;
 
