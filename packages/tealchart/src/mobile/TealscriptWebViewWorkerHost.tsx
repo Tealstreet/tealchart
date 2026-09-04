@@ -40,6 +40,27 @@ const RUNTIME_BASE_URL = 'https://tealchart.invalid/';
 // arrives and runtime-ready does not, the transport is fine and the runtime script
 // is at fault; if neither arrives, nothing can post back and every other signal is
 // unreliable for the same reason.
+// Installed BEFORE the page's own script. The runtime registers window.onerror
+// inside the very script under suspicion, so a parse failure there leaves no
+// handler to report it — the document arrives whole, executes nothing, and says
+// nothing. This handler exists before that script is parsed, so it survives it.
+const RUNTIME_PREFLIGHT_JS = `(function () {
+  window.__tealchartBootErrors = [];
+  window.addEventListener('error', function (event) {
+    var detail = event.message || String(event.error || 'unknown');
+    var where = (event.filename || '') + ':' + (event.lineno || 0) + ':' + (event.colno || 0);
+    window.__tealchartBootErrors.push(detail + ' @' + where);
+    document.title = 'tealscript:boot-error:' + detail.slice(0, 60);
+    try {
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'runtime-error',
+        message: 'boot ' + detail + ' @' + where,
+      }));
+    } catch (ignored) {}
+  }, true);
+})();
+true;`;
+
 const RUNTIME_PROBE_JS = `(function () {
   try {
     var hasBridge = !!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage);
@@ -53,7 +74,7 @@ const RUNTIME_PROBE_JS = `(function () {
         ' docLen=' + document.documentElement.outerHTML.length +
         ' scripts=' + document.scripts.length +
         ' scriptLen=' + scriptLen +
-        ' tail=' + (scriptEl ? (scriptEl.textContent || '').slice(-24) : 'none'),
+        ' boot=' + ((window.__tealchartBootErrors || []).join(' | ') || 'none'),
     }));
   } catch (probeError) {
     document.title = 'tealscript:probe-threw';
@@ -338,6 +359,7 @@ export function useTealscriptWebViewWorkerBridge(): {
       <View pointerEvents="none" style={styles.host}>
         <NativeWebView
           injectedJavaScript={RUNTIME_PROBE_JS}
+          injectedJavaScriptBeforeContentLoaded={RUNTIME_PREFLIGHT_JS}
           javaScriptEnabled
           onError={bridge.handleWebViewError}
           onHttpError={bridge.handleWebViewHttpError}
