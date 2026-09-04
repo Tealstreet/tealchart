@@ -48,6 +48,28 @@ describe('TealscriptWebViewWorkerBridge diagnostics', () => {
     );
   });
 
+  it('reports page-level runtime errors to queued workers', () => {
+    const bridge = new TealscriptWebViewWorkerBridge();
+    const worker = bridge.createWorker();
+    const onError = vi.fn();
+    worker.onerror = onError;
+
+    bridge.handleMessage({
+      nativeEvent: {
+        data: stringifyTealscriptWebViewBridgeMessage({
+          type: 'runtime-error',
+          message: 'Worker is not defined',
+        }),
+      },
+    } as never);
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Tealscript WebView runtime error: Worker is not defined',
+      }),
+    );
+  });
+
   it('clears the ready timeout once the runtime posts runtime-ready', () => {
     vi.useFakeTimers();
     const bridge = new TealscriptWebViewWorkerBridge({ readyTimeoutMs: 25 });

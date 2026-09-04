@@ -37,6 +37,7 @@ type BridgeToWebViewMessage =
 
 type BridgeFromWebViewMessage =
   | { type: 'runtime-ready' }
+  | { type: 'runtime-error'; message: string; filename?: string; lineno?: number; colno?: number }
   | { type: 'worker-message'; workerId: string; data: unknown }
   | { type: 'worker-error'; workerId: string; message: string; filename?: string; lineno?: number; colno?: number };
 
@@ -178,6 +179,12 @@ export class TealscriptWebViewWorkerBridge {
       this.ready = true;
       this.clearReadyTimeout();
       this.flushPendingMessages();
+      return;
+    }
+
+    if (message.type === 'runtime-error') {
+      logTealscriptWebView(`runtime error ${message.message}`);
+      this.reportBridgeError(`Tealscript WebView runtime error: ${message.message}`);
       return;
     }
 
