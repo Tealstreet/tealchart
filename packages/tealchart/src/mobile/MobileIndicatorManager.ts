@@ -24,27 +24,23 @@ import type {
   Program,
   RequestCorporateActionQuery,
   RequestCurrencyRateQuery,
-  RequestDatafeedErrorCode,
   RequestDatafeed,
+  RequestDatafeedErrorCode,
   RequestEconomicSeriesQuery,
   RequestFinancialMetricQuery,
   RequestFootprintQuery,
   RequestQuandlSeriesQuery,
   RequestSeriesQuery,
   RuntimeProfile,
-  TealscriptRuntimeOptions,
   TealscriptExecutionBackend,
+  TealscriptRuntimeOptions,
   WorkerError,
 } from '@tealstreet/tealscript';
-import type { TealscriptRequestDataResolver } from '../types';
 import type { EventCallback } from '../events/EventEmitter';
 import type { IndicatorInstance, PlotStyleOverride } from '../state/chartState';
-import type { Bar, UnifiedPaneLayout } from '../types';
+import type { Bar, TealscriptRequestDataResolver, UnifiedPaneLayout } from '../types';
 
-import {
-  parse,
-  TealscriptParseError,
-} from '@tealstreet/tealscript';
+import { parse, TealscriptParseError } from '@tealstreet/tealscript';
 import { LogCategory, TealchartLogger } from '../debug/TealchartLogger';
 import { EventEmitter } from '../events/EventEmitter';
 import { type BuiltinIndicator } from '../indicators/builtinIndicators';
@@ -195,9 +191,7 @@ export class MobileIndicatorManager {
     this._recomputePlots();
   }
 
-  setTealscriptBackendSelection(options: {
-    tealscriptExecutionBackend?: TealscriptExecutionBackend;
-  }): void {
+  setTealscriptBackendSelection(options: { tealscriptExecutionBackend?: TealscriptExecutionBackend }): void {
     if (this._tealscriptExecutionBackend === options.tealscriptExecutionBackend) {
       return;
     }
@@ -232,6 +226,18 @@ export class MobileIndicatorManager {
     // hands back the same array, which reference equality would read as no change.
     this._bars = bars;
     this._tealscriptManager?.setBars(bars);
+    this._recomputePlots(silent);
+  }
+
+  /**
+   * Realtime tick path. ChartWidgetCore probes for this method and falls back to
+   * setBars when it is absent — and setBars restarts every ready worker to cancel
+   * stale full recalculations, clearing plots and drawings each time. Without this
+   * override every tick tore down and rebuilt all indicator workers, which is what
+   * made indicators flicker on device.
+   */
+  updateBar(bar: Bar, silent = false): void {
+    this._tealscriptManager?.updateBar(bar);
     this._recomputePlots(silent);
   }
 
@@ -590,7 +596,11 @@ export class MobileIndicatorManager {
     this._lastErrorKeys.delete(instanceId);
   }
 
-  private _addWorkerScript(instanceId: string, code: string | undefined, inputs: Record<string, unknown> | undefined): void {
+  private _addWorkerScript(
+    instanceId: string,
+    code: string | undefined,
+    inputs: Record<string, unknown> | undefined,
+  ): void {
     if (!code || !this._tealscriptManager) return;
     void this._tealscriptManager.addScript(instanceId, code, inputs).catch((error: unknown) => {
       this._emitError(instanceId, this._toRuntimeError(error));
@@ -708,10 +718,11 @@ export class MobileIndicatorManager {
     }
   }
 
-  private _optionalRequestDataValue(value: unknown, kind: RequestDataMessage['kind']): ReturnType<TealscriptRequestDataResolver> {
-    return value === undefined
-      ? this._missingRequestData(kind)
-      : { ok: true, value: value as never };
+  private _optionalRequestDataValue(
+    value: unknown,
+    kind: RequestDataMessage['kind'],
+  ): ReturnType<TealscriptRequestDataResolver> {
+    return value === undefined ? this._missingRequestData(kind) : { ok: true, value: value as never };
   }
 
   private _missingRequestData(kind: RequestDataMessage['kind']): ReturnType<TealscriptRequestDataResolver> {
@@ -727,7 +738,8 @@ export class MobileIndicatorManager {
   private _mapRequestDatafeedErrorCode(
     code: RequestDatafeedErrorCode,
   ): 'invalid-query' | 'not-found' | 'provider-error' {
-    if (code === 'invalid_currency' || code === 'invalid_symbol' || code === 'invalid_timeframe') return 'invalid-query';
+    if (code === 'invalid_currency' || code === 'invalid_symbol' || code === 'invalid_timeframe')
+      return 'invalid-query';
     if (code === 'missing_context') return 'not-found';
     return 'provider-error';
   }
