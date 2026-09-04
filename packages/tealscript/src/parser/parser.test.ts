@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parse, validate, TealscriptParseError, formatParseError } from './parser';
 import { isExpression } from './ast';
-import type { Expression, Statement } from './ast';
+import type { Expression, FunctionDeclaration, Statement } from './ast';
 
 describe('Tealscript Parser', () => {
   describe('parse', () => {
@@ -762,6 +762,24 @@ plot(hi - lo)`);
         expect(assignment).toBeDefined();
         expect(assignment?.names.map((name) => name.name)).toEqual(['hi', 'lo']);
         expect(assignment?.right.type).toBe('IfStatement');
+      });
+
+      it('parses line-broken tuple declarations inside a function body', () => {
+        const ast = parse(`//@version=6
+indicator("Test")
+calc() =>
+    [hmaxt, lmint, hmax, lmin]
+     = detect(open, close, high, low)
+    hmax - lmin
+plot(calc())`);
+
+        const fn = ast.body.find((s) => s.type === 'FunctionDeclaration') as FunctionDeclaration | undefined;
+        expect(fn).toBeDefined();
+        expect(Array.isArray(fn?.body)).toBe(true);
+        if (Array.isArray(fn?.body)) {
+          expect(fn.body[0]?.type).toBe('VariableDeclaration');
+          expect(fn.body.at(-1)?.type).toBe('ExpressionStatement');
+        }
       });
 
       it('parses := with block if as RHS in a UDF body', () => {

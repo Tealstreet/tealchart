@@ -190,6 +190,22 @@ describe('Tealscript Parser', () => {
       expect(declaration.alias.name).toBe('dpl');
     });
 
+    it('parses version-pinned imports from hyphenated TradingView owners', () => {
+      const ast = parse(`//@version=5
+import CN_FX-999/CNTLibrary/3 as Cnt
+indicator("Hyphen Import")
+plot(close)
+`);
+      const declaration = ast.body[0] as ImportDeclaration;
+
+      expect(declaration.type).toBe('ImportDeclaration');
+      expect(declaration.path).toBe('CN_FX-999/CNTLibrary/3');
+      expect(declaration.owner).toBe('CN_FX-999');
+      expect(declaration.library).toBe('CNTLibrary');
+      expect(declaration.version).toBe(3);
+      expect(declaration.alias.name).toBe('Cnt');
+    });
+
     it('parses exported library constants', () => {
       const ast = parse('export const int length = 14\n');
       const declaration = ast.body[0] as VariableDeclaration;
@@ -200,6 +216,23 @@ describe('Tealscript Parser', () => {
         baseType: 'int',
         qualifier: 'const',
       }));
+    });
+
+    it('does not treat identifiers beginning with export as exported declarations', () => {
+      const ast = parse(`indicator("Export Prefix")
+export_bars = input.int(2000, "Bars to Export")
+plot(export_bars)
+`);
+      const declaration = ast.body[1] as VariableDeclaration;
+      const names = declaration.names;
+
+      expect(declaration.type).toBe('VariableDeclaration');
+      expect(names.type).toBe('VariableDeclarator');
+      if (names.type !== 'VariableDeclarator') {
+        throw new Error('Expected a single variable declaration');
+      }
+      expect(names.name.name).toBe('export_bars');
+      expect(declaration.exported).toBe(false);
     });
 
     it('parses exported library enums', () => {
@@ -300,6 +333,21 @@ arrayValue = [1, 2]
         'inputValue',
         'arrayValue',
       ]);
+    });
+
+    it('parses Unicode letters inside Pine identifiers', () => {
+      const ast = parse(`//@version=6
+indicator("Unicode Identifier")
+macdSólow = input.int(26)
+plot(macdSólow)
+`);
+
+      expect(ast.body).toHaveLength(3);
+      const declaration = ast.body[1] as VariableDeclaration;
+      expect(declaration.names.type).toBe('VariableDeclarator');
+      if (declaration.names.type === 'VariableDeclarator') {
+        expect(declaration.names.name.name).toBe('macdSólow');
+      }
     });
 
     it('parses array type annotations', () => {
@@ -717,6 +765,45 @@ map<string, sig.State> stateBySymbol = na
       expect(Array.isArray(fn.body)).toBe(true);
       if (Array.isArray(fn.body)) {
         expect(fn.body.map((statement) => statement.type)).toEqual(['VariableDeclaration', 'ExpressionStatement']);
+      }
+    });
+
+    it('parses public-script UDF expression bodies indented by three to six spaces', () => {
+      const threeSpace = parse(`clamp(value, minValue, maxValue) =>
+   value > maxValue ? maxValue : value < minValue ? minValue : value
+`);
+      const fiveSpace = parse(`lineStyle(style) =>
+     style == "Dotted" ? line.style_dotted :
+     line.style_dashed
+`);
+      const sixSpace = parse(`mode(modeSwitch, src, len) =>
+      modeSwitch == "Hma" ? HMA(src, len) :
+      modeSwitch == "Ehma" ? EHMA(src, len) :
+      na
+`);
+
+      for (const ast of [threeSpace, fiveSpace, sixSpace]) {
+        const fn = ast.body[0] as FunctionDeclaration;
+        expect(fn.type).toBe('FunctionDeclaration');
+        expect(Array.isArray(fn.body)).toBe(true);
+        if (Array.isArray(fn.body)) {
+          expect(fn.body.map((statement) => statement.type)).toEqual(['ExpressionStatement']);
+        }
+      }
+    });
+
+    it('parses multiline chained ternary returns in UDF bodies', () => {
+      const ast = parse(`ma(source, length, type) =>
+    type == "SMA" ? ta.sma(source, length) :
+     type == "EMA" ? ta.ema(source, length) :
+     ta.wma(source, length)
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual(['ExpressionStatement']);
       }
     });
 
@@ -1464,6 +1551,212 @@ plot(str.length(score()))
           : []).toEqual(['ExpressionStatement']);
       }
     });
+
+    it('parses switch arms whose result is a reassignment side effect', () => {
+      const ast = parse(`indicator("Switch Assignment Arms")
+value = 0
+switch
+    close > open => value := 1
+    => value := -1
+plot(value)
+`);
+      const switchStatement = ast.body[2];
+
+      expect(switchStatement?.type).toBe('ExpressionStatement');
+      if (switchStatement?.type === 'ExpressionStatement') {
+        expect(switchStatement.expression.type).toBe('SwitchExpression');
+        if (switchStatement.expression.type === 'SwitchExpression') {
+          expect(switchStatement.expression.cases.map((branch) => (
+            Array.isArray(branch.consequent) ? branch.consequent[0]?.type : branch.consequent.type
+          ))).toEqual(['AssignmentStatement', 'AssignmentStatement']);
+        }
+      }
+    });
+
+    it('parses nested switch arms with reassignment and call side effects', () => {
+      const ast = parse(`indicator("Nested Switch Assignment Arms")
+value = 0
+box1 = box(na)
+if close > open
+    signalUp = close > high[1]
+    signalDn = close < low[1]
+    switch
+        signalUp => box1 := box.new(bar_index, high, bar_index + 1, low)
+        signalDn => box1 := box.new(bar_index, low, bar_index + 1, high)
+    switch
+        not signalUp or not signalDn => box1.set_right(bar_index + 4)
+        => box1 := box(na)
+plot(value)
+`);
+      const branch = ast.body[3];
+
+      expect(branch?.type).toBe('IfStatement');
+      if (branch?.type === 'IfStatement') {
+        expect(branch.consequent.map((statement) => statement.type)).toContain('ExpressionStatement');
+      }
+    });
+
+    it('parses locals initialized from multiline if expressions in nested blocks', () => {
+      const ast = parse(`offsetHours(h, fxO) =>
+    if h > 0
+        ho = if h < fxO
+            fxO - h - 1
+        else
+            24 - h + fxO - 1
+        ho
+    else
+        0
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const branch = fn.body[0];
+        const declaration = branch.type === 'IfStatement' ? branch.consequent[0] : null;
+        expect(declaration?.type).toBe('VariableDeclaration');
+        expect(declaration?.type === 'VariableDeclaration' ? declaration.init.type : null).toBe('IfStatement');
+      }
+    });
+
+    it('parses locals initialized from multiline if expressions in deep else branches', () => {
+      const ast = parse(`sessionCountdown(flag, h, fxO) =>
+    if flag
+        if h == 0
+            "done"
+        else
+            if h > 12
+                "late"
+            else
+                ho = if h < fxO
+                    fxO - h - 1
+                else
+                    24 - h + fxO - 1
+                str.tostring(ho)
+    else
+        "off"
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body[0]?.type).toBe('IfStatement');
+      }
+    });
+
+    it('parses if branches returning parenthesized expressions', () => {
+      const ast = parse(`volumePortion(lH, lL, pLL, pSTP) =>
+    if lH >= pLL and lL < pLL + pSTP
+        vPOR = if lL >= pLL and lH > pLL + pSTP
+            (pLL + pSTP - lL) / (lH - lL)
+        else
+            pSTP / (lH - lL)
+        vPOR
+    else
+        0
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const branch = fn.body[0];
+        const declaration = branch.type === 'IfStatement' ? branch.consequent[0] : null;
+        const init = declaration?.type === 'VariableDeclaration' ? declaration.init : null;
+        expect(init?.type).toBe('IfStatement');
+        const innerBranch = init?.type === 'IfStatement' ? init.consequent[0] : null;
+        expect(innerBranch?.type).toBe('ExpressionStatement');
+      }
+    });
+
+    it('parses switch default arms returning nested if expressions', () => {
+      const ast = parse(`candleColor(momentumValue) =>
+    switch momentumValue
+        1 => color.green
+        =>
+            if close > open
+                color.lime
+            else if close < open
+                color.red
+            else
+                color.gray
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        const statement = fn.body[0];
+        expect(statement.type).toBe('ExpressionStatement');
+        expect(statement.type === 'ExpressionStatement' ? statement.expression.type : null).toBe('SwitchExpression');
+      }
+    });
+
+    it('parses else-if side-effect chains inside UDF bodies', () => {
+      const ast = parse(`main_logic(_input) =>
+    _result = 0.0
+    if close > _input and close[1] > _input
+        _result := math.max(_input, close)
+    else if close < _input and close[1] < _input
+        _result := math.min(_input, close)
+    else if close > _input
+        _result := close
+    else
+        _result := open
+    _result
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'IfStatement',
+          'ExpressionStatement',
+        ]);
+      }
+    });
+
+    it('does not normalize a script from one orphan two-space top-level line', () => {
+      const ast = parse(`//@version=5
+  indicator("Indented Declaration", overlay = true)
+main_logic(_input) =>
+    _result = 0.0
+    if close > _input
+        _result := close
+    else if close < _input
+        _result := open
+    _result
+plot(main_logic(close))
+`);
+      const fn = ast.body[1] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body.map((statement) => statement.type)).toEqual([
+          'VariableDeclaration',
+          'IfStatement',
+          'ExpressionStatement',
+        ]);
+      }
+    });
+
+    it('parses local UDF declarations inside indented blocks', () => {
+      const ast = parse(`indicator("Local UDF")
+if close > open
+    formatValue(value) =>
+        str.tostring(math.round(value * 100) / 100)
+    labelText = str.format("{0}", formatValue(close))
+plot(close)
+`);
+      const branch = ast.body[1];
+
+      expect(branch?.type).toBe('IfStatement');
+      if (branch?.type === 'IfStatement') {
+        expect(branch.consequent.map((statement) => statement.type)).toEqual([
+          'FunctionDeclaration',
+          'VariableDeclaration',
+        ]);
+      }
+    });
   });
 
   describe('Expressions', () => {
@@ -1556,6 +1849,24 @@ plot(str.length(score()))
         expect(decl.init).toEqual(expect.objectContaining({
           type: 'StringLiteral',
           value: 'hello',
+        }));
+      });
+
+      it('parses triple-quoted multiline string literals from Pine v6 sources', () => {
+        const ast = parse(`debugText = str.format("""GEX DEBUG
+Chart: {0}
+Ticker: {1}""", syminfo.ticker, timeframe.period)
+`);
+        const decl = ast.body[0] as VariableDeclaration;
+        const call = decl.init as CallExpression;
+
+        expect(call.type).toBe('CallExpression');
+        expect(call.arguments[0]).toEqual(expect.objectContaining({
+          type: 'CallArgument',
+          value: expect.objectContaining({
+            type: 'StringLiteral',
+            value: 'GEX DEBUG\nChart: {0}\nTicker: {1}',
+          }),
         }));
       });
 
@@ -1801,6 +2112,25 @@ y = close
         expect(decimalSubtraction.init).toEqual(expect.objectContaining({
           type: 'BinaryExpression',
           operator: '-',
+        }));
+      });
+
+      it('parses assignment-ending two-space continuations without changing block indentation', () => {
+        const ast = parse(`f(int len) =>
+    for x = 1 to len -1
+        break
+    x
+
+divergence =
+  f(1) + f(2)
+`);
+        const fn = ast.body[0] as FunctionDeclaration;
+        const declaration = ast.body[1] as VariableDeclaration;
+
+        expect(fn.type).toBe('FunctionDeclaration');
+        expect(declaration.init).toEqual(expect.objectContaining({
+          type: 'BinaryExpression',
+          operator: '+',
         }));
       });
     });
@@ -2100,6 +2430,26 @@ lookup = map.new<
       }
     });
 
+    it('parses comma-chained declarations followed by else-if inside a function body', () => {
+      const ast = parse(`f() =>
+    bool match1 = check(a), match2 = check(b), match3 = check(c)
+    string st1 = ""
+    if match1
+        st1 := "a"
+    else if match2
+        st1 := "b"
+    st1
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(ast.body).toHaveLength(1);
+        expect(fn.body.at(-1)?.type).toBe('ExpressionStatement');
+      }
+    });
+
     it('parses CRLF-wrapped tuple declaration chains from public screener sources', () => {
       const ast = parse('indicator("Screener")\r\n[tid_001, out_001] = feed(i_symbols), [tid_002, out_002] = feed(out_001),\r\n[tid_003, out_003] = feed(out_002)\r\n');
       const declarations = ast.body.filter((statement): statement is VariableDeclaration => statement.type === 'VariableDeclaration');
@@ -2262,6 +2612,28 @@ plot(data("D", close))
         type: 'ForStatement',
         kind: 'numeric',
       }));
+    });
+
+    it('parses multiline if and else-if conditions from public Pine sources', () => {
+      const ast = parse(`calc_divergence(indicator, isok) =>
+    if
+      empty_low and
+      not na(local_bottom)
+      and indicator[bars_since_trough] < indicator
+        result := 1
+    else if
+      empty_high and
+      not na(local_top)
+        result := -1
+    result
+`);
+      const fn = ast.body[0] as FunctionDeclaration;
+
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(Array.isArray(fn.body)).toBe(true);
+      if (Array.isArray(fn.body)) {
+        expect(fn.body[0]?.type).toBe('IfStatement');
+      }
     });
 
     it('parses collection for loop', () => {

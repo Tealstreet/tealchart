@@ -48,7 +48,7 @@ describe('Pine v6 reference manual audit', () => {
     expect(audit.officialBuiltinNames).toBe(860);
     expect(audit.committedBuiltinNames).toBe(899);
     expect(audit.builtinNamesAbsentFromCommittedListCount).toBe(0);
-    expect(audit.unresolvedManualBuiltinNamesCount).toBe(16);
+    expect(audit.unresolvedManualBuiltinNamesCount).toBe(15);
     expect(audit.committedBuiltinNamesAbsentFromManualCount).toBe(39);
     expect(audit.grammarEntriesAbsentFromCommittedListCount).toBe(0);
   });

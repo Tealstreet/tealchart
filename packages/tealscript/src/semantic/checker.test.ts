@@ -106,6 +106,20 @@ plot(nope.value)`,
         },
       },
       {
+        name: 'unsupported official TradingView version',
+        source: `//@version=6
+indicator("Official Import")
+import TradingView/ta/6 as tvta
+plot(close)`,
+        options: undefined,
+        expected: {
+          code: 'unresolved-import',
+          message: "Official TradingView library 'TradingView/ta' version 6 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import",
+          line: 3,
+          column: 1,
+        },
+      },
+      {
         name: 'type mismatch',
         source: `//@version=6
 indicator("Types")
@@ -140,6 +154,67 @@ plot(close)`,
       const result = checkProgram(parse(testCase.source), testCase.options);
       expect(result.diagnostics[0], testCase.name).toEqual(expect.objectContaining(testCase.expected));
     }
+  });
+
+  it('resolves supported TradingView ta library versions as official builtins', () => {
+    const pine = `//@version=6
+indicator("Official ta")
+import TradingView/ta/10 as tvta
+plot(tvta.changePercent(close, open))
+plot(ta.rsi(close, 14))`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('keeps official TradingView ta imports version-pinned', () => {
+    const pine = `//@version=6
+indicator("Official ta v7")
+import TradingView/ta/7 as tvta
+[up, down, delta] = tvta.requestUpAndDownVolume("1")
+plot(delta)`;
+
+    expect(checkProgram(parse(pine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unknown-function',
+      message: 'Unknown library function: tvta.requestUpAndDownVolume',
+    }));
+  });
+
+  it('reports documented but unimplemented official TradingView ta functions explicitly', () => {
+    const pine = `//@version=6
+indicator("Official ta unsupported")
+import TradingView/ta/10 as tvta
+plot(tvta.atr2(14))`;
+
+    expect(checkProgram(parse(pine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unsupported-feature',
+      message: "Official TradingView library function 'TradingView/ta/10.atr2' is documented but not implemented by TealScript yet",
+    }));
+  });
+
+  it('resolves official TradingView ZigZag v8 types and functions as a pinned builtin library', () => {
+    const pine = `//@version=6
+indicator("Official ZigZag")
+import TradingView/ZigZag/8 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zlib.update(zigZag)
+array<zlib.Pivot> pivots = zigZag.pivots
+last = zlib.lastPivot(zigZag)
+plot(changed ? array.size(pivots) : 0)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('keeps official TradingView ZigZag imports version-pinned', () => {
+    const pine = `//@version=6
+indicator("Official ZigZag v9")
+import TradingView/ZigZag/9 as zlib
+plot(close)`;
+
+    expect(checkProgram(parse(pine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unresolved-import',
+      message: "Official TradingView library 'TradingView/ZigZag' version 9 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import",
+    }));
   });
 
   it('tracks Pine v6 reference builtin coverage through checker resolution', () => {
@@ -380,9 +455,10 @@ y = year(time, TZ)
 m = month(time, TZ)
 d = dayofmonth(time, TZ)
 sessionStart = timestamp(TZ, y, m, d, 18, 0)
+sessionEnd = timestamp(TZ, y, m, d, 18, 0, 30)
 inSession = not na(time(timeframe.period, sess, TZ))
 inCloseSession = not na(time_close(timeframe.period, sess, TZ))
-plot(inSession and inCloseSession ? sessionStart : na)
+plot(inSession and inCloseSession ? sessionStart + sessionEnd : na)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -581,7 +657,7 @@ plot(na or close > open ? 1 : 0)
     ]);
   });
 
-  it('reports literal na assigned to bool variables', () => {
+  it('allows typed bool na initializers and rejects na reassignment', () => {
     const result = checkProgram(parse(`
 indicator("NA Bool Assignments")
 bool converted = bool(na)
@@ -592,7 +668,6 @@ plot(converted ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot assign na value to bool variable 'initialized'",
       'Cannot assign na value to bool variable reassigned',
     ]);
   });
@@ -627,6 +702,28 @@ legacySeconds = timeframe.to_seconds(timeframe="1D")
 prefixedRounded = timeframe.from_seconds(seconds=30)
 prefixedChanged = timeframe.change(timeframe="3")
 plot(isLower and changed and legacySeconds > 0 ? 1 : 0)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('keeps built-in namespace calls distinct from same-named user methods', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Timeframe Method Shadow")
+method change(simple string frame, series int frameTime, simple bool discoverPrice, simple bool discoverExtendedPrice) =>
+    discoverExtendedPrice ? timeframe.change(frame) : ta.change(frameTime) > 0
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts user methods on built-in member receivers', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Timeframe Member Method")
+method user_tf(string frame) => frame == "" ? timeframe.period : frame
+resolved = timeframe.period.user_tf()
+plot(str.length(resolved))
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1301,7 +1398,7 @@ plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bor
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(9).fill('legacy-argument'));
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(Array(8).fill('legacy-argument'));
   });
 
   it('accepts v5 deprecated visual transp arguments with info diagnostics', () => {
@@ -1319,6 +1416,57 @@ plotshape(close > open, color=color.green, transp=20)
       "fill() accepted legacy argument 'transp' for compatibility",
       "plotshape() accepted legacy argument 'transp' for compatibility; use color.new(color, transparency) in Pine v6",
     ]);
+  });
+
+  it('uses modern v5 positional visual argument order when transp is not supplied', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("V5 Modern Visual Positional Args", overlay=true)
+linePlot = plot(close, "Line", color.blue)
+basePlot = plot(open, "Base", color.red)
+fill(linePlot, basePlot, color.green, "Band")
+plotshape(close > open, "Shape", shape.circle, location.abovebar, color.blue, 0, "S", color.white)
+plotchar(close > open, "Char", "C", location.belowbar, color.green, 0, "T", color.white)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('accepts fill gradient overload arguments', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Fill Gradient")
+upper = plot(high)
+lower = plot(low)
+fill(upper, lower, high, low, color.new(color.green, 80), color.new(color.red, 80), "Gradient")
+fill(plot1=upper, plot2=lower, top_value=high, bottom_value=low, top_color=color.green, bottom_color=color.red)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('selects user function overloads by argument shape for tuple returns', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("UDF Overloads")
+hl() => [high, low]
+hl(int bar) => [high[bar], low[bar]]
+[nowHigh, nowLow] = hl()
+[prevHigh, prevLow] = hl(1)
+plot(nowHigh + nowLow + prevHigh + prevLow)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('infers matrix column extraction as an array receiver', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Matrix Column Average")
+m = matrix.new<float>(1, 2, 0.0)
+m.set(0, 0, close)
+m.set(0, 1, volume)
+col0 = m.col(0)
+plot(col0.avg() + m.column(1).avg())
+`));
+
+    expect(result.diagnostics).toEqual([]);
   });
 
   it('accepts v4 positional visual transp arguments', () => {
@@ -1368,12 +1516,15 @@ plot(length)
     const result = checkProgram(parse(`//@version=6
 indicator("Object Casts")
 var color transparent = color(na)
+var color base = color(#DBD07C)
+var color faded = color(color.red, 50)
 var box b = box(na)
 var label lb = label(na)
 var line ln = line(na)
 var linefill lf = linefill(na)
 var table t = table(na)
-plot(na(transparent) and na(b) and na(lb) and na(ln) and na(lf) and na(t) ? 1 : 0)
+plot(na(transparent) and na(b) and na(lb) and na(ln) and na(lf) and na(t) ? 1 : 0, color=color.new(base, 0))
+plot(open, color=faded)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -1479,7 +1630,7 @@ plotarrow(series="spread", offset=false, minheight="5", maxheight=false, show_la
     ]);
   });
 
-  it('rejects legacy visual transp arguments in v6 signatures', () => {
+  it('rejects legacy visual transp arguments in v6 signatures except bgcolor compatibility', () => {
     const result = checkProgram(parse(`//@version=6
 indicator("V6 Visual Transparency Rejection", overlay=true)
 linePlot = plot(close, color=color.blue, transp=25)
@@ -1498,7 +1649,6 @@ plotcandle(open, high, low, close, color=color.yellow, wickcolor=color.gray, bor
       "Unknown argument 'transp' for plot(); use color.new(color, transparency) in Pine v6",
       "Unknown argument 'transp' for fill()",
       "Unknown argument 'transp' for barcolor()",
-      "Unknown argument 'transp' for bgcolor()",
       "Unknown argument 'transp' for plotshape(); use color.new(color, transparency) in Pine v6",
       "Unknown argument 'transp' for plotchar(); use color.new(color, transparency) in Pine v6",
       "Unknown argument 'transp' for plotarrow(); use color.new(color, transparency) in Pine v6",
@@ -1517,7 +1667,7 @@ fill(linePlot, basePlot, color.red, editable="yes", fillgaps=1)
 barcolor(color.red, editable="yes")
 bgcolor(color.blue, editable=1, force_overlay="yes")
 plotbar(open, high, low, close, editable=1, force_overlay="yes")
-plotcandle(open, high, low, close, editable="yes")
+plotcandle(open, high, low, close, editable="yes", force_overlay=1)
 plotshape(close > open, editable=1, force_overlay="yes")
 plotchar(close > open, editable="yes", force_overlay=1)
 plotarrow(close - open, editable=1, force_overlay="yes")
@@ -1537,6 +1687,7 @@ plotarrow(close - open, editable=1, force_overlay="yes")
       'plotbar editable must be a boolean, got int',
       'plotbar force_overlay must be a boolean, got string',
       'plotcandle editable must be a boolean, got string',
+      'plotcandle force_overlay must be a boolean, got int',
       'plotshape editable must be a boolean, got int',
       'plotshape force_overlay must be a boolean, got string',
       'plotchar editable must be a boolean, got string',
@@ -1846,6 +1997,8 @@ strategy.close_all(comment="flat")
 strategy.close_all(comment="flat prefix", "flat alert")
 strategy.cancel("Add")
 strategy.cancel_all()
+plot(strategy.default_entry_qty(close))
+plot(strategy.default_entry_qty(fill_price=close))
 plot(strategy.opentrades.capital_held)
 plot(strategy.opentrades.entry_price(0))
 plot(str.length(strategy.opentrades.entry_comment(0)))
@@ -3172,6 +3325,17 @@ plot(price)
       'Cannot assign Mode value to Direction variable direction',
       'Cannot assign Other value to Pivot variable pivot',
     ]);
+  });
+
+  it('allows explicit bool variables to initialize from na', () => {
+    const result = checkProgram(parse(`
+indicator("Bool Na")
+bool flag = na
+flag := close > open
+plot(flag ? 1 : 0)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
   });
 
   it('infers compatible switch expression types for downstream diagnostics', () => {

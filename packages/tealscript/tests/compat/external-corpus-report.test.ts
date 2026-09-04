@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import realtimeCorpusReport from '../../reports/external-pine-corpus-realtime.report.json' with { type: 'json' };
 import v1Report from '../../reports/external-pine-corpus-v1.report.json' with { type: 'json' };
 import v2Report from '../../reports/external-pine-corpus-v2.report.json' with { type: 'json' };
+import v3Report from '../../reports/external-pine-corpus-v3.report.json' with { type: 'json' };
 import {
   assertRealtimeSubsetOutputSafe,
   EXTERNAL_PINE_CORPUS_REALTIME_REPORT_SCHEMA_VERSION,
@@ -17,18 +18,20 @@ describe('external Pine corpus committed report', () => {
     expect(report.schemaVersion).toBe(EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION);
     expect(report.summary.total).toBe(220);
     expect(report.summary.funnel).toEqual({
-      parse: { count: 219, percent: 99.55 },
+      parse: { count: 218, percent: 99.09 },
       semantic: { count: 190, percent: 86.36 },
       compile: { count: 190, percent: 86.36 },
       execute: { count: 188, percent: 85.45 },
       output: { count: 178, percent: 80.91 },
     });
     expect(report.summary.achievableCeiling).toEqual(expect.objectContaining({
-      denominator: 199,
-      excludedInvalidPine: 21,
+      denominator: 194,
+      excludedInvalidPine: 24,
       excludedCorpusHygiene: 0,
+      excludedCorpusInputGap: 0,
+      excludedUnsupportedByDesign: 2,
     }));
-    expect(report.summary.achievableCeiling.funnel.output).toEqual({ count: 178, percent: 89.45 });
+    expect(report.summary.achievableCeiling.funnel.output).toEqual({ count: 178, percent: 91.75 });
     expect(report.summary.outputParity).toEqual({
       'not-run': 220,
     });
@@ -45,20 +48,31 @@ describe('external Pine corpus committed report', () => {
       differenceKinds: {},
     });
     expect(report.summary.compiledBarErrors).toEqual({
-      scripts: 0,
-      totalErrors: 0,
-      firstCauses: [],
+      scripts: 1,
+      totalErrors: 160,
+      firstCauses: [
+        expect.objectContaining({
+          message: 'deps._mtx[name] is not a function',
+          count: 1,
+        }),
+      ],
     });
     expect(report.summary.validity).toEqual({
-      'host-dependency-gap': 2,
-      'invalid-pine': 21,
-      supported: 182,
-      'tealscript-gap': 15,
+      'invalid-pine': 24,
+      supported: 184,
+      'tealscript-gap': 10,
+      'unsupported-by-design': 2,
     });
     expect(report.summary.swallowedErrors).toEqual({
-      scripts: 0,
-      totalErrors: 0,
-      firstCauses: [],
+      scripts: 1,
+      totalErrors: 160,
+      firstCauses: [
+        expect.objectContaining({
+          site: 'compiled-bar',
+          message: 'deps._mtx[name] is not a function',
+          count: 1,
+        }),
+      ],
     });
   });
 
@@ -76,25 +90,29 @@ describe('external Pine corpus committed report', () => {
       unknown: 1,
     });
     expect(report.summary.funnel).toEqual({
-      parse: { count: 139, percent: 92.05 },
-      semantic: { count: 113, percent: 74.83 },
-      compile: { count: 113, percent: 74.83 },
-      execute: { count: 108, percent: 71.52 },
-      output: { count: 93, percent: 61.59 },
+      parse: { count: 145, percent: 96.03 },
+      semantic: { count: 122, percent: 80.79 },
+      compile: { count: 122, percent: 80.79 },
+      execute: { count: 118, percent: 78.15 },
+      output: { count: 103, percent: 68.21 },
     });
     expect(report.summary.achievableCeiling).toEqual(expect.objectContaining({
-      denominator: 142,
-      excludedInvalidPine: 8,
+      denominator: 112,
+      excludedInvalidPine: 13,
       excludedCorpusHygiene: 1,
+      excludedCorpusInputGap: 11,
+      excludedUnsupportedByDesign: 14,
     }));
-    expect(report.summary.achievableCeiling.funnel.output).toEqual({ count: 93, percent: 65.49 });
-    expect(report.summary.achievableCeiling.funnel.semantic).toEqual({ count: 113, percent: 79.58 });
+    expect(report.summary.achievableCeiling.funnel.output).toEqual({ count: 103, percent: 91.96 });
+    expect(report.summary.achievableCeiling.funnel.semantic).toEqual({ count: 111, percent: 99.11 });
+    expect(report.summary.achievableCeiling.funnel.execute).toEqual({ count: 107, percent: 95.54 });
     expect(report.summary.validity).toEqual({
       'corpus-hygiene': 1,
-      'host-dependency-gap': 15,
-      'invalid-pine': 8,
-      supported: 96,
-      'tealscript-gap': 31,
+      'corpus-input-gap': 11,
+      'invalid-pine': 13,
+      supported: 111,
+      'tealscript-gap': 1,
+      'unsupported-by-design': 14,
     });
     expect(report.summary.outputParity).toEqual({
       'not-run': 151,
@@ -120,6 +138,64 @@ describe('external Pine corpus committed report', () => {
       totalErrors: 0,
       firstCauses: [],
     });
+  });
+
+  it('pins the expanded corpus v3 funnel', () => {
+    const report = v3Report;
+
+    expect(report.schemaVersion).toBe(EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION);
+    expect(report.summary.total).toBe(463);
+    expect(report.summary.repositories).toBe(144);
+    expect(report.summary.declarationKinds).toEqual({
+      indicator: 349,
+      library: 1,
+      strategy: 67,
+      study: 46,
+    });
+    expect(report.summary.versionMix).toEqual({
+      3: 40,
+      4: 5,
+      5: 204,
+      6: 213,
+      unknown: 1,
+    });
+    expect(report.summary.funnel).toEqual({
+      parse: { count: 448, percent: 96.76 },
+      semantic: { count: 382, percent: 82.51 },
+      compile: { count: 382, percent: 82.51 },
+      execute: { count: 365, percent: 78.83 },
+      output: { count: 330, percent: 71.27 },
+    });
+    expect(report.summary.achievableCeiling).toEqual(expect.objectContaining({
+      denominator: 355,
+      excludedInvalidPine: 51,
+      excludedCorpusHygiene: 7,
+      excludedCorpusInputGap: 24,
+      excludedUnsupportedByDesign: 26,
+    }));
+    expect(report.summary.achievableCeiling.funnel.parse).toEqual({ count: 355, percent: 100 });
+    expect(report.summary.achievableCeiling.funnel.output).toEqual({ count: 330, percent: 92.96 });
+    expect(report.summary.validity).toEqual({
+      'corpus-hygiene': 7,
+      'corpus-input-gap': 24,
+      'host-dependency-gap': 3,
+      'invalid-pine': 51,
+      supported: 352,
+      'unsupported-by-design': 26,
+    });
+    expect(report.summary.failureCauses.slice(0, 10).map(({ stage, cause, count }) => ({ stage, cause, count }))).toEqual([
+      { stage: 'semantic', cause: 'unresolved-import', count: 26 },
+      { stage: 'semantic', cause: 'type-mismatch', count: 16 },
+      { stage: 'parse', cause: 'unexpected-token', count: 15 },
+      { stage: 'output', cause: 'conditional-or-data-gated-output-not-triggered', count: 11 },
+      { stage: 'output', cause: 'corpus-bars-do-not-trigger-data-gated-output', count: 11 },
+      { stage: 'execute', cause: 'request-context-limit', count: 8 },
+      { stage: 'semantic', cause: 'unknown-identifier', count: 7 },
+      { stage: 'semantic', cause: 'duplicate-symbol', count: 5 },
+      { stage: 'output', cause: 'synthetic-window-did-not-trigger-output', count: 5 },
+      { stage: 'execute', cause: 'array-bounds-runtime-error', count: 4 },
+    ]);
+    expect(report.rows.every((row) => row.sourceRepoUrl && row.sourceFilePath && row.commitSha)).toBe(true);
   });
 
   it('does not claim independent backend parity after the runtime deletion', () => {

@@ -133,14 +133,14 @@ plotbar(o, h + 1, l - 1, c, "Custom bars", bodyColor, false, 6, display.none, fo
   it('captures background and bar color visual parameters', () => {
     const result = runCompatScript(`
 indicator("Bar background smoke", overlay=true)
-bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", display.price_scale, force_overlay=true)
+bgcolor(bar_index == 0 ? color.blue : na, 1, false, 4, "Session", display.price_scale, force_overlay=true, transp=75)
 barcolor(bar_index == 0 ? color.red : na, 1, true, 5, "Bar Tint", display.none)
 `);
 
     expect(result.errors).toEqual([]);
     const background = getPlot(result, 'Session');
     expect(background.type).toBe('bgcolor');
-    expect(background.color).toEqual([null, '#2196F3', ...Array(compatibilityBars.length - 1).fill(null)]);
+    expect(background.color).toEqual([null, '#2196F340', ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(background.values).toEqual([null, 1, ...Array(compatibilityBars.length - 1).fill(null)]);
     expect(background.offset).toBe(1);
     expect(background.editable).toBe(false);

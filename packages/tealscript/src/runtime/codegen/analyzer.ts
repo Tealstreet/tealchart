@@ -10,6 +10,9 @@ import type {
   FunctionDeclaration,
   EnumDeclaration,
 } from '../../parser/ast';
+import {
+  getOfficialTradingViewLibrary,
+} from '../../officialTradingViewLibraries';
 
 export interface TACallSite {
   memberName: string;
@@ -121,7 +124,9 @@ export interface AnalysisContext {
   securitySites: SecurityCallSite[];
   capturedParams: Set<string>;
   importedNamespaces: Set<string>;
+  officialLibraryFunctions: Map<string, string>;
   importedFunctions: Map<string, string>;
+  userFunctionOverloads: Map<string, string[]>;
   importedMethods: Map<string, string>;
   localMethodOverloads: Map<string, LocalMethodOverloadInfo[]>;
   importedMethodOverloads: Map<string, ImportedMethodOverloadInfo[]>;
@@ -143,7 +148,7 @@ export interface AnalyzeOptions {
 }
 
 const BAR_FIELDS = new Set([
-  'open', 'high', 'low', 'close', 'volume',
+  'open', 'high', 'low', 'close', 'volume', 'bid', 'ask',
   'time', 'time_close', 'timenow',
   'hl2', 'hlc3', 'ohlc4', 'hlcc4',
 ]);
@@ -406,7 +411,9 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     securitySites: [],
     capturedParams: new Set(options.capturedParams ?? []),
     importedNamespaces: new Set(),
+    officialLibraryFunctions: new Map(),
     importedFunctions: new Map(),
+    userFunctionOverloads: new Map(),
     importedMethods: new Map(),
     localMethodOverloads: new Map(),
     importedMethodOverloads: new Map(),
@@ -427,6 +434,11 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
   const plotCallCounts = new Map<string, number>();
   const functionBodies = new Map<string, Expression | Statement[]>();
   const registeredImportKeys = new Set<string>();
+  const userFunctionCounts = new Map<string, number>();
+  for (const statement of ast.body) {
+    if (statement.type !== 'FunctionDeclaration' || statement.isMethod) continue;
+    userFunctionCounts.set(statement.name.name, (userFunctionCounts.get(statement.name.name) ?? 0) + 1);
+  }
   let activeFunctionName: string | null = null;
   let activeFunctionParams: Set<string> | null = null;
   let activeFunctionLocals: Set<string> | null = null;
@@ -496,6 +508,12 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
 
   function localMethodInternalName(receiverType: string | null, methodName: string, paramCount: number): string {
     return `${receiverType ?? 'any'}__${methodName}__${paramCount}`;
+  }
+
+  function userFunctionInternalName(functionName: string, paramCount: number): string {
+    return userFunctionCounts.get(functionName) && userFunctionCounts.get(functionName)! > 1
+      ? `${functionName}$arity${paramCount}`
+      : functionName;
   }
 
   function walkFunctionBody(name: string, params: string[], body: Expression | Statement[]): void {
@@ -635,7 +653,16 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
     if (registeredImportKeys.has(importKey)) return;
     registeredImportKeys.add(importKey);
 
-    const libraryAst = options.libraries?.get(stmt.path);
+    const officialLibrary = getOfficialTradingViewLibrary(stmt.path);
+    const libraryAst = officialLibrary?.program ?? options.libraries?.get(stmt.path);
+    if (officialLibrary && !officialLibrary.program) {
+      ctx.importedNamespaces.add(stmt.alias.name);
+      for (const fn of officialLibrary.functions.values()) {
+        if (fn.runtimeName) ctx.officialLibraryFunctions.set(`${stmt.alias.name}.${fn.name}`, fn.runtimeName);
+      }
+      return;
+    }
+
     if (!libraryAst) {
       ctx.importDiagnostics.push(`import not found in deterministic library registry: ${stmt.path} as ${stmt.alias.name}`);
       ctx.importedNamespaces.add(stmt.alias.name);
@@ -781,7 +808,8 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
       case 'CallExpression': {
         const { fullName, namespace } = resolveCallee(expr.callee);
         const isBareUserFunctionCall = expr.callee.type === 'Identifier' && ctx.funcInfos.has(fullName);
-        const taFullName = isBareUserFunctionCall ? fullName : canonicalTACallName(fullName);
+        const officialRuntimeName = ctx.officialLibraryFunctions.get(fullName);
+        const taFullName = isBareUserFunctionCall ? fullName : canonicalTACallName(officialRuntimeName ?? fullName);
         const taNamespace = taFullName.split('.')[0] ?? '';
 
         if (UNSUPPORTED_REQUEST_FUNCS.has(fullName)) {
@@ -912,7 +940,7 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           break;
         }
 
-        if (taNamespace === 'ta' && !(taFullName in TA_CLASS_MAP) && !DIRECT_TA_FUNCS.has(taFullName)) {
+        if (taNamespace === 'ta' && !(taFullName in TA_CLASS_MAP) && !DIRECT_TA_FUNCS.has(taFullName) && !ctx.officialLibraryFunctions.has(taFullName)) {
           addUnsupported(`${taFullName} not yet supported by transpiler`);
         }
 
@@ -1189,8 +1217,14 @@ export function analyze(ast: Program, options: AnalyzeOptions = {}): AnalysisCon
           registerFunctionInfo(internalName, stmt);
           walkFunctionBody(internalName, stmt.params.map((p) => p.name), stmt.body);
         } else {
-          registerFunctionInfo(stmt.name.name, stmt);
-          walkFunctionBody(stmt.name.name, stmt.params.map((p) => p.name), stmt.body);
+          const internalName = userFunctionInternalName(stmt.name.name, stmt.params.length);
+          if (internalName !== stmt.name.name) {
+            const overloads = ctx.userFunctionOverloads.get(stmt.name.name) ?? [];
+            overloads.push(internalName);
+            ctx.userFunctionOverloads.set(stmt.name.name, overloads);
+          }
+          registerFunctionInfo(internalName, stmt);
+          walkFunctionBody(internalName, stmt.params.map((p) => p.name), stmt.body);
         }
         break;
       }

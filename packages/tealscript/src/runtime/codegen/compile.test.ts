@@ -74,7 +74,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
       input(_id: string, _funcName: string, defval: unknown) { return defval; },
       strategyEntry() {}, strategyExit() {}, strategyClose() {},
       strategyCloseAll() {}, strategyCancel() {}, strategyCancelAll() {},
-      strategyOrder() {}, strategyProp() { return 0; }, strategyPropHistory() { return NaN; },
+      strategyOrder() {}, strategyDefaultEntryQty() { return NaN; }, strategyProp() { return 0; }, strategyPropHistory() { return NaN; },
       strategyTradeProp() { return NaN; }, strategyRisk() { return undefined; },
       alert() {}, alertCondition() {},
       logInfo() {}, logWarning() {}, logError() {},
