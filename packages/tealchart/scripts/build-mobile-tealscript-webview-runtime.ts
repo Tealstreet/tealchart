@@ -12,9 +12,44 @@ const outputFile = resolve(packageDir, 'src/mobile/generatedTealscriptWebViewRun
 
 const bridgeRuntime = String.raw`
 const BRIDGE_TAG = '__tealchartWebViewBridge';
+const earlyNativeMessages = [];
 const workerScript = __WORKER_SCRIPT__;
 const workers = new Map();
 let nextWorkerId = 0;
+
+function formatErrorMessage(error) {
+  if (!error) return 'unknown error';
+  if (typeof error === 'string') return error;
+  if (typeof error.message === 'string' && error.message.length > 0) return error.message;
+  return String(error);
+}
+
+function postNative(message) {
+  const nativeBridge = window.ReactNativeWebView;
+  if (!nativeBridge || typeof nativeBridge.postMessage !== 'function') {
+    earlyNativeMessages.push(message);
+    return false;
+  }
+  nativeBridge.postMessage(JSON.stringify(encodeBridgeValue(message)));
+  return true;
+}
+
+window.onerror = function(message, source, lineno, colno, error) {
+  postNative({
+    type: 'runtime-error',
+    message: formatErrorMessage(error) || String(message),
+    filename: source,
+    lineno,
+    colno,
+  });
+};
+
+window.onunhandledrejection = function(event) {
+  postNative({
+    type: 'runtime-error',
+    message: formatErrorMessage(event && event.reason),
+  });
+};
 
 function encodeBridgeValue(value) {
   if (value === undefined) return { [BRIDGE_TAG]: 'undefined' };
@@ -67,10 +102,6 @@ function decodeBridgeValue(value) {
     return Object.fromEntries(Object.entries(value).map(([key, entryValue]) => [key, decodeBridgeValue(entryValue)]));
   }
   return value;
-}
-
-function postNative(message) {
-  window.ReactNativeWebView.postMessage(JSON.stringify(encodeBridgeValue(message)));
 }
 
 function createWorker(workerId) {
