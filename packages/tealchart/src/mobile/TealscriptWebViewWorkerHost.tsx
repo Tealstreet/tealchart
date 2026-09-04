@@ -35,11 +35,6 @@ const RUNTIME_HTML_BYTES = TEALSCRIPT_WEBVIEW_RUNTIME_HTML.length;
 // workers exactly that way, so the origin is load-bearing rather than cosmetic.
 const RUNTIME_BASE_URL = 'https://tealchart.invalid/';
 
-// Runs after the document loads, independently of the page's own script. It answers
-// the one question the page cannot: whether postMessage works at all. If this probe
-// arrives and runtime-ready does not, the transport is fine and the runtime script
-// is at fault; if neither arrives, nothing can post back and every other signal is
-// unreliable for the same reason.
 // Installed BEFORE the page's own script. The runtime registers window.onerror
 // inside the very script under suspicion, so a parse failure there leaves no
 // handler to report it — the document arrives whole, executes nothing, and says
@@ -61,26 +56,6 @@ const RUNTIME_PREFLIGHT_JS = `(function () {
 })();
 true;`;
 
-const RUNTIME_PROBE_JS = `(function () {
-  try {
-    var hasBridge = !!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage);
-    if (!hasBridge) { document.title = 'tealscript:no-rnwebview'; return; }
-    var scriptEl = document.scripts[0];
-    var scriptLen = scriptEl ? (scriptEl.textContent || '').length : -1;
-    window.ReactNativeWebView.postMessage(JSON.stringify({
-      type: 'runtime-error',
-      message:
-        'probe title=' + document.title +
-        ' docLen=' + document.documentElement.outerHTML.length +
-        ' scripts=' + document.scripts.length +
-        ' scriptLen=' + scriptLen +
-        ' boot=' + ((window.__tealchartBootErrors || []).join(' | ') || 'none'),
-    }));
-  } catch (probeError) {
-    document.title = 'tealscript:probe-threw';
-  }
-})();
-true;`;
 
 type BridgeToWebViewMessage =
   | { type: 'create-worker'; workerId: string }
@@ -420,8 +395,7 @@ export function useTealscriptWebViewWorkerBridge(): {
       ) : (
         <View pointerEvents="none" style={styles.host}>
           <NativeWebView
-            injectedJavaScript={RUNTIME_PROBE_JS}
-            injectedJavaScriptBeforeContentLoaded={RUNTIME_PREFLIGHT_JS}
+              injectedJavaScriptBeforeContentLoaded={RUNTIME_PREFLIGHT_JS}
             javaScriptEnabled
             onError={bridge.handleWebViewError}
             onHttpError={bridge.handleWebViewHttpError}
