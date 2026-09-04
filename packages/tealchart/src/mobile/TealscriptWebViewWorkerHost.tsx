@@ -44,9 +44,16 @@ const RUNTIME_PROBE_JS = `(function () {
   try {
     var hasBridge = !!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage);
     if (!hasBridge) { document.title = 'tealscript:no-rnwebview'; return; }
+    var scriptEl = document.scripts[0];
+    var scriptLen = scriptEl ? (scriptEl.textContent || '').length : -1;
     window.ReactNativeWebView.postMessage(JSON.stringify({
       type: 'runtime-error',
-      message: 'probe title=' + document.title + ' worker=' + (typeof Worker) + ' blob=' + (typeof Blob),
+      message:
+        'probe title=' + document.title +
+        ' docLen=' + document.documentElement.outerHTML.length +
+        ' scripts=' + document.scripts.length +
+        ' scriptLen=' + scriptLen +
+        ' tail=' + (scriptEl ? (scriptEl.textContent || '').slice(-24) : 'none'),
     }));
   } catch (probeError) {
     document.title = 'tealscript:probe-threw';
