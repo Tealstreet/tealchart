@@ -30,6 +30,30 @@ export function logTealscriptWebView(message: string): void {
 const DEFAULT_READY_TIMEOUT_MS = 10_000;
 const RUNTIME_HTML_BYTES = TEALSCRIPT_WEBVIEW_RUNTIME_HTML.length;
 
+// Without a baseUrl, iOS loads this through loadHTMLString into an OPAQUE origin,
+// where `new Worker(URL.createObjectURL(blob))` is blocked. The runtime creates its
+// workers exactly that way, so the origin is load-bearing rather than cosmetic.
+const RUNTIME_BASE_URL = 'https://tealchart.invalid/';
+
+// Runs after the document loads, independently of the page's own script. It answers
+// the one question the page cannot: whether postMessage works at all. If this probe
+// arrives and runtime-ready does not, the transport is fine and the runtime script
+// is at fault; if neither arrives, nothing can post back and every other signal is
+// unreliable for the same reason.
+const RUNTIME_PROBE_JS = `(function () {
+  try {
+    var hasBridge = !!(window.ReactNativeWebView && window.ReactNativeWebView.postMessage);
+    if (!hasBridge) { document.title = 'tealscript:no-rnwebview'; return; }
+    window.ReactNativeWebView.postMessage(JSON.stringify({
+      type: 'runtime-error',
+      message: 'probe title=' + document.title + ' worker=' + (typeof Worker) + ' blob=' + (typeof Blob),
+    }));
+  } catch (probeError) {
+    document.title = 'tealscript:probe-threw';
+  }
+})();
+true;`;
+
 type BridgeToWebViewMessage =
   | { type: 'create-worker'; workerId: string }
   | { type: 'worker-message'; workerId: string; data: unknown }
@@ -190,7 +214,10 @@ export class TealscriptWebViewWorkerBridge {
     }
 
     const worker = this.workers.get(message.workerId);
-    if (!worker) return;
+    if (!worker) {
+      logTealscriptWebView(`unmatched ${message.type} worker=${message.workerId}`);
+      return;
+    }
 
     if (message.type === 'worker-message') {
       worker.dispatchMessage(message.data);
@@ -303,6 +330,7 @@ export function useTealscriptWebViewWorkerBridge(): {
     () => (
       <View pointerEvents="none" style={styles.host}>
         <NativeWebView
+          injectedJavaScript={RUNTIME_PROBE_JS}
           javaScriptEnabled
           onError={bridge.handleWebViewError}
           onHttpError={bridge.handleWebViewHttpError}
@@ -311,7 +339,7 @@ export function useTealscriptWebViewWorkerBridge(): {
           onNavigationStateChange={bridge.handleNavigationStateChange}
           originWhitelist={['*']}
           ref={bridge.setWebView}
-          source={{ html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
+          source={{ baseUrl: RUNTIME_BASE_URL, html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
         />
       </View>
     ),
