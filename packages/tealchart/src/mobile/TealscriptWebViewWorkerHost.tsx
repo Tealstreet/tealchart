@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { WebViewMessageEvent, WebViewProps } from 'react-native-webview';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
@@ -30,33 +30,6 @@ export function logTealscriptWebView(message: string): void {
 const DEFAULT_READY_TIMEOUT_MS = 10_000;
 const RUNTIME_HTML_BYTES = TEALSCRIPT_WEBVIEW_RUNTIME_HTML.length;
 
-// Without a baseUrl, iOS loads this through loadHTMLString into an OPAQUE origin,
-// where `new Worker(URL.createObjectURL(blob))` is blocked. The runtime creates its
-// workers exactly that way, so the origin is load-bearing rather than cosmetic.
-const RUNTIME_BASE_URL = 'https://tealchart.invalid/';
-
-// Installed BEFORE the page's own script. The runtime registers window.onerror
-// inside the very script under suspicion, so a parse failure there leaves no
-// handler to report it — the document arrives whole, executes nothing, and says
-// nothing. This handler exists before that script is parsed, so it survives it.
-const RUNTIME_PREFLIGHT_JS = `(function () {
-  window.__tealchartBootErrors = [];
-  window.addEventListener('error', function (event) {
-    var detail = event.message || String(event.error || 'unknown');
-    var where = (event.filename || '') + ':' + (event.lineno || 0) + ':' + (event.colno || 0);
-    window.__tealchartBootErrors.push(detail + ' @' + where);
-    document.title = 'tealscript:boot-error:' + detail.slice(0, 60);
-    try {
-      window.ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'runtime-error',
-        message: 'boot ' + detail + ' @' + where,
-      }));
-    } catch (ignored) {}
-  }, true);
-})();
-true;`;
-
-
 type BridgeToWebViewMessage =
   | { type: 'create-worker'; workerId: string }
   | { type: 'worker-message'; workerId: string; data: unknown }
@@ -73,7 +46,6 @@ type WebViewWorkerErrorListener = (event: ErrorEvent) => void;
 type NativeWebViewErrorEvent = Parameters<NonNullable<WebViewProps['onError']>>[0];
 type NativeWebViewHttpErrorEvent = Parameters<NonNullable<WebViewProps['onHttpError']>>[0];
 type NativeWebViewLoadEvent = Parameters<NonNullable<WebViewProps['onLoadEnd']>>[0];
-type NativeWebViewNavigationEvent = Parameters<NonNullable<WebViewProps['onNavigationStateChange']>>[0];
 
 interface TealscriptWebViewWorkerBridgeOptions {
   readyTimeoutMs?: number;
@@ -182,7 +154,7 @@ export class TealscriptWebViewWorkerBridge {
   setWebView = (webView: WebView | null): void => {
     this.webView = webView;
     if (webView && !this.ready) {
-      logTealscriptWebView(`WebView attached htmlBytes=${RUNTIME_HTML_BYTES}`);
+      logTealscriptWebView('WebView attached');
       this.startReadyTimeout();
     } else if (!webView) {
       logTealscriptWebView('WebView detached');
@@ -211,30 +183,19 @@ export class TealscriptWebViewWorkerBridge {
     }
 
     if (message.type === 'runtime-error') {
-      // The bootstrap probe reports through this same channel, so a healthy boot
-      // would otherwise raise a user-facing error toast saying nothing is wrong.
-      const isProbe = message.message.startsWith('probe ');
-      logTealscriptWebView(isProbe ? message.message : `runtime error ${message.message}`);
-      if (!isProbe) this.reportBridgeError(`Tealscript WebView runtime error: ${message.message}`);
+      logTealscriptWebView(`runtime error ${message.message}`);
+      this.reportBridgeError(`Tealscript WebView runtime error: ${message.message}`);
       return;
     }
 
     const worker = this.workers.get(message.workerId);
-    if (!worker) {
-      logTealscriptWebView(`unmatched ${message.type} worker=${message.workerId}`);
-      return;
-    }
+    if (!worker) return;
 
     if (message.type === 'worker-message') {
       worker.dispatchMessage(message.data);
     } else {
       worker.dispatchError(message);
     }
-  };
-
-  handleNavigationStateChange = (event: NativeWebViewNavigationEvent): void => {
-    const title = typeof event.title === 'string' && event.title.length > 0 ? event.title : '(no title)';
-    logTealscriptWebView(`WebView title ${title}`);
   };
 
   handleLoadEnd = (_event: NativeWebViewLoadEvent): void => {
@@ -324,91 +285,30 @@ export class TealscriptWebViewWorkerBridge {
   }
 }
 
-// ONE WebView for the whole app, not one per chart. Each instance parses the same
-// ~2MB runtime bundle, so a 3-pane layout used to pay that three times over. The
-// workers inside it stay one-per-script, because terminating a worker is the only
-// way to cancel a running Pine recalculation.
-//
-// Refcounted rather than torn down on the first unmount: with a split layout, one
-// chart closing must not take the runtime out from under its siblings.
-// Exactly one mounted chart renders the WebView. The others share its bridge and
-// render nothing, so a split layout mounts one runtime rather than one per pane.
-// Ownership transfers if the owning chart unmounts first, which it can — pane
-// order is the user's, not ours.
-let sharedBridge: TealscriptWebViewWorkerBridge | null = null;
-let hostOwnerId: number | null = null;
-let nextHostId = 0;
-const ownerListeners = new Set<() => void>();
-const mountedHostIds = new Set<number>();
-
-function acquireSharedBridge(): TealscriptWebViewWorkerBridge {
-  if (!sharedBridge) sharedBridge = new TealscriptWebViewWorkerBridge();
-  return sharedBridge;
-}
-
-function claimHost(id: number): void {
-  if (hostOwnerId === null) {
-    hostOwnerId = id;
-    for (const listener of ownerListeners) listener();
-  }
-}
-
-function releaseHost(id: number, survivors: readonly number[]): void {
-  if (hostOwnerId !== id) return;
-  hostOwnerId = survivors.length > 0 ? survivors[0] : null;
-  if (hostOwnerId === null && sharedBridge) {
-    sharedBridge.terminate();
-    sharedBridge = null;
-  }
-  for (const listener of ownerListeners) listener();
-}
-
 export function useTealscriptWebViewWorkerBridge(): {
   createWorker: () => Worker;
   hostElement: ReactElement;
 } {
-  const bridge = acquireSharedBridge();
-  const idRef = useRef<number | null>(null);
-  if (idRef.current === null) idRef.current = ++nextHostId;
-  const id = idRef.current;
-
-  const [isHost, setIsHost] = useState(() => hostOwnerId === null || hostOwnerId === id);
-
-  useEffect(() => {
-    const sync = () => setIsHost(hostOwnerId === id);
-    ownerListeners.add(sync);
-    mountedHostIds.add(id);
-    claimHost(id);
-    sync();
-
-    return () => {
-      ownerListeners.delete(sync);
-      mountedHostIds.delete(id);
-      releaseHost(id, [...mountedHostIds]);
-    };
-  }, [id]);
+  const bridgeRef = useRef<TealscriptWebViewWorkerBridge | null>(null);
+  if (!bridgeRef.current) bridgeRef.current = new TealscriptWebViewWorkerBridge();
+  const bridge = bridgeRef.current;
 
   const hostElement = useMemo(
-    () =>
-      !isHost ? (
-        <View pointerEvents="none" style={styles.host} />
-      ) : (
-        <View pointerEvents="none" style={styles.host}>
-          <NativeWebView
-              injectedJavaScriptBeforeContentLoaded={RUNTIME_PREFLIGHT_JS}
-            javaScriptEnabled
-            onError={bridge.handleWebViewError}
-            onHttpError={bridge.handleWebViewHttpError}
-            onLoadEnd={bridge.handleLoadEnd}
-            onMessage={bridge.handleMessage}
-            onNavigationStateChange={bridge.handleNavigationStateChange}
-            originWhitelist={['*']}
-            ref={bridge.setWebView}
-            source={{ baseUrl: RUNTIME_BASE_URL, html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
-          />
-        </View>
-      ),
-    [bridge, isHost],
+    () => (
+      <View pointerEvents="none" style={styles.host}>
+        <NativeWebView
+          javaScriptEnabled
+          onError={bridge.handleWebViewError}
+          onHttpError={bridge.handleWebViewHttpError}
+          onLoadEnd={bridge.handleLoadEnd}
+          onMessage={bridge.handleMessage}
+          originWhitelist={['*']}
+          ref={bridge.setWebView}
+          source={{ html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
+        />
+      </View>
+    ),
+    [bridge],
   );
 
   return { createWorker: bridge.createWorker, hostElement };
