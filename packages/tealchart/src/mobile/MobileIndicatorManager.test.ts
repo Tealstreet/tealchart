@@ -50,6 +50,10 @@ class FakeWorker {
   emit(data: unknown): void {
     this.onmessage?.({ data } as MessageEvent);
   }
+
+  emitError(message: string): void {
+    this.onerror?.({ message } as ErrorEvent);
+  }
 }
 
 function flushWorkerInit(): Promise<void> {
@@ -372,6 +376,33 @@ describe('MobileIndicatorManager custom Tealscript indicators', () => {
     }));
 
     expect(manager.getPlots()).toEqual([{ ...plot, scriptId: instanceId }]);
+  });
+
+  it('reports WebView worker errors without losing the manager context', async () => {
+    const worker = new FakeWorker();
+    const onError = vi.fn();
+    const manager = new MobileIndicatorManager({
+      createWorker: () => worker as unknown as Worker,
+    });
+    manager.onErrorSubscribe(onError);
+
+    const instanceId = manager.addTealscriptIndicator({
+      id: 'mobile-webview-error',
+      code: 'indicator("Mobile WebView Error")\nplot(close)',
+    });
+
+    worker.emit({ type: 'ready' });
+    await flushWorkerInit();
+
+    expect(() => worker.emitError('Tealscript WebView runtime error: synthetic failure')).not.toThrow();
+    expect(onError).toHaveBeenCalledWith(
+      instanceId,
+      expect.objectContaining({
+        type: 'runtime',
+        severity: 'error',
+        message: 'Tealscript WebView runtime error: synthetic failure',
+      }),
+    );
   });
 
   it('adapts mobile request datafeeds to worker requestData messages', async () => {

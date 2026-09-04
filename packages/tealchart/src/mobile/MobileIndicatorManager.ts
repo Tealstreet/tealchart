@@ -576,7 +576,7 @@ export class MobileIndicatorManager {
     };
   }
 
-  private _emitError(instanceId: string, error: WorkerError): void {
+  private _emitError = (instanceId: string, error: WorkerError): void => {
     const key = `${error.type}:${error.line ?? ''}:${error.column ?? ''}:${error.message}`;
     if (this._lastErrorKeys.get(instanceId) === key) {
       return;
@@ -584,7 +584,7 @@ export class MobileIndicatorManager {
 
     this._lastErrorKeys.set(instanceId, key);
     this._events.emit(MOBILE_INDICATOR_ERROR_EVENT, instanceId, error);
-  }
+  };
 
   private _clearError(instanceId: string): void {
     this._lastErrorKeys.delete(instanceId);
