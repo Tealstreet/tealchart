@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { WebViewMessageEvent, WebViewProps } from 'react-native-webview';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
@@ -236,8 +236,11 @@ export class TealscriptWebViewWorkerBridge {
     }
 
     if (message.type === 'runtime-error') {
-      logTealscriptWebView(`runtime error ${message.message}`);
-      this.reportBridgeError(`Tealscript WebView runtime error: ${message.message}`);
+      // The bootstrap probe reports through this same channel, so a healthy boot
+      // would otherwise raise a user-facing error toast saying nothing is wrong.
+      const isProbe = message.message.startsWith('probe ');
+      logTealscriptWebView(isProbe ? message.message : `runtime error ${message.message}`);
+      if (!isProbe) this.reportBridgeError(`Tealscript WebView runtime error: ${message.message}`);
       return;
     }
 
@@ -346,33 +349,92 @@ export class TealscriptWebViewWorkerBridge {
   }
 }
 
+// ONE WebView for the whole app, not one per chart. Each instance parses the same
+// ~2MB runtime bundle, so a 3-pane layout used to pay that three times over. The
+// workers inside it stay one-per-script, because terminating a worker is the only
+// way to cancel a running Pine recalculation.
+//
+// Refcounted rather than torn down on the first unmount: with a split layout, one
+// chart closing must not take the runtime out from under its siblings.
+// Exactly one mounted chart renders the WebView. The others share its bridge and
+// render nothing, so a split layout mounts one runtime rather than one per pane.
+// Ownership transfers if the owning chart unmounts first, which it can — pane
+// order is the user's, not ours.
+let sharedBridge: TealscriptWebViewWorkerBridge | null = null;
+let hostOwnerId: number | null = null;
+let nextHostId = 0;
+const ownerListeners = new Set<() => void>();
+const mountedHostIds = new Set<number>();
+
+function acquireSharedBridge(): TealscriptWebViewWorkerBridge {
+  if (!sharedBridge) sharedBridge = new TealscriptWebViewWorkerBridge();
+  return sharedBridge;
+}
+
+function claimHost(id: number): void {
+  if (hostOwnerId === null) {
+    hostOwnerId = id;
+    for (const listener of ownerListeners) listener();
+  }
+}
+
+function releaseHost(id: number, survivors: readonly number[]): void {
+  if (hostOwnerId !== id) return;
+  hostOwnerId = survivors.length > 0 ? survivors[0] : null;
+  if (hostOwnerId === null && sharedBridge) {
+    sharedBridge.terminate();
+    sharedBridge = null;
+  }
+  for (const listener of ownerListeners) listener();
+}
+
 export function useTealscriptWebViewWorkerBridge(): {
   createWorker: () => Worker;
   hostElement: ReactElement;
 } {
-  const bridgeRef = useRef<TealscriptWebViewWorkerBridge | null>(null);
-  if (!bridgeRef.current) bridgeRef.current = new TealscriptWebViewWorkerBridge();
-  const bridge = bridgeRef.current;
+  const bridge = acquireSharedBridge();
+  const idRef = useRef<number | null>(null);
+  if (idRef.current === null) idRef.current = ++nextHostId;
+  const id = idRef.current;
+
+  const [isHost, setIsHost] = useState(() => hostOwnerId === null || hostOwnerId === id);
+
+  useEffect(() => {
+    const sync = () => setIsHost(hostOwnerId === id);
+    ownerListeners.add(sync);
+    mountedHostIds.add(id);
+    claimHost(id);
+    sync();
+
+    return () => {
+      ownerListeners.delete(sync);
+      mountedHostIds.delete(id);
+      releaseHost(id, [...mountedHostIds]);
+    };
+  }, [id]);
 
   const hostElement = useMemo(
-    () => (
-      <View pointerEvents="none" style={styles.host}>
-        <NativeWebView
-          injectedJavaScript={RUNTIME_PROBE_JS}
-          injectedJavaScriptBeforeContentLoaded={RUNTIME_PREFLIGHT_JS}
-          javaScriptEnabled
-          onError={bridge.handleWebViewError}
-          onHttpError={bridge.handleWebViewHttpError}
-          onLoadEnd={bridge.handleLoadEnd}
-          onMessage={bridge.handleMessage}
-          onNavigationStateChange={bridge.handleNavigationStateChange}
-          originWhitelist={['*']}
-          ref={bridge.setWebView}
-          source={{ baseUrl: RUNTIME_BASE_URL, html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
-        />
-      </View>
-    ),
-    [bridge],
+    () =>
+      !isHost ? (
+        <View pointerEvents="none" style={styles.host} />
+      ) : (
+        <View pointerEvents="none" style={styles.host}>
+          <NativeWebView
+            injectedJavaScript={RUNTIME_PROBE_JS}
+            injectedJavaScriptBeforeContentLoaded={RUNTIME_PREFLIGHT_JS}
+            javaScriptEnabled
+            onError={bridge.handleWebViewError}
+            onHttpError={bridge.handleWebViewHttpError}
+            onLoadEnd={bridge.handleLoadEnd}
+            onMessage={bridge.handleMessage}
+            onNavigationStateChange={bridge.handleNavigationStateChange}
+            originWhitelist={['*']}
+            ref={bridge.setWebView}
+            source={{ baseUrl: RUNTIME_BASE_URL, html: TEALSCRIPT_WEBVIEW_RUNTIME_HTML }}
+          />
+        </View>
+      ),
+    [bridge, isHost],
   );
 
   return { createWorker: bridge.createWorker, hostElement };
