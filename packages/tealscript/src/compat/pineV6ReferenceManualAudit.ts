@@ -26,8 +26,8 @@ export const PINE_V6_REFERENCE_MANUAL_UNRESOLVED_BUILTIN_GROUPS = {
   },
   declarationsAndStrategyHelpers: {
     reason:
-      'Manual strategy conversion/default-quantity helpers are strategy-only convenience queries outside the deterministic position-ledger slice.',
-    names: ['strategy.convert_to_account', 'strategy.convert_to_symbol', 'strategy.default_entry_qty'],
+      'Manual strategy currency conversion helpers are strategy-only convenience queries outside the deterministic position-ledger slice.',
+    names: ['strategy.convert_to_account', 'strategy.convert_to_symbol'],
   },
   providerRecommendationSeries: {
     reason:

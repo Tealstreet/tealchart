@@ -34,7 +34,9 @@ export async function refetchExternalPineCorpus(options: RefetchOptions): Promis
     const sourceRepoUrl = requireField(row, 'sourceRepoUrl');
     const sourceFilePath = requireField(row, 'sourceFilePath');
     const commitSha = requireField(row, 'commitSha');
-    const source = await fetchRawGithubSource(sourceRepoUrl, sourceFilePath, commitSha);
+    const rawSource = await fetchRawGithubSource(sourceRepoUrl, sourceFilePath, commitSha);
+    const normalized = normalizeHarvestedPineSource(rawSource);
+    const source = normalized.source;
     const byteSize = Buffer.byteLength(source, 'utf8');
     if (byteSize !== row.byteSize) {
       throw new Error(`${row.localPath} byte-size mismatch: expected ${row.byteSize}, got ${byteSize}`);
@@ -43,7 +45,7 @@ export async function refetchExternalPineCorpus(options: RefetchOptions): Promis
     const localPath = row.localPath;
     await mkdir(dirname(join(outputDir, localPath)), { recursive: true });
     await writeFile(join(outputDir, localPath), source, 'utf8');
-    scripts.push({ localPath, sourceRepoUrl, sourceFilePath, commitSha });
+    scripts.push({ localPath, sourceRepoUrl, sourceFilePath, commitSha, sourceTransform: normalized.transform });
     bytesMatched += 1;
   }
 
@@ -63,6 +65,41 @@ export async function refetchExternalPineCorpus(options: RefetchOptions): Promis
     bytesMatched,
     manifestPath,
   };
+}
+
+export function normalizeHarvestedPineSource(source: string): {
+  source: string;
+  transform?: NonNullable<ExternalCorpusManifest['scripts'][number]['sourceTransform']>;
+} {
+  const rawByteSize = Buffer.byteLength(source, 'utf8');
+  const lines = source.split(/\r?\n/);
+  const markerLine = lines.findIndex((line) => line.trim() === 'PineScript code:');
+  const startLine = lines.findIndex((line, index) => (
+    index > markerLine
+    && /^\s*(?:\/\/\s*@version\s*=|(?:indicator|strategy|study|library)\s*\()/u.test(normalizeCopiedCodeSpaces(line))
+  ));
+  if (markerLine === -1 || startLine === -1) return { source };
+
+  const bodyLines = lines.slice(startLine).map(normalizeCopiedCodeSpaces);
+  const expandMarkerIndex = bodyLines.findIndex((line) => /^Expand \(\d+ lines\)\s*$/u.test(line.trim()));
+  const sourceLines = expandMarkerIndex === -1 ? bodyLines : bodyLines.slice(0, expandMarkerIndex);
+  const transformed = `${sourceLines.join('\n').trimEnd()}\n`;
+  const transformedByteSize = Buffer.byteLength(transformed, 'utf8');
+  return {
+    source: transformed,
+    transform: {
+      kind: 'tradingview-copy-code-body',
+      startLine: startLine + 1,
+      removedTrailingExpandMarker: expandMarkerIndex !== -1,
+      normalizedCopiedCodeSpaces: transformed !== lines.slice(startLine, expandMarkerIndex === -1 ? undefined : startLine + expandMarkerIndex).join('\n').trimEnd() + '\n',
+      rawByteSize,
+      transformedByteSize,
+    },
+  };
+}
+
+function normalizeCopiedCodeSpaces(line: string): string {
+  return line.replace(/[\u00a0\u2007\u202f\u2009\u200a\u200b\u2060]/gu, ' ');
 }
 
 function requireField(row: ExternalCorpusReportRow, field: 'sourceRepoUrl' | 'sourceFilePath' | 'commitSha'): string {

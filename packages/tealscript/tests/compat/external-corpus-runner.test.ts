@@ -1,4 +1,4 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -10,9 +10,42 @@ import {
   runExternalPineCorpus,
   visiblePlotsForCorpus,
 } from '../../scripts/run-external-pine-corpus.ts';
+import { normalizeHarvestedPineSource } from '../../scripts/refetch-external-pine-corpus.ts';
 import type { ExecutionResult } from '../../src';
 
 describe('external Pine corpus runner', () => {
+  it('extracts Pine from TradingView copy-code dumps without changing normal source', () => {
+    const raw = [
+      'Script Name: Example Strategy',
+      'Author: Example',
+      'PineScript code:',
+      '',
+      'Pine Script strategy',
+      'Example Strategy',
+      'Copy code',
+      '1',
+      '2',
+      '//@version=5',
+      'strategy("Example", overlay=true)',
+      'value\u00a0=\u00a0close',
+      'plot(value)',
+      'Expand (12 lines)',
+    ].join('\n');
+
+    const extracted = normalizeHarvestedPineSource(raw);
+
+    expect(extracted.source).toBe('//@version=5\nstrategy("Example", overlay=true)\nvalue = close\nplot(value)\n');
+    expect(extracted.transform).toEqual(expect.objectContaining({
+      kind: 'tradingview-copy-code-body',
+      startLine: 10,
+      removedTrailingExpandMarker: true,
+      normalizedCopiedCodeSpaces: true,
+    }));
+
+    const normal = '//@version=6\nindicator("Normal")\nplot(close)\n';
+    expect(normalizeHarvestedPineSource(normal)).toEqual({ source: normal });
+  });
+
   it('counts only visible plot outputs while preserving sparse global plots', () => {
     const result = {
       plots: [
@@ -114,8 +147,96 @@ describe('external Pine corpus runner', () => {
       expect(report.rows.find((row) => row.localPath === 'parse.pine')?.firstFailedStage).toBe('parse');
       expect(report.rows.find((row) => row.localPath === 'parse.pine')?.validity.bucket).toBe('tealscript-gap');
       expect(report.rows.find((row) => row.localPath === 'invalid.pine')?.validity.bucket).toBe('invalid-pine');
-      expect(report.rows.find((row) => row.localPath === 'no-output.pine')?.outputSilence?.bucket).toBe('correct-silence');
+      const noOutputRow = report.rows.find((row) => row.localPath === 'no-output.pine');
+      expect(noOutputRow?.outputSilence?.bucket).toBe('correct-silence');
+      expect(noOutputRow?.outputSilence?.cause).toBe('source-declares-no-chart-output');
+      expect(noOutputRow?.stages.output.diagnostic).toContain('output-silence:source-declares-no-chart-output');
       expect(JSON.stringify(report)).not.toContain('not_a_builtin)');
+    } finally {
+      await rm(dir, { force: true, recursive: true });
+    }
+  });
+
+  it('classifies Pine-compatible execute refusals separately from engine gaps', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'tealscript-external-corpus-execute-classifier-'));
+    try {
+      await mkdir(join(dir, 'sources'));
+      await writeFile(
+        join(dir, 'manifest.json'),
+        JSON.stringify({
+          scripts: [
+            {
+              localPath: 'sources/request-limit.pine',
+              sourceRepoUrl: 'https://github.com/example/request',
+              sourceFilePath: 'request-limit.pine',
+              commitSha: 'a'.repeat(40),
+            },
+            {
+              localPath: 'sources/timeframe-guard.pine',
+              sourceRepoUrl: 'https://github.com/example/guard',
+              sourceFilePath: 'timeframe-guard.pine',
+              commitSha: 'b'.repeat(40),
+            },
+            {
+              localPath: 'sources/0023-Erald12-PinescriptIndicator-order_block.txt',
+              sourceRepoUrl: 'https://github.com/example/array',
+              sourceFilePath: 'order block.txt',
+              commitSha: 'c'.repeat(40),
+            },
+            {
+              localPath: 'sources/unguarded-array.pine',
+              sourceRepoUrl: 'https://github.com/example/gap',
+              sourceFilePath: 'unguarded-array.pine',
+              commitSha: 'd'.repeat(40),
+            },
+          ],
+        }),
+        'utf8',
+      );
+      await writeFile(
+        join(dir, 'sources/request-limit.pine'),
+        `//@version=6
+indicator("Request Limit")
+value = 0.0
+for i = 1 to 41
+    value += request.security("SYM", str.tostring(i), close)
+plot(value)
+`,
+        'utf8',
+      );
+      await writeFile(
+        join(dir, 'sources/timeframe-guard.pine'),
+        `//@version=6
+indicator("Guard")
+runtime.error("Structure & Levels: chart timeframe is above the Long-Term S/R Timeframe (15). Raise that Timeframe or disable Long-Term S/R.")
+plot(close)
+`,
+        'utf8',
+      );
+      const emptyArrayScript = `//@version=6
+indicator("Empty Array")
+var values = array.new<float>(0)
+if barstate.islast
+    plot(values.get(0))
+`;
+      await writeFile(join(dir, 'sources/0023-Erald12-PinescriptIndicator-order_block.txt'), emptyArrayScript, 'utf8');
+      await writeFile(join(dir, 'sources/unguarded-array.pine'), emptyArrayScript, 'utf8');
+
+      const report = await runExternalPineCorpus({ inputDir: dir });
+
+      expect(report.summary.validity).toEqual({
+        supported: 3,
+        'tealscript-gap': 1,
+      });
+      expect(report.summary.failureCauses.map(({ stage, cause, count }) => ({ stage, cause, count }))).toEqual([
+        { stage: 'execute', cause: 'array-bounds-runtime-error', count: 2 },
+        { stage: 'execute', cause: 'request-context-limit', count: 1 },
+        { stage: 'execute', cause: 'script-timeframe-runtime-guard', count: 1 },
+      ]);
+      expect(report.rows.find((row) => row.localPath === 'sources/request-limit.pine')?.validity.reason).toContain('40 unique request.* contexts');
+      expect(report.rows.find((row) => row.localPath === 'sources/timeframe-guard.pine')?.validity.reason).toContain('intentionally calls runtime.error()');
+      expect(report.rows.find((row) => row.localPath.includes('0023-Erald12'))?.validity.bucket).toBe('supported');
+      expect(report.rows.find((row) => row.localPath === 'sources/unguarded-array.pine')?.validity.bucket).toBe('tealscript-gap');
     } finally {
       await rm(dir, { force: true, recursive: true });
     }

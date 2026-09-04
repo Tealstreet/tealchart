@@ -109,6 +109,80 @@ describe('executeCompiled — full integration parity', () => {
   const closes = [10, 11, 12, 11.5, 13, 12, 14, 15, 13, 12, 11, 14, 16, 15, 13, 12, 14, 15, 16, 17];
   const bars = makeBars(closes);
 
+  it('escapes Pine identifiers that collide with JavaScript reserved words', () => {
+    const ast = parse(`//@version=6
+indicator("reserved identifiers", overlay=false)
+var float delete = 1
+class = 2
+mix(delete, class) =>
+    var float typeof = 0
+    typeof := delete + class
+    typeof
+plot(delete + class + mix(3, 4))
+`);
+
+    const result = executeScript(ast, bars);
+
+    expect(result.plots[0]?.values.at(-1)).toBe(10);
+  });
+
+  it('keeps same-named regular UDF locals separate from persistent locals', () => {
+    const ast = parse(`//@version=6
+indicator("local persistent collision", overlay=false)
+calc(src, period) =>
+    var float scale = na
+    if na(scale)
+        sum = 0.0
+        count = 0
+        for i = 1 to period
+            sum += math.abs(src - src[1])
+            count += 1
+        scale := count > 0 ? sum / count : 1.0
+    var float sum = 0.0
+    sum := sum + scale
+    sum
+plot(calc(close, 2))
+`);
+
+    const result = executeScript(ast, bars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots).toHaveLength(1);
+  });
+
+  it('selects user function overloads by argument shape at runtime', () => {
+    const ast = parse(`//@version=6
+indicator("udf overload runtime", overlay=false)
+hl() => [high, low]
+hl(int bar) => [high[bar], low[bar]]
+[nowHigh, nowLow] = hl()
+[prevHigh, prevLow] = hl(1)
+plot(nowHigh + nowLow + nz(prevHigh) + nz(prevLow))
+`);
+
+    const result = executeScript(ast, bars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.plots[0]?.values.at(-1)).toBe(66);
+  });
+
+  it('maps receiver collection method aliases reached through UDT fields', () => {
+    const ast = parse(`//@version=6
+indicator("collection receiver aliases", overlay=false)
+type Store
+    array<int> values
+var Store store = Store.new(array.from(1, 2, 3))
+plot(store.values.indexof(2) + store.values.lastindexof(2))
+`);
+
+    const result = executeScript(ast, bars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots[0]?.values.at(-1)).toBe(2);
+  });
+
   it('matches v6 warmup/na first-valid bars across compiled TA state machines', () => {
     const warmupBars: Bar[] = Array.from({ length: 40 }, (_, index) => {
       const close = 20 + index * 0.8 + Math.sin(index / 2) * 2;
@@ -1261,6 +1335,33 @@ plot(typedSource, "Typed Source")`;
     expect(interpResult.errors).toEqual([]);
     expect(compiledResult?.inputs).toEqual(interpResult.inputs);
     expect(compiledResult?.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps untyped generic input UI metadata out of numeric range metadata', () => {
+    const pine = `//@version=6
+indicator("generic input metadata")
+origin = input(0, "Start index", "first chart bar has index 0")
+lambda = input(1., "Power transform", "no transform if 1", inline="1", group="Data")
+steps = input(16, "Interval", inline="1", group="Data")
+plot(origin + lambda + steps)`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const compiledResult = executeCompiled(compiled, bars);
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(compiledResult?.inputs.map((input) => ({
+      title: input.title,
+      minval: input.minval,
+      maxval: input.maxval,
+      step: input.step,
+    }))).toEqual([
+      { title: 'Start index', minval: undefined, maxval: undefined, step: undefined },
+      { title: 'Power transform', minval: undefined, maxval: undefined, step: undefined },
+      { title: 'Interval', minval: undefined, maxval: undefined, step: undefined },
+    ]);
+    expect(compiledResult?.plots[0]?.values.at(-1)).toBe(17);
   });
 
   it('keeps duplicate-titled legacy inputs isolated by call site', () => {
@@ -4050,6 +4151,30 @@ plot(strategy.closedtrades.first_index, title="First Closed")`;
     expect(compiledResult.strategy.fills.length).toBe(interpResult.strategy.fills.length);
   });
 
+  it('compiles strategy.default_entry_qty from default sizing settings', () => {
+    const singleBar = [{ time: 1, open: 100, high: 100, low: 100, close: 100, volume: 100 }];
+    const run = (pine: string, title: string): (number | null)[] => {
+      const ast = parse(pine);
+      const compiled = tryCompile(ast);
+      if (!compiled.success) throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+      const result = executeCompiled(compiled, singleBar);
+
+      expect(result?.errors).toEqual([]);
+      return findPlot(result!, title).values;
+    };
+
+    expect(run(`//@version=6
+strategy("Default entry quantity", initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=25)
+fixedQty = strategy.default_entry_qty(50)
+plot(fixedQty, "Percent")`, 'Percent')).toEqual([50]);
+    expect(run(`//@version=6
+strategy("Default cash quantity", default_qty_type=strategy.cash, default_qty_value=2000)
+plot(strategy.default_entry_qty(fill_price=200), "Cash")`, 'Cash')).toEqual([10]);
+    expect(run(`//@version=6
+strategy("Default fixed quantity", default_qty_type=strategy.fixed, default_qty_value=7)
+plot(strategy.default_entry_qty(close), "Fixed")`, 'Fixed')).toEqual([7]);
+  });
+
   it('preserves strategy.entry OCA groups for compiled sibling cancellation', () => {
     const pine = `//@version=6
 strategy("Compiled entry OCA", process_orders_on_close=false)
@@ -5477,6 +5602,64 @@ plot(wt.smooth(close), "Smooth")`;
     expect(compiledResult?.profile.executionMode).toBe('compiled');
     expect(compiledResult?.errors).toEqual([]);
     expect(compiledResult?.plots[0]?.values).toEqual(interpResult.plots[0]?.values);
+  });
+
+  it('executes official TradingView ta library builtins without host-supplied source', () => {
+    const pine = `//@version=6
+indicator("official ta")
+import TradingView/ta/7
+plot(ta.changePercent(close, open), "Change")
+plot(ta.dema(close, 2), "Official DEMA")
+plot(ta.rsi(close, 14), "Native RSI")`;
+    const result = executeScript(parse(pine), makeBars([100, 105, 110]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots[0]?.title).toBe('Change');
+    expect(result.plots[0]?.values.map((value) => value === null ? null : Number(value.toFixed(8)))).toEqual([
+      0.50251256,
+      0.4784689,
+      0.456621,
+    ]);
+    expect(result.plots[1]?.title).toBe('Official DEMA');
+    expect(result.plots[1]?.values.every((value) => value !== null && Number.isFinite(value))).toBe(true);
+    expect(result.plots[2]?.title).toBe('Native RSI');
+  });
+
+  it('executes aliased official TradingView ta supertrend through the native TA state machine', () => {
+    const pine = `//@version=6
+indicator("official ta aliased supertrend")
+import TradingView/ta/9 as tvta
+[trend, direction] = tvta.supertrend(2.5, 3)
+plot(trend, "Trend")
+plot(direction, "Direction")`;
+    const result = executeScript(parse(pine), makeBars([100, 105, 110, 103, 99, 101]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Trend', 'Direction']);
+    expect(result.plots[0]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
+    expect(result.plots[1]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
+  });
+
+  it('executes official TradingView ZigZag v8 imports without host-supplied source', () => {
+    const pine = `//@version=6
+indicator("official zigzag")
+import TradingView/ZigZag/8 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zlib.update(zigZag)
+array<zlib.Pivot> pivots = zigZag.pivots
+last = zlib.lastPivot(zigZag)
+plot(array.size(pivots), "Pivot Count")
+plot(na(last) ? 1 : last.end.index - last.start.index, "Last Span")`;
+    const result = executeScript(parse(pine), makeBars([100, 105, 110]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Pivot Count', 'Last Span']);
+    expect(result.plots[0]?.values).toEqual([0, 0, 0]);
+    expect(result.plots[1]?.values).toEqual([1, 1, 1]);
   });
 
   it('returns na for missing currency rates with reference parity', () => {

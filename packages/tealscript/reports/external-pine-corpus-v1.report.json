@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 12,
-  "generatedAt": "2026-09-03T07:14:44.277Z",
+  "schemaVersion": 14,
+  "generatedAt": "2026-09-04T11:15:18.103Z",
   "inputDir": "/tmp/pine-corpus-v1",
   "bars": {
     "count": 160,
@@ -24,8 +24,8 @@
     },
     "funnel": {
       "parse": {
-        "count": 219,
-        "percent": 99.55
+        "count": 218,
+        "percent": 99.09
       },
       "semantic": {
         "count": 190,
@@ -45,37 +45,39 @@
       }
     },
     "achievableCeiling": {
-      "denominator": 199,
-      "excludedInvalidPine": 21,
+      "denominator": 194,
+      "excludedInvalidPine": 24,
       "excludedCorpusHygiene": 0,
+      "excludedCorpusInputGap": 0,
+      "excludedUnsupportedByDesign": 2,
       "funnel": {
         "parse": {
-          "count": 199,
-          "percent": 100
+          "count": 193,
+          "percent": 99.48
         },
         "semantic": {
           "count": 190,
-          "percent": 95.48
+          "percent": 97.94
         },
         "compile": {
           "count": 190,
-          "percent": 95.48
+          "percent": 97.94
         },
         "execute": {
           "count": 188,
-          "percent": 94.47
+          "percent": 96.91
         },
         "output": {
           "count": 178,
-          "percent": 89.45
+          "percent": 91.75
         }
       }
     },
     "validity": {
-      "host-dependency-gap": 2,
-      "invalid-pine": 21,
-      "supported": 182,
-      "tealscript-gap": 15
+      "invalid-pine": 24,
+      "supported": 184,
+      "tealscript-gap": 10,
+      "unsupported-by-design": 2
     },
     "outputSilence": {
       "correct-silence": 4,
@@ -97,14 +99,29 @@
       "differenceKinds": {}
     },
     "compiledBarErrors": {
-      "scripts": 0,
-      "totalErrors": 0,
-      "firstCauses": []
+      "scripts": 1,
+      "totalErrors": 160,
+      "firstCauses": [
+        {
+          "message": "deps._mtx[name] is not a function",
+          "count": 1,
+          "representativeScript": "sources/0044__eonfutures__Pinescript-Indicators.txt",
+          "firstBarIndex": 0
+        }
+      ]
     },
     "swallowedErrors": {
-      "scripts": 0,
-      "totalErrors": 0,
-      "firstCauses": []
+      "scripts": 1,
+      "totalErrors": 160,
+      "firstCauses": [
+        {
+          "site": "compiled-bar",
+          "message": "deps._mtx[name] is not a function",
+          "count": 1,
+          "representativeScript": "sources/0044__eonfutures__Pinescript-Indicators.txt",
+          "firstBarIndex": 0
+        }
+      ]
     },
     "executionModes": {
       "compiled": 190,
@@ -130,9 +147,9 @@
       },
       {
         "stage": "output",
-        "cause": "No plots, drawings, alerts, or logs were produced",
-        "count": 10,
-        "representativeDiagnostic": "No plots, drawings, alerts, or logs were produced"
+        "cause": "conditional-or-data-gated-output-not-triggered",
+        "count": 6,
+        "representativeDiagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
       },
       {
         "stage": "semantic",
@@ -142,9 +159,21 @@
       },
       {
         "stage": "execute",
-        "cause": "runtime.error",
+        "cause": "request-context-limit",
         "count": 2,
         "representativeDiagnostic": "runtime.error: Too many unique request.* contexts: maximum is 40"
+      },
+      {
+        "stage": "output",
+        "cause": "strategy-only-ledger-output",
+        "count": 2,
+        "representativeDiagnostic": "output-silence:strategy-only-ledger-output: The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity."
+      },
+      {
+        "stage": "parse",
+        "cause": "unexpected-token",
+        "count": 2,
+        "representativeDiagnostic": "307:28: Expected \"/*\", \"=\", or [ \\t] but \"\\r\" found."
       },
       {
         "stage": "semantic",
@@ -159,22 +188,22 @@
         "representativeDiagnostic": "168:9: method-receiver-type: No method delete() overload accepts box receiver"
       },
       {
-        "stage": "parse",
-        "cause": "unexpected-token",
+        "stage": "output",
+        "cause": "source-declares-no-chart-output",
         "count": 1,
-        "representativeDiagnostic": "451:200: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        "representativeDiagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      },
+      {
+        "stage": "output",
+        "cause": "synthetic-window-did-not-trigger-output",
+        "count": 1,
+        "representativeDiagnostic": "output-silence:synthetic-window-did-not-trigger-output: The default 160-bar synthetic window did not trigger visible output, but the extended probe produced 0 plots, 2 drawings, 0 alerts, 0 logs."
       },
       {
         "stage": "semantic",
         "cause": "unknown-argument",
         "count": 1,
         "representativeDiagnostic": "2:108: unknown-argument: Unknown argument 'linktoseries' for indicator()"
-      },
-      {
-        "stage": "semantic",
-        "cause": "unknown-identifier",
-        "count": 1,
-        "representativeDiagnostic": "91:45: unknown-identifier: Unknown identifier: TFhrdata"
       }
     ]
   },
@@ -1240,14 +1269,14 @@
       "declaredVersion": 5,
       "declarationKind": "indicator",
       "byteSize": 37025,
-      "firstFailedStage": null,
-      "outcome": "produced-output-compiled",
-      "executionMode": "compiled",
+      "firstFailedStage": "parse",
+      "outcome": "failed",
+      "executionMode": "not-run",
       "fallbackReasons": [],
       "output": {
-        "produced": true,
-        "plots": 4,
-        "drawings": 36,
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
         "alerts": 0,
         "logs": 0
       },
@@ -1261,24 +1290,25 @@
       },
       "stages": {
         "parse": {
-          "status": "passed"
+          "status": "failed",
+          "diagnostic": "307:28: Expected \"/*\", \"=\", or [ \\t] but \"\\r\" found."
         },
         "semantic": {
-          "status": "passed"
+          "status": "not-run"
         },
         "compile": {
-          "status": "passed"
+          "status": "not-run"
         },
         "execute": {
-          "status": "passed"
+          "status": "not-run"
         },
         "output": {
-          "status": "passed"
+          "status": "not-run"
         }
       },
       "validity": {
-        "bucket": "supported",
-        "reason": "Pipeline reached visible output."
+        "bucket": "tealscript-gap",
+        "reason": "Parse failure is not proven invalid Pine or corpus hygiene, so it remains counted as a TealScript parser gap."
       }
     },
     {
@@ -1913,6 +1943,7 @@
       },
       "outputSilence": {
         "bucket": "undecided",
+        "cause": "conditional-or-data-gated-output-not-triggered",
         "reason": "All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.",
         "sourceCalls": [
           {
@@ -1931,6 +1962,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -1943,6 +1976,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -1951,6 +1986,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -1978,7 +2015,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
         }
       },
       "validity": {
@@ -2395,14 +2432,27 @@
       "declaredVersion": 5,
       "declarationKind": "indicator",
       "byteSize": 35465,
-      "firstFailedStage": "semantic",
-      "outcome": "failed",
-      "executionMode": "not-run",
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
       "fallbackReasons": [],
+      "compiledBarErrors": {
+        "count": 160,
+        "firstBarIndex": 0,
+        "firstMessage": "deps._mtx[name] is not a function"
+      },
+      "swallowedErrors": [
+        {
+          "site": "compiled-bar",
+          "count": 160,
+          "firstBarIndex": 0,
+          "firstMessage": "deps._mtx[name] is not a function"
+        }
+      ],
       "output": {
-        "produced": false,
+        "produced": true,
         "plots": 0,
-        "drawings": 0,
+        "drawings": 157,
         "alerts": 0,
         "logs": 0
       },
@@ -2419,22 +2469,21 @@
           "status": "passed"
         },
         "semantic": {
-          "status": "failed",
-          "diagnostic": "91:45: unknown-identifier: Unknown identifier: TFhrdata"
+          "status": "passed"
         },
         "compile": {
-          "status": "not-run"
+          "status": "passed"
         },
         "execute": {
-          "status": "not-run"
+          "status": "passed"
         },
         "output": {
-          "status": "not-run"
+          "status": "passed"
         }
       },
       "validity": {
-        "bucket": "tealscript-gap",
-        "reason": "Semantic failure is not proven invalid Pine: unknown-identifier."
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
       }
     },
     {
@@ -3434,8 +3483,8 @@
         }
       },
       "validity": {
-        "bucket": "host-dependency-gap",
-        "reason": "The source imports a TradingView library that was not available to the corpus host; valid Pine cannot run until the product supplies or accepts that library source."
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import fstarcapital/AssetCorrelationUtils/12 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
       }
     },
     {
@@ -3485,8 +3534,8 @@
         }
       },
       "validity": {
-        "bucket": "tealscript-gap",
-        "reason": "Typed int variable receives a float expression; not proven invalid Pine, so this remains counted as a TealScript compatibility gap."
+        "bucket": "invalid-pine",
+        "reason": "Pine does not implicitly cast float expressions to int variables; scripts must use int() or another explicit integer expression."
       }
     },
     {
@@ -6351,8 +6400,8 @@
         }
       },
       "validity": {
-        "bucket": "tealscript-gap",
-        "reason": "Pipeline failed at execute."
+        "bucket": "supported",
+        "reason": "TradingView allows 40 unique request.* contexts by default and 64 on Ultimate plans; the corpus host uses the default 40-context limit."
       }
     },
     {
@@ -8004,8 +8053,8 @@
         }
       },
       "validity": {
-        "bucket": "tealscript-gap",
-        "reason": "Pipeline failed at execute."
+        "bucket": "supported",
+        "reason": "TradingView allows 40 unique request.* contexts by default and 64 on Ultimate plans; the corpus host uses the default 40-context limit."
       }
     },
     {
@@ -8155,8 +8204,8 @@
         }
       },
       "validity": {
-        "bucket": "tealscript-gap",
-        "reason": "Typed int variable receives a float expression; not proven invalid Pine, so this remains counted as a TealScript compatibility gap."
+        "bucket": "invalid-pine",
+        "reason": "Pine does not implicitly cast float expressions to int variables; scripts must use int() or another explicit integer expression."
       }
     },
     {
@@ -8692,6 +8741,7 @@
       },
       "outputSilence": {
         "bucket": "correct-silence",
+        "cause": "strategy-only-ledger-output",
         "reason": "The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity.",
         "sourceCalls": [
           {
@@ -8722,6 +8772,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -8734,6 +8786,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -8742,6 +8796,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -8769,7 +8825,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:strategy-only-ledger-output: The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity."
         }
       },
       "validity": {
@@ -9007,6 +9063,7 @@
       },
       "outputSilence": {
         "bucket": "undecided",
+        "cause": "conditional-or-data-gated-output-not-triggered",
         "reason": "All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.",
         "sourceCalls": [
           {
@@ -9049,6 +9106,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -9061,6 +9120,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9069,6 +9130,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9096,7 +9159,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
         }
       },
       "validity": {
@@ -9184,6 +9247,7 @@
       },
       "outputSilence": {
         "bucket": "correct-silence",
+        "cause": "strategy-only-ledger-output",
         "reason": "The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity.",
         "sourceCalls": [
           {
@@ -9238,6 +9302,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -9250,6 +9316,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9258,6 +9326,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9285,7 +9355,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:strategy-only-ledger-output: The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity."
         }
       },
       "validity": {
@@ -9440,8 +9510,8 @@
         }
       },
       "validity": {
-        "bucket": "host-dependency-gap",
-        "reason": "The source imports a TradingView library that was not available to the corpus host; valid Pine cannot run until the product supplies or accepts that library source."
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import chhagansinghmeena/BankNifty_CSM/16 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
       }
     },
     {
@@ -9624,6 +9694,7 @@
       },
       "outputSilence": {
         "bucket": "undecided",
+        "cause": "conditional-or-data-gated-output-not-triggered",
         "reason": "All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.",
         "sourceCalls": [
           {
@@ -9654,6 +9725,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -9666,6 +9739,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9674,6 +9749,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9701,7 +9778,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
         }
       },
       "validity": {
@@ -9789,11 +9866,14 @@
       },
       "outputSilence": {
         "bucket": "correct-silence",
+        "cause": "source-declares-no-chart-output",
         "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected.",
         "sourceCalls": [],
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -9806,6 +9886,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9814,6 +9896,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -9841,7 +9925,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
         }
       },
       "validity": {
@@ -9946,8 +10030,8 @@
         }
       },
       "validity": {
-        "bucket": "tealscript-gap",
-        "reason": "Typed int variable receives a float expression; not proven invalid Pine, so this remains counted as a TealScript compatibility gap."
+        "bucket": "invalid-pine",
+        "reason": "Pine does not implicitly cast float expressions to int variables; scripts must use int() or another explicit integer expression."
       }
     },
     {
@@ -10280,6 +10364,7 @@
       },
       "outputSilence": {
         "bucket": "undecided",
+        "cause": "conditional-or-data-gated-output-not-triggered",
         "reason": "All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.",
         "sourceCalls": [
           {
@@ -10298,6 +10383,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -10310,6 +10397,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -10318,6 +10407,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -10345,7 +10436,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
         }
       },
       "validity": {
@@ -10433,6 +10524,7 @@
       },
       "outputSilence": {
         "bucket": "undecided",
+        "cause": "conditional-or-data-gated-output-not-triggered",
         "reason": "All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.",
         "sourceCalls": [
           {
@@ -10463,6 +10555,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -10475,6 +10569,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -10483,6 +10579,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -10510,7 +10608,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
         }
       },
       "validity": {
@@ -11548,6 +11646,7 @@
       },
       "outputSilence": {
         "bucket": "correct-silence",
+        "cause": "synthetic-window-did-not-trigger-output",
         "reason": "The default 160-bar synthetic window did not trigger visible output, but the extended probe produced 0 plots, 2 drawings, 0 alerts, 0 logs.",
         "sourceCalls": [
           {
@@ -11560,6 +11659,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -11572,6 +11673,8 @@
           "compiledOutput": {
             "produced": true,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 2,
             "alerts": 0,
             "logs": 0,
@@ -11580,6 +11683,8 @@
           "probeOutput": {
             "produced": true,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 2,
             "alerts": 0,
             "logs": 0,
@@ -11607,7 +11712,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:synthetic-window-did-not-trigger-output: The default 160-bar synthetic window did not trigger visible output, but the extended probe produced 0 plots, 2 drawings, 0 alerts, 0 logs."
         }
       },
       "validity": {
@@ -11645,6 +11750,7 @@
       },
       "outputSilence": {
         "bucket": "undecided",
+        "cause": "conditional-or-data-gated-output-not-triggered",
         "reason": "All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.",
         "sourceCalls": [
           {
@@ -11663,6 +11769,8 @@
         "sameBarsProbeOutput": {
           "produced": false,
           "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
           "drawings": 0,
           "alerts": 0,
           "logs": 0,
@@ -11675,6 +11783,8 @@
           "compiledOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -11683,6 +11793,8 @@
           "probeOutput": {
             "produced": false,
             "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
             "drawings": 0,
             "alerts": 0,
             "logs": 0,
@@ -11710,7 +11822,7 @@
         },
         "output": {
           "status": "failed",
-          "diagnostic": "No plots, drawings, alerts, or logs were produced"
+          "diagnostic": "output-silence:conditional-or-data-gated-output-not-triggered: All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap."
         }
       },
       "validity": {

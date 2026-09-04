@@ -894,6 +894,21 @@ function getRuntimeTimeframeDurationMs(timeframe: string, currentPeriod: string)
   }
 }
 
+function isRuntimeLowerTimeframe(requestTimeframe: string, chartTimeframe: string): boolean {
+  const requestSpec = parseRuntimeTimeframeSpec(requestTimeframe, chartTimeframe);
+  const chartSpec = parseRuntimeTimeframeSpec(chartTimeframe, chartTimeframe);
+  if (!requestSpec || !chartSpec) return false;
+  if (requestSpec.unit === 'tick' && chartSpec.unit === 'tick') {
+    return requestSpec.multiplier < chartSpec.multiplier;
+  }
+  if (requestSpec.unit === 'tick') return chartSpec.unit !== 'tick';
+  if (chartSpec.unit === 'tick') return false;
+
+  const requestDuration = getRuntimeTimeframeDurationMs(requestTimeframe, chartTimeframe);
+  const chartDuration = getRuntimeTimeframeDurationMs(chartTimeframe, chartTimeframe);
+  return requestDuration !== null && chartDuration !== null && requestDuration < chartDuration;
+}
+
 function runtimeTimeframeInfo(period: string, currentPeriod: string): ExecutionContext['timeframe'] | null {
   const spec = parseRuntimeTimeframeSpec(period, currentPeriod);
   if (!spec) return null;
@@ -2545,10 +2560,21 @@ function createCompiledBuiltinRegistry(): BuiltinRegistry {
   registerDrawingConstants(builtins);
   registerCompiledTimeframeBuiltins(builtins);
   registerCompiledFootprintBuiltins(builtins);
+  registerOfficialTradingViewBuiltins(builtins);
   registerCompiledLegacyBuiltins(builtins);
   builtins.set('syminfo.prefix', (args, named, ctx) => runtimeSyminfoPrefix(args, named, ctx));
   builtins.set('syminfo.ticker', (args, named, ctx) => runtimeSyminfoTicker(args, named, ctx));
   return builtins;
+}
+
+function registerOfficialTradingViewBuiltins(builtins: BuiltinRegistry): void {
+  builtins.set('TradingView.ta.changePercent', (args, named) => {
+    const namedArgs = Object.fromEntries(named);
+    const newValue = toRuntimeNumber(orderedRuntimeArg(args, namedArgs, ['newValue', 'oldValue'], 0));
+    const oldValue = toRuntimeNumber(orderedRuntimeArg(args, namedArgs, ['newValue', 'oldValue'], 1));
+    if (!Number.isFinite(newValue) || !Number.isFinite(oldValue) || oldValue === 0) return Number.NaN;
+    return ((newValue - oldValue) / oldValue) * 100;
+  });
 }
 
 function registerCompiledFootprintBuiltins(builtins: BuiltinRegistry): void {
@@ -3145,6 +3171,7 @@ function evaluateSecuritySeries(
       },
       strategyEntry() {}, strategyExit() {}, strategyClose() {}, strategyCloseAll() {},
       strategyCancel() {}, strategyCancelAll() {}, strategyOrder() {},
+      strategyDefaultEntryQty() { return 0; },
       strategyProp() { return 0; },
       strategyPropHistory() { return NaN; },
       strategyTradeProp() { return NaN; },
@@ -3179,9 +3206,8 @@ function evaluateSecuritySeries(
         if (requestDisabledByDynamicRequests(secId, 'request.security_lower_tf')) return createPineArray();
         const symStr = String(symbol ?? '').trim();
         const tfStr = normalizeRuntimeTimeframePeriod(String(timeframe ?? ''), String(builtinCtx.timeframe.period ?? ''));
-        const requestDuration = getRuntimeTimeframeDurationMs(tfStr, String(builtinCtx.timeframe.period ?? ''));
         const chartDuration = getRuntimeTimeframeDurationMs(String(builtinCtx.timeframe.period ?? ''), String(builtinCtx.timeframe.period ?? ''));
-        if (requestDuration === null || chartDuration === null || requestDuration >= chartDuration) {
+        if (!isRuntimeLowerTimeframe(tfStr, String(builtinCtx.timeframe.period ?? '')) || chartDuration === null) {
           if (isRuntimeTruthy(ignoreInvalidTimeframe)) return createPineArray();
           throw new CompiledRuntimeErrorException(`request.security_lower_tf requires a lower timeframe than the chart timeframe: ${tfStr}`);
         }
@@ -3472,8 +3498,10 @@ function collectLowerTimeframeValues(
   requestedValues: unknown[],
   chartStart: number,
   chartEnd: number,
-): PineArray {
+): PineArray | unknown[] {
   const array = createPineArray();
+  const tupleArrays: PineArray[] = [];
+  let tupleArity: number | null = null;
   if (!Number.isFinite(chartStart) || !Number.isFinite(chartEnd) || chartEnd <= chartStart) {
     return array;
   }
@@ -3481,11 +3509,30 @@ function collectLowerTimeframeValues(
   for (let i = 0; i < requestBars.length; i++) {
     const requestTime = requestBars[i]!.time;
     if (requestTime >= chartStart && requestTime < chartEnd) {
-      pushArrayValue(array, requestedValues[i] ?? NaN);
+      const value = requestedValues[i] ?? NaN;
+      const tupleValues = lowerTimeframeTupleValues(value);
+      if (tupleValues) {
+        tupleArity ??= tupleValues.length;
+        for (let itemIndex = 0; itemIndex < tupleArity; itemIndex += 1) {
+          tupleArrays[itemIndex] ??= createPineArray();
+          pushArrayValue(tupleArrays[itemIndex]!, tupleValues[itemIndex] ?? NaN);
+        }
+      } else {
+        pushArrayValue(array, value);
+      }
     }
   }
 
+  if (tupleArity !== null) return tupleArrays;
   return array;
+}
+
+function lowerTimeframeTupleValues(value: unknown): unknown[] | null {
+  if (Array.isArray(value) && !isPineArray(value)) return value;
+  if (isPineArray(value)) {
+    return Array.from({ length: getArraySize(value) }, (_, index) => getArrayValue(value, index));
+  }
+  return null;
 }
 
 function mergeRequestSeriesValue(
@@ -4146,7 +4193,8 @@ export function executeCompiled(
       if (type === 'int' || type === 'float' || type === 'string' || type === 'timeframe' || type === 'enum') {
         metadata.options = toInputOptions(options);
       }
-      if (!hasOptions && (type === 'int' || type === 'float')) {
+      const supportsRangeMetadata = legacy || funcName !== 'input';
+      if (supportsRangeMetadata && !hasOptions && (type === 'int' || type === 'float')) {
         metadata.minval = optionalNumber(metadataNames, legacy ? 3 : 2);
         metadata.maxval = optionalNumber(metadataNames, legacy ? 4 : 3);
         metadata.step = optionalNumber(metadataNames, legacy ? 6 : 4);
@@ -4385,6 +4433,19 @@ export function executeCompiled(
         if (!isStrategy) return;
         cancelAllStrategyOrders(ledger, barIndex, bar.time);
       },
+      strategyDefaultEntryQty(args: unknown[], named?: Record<string, unknown>) {
+        if (!isStrategy) return 0;
+        const fillPrice = toOptionalNumber(compiledOrderedArg(args, named, ['fill_price'], 0));
+        if (fillPrice === undefined || !Number.isFinite(fillPrice) || fillPrice <= 0) return NaN;
+        return resolveCompiledStrategyOrderQty(
+          ledger,
+          ledger.settings.defaultQtyType,
+          ledger.settings.defaultQtyValue,
+          fillPrice,
+          undefined,
+          bar.close,
+        );
+      },
       strategyProp(name: string) {
         return readStrategyProp(name);
       },
@@ -4580,13 +4641,12 @@ export function executeCompiled(
         const tfStr = normalizeRuntimeTimeframePeriod(String(timeframe ?? ''), String(ctx.timeframe.period ?? ''));
         const currencyStr = normalizeRuntimeRequestCurrency(currency);
         const calcBars = normalizeRuntimePositiveInteger(calcBarsCount);
-        const requestDuration = getRuntimeTimeframeDurationMs(tfStr, String(ctx.timeframe.period ?? ''));
         const chartDuration = getRuntimeTimeframeDurationMs(String(ctx.timeframe.period ?? ''), String(ctx.timeframe.period ?? ''));
         const sourceKey = runtimeSourceDescriptorKey(sourceDescriptor);
         const capturesKey = runtimeCapturesKey(captures);
         trackRequestContext(`request.security_lower_tf\u0000${secId}\u0000${symStr}\u0000${tfStr}\u0000${currencyStr ?? ''}\u0000${calcBars ?? ''}\u0000${sourceKey}\u0000${capturesKey}`);
 
-        if (requestDuration === null || chartDuration === null || requestDuration >= chartDuration) {
+        if (!isRuntimeLowerTimeframe(tfStr, String(ctx.timeframe.period ?? '')) || chartDuration === null) {
           if (isRuntimeTruthy(ignoreInvalidTimeframe)) return createPineArray();
           throwCompiledRuntimeError(`request.security_lower_tf requires a lower timeframe than the chart timeframe: ${tfStr}`);
         }

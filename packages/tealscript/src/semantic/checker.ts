@@ -37,6 +37,12 @@ import {
   CURRENCY_CONSTANT_CODES,
   isExportableBuiltinConstantPath,
 } from '../builtinMetadata';
+import {
+  getOfficialTradingViewLibrary,
+  unsupportedOfficialTradingViewFunctionMessage,
+  type OfficialTradingViewLibrary,
+  type OfficialTradingViewLibraryFunction,
+} from '../officialTradingViewLibraries';
 
 export type SemanticDiagnosticSeverity = 'error' | 'warning' | 'info';
 
@@ -109,6 +115,8 @@ type TupleInitializerShape =
 interface SemanticImportedLibrary {
   alias: string;
   functions: Map<string, FunctionDeclaration>;
+  builtinFunctions?: Map<string, OfficialTradingViewLibraryFunction>;
+  official?: OfficialTradingViewLibrary;
   types: Map<string, TypeDeclaration>;
   enums: Map<string, EnumDeclaration>;
   constants: Map<string, VariableDeclaration>;
@@ -437,10 +445,11 @@ const PINE_NA_CAST_SIGNATURE: BuiltinSignature = {
 };
 const LEGACY_COLOR_TRANSP_SIGNATURE: BuiltinSignature = {
   params: ['color', 'transp'],
-  minArgs: 2,
+  minArgs: 1,
   maxArgs: 2,
   allowNamedPrefixWithPositional: true,
 };
+const FILL_GRADIENT_PARAMS = ['plot1', 'plot2', 'top_value', 'bottom_value', 'top_color', 'bottom_color', 'title', 'editable', 'show_last', 'fillgaps', 'display'];
 const COLOR_CHANNEL_NAMES = new Set(['color.r', 'color.g', 'color.b', 'color.t']);
 const COLOR_CONSTANT_NAMES = new Set([
   'color.aqua',
@@ -481,6 +490,7 @@ const LEGACY_BARE_VISUAL_CONSTANT_VALUES = new Map<string, string>([
   ['stepline', 'stepline'],
 ]);
 const COLOR_FUNCTION_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
+  ['color', ['color']],
   ['color.new', ['color']],
   ['color.r', ['color']],
   ['color.g', ['color']],
@@ -1328,7 +1338,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   [
     'bgcolor',
     {
-      params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
+      params: ['color', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay', 'transp'],
       legacyV4Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
       legacyV5Params: ['color', 'transp', 'offset', 'editable', 'show_last', 'title', 'display', 'force_overlay'],
       minArgs: 1,
@@ -1607,6 +1617,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
         'show_last',
         'bordercolor',
         'display',
+        'force_overlay',
       ],
       legacyV4Params: ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'transp'],
       legacyV5Params: ['open', 'high', 'low', 'close', 'title', 'color', 'wickcolor', 'editable', 'show_last', 'bordercolor', 'display', 'transp'],
@@ -2008,6 +2019,7 @@ const BUILTIN_SIGNATURES = new Map<string, BuiltinSignature>([
   ['strategy.cancel_all', { params: [], minArgs: 0, maxArgs: 0 }],
   ['strategy.close', { params: ['id', 'comment', 'qty', 'qty_percent', 'alert_message', 'immediately', 'disable_alert'], legacyV5Params: LEGACY_STRATEGY_CLOSE_PARAMS, minArgs: 1, allowNamedPrefixWithPositional: true }],
   ['strategy.close_all', { params: ['comment', 'alert_message', 'immediately', 'disable_alert'], minArgs: 0, allowNamedPrefixWithPositional: true }],
+  ['strategy.default_entry_qty', { params: ['fill_price'], minArgs: 1, maxArgs: 1, allowNamedPrefixWithPositional: true }],
   ['strategy.entry', { params: STRATEGY_ORDER_PARAMS, legacyV5Params: LEGACY_STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
   ['strategy.exit', { params: STRATEGY_EXIT_PARAMS, legacyV5Params: LEGACY_STRATEGY_EXIT_PARAMS, minArgs: 1, maxArgs: STRATEGY_EXIT_PARAMS.length, allowNamedPrefixWithPositional: true }],
   ['strategy.order', { params: STRATEGY_ORDER_PARAMS, legacyV5Params: LEGACY_STRATEGY_ORDER_PARAMS, minArgs: 2, maxArgs: STRATEGY_ORDER_PARAMS.length, allowNamedPrefixWithPositional: true }],
@@ -2375,7 +2387,7 @@ const VISUAL_STRING_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>
 const VISUAL_COLOR_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['barcolor', ['color']],
   ['bgcolor', ['color']],
-  ['fill', ['color']],
+  ['fill', ['color', 'top_color', 'bottom_color']],
   ['hline', ['color']],
   ['plot', ['color']],
   ['plotbar', ['color']],
@@ -2399,7 +2411,7 @@ const VISUAL_BOOL_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
 const VISUAL_NUMERIC_PARAMETER_NAMES_BY_CALL = new Map<string, readonly string[]>([
   ['barcolor', ['offset', 'show_last', 'transp']],
   ['bgcolor', ['offset', 'show_last', 'transp']],
-  ['fill', ['show_last', 'transp']],
+  ['fill', ['top_value', 'bottom_value', 'show_last', 'transp']],
   ['hline', ['price', 'linewidth']],
   ['plot', ['linewidth', 'histbase', 'offset', 'show_last', 'precision', 'transp']],
   ['plotbar', ['open', 'high', 'low', 'close', 'show_last', 'precision', 'transp']],
@@ -2861,6 +2873,7 @@ class SemanticChecker {
   private rootScope = new SemanticScope();
   private typeDeclarations = new Map<string, TypeDeclaration>();
   private enumDeclarations = new Map<string, EnumDeclaration>();
+  private functionDeclarations = new Map<string, FunctionDeclaration[]>();
   private methodDeclarations = new Map<string, FunctionDeclaration[]>();
   private importedLibraries = new Map<string, SemanticImportedLibrary>();
   private functionSymbolDeclarations = new WeakMap<SemanticSymbol, FunctionDeclaration>();
@@ -2877,6 +2890,7 @@ class SemanticChecker {
     this.rootScope = new SemanticScope();
     this.typeDeclarations = this.collectTypeDeclarations(program.body);
     this.enumDeclarations = this.collectEnumDeclarations(program.body);
+    this.functionDeclarations = this.collectFunctionDeclarations(program.body);
     this.methodDeclarations = this.collectMethodDeclarations(program.body);
     this.importedLibraries = this.collectImportedLibraries(program);
     this.functionSymbolDeclarations = new WeakMap();
@@ -2973,12 +2987,28 @@ class SemanticChecker {
 
   private collectImportedLibraries(program: Program): Map<string, SemanticImportedLibrary> {
     const libraries = new Map<string, SemanticImportedLibrary>();
-    if (!this.options.libraries?.size) return libraries;
 
     for (const statement of program.body) {
       if (statement.type !== 'ImportDeclaration') continue;
 
-      const libraryProgram = this.options.libraries.get(statement.path);
+      const officialLibrary = getOfficialTradingViewLibrary(statement.path);
+      if (officialLibrary && !officialLibrary.program) {
+        libraries.set(statement.alias.name, {
+          alias: statement.alias.name,
+          functions: new Map(),
+          builtinFunctions: officialLibrary.functions,
+          official: officialLibrary,
+          types: new Map(),
+          enums: new Map(),
+          constants: new Map(),
+          methods: new Map(),
+          memberNames: new Set(officialLibrary.functions.keys()),
+        });
+        continue;
+      }
+
+      if (!officialLibrary?.program && !this.options.libraries?.size) continue;
+      const libraryProgram = officialLibrary?.program ?? this.options.libraries?.get(statement.path);
       if (!libraryProgram) continue;
 
       const types = new Map<string, TypeDeclaration>();
@@ -3465,6 +3495,17 @@ class SemanticChecker {
         .filter((statement): statement is EnumDeclaration => statement.type === 'EnumDeclaration')
         .map((statement) => [statement.name.name, statement]),
     );
+  }
+
+  private collectFunctionDeclarations(statements: Statement[]): Map<string, FunctionDeclaration[]> {
+    const declarations = new Map<string, FunctionDeclaration[]>();
+    for (const statement of statements) {
+      if (statement.type !== 'FunctionDeclaration' || statement.isMethod) continue;
+      const functions = declarations.get(statement.name.name) ?? [];
+      functions.push(statement);
+      declarations.set(statement.name.name, functions);
+    }
+    return declarations;
   }
 
   private collectMethodDeclarations(statements: Statement[]): Map<string, FunctionDeclaration[]> {
@@ -4060,6 +4101,9 @@ class SemanticChecker {
       const version = parts[parts.length - 1]!;
       const library = parts[parts.length - 2]!;
       const owner = parts.slice(0, -2).join('/');
+      if (owner === 'TradingView') {
+        return `Official TradingView library '${owner}/${library}' version ${version} is not implemented by TealScript; implement that documented standard-library surface or remove/change the import`;
+      }
       return `Import '${statement.path}' as alias '${alias}' was not supplied by the host library registry; provide Pine library source for ${owner}/${library} version ${version}, or remove/change the import`;
     }
     return `Import '${statement.path}' as alias '${alias}' was not supplied by the host library registry; provide the matching Pine library source or remove/change the import`;
@@ -4330,8 +4374,9 @@ class SemanticChecker {
     if (expression.callee.type !== 'Identifier') return undefined;
 
     const symbol = scope.lookup(expression.callee.name);
-    const declaration =
-      symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+    const declaration = symbol?.kind === 'function' && symbol.isMethod !== true
+      ? this.findUserFunctionDeclaration(expression.callee.name, expression, scope) ?? this.functionSymbolDeclarations.get(symbol)
+      : undefined;
     if (!declaration) return undefined;
 
     return this.tupleInitializerShapesFromFunctionReturn(
@@ -4404,6 +4449,10 @@ class SemanticChecker {
   }
 
   private inferBuiltinTupleElementTypes(expression: CallExpression, _scope: SemanticScope): SemanticType[] | undefined {
+    const importedOfficial = this.resolveOfficialImportedFunction(this.memberPath(expression.callee).join('.'), _scope);
+    if (importedOfficial?.returnKind === 'tuple' && importedOfficial.tupleArity) {
+      return Array.from({ length: importedOfficial.tupleArity }, () => ({ kind: 'float', qualifier: 'series' }));
+    }
     const calleeName = canonicalBuiltinName(this.memberPath(expression.callee).join('.'));
     if (calleeName === 'ta.vwap') {
       const stdevMult = this.resolveCallArgumentExpression(expression, ['source', 'anchor', 'stdev_mult'], 2);
@@ -4975,9 +5024,6 @@ class SemanticChecker {
   }
 
   private checkMemberExpression(expression: MemberExpression, scope: SemanticScope): void {
-    if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
-      return;
-    }
     if (this.checkImportedEnumMemberExpression(expression, scope)) {
       return;
     }
@@ -4991,6 +5037,9 @@ class SemanticChecker {
         this.checkImportedNamespaceMemberExpression(expression, scope);
         return;
       }
+    }
+    if (expression.object.type === 'Identifier' && BUILTIN_NAMESPACES.has(expression.object.name)) {
+      return;
     }
     this.checkExpression(expression.object, scope);
 
@@ -5031,9 +5080,10 @@ class SemanticChecker {
     const library = this.importedLibraries.get(alias);
     if (!library) return;
 
-    if (!library.functions.has(memberName)) {
+    if (!library.functions.has(memberName) && !library.builtinFunctions?.has(memberName)) {
       if (library.constants.has(memberName) || library.types.has(memberName) || library.enums.has(memberName)) return;
       if (library.memberNames.has(memberName)) return;
+      if (library.official && this.isKnownBuiltinFunction(`${alias}.${memberName}`)) return;
       this.addDiagnostic(
         'unknown-imported-member',
         `Unknown library member: ${alias}.${memberName}`,
@@ -5182,13 +5232,22 @@ class SemanticChecker {
     }
 
     this.checkArgumentOrder(expression.arguments, displayName, signature);
-    this.checkArgumentNames(expression.arguments, signature, displayName);
-    this.checkArgumentCount(expression.arguments, signature, displayName);
-    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName);
+    this.checkArgumentNames(expression.arguments, signature, displayName, scope);
+    this.checkArgumentCount(expression.arguments, signature, displayName, scope);
+    this.checkDuplicateArgumentBindings(expression.arguments, signature, displayName, scope);
     this.checkLegacyCompatibleArguments(expression.arguments, signature, displayName);
   }
 
   private resolveBuiltinSignature(displayName: string, expression: CallExpression, scope: SemanticScope): BuiltinSignature | undefined {
+    const importedBuiltin = this.resolveOfficialImportedFunction(displayName, scope);
+    if (importedBuiltin) {
+      return {
+        params: importedBuiltin.params,
+        minArgs: importedBuiltin.minArgs,
+        maxArgs: importedBuiltin.maxArgs,
+        allowNamedPrefixWithPositional: true,
+      };
+    }
     if (displayName === 'input' && this.legacyInputTypeCallName(expression)) {
       return LEGACY_INPUT_SIGNATURE;
     }
@@ -5198,7 +5257,7 @@ class SemanticChecker {
     ) {
       return PINE_NA_CAST_SIGNATURE;
     }
-    if (displayName === 'color' && this.currentPineVersion <= 4 && this.usesLegacyColorTransparencyOverload(expression, scope)) {
+    if (displayName === 'color' && this.usesLegacyColorTransparencyOverload(expression, scope)) {
       return LEGACY_COLOR_TRANSP_SIGNATURE;
     }
     if (displayName === 'label.new') {
@@ -5210,7 +5269,11 @@ class SemanticChecker {
     if (displayName === 'box.new') {
       return this.usesBoxPointOverload(expression, scope) ? BOX_NEW_POINT_SIGNATURE : BOX_NEW_COORDINATE_SIGNATURE;
     }
-    return BUILTIN_SIGNATURES.get(displayName) ?? BUILTIN_SIGNATURES.get(canonicalBuiltinName(displayName));
+    const exactSignature = BUILTIN_SIGNATURES.get(displayName);
+    if (exactSignature) return exactSignature;
+    return expression.callee.type === 'Identifier'
+      ? BUILTIN_SIGNATURES.get(canonicalBuiltinName(displayName))
+      : undefined;
   }
 
   private usesNaCastOverload(expression: CallExpression): boolean {
@@ -5222,7 +5285,7 @@ class SemanticChecker {
   private usesLegacyColorTransparencyOverload(expression: CallExpression, scope: SemanticScope): boolean {
     if (expression.arguments.some((argument) => argument.name?.name === 'transp' || argument.name?.name === 'color')) return true;
     const positional = expression.arguments.filter((argument) => !argument.name);
-    if (positional.length !== 2) return false;
+    if (positional.length < 1 || positional.length > 2) return false;
     return this.inferExpressionType(positional[0]!.value, scope).kind === 'color';
   }
 
@@ -5273,6 +5336,8 @@ class SemanticChecker {
 
   private checkUnsupportedBuiltinNamespaceCall(expression: CallExpression, displayName: string, scope: SemanticScope): void {
     if (expression.callee.type !== 'MemberExpression') return;
+    if (this.resolveLocalUserCallable(expression, scope)) return;
+
     const namespace = this.memberPath(expression.callee)[0];
     if (!namespace) return;
 
@@ -5308,6 +5373,21 @@ class SemanticChecker {
 
     if (path.length === 2) {
       if (library.functions.has(memberName)) return;
+      const officialFunction = library.builtinFunctions?.get(memberName);
+      if (officialFunction) {
+        if (!officialFunction.runtimeName) {
+          const officialPath = library.official
+            ? `${library.official.owner}/${library.official.library}/${library.official.version}`
+            : alias;
+          this.addDiagnostic(
+            'unsupported-feature',
+            unsupportedOfficialTradingViewFunctionMessage(officialPath, memberName),
+            expression.callee.loc,
+          );
+        }
+        return;
+      }
+      if (library.official && this.isKnownBuiltinFunction(`${alias}.${memberName}`)) return;
       this.addDiagnostic('unknown-function', `Unknown library function: ${alias}.${memberName}`, expression.callee.loc);
       return;
     }
@@ -5554,13 +5634,14 @@ class SemanticChecker {
     const signature = this.resolveBuiltinSignature(calleeName, expression, scope);
     if (!signature) return;
     if (this.hasUnstableOptionArgumentBindings(expression.arguments, signature)) return;
+    const params = this.resolveSignatureParams(expression.arguments, signature, scope);
 
     for (const parameterName of colorParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'color');
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'color');
     }
 
     for (const parameterName of numericParameterNames ?? []) {
-      this.checkBuiltinArgumentKind(expression, scope, calleeName, signature.params, parameterName, 'number', signature);
+      this.checkBuiltinArgumentKind(expression, scope, calleeName, params, parameterName, 'number', signature);
     }
 
     this.checkColorTransparencyLiteralArgument(expression, calleeName, signature);
@@ -7691,6 +7772,7 @@ class SemanticChecker {
 
     const methods = this.methodDeclarations.get(expression.callee.property.name);
     if (!methods?.length) return;
+    if (this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope)) return;
 
     const receiverType = this.inferExpressionType(expression.callee.object, scope);
     if (receiverType.kind === 'unknown') return;
@@ -7743,14 +7825,16 @@ class SemanticChecker {
   ): { declaration: FunctionDeclaration; displayName: string; parameterOffset: number } | undefined {
     if (expression.callee.type === 'Identifier') {
       const symbol = scope.lookup(expression.callee.name);
-      const declaration =
-        symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+      const declaration = symbol?.kind === 'function' && symbol.isMethod !== true
+        ? this.findUserFunctionDeclaration(expression.callee.name, expression, scope) ?? this.functionSymbolDeclarations.get(symbol)
+        : undefined;
       return declaration
         ? { declaration, displayName: `function ${expression.callee.name}`, parameterOffset: 0 }
         : undefined;
     }
 
     if (expression.callee.type !== 'MemberExpression') return undefined;
+    if (this.resolveBuiltinSignature(this.memberPath(expression.callee).join('.'), expression, scope)) return undefined;
 
     const receiverType = this.inferExpressionType(expression.callee.object, scope);
     if (receiverType.kind === 'unknown') return undefined;
@@ -8507,9 +8591,9 @@ class SemanticChecker {
     }
   }
 
-  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+  private checkArgumentNames(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope?: SemanticScope): void {
     if (signature.allowExtraNamed) return;
-    const allowed = new Set(this.resolveSignatureParams(args, signature));
+    const allowed = new Set(this.resolveSignatureParams(args, signature, scope));
     const mixedInputRangeArg = this.firstMixedInputRangeOptionsArgument(args, signature, displayName);
     if (mixedInputRangeArg?.name) {
       this.addDiagnostic(
@@ -8547,13 +8631,13 @@ class SemanticChecker {
     });
   }
 
-  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
+  private checkArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope?: SemanticScope): void {
     if (signature === BUILTIN_SIGNATURES.get('timestamp')) {
-      this.checkTimestampArgumentCount(args, signature, displayName);
+      this.checkTimestampArgumentCount(args, signature, displayName, scope);
       return;
     }
 
-    const params = this.resolveSignatureParams(args, signature);
+    const params = this.resolveSignatureParams(args, signature, scope);
     const binding = signature.allowNamedPrefixWithPositional ? this.bindSignatureArguments(args, signature, params) : undefined;
     const positionalCount = this.leadingPositionalCount(args);
     const suppliedNames = binding?.boundParams ?? new Set(args.flatMap((arg) => (arg.name ? [this.canonicalSignatureArgumentName(arg.name.name, signature)] : [])));
@@ -8593,8 +8677,8 @@ class SemanticChecker {
     }
   }
 
-  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
-    const params = this.resolveSignatureParams(args, signature);
+  private checkDuplicateArgumentBindings(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope?: SemanticScope): void {
+    const params = this.resolveSignatureParams(args, signature, scope);
     if (signature.allowNamedPrefixWithPositional) {
       const boundParams = new Set<string>();
       const positionalBoundParams = new Set<string>();
@@ -8673,8 +8757,8 @@ class SemanticChecker {
     return undefined;
   }
 
-  private checkTimestampArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string): void {
-    const params = this.resolveTimestampSignatureParams(args, signature);
+  private checkTimestampArgumentCount(args: CallArgument[], signature: BuiltinSignature, displayName: string, scope?: SemanticScope): void {
+    const params = this.resolveTimestampSignatureParams(args, signature, scope);
     const binding = this.bindSignatureArguments(args, signature, params);
     const requiredParams = params.includes('dateString') ? ['dateString'] : ['year', 'month', 'day'];
 
@@ -8756,7 +8840,10 @@ class SemanticChecker {
     if (this.currentPineVersion <= 4 && signature.legacyV4Params) {
       return signature.legacyV4Params;
     }
-    if (this.currentPineVersion <= 5 && signature.legacyV5Params) {
+    if (signature === BUILTIN_SIGNATURES.get('fill') && this.usesGradientFillSignature(args)) {
+      return FILL_GRADIENT_PARAMS;
+    }
+    if (this.currentPineVersion <= 5 && signature.legacyV5Params && this.usesNamedLegacyArgument(args, signature)) {
       return signature.legacyV5Params;
     }
 
@@ -8785,6 +8872,25 @@ class SemanticChecker {
     const rangeOverload = signature.overloads.find((params) => params.includes('minval'));
 
     return (usesOptionsOverload ? optionsOverload : rangeOverload) ?? signature.params;
+  }
+
+  private usesNamedLegacyArgument(args: CallArgument[], signature: BuiltinSignature): boolean {
+    if (!signature.legacyV5Params) return false;
+    const modernParams = new Set(signature.params);
+    const legacyParams = new Set(signature.legacyV5Params);
+    return args.some((arg) => {
+      if (!arg.name) return false;
+      const name = this.canonicalSignatureArgumentName(arg.name.name, signature);
+      return legacyParams.has(name) && !modernParams.has(name);
+    });
+  }
+
+  private usesGradientFillSignature(args: CallArgument[]): boolean {
+    const suppliedNames = new Set(args.flatMap((arg) => (arg.name ? [arg.name.name] : [])));
+    if (suppliedNames.has('top_value') || suppliedNames.has('bottom_value') || suppliedNames.has('top_color') || suppliedNames.has('bottom_color')) return true;
+
+    const positional = args.filter((arg) => !arg.name);
+    return positional.length >= 6;
   }
 
   private resolveSignatureMinArgs(signature: BuiltinSignature): number {
@@ -9365,6 +9471,8 @@ class SemanticChecker {
     if (mathType) return mathType;
     const stringType = this.inferStringCallType(expression, scope, calleePath);
     if (stringType) return stringType;
+    const officialImportedFunctionType = this.inferOfficialImportedFunctionCallType(expression, scope, calleePath);
+    if (officialImportedFunctionType) return officialImportedFunctionType;
     const taType = this.inferTaCallType(expression, scope, calleePath);
     if (taType) return taType;
     const requestType = this.inferRequestCallType(expression, scope, calleePath);
@@ -9397,6 +9505,8 @@ class SemanticChecker {
     if (arrayHelperType) return arrayHelperType;
     const matrixElementReadType = this.inferMatrixElementReadCallType(expression, scope);
     if (matrixElementReadType) return matrixElementReadType;
+    const matrixHelperType = this.inferMatrixHelperCallType(expression, scope);
+    if (matrixHelperType) return matrixHelperType;
     const mapValueReadType = this.inferMapValueReadCallType(expression, scope);
     if (mapValueReadType) return mapValueReadType;
     const userFunctionType = this.inferUserFunctionCallType(expression, scope);
@@ -9604,6 +9714,16 @@ class SemanticChecker {
     return undefined;
   }
 
+  private inferOfficialImportedFunctionCallType(expression: CallExpression, scope: SemanticScope, calleePath: string[]): SemanticType | undefined {
+    const importedBuiltin = this.resolveOfficialImportedFunction(calleePath.join('.'), scope);
+    if (!importedBuiltin) return undefined;
+    if (importedBuiltin.returnKind === 'tuple') return { kind: 'unknown', qualifier: 'series' };
+    return {
+      kind: importedBuiltin.returnKind,
+      qualifier: this.inferCallArgumentMaxQualifier(expression, scope) === 'series' ? 'series' : 'simple',
+    };
+  }
+
   private inferTaSourceReturnType(expression: CallExpression, scope: SemanticScope, parameterNames: string[], index: number): SemanticType {
     const source = this.inferCallArgumentType(expression, scope, parameterNames, index);
     return source ? { ...source, qualifier: 'series' } : { kind: 'unknown', qualifier: 'series' };
@@ -9733,8 +9853,9 @@ class SemanticChecker {
     if (expression.callee.type !== 'Identifier') return undefined;
 
     const symbol = scope.lookup(expression.callee.name);
-    const declaration =
-      symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+    const declaration = symbol?.kind === 'function' && symbol.isMethod !== true
+      ? this.findUserFunctionDeclaration(expression.callee.name, expression, scope) ?? this.functionSymbolDeclarations.get(symbol)
+      : undefined;
     if (!declaration) return undefined;
 
     return this.inferFunctionReturnType(declaration, this.inferCallableParameterTypes(declaration, expression.arguments, scope));
@@ -9744,8 +9865,9 @@ class SemanticChecker {
     if (expression.callee.type !== 'Identifier') return undefined;
 
     const symbol = scope.lookup(expression.callee.name);
-    const declaration =
-      symbol?.kind === 'function' && symbol.isMethod !== true ? this.functionSymbolDeclarations.get(symbol) : undefined;
+    const declaration = symbol?.kind === 'function' && symbol.isMethod !== true
+      ? this.findUserFunctionDeclaration(expression.callee.name, expression, scope) ?? this.functionSymbolDeclarations.get(symbol)
+      : undefined;
     if (!declaration) return undefined;
 
     return this.inferFunctionTupleElementTypes(declaration, this.inferCallableParameterTypes(declaration, expression.arguments, scope));
@@ -9801,6 +9923,28 @@ class SemanticChecker {
     if (!method) return undefined;
 
     return this.inferFunctionTupleElementTypes(method, this.inferCallableParameterTypes(method, expression.arguments, scope, receiverType));
+  }
+
+  private findUserFunctionDeclaration(
+    functionName: string,
+    expression?: CallExpression,
+    scope?: SemanticScope,
+  ): FunctionDeclaration | undefined {
+    const functions = this.functionDeclarations.get(functionName);
+    if (!functions?.length) return undefined;
+    if (!expression || !scope) return functions[0];
+
+    const candidates = functions
+      .map((declaration) => ({
+        declaration,
+        score: this.userCallableSpecificityScore(declaration, expression, 0, scope) ?? Number.NEGATIVE_INFINITY,
+      }))
+      .filter((candidate) => Number.isFinite(candidate.score));
+    if (candidates.length === 0) return undefined;
+
+    const bestScore = Math.max(...candidates.map((candidate) => candidate.score));
+    const bestCandidates = candidates.filter((candidate) => candidate.score === bestScore);
+    return bestCandidates.length === 1 ? bestCandidates[0]?.declaration : undefined;
   }
 
   private findUserMethodDeclaration(
@@ -10133,6 +10277,22 @@ class SemanticChecker {
     return receiverType.elementType;
   }
 
+  private inferMatrixHelperCallType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
+    if (expression.callee.type !== 'MemberExpression') return undefined;
+
+    const methodName = expression.callee.property.name;
+    const receiverType = this.inferMatrixHelperReceiverType(expression, scope);
+    if (receiverType?.kind !== 'matrix') return undefined;
+
+    if (methodName === 'row' || methodName === 'col' || methodName === 'column') {
+      return {
+        kind: 'array',
+        elementType: receiverType.elementType,
+      };
+    }
+    return undefined;
+  }
+
   private inferMatrixHelperReceiverType(expression: CallExpression, scope: SemanticScope): SemanticType | undefined {
     if (expression.callee.type !== 'MemberExpression') return undefined;
 
@@ -10235,6 +10395,10 @@ class SemanticChecker {
     if (objectType.kind !== 'udt' || !objectType.name) return objectType;
 
     const field = this.findUdtField(objectType.name, expression.property.name);
+    const [libraryAlias] = objectType.name.split('.');
+    if (libraryAlias && this.importedLibraries.has(libraryAlias)) {
+      return this.importedSemanticTypeFromAnnotation(libraryAlias, field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
+    }
     return this.typeFromAnnotation(field?.typeAnnotation ?? undefined) ?? { kind: 'unknown', qualifier: objectType.qualifier };
   }
 
@@ -10295,6 +10459,7 @@ class SemanticChecker {
 
   private inferStrategyCallType(calleePath: string[]): SemanticType | undefined {
     const calleeName = calleePath.join('.');
+    if (calleeName === 'strategy.default_entry_qty') return { kind: 'float', qualifier: 'series' };
     if (STRATEGY_STRING_ACCESSOR_NAMES.has(calleeName)) return { kind: 'string', qualifier: 'series' };
     if (STRATEGY_INT_ACCESSOR_NAMES.has(calleeName)) return { kind: 'int', qualifier: 'series' };
     if (STRATEGY_FLOAT_ACCESSOR_NAMES.has(calleeName)) return { kind: 'float', qualifier: 'series' };
@@ -10497,15 +10662,6 @@ class SemanticChecker {
     const targetType = this.typeFromAnnotation(annotation);
     if (!targetType || !this.canCheckTypeCompatibility(annotation)) return;
 
-    if (targetType.kind === 'bool' && init.type === 'NaExpression') {
-      this.addDiagnostic(
-        'type-mismatch',
-        this.variableAssignmentMessage('na', 'bool', variableName),
-        loc,
-      );
-      return;
-    }
-
     const initType = init.type === 'IfStatement'
       ? this.inferIfExpressionType(init, scope)
       : this.inferExpressionType(init, scope);
@@ -10658,6 +10814,22 @@ class SemanticChecker {
 
   private isNumericType(type: SemanticType): type is SemanticType & { kind: 'int' | 'float' } {
     return type.kind === 'int' || type.kind === 'float';
+  }
+
+  private resolveOfficialImportedFunction(name: string, scope: SemanticScope): OfficialTradingViewLibraryFunction | undefined {
+    const path = name.split('.');
+    if (path.length !== 2) return undefined;
+    const [alias, member] = path;
+    if (!alias || !member || scope.lookup(alias)?.kind !== 'import') return undefined;
+    return this.importedLibraries.get(alias)?.builtinFunctions?.get(member);
+  }
+
+  private isKnownBuiltinFunction(name: string): boolean {
+    const canonicalName = canonicalBuiltinName(name);
+    return BUILTIN_FUNCTIONS.has(name)
+      || BUILTIN_FUNCTIONS.has(canonicalName)
+      || BUILTIN_SIGNATURES.has(name)
+      || BUILTIN_SIGNATURES.has(canonicalName);
   }
 
   private declare(scope: SemanticScope, symbol: SemanticSymbol): boolean {

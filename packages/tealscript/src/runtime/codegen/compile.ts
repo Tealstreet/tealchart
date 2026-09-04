@@ -268,6 +268,7 @@ export interface CompiledBarContext {
   strategyCancel(...args: unknown[]): void;
   strategyCancelAll(...args: unknown[]): void;
   strategyOrder(...args: unknown[]): void;
+  strategyDefaultEntryQty(args: unknown[], named?: Record<string, unknown>): unknown;
   strategyProp(name: string): unknown;
   strategyPropHistory(name: string, offset: unknown): unknown;
   strategyTradeProp(name: string, args: unknown[], named?: Record<string, unknown>): unknown;

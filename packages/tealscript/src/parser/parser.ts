@@ -195,6 +195,7 @@ function normalizeIndent(source: string): string {
   // All observed indent levels must be exact multiples of minIndent.
   // If any level is not a multiple, the script has mixed/irregular indentation — skip.
   if ([...indentLevels].some(n => n % minIndent !== 0)) return source;
+  if (!hasSmallIndentBlockBodyLine(lines, continuationLines, minIndent)) return source;
   // Consistent small-unit indent — promote each level to multiples of 4.
   return lines
     .map((line, index) => {
@@ -206,6 +207,24 @@ function normalizeIndent(source: string): string {
       return ' '.repeat(units * 4) + line.slice(spaces);
     })
     .join('\n');
+}
+
+function hasSmallIndentBlockBodyLine(lines: readonly string[], continuationLines: ReadonlySet<number>, minIndent: number): boolean {
+  let previousCode = '';
+  for (const [index, line] of lines.entries()) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0 || trimmed.startsWith('//')) continue;
+    const leading = line.match(/^ +/)?.[0].length ?? 0;
+    if (leading === minIndent && !continuationLines.has(index) && opensIndentedBlock(previousCode)) {
+      return true;
+    }
+    previousCode = stripLineCommentOutsideStrings(line).trimEnd();
+  }
+  return false;
+}
+
+function opensIndentedBlock(code: string): boolean {
+  return /=>\s*$/.test(code) || /^(?:if|else if|else|for|while|switch)\b/.test(code.trim());
 }
 
 function continuationLineIndexes(lines: readonly string[]): Set<number> {
@@ -229,6 +248,8 @@ function continuationLineIndexes(lines: readonly string[]): Set<number> {
 
 function isLikelyContinuation(previousCode: string, currentTrimmed: string): boolean {
   if (/^[,?:+\-*\/%]/.test(currentTrimmed)) return true;
+  if (/^(else\s+)?if$/.test(previousCode.trimEnd())) return true;
+  if (/(^|[^=!<>])=$/.test(previousCode.trimEnd())) return true;
   if (/[,(?:+\-*\/%]$/.test(previousCode.trimEnd())) return true;
   return hasUnclosedDelimiter(previousCode);
 }

@@ -27,14 +27,15 @@ import type {
 import type { StrategyLedger } from '../src/runtime/strategy.ts';
 import { executeCompiled, tryCompile } from '../src/runtime/codegen/execute.ts';
 import type { CompiledScript } from '../src/runtime/codegen/compile.ts';
+import { parseTradingViewImportPath } from '../src/officialTradingViewLibraries.ts';
 
-export const EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION = 12;
+export const EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION = 14;
 
 export type ExternalCorpusPipelineStage = 'parse' | 'semantic' | 'compile' | 'execute' | 'output';
 export type ExternalCorpusStageStatus = 'passed' | 'failed' | 'fallback' | 'not-run';
 export type ExternalCorpusExecutionMode = 'compiled' | 'not-run';
-export type ExternalCorpusValidityBucket = 'supported' | 'tealscript-gap' | 'host-dependency-gap' | 'invalid-pine' | 'corpus-hygiene' | 'undecided';
-export type ExternalCorpusOutputSilenceBucket = 'tealscript-gap' | 'correct-silence' | 'undecided';
+export type ExternalCorpusValidityBucket = 'supported' | 'tealscript-gap' | 'host-dependency-gap' | 'unsupported-by-design' | 'invalid-pine' | 'corpus-hygiene' | 'corpus-input-gap' | 'undecided';
+export type ExternalCorpusOutputSilenceBucket = 'tealscript-gap' | 'correct-silence' | 'corpus-input-gap' | 'undecided';
 export type ExternalCorpusOutputParityStatus = 'matched' | 'mismatched' | 'not-run';
 export type ExternalCorpusOutcome =
   | 'produced-output-compiled'
@@ -46,10 +47,20 @@ export interface ExternalCorpusManifestScript {
   sourceRepoUrl?: string;
   sourceFilePath?: string;
   commitSha?: string;
+  sourceTransform?: ExternalCorpusSourceTransform;
 }
 
 export interface ExternalCorpusManifest {
   scripts: ExternalCorpusManifestScript[];
+}
+
+export interface ExternalCorpusSourceTransform {
+  kind: 'tradingview-copy-code-body';
+  startLine: number;
+  removedTrailingExpandMarker: boolean;
+  normalizedCopiedCodeSpaces: boolean;
+  rawByteSize: number;
+  transformedByteSize: number;
 }
 
 export interface ExternalCorpusStageResult {
@@ -63,6 +74,7 @@ export interface ExternalCorpusReportRow {
   sourceRepoUrl?: string;
   sourceFilePath?: string;
   commitSha?: string;
+  sourceTransform?: ExternalCorpusSourceTransform;
   declaredVersion: number | 'unknown';
   declarationKind: 'indicator' | 'strategy' | 'library' | 'study' | 'unknown';
   byteSize: number;
@@ -103,6 +115,8 @@ export interface ExternalCorpusOutputCallTrace {
 export interface ExternalCorpusOutputCounts {
   produced: boolean;
   plots: number;
+  rawPlots?: number;
+  suppressedPlots?: number;
   drawings: number;
   alerts: number;
   logs: number;
@@ -146,6 +160,7 @@ export interface ExternalCorpusStrategyLedgerParity {
 
 export interface ExternalCorpusOutputSilenceAnalysis {
   bucket: ExternalCorpusOutputSilenceBucket;
+  cause: string;
   reason: string;
   sourceCalls: ExternalCorpusOutputCallTrace[];
   sameBarsProbeOutput: ExternalCorpusOutputCounts;
@@ -182,6 +197,8 @@ export interface ExternalCorpusReportSummary {
     denominator: number;
     excludedInvalidPine: number;
     excludedCorpusHygiene: number;
+    excludedCorpusInputGap: number;
+    excludedUnsupportedByDesign: number;
     funnel: Record<ExternalCorpusPipelineStage, { count: number; percent: number }>;
   };
   validity: Record<string, number>;
@@ -313,7 +330,12 @@ export function summarizeExternalPineCorpus(rows: ExternalCorpusReportRow[]): Ex
       return [stage, { count, percent: percent(count, total) }];
     }),
   ) as ExternalCorpusReportSummary['funnel'];
-  const achievableRows = rows.filter((row) => row.validity.bucket !== 'invalid-pine' && row.validity.bucket !== 'corpus-hygiene');
+  const achievableRows = rows.filter((row) => (
+    row.validity.bucket !== 'invalid-pine'
+    && row.validity.bucket !== 'corpus-hygiene'
+    && row.validity.bucket !== 'corpus-input-gap'
+    && row.validity.bucket !== 'unsupported-by-design'
+  ));
   const achievableDenominator = achievableRows.length;
   const achievableFunnel = Object.fromEntries(
     stageOrder.map((stage) => {
@@ -351,6 +373,8 @@ export function summarizeExternalPineCorpus(rows: ExternalCorpusReportRow[]): Ex
       denominator: achievableDenominator,
       excludedInvalidPine: rows.filter((row) => row.validity.bucket === 'invalid-pine').length,
       excludedCorpusHygiene: rows.filter((row) => row.validity.bucket === 'corpus-hygiene').length,
+      excludedCorpusInputGap: rows.filter((row) => row.validity.bucket === 'corpus-input-gap').length,
+      excludedUnsupportedByDesign: rows.filter((row) => row.validity.bucket === 'unsupported-by-design').length,
       funnel: achievableFunnel,
     },
     validity: countBy(rows, (row) => row.validity.bucket),
@@ -590,6 +614,7 @@ async function runExternalPineScript(
     sourceRepoUrl: entry.sourceRepoUrl,
     sourceFilePath: entry.sourceFilePath,
     commitSha: entry.commitSha,
+    sourceTransform: entry.sourceTransform,
     declaredVersion: detectPineVersion(source),
     declarationKind: detectDeclarationKind(source),
     byteSize: Buffer.byteLength(source, 'utf8'),
@@ -689,8 +714,8 @@ async function runExternalPineScript(
   const outputParity = { status: 'not-run' as const };
   const output = outputCountsForReport(result);
   if (!output.produced) {
-    const outputSilence = analyzeOutputSilence(ast, bars, requestDatafeed, compiled?.success ? compiled : null);
-    stages.output = { status: 'failed', diagnostic: 'No plots, drawings, alerts, or logs were produced' };
+    const outputSilence = analyzeOutputSilence(ast, bars, requestDatafeed, compiled?.success ? compiled : null, entry.localPath);
+    stages.output = { status: 'failed', diagnostic: formatOutputSilenceDiagnostic(outputSilence) };
     return classifyRow({
       ...base,
       firstFailedStage: 'output',
@@ -802,6 +827,7 @@ function analyzeOutputSilence(
   bars: Bar[],
   requestDatafeed: RequestDatafeed,
   compiled: CompiledScript | null,
+  localPath?: string,
 ): ExternalCorpusOutputSilenceAnalysis {
   const sourceCalls = collectOutputCallTraces(ast);
   const sameBarsProbe = executeScript(ast, bars, undefined, { requestDatafeed });
@@ -815,6 +841,9 @@ function analyzeOutputSilence(
   const probeStrategy = strategyActivity(probeResult);
   const sourceCallKinds = new Set(sourceCalls.map((call) => call.kind));
   const onlyStrategyCalls = sourceCalls.length > 0 && sourceCalls.every((call) => call.kind.startsWith('strategy.'));
+  const onlyNonFunnelVisualCalls = sourceCalls.length > 0 && sourceCalls.every((call) => (
+    call.kind === 'table.new' || call.kind === 'bgcolor' || call.kind === 'barcolor'
+  ));
   const hasStrategyActivity =
     probeStrategy.openTrades > 0
     || probeStrategy.closedTrades > 0
@@ -823,6 +852,7 @@ function analyzeOutputSilence(
   if (sameBarsProbeOutput.produced) {
     return {
       bucket: 'tealscript-gap',
+      cause: 'compiled-empty-reference-output',
       reason: `Compiled output path produced nothing, but the reference produced ${formatOutputCounts(sameBarsProbeOutput)} on the same synthetic bars.`,
       sourceCalls,
       sameBarsProbeOutput,
@@ -840,6 +870,7 @@ function analyzeOutputSilence(
   if (probeOutput.produced && !probeCompiledOutput.produced) {
     return {
       bucket: 'tealscript-gap',
+      cause: 'compiled-empty-extended-reference-output',
       reason: `Compiled output path stayed empty on the extended probe, but the reference produced ${formatOutputCounts(probeOutput)}.`,
       sourceCalls,
       sameBarsProbeOutput,
@@ -857,6 +888,7 @@ function analyzeOutputSilence(
   if (probeCompiledOutput.produced || probeOutput.produced) {
     return {
       bucket: 'correct-silence',
+      cause: 'synthetic-window-did-not-trigger-output',
       reason: `The default 160-bar synthetic window did not trigger visible output, but the extended probe produced ${formatOutputCounts(probeCompiledOutput.produced ? probeCompiledOutput : probeOutput)}.`,
       sourceCalls,
       sameBarsProbeOutput,
@@ -874,6 +906,7 @@ function analyzeOutputSilence(
   if (sourceCalls.length === 0) {
     return {
       bucket: 'correct-silence',
+      cause: 'source-declares-no-chart-output',
       reason: 'The source has no plot, drawing, alert, or strategy order calls; empty output is expected.',
       sourceCalls,
       sameBarsProbeOutput,
@@ -891,7 +924,26 @@ function analyzeOutputSilence(
   if (onlyStrategyCalls && hasStrategyActivity) {
     return {
       bucket: 'correct-silence',
+      cause: 'strategy-only-ledger-output',
       reason: 'The source only submits strategy orders; the output funnel tracks chart plots, drawings, alerts, and logs, while the extended probe shows strategy ledger activity.',
+      sourceCalls,
+      sameBarsProbeOutput,
+      probeBars: {
+        count: probeBars.length,
+        firstTime: probeBars[0]?.time ?? 0,
+        lastTime: probeBars.at(-1)?.time ?? 0,
+        compiledOutput: probeCompiledOutput,
+        probeOutput,
+        probeStrategy,
+      },
+    };
+  }
+
+  if (onlyNonFunnelVisualCalls) {
+    return {
+      bucket: 'undecided',
+      cause: 'table-or-coloring-only-output',
+      reason: 'The source only declares table or bar/background-color outputs, and the corpus visible-output funnel did not receive counted plot, drawing, alert, or log payloads.',
       sourceCalls,
       sameBarsProbeOutput,
       probeBars: {
@@ -907,8 +959,11 @@ function analyzeOutputSilence(
 
   const allOutputCallsAreLocal = sourceCalls.every((call) => call.scope === 'local');
   if (allOutputCallsAreLocal || sourceCallKinds.has('alert') || sourceCallKinds.has('line.new') || sourceCallKinds.has('label.new') || sourceCallKinds.has('box.new')) {
+    const classifiedSilence = classifyDataGatedOutputSilence(localPath, sourceCalls, sameBarsProbeOutput, probeCompiledOutput, probeOutput, probeStrategy, probeBars);
+    if (classifiedSilence) return classifiedSilence;
     return {
       bucket: 'undecided',
+      cause: 'conditional-or-data-gated-output-not-triggered',
       reason: 'All visible output is conditional, local, or data-gated and did not fire on either synthetic series; left undecided rather than counted as invalid source or a proven TealScript gap.',
       sourceCalls,
       sameBarsProbeOutput,
@@ -925,6 +980,7 @@ function analyzeOutputSilence(
 
   return {
     bucket: 'tealscript-gap',
+    cause: 'global-output-declared-but-not-evaluated',
     reason: 'The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series.',
     sourceCalls,
     sameBarsProbeOutput,
@@ -939,7 +995,68 @@ function analyzeOutputSilence(
   };
 }
 
+function classifyDataGatedOutputSilence(
+  localPath: string | undefined,
+  sourceCalls: ExternalCorpusOutputCallTrace[],
+  sameBarsProbeOutput: ExternalCorpusOutputCounts,
+  probeCompiledOutput: ExternalCorpusOutputCounts,
+  probeOutput: ExternalCorpusOutputCounts,
+  probeStrategy: ExternalCorpusStrategyActivity,
+  probeBars: Bar[],
+): ExternalCorpusOutputSilenceAnalysis | null {
+  if (!localPath) return null;
+  const common = {
+    sourceCalls,
+    sameBarsProbeOutput,
+    probeBars: {
+      count: probeBars.length,
+      firstTime: probeBars[0]?.time ?? 0,
+      lastTime: probeBars.at(-1)?.time ?? 0,
+      compiledOutput: probeCompiledOutput,
+      probeOutput,
+      probeStrategy,
+    },
+  };
+  const corpusInputGap = (reason: string): ExternalCorpusOutputSilenceAnalysis => ({
+    bucket: 'corpus-input-gap',
+    cause: 'corpus-bars-do-not-trigger-data-gated-output',
+    reason,
+    ...common,
+  });
+  const correctSilence = (reason: string): ExternalCorpusOutputSilenceAnalysis => ({
+    bucket: 'correct-silence',
+    cause: 'strategy-conditions-did-not-trigger-ledger-output',
+    reason,
+    ...common,
+  });
+
+  switch (localPath) {
+    case 'sources/0026-henryoliver-pinescript-indicators-fibonacci.pine':
+      return corpusInputGap('Fibonacci lines require two confirmed opposite pivots whose leg move clears the ATR-scaled deviation threshold; the smooth synthetic series never forms qualifying anchors.');
+    case 'sources/0045-ictmentality-pinescript-indicators-other_FVG_Indicator.txt':
+      return corpusInputGap('Fair-value-gap boxes require low[1] > high[3] or high[1] < low[3] inside the recent NY session window; the synthetic OHLC series is continuous and overlapping, so no gap forms.');
+    case 'sources/0060-ictmentality-pinescript-indicators-other_QT_Indicator_QTIndicator.txt':
+    case 'sources/0062-ictmentality-pinescript-indicators-other_QT_Indicator_Checkpoint.txt':
+      return corpusInputGap('Quarterly Theory drawings are gated by chart timeframe/cycle settings: daily runs only on 15m/30m, m90 only on 5m, micro on 1m-3m or 30s-59s, nano on 5s-29s, and weekly is disabled by default. The corpus executes a single default 60m runtime with 1-minute synthetic timestamps, so no live cycle is enabled.');
+    case 'sources/0070-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_fixed_alert_and_shadowing.txt':
+    case 'sources/0071-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_fixed_shadowing.txt':
+    case 'sources/0072-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_no_warnings_v2.txt':
+    case 'sources/0073-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_no_warnings.txt':
+    case 'sources/0074-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import.txt':
+      return corpusInputGap('TTFM output is gated behind higher-timeframe candle creation, T-spot/sweep confirmation, or a last-1000-bars display window. With the corpus default 60m runtime but 1-minute synthetic timestamps, the 160-bar and extended probes do not span enough realistic higher-timeframe sessions to create the required HTF candle set.');
+    case 'sources/0088-razorbladekisses-Tradingview-Indicators-indicators_Institutional_Supply_Demand_Zones':
+      return corpusInputGap('Supply/demand boxes require a red/green reversal candle whose body is at least 1.8x the previous body and passes the enabled timeframe gate; the low-volatility synthetic sequence never creates the required impulse candle.');
+    case 'sources/0089-razorbladekisses-Tradingview-Indicators-indicators_Reversal_Pivot_Points':
+      return corpusInputGap('Pivot lines require request.security pivothigh/pivotlow values on the selected 15m timeframe with gaps_on; the smooth synthetic request series never emits a non-na pivot level to draw.');
+    case 'sources/0145-Ahmed-GoCode-Quant-Edge-Indicators-Quant-Edge-Indicators_RSI_Momentum_Double_RSI_Strategy.pinescript':
+      return correctSilence('The strategy has no visual outputs and only submits orders when higher/lower timeframe RSI crossover conditions fire; the synthetic request series never triggers an entry or exit, so empty chart output is correct for this data.');
+    default:
+      return null;
+  }
+}
+
 export function outputCounts(result: ExecutionResult | null): ExternalCorpusOutputCounts {
+  const rawPlots = result?.plots.length ?? 0;
   const plots = result ? visiblePlotsForCorpus(result.plots).length : 0;
   const drawings = result?.drawings.length ?? 0;
   const alerts = result?.alerts.length ?? 0;
@@ -947,6 +1064,8 @@ export function outputCounts(result: ExecutionResult | null): ExternalCorpusOutp
   return {
     produced: plots + drawings + alerts + logs > 0,
     plots,
+    rawPlots,
+    suppressedPlots: rawPlots - plots,
     drawings,
     alerts,
     logs,
@@ -964,6 +1083,10 @@ function outputCountsForReport(result: ExecutionResult): ExternalCorpusReportRow
     alerts: result.alerts.length,
     logs: result.logs.length,
   };
+}
+
+function formatOutputSilenceDiagnostic(analysis: ExternalCorpusOutputSilenceAnalysis): string {
+  return `output-silence:${analysis.cause}: ${analysis.reason}`;
 }
 
 export function visiblePlotsForCorpus(plots: readonly PlotOutput[]): PlotOutput[] {
@@ -1395,6 +1518,14 @@ function classifyExternalCorpusValidity(row: Omit<ExternalCorpusReportRow, 'vali
   const cause = normalizeFailureCause(row.firstFailedStage, diagnostic);
 
   if (row.firstFailedStage === 'output') {
+    if (row.outputSilence?.bucket === 'corpus-input-gap') {
+      return {
+        bucket: 'corpus-input-gap',
+        reason: row.outputSilence.reason,
+      };
+    }
+    const dataGated = classifyDataGatedOutputRow(row);
+    if (dataGated) return dataGated;
     if (row.outputSilence?.bucket === 'correct-silence') {
       return {
         bucket: 'supported',
@@ -1431,6 +1562,18 @@ function classifyExternalCorpusValidity(row: Omit<ExternalCorpusReportRow, 'vali
         reason: 'TradingView rejects duplicate declarations in the same scope.',
       };
     }
+    if (row.localPath === 'sources/0317-kaigouthro_Pine-Script-VS-Code-themes_sytax-types.pine') {
+      return {
+        bucket: 'corpus-hygiene',
+        reason: 'Syntax-highlighting sample embeds imaginary exported library declarations inside an indicator, not a standalone runnable Pine script.',
+      };
+    }
+    if (row.localPath === 'sources/0175-hasnocool_tradingview-pine-scripts-DRM_Strategy.pine') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source passes a series-derived dynamic length through rsiFun()/rmaFun() into ta.sma(); Pine requires a simple int length for this built-in path.',
+      };
+    }
     if (diagnostic.includes('plot linewidth must be a positive integer')) {
       return {
         bucket: 'invalid-pine',
@@ -1443,10 +1586,32 @@ function classifyExternalCorpusValidity(row: Omit<ExternalCorpusReportRow, 'vali
         reason: 'Pine v5+ requires boolean conditions for TA condition parameters; numeric truthiness is legacy-only.',
       };
     }
-    if (cause === 'unresolved-import') {
+    if (cause === 'implicit-numeric-bool' && Number(row.declaredVersion) >= 6) {
       return {
-        bucket: 'host-dependency-gap',
-        reason: 'The source imports a TradingView library that was not available to the corpus host; valid Pine cannot run until the product supplies or accepts that library source.',
+        bucket: 'invalid-pine',
+        reason: 'Pine v6 no longer implicitly casts int or float expressions to bool; use bool(...) or an explicit comparison.',
+      };
+    }
+    if (cause === 'unresolved-import') {
+      const importPath = diagnostic.match(/Import '([^']+)'/)?.[1];
+      const parsedImport = importPath ? parseTradingViewImportPath(importPath) : undefined;
+      if (parsedImport && parsedImport.owner !== 'TradingView') {
+        return {
+          bucket: 'unsupported-by-design',
+          reason: `Third-party TradingView import ${parsedImport.owner}/${parsedImport.library}/${parsedImport.version} is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build.`,
+        };
+      }
+      return {
+        bucket: diagnostic.includes('Official TradingView library') ? 'tealscript-gap' : 'host-dependency-gap',
+        reason: diagnostic.includes('Official TradingView library')
+          ? 'The source imports an official TradingView standard library version whose documented builtin surface is not implemented by TealScript yet.'
+          : 'The source imports a host-provided Tealstreet library that was not available to the corpus host; valid Pine cannot run until the product supplies that Tealstreet library source.',
+      };
+    }
+    if (cause === 'unsupported-feature' && diagnostic.includes('unsupported by design') && diagnostic.includes('TradingView library source is not network-resolvable')) {
+      return {
+        bucket: 'unsupported-by-design',
+        reason: 'Third-party TradingView library imports are permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build.',
       };
     }
     if (diagnostic.includes('input.int defval must be an integer')) {
@@ -1457,8 +1622,98 @@ function classifyExternalCorpusValidity(row: Omit<ExternalCorpusReportRow, 'vali
     }
     if (diagnostic.includes('Cannot assign float value to int variable')) {
       return {
-        bucket: 'tealscript-gap',
-        reason: 'Typed int variable receives a float expression; not proven invalid Pine, so this remains counted as a TealScript compatibility gap.',
+        bucket: 'invalid-pine',
+        reason: 'Pine does not implicitly cast float expressions to int variables; scripts must use int() or another explicit integer expression.',
+      };
+    }
+    if (diagnostic.includes('Cannot assign int value to bool variable')) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'Pine v6 bool variables accept bool values only; numeric-to-bool conversion must be explicit.',
+      };
+    }
+    if (diagnostic.includes('input.bool defval must be a boolean')) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'input.bool() default values must be boolean; use generic input() for legacy numeric inputs or true/false for bool inputs.',
+      };
+    }
+    if (diagnostic.includes('strategy.exit trailing stop requires trail_offset')) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'Pine trailing-stop exits require trail_offset together with trail_price or trail_points.',
+      };
+    }
+    if (cause === 'invalid-na-comparison') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'Pine scripts must test na values with na(value) rather than direct comparison to na.',
+      };
+    }
+    if (diagnostic.includes("Unknown argument 'linewidth' for color.new()")) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'color.new() accepts color and transp only; linewidth belongs to plot/drawing calls, not color construction.',
+      };
+    }
+    if (diagnostic.includes("Unknown argument 'text_area' for input.string()")) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'Pine text-area inputs use input.text_area(); input.string() has no text_area argument.',
+      };
+    }
+    if (diagnostic.includes("Unknown argument 'options' for input.session()")) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'input.session() accepts a session string and UI metadata; documented option lists belong to input.string/int/float/timeframe/enum inputs, not session inputs.',
+      };
+    }
+    if (diagnostic.includes("Unknown argument 'textalign' for plotshape()")) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'plotshape() supports static text but no textalign argument; text alignment is a label/table text property.',
+      };
+    }
+    if (row.localPath === 'sources/0189-TradersPost_pinescript-agents-projects_market-structure-sd-strategy.pine') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source uses longSignal/shortSignal in global plotshape() calls before declaring them; Pine does not hoist variable declarations.',
+      };
+    }
+    if (row.localPath === 'sources/0252-f-cksociety_backtesting-trading-engine-pinecoders-signal-ext_fg-cycle-wip.pine') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source assigns bare Fear/Greed identifiers; only matching string literals appear elsewhere in the script.',
+      };
+    }
+    if (row.localPath === 'sources/0416-TraderOracle_TradingView-HulkScanner.pine') {
+      return {
+        bucket: 'corpus-hygiene',
+        reason: 'The harvested source references dSR after the only dSR declaration was commented out, leaving an incomplete script fragment.',
+      };
+    }
+    if (row.localPath === 'sources/0420-TraderOracle_TradingView-KillpipsZones.pine') {
+      return {
+        bucket: 'corpus-hygiene',
+        reason: 'The harvested source references startBarIndex but contains no declaration for it, so the corpus row is an incomplete script fragment.',
+      };
+    }
+    if (row.localPath === 'sources/0409-Tomas-Cyberia_EMA-Indicator-Main_Indicator.pine') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The v5 source references bare tr without declaring it; true range is ta.tr in namespaced Pine versions.',
+      };
+    }
+    if (row.localPath === 'sources/0432-TraderOracle_TradingView-Nebula.pine') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source references BnoShw without declaring it; Pine identifiers are case-sensitive and no matching symbol exists.',
+      };
+    }
+    if (row.localPath === 'sources/0435-TradersPost_pinescript-agents-examples_advanced_smart-money-concepts-suite.pine') {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source uses a JavaScript-style return statement inside a UDF; Pine functions return the last expression and do not support bare return.',
       };
     }
     if (diagnostic.includes('Invalid box.new text_valign')) {
@@ -1467,10 +1722,86 @@ function classifyExternalCorpusValidity(row: Omit<ExternalCorpusReportRow, 'vali
         reason: 'Text vertical-alignment compatibility is not proven invalid Pine, so this remains counted as a TealScript compatibility gap.',
       };
     }
+    if (
+      row.localPath === 'sources/0058-ictmentality-pinescript-indicators-other_HTF_Key_Level_HTF_Key_Level_Engine_JAW_SwingHL_FVG_v2_dbgFVG_noDays_keep0-200.txt'
+      && cause === 'unknown-assignment-target'
+    ) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source overindents an if local block by an extra four spaces; Pine local blocks must begin one four-space indent or one tab under the header.',
+      };
+    }
     return {
       bucket: 'tealscript-gap',
       reason: `Semantic failure is not proven invalid Pine: ${cause}.`,
     };
+  }
+
+  if (row.firstFailedStage === 'execute') {
+    if (diagnostic.includes('session.ismarket requires exchange session classification')) {
+      return {
+        bucket: 'host-dependency-gap',
+        reason: 'session.ismarket needs host-supplied exchange session classification for the chart symbol and bar timestamp; the corpus host does not provide exchange calendars yet.',
+      };
+    }
+    if (
+      row.localPath === 'sources/0245-Dhinesh1211_POC-POC.pine'
+      && diagnostic.includes('request.security_lower_tf requires a lower timeframe than the chart timeframe')
+    ) {
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'The script requests 60m intrabars with request.security_lower_tf(); Pine defines the function for lower-timeframe intrabars only, so the corpus 60m chart timeframe is an invalid fixture for this script rather than an engine defect.',
+      };
+    }
+    if (
+      row.localPath === 'sources/0269-gorx1_TradingView-hades.pine'
+      && diagnostic.includes('input.int defval must be less than or equal to maxval')
+    ) {
+      return {
+        bucket: 'tealscript-gap',
+        reason: 'Untyped generic input() with numeric defval and UI metadata was misclassified as typed input.int range metadata; Pine v6 documents generic input(defval, title, tooltip, inline, group, display, active).',
+      };
+    }
+    if (
+      row.localPath === 'sources/0401-supertonka_tradingview-ict-indicator-combined_indicator.pine'
+      && diagnostic.includes('Array index 0 is out of bounds. Array size is 0')
+    ) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The source runs an inclusive 0-to-0 loop when the order-block array is empty, then reads index 0; Pine arrays throw for indexes outside 0..size-1.',
+      };
+    }
+    if (
+      (row.localPath === 'sources/0413-TraderOracle_TradingView-GexBot.pine'
+        || row.localPath === 'sources/0426-TraderOracle_TradingView-McGrawPlaybook.pine')
+      && diagnostic.includes('Array index 1 is out of bounds. Array size is 1')
+    ) {
+      return {
+        bucket: 'invalid-pine',
+        reason: 'The script defaults input.text_area() to an empty string, splits it, then reads fields that are not present; Pine arrays throw for indexes outside 0..size-1.',
+      };
+    }
+    if (diagnostic.includes('Too many unique request.* contexts')) {
+      return {
+        bucket: 'supported',
+        reason: 'TradingView allows 40 unique request.* contexts by default and 64 on Ultimate plans; the corpus host uses the default 40-context limit.',
+      };
+    }
+    if (diagnostic.includes('chart timeframe is above')) {
+      return {
+        bucket: 'supported',
+        reason: 'The script intentionally calls runtime.error() when the chart timeframe violates its own configured guard.',
+      };
+    }
+    if (
+      row.localPath === 'sources/0023-Erald12-PinescriptIndicator-order_block.txt'
+      && diagnostic.includes('Array index 0 is out of bounds. Array size is 0')
+    ) {
+      return {
+        bucket: 'supported',
+        reason: 'The script indexes bullish_ob[0] on barstate.islast when the order-block array is empty under the corpus bars; Pine arrays throw for indexes outside 0..size-1.',
+      };
+    }
   }
 
   return {
@@ -1479,11 +1810,141 @@ function classifyExternalCorpusValidity(row: Omit<ExternalCorpusReportRow, 'vali
   };
 }
 
+function classifyDataGatedOutputRow(row: Omit<ExternalCorpusReportRow, 'validity'>): ExternalCorpusReportRow['validity'] | null {
+  const classifiableCauses = new Set([
+    'conditional-or-data-gated-output-not-triggered',
+    'global-output-declared-but-not-evaluated',
+  ]);
+  if (!row.outputSilence?.cause || !classifiableCauses.has(row.outputSilence.cause)) return null;
+  switch (row.localPath) {
+    case 'sources/0026-henryoliver-pinescript-indicators-fibonacci.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Fibonacci lines require two confirmed opposite pivots whose leg move clears the ATR-scaled deviation threshold; the smooth synthetic series never forms qualifying anchors.',
+      };
+    case 'sources/0045-ictmentality-pinescript-indicators-other_FVG_Indicator.txt':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Fair-value-gap boxes require low[1] > high[3] or high[1] < low[3] inside the recent NY session window; the synthetic OHLC series is continuous and overlapping, so no gap forms.',
+      };
+    case 'sources/0060-ictmentality-pinescript-indicators-other_QT_Indicator_QTIndicator.txt':
+    case 'sources/0062-ictmentality-pinescript-indicators-other_QT_Indicator_Checkpoint.txt':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Quarterly Theory drawings are gated by chart timeframe/cycle settings: daily runs only on 15m/30m, m90 only on 5m, micro on 1m-3m or 30s-59s, nano on 5s-29s, and weekly is disabled by default. The corpus executes a single default 60m runtime with 1-minute synthetic timestamps, so no live cycle is enabled.',
+      };
+    case 'sources/0070-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_fixed_alert_and_shadowing.txt':
+    case 'sources/0071-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_fixed_shadowing.txt':
+    case 'sources/0072-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_no_warnings_v2.txt':
+    case 'sources/0073-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import_no_warnings.txt':
+    case 'sources/0074-ictmentality-pinescript-indicators-other_TTFM_TTFM_no_import.txt':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'TTFM output is gated behind higher-timeframe candle creation, T-spot/sweep confirmation, or a last-1000-bars display window. With the corpus default 60m runtime but 1-minute synthetic timestamps, the 160-bar and extended probes do not span enough realistic higher-timeframe sessions to create the required HTF candle set.',
+      };
+    case 'sources/0088-razorbladekisses-Tradingview-Indicators-indicators_Institutional_Supply_Demand_Zones':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Supply/demand boxes require a red/green reversal candle whose body is at least 1.8x the previous body and passes the enabled timeframe gate; the low-volatility synthetic sequence never creates the required impulse candle.',
+      };
+    case 'sources/0089-razorbladekisses-Tradingview-Indicators-indicators_Reversal_Pivot_Points':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Pivot lines require request.security pivothigh/pivotlow values on the selected 15m timeframe with gaps_on; the smooth synthetic request series never emits a non-na pivot level to draw.',
+      };
+    case 'sources/0145-Ahmed-GoCode-Quant-Edge-Indicators-Quant-Edge-Indicators_RSI_Momentum_Double_RSI_Strategy.pinescript':
+      return {
+        bucket: 'supported',
+        reason: 'The strategy has no visual outputs and only submits orders when higher/lower timeframe RSI crossover conditions fire; the synthetic request series never triggers an entry or exit, so empty chart output is correct for this data.',
+      };
+    case 'sources/0182-pineforge-4pass_pineforge-engine-tutorial_mtf_strategy_ltf.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'The strategy enters only when lower-timeframe intrabar range exceeds the configured threshold and the chart bar closes bullish; a targeted lower-timeframe fixture proves the request array and strategy entry path emit, while the corpus synthetic request feed stays too smooth.',
+      };
+    case 'sources/0183-Tim1l_PineCryptoStrategies-strategy1.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'The strategy enters only when its fixed H4 momentum state equals 4 and the 15m RSI crosses below the H4 RSI; a targeted crossover fixture proves the strategy order path emits, while the corpus bars do not form that multi-timeframe crossover.',
+      };
+    case 'sources/0201-Alorse_pinescript-strategies-multi_Multi_MTF_MACD.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Alerts are gated by MACD divergence plus EMA trend filters in requested-symbol data; a targeted divergence/alert fixture proves local alert output emits, while the smooth corpus request series forms no qualifying divergence.',
+      };
+    case 'sources/0202-Alorse_pinescript-strategies-multi_Multi_Supertrend.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Alerts and labels are gated by a Supertrend direction flip; a targeted trend-flip fixture proves both alert and label output emit, while the corpus bars never flip the trend.',
+      };
+    case 'sources/0204-Alorse_pinescript-strategies-strategies_MTF_RSI.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'The strategy enters only when price is above its moving average while RSI is oversold; a targeted RSI fixture proves strategy ledger output emits, while the corpus bars do not satisfy that conjunction.',
+      };
+    case 'sources/0232-dcaoyuan_vibetrader-public_indicators_dynpivot.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Dynamic pivot lines require confirmed ta.pivothigh()/ta.pivotlow() values; a targeted swing fixture proves line output emits, while the smooth corpus series does not form the required pivots.',
+      };
+    case 'sources/0241-deepentropy_lightweight-charts-indicators-docs_official_indicators_community_Fair_Value_Gap.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Fair-value-gap boxes require a true gap between the current bar and the bar two bars back; a targeted gap fixture proves box output emits, while the corpus OHLC series overlaps continuously.',
+      };
+    case 'sources/0262-geraked_tradingview-strategies_BBRSI.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'The strategy enters only after RSI recovers from an oversold Bollinger-band break or reverses from an overbought break; a targeted BB/RSI fixture proves order output emits, while the corpus bars do not make the two-step reversal.',
+      };
+    case 'sources/0285-harryguiacorn_TradingView-Proprietary-Indicators-STRG-HOLP.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'HOLP/LOHP orders require a fresh lookback low/high followed by a breakout back through the lookback bar; a targeted breakout fixture proves strategy output emits, while the corpus bars do not form that sequence.',
+      };
+    case 'sources/0303-iamhuraira_trading-view-script-FVG_Indicator.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'FVG boxes require low > high[2] or high < low[2] inside the lookback window; a targeted gap fixture proves box output emits, while the corpus OHLC series is continuous.',
+      };
+    case 'sources/0398-sonnyparlin_fvg_pinescript-fvg.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'FVG boxes require a gap larger than the ATR-derived minimum and aligned with the EMA trend filter; a targeted gap-and-trend fixture proves box output emits, while the corpus bars do not clear the filter.',
+      };
+    case 'sources/0434-TraderOracle_TradingView-Pivot_Order_Blocks.pine':
+      return {
+        bucket: 'corpus-input-gap',
+        reason: 'Pivot order-block boxes require confirmed pivot highs or lows after the configured left/right lookback window; a targeted pivot fixture proves box output emits, while the corpus bars do not produce qualifying pivots.',
+      };
+    default:
+      return null;
+  }
+}
+
 function classifyParseValidity(row: Omit<ExternalCorpusReportRow, 'validity'>, diagnostic: string): ExternalCorpusReportRow['validity'] {
   if (row.sourceFilePath === '.cursor/rules/10 - pinescript-management.md') {
     return {
       bucket: 'corpus-hygiene',
       reason: 'Scraped file is a Markdown development guide containing Pine examples, not a standalone Pine script.',
+    };
+  }
+  if (row.sourceFilePath === 'strategies/bb.sh.pine') {
+    return {
+      bucket: 'corpus-hygiene',
+      reason: 'Scraped file is a shell heredoc template with environment interpolation, not standalone Pine source.',
+    };
+  }
+  if (row.sourceFilePath === 'study-dynamic-variable-alert.pine') {
+    return {
+      bucket: 'corpus-hygiene',
+      reason: 'Scraped file is a Telegram/PineCoders note that embeds a Pine example inside prose, not a standalone Pine script.',
+    };
+  }
+  if (row.sourceFilePath === 'themes/syntaxCheck.pine') {
+    return {
+      bucket: 'corpus-hygiene',
+      reason: 'Scraped file is a Pine syntax-highlighting token sample, not a standalone Pine script.',
     };
   }
   if (row.id.startsWith('0166:')) {
@@ -1504,10 +1965,46 @@ function classifyParseValidity(row: Omit<ExternalCorpusReportRow, 'validity'>, d
       reason: 'Pine conditional expressions require both ? and : arms; this source has a colonless multi-line ternary.',
     };
   }
+  if (row.id.startsWith('0227:')) {
+    return {
+      bucket: 'invalid-pine',
+      reason: 'String literals cannot contain raw line breaks before the closing quote; this source has an unterminated tooltip string.',
+    };
+  }
+  if (row.id.startsWith('0229:')) {
+    return {
+      bucket: 'invalid-pine',
+      reason: 'The source is truncated at a plot expression and starts a statement with a bare comparison tail.',
+    };
+  }
+  if (row.id.startsWith('0257:')) {
+    return {
+      bucket: 'invalid-pine',
+      reason: 'The source contains a corrupted identifier with an apostrophe inside a variable name, which Pine parses as a string delimiter.',
+    };
+  }
+  if (row.id.startsWith('0295:')) {
+    return {
+      bucket: 'invalid-pine',
+      reason: 'String literals cannot span raw line breaks; multiline literal text must be represented with supported Pine string syntax.',
+    };
+  }
+  if (row.id.startsWith('0329:')) {
+    return {
+      bucket: 'invalid-pine',
+      reason: 'Pine named arguments use identifier= syntax; plot.style=plot.style_dashed is not a valid call argument name.',
+    };
+  }
   if (row.id.startsWith('0147:')) {
     return {
       bucket: 'invalid-pine',
       reason: 'Pine identifiers are limited to ASCII letters, digits, and underscores; this source uses a non-ASCII identifier character.',
+    };
+  }
+  if (row.id.startsWith('0410:')) {
+    return {
+      bucket: 'invalid-pine',
+      reason: 'The source contains a malformed assignment that starts with title= options without an input.* call.',
     };
   }
   if (['0047:', '0048:', '0049:', '0053:'].some((prefix) => row.id.startsWith(prefix))) {
@@ -1536,8 +2033,15 @@ function normalizeFailureCause(stage: ExternalCorpusPipelineStage, diagnostic: s
     return unsupportedMatch?.[1]?.trim() || 'compile-failure';
   }
   if (stage === 'execute') {
+    if (diagnostic.includes('Too many unique request.* contexts')) return 'request-context-limit';
+    if (diagnostic.includes('Array index') && diagnostic.includes('out of bounds')) return 'array-bounds-runtime-error';
+    if (diagnostic.includes('chart timeframe is above')) return 'script-timeframe-runtime-guard';
     const codeMatch = diagnostic.match(/(?:^|\s)(runtime\.error|[a-z][a-z0-9_.-]+):/i);
     if (codeMatch) return codeMatch[1]!;
+  }
+  if (stage === 'output') {
+    const silenceMatch = diagnostic.match(/^output-silence:([^:]+):/);
+    if (silenceMatch) return silenceMatch[1]!;
   }
   return diagnostic.split('\n')[0]?.slice(0, 120) || 'unknown';
 }

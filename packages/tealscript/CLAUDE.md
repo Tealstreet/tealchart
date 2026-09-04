@@ -25,10 +25,13 @@ parser tests for CRLF comma-wrapped statement chains, mixed declaration /
 reassignment / expression chains, comments inside continuation initializers,
 two-space UDF indentation, blank lines before switch cases, `indicator` as a
 local variable name, spaced array type brackets such as `label []`, and
-two-space continuation lines after enum/type declarations. The parser wrapper's
-small-indent normalizer must skip obvious continuation lines, including
-leading-comma argument/declaration continuations, so it does not promote them
-into structural block indentation.
+two-space continuation lines after enum/type declarations. Public corpus
+sources also rely on triple-quoted multiline strings, Unicode identifier
+characters, comma-chained declarations inside UDF bodies, and tuple declaration
+patterns whose `=` starts on the following continuation line. The parser
+wrapper's small-indent normalizer must skip obvious continuation lines,
+including leading-comma argument/declaration continuations, so it does not
+promote them into structural block indentation.
 
 ### Runtime (`src/runtime/`)
 
@@ -73,10 +76,26 @@ into structural block indentation.
   emitted read expression. History-read variables and UDT fields can compile to
   reads such as `series.get(0)` or field getters; those are values, not
   JavaScript lvalues.
+- Generated JavaScript identifiers and state member suffixes must be escaped
+  from Pine names at emission time. Pine permits names such as `delete` that
+  are JavaScript syntax errors when emitted raw, and the same escaping must be
+  used for locals, UDFs, loop counters, state slots, snapshots, and history
+  members.
+- Generated UDF local lookup is block-scoped for regular locals and
+  function-scoped for `var`/`varip` state. Public libraries use a temporary
+  `sum` during scale initialization and a persistent `sum` accumulator later in
+  the same function; binding either name at the wrong scope corrupts history
+  and output.
+- Generated user-function overloads need distinct internal identities by
+  callable argument shape. The semantic checker accepts `hl()` and `hl(bar)` as
+  separate UDFs; codegen must not key both bodies under the bare display name or
+  runtime calls select whichever overload was registered last.
 - Compiled collection lowering must preserve Pine collection wrappers and Pine
   argument ordering. Array literals are Pine arrays, collection receiver
   methods use the same ordered arguments as namespace calls, and collection
-  history reads must not be confused with array element indexing.
+  history reads must not be confused with array element indexing. Receiver
+  methods reached dynamically, such as UDT-field arrays, still need Pine-to-JS
+  helper-name aliases (`indexof` -> `indexOf`) before dispatch.
 - Local method overloads keep distinct generated identities by receiver type
   and arity. Resolve user/imported methods before generic collection method
   fallback so script methods named like `copy` or `size` are not swallowed.
@@ -163,6 +182,10 @@ into structural block indentation.
   global plot declarations still count. A `plotshape(false)` or sparse
   `plotcandle(...)` defines a user-visible output control even when every
   sampled value is `na`.
+- External-corpus execute failures are not automatically TealScript gaps. Pine
+  runtime refusals such as the default 40 unique `request.*()` context limit,
+  script-authored `runtime.error()` guards, and proven out-of-range array reads
+  are corpus-valid rows when TradingView would also stop execution.
 - Missing Pine declaration precision is represented as `undefined`. Do not replace it with a backend
   default such as `4`; Tealchart decides display precision at label render time
   from the pane and instrument tick precision.
@@ -194,6 +217,10 @@ into structural block indentation.
   capturing the chart-context value makes request expressions use the chart's
   source instead of the requested series. Unknown or series-like dependencies
   stay replayed.
+- `request.security_lower_tf()` accepts tick timeframes such as `1T` as lower
+  than time-based chart periods. Tuple expressions return one intrabar
+  `PineArray` per tuple item, including `bid`/`ask` source fields; returning an
+  array of per-tick tuples makes destructuring assign mismatched arrays.
 - Compiled imported-library support has two symbol surfaces: exported API for
   importing scripts, and private library-local helpers/types/methods for code
   executing inside that library. Keep those identities distinct. Request
@@ -252,6 +279,9 @@ series[n]   // n bars ago
   init flag for delayed blocks such as `if barstate.islast`.
 - Untyped variables inferred from literal initializers can widen qualifiers on later reassignment or compound assignment; explicit `const`/`input`/`simple` annotations remain enforced.
 - Unary numeric literals such as `-1` and `+1` are numeric literals for type inference, not `unknown`; sentinel locals initialized that way must still widen when reassigned from loop or series values.
+- Explicit type annotations can initialize from `na`, including `bool flag = na`;
+  the annotation supplies the missing type. Numeric widening is one-way:
+  `int` can flow into `float`, but `float` does not implicitly flow into `int`.
 - Bare user/imported function calls resolve before builtins and before legacy
   global compatibility aliases. Public v3/v4 scripts often define helpers named
   like later builtins (`median`, `sum`, `dema`); compiled analysis/emission
@@ -377,6 +407,9 @@ input defaults are for preserving `input.source` identity only. Explicit scalar
 legacy inputs such as `input(type=float, defval=-0.5)` must validate and
 	register the unwrapped scalar default; otherwise valid v3/v4 scripts turn unary
 	numeric defaults into source-wrapper objects.
+Untyped generic `input()` uses its own UI-metadata signature; do not treat
+numeric generic inputs as `input.int()`/`input.float()` range inputs or named
+`inline`/`group` arguments can be shifted into `maxval` at runtime.
 Cached global input declarations and skipped initialized `var`/`varip`
 declarations must still reserve the sequential builtin call-id slots they
 consumed when first evaluated. The IDs are part of persisted chart/study input
@@ -449,12 +482,23 @@ Corpus refetch/repro commands should pass explicit report paths and fresh
 repo root so documented paths like
 `packages/tealscript/reports/external-pine-corpus-v2.report.json` work under
 `yarn workspace`; do not rely on the workspace package directory as cwd.
-Unresolved imports classify as `host-dependency-gap`, not invalid Pine or
+Unresolved host imports classify as `host-dependency-gap`, not invalid Pine or
 undecided, because valid Pine still fails for the user until the host supplies
-the library source. The `unresolved-import` diagnostic must name the requested
-owner/library/version and say that the host library registry did not supply it;
-do not collapse this into a generic checker error. Obvious non-script files
-classify as `corpus-hygiene` and are excluded from the achievable ceiling. Rows
+the library source. Official TradingView standard libraries are implemented as
+documented builtins, version by version; register the full documented export
+surface, not only the functions a corpus happens to call. Unsupported official
+versions or documented exports without runtime bodies stay TealScript gaps and
+fail loudly. AST-backed official surfaces such as `TradingView/ZigZag/8` are
+embedded built-in library programs and still version-pinned; do not resolve
+them through the host library registry or a network fetch. Third-party
+TradingView library imports are
+`unsupported-by-design`: TradingView exposes no network-resolvable library
+source outside its closed Pine runtime, so there is no fetcher/scraper/resolver
+to build, and future proposals to fetch TradingView library source should be
+rejected without scoping. The `unresolved-import` diagnostic must name the
+requested owner/library/version; do not collapse this into a generic checker
+error. Obvious non-script files classify as `corpus-hygiene` and are excluded
+from the achievable ceiling. Rows
 that execute without plots, drawings, alerts, or logs are not all equivalent
 failures. The runner traces
 source-level output calls and records compiled runtime output. Future product
@@ -563,11 +607,12 @@ directions; v6 signatures remain strict unless the reference says otherwise.
 External public-corpus reports are metadata only, read source from
 `/tmp/pine-corpus-v1` or `/tmp/pine-corpus-v2`, and carry row-level validity
 classification: `supported`, `tealscript-gap`, `host-dependency-gap`,
-`invalid-pine`, or `corpus-hygiene`. The achievable ceiling excludes only rows
-marked invalid by a specific TradingView rule or obvious non-Pine corpus
-hygiene. Rows not proven invalid or hygiene remain in the product denominator as
-TealScript or host-dependency gaps so the corpus cannot flatter TealScript by
-guessing.
+`unsupported-by-design`, `invalid-pine`, or `corpus-hygiene`. The achievable
+ceiling excludes rows marked invalid by a specific TradingView rule, obvious
+non-Pine corpus hygiene, corpus input gaps, and permanent unsupported-by-design
+policy outcomes. Rows not proven invalid, hygiene, corpus-input, or
+unsupported-by-design remain in the product denominator as TealScript or
+host-dependency gaps so the corpus cannot flatter TealScript by guessing.
 
 See `PINE_PARITY_AUDIT.md`, `PINE_COMPATIBILITY_INVENTORY.md`, and `PINE_BUILTINS_COVERAGE.md` before claiming PineScript compatibility.
 

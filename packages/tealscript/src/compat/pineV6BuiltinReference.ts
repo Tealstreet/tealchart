@@ -968,8 +968,8 @@ export const PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS = {
   },
   strategyConversionHelpers: {
     reason:
-      'These helpers are strategy-only sizing/currency conversion conveniences and are outside the current deterministic strategy ledger slice.',
-    names: ['strategy.convert_to_account', 'strategy.convert_to_symbol', 'strategy.default_entry_qty'],
+      'These helpers are strategy-only currency conversion conveniences and are outside the current deterministic strategy ledger slice.',
+    names: ['strategy.convert_to_account', 'strategy.convert_to_symbol'],
   },
 } as const satisfies Record<string, PineV6KnownMissingBuiltinGroup>;
 
@@ -1069,13 +1069,6 @@ export const PINE_V6_KNOWN_MISSING_BUILTIN_REVIEW = {
     decision: 'keep-allowlisted',
     reason:
       'Strategy-only currency conversion helper; it is not an indicator paste blocker and sits outside the deterministic position-ledger slice.',
-  },
-  'strategy.default_entry_qty': {
-    manualCategories: ['functions'],
-    traffic: 'medium-strategy-only',
-    decision: 'keep-allowlisted',
-    reason:
-      'Strategy-only sizing preview helper; order sizing itself is implemented in the deterministic ledger, but this convenience query is outside that slice.',
   },
 } as const satisfies Record<string, PineV6KnownMissingBuiltinReview>;
 

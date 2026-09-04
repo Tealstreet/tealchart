@@ -61,6 +61,12 @@ function lowerTimeframeRequestDatafeed(): InMemoryRequestDatafeed {
       bars: lowerRequestedBars,
       syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
     },
+    {
+      symbol: 'BTCUSDT',
+      timeframe: '1T',
+      bars: lowerRequestedBars,
+      syminfo: { ticker: 'BTCUSDT', timezone: 'Etc/UTC' },
+    },
   ]);
 }
 
@@ -637,6 +643,38 @@ plot(array.size(intrabars), title="Count")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Count').values).toEqual([0, 0, 2]);
+  });
+
+  it('returns tuple expressions as one intrabar array per tuple item', () => {
+    const result = runCompatScript(`
+indicator("Lower TF tuple request", timeframe="2")
+[prices, volumes, bids, asks] = request.security_lower_tf(syminfo.tickerid, "1T", [close, volume, bid, ask])
+plot(array.size(prices), title="Price Count")
+plot(array.size(volumes), title="Volume Count")
+plot(array.size(bids), title="Bid Count")
+plot(array.size(asks), title="Ask Count")
+plot(array.get(prices, 0), title="First Price")
+plot(array.get(prices, 1), title="Second Price")
+plot(array.get(volumes, 0), title="First Volume")
+plot(array.get(volumes, 1), title="Second Volume")
+plot(na(array.get(bids, 0)) ? 1 : 0, title="Missing Bid")
+plot(na(array.get(asks, 1)) ? 1 : 0, title="Missing Ask")
+`, {
+      bars: lowerChartBars,
+      engineOptions: { requestDatafeed: lowerTimeframeRequestDatafeed() },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(getPlot(result, 'Price Count').values).toEqual([2, 2, 2]);
+    expect(getPlot(result, 'Volume Count').values).toEqual([2, 2, 2]);
+    expect(getPlot(result, 'Bid Count').values).toEqual([2, 2, 2]);
+    expect(getPlot(result, 'Ask Count').values).toEqual([2, 2, 2]);
+    expect(getPlot(result, 'First Price').values).toEqual([11, 21, 31]);
+    expect(getPlot(result, 'Second Price').values).toEqual([13, 24, 34]);
+    expect(getPlot(result, 'First Volume').values).toEqual([100, 120, 140]);
+    expect(getPlot(result, 'Second Volume').values).toEqual([110, 130, 150]);
+    expect(getPlot(result, 'Missing Bid').values).toEqual([1, 1, 1]);
+    expect(getPlot(result, 'Missing Ask').values).toEqual([1, 1, 1]);
   });
 
   it('supports ignore_invalid_symbol for missing lower-timeframe contexts', () => {
