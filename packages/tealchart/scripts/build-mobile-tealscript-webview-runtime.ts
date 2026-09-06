@@ -1,8 +1,8 @@
+import { writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { build } from 'esbuild';
-import { writeFile } from 'node:fs/promises';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const packageDir = resolve(scriptDir, '..');
@@ -16,6 +16,8 @@ const earlyNativeMessages = [];
 const workerScript = __WORKER_SCRIPT__;
 const workers = new Map();
 let nextWorkerId = 0;
+
+document.title = 'tealscript:top';
 
 function formatErrorMessage(error) {
   if (!error) return 'unknown error';
@@ -35,6 +37,7 @@ function postNative(message) {
 }
 
 window.onerror = function(message, source, lineno, colno, error) {
+  document.title = 'tealscript:error:' + (formatErrorMessage(error) || String(message)).slice(0, 80);
   postNative({
     type: 'runtime-error',
     message: formatErrorMessage(error) || String(message),
@@ -145,11 +148,18 @@ window.__TEALCHART_HANDLE_NATIVE_TEALSCRIPT_MESSAGE__ = function(serialized) {
   }
 };
 
+document.title = 'tealscript:worker-setup';
 postNative({ type: 'runtime-ready' });
 `;
 
 function createHtml(workerScript: string): string {
-  const script = bridgeRuntime.replace('__WORKER_SCRIPT__', JSON.stringify(workerScript));
+  // The replacement MUST be a function. With a string, `String.replace` interprets
+  // `$&`, `` $` ``, `$'` and `$n` inside it — and the minified worker bundle contains
+  // such a sequence, which spliced the surrounding template back into the payload and
+  // emitted a second, truncated `const workerScript = );`. The page then failed to
+  // parse with `SyntaxError: Unexpected EOF` and, because the runtime registers its
+  // own error handler inside that same script, reported nothing at all.
+  const script = bridgeRuntime.replace('__WORKER_SCRIPT__', () => JSON.stringify(workerScript));
   return `<!doctype html><html><head><meta charset="utf-8"></head><body><script>${script}</script></body></html>`;
 }
 
