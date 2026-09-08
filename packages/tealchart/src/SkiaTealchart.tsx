@@ -160,7 +160,7 @@ import {
   getNativePositionObjectId as getPositionObjectId,
 } from './mobile/utils/tradeLineLayout';
 import { applyChartOverridesToRenderOptions } from './overrides';
-import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore } from './state/chartState';
+import { AVAILABLE_TIMEFRAMES, filterTimeframesBySupportedResolutions, getChartStore, setMapStoreKey } from './state/chartState';
 import { TealchartApi } from './TealchartApi';
 import { DEFAULT_MARGINS } from './types';
 import { NATIVE_PRICE_AXIS_TAG_SIZING } from './utils/priceAxisTagSizing';
@@ -1359,7 +1359,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const nativeChartSettingsContext = useMemo<ChartSettingsControlContext>(
     () => ({
       getSettings: () => chartStore.settings.get(),
-      setSetting: (key, value) => chartStore.settings.setKey(key, value),
+      setSetting: (key, value) => setMapStoreKey(chartStore.settings, key, value),
       setChartProperties: (properties) => chartStore.settings.setKey('chartProperties', properties),
       markLayoutDirty: markNativeLayoutDirtyIfReady,
     }),

@@ -120,7 +120,7 @@ import { DEFAULT_LAYOUT_NAME } from './layoutDefaults';
 import { applyChartOverridesToRenderOptions } from './overrides';
 import { PaneManager } from './rendering/PaneManager';
 import { DIRTY, RenderScheduler } from './rendering/RenderScheduler';
-import { getChartStore, hasChartStore } from './state/chartState';
+import { getChartStore, hasChartStore, setMapStoreKey } from './state/chartState';
 import { generateIndicatorId } from './state/indicatorActions';
 import { getTealchartApiLineRenderSnapshot, TealchartApi } from './TealchartApi';
 import { TealscriptManager } from './tealscript/TealscriptManager';
@@ -1972,7 +1972,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     return {
       getSettings: () => this._getCurrentSettings(),
       setSetting: (key, value) => {
-        this._chartStore?.settings.setKey(key, value);
+        setMapStoreKey(this._chartStore?.settings, key, value);
         if (key === 'showVolume') {
           this._mergeRenderOptions({ showVolume: Boolean(value) });
           this._scheduler.markDirty(DIRTY.OPTIONS | DIRTY.FULL);

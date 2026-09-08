@@ -550,6 +550,24 @@ export function getSaveStatusAtom(chartKey: string): WritableAtom<SaveStatus> {
 // Store Update Helpers
 // ============================================================================
 
+interface MapStoreKeyWriter<Value extends object> {
+  setKey(key: keyof Value, value: Value[keyof Value]): void;
+}
+
+/**
+ * Nanostores 1.5 tightened MapStore.setKey's generic lookup enough that
+ * correlated key/value wrappers can fail inference. Keep Tealchart's typed
+ * boundary here while preserving setKey's runtime notification semantics.
+ */
+export function setMapStoreKey<Value extends object, K extends keyof Value>(
+  store: MapStore<Value> | null | undefined,
+  key: K,
+  value: Value[K],
+): void {
+  if (!store) return;
+  (store as unknown as MapStoreKeyWriter<Value>).setKey(key, value);
+}
+
 /**
  * Update a single property in the settings store
  */
@@ -559,7 +577,7 @@ export function updateChartSetting<K extends keyof ChartSettings>(
   value: ChartSettings[K],
 ): void {
   const store = getChartStore(chartKey).settings;
-  store.setKey(key, value);
+  setMapStoreKey(store, key, value);
 }
 
 /**
