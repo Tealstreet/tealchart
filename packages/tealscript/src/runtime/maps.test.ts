@@ -83,6 +83,8 @@ describe('PineMap', () => {
 
     putMapValue(map, 'K1', 100);
     expect(getMapValue(map, 'K1')).toBe(100);
-    expect(() => putMapValue(map, 'Overflow', 1)).toThrow('Map cannot contain more than 50000 key-value pairs');
+    expect(() => putMapValue(map, 'Overflow', 1)).toThrow(
+      'Map cannot contain more than 50000 key-value pairs. Remove old keys or update existing keys before adding more entries.',
+    );
   });
 });

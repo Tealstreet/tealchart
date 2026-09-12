@@ -787,6 +787,8 @@ export class TealScriptDrawingRenderer {
     ctx.save();
 
     for (const table of tables) {
+      if (table.cells.length === 0) continue;
+
       const metrics = this.measureTable(table, pane);
       const origin = this.resolveTableOrigin(table.position, metrics.width, metrics.height, options.width, margins, pane);
 

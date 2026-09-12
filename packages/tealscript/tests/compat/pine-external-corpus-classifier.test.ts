@@ -468,6 +468,8 @@ plot(helper.value(close), "Value")`,
     id: 'external-security-legacy-alias',
     title: 'Legacy security alias',
     featureTags: ['security', 'request.security', 'timeframe'],
+    expectedPassed: false,
+    expectedFirstFailureClass: 'semantic_gap',
     source: `//@version=5
 indicator("Legacy security")
 legacyClose = security("TEST", "D", close, lookahead=barmerge.lookahead_on)
@@ -1146,17 +1148,17 @@ describe('Pine external corpus source classifier', () => {
     expect(run.summary.validationErrors).toEqual({});
     expect(run.summary).toMatchObject({
       total: 85,
-      passed: 77,
-      failed: 8,
+      passed: 76,
+      failed: 9,
       plannedUnsupported: 0,
       excludedFailed: 7,
-      actionableFailed: 1,
+      actionableFailed: 2,
     });
     expect(run.summary.byFirstFailureClass).toEqual({
       data_gap: 1,
       parse_gap: 1,
       runtime_gap: 1,
-      semantic_gap: 5,
+      semantic_gap: 6,
     });
     expect(run.summary.byExcludedFailureReason).toEqual({
       classifier_self_test: 3,
@@ -1192,7 +1194,7 @@ describe('Pine external corpus source classifier', () => {
     expect(formatPineCompatibilityCorpusMarkdown(run)).toContain('Total: 85');
     expect(formatPineCompatibilityCorpusMarkdown(run)).toContain('Excluded failed: 7');
     expect(formatPineCompatibilityCorpusMarkdown(run)).not.toContain('| compiled_fallback |');
-    expect(formatPineCompatibilityCorpusMarkdown(run)).toContain('| request.security | 28 | 26 | 2 |');
+    expect(formatPineCompatibilityCorpusMarkdown(run)).toContain('| request.security | 28 | 25 | 3 |');
   });
 
   it('tracks compiled fallback rate for external fixtures expected to run', () => {

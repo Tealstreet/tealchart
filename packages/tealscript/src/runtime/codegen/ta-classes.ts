@@ -5,6 +5,115 @@ export interface Saveable {
   restore(snap: unknown): void;
 }
 
+function validatePositiveIntegerLength(value: number, parameterName = 'TA length'): number {
+  const length = Number(value);
+  if (!Number.isFinite(length) || Math.trunc(length) !== length || length < 1) {
+    throw new Error(`${parameterName} must be a positive integer; got ${formatInvalidLength(length)}. TradingView rejects zero, negative, fractional, and na lengths, so guard computed lengths or add one before calling TA functions`);
+  }
+  return length;
+}
+
+function formatInvalidLength(value: number): string {
+  if (Number.isNaN(value)) return 'na';
+  if (value === Number.POSITIVE_INFINITY) return 'Infinity';
+  if (value === Number.NEGATIVE_INFINITY) return '-Infinity';
+  return String(value);
+}
+
+interface NonNaSample {
+  value: number;
+  barIndex: number;
+}
+
+interface NonNaWindowSnapshot {
+  samples: NonNaSample[];
+  barIndex: number;
+}
+
+class NonNaWindow {
+  private samples: NonNaSample[] = [];
+  private barIndex = -1;
+  private readonly length: number;
+
+  constructor(length: number) {
+    this.length = validatePositiveIntegerLength(length);
+  }
+
+  push(value: number): void {
+    this.barIndex += 1;
+    if (value !== value) return;
+    this.samples.push({ value, barIndex: this.barIndex });
+    if (this.samples.length > this.length) this.samples.shift();
+  }
+
+  get ready(): boolean {
+    return this.samples.length >= this.length;
+  }
+
+  valuesOldestFirst(): number[] {
+    return this.samples.map((sample) => sample.value);
+  }
+
+  valuesNewestFirst(): number[] {
+    return [...this.samples].reverse().map((sample) => sample.value);
+  }
+
+  samplesNewestFirst(): NonNaSample[] {
+    return [...this.samples].reverse();
+  }
+
+  currentBarIndex(): number {
+    return this.barIndex;
+  }
+
+  save(): NonNaWindowSnapshot {
+    return {
+      samples: this.samples.map((sample) => ({ ...sample })),
+      barIndex: this.barIndex,
+    };
+  }
+
+  restore(snap: NonNaWindowSnapshot): void {
+    this.samples = snap.samples.map((sample) => ({ ...sample }));
+    this.barIndex = snap.barIndex;
+  }
+}
+
+interface PairedNonNaWindowSnapshot {
+  samples: { left: number; right: number }[];
+}
+
+class PairedNonNaWindow {
+  private samples: { left: number; right: number }[] = [];
+  private readonly length: number;
+
+  constructor(length: number) {
+    this.length = validatePositiveIntegerLength(length);
+  }
+
+  push(left: number, right: number): void {
+    if (left !== left || right !== right) return;
+    this.samples.push({ left, right });
+    if (this.samples.length > this.length) this.samples.shift();
+  }
+
+  windows(): [number[], number[]] | null {
+    if (this.samples.length < this.length) return null;
+    return [
+      this.samples.map((sample) => sample.left),
+      this.samples.map((sample) => sample.right),
+    ];
+  }
+
+  save(): PairedNonNaWindowSnapshot {
+    return { samples: this.samples.map((sample) => ({ ...sample })) };
+  }
+
+  restore(snap: PairedNonNaWindowSnapshot): void {
+    this.samples = snap.samples.map((sample) => ({ ...sample }));
+  }
+}
+
 // ==========================================================================
 // SMA — Simple Moving Average
 // ==========================================================================
@@ -28,7 +137,7 @@ export class SMA implements Saveable {
   private snap: SMASnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.buf = new Float64Array(this.length);
     this.buf.fill(NaN);
   }
@@ -57,7 +166,7 @@ export class SMA implements Saveable {
 
   private _advance(src: number): number {
     this.barCount++;
-    if (src !== src) return NaN; // NaN check
+    if (src !== src) return this.size < this.length ? NaN : this.sum / this.length;
 
     if (this.size < this.length) {
       this.buf[this.size] = src;
@@ -113,6 +222,46 @@ interface EMASnapshot {
   value: number;
 }
 
+// ===========================================================================
+// Sum -- rolling sum over non-na source values
+// ===========================================================================
+
+export class Sum implements Saveable {
+  private series: NonNaWindow;
+  private readonly length: number;
+  private snap: SeriesSnapshot | null = null;
+
+  constructor(length: number) {
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
+  }
+
+  compute(src: number): number {
+    this.snap = { series: this.series.save() };
+    return this._advance(src);
+  }
+
+  recompute(src: number): number {
+    if (this.snap) this.series.restore(this.snap.series as NonNaWindowSnapshot);
+    return this._advance(src);
+  }
+
+  private _advance(src: number): number {
+    this.series.push(src);
+    if (!this.series.ready) return NaN;
+    return this.series.valuesOldestFirst().reduce((sum, value) => sum + value, 0);
+  }
+
+  save(): SeriesSnapshot {
+    return { series: this.series.save() };
+  }
+
+  restore(snap: SeriesSnapshot): void {
+    this.series.restore(snap.series as NonNaWindowSnapshot);
+    this.snap = null;
+  }
+}
+
 export class EMA implements Saveable {
   private value: number = NaN;
   private readonly alpha: number;
@@ -120,7 +269,7 @@ export class EMA implements Saveable {
   private snap: EMASnapshot | null = null;
 
   constructor(length: number) {
-    this.alpha = 2 / (Math.max(1, Math.trunc(length)) + 1);
+    this.alpha = 2 / (validatePositiveIntegerLength(length) + 1);
   }
 
   compute(src: number): number {
@@ -136,7 +285,7 @@ export class EMA implements Saveable {
   }
 
   private _advance(src: number): number {
-    if (src !== src) return NaN;
+    if (src !== src) return this.value;
     if (this.value !== this.value) {
       this.value = src;
     } else {
@@ -175,7 +324,7 @@ export class RMA implements Saveable {
   private snap: RMASnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.alpha = 1 / this.length;
     this.seedBuf = new Float64Array(this.length);
   }
@@ -199,7 +348,7 @@ export class RMA implements Saveable {
   }
 
   private _advance(src: number): number {
-    if (src !== src) return NaN;
+    if (src !== src) return this.value;
 
     if (this.seedCount < this.length) {
       this.seedBuf[this.seedCount] = src;
@@ -455,7 +604,7 @@ export class Change implements Saveable {
   private snap: ChangeSnapshot | null = null;
 
   constructor(maxLength: number = 1) {
-    this.maxLength = Math.max(1, Math.trunc(maxLength));
+    this.maxLength = validatePositiveIntegerLength(maxLength, 'ta.change length');
     this.buf = new Float64Array(this.maxLength + 1);
     this.buf.fill(NaN);
   }
@@ -518,14 +667,14 @@ interface SeriesSnapshot {
 }
 
 export class WMA implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: SeriesSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -535,21 +684,21 @@ export class WMA implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
+    if (!this.series.ready) return NaN;
 
     let weightedSum = 0;
     let weightSum = 0;
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
-      const weight = this.length - index;
+    const values = this.series.valuesOldestFirst();
+    for (let index = 0; index < values.length; index += 1) {
+      const value = values[index];
+      const weight = index + 1;
       weightedSum += value * weight;
       weightSum += weight;
     }
@@ -561,68 +710,60 @@ export class WMA implements Saveable {
   }
 
   restore(snap: SeriesSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class VWMA implements Saveable {
-  private sourceSeries: NumericSeries;
-  private volumeSeries: NumericSeries;
+  private numerators: NonNaWindow;
+  private volumes: NonNaWindow;
   private readonly length: number;
 
   private snap: { source: unknown; volume: unknown } | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.sourceSeries = new NumericSeries(this.length);
-    this.volumeSeries = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.numerators = new NonNaWindow(this.length);
+    this.volumes = new NonNaWindow(this.length);
   }
 
   compute(source: number, volume: number): number {
     this.snap = {
-      source: this.sourceSeries.save(),
-      volume: this.volumeSeries.save(),
+      source: this.numerators.save(),
+      volume: this.volumes.save(),
     };
     return this._advance(source, volume);
   }
 
   recompute(source: number, volume: number): number {
     if (this.snap) {
-      this.sourceSeries.restore(this.snap.source as ReturnType<NumericSeries['save']>);
-      this.volumeSeries.restore(this.snap.volume as ReturnType<NumericSeries['save']>);
+      this.numerators.restore(this.snap.source as NonNaWindowSnapshot);
+      this.volumes.restore(this.snap.volume as NonNaWindowSnapshot);
     }
     return this._advance(source, volume);
   }
 
   private _advance(source: number, volume: number): number {
-    this.sourceSeries.push(source);
-    this.volumeSeries.push(volume);
-    if (this.sourceSeries.length < this.length || this.volumeSeries.length < this.length) return NaN;
+    this.numerators.push(source * volume);
+    this.volumes.push(volume);
+    if (!this.numerators.ready || !this.volumes.ready) return NaN;
 
-    let weightedSum = 0;
-    let volumeSum = 0;
-    for (let offset = 0; offset < this.length; offset += 1) {
-      const value = this.sourceSeries.get(offset);
-      const weight = this.volumeSeries.get(offset);
-      if (value !== value || weight !== weight) continue;
-      weightedSum += value * weight;
-      volumeSum += weight;
-    }
-
+    const weightedSum = this.numerators.valuesOldestFirst().reduce((sum, value) => sum + value, 0);
+    const volumeSum = this.volumes.valuesOldestFirst().reduce((sum, value) => sum + value, 0);
     return volumeSum === 0 ? NaN : weightedSum / volumeSum;
   }
 
   save(): { source: unknown; volume: unknown } {
     return {
-      source: this.sourceSeries.save(),
-      volume: this.volumeSeries.save(),
+      source: this.numerators.save(),
+      volume: this.volumes.save(),
     };
   }
 
   restore(snap: { source: unknown; volume: unknown }): void {
-    this.sourceSeries.restore(snap.source as ReturnType<NumericSeries['save']>);
-    this.volumeSeries.restore(snap.volume as ReturnType<NumericSeries['save']>);
+    this.numerators.restore(snap.source as NonNaWindowSnapshot);
+    this.volumes.restore(snap.volume as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
@@ -686,8 +827,8 @@ export class ALMA implements Saveable {
 
   private snap: ALMASnapshot | null = null;
 
-  constructor(length: number, offset: number, sigma: number, useFlooredOffset = true) {
-    this.length = Math.max(1, Math.trunc(length));
+  constructor(length: number, offset: number, sigma: number, useFlooredOffset = false) {
+    this.length = validatePositiveIntegerLength(length);
     this.offset = offset;
     this.sigma = sigma;
     this.useFlooredOffset = useFlooredOffset;
@@ -743,14 +884,14 @@ export class ALMA implements Saveable {
 // ==========================================================================
 
 export class CCI implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: SeriesSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -760,21 +901,20 @@ export class CCI implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length || src !== src) return NaN;
+    if (!this.series.ready || src !== src) return NaN;
 
-    const values = Array.from({ length: this.length }, (_, i) => this.series.get(i));
-    if (values.some((value) => value !== value)) return NaN;
+    const values = this.series.valuesOldestFirst();
 
     const basis = values.reduce((sum, value) => sum + value, 0) / this.length;
     const meanDeviation = values.reduce((sum, value) => sum + Math.abs(value - basis), 0) / this.length;
-    return meanDeviation === 0 ? 0 : (src - basis) / (0.015 * meanDeviation);
+    return meanDeviation === 0 ? NaN : (src - basis) / (0.015 * meanDeviation);
   }
 
   save(): SeriesSnapshot {
@@ -782,7 +922,7 @@ export class CCI implements Saveable {
   }
 
   restore(snap: SeriesSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
@@ -794,7 +934,7 @@ export class CMO implements Saveable {
   private snap: SeriesSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.series = new NumericSeries(this.length + 1);
   }
 
@@ -852,7 +992,7 @@ export class WPR implements Saveable {
   private snap: WPRSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.highs = new NumericSeries(this.length);
     this.lows = new NumericSeries(this.length);
   }
@@ -925,8 +1065,8 @@ export class HMA implements Saveable {
   private snap: HMASnapshot | null = null;
 
   constructor(length: number) {
-    const normalized = Math.max(1, Math.trunc(length));
-    this.half = new WMA(Math.floor(normalized / 2));
+    const normalized = validatePositiveIntegerLength(length);
+    this.half = new WMA(Math.max(1, Math.floor(normalized / 2)));
     this.full = new WMA(normalized);
     this.raw = new WMA(Math.round(Math.sqrt(normalized)));
   }
@@ -985,7 +1125,7 @@ export class Mom implements Saveable {
   private snap: SeriesSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.series = new NumericSeries(this.length + 1);
   }
 
@@ -1025,7 +1165,7 @@ export class ROC implements Saveable {
   private snap: SeriesSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.series = new NumericSeries(this.length + 1);
   }
 
@@ -1124,14 +1264,14 @@ interface HighestLowestSnapshot {
 }
 
 export class Highest implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.trunc(length);
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -1141,7 +1281,7 @@ export class Highest implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
@@ -1149,13 +1289,8 @@ export class Highest implements Saveable {
   private _advance(src: number): number {
     this.series.push(src);
     if (this.length <= 0) return NaN;
-    const len = Math.min(this.length, this.series.length);
-    let max = -Infinity;
-    for (let i = 0; i < len; i++) {
-      const v = this.series.get(i);
-      if (v !== v) continue;
-      if (v > max) max = v;
-    }
+    if (!this.series.ready) return NaN;
+    const max = Math.max(...this.series.valuesNewestFirst());
     return max === -Infinity ? NaN : max;
   }
 
@@ -1164,20 +1299,20 @@ export class Highest implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Lowest implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -1187,7 +1322,7 @@ export class Lowest implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
@@ -1195,13 +1330,8 @@ export class Lowest implements Saveable {
   private _advance(src: number): number {
     this.series.push(src);
     if (this.length <= 0) return NaN;
-    const len = Math.min(this.length, this.series.length);
-    let min = Infinity;
-    for (let i = 0; i < len; i++) {
-      const v = this.series.get(i);
-      if (v !== v) continue;
-      if (v < min) min = v;
-    }
+    if (!this.series.ready) return NaN;
+    const min = Math.min(...this.series.valuesNewestFirst());
     return min === Infinity ? NaN : min;
   }
 
@@ -1210,20 +1340,20 @@ export class Lowest implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Range implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -1233,19 +1363,17 @@ export class Range implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    const len = Math.min(this.length, this.series.length);
+    if (this.length <= 0 || !this.series.ready) return NaN;
     let max = -Infinity;
     let min = Infinity;
-    for (let i = 0; i < len; i += 1) {
-      const value = this.series.get(i);
-      if (value !== value) continue;
+    for (const value of this.series.valuesNewestFirst()) {
       if (value > max) max = value;
       if (value < min) min = value;
     }
@@ -1257,20 +1385,20 @@ export class Range implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class HighestBars implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.trunc(length);
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -1280,7 +1408,7 @@ export class HighestBars implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
@@ -1288,14 +1416,14 @@ export class HighestBars implements Saveable {
   private _advance(src: number): number {
     this.series.push(src);
     if (this.length <= 0) return NaN;
+    if (!this.series.ready) return NaN;
     let highest = -Infinity;
     let offset = NaN;
-    for (let index = 0; index < this.series.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) continue;
+    for (const sample of this.series.samplesNewestFirst()) {
+      const value = sample.value;
       if (value > highest) {
         highest = value;
-        offset = index;
+        offset = sample.barIndex - this.series.currentBarIndex();
       }
     }
     return offset;
@@ -1306,20 +1434,20 @@ export class HighestBars implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class LowestBars implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.trunc(length);
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -1329,7 +1457,7 @@ export class LowestBars implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
@@ -1337,14 +1465,14 @@ export class LowestBars implements Saveable {
   private _advance(src: number): number {
     this.series.push(src);
     if (this.length <= 0) return NaN;
+    if (!this.series.ready) return NaN;
     let lowest = Infinity;
     let offset = NaN;
-    for (let index = 0; index < this.series.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) continue;
+    for (const sample of this.series.samplesNewestFirst()) {
+      const value = sample.value;
       if (value < lowest) {
         lowest = value;
-        offset = index;
+        offset = sample.barIndex - this.series.currentBarIndex();
       }
     }
     return offset;
@@ -1355,20 +1483,20 @@ export class LowestBars implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Rising implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length + 1);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length + 1);
   }
 
   compute(src: number): boolean {
@@ -1378,7 +1506,7 @@ export class Rising implements Saveable {
 
   recompute(src: number): boolean {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
@@ -1386,10 +1514,10 @@ export class Rising implements Saveable {
   private _advance(src: number): boolean {
     if (src !== src) return false;
     this.series.push(src);
-    if (this.series.length <= this.length) return false;
-    for (let offset = 1; offset <= this.length; offset += 1) {
-      const value = this.series.get(offset);
-      if (value !== value || src <= value) return false;
+    if (!this.series.ready) return false;
+    const values = this.series.valuesNewestFirst();
+    for (let offset = 1; offset < values.length; offset += 1) {
+      if (src <= values[offset]) return false;
     }
     return true;
   }
@@ -1399,20 +1527,20 @@ export class Rising implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Falling implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: HighestLowestSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length + 1);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length + 1);
   }
 
   compute(src: number): boolean {
@@ -1422,7 +1550,7 @@ export class Falling implements Saveable {
 
   recompute(src: number): boolean {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
@@ -1430,10 +1558,10 @@ export class Falling implements Saveable {
   private _advance(src: number): boolean {
     if (src !== src) return false;
     this.series.push(src);
-    if (this.series.length <= this.length) return false;
-    for (let offset = 1; offset <= this.length; offset += 1) {
-      const value = this.series.get(offset);
-      if (value !== value || src >= value) return false;
+    if (!this.series.ready) return false;
+    const values = this.series.valuesNewestFirst();
+    for (let offset = 1; offset < values.length; offset += 1) {
+      if (src >= values[offset]) return false;
     }
     return true;
   }
@@ -1443,42 +1571,68 @@ export class Falling implements Saveable {
   }
 
   restore(snap: HighestLowestSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Max implements Saveable {
-  compute(left: number, right: number): number {
-    return left !== left || right !== right ? NaN : Math.max(left, right);
+  private value: number = -Infinity;
+  private snap: { value: number } | null = null;
+
+  compute(left: number, right?: number): number {
+    this.snap = { value: this.value };
+    return this._advance(left, right);
   }
 
-  recompute(left: number, right: number): number {
-    return this.compute(left, right);
+  recompute(left: number, right?: number): number {
+    if (this.snap) this.value = this.snap.value;
+    return this._advance(left, right);
   }
 
-  save(): null {
-    return null;
+  private _advance(left: number, right?: number): number {
+    if (right !== undefined) return left !== left || right !== right ? NaN : Math.max(left, right);
+    if (left === left && left > this.value) this.value = left;
+    return this.value === -Infinity ? NaN : this.value;
   }
 
-  restore(): void {
+  save(): { value: number } {
+    return { value: this.value };
+  }
+
+  restore(snap: { value: number }): void {
+    this.value = snap.value;
+    this.snap = null;
   }
 }
 
 export class Min implements Saveable {
-  compute(left: number, right: number): number {
-    return left !== left || right !== right ? NaN : Math.min(left, right);
+  private value: number = Infinity;
+  private snap: { value: number } | null = null;
+
+  compute(left: number, right?: number): number {
+    this.snap = { value: this.value };
+    return this._advance(left, right);
   }
 
-  recompute(left: number, right: number): number {
-    return this.compute(left, right);
+  recompute(left: number, right?: number): number {
+    if (this.snap) this.value = this.snap.value;
+    return this._advance(left, right);
   }
 
-  save(): null {
-    return null;
+  private _advance(left: number, right?: number): number {
+    if (right !== undefined) return left !== left || right !== right ? NaN : Math.min(left, right);
+    if (left === left && left < this.value) this.value = left;
+    return this.value === Infinity ? NaN : this.value;
   }
 
-  restore(): void {
+  save(): { value: number } {
+    return { value: this.value };
+  }
+
+  restore(snap: { value: number }): void {
+    this.value = snap.value;
+    this.snap = null;
   }
 }
 
@@ -1589,7 +1743,10 @@ export class ATR implements Saveable {
   }
 
   private _advance(high: number, low: number, close: number, isRecompute: boolean): number {
-    if (high !== high || low !== low || close !== close) return NaN;
+    if (high !== high || low !== low || close !== close) {
+      this.prevClose = NaN;
+      return isRecompute ? this.rma.recompute(NaN) : this.rma.compute(NaN);
+    }
     let tr: number;
     if (this.prevClose !== this.prevClose) {
       tr = high - low;
@@ -1619,6 +1776,7 @@ export class ATR implements Saveable {
 // ==========================================================================
 
 interface DMISnapshot {
+  hasPreviousBar: boolean;
   prevHigh: number;
   prevLow: number;
   prevClose: number;
@@ -1629,6 +1787,7 @@ interface DMISnapshot {
 }
 
 export class DMI implements Saveable {
+  private hasPreviousBar = false;
   private prevHigh: number = NaN;
   private prevLow: number = NaN;
   private prevClose: number = NaN;
@@ -1665,24 +1824,31 @@ export class DMI implements Saveable {
   }
 
   private _advance(high: number, low: number, close: number, isRecompute: boolean): [number, number, number] {
-    if (high !== high || low !== low || close !== close) return [NaN, NaN, NaN];
-
-    const tr = this.prevClose !== this.prevClose
-      ? high - low
-      : Math.max(high - low, Math.abs(high - this.prevClose), Math.abs(low - this.prevClose));
+    const validBar = high === high && low === low && close === close;
+    const tr = validBar
+      ? this.prevClose !== this.prevClose
+        ? high - low
+        : Math.max(high - low, Math.abs(high - this.prevClose), Math.abs(low - this.prevClose))
+      : NaN;
 
     let plusDm = NaN;
     let minusDm = NaN;
-    if (this.prevHigh === this.prevHigh && this.prevLow === this.prevLow) {
-      const upMove = high - this.prevHigh;
-      const downMove = this.prevLow - low;
-      plusDm = upMove > downMove && upMove > 0 ? upMove : 0;
-      minusDm = downMove > upMove && downMove > 0 ? downMove : 0;
+    if (this.hasPreviousBar) {
+      if (validBar && this.prevHigh === this.prevHigh && this.prevLow === this.prevLow) {
+        const upMove = high - this.prevHigh;
+        const downMove = this.prevLow - low;
+        plusDm = upMove > downMove && upMove > 0 ? upMove : 0;
+        minusDm = downMove > upMove && downMove > 0 ? downMove : 0;
+      } else {
+        plusDm = 0;
+        minusDm = 0;
+      }
     }
 
-    this.prevHigh = high;
-    this.prevLow = low;
-    this.prevClose = close;
+    this.hasPreviousBar = true;
+    this.prevHigh = validBar ? high : NaN;
+    this.prevLow = validBar ? low : NaN;
+    this.prevClose = validBar ? close : NaN;
 
     const smoothTr = isRecompute ? this.trRma.recompute(tr) : this.trRma.compute(tr);
     const smoothPlusDm = isRecompute ? this.plusDmRma.recompute(plusDm) : this.plusDmRma.compute(plusDm);
@@ -1702,6 +1868,7 @@ export class DMI implements Saveable {
 
   save(): DMISnapshot {
     return {
+      hasPreviousBar: this.hasPreviousBar,
       prevHigh: this.prevHigh,
       prevLow: this.prevLow,
       prevClose: this.prevClose,
@@ -1713,6 +1880,7 @@ export class DMI implements Saveable {
   }
 
   restore(snap: DMISnapshot): void {
+    this.hasPreviousBar = snap.hasPreviousBar;
     this.prevHigh = snap.prevHigh;
     this.prevLow = snap.prevLow;
     this.prevClose = snap.prevClose;
@@ -2011,7 +2179,7 @@ export class Stoch implements Saveable {
   private snap: StochSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.highest = new Highest(length);
     this.lowest = new Lowest(length);
   }
@@ -2069,16 +2237,16 @@ interface StdDevSnapshot {
 }
 
 export class StdDev implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
   private readonly biased: boolean;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number, biased = true) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.biased = biased;
-    this.series = new NumericSeries(this.length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2088,24 +2256,21 @@ export class StdDev implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
+    if (!this.series.ready) return NaN;
+    const values = this.series.valuesOldestFirst();
     let sum = 0;
-    for (let i = 0; i < this.length; i++) {
-      const v = this.series.get(i);
-      if (v !== v) return NaN;
-      sum += v;
-    }
+    for (const v of values) sum += v;
     const mean = sum / this.length;
     let sumSq = 0;
-    for (let i = 0; i < this.length; i++) {
-      const d = this.series.get(i) - mean;
+    for (const value of values) {
+      const d = value - mean;
       sumSq += d * d;
     }
     const divisor = this.biased ? this.length : this.length - 1;
@@ -2117,22 +2282,22 @@ export class StdDev implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Variance implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
   private readonly biased: boolean;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number, biased = true) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.biased = biased;
-    this.series = new NumericSeries(this.length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2142,28 +2307,25 @@ export class Variance implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
+    if (!this.series.ready) return NaN;
+    const values = this.series.valuesOldestFirst();
     let sum = 0;
-    for (let i = 0; i < this.length; i += 1) {
-      const value = this.series.get(i);
-      if (value !== value) return NaN;
-      sum += value;
-    }
+    for (const value of values) sum += value;
 
     const mean = sum / this.length;
     const divisor = this.biased ? this.length : this.length - 1;
     if (divisor <= 0) return NaN;
 
     let sumSq = 0;
-    for (let i = 0; i < this.length; i += 1) {
-      const diff = this.series.get(i) - mean;
+    for (const value of values) {
+      const diff = value - mean;
       sumSq += diff * diff;
     }
     return sumSq / divisor;
@@ -2174,20 +2336,20 @@ export class Variance implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Dev implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2197,26 +2359,21 @@ export class Dev implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
+    if (!this.series.ready) return NaN;
+    const values = this.series.valuesOldestFirst();
     let sum = 0;
-    for (let i = 0; i < this.length; i += 1) {
-      const value = this.series.get(i);
-      if (value !== value) return NaN;
-      sum += value;
-    }
+    for (const value of values) sum += value;
 
     const mean = sum / this.length;
     let deviation = 0;
-    for (let i = 0; i < this.length; i += 1) {
-      deviation += Math.abs(this.series.get(i) - mean);
-    }
+    for (const value of values) deviation += Math.abs(value - mean);
     return deviation / this.length;
   }
 
@@ -2225,7 +2382,7 @@ export class Dev implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
@@ -2236,37 +2393,33 @@ interface PairedSeriesSnapshot {
 }
 
 export class Covariance implements Saveable {
-  private leftSeries: NumericSeries;
-  private rightSeries: NumericSeries;
+  private pairs: PairedNonNaWindow;
   private readonly length: number;
 
   private snap: PairedSeriesSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.leftSeries = new NumericSeries(this.length);
-    this.rightSeries = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.pairs = new PairedNonNaWindow(this.length);
   }
 
   compute(left: number, right: number): number {
     this.snap = {
-      left: this.leftSeries.save(),
-      right: this.rightSeries.save(),
+      left: this.pairs.save(),
+      right: null,
     };
     return this._advance(left, right);
   }
 
   recompute(left: number, right: number): number {
     if (this.snap) {
-      this.leftSeries.restore(this.snap.left as ReturnType<NumericSeries['save']>);
-      this.rightSeries.restore(this.snap.right as ReturnType<NumericSeries['save']>);
+      this.pairs.restore(this.snap.left as PairedNonNaWindowSnapshot);
     }
     return this._advance(left, right);
   }
 
   protected _advance(left: number, right: number): number {
-    this.leftSeries.push(left);
-    this.rightSeries.push(right);
+    this.pairs.push(left, right);
     const values = this.getWindows();
     if (!values) return NaN;
     const [leftValues, rightValues] = values;
@@ -2280,29 +2433,18 @@ export class Covariance implements Saveable {
   }
 
   protected getWindows(): [number[], number[]] | null {
-    if (this.leftSeries.length < this.length || this.rightSeries.length < this.length) return null;
-    const leftValues: number[] = [];
-    const rightValues: number[] = [];
-    for (let index = 0; index < this.length; index += 1) {
-      const left = this.leftSeries.get(index);
-      const right = this.rightSeries.get(index);
-      if (left !== left || right !== right) return null;
-      leftValues.push(left);
-      rightValues.push(right);
-    }
-    return [leftValues, rightValues];
+    return this.pairs.windows();
   }
 
   save(): PairedSeriesSnapshot {
     return {
-      left: this.leftSeries.save(),
-      right: this.rightSeries.save(),
+      left: this.pairs.save(),
+      right: null,
     };
   }
 
   restore(snap: PairedSeriesSnapshot): void {
-    this.leftSeries.restore(snap.left as ReturnType<NumericSeries['save']>);
-    this.rightSeries.restore(snap.right as ReturnType<NumericSeries['save']>);
+    this.pairs.restore(snap.left as PairedNonNaWindowSnapshot);
     this.snap = null;
   }
 }
@@ -2334,14 +2476,14 @@ export class Correlation extends Covariance {
 }
 
 export class COG implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2351,20 +2493,20 @@ export class COG implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
+    if (!this.series.ready) return NaN;
 
     let sum = 0;
     let weighted = 0;
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
+    const values = this.series.valuesNewestFirst();
+    for (let index = 0; index < values.length; index += 1) {
+      const value = values[index];
       sum += value;
       weighted += value * (index + 1);
     }
@@ -2377,20 +2519,20 @@ export class COG implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Median implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2400,20 +2542,15 @@ export class Median implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
-    const values: number[] = [];
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
-      values.push(value);
-    }
+    if (!this.series.ready) return NaN;
+    const values = this.series.valuesOldestFirst();
 
     values.sort((a, b) => a - b);
     const mid = Math.floor(values.length / 2);
@@ -2425,20 +2562,20 @@ export class Median implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class Mode implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2448,20 +2585,15 @@ export class Mode implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length) return NaN;
-    const values: number[] = [];
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
-      values.push(value);
-    }
+    if (!this.series.ready) return NaN;
+    const values = this.series.valuesOldestFirst();
 
     const counts = new Map<number, number>();
     for (const value of values) {
@@ -2484,22 +2616,22 @@ export class Mode implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class PercentileNearestRank implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
   private readonly percentage: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number, percentage: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.percentage = Math.min(100, Math.max(0, percentage));
-    this.series = new NumericSeries(this.length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2509,14 +2641,14 @@ export class PercentileNearestRank implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length || this.percentage !== this.percentage) return NaN;
+    if (!this.series.ready || this.percentage !== this.percentage) return NaN;
     const sorted = this.getSortedWindow();
     if (!sorted) return NaN;
     const rank = Math.max(1, Math.ceil((this.percentage / 100) * sorted.length));
@@ -2524,12 +2656,7 @@ export class PercentileNearestRank implements Saveable {
   }
 
   private getSortedWindow(): number[] | null {
-    const values: number[] = [];
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return null;
-      values.push(value);
-    }
+    const values = this.series.valuesOldestFirst();
     return values.sort((a, b) => a - b);
   }
 
@@ -2538,22 +2665,22 @@ export class PercentileNearestRank implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class PercentileLinearInterpolation implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
   private readonly percentage: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number, percentage: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.percentage = Math.min(100, Math.max(0, percentage));
-    this.series = new NumericSeries(this.length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2563,20 +2690,15 @@ export class PercentileLinearInterpolation implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length || this.percentage !== this.percentage) return NaN;
-    const sorted: number[] = [];
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
-      sorted.push(value);
-    }
+    if (!this.series.ready || this.percentage !== this.percentage) return NaN;
+    const sorted = this.series.valuesOldestFirst();
     sorted.sort((a, b) => a - b);
 
     const rank = (this.percentage / 100) * (sorted.length - 1);
@@ -2593,20 +2715,20 @@ export class PercentileLinearInterpolation implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
 
 export class PercentRank implements Saveable {
-  private series: NumericSeries;
+  private series: NonNaWindow;
   private readonly length: number;
 
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
-    this.series = new NumericSeries(this.length);
+    this.length = validatePositiveIntegerLength(length);
+    this.series = new NonNaWindow(this.length);
   }
 
   compute(src: number): number {
@@ -2616,18 +2738,16 @@ export class PercentRank implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series as NonNaWindowSnapshot);
     }
     return this._advance(src);
   }
 
   private _advance(src: number): number {
     this.series.push(src);
-    if (this.series.length < this.length || src !== src) return NaN;
+    if (!this.series.ready || src !== src) return NaN;
     let belowOrEqual = 0;
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
+    for (const value of this.series.valuesOldestFirst()) {
       if (value <= src) belowOrEqual += 1;
     }
     return (belowOrEqual / this.length) * 100;
@@ -2638,7 +2758,7 @@ export class PercentRank implements Saveable {
   }
 
   restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+    this.series.restore(snap.series as NonNaWindowSnapshot);
     this.snap = null;
   }
 }
@@ -2648,10 +2768,10 @@ export class LinReg implements Saveable {
   private readonly length: number;
   private readonly offset: number;
 
-  private snap: StdDevSnapshot | null = null;
+  private snap: { series: ReturnType<NumericSeries['save']> } | null = null;
 
   constructor(length: number, offset: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.offset = offset;
     this.series = new NumericSeries(this.length);
   }
@@ -2663,7 +2783,7 @@ export class LinReg implements Saveable {
 
   recompute(src: number): number {
     if (this.snap) {
-      this.series.restore(this.snap.series as ReturnType<NumericSeries['save']>);
+      this.series.restore(this.snap.series);
     }
     return this._advance(src);
   }
@@ -2671,6 +2791,8 @@ export class LinReg implements Saveable {
   private _advance(src: number): number {
     this.series.push(src);
     if (this.series.length < this.length || this.offset !== this.offset) return NaN;
+    const values = Array.from({ length: this.length }, (_value, index) => this.series.get(this.length - 1 - index));
+    if (values.some((value) => value !== value)) return NaN;
 
     let sumX = 0;
     let sumY = 0;
@@ -2679,8 +2801,7 @@ export class LinReg implements Saveable {
 
     for (let index = 0; index < this.length; index += 1) {
       const x = index;
-      const y = this.series.get(this.length - 1 - index);
-      if (y !== y) return NaN;
+      const y = values[index];
       sumX += x;
       sumY += y;
       sumXY += x * y;
@@ -2695,12 +2816,12 @@ export class LinReg implements Saveable {
     return intercept + slope * (this.length - 1 - this.offset);
   }
 
-  save(): StdDevSnapshot {
+  save(): { series: ReturnType<NumericSeries['save']> } {
     return { series: this.series.save() };
   }
 
-  restore(snap: StdDevSnapshot): void {
-    this.series.restore(snap.series as ReturnType<NumericSeries['save']>);
+  restore(snap: { series: ReturnType<NumericSeries['save']> }): void {
+    this.series.restore(snap.series);
     this.snap = null;
   }
 }
@@ -2766,7 +2887,7 @@ export class MFI implements Saveable {
   private snap: MFISnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.positive = new NumericSeries(this.length);
     this.negative = new NumericSeries(this.length);
   }
@@ -2795,7 +2916,7 @@ export class MFI implements Saveable {
     if (source !== source || volume !== volume) return NaN;
 
     if (previousSource !== undefined && previousSource === previousSource) {
-      const rawFlow = source * volume;
+      const rawFlow = Math.abs(source * volume);
       this.positive.push(source > previousSource ? rawFlow : 0);
       this.negative.push(source < previousSource ? rawFlow : 0);
     }
@@ -3079,13 +3200,16 @@ export class KC implements Saveable {
   }
 
   private _advance(src: number, high: number, low: number, close: number, isRecompute: boolean): [number, number, number] {
-    if (src !== src || high !== high || low !== low || close !== close || !Number.isFinite(this.mult)) {
+    if (!Number.isFinite(this.mult)) {
       return [NaN, NaN, NaN];
     }
-    const span = this.useTrueRange && this.prevClose === this.prevClose
-      ? Math.max(high - low, Math.abs(high - this.prevClose), Math.abs(low - this.prevClose))
-      : high - low;
-    this.prevClose = close;
+    const validBar = src === src && high === high && low === low && close === close;
+    const span = validBar
+      ? this.useTrueRange && this.prevClose === this.prevClose
+        ? Math.max(high - low, Math.abs(high - this.prevClose), Math.abs(low - this.prevClose))
+        : high - low
+      : NaN;
+    this.prevClose = validBar ? close : NaN;
     const middle = isRecompute ? this.basis.recompute(src) : this.basis.compute(src);
     const range = isRecompute ? this.range.recompute(span) : this.range.compute(span);
     return [middle, middle + range * this.mult, middle - range * this.mult];
@@ -3140,33 +3264,25 @@ interface KSTSnapshot {
 }
 
 class KSTSmaWindow {
-  private series: NumericSeries;
+  private sma: SMA | null;
   private readonly length: number;
 
   constructor(length: number) {
-    this.length = Math.max(0, Math.trunc(length));
-    this.series = new NumericSeries(Math.max(1, this.length));
+    this.length = validatePositiveIntegerLength(length, 'ta.kst smoothing length');
+    this.sma = new SMA(this.length);
   }
 
   compute(src: number): number {
-    if (src !== src || this.length < 1) return NaN;
-    this.series.push(src);
-    if (this.series.length < this.length) return NaN;
-    let sum = 0;
-    for (let index = 0; index < this.length; index += 1) {
-      const value = this.series.get(index);
-      if (value !== value) return NaN;
-      sum += value;
-    }
-    return sum / this.length;
+    if (this.sma === null) return NaN;
+    return this.sma.compute(src);
   }
 
   save(): unknown {
-    return this.series.save();
+    return this.sma?.save() ?? null;
   }
 
   restore(snap: unknown): void {
-    this.series.restore(snap as ReturnType<NumericSeries['save']>);
+    if (this.sma !== null && snap !== null) this.sma.restore(snap as SMASnapshot);
   }
 }
 
@@ -3188,7 +3304,7 @@ export class KST implements Saveable {
     smaLength4: number,
     signalLength: number,
   ) {
-    this.rocLengths = [rocLength1, rocLength2, rocLength3, rocLength4].map((length) => Math.max(0, Math.trunc(length)));
+    this.rocLengths = [rocLength1, rocLength2, rocLength3, rocLength4].map((length, index) => validatePositiveIntegerLength(length, `ta.kst roclength${index + 1}`));
     const maxRocLength = Math.max(...this.rocLengths);
     this.source = new NumericSeries(maxRocLength + 1);
     this.rocSmas = [smaLength1, smaLength2, smaLength3, smaLength4].map((length) => new KSTSmaWindow(length));
@@ -3323,7 +3439,7 @@ export class RCI implements Saveable {
   private snap: StdDevSnapshot | null = null;
 
   constructor(length: number) {
-    this.length = Math.max(1, Math.trunc(length));
+    this.length = validatePositiveIntegerLength(length);
     this.series = new NumericSeries(this.length);
   }
 

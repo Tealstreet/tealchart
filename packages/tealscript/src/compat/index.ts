@@ -1,6 +1,23 @@
 export const PINE_COMPATIBILITY_SCHEMA_VERSION = 1;
 
 export {
+  PINE_TRACE_SCHEMA_VERSION,
+  parsePineTraceJson,
+  replayPineTrace,
+  validatePineTrace,
+  type PineTrace,
+  type PineTraceAlert,
+  type PineTraceContext,
+  type PineTraceExpected,
+  type PineTraceFill,
+  type PineTraceMismatch,
+  type PineTraceOrder,
+  type PineTracePlot,
+  type PineTraceReplay,
+  type PineTraceStage,
+} from './pineTrace';
+
+export {
   PINE_V6_GRAMMAR_CONSTRUCTS,
   PINE_V6_GRAMMAR_REFERENCE_SOURCES,
   PINE_V6_KNOWN_MISSING_GRAMMAR,

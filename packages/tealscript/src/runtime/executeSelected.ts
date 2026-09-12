@@ -5,7 +5,7 @@ import {
   applyTealscriptBackendSelectionProfile,
   selectTealscriptExecutionBackend,
 } from './backendSelection';
-import { tryExecuteScript, type CompiledExecutionOptions } from './codegen/execute';
+import { executeCompiledScript, type CompiledExecutionOptions } from './codegen/execute';
 
 export interface SelectedTealscriptExecutionOptions extends TealscriptExecutionOptions {
   maxBarsBack?: number;
@@ -22,8 +22,7 @@ export function executeSelectedTealscriptBackend(
 ): ExecutionResult {
   const selection = selectTealscriptExecutionBackend(options.runtime?.backend);
 
-  let fallbackReason: string | undefined;
-  const compiledResult = tryExecuteScript(ast, bars, inputs, {
+  const execution = executeCompiledScript(ast, bars, inputs, {
     runtime: options.runtime,
     maxBarsBack: options.maxBarsBack,
     requestDatafeed: options.requestDatafeed,
@@ -31,12 +30,9 @@ export function executeSelectedTealscriptBackend(
     realtimeLastBar: options.realtimeLastBar,
     confirmedRealtimeBarIndex: options.confirmedRealtimeBarIndex,
     confirmedRealtimeBarStartIndex: options.confirmedRealtimeBarStartIndex,
-    onFallback: (reason) => {
-      fallbackReason = reason;
-    },
   });
-  if (!compiledResult) {
-    throw new Error(`Compiled TealScript execution failed${fallbackReason ? `: ${fallbackReason}` : ''}`);
+  if (execution.status === 'failure') {
+    throw new Error(`Compiled TealScript execution failed: ${execution.reason}`);
   }
-  return applyTealscriptBackendSelectionProfile(compiledResult, selection);
+  return applyTealscriptBackendSelectionProfile(execution.result, selection);
 }

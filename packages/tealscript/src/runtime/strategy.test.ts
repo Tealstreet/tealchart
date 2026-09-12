@@ -228,6 +228,7 @@ describe('strategy ledger model', () => {
       defaultQtyValue: 10,
       pyramiding: 2,
       commissionValue: 0.05,
+      calcOnEveryHistoryTick: true,
     });
 
     expect(settings).toMatchObject({
@@ -242,6 +243,7 @@ describe('strategy ledger model', () => {
       slippageTicks: 0,
       processOrdersOnClose: false,
       useBarMagnifier: false,
+      calcOnEveryHistoryTick: true,
     });
     expect(createDefaultStrategySettings().pyramiding).toBe(1);
   });
@@ -573,6 +575,50 @@ describe('strategy ledger model', () => {
       entryPrice: 100,
       exitPrice: 105,
       profit: 5,
+    });
+  });
+
+  it('recomputes position average price from remaining open lots after partial exits', () => {
+    const ledger = createStrategyLedger();
+    const first = submitStrategyOrder(ledger, {
+      id: 'First',
+      direction: 'long',
+      qty: 10,
+      qtyType: 'fixed',
+      qtyValue: 10,
+      barIndex: 0,
+      time: 1,
+    });
+    const second = submitStrategyOrder(ledger, {
+      id: 'Second',
+      direction: 'long',
+      qty: 10,
+      qtyType: 'fixed',
+      qtyValue: 10,
+      barIndex: 1,
+      time: 2,
+    });
+    const exit = submitStrategyOrder(ledger, {
+      id: 'Reduce',
+      direction: 'short',
+      qty: 15,
+      qtyType: 'fixed',
+      qtyValue: 15,
+      barIndex: 2,
+      time: 3,
+    });
+
+    fillStrategyMarketOrder(ledger, first, 100, 0, 1);
+    fillStrategyMarketOrder(ledger, second, 110, 1, 2);
+    fillStrategyMarketOrder(ledger, exit, 120, 2, 3);
+
+    expect(ledger.openTrades.map(({ entryOrderId, qty, entryPrice }) => ({ entryOrderId, qty, entryPrice }))).toEqual([
+      { entryOrderId: 'Second', qty: 5, entryPrice: 110 },
+    ]);
+    expect(ledger.position).toMatchObject({
+      direction: 'long',
+      size: 5,
+      avgPrice: 110,
     });
   });
 

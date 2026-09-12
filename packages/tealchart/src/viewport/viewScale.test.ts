@@ -588,7 +588,7 @@ describe('applyAutoScale', () => {
 // getVisiblePlotRange
 // ---------------------------------------------------------------------------
 
-function makePlot(scriptId: string, values: (number | null)[]): PlotOutput {
+function makePlot(scriptId: string, values: (number | null)[], overrides: Partial<PlotOutput> = {}): PlotOutput {
   return {
     id: `${scriptId}_plot`,
     type: 'plot',
@@ -596,6 +596,7 @@ function makePlot(scriptId: string, values: (number | null)[]): PlotOutput {
     values,
     scriptId,
     color: '#ffffff',
+    ...overrides,
   };
 }
 
@@ -714,5 +715,82 @@ describe('getVisiblePlotRange', () => {
     expect(result).not.toBeNull();
     expect(result!.min).toBeLessThan(-10);
     expect(result!.max).toBeGreaterThan(50);
+  });
+
+  it('ignores plots that are not visible in the pane range', () => {
+    const bars = makeBars(5, { startTime: 1_000_000, interval: 60_000 });
+    const visible = makePlot('ind', [10, 20, 30, 40, 50]);
+    const displayNone = makePlot('ind', [10_000, 10_000, 10_000, 10_000, 10_000], { display: 0 });
+    const priceScaleOnly = makePlot('ind', [-10_000, -10_000, -10_000, -10_000, -10_000], { display: 8 });
+    const forceOverlay = makePlot('ind', [5_000, 5_000, 5_000, 5_000, 5_000], { forceOverlay: true });
+
+    const result = getVisiblePlotRange(
+      [visible, displayNone, priceScaleOnly, forceOverlay],
+      ['ind'],
+      bars,
+      bars[0].time,
+      bars[4].time,
+    );
+
+    expect(result).not.toBeNull();
+    expect(result!.min).toBeCloseTo(6, 5);
+    expect(result!.max).toBeCloseTo(54, 5);
+  });
+
+  it('applies showLast and offset before computing pane range', () => {
+    const bars = makeBars(4, { startTime: 1_000_000, interval: 60_000 });
+    const showLast = makePlot('showLast', [1_000, 1_000, 40, 50], { showLast: 2 });
+    const shiftedOut = makePlot('offset', [10_000, 20, 25], { offset: -1 });
+
+    const result = getVisiblePlotRange(
+      [showLast, shiftedOut],
+      ['showLast', 'offset'],
+      bars,
+      bars[0].time,
+      bars[1].time,
+      0,
+    );
+
+    expect(result).not.toBeNull();
+    expect(result).toEqual({ min: 20, max: 25 });
+  });
+
+  it('includes hline and style histbase values that are part of the visible pane scale', () => {
+    const bars = makeBars(3, { startTime: 1_000_000, interval: 60_000 });
+    const columns = makePlot('ind', [10, 20, 30], { style: 'columns', histbase: -50 });
+    const hline: PlotOutput = {
+      id: 'hline_limit',
+      type: 'hline',
+      title: 'Limit',
+      values: [],
+      scriptId: 'ind',
+      color: '#ffffff',
+      price: 100,
+    };
+
+    const result = getVisiblePlotRange([columns, hline], ['ind'], bars, bars[0].time, bars[2].time, 0);
+
+    expect(result).toEqual({ min: -50, max: 100 });
+  });
+
+  it('includes absolute plotshape and plotchar values in pane scale while excluding plotarrow magnitude values', () => {
+    const bars = makeBars(3, { startTime: 1_000_000, interval: 60_000 });
+    const baseline = makePlot('ind', [10, 20, 30]);
+    const shape = makePlot('ind', [500, null, 600], { id: 'shape', location: 'absolute', type: 'plotshape' });
+    const char = makePlot('ind', [null, -200, null], { id: 'char', location: 'absolute', type: 'plotchar' });
+    const arrow = makePlot('ind', [10_000, -10_000, 5_000], { id: 'arrow', type: 'plotarrow' });
+
+    const result = getVisiblePlotRange([baseline, shape, char, arrow], ['ind'], bars, bars[0].time, bars[2].time, 0);
+
+    expect(result).toEqual({ min: -200, max: 600 });
+  });
+
+  it('does not include areabr histbase in pane scale', () => {
+    const bars = makeBars(3, { startTime: 1_000_000, interval: 60_000 });
+    const areabr = makePlot('ind', [10, 20, 30], { style: 'areabr', histbase: -50 });
+
+    const result = getVisiblePlotRange([areabr], ['ind'], bars, bars[0].time, bars[2].time, 0);
+
+    expect(result).toEqual({ min: 10, max: 30 });
   });
 });

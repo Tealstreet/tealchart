@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -27,7 +28,7 @@ import type {
 import type { StrategyLedger } from '../src/runtime/strategy.ts';
 import { executeCompiled, tryCompile } from '../src/runtime/codegen/execute.ts';
 import type { CompiledScript } from '../src/runtime/codegen/compile.ts';
-import { parseTradingViewImportPath } from '../src/officialTradingViewLibraries.ts';
+import { getOfficialTradingViewLibrary, parseTradingViewImportPath } from '../src/officialTradingViewLibraries.ts';
 
 export const EXTERNAL_PINE_CORPUS_REPORT_SCHEMA_VERSION = 14;
 
@@ -47,6 +48,7 @@ export interface ExternalCorpusManifestScript {
   sourceRepoUrl?: string;
   sourceFilePath?: string;
   commitSha?: string;
+  sourceSha256?: string;
   sourceTransform?: ExternalCorpusSourceTransform;
 }
 
@@ -74,7 +76,9 @@ export interface ExternalCorpusReportRow {
   sourceRepoUrl?: string;
   sourceFilePath?: string;
   commitSha?: string;
+  sourceSha256?: string;
   sourceTransform?: ExternalCorpusSourceTransform;
+  sourceHasElidedMarker?: boolean;
   declaredVersion: number | 'unknown';
   declarationKind: 'indicator' | 'strategy' | 'library' | 'study' | 'unknown';
   byteSize: number;
@@ -125,6 +129,8 @@ export interface ExternalCorpusOutputCounts {
 }
 
 export interface ExternalCorpusStrategyActivity {
+  orders: number;
+  fills: number;
   openTrades: number;
   closedTrades: number;
   positionSize: number;
@@ -271,7 +277,7 @@ const REPO_ROOT = resolve(PACKAGE_ROOT, '../..');
 
 export async function runExternalPineCorpus(options: RunExternalPineCorpusOptions): Promise<ExternalCorpusReport> {
   const inputDir = resolve(options.inputDir);
-  const bars = options.bars ?? createSyntheticBars(160);
+  const bars = options.bars ?? createStandardCorpusBars();
   const manifest = await readManifest(inputDir);
   const discoveredScripts = manifest?.scripts ?? (await discoverScripts(inputDir));
   const scripts = options.localPaths
@@ -429,6 +435,16 @@ function buildStrategyLedgerParity(
   _compiled: ExecutionResult | null,
 ): ExternalCorpusStrategyLedgerParity {
   return strategyLedgerParityNotRun();
+}
+
+function buildHostLibraryRegistry(ast: Program): Map<string, Program> {
+  const libraries = new Map<string, Program>();
+  for (const statement of ast.body) {
+    if (statement.type !== 'ImportDeclaration') continue;
+    const library = getOfficialTradingViewLibrary(statement.path);
+    if (library?.program) libraries.set(statement.path, library.program);
+  }
+  return libraries;
 }
 
 export function compareStrategyLedger(
@@ -607,6 +623,10 @@ async function runExternalPineScript(
 ): Promise<ExternalCorpusReportRow> {
   const absolutePath = resolve(inputDir, entry.localPath);
   const source = await readFile(absolutePath, 'utf8');
+  const sourceSha256 = hashSource(source);
+  if (entry.sourceSha256 && sourceSha256 !== entry.sourceSha256) {
+    throw new Error(`${entry.localPath} sha256 mismatch: expected ${entry.sourceSha256}, got ${sourceSha256}`);
+  }
   const stages = initialStages();
   const base = {
     id: `${String(index + 1).padStart(4, '0')}:${entry.sourceRepoUrl ?? 'local'}:${entry.sourceFilePath ?? entry.localPath}`,
@@ -614,7 +634,9 @@ async function runExternalPineScript(
     sourceRepoUrl: entry.sourceRepoUrl,
     sourceFilePath: entry.sourceFilePath,
     commitSha: entry.commitSha,
+    sourceSha256,
     sourceTransform: entry.sourceTransform,
+    sourceHasElidedMarker: containsElidedSourceMarker(source),
     declaredVersion: detectPineVersion(source),
     declarationKind: detectDeclarationKind(source),
     byteSize: Buffer.byteLength(source, 'utf8'),
@@ -629,7 +651,8 @@ async function runExternalPineScript(
     return classifyRow(failedRow(base, stages, 'parse'));
   }
 
-  const semantic = checkProgram(ast);
+  const libraries = buildHostLibraryRegistry(ast);
+  const semantic = checkProgram(ast, { libraries });
   const semanticError = semantic.diagnostics.find((diagnostic) => diagnostic.severity === 'error');
   if (semanticError) {
     stages.semantic = { status: 'failed', diagnostic: formatSemanticDiagnostic(semanticError) };
@@ -640,7 +663,7 @@ async function runExternalPineScript(
   let compiled: CompiledScript | null = null;
   const fallbackReasons: string[] = [];
   try {
-    compiled = tryCompile(ast);
+    compiled = tryCompile(ast, undefined, { libraries });
     if (compiled.success) {
       stages.compile = { status: 'passed' };
     } else {
@@ -662,7 +685,7 @@ async function runExternalPineScript(
   let compiledResultForParity: ExecutionResult | null = null;
   let executionMode: ExternalCorpusExecutionMode = 'not-run';
   try {
-    const compiledResult = executeCompiled(compiled, bars, undefined, { requestDatafeed });
+    const compiledResult = executeCompiled(compiled, bars, undefined, { requestDatafeed, libraries });
     if (!compiledResult) {
       stages.execute = { status: 'failed', diagnostic: 'Compiled execution returned no result' };
       return {
@@ -714,7 +737,14 @@ async function runExternalPineScript(
   const outputParity = { status: 'not-run' as const };
   const output = outputCountsForReport(result);
   if (!output.produced) {
-    const outputSilence = analyzeOutputSilence(ast, bars, requestDatafeed, compiled?.success ? compiled : null, entry.localPath);
+    const outputSilence = analyzeOutputSilence(
+      ast,
+      bars,
+      requestDatafeed,
+      compiled?.success ? compiled : null,
+      entry.localPath,
+      libraries,
+    );
     stages.output = { status: 'failed', diagnostic: formatOutputSilenceDiagnostic(outputSilence) };
     return classifyRow({
       ...base,
@@ -747,6 +777,14 @@ async function runExternalPineScript(
     outputSilence: undefined,
     stages,
   });
+}
+
+function hashSource(source: string): string {
+  return createHash('sha256').update(source, 'utf8').digest('hex');
+}
+
+function containsElidedSourceMarker(source: string): boolean {
+  return /^\s*\.{3}\s*(?:(?:\/\/|#).*)?$/mu.test(source);
 }
 
 function initialStages(): Record<ExternalCorpusPipelineStage, ExternalCorpusStageResult> {
@@ -828,13 +866,16 @@ function analyzeOutputSilence(
   requestDatafeed: RequestDatafeed,
   compiled: CompiledScript | null,
   localPath?: string,
+  libraries?: Map<string, Program>,
 ): ExternalCorpusOutputSilenceAnalysis {
   const sourceCalls = collectOutputCallTraces(ast);
-  const sameBarsProbe = executeScript(ast, bars, undefined, { requestDatafeed });
+  const sameBarsProbe = executeScript(ast, bars, undefined, { requestDatafeed, libraries });
   const probeBars = createOutputProbeBars();
   const probeRequestDatafeed = new SyntheticExternalCorpusRequestDatafeed(probeBars);
-  const probeCompiled = compiled ? executeCompiled(compiled, probeBars, undefined, { requestDatafeed: probeRequestDatafeed }) : null;
-  const probeResult = executeScript(ast, probeBars, undefined, { requestDatafeed: probeRequestDatafeed });
+  const probeCompiled = compiled
+    ? executeCompiled(compiled, probeBars, undefined, { requestDatafeed: probeRequestDatafeed, libraries })
+    : null;
+  const probeResult = executeScript(ast, probeBars, undefined, { requestDatafeed: probeRequestDatafeed, libraries });
   const sameBarsProbeOutput = outputCounts(sameBarsProbe);
   const probeCompiledOutput = outputCounts(probeCompiled);
   const probeOutput = outputCounts(probeResult);
@@ -1061,8 +1102,9 @@ export function outputCounts(result: ExecutionResult | null): ExternalCorpusOutp
   const drawings = result?.drawings.length ?? 0;
   const alerts = result?.alerts.length ?? 0;
   const logs = result?.logs.length ?? 0;
+  const strategyLedgerActive = result ? hasStrategyLedgerActivity(result.strategy) : false;
   return {
-    produced: plots + drawings + alerts + logs > 0,
+    produced: plots + drawings + alerts + logs > 0 || strategyLedgerActive,
     plots,
     rawPlots,
     suppressedPlots: rawPlots - plots,
@@ -1077,7 +1119,9 @@ export function outputCounts(result: ExecutionResult | null): ExternalCorpusOutp
 function outputCountsForReport(result: ExecutionResult): ExternalCorpusReportRow['output'] {
   const plots = visiblePlotsForCorpus(result.plots).length;
   return {
-    produced: plots + result.drawings.length + result.alerts.length + result.logs.length > 0,
+    produced:
+      plots + result.drawings.length + result.alerts.length + result.logs.length > 0
+      || hasStrategyLedgerActivity(result.strategy),
     plots,
     drawings: result.drawings.length,
     alerts: result.alerts.length,
@@ -1278,11 +1322,25 @@ function summarizeOutputDiff(expected: string, actual: string, expectedLabel = '
 }
 
 function strategyActivity(result: ExecutionResult): ExternalCorpusStrategyActivity {
+  const ledger = result.strategy;
   return {
-    openTrades: result.strategy.openTrades.length,
-    closedTrades: result.strategy.closedTrades.length,
-    positionSize: result.strategy.position.size,
+    orders: ledger?.orders.length ?? 0,
+    fills: ledger?.fills.length ?? 0,
+    openTrades: ledger?.openTrades.length ?? 0,
+    closedTrades: ledger?.closedTrades.length ?? 0,
+    positionSize: ledger?.position.size ?? 0,
   };
+}
+
+function hasStrategyLedgerActivity(ledger: StrategyLedger | undefined): boolean {
+  if (!ledger) return false;
+  return (
+    ledger.orders.length > 0
+    || ledger.fills.length > 0
+    || ledger.openTrades.length > 0
+    || ledger.closedTrades.length > 0
+    || ledger.position.size !== 0
+  );
 }
 
 function formatOutputCounts(counts: ExternalCorpusOutputCounts): string {
@@ -1923,6 +1981,12 @@ function classifyDataGatedOutputRow(row: Omit<ExternalCorpusReportRow, 'validity
 }
 
 function classifyParseValidity(row: Omit<ExternalCorpusReportRow, 'validity'>, diagnostic: string): ExternalCorpusReportRow['validity'] {
+  if (row.sourceHasElidedMarker) {
+    return {
+      bucket: 'corpus-hygiene',
+      reason: 'The harvested source contains a standalone literal ellipsis marker, indicating truncated or elided Pine rather than a complete standalone script.',
+    };
+  }
   if (row.sourceFilePath === '.cursor/rules/10 - pinescript-management.md') {
     return {
       bucket: 'corpus-hygiene',
@@ -2059,7 +2123,7 @@ function percent(count: number, total: number): number {
   return total === 0 ? 0 : Math.round((count / total) * 10_000) / 100;
 }
 
-export function createSyntheticBars(count: number): Bar[] {
+export function createLegacySyntheticBars(count: number): Bar[] {
   const start = Date.UTC(2024, 0, 1);
   return Array.from({ length: count }, (_, index) => {
     const trend = 100 + index * 0.35;
@@ -2079,8 +2143,51 @@ export function createSyntheticBars(count: number): Bar[] {
   });
 }
 
+export function createSyntheticBars(count: number): Bar[] {
+  return createRealisticDailyBars(count);
+}
+
+export function createStandardCorpusBars(): Bar[] {
+  return createRealisticDailyBars(1_600);
+}
+
+function createRealisticDailyBars(count: number): Bar[] {
+  const start = Date.UTC(2019, 0, 1);
+  const sessionOffsets = [
+    8 * 60 + 45,
+    13 * 60 + 45,
+    14 * 60 + 30,
+    15 * 60 + 30,
+  ];
+  let lastClose = 100;
+  let day = 0;
+  const bars: Bar[] = [];
+  while (bars.length < count) {
+    const index = bars.length;
+    const sessionOffset = sessionOffsets[index % sessionOffsets.length]!;
+    const time = start + day * 86_400_000 + sessionOffset * 60_000;
+    day += 1;
+    const weekday = new Date(time).getUTCDay();
+    if (weekday === 0 || weekday === 6) continue;
+
+    const regime = Math.floor(index / 85) % 2 === 0 ? 1 : -1;
+    const cyclicalMove = Math.sin(index / 4) * 2.8 + Math.sin(index / 17) * 4.2;
+    const impulse = index % 43 === 0 ? (index % 86 === 0 ? 11 : -9) : 0;
+    const gap = index % 29 === 0 ? (index % 58 === 0 ? 4.5 : -3.8) : 0;
+    const open = Math.max(1, lastClose + gap);
+    const close = Math.max(1, open + regime * 0.42 + cyclicalMove + impulse);
+    const rangePad = 1.2 + (index % 7) * 0.35 + (index % 31 === 0 ? 5 : 0);
+    const high = Math.max(open, close) + rangePad;
+    const low = Math.max(0.01, Math.min(open, close) - rangePad * (0.75 + (index % 3) * 0.2));
+    const volume = 75_000 + (index % 21) * 3_700 + (index % 37 === 0 ? 450_000 : 0);
+    bars.push({ time, open, high, low, close, volume });
+    lastClose = close;
+  }
+  return bars;
+}
+
 function createOutputProbeBars(): Bar[] {
-  return createSyntheticBars(2_880);
+  return createRealisticDailyBars(2_880);
 }
 
 export class SyntheticExternalCorpusRequestDatafeed implements RequestDatafeed {

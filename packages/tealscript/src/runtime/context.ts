@@ -129,6 +129,41 @@ export interface ChartInfo {
   rightVisibleBarTime?: number;
 }
 
+export const DEFAULT_CHART_BG_COLOR = '#FFFFFF';
+export const LIGHT_BACKGROUND_CHART_FG_COLOR = '#0F0F0F';
+export const DARK_BACKGROUND_CHART_FG_COLOR = '#DBDBDB';
+
+function parseHexChartColor(value: string): { red: number; green: number; blue: number } | null {
+  const match = /^#?([0-9a-fA-F]{6})(?:[0-9a-fA-F]{2})?$/.exec(value.trim());
+  if (!match) return null;
+  const hex = match[1];
+  return {
+    red: parseInt(hex.slice(0, 2), 16),
+    green: parseInt(hex.slice(2, 4), 16),
+    blue: parseInt(hex.slice(4, 6), 16),
+  };
+}
+
+export function chartForegroundForBackground(bgColor: string): string {
+  const parsed = parseHexChartColor(bgColor);
+  if (!parsed) return LIGHT_BACKGROUND_CHART_FG_COLOR;
+  const brightness = (parsed.red * 299 + parsed.green * 587 + parsed.blue * 114) / 1000;
+  return brightness < 128 ? DARK_BACKGROUND_CHART_FG_COLOR : LIGHT_BACKGROUND_CHART_FG_COLOR;
+}
+
+export function mergeChartInfo(base: ChartInfo, override?: Partial<ChartInfo>): ChartInfo {
+  const bgColor = override?.bgColor ?? base.bgColor;
+  const hasExplicitForeground = override !== undefined
+    && Object.prototype.hasOwnProperty.call(override, 'fgColor')
+    && override.fgColor !== undefined;
+  return {
+    ...base,
+    ...override,
+    bgColor,
+    fgColor: hasExplicitForeground ? override.fgColor! : chartForegroundForBackground(bgColor),
+  };
+}
+
 /**
  * Timeframe information
  */
@@ -371,7 +406,7 @@ export class ExecutionContext {
     pricescale: 100,
     pointvalue: 1,
     mincontract: 1,
-    volumetype: 'base',
+    volumetype: 'n/a',
     expiration_date: Number.NaN,
     employees: Number.NaN,
     shareholders: Number.NaN,
@@ -389,8 +424,8 @@ export class ExecutionContext {
 
   /** Chart display metadata */
   chart: ChartInfo = {
-    bgColor: '#FFFFFF',
-    fgColor: '#363A45',
+    bgColor: DEFAULT_CHART_BG_COLOR,
+    fgColor: LIGHT_BACKGROUND_CHART_FG_COLOR,
     type: 'standard',
   };
 
@@ -783,7 +818,7 @@ export class ExecutionContext {
   registerPlot(plot: Omit<PlotOutput, 'values'>): void {
     const isLimitedPlot = plot.type !== 'hline';
     if (!this.plots.has(plot.id) && isLimitedPlot && this.countLimitedPlots() >= ExecutionContext.MAX_PLOT_OUTPUTS) {
-      throw new Error(`Too many plot outputs: maximum is ${ExecutionContext.MAX_PLOT_OUTPUTS}`);
+      throw new Error(`Too many plot outputs: maximum is ${ExecutionContext.MAX_PLOT_OUTPUTS} per script. Remove or combine output calls; plot(), plotshape(), plotchar(), plotarrow(), plotbar(), plotcandle(), bgcolor(), barcolor(), fill(), and alertcondition() each use an output slot.`);
     }
 
     const fullPlot: PlotOutput = {
@@ -812,7 +847,6 @@ export class ExecutionContext {
    */
   truncatePlots(length: number): void {
     for (const plot of this.plots.values()) {
-      if (plot.type === 'hline') continue;
       plot.values.length = length;
       if (Array.isArray(plot.color)) {
         plot.color.length = length;

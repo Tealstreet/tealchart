@@ -1,0 +1,22 @@
+//@version=6
+indicator("Supported box.new named const options")
+xloc_base = xloc.bar_index
+xloc_mode = xloc_base
+extend_base = extend.right
+extend_mode = extend_base
+border_base = line.style_dotted
+border_mode = border_base
+halign_base = text.align_center
+halign = halign_base
+valign_base = text.align_top
+valign = valign_base
+wrap_base = text.wrap_auto
+wrap_mode = wrap_base
+font_base = font.family_monospace
+font_family = font_base
+size_base = size.normal
+box_size = size_base
+format_base = text.format_bold
+box_format = format_base + text.format_italic
+box.new(left=bar_index, top=high, right=bar_index + 1, bottom=low, xloc=xloc_mode, extend=extend_mode, border_style=border_mode, text_halign=halign, text_valign=valign, text_wrap=wrap_mode, text_font_family=font_family, text_size=box_size, text_formatting=box_format)
+plot(close)

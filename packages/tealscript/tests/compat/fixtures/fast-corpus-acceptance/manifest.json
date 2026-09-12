@@ -1,0 +1,154 @@
+{
+  "description": "Small real-script corpus acceptance gate. This subset catches acceptance regressions only; it is not a replacement for the full attributed corpus rerun.",
+  "selectedAtCommit": "97e24ceafc",
+  "scripts": [
+    {
+      "localPath": "sources/v5__0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine",
+      "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+      "sourceFilePath": "trailing_stops/chandelier_exit.pine",
+      "commitSha": "60c93d3711d222b8f2db96160defe568429348e0",
+      "sourceSha256": "d505921fb4b9b7933b45a443cd3c13c255b30fa6c6216e7061844d3fb62eceda",
+      "sourceCorpus": "v5",
+      "sourceCorpusLocalPath": "sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine",
+      "gateSelectionReason": "v6 indicator with high-use input.float/input.int groups, color.new/color constants, plots and alerts"
+    },
+    {
+      "localPath": "sources/v5__0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine",
+      "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+      "sourceFilePath": "utils/unit_testing_framework.pine",
+      "commitSha": "60c93d3711d222b8f2db96160defe568429348e0",
+      "sourceSha256": "02b9dcd04cd5ea2990297dd7d216f00f294ed2fa7c745489a58a0bd8492c82ce",
+      "sourceCorpus": "v5",
+      "sourceCorpusLocalPath": "sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine",
+      "gateSelectionReason": "v5 indicator with table/drawing output and high-use input.color/input.string metadata"
+    },
+    {
+      "localPath": "sources/v5__0478__everget-tradingview-pinescript-indicators__price_volume_trend.pine",
+      "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+      "sourceFilePath": "volume/price_volume_trend.pine",
+      "commitSha": "60c93d3711d222b8f2db96160defe568429348e0",
+      "sourceSha256": "3c9f3cc6cab53074b662fedba6132e124e21c2cbc4a910eaf6b633b874db86fa",
+      "sourceCorpus": "v5",
+      "sourceCorpusLocalPath": "sources/0478__everget-tradingview-pinescript-indicators__price_volume_trend.pine",
+      "gateSelectionReason": "declared-v4 study that caught the bare pvt TA variable regression after shadowed-state resolution changed"
+    },
+    {
+      "localPath": "sources/v6__0162__ferranbt-pinecone__accumulators.pine",
+      "sourceRepoUrl": "https://github.com/ferranbt/pinecone",
+      "sourceFilePath": "tests/testdata/ta/accumulators.pine",
+      "commitSha": "9eff0496494d4c076de10cf70b18fd09fc8ad54d",
+      "sourceSha256": "edfe46f57dea2f0cf991161383c7f598a6d7ea6e60336375cee14c2cd5551a45",
+      "sourceCorpus": "v6",
+      "sourceCorpusLocalPath": "sources/0162__ferranbt-pinecone__accumulators.pine",
+      "gateSelectionReason": "v6 public accumulator script touching the TA float member aliases in log output"
+    },
+    {
+      "localPath": "sources/v6__0341__jpsm83-pineScript__idEmasSameDirectMtf.pine",
+      "sourceRepoUrl": "https://github.com/jpsm83/pineScript",
+      "sourceFilePath": "idEmasSameDirectMtf.pine",
+      "commitSha": "e389a16e847a3b012bb07063720dd18206f33486",
+      "sourceSha256": "cf9fba824325c2106e8c2776ab9caf0a1e6222de25091f0b4513bcf5bbbf9f9e",
+      "sourceCorpus": "v6",
+      "sourceCorpusLocalPath": "sources/0341__jpsm83-pineScript__idEmasSameDirectMtf.pine",
+      "gateSelectionReason": "declared-v5 MTF/request-style indicator using ta.accdist, plots and alert output"
+    },
+    {
+      "localPath": "sources/v6__0577__deepentropy-lightweight-charts-indicators__Breakouts-with-Tests-Retests-LuxAlgo-.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+      "sourceFilePath": "docs/official/indicators_community/Breakouts with Tests & Retests [LuxAlgo].pine",
+      "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5",
+      "sourceSha256": "954272248860f9f395ff3defcf5485d420e119414ca81ea8c8c3842c1a41598c",
+      "sourceCorpus": "v6",
+      "sourceCorpusLocalPath": "sources/0577__deepentropy-lightweight-charts-indicators__Breakouts-with-Tests-Retests-LuxAlgo-.pine",
+      "gateSelectionReason": "declared-v5 drawing-heavy script that recovered from nested switch-arm value fixes"
+    },
+    {
+      "localPath": "sources/v6__0145__TongIncomeWheel-AQE__Scoring_v1_8_Overlay.pine",
+      "sourceRepoUrl": "https://github.com/TongIncomeWheel/AQE",
+      "sourceFilePath": "reference/Scoring_v1_8_Overlay.pine",
+      "commitSha": "9e8d99e6495440cc4c143077fcc87aa4c96b4243",
+      "sourceSha256": "8fea40d771f9b708aa81c61af2ea7fe9b9713dfefc8f3e194930bcf5b1bccef4",
+      "sourceCorpus": "v6",
+      "sourceCorpusLocalPath": "sources/0145__TongIncomeWheel-AQE__Scoring_v1_8_Overlay.pine",
+      "gateSelectionReason": "v6 request-expression indicator with plots, drawings and alerts"
+    },
+    {
+      "localPath": "sources/v7__0160__helenananaa-pine-compat-runtime__matrix_eigenvectors.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/matrix_eigenvectors.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "27a82372e0c90112412b1fe1a1f475d698e1e57abe23b0735721d37c024a1e28",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvectors"
+      ],
+      "sourceCorpus": "v7",
+      "sourceCorpusLocalPath": "sources/0160__helenananaa-pine-compat-runtime__matrix_eigenvectors.pine",
+      "gateSelectionReason": "v7 targeted matrix eigenvectors row from the recovered matrix class"
+    },
+    {
+      "localPath": "sources/v7__0183__helenananaa-pine-compat-runtime__matrix_pinv.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/matrix_pinv.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "909488b135c2f6782fb8f36dd07c47bacfecb750f68eb45165e8b8cb23fef376",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.pinv"
+      ],
+      "sourceCorpus": "v7",
+      "sourceCorpusLocalPath": "sources/0183__helenananaa-pine-compat-runtime__matrix_pinv.pine",
+      "gateSelectionReason": "v7 targeted matrix pseudo-inverse row with multiple matrix output plots"
+    },
+    {
+      "localPath": "sources/v7__0334__helenananaa-pine-compat-runtime__strategy_opentrades_fields.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/strategy_opentrades_fields.pine",
+      "commitSha": "171ab20948c35cdfecda08094a8a322c2c429f38",
+      "sourceSha256": "41fff2330182aad9892c586336ca6767c755b8848373c7a590d8d8a04562d3fb",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.opentrades.commission",
+        "strategy.opentrades.entry_comment",
+        "strategy.opentrades.max_drawdown_percent",
+        "strategy.opentrades.max_runup_percent"
+      ],
+      "sourceCorpus": "v7",
+      "sourceCorpusLocalPath": "sources/0334__helenananaa-pine-compat-runtime__strategy_opentrades_fields.pine",
+      "gateSelectionReason": "declared-v5 strategy state/opentrades row from the high-use strategy surface"
+    },
+    {
+      "localPath": "sources/v7__0363__helenananaa-pine-compat-runtime__supported_box_new_named_const_options.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/supported_box_new_named_const_options.pine",
+      "commitSha": "be61d0135e39b1d0c71d6e39c43f4bf997ac7e8e",
+      "sourceSha256": "f589909ad40515ebff277272595536f7b91c37b21e9433b1dfeb5f030286742c",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "sourceCorpus": "v7",
+      "sourceCorpusLocalPath": "sources/0363__helenananaa-pine-compat-runtime__supported_box_new_named_const_options.pine",
+      "gateSelectionReason": "v6 drawing constructor row with named constant options and box output"
+    },
+    {
+      "localPath": "sources/v7__0399__folknor-pine-tools__test-argument-ordering.pine",
+      "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+      "sourceFilePath": "pine-data/tests/polymorphism/test-argument-ordering.pine",
+      "commitSha": "08de57b88f294bf036798d631fc40136cef222f3",
+      "sourceSha256": "40ab1296349a2a4d8bff48fcda4911a1f147cddb2fa951411a8b60dfcb878cc3",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "sourceCorpus": "v7",
+      "sourceCorpusLocalPath": "sources/0399__folknor-pine-tools__test-argument-ordering.pine",
+      "gateSelectionReason": "v6 high-use optional argument ordering row for input/plot/alert surfaces"
+    }
+  ]
+}

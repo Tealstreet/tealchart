@@ -268,15 +268,29 @@ window = values.slice(0, 2)
 window[1] *= 2
 literal = [4, 5, 6]
 literal[2] := 12
-plot(values[0], title="First")
-plot(values[1], title="Second")
-plot(literal[2], title="Literal")
+plot(values.get(0), title="First")
+plot(values.get(1), title="Second")
+plot(array.get(literal, 2), title="Literal")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'First').values)).toEqual([10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
     expect(roundSeries(getPlot(result, 'Second').values)).toEqual([14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14]);
     expect(roundSeries(getPlot(result, 'Literal').values)).toEqual([12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]);
+  });
+
+  it('reads prior array instances through the history operator', () => {
+    const result = runCompatScript(`
+indicator("Array history references")
+a = array.new<float>(1)
+a.set(0, close)
+previous = a[1]
+previousClose = na(previous) ? na : previous.get(0)
+plot(previousClose, title="Previous Close")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Previous Close').values)).toEqual([null, 102, 105, 107, 103, 99, 100, 104, 109, 108, 111, 110]);
   });
 
   it('reads array literal values with array helpers', () => {
@@ -321,7 +335,7 @@ plot(array.stdev(id=values, biased=false), title="Unbiased Stdev")
 plot(array.covariance(id1=values, other, biased=true), title="Covariance")
 plot(array.percentile_nearest_rank(id=values, percentage=50), title="Nearest Rank")
 plot(array.percentile_linear_interpolation(id=values, percentage=50), title="Linear Percentile")
-plot(array.percentrank(id=values, value=2), title="Percent Rank")
+plot(array.percentrank(id=values, index=2), title="Percent Rank")
 plot(array.get(standardized, 0), title="Standardized First")
 plot(array.get(absValues, 0), title="Abs First")
 `);
@@ -367,11 +381,17 @@ indicator("Array sort index and predicates")
 values = array.from(5, -2, 0, 9, 1)
 indices = values.sort_indices()
 descending = array.sort_indices(values, order.descending)
+type Ranked
+    float key
+    float payload
+objects = array.from(Ranked.new(2, 10), Ranked.new(1, 20), Ranked.new(3, 30))
+objectIndices = objects.sort_indices(order.ascending, "key")
 truthy = array.from(1, true, 2)
 mixed = array.from(0, false, 1)
 colors = array.new_color(2, color.red)
 plot(array.get(indices, 0), title="Smallest Index")
 plot(array.get(descending, 0), title="Largest Index")
+plot(array.get(objectIndices, 0), title="Object Smallest Index")
 plot(values.every() ? 1 : 0, title="Every Values")
 plot(truthy.every() ? 1 : 0, title="Every Truthy")
 plot(mixed.some() ? 1 : 0, title="Some Mixed")

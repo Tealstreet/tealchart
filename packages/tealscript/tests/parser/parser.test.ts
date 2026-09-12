@@ -2115,6 +2115,121 @@ y = close
         }));
       });
 
+      it('parses leading additive continuations after complete conditional operands', () => {
+        const ast = parse(`//@version=5
+indicator("Continuation")
+if true
+    plusText := "REASON "
+         + (close <= open ? "down" : "")
+         + " still part of plusText"
+    minusText := "REASON "
+         - (close <= open ? "down" : "")
+         - " still part of minusText"
+`);
+        const ifStatement = ast.body[1];
+        expect(ifStatement?.type).toBe('IfStatement');
+        if (ifStatement?.type !== 'IfStatement') return;
+
+        const assignments = ifStatement.consequent.filter((statement): statement is AssignmentStatement => statement.type === 'AssignmentStatement');
+        expect(assignments).toHaveLength(2);
+        const [plusAssignment, minusAssignment] = assignments as [AssignmentStatement, AssignmentStatement];
+        expect(plusAssignment.right).toEqual(expect.objectContaining({
+          type: 'BinaryExpression',
+          operator: '+',
+        }));
+        expect(plusAssignment.right.loc?.end.line).toBe(6);
+        expect(minusAssignment.right).toEqual(expect.objectContaining({
+          type: 'BinaryExpression',
+          operator: '-',
+        }));
+        expect(minusAssignment.right.loc?.end.line).toBe(9);
+
+        const escapedUnaryStatements = ifStatement.consequent.filter(statement =>
+          statement.type === 'ExpressionStatement'
+          && statement.expression.type === 'UnaryExpression'
+          && (statement.expression.operator === '+' || statement.expression.operator === '-')
+        );
+        expect(escapedUnaryStatements).toHaveLength(0);
+      });
+
+      it('parses grammar-derived operator continuations after complete conditional operands', () => {
+        const binaryCases = [
+          { operator: 'or', left: 'close <= open ? true : false', right: 'high >= low ? true : false' },
+          { operator: 'and', left: 'close <= open ? true : false', right: 'high >= low ? true : false' },
+          { operator: '==', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '!=', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '<=', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '>=', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '<', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '>', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '|', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '^', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '&', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '<<', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '>>', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '+', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '-', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '*', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '/', left: 'close <= open ? 1 : 2', right: 'high >= low ? 3 : 4' },
+          { operator: '%', left: 'close <= open ? 5 : 6', right: 'high >= low ? 3 : 4' },
+        ];
+
+        for (const version of [3, 4, 5, 6]) {
+          for (const testCase of binaryCases) {
+            const ast = parse(`//@version=${version}
+if true
+    result := (${testCase.left})
+         ${testCase.operator} (${testCase.right})
+`);
+            const label = `v${version} ${testCase.operator}`;
+            const ifStatement = ast.body[0];
+            expect(ifStatement?.type, label).toBe('IfStatement');
+            if (ifStatement?.type !== 'IfStatement') continue;
+
+            expect(ifStatement.consequent, label).toHaveLength(1);
+            const assignment = ifStatement.consequent[0];
+            expect(assignment?.type, label).toBe('AssignmentStatement');
+            if (assignment?.type !== 'AssignmentStatement') continue;
+            expect(assignment.right.type, label).toBe('BinaryExpression');
+            if (assignment.right.type !== 'BinaryExpression') continue;
+            expect(assignment.right.operator, label).toBe(testCase.operator);
+            expect(assignment.right.loc?.end.line, label).toBe(4);
+          }
+        }
+      });
+
+      it('parses ternary operator continuations after complete operands', () => {
+        for (const version of [3, 4, 5, 6]) {
+          const questionContinuation = parse(`//@version=${version}
+if true
+    result := close <= open
+         ? (high >= low ? 1 : 2)
+         : 3
+`);
+          const colonContinuation = parse(`//@version=${version}
+if true
+    result := close <= open ? (high >= low ? 1 : 2)
+         : 3
+`);
+
+          for (const [label, ast, endLine] of [
+            [`v${version} question`, questionContinuation, 5],
+            [`v${version} colon`, colonContinuation, 4],
+          ] as const) {
+            const ifStatement = ast.body[0];
+            expect(ifStatement?.type, label).toBe('IfStatement');
+            if (ifStatement?.type !== 'IfStatement') continue;
+
+            expect(ifStatement.consequent, label).toHaveLength(1);
+            const assignment = ifStatement.consequent[0];
+            expect(assignment?.type, label).toBe('AssignmentStatement');
+            if (assignment?.type !== 'AssignmentStatement') continue;
+            expect(assignment.right.type, label).toBe('ConditionalExpression');
+            expect(assignment.right.loc?.end.line, label).toBe(endLine);
+          }
+        }
+      });
+
       it('parses assignment-ending two-space continuations without changing block indentation', () => {
         const ast = parse(`f(int len) =>
     for x = 1 to len -1

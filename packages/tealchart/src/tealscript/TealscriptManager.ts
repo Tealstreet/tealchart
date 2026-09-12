@@ -317,10 +317,10 @@ class TealscriptWorkerWrapper {
         break;
 
       case 'result':
-        if (this.isStaleMessage(message.output?.metadata)) {
+        if (this.isStaleMessage(message.output.metadata)) {
           return;
         }
-        this.markRequestSettled(message.output?.metadata);
+        this.markRequestSettled(message.output.metadata);
         this.options.onResult?.(getResultOutput(message));
         break;
 

@@ -2,7 +2,7 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 import type { ReactElement, ReactNode } from 'react';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
-import { Group, Rect, Path as SkiaPath } from '@shopify/react-native-skia';
+import { Group, Rect, Skia, Path as SkiaPath, Text as SkiaText } from '@shopify/react-native-skia';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
@@ -141,6 +141,7 @@ describe('indicator plot clip channel', () => {
     { close: 12, high: 13, low: 11, open: 12, time: 1_000, volume: 1, interval: 1_000, sourceIndex: 1, x: 30 },
   ] as never;
   const plots = [{ type: 'plot', id: 'p1', scriptId: 's1', style: 'line', values: [10, 12], color: '#fff' }] as never;
+  const textFont = Skia.Font();
 
   function render(staticProjection: unknown) {
     return NativeIndicatorPlotLayerImpl({
@@ -149,6 +150,7 @@ describe('indicator plot clip channel', () => {
       plots,
       sharedViewport,
       staticProjection: staticProjection as never,
+      textFont,
       totalBarCount: 2,
       visibleBars,
     });
@@ -161,6 +163,7 @@ describe('indicator plot clip channel', () => {
       plots,
       sharedViewport,
       staticProjection: staticProjection as never,
+      textFont,
       totalBarCount: 2,
       visibleBars,
     });
@@ -246,6 +249,7 @@ describe('native Pine visual output rendering', () => {
     priceMax: { value: 100 },
   } as never;
   const visibleBars = [bar(0, 0), bar(1, 30_000), bar(2, 60_000)] as never;
+  const textFont = Skia.Font();
 
   function renderVisuals(plots: PlotOutput[]) {
     return expandAll(
@@ -255,6 +259,7 @@ describe('native Pine visual output rendering', () => {
         plots,
         sharedViewport,
         staticProjection: null,
+        textFont,
         totalBarCount: 3,
         visibleBars,
       }),
@@ -316,6 +321,112 @@ describe('native Pine visual output rendering', () => {
     expect(vi.mocked(panePath.value.moveTo as never).mock.calls[0]?.[1]).toBeGreaterThanOrEqual(400);
   });
 
+  it('renders ordinary plot lines with per-bar colors and breaks on color na', () => {
+    const rendered = renderVisuals([
+      plot({
+        color: ['#00aa00', '#aa0000', null],
+        id: 'colored_line',
+        scriptId: 'script',
+        values: [20, 40, 60],
+      }),
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const greenPath = paths.find((props) => props.color === '#00aa00')?.path as {
+      value: { lineTo: unknown; moveTo: unknown };
+    };
+    const redPath = paths.find((props) => props.color === '#aa0000')?.path as {
+      value: { lineTo: unknown; moveTo: unknown };
+    };
+
+    expect(paths.map((props) => props.color)).toEqual(['#00aa00', '#aa0000']);
+    expect(vi.mocked(greenPath.value.lineTo as never).mock.calls).toHaveLength(0);
+    expect(vi.mocked(redPath.value.moveTo as never).mock.calls).toHaveLength(1);
+    expect(vi.mocked(redPath.value.lineTo as never).mock.calls).toHaveLength(1);
+  });
+
+  it('renders histogram bars with per-bar colors and skips color na', () => {
+    const rendered = renderVisuals([
+      plot({
+        color: ['#00aa00', null, '#aa0000'],
+        id: 'colored_histogram',
+        scriptId: 'script',
+        style: 'histogram',
+        values: [20, 40, 60],
+      }),
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const greenPath = paths.find((props) => props.color === '#00aa00')?.path as { value: { addRect: unknown } };
+    const redPath = paths.find((props) => props.color === '#aa0000')?.path as { value: { addRect: unknown } };
+
+    expect(paths.map((props) => props.color)).toEqual(['#00aa00', '#aa0000']);
+    expect(vi.mocked(greenPath.value.addRect as never).mock.calls).toHaveLength(1);
+    expect(vi.mocked(redPath.value.addRect as never).mock.calls).toHaveLength(1);
+  });
+
+  it('renders cross and circle plot styles as markers instead of line-only paths', () => {
+    const rendered = renderVisuals([
+      plot({
+        color: ['#00aa00', null, '#aa0000'],
+        id: 'cross_markers',
+        scriptId: 'script',
+        style: 'cross',
+        values: [20, 40, 60],
+      }),
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const greenPath = paths.find((props) => props.color === '#00aa00')?.path as {
+      value: { lineTo: unknown; moveTo: unknown };
+    };
+    const redPath = paths.find((props) => props.color === '#aa0000')?.path as {
+      value: { lineTo: unknown; moveTo: unknown };
+    };
+
+    expect(paths.map((props) => props.color)).toEqual(['#00aa00', '#aa0000']);
+    expect(vi.mocked(greenPath.value.moveTo as never).mock.calls).toHaveLength(2);
+    expect(vi.mocked(greenPath.value.lineTo as never).mock.calls).toHaveLength(2);
+    expect(vi.mocked(redPath.value.moveTo as never).mock.calls).toHaveLength(2);
+    expect(vi.mocked(redPath.value.lineTo as never).mock.calls).toHaveLength(2);
+  });
+
+  it('renders area plot styles with a baseline fill behind the line', () => {
+    const rendered = renderVisuals([
+      plot({
+        color: '#00aa00',
+        histbase: 10,
+        id: 'area_plot',
+        scriptId: 'script',
+        style: 'area',
+        values: [20, 40, 60],
+      }),
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const fillPath = paths.find((props) => props.color === '#00aa0033')?.path as {
+      value: { close: unknown; lineTo: unknown; moveTo: unknown };
+    };
+
+    expect(paths.map((props) => props.color)).toEqual(['#00aa0033', '#00aa00']);
+    expect(vi.mocked(fillPath.value.close as never).mock.calls).toHaveLength(1);
+  });
+
+  it('renders stepline diamond markers in addition to the step line', () => {
+    const rendered = renderVisuals([
+      plot({
+        color: '#00aa00',
+        id: 'step_diamond',
+        linewidth: 2,
+        scriptId: 'script',
+        style: 'stepline_diamond',
+        values: [20, 40, 60],
+      }),
+    ]);
+    const paths = findProps(rendered, SkiaPath).filter((props) => props.color === '#00aa00');
+    const diamondPath = paths[1]?.path as { value: { close: unknown } };
+
+    expect(paths).toHaveLength(2);
+    expect(paths[0]?.props?.style ?? paths[0]?.style).toBe('stroke');
+    expect(vi.mocked(diamondPath.value.close as never).mock.calls).toHaveLength(3);
+  });
+
   it('renders plotcandle outputs with per-bar body, wick, and border colors, skipping na OHLC bars', () => {
     const rendered = renderVisuals([
       {
@@ -348,6 +459,38 @@ describe('native Pine visual output rendering', () => {
     expect(borderDownPath).toBeDefined();
   });
 
+  it('skips plotcandle bodies with per-bar color na and skips na wick or border subparts', () => {
+    const rendered = renderVisuals([
+      {
+        color: [null, '#00aa00', '#aa0000'],
+        borderColor: ['#ffffff', '#eeeeee', null],
+        closeValues: [20, 25, 30],
+        highValues: [25, 30, 35],
+        id: 'plotcandle_ColorNa',
+        lowValues: [5, 10, 15],
+        openValues: [10, 20, 25],
+        scriptId: 'script',
+        title: 'Color na',
+        type: 'plotcandle',
+        values: [20, 25, 30],
+        wickColor: ['#0000ff', null, '#ff00ff'],
+      },
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const visibleBodyPath = findPathPropsWithCloseCalls(paths, '#00aa00', 1);
+    const hiddenWickPath = paths.find((props) => props.color === '#00aa00' && props.style === 'stroke')?.path as {
+      value: { close: unknown };
+    };
+    const hiddenBorderPath = paths.find((props) => props.color === '#aa0000' && props.style === 'stroke')?.path as {
+      value: { close: unknown };
+    };
+
+    expect(paths.map((props) => props.color)).not.toContain('#2196F3');
+    expect(visibleBodyPath).toBeDefined();
+    expect(vi.mocked(hiddenWickPath.value.close as never).mock.calls).toHaveLength(0);
+    expect(vi.mocked(hiddenBorderPath.value.close as never).mock.calls).toHaveLength(0);
+  });
+
   it('renders plotbar high-low bars with open and close ticks, skipping na OHLC bars', () => {
     const rendered = renderVisuals([
       {
@@ -375,6 +518,31 @@ describe('native Pine visual output rendering', () => {
     expect(vi.mocked(upPath.value.lineTo as never).mock.calls).toHaveLength(3);
     expect(vi.mocked(skippedPath.value.moveTo as never).mock.calls).toHaveLength(0);
     expect(vi.mocked(skippedPath.value.lineTo as never).mock.calls).toHaveLength(0);
+  });
+
+  it('skips plotbar bars with per-bar color na', () => {
+    const rendered = renderVisuals([
+      {
+        color: [null, '#00aa00', '#aa0000'],
+        closeValues: [20, 30, 30],
+        highValues: [25, 40, 35],
+        id: 'plotbar_ColorNa',
+        lowValues: [5, 10, 15],
+        openValues: [10, 20, 25],
+        scriptId: 'script',
+        title: 'Color na',
+        type: 'plotbar',
+        values: [20, 30, 30],
+      },
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const visiblePath = paths.find((props) => props.color === '#00aa00')?.path as {
+      value: { lineTo: unknown; moveTo: unknown };
+    };
+
+    expect(paths.map((props) => props.color)).not.toContain('#2196F3');
+    expect(vi.mocked(visiblePath.value.moveTo as never).mock.calls).toHaveLength(3);
+    expect(vi.mocked(visiblePath.value.lineTo as never).mock.calls).toHaveLength(3);
   });
 
   it('renders plotarrow directions with per-bar colors and skips zero or na values', () => {
@@ -416,5 +584,53 @@ describe('native Pine visual output rendering', () => {
 
     expect(vi.mocked(defaultUpPath.value.close as never).mock.calls).toHaveLength(1);
     expect(vi.mocked(defaultDownPath.value.close as never).mock.calls).toHaveLength(1);
+  });
+
+  it('renders plotshape markers and keeps marker text when color is na', () => {
+    // TradingView text-and-shapes docs: non-na series emits the marker; color=na hides the mark, not its text.
+    const rendered = renderVisuals([
+      {
+        color: ['#00aa00', null, '#aa0000'],
+        id: 'plotshape_Signals',
+        location: 'belowbar',
+        scriptId: 'script',
+        shape: 'triangleup',
+        textValues: ['Buy', 'Hidden marker text', 'Buy'],
+        title: 'Signals',
+        type: 'plotshape',
+        values: [1, 1, 1],
+      },
+    ]);
+    const paths = findProps(rendered, SkiaPath);
+    const text = findProps(rendered, SkiaText);
+    const greenPath = paths.find((props) => props.color === '#00aa00')?.path as { value: { close: unknown } };
+    const redPath = paths.find((props) => props.color === '#aa0000')?.path as { value: { close: unknown } };
+
+    expect(paths.map((props) => props.color)).toEqual(['#00aa00', '#aa0000']);
+    expect(vi.mocked(greenPath.value.close as never).mock.calls).toHaveLength(1);
+    expect(vi.mocked(redPath.value.close as never).mock.calls).toHaveLength(1);
+    expect(text.map((props) => props.text)).toEqual(['Buy', 'Hidden marker text', 'Buy']);
+  });
+
+  it('renders plotchar glyphs through the native text path', () => {
+    // TradingView text-and-shapes docs: plotchar emits the supplied character where its series is non-na.
+    const rendered = renderVisuals([
+      {
+        char: 'X',
+        color: ['#00aa00', null, '#aa0000'],
+        id: 'plotchar_State',
+        location: 'top',
+        scriptId: 'script',
+        textColor: '#ff00ff',
+        title: 'State',
+        type: 'plotchar',
+        values: [1, 1, 1],
+      },
+    ]);
+    const text = findProps(rendered, SkiaText);
+
+    expect(findProps(rendered, SkiaPath).map((props) => props.color)).toEqual([]);
+    expect(text.map((props) => props.text)).toEqual(['X', 'X']);
+    expect(text.map((props) => props.color)).toEqual(['#00aa00', '#aa0000']);
   });
 });

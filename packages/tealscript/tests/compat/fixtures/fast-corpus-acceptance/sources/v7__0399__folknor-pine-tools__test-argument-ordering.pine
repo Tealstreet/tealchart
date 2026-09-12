@@ -1,0 +1,110 @@
+//@version=6
+// Test: Argument ordering flexibility for global functions
+// For each function, test positional, mixed, and reordered named arguments
+
+indicator("Test argument ordering", overlay=true)
+
+// === alert ===
+// alert(message, freq)
+alert("msg1", alert.freq_once_per_bar)
+alert(message="msg2", freq=alert.freq_once_per_bar)
+alert(freq=alert.freq_once_per_bar, message="msg3")
+
+// === alertcondition ===
+// alertcondition(condition, title, message)
+alertcondition(true, "title1", "message1")
+alertcondition(condition=true, title="title2", message="message2")
+alertcondition(message="message3", title="title3", condition=true)
+
+// === barcolor ===
+// barcolor(color, offset, editable, show_last, title, display)
+barcolor(color.red)
+barcolor(color=color.green, title="bc1")
+barcolor(title="bc2", color=color.blue)
+
+// === bgcolor ===
+// bgcolor(color, offset, editable, show_last, title, display, force_overlay)
+bgcolor(color.new(color.red, 90))
+bgcolor(color=color.new(color.green, 90), title="bg1")
+bgcolor(title="bg2", color=color.new(color.blue, 90))
+
+// === fill ===
+// fill(hline1, hline2, color, title, editable, fillgaps, display)
+h1 = hline(10)
+h2 = hline(20)
+fill(h1, h2, color.new(color.red, 80))
+fill(hline1=h1, hline2=h2, color=color.new(color.green, 80))
+fill(color=color.new(color.blue, 80), hline2=h2, hline1=h1)
+
+// === hline ===
+// hline(price, title, color, linestyle, linewidth, editable, display)
+hline(50)
+hline(price=60, title="h1")
+hline(title="h2", price=70)
+
+// === input ===
+// input(defval, title, tooltip, inline, group, display)
+i1 = input(14)
+i2 = input(defval=15, title="input1")
+i3 = input(title="input2", defval=16)
+
+// === max_bars_back ===
+// max_bars_back(var, num) - note: 'var' is reserved keyword, can't use as named arg
+var myVar = 0.0
+myVar := close
+max_bars_back(myVar, 100)
+// Cannot test named args for max_bars_back because 'var' is a reserved keyword
+
+// === nz ===
+// nz(source, replacement)
+n1 = nz(close)
+n2 = nz(source=close)
+n3 = nz(close, 0.0)
+n4 = nz(source=close, replacement=0.0)
+n5 = nz(replacement=0.0, source=close)
+
+// === fixnan ===
+// fixnan(source)
+f1 = fixnan(close)
+f2 = fixnan(source=close)
+
+// === plot ===
+// plot(series, title, color, linewidth, style, ...)
+plot(close, "p1", color.red)
+plot(series=close, title="p2", color=color.green)
+plot(color=color.blue, title="p3", series=close)
+
+// === plotshape ===
+// plotshape(series, title, style, location, color, ...)
+plotshape(close > open, "ps1")
+plotshape(series=close > open, title="ps2")
+plotshape(title="ps3", series=close > open)
+
+// === plotchar ===
+// plotchar(series, title, char, location, color, ...)
+plotchar(close > open, "pc1", "X")
+plotchar(series=close > open, title="pc2", char="Y")
+plotchar(char="Z", title="pc3", series=close > open)
+
+// === timestamp ===
+// timestamp(year, month, day, hour, minute, second)
+t1 = timestamp(2024, 1, 1, 0, 0, 0)
+t2 = timestamp(year=2024, month=1, day=1, hour=0, minute=0, second=0)
+t3 = timestamp(second=0, minute=0, hour=0, day=1, month=1, year=2024)
+
+// === Time functions ===
+// dayofmonth(time), dayofweek(time), etc.
+d1 = dayofmonth(time)
+d2 = dayofmonth(time=time)
+w1 = dayofweek(time)
+w2 = dayofweek(time=time)
+h = hour(time)
+m = minute(time)
+s = second(time)
+mo = month(time)
+y = year(time)
+woy = weekofyear(time)
+
+plot(n1 + n2 + n3 + n4 + n5 + f1 + f2, "nz/fixnan sum")
+plot(i1 + i2 + i3, "inputs sum")
+plot(t1, "timestamp")

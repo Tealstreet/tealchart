@@ -1,8 +1,8 @@
 {
   "description": "Auto-bootstrapped from engine output",
   "barCount": 200,
-  "closedTradeCount": 104,
-  "openTradeCount": 19,
-  "netProfit": -114.04999999999995,
+  "closedTradeCount": 17,
+  "openTradeCount": 1,
+  "netProfit": -30.350000000000023,
   "source": "engine-baseline"
 }

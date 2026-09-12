@@ -69,7 +69,7 @@ describe('Compiled vs Reference parity sweep', () => {
     ['Cross', `//@version=6\nindicator("test")\nplot(ta.cross(close, 104) ? 1 : 0)`],
     ['Crossover', `//@version=6\nindicator("test")\nplot(ta.crossover(ta.ema(close, 3), ta.sma(close, 5)) ? 1 : 0)`],
     ['Highest/Lowest', `//@version=6\nindicator("test")\nplot(ta.highest(close, 5))\nplot(ta.lowest(close, 5))\nplot(ta.highest(5))\nplot(ta.lowest(length=5))\nplot(ta.highest(source=high, 4))\nplot(ta.lowest(source=low, 4))`],
-    ['Max/Min', `//@version=6\nindicator("test")\nplot(ta.max(close, open))\nplot(ta.min(close, open))\nplot(ta.max(source1=close, source2=open))\nplot(ta.min(source1=close, source2=open))\nplot(ta.max(source1=close, open))\nplot(ta.min(source1=close, open))`],
+    ['Max/Min', `//@version=6\nindicator("test")\nplot(ta.max(close))\nplot(ta.min(close))\nplot(ta.max(source1=close))\nplot(ta.min(source1=close))\nplot(ta.max(source=close))\nplot(ta.min(source=close))`],
     ['HighestBars/LowestBars', `//@version=6\nindicator("test")\nplot(ta.highestbars(4))\nplot(ta.lowestbars(4))\nplot(ta.highestbars(high, 4))\nplot(ta.lowestbars(low, 4))`],
     ['Range/Rising/Falling', `//@version=6\nindicator("test")\nplot(ta.range(close, 4))\nplot(ta.rising(close, 2) ? 1 : 0)\nplot(ta.falling(close, 2) ? 1 : 0)`],
     ['Variance/Dev', `//@version=6\nindicator("test")\nplot(ta.variance(close, 4))\nplot(ta.variance(close, 4, false))\nplot(ta.dev(close, 4))`],

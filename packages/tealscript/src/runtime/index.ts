@@ -142,6 +142,7 @@ export {
   type StrategyIntrabarSource,
   type StrategyIntrabarSuccess,
   type StrategyIntrabarUnavailableReason,
+  type StrategyMarginApproximationReason,
   type StrategyLedger,
   type StrategyLedgerSettings,
   type StrategyOcaType,

@@ -63,12 +63,121 @@
     return { type: 'MultiStatement', statements, loc: loc() };
   }
 
+  function buildExpressionBodyChain(head, tail) {
+    return [
+      { type: 'ExpressionStatement', expression: head, loc: loc() },
+      ...tail.map(t => t[3]).flatMap(flattenTransientStatement)
+    ];
+  }
+
   function isIdentifierStart(ch) {
     return /^[A-Za-z_]$/u.test(ch) || /^\p{L}$/u.test(ch);
   }
 
   function isIdentifierPart(ch) {
     return /^[A-Za-z0-9_]$/u.test(ch) || /^[\p{L}\p{N}]$/u.test(ch);
+  }
+
+  function isBlockIndentedOperator() {
+    const start = location().start.offset;
+    const previousLineStart = input.lastIndexOf('\n', start - 1) + 1;
+    let previousIndentation = 0;
+    while (input[previousLineStart + previousIndentation] === ' ' || input[previousLineStart + previousIndentation] === '\t') {
+      previousIndentation += input[previousLineStart + previousIndentation] === '\t' ? 4 : 1;
+    }
+
+    const lineBreak = input.indexOf('\n', start);
+    if (lineBreak === -1) return false;
+    let offset = lineBreak + 1;
+    let nextIndentation = 0;
+    while (input[offset] === ' ' || input[offset] === '\t') {
+      nextIndentation += input[offset] === '\t' ? 4 : 1;
+      offset += 1;
+    }
+    const previousLine = input.slice(previousLineStart, start).trimStart();
+    const previousLineIsAssignment = startsWithAssignmentStatement(previousLine);
+    const previousLineIsBlockHeader = /^(if|else\s+if|for|while|switch)\b/.test(previousLine);
+    const previousLineIsSwitchAssignment = previousLineIsAssignment && /\bswitch\b/.test(previousLine);
+    const beforeOperator = input.slice(0, start);
+    const openDelimiters = [...beforeOperator].reduce((depth, char) => {
+      if (char === '(' || char === '[' || char === '{') return depth + 1;
+      if (char === ')' || char === ']' || char === '}') return Math.max(0, depth - 1);
+      return depth;
+    }, 0);
+    return (input[offset] === '-' || input[offset] === '+') &&
+      openDelimiters === 0 &&
+      (previousLineIsBlockHeader || previousLineIsSwitchAssignment || (nextIndentation <= previousIndentation && previousLineIsAssignment));
+  }
+
+  function startsWithAssignmentStatement(line) {
+    let depth = 0;
+    let inDouble = false;
+    let inSingle = false;
+    let escaped = false;
+    for (let offset = 0; offset < line.length; offset += 1) {
+      const character = line[offset];
+      const previous = line[offset - 1] || '';
+      const next = line[offset + 1] || '';
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (character === '\\' && (inDouble || inSingle)) {
+        escaped = true;
+        continue;
+      }
+      if (character === '"' && !inSingle) {
+        inDouble = !inDouble;
+        continue;
+      }
+      if (character === "'" && !inDouble) {
+        inSingle = !inSingle;
+        continue;
+      }
+      if (inDouble || inSingle) continue;
+      if (character === '/' && next === '/') break;
+      if (character === '(' || character === '[' || character === '{') {
+        depth += 1;
+        continue;
+      }
+      if (character === ')' || character === ']' || character === '}') {
+        depth = Math.max(0, depth - 1);
+        continue;
+      }
+      if (depth !== 0) continue;
+      if (character === ':' && next === '=') return true;
+      if (
+        character === '=' &&
+        next !== '=' &&
+        next !== '>' &&
+        previous !== '=' &&
+        previous !== '!' &&
+        previous !== '<' &&
+        previous !== '>'
+      ) {
+        return true;
+      }
+      if ("+-*/%".includes(character) && next === '=') return true;
+    }
+    return false;
+  }
+
+  function currentLineIndentation() {
+    const lineStart = input.lastIndexOf('\n', location().start.offset - 1) + 1;
+    let indentation = 0;
+    for (let offset = lineStart; offset < input.length; offset += 1) {
+      const character = input[offset];
+      if (character === ' ') indentation += 1;
+      else if (character === '\t') indentation += 4;
+      else break;
+    }
+    return indentation;
+  }
+
+  const arbitraryElseIndentStack = [];
+
+  function currentArbitraryElseIndentation() {
+    return arbitraryElseIndentStack[arbitraryElseIndentStack.length - 1];
   }
 }
 
@@ -171,7 +280,8 @@ IndicatorDeclaration
         'risk_free_rate',
         'backtest_fill_limits_assumption',
         'close_entries_rule',
-        'fill_orders_on_standard_ohlc'
+        'fill_orders_on_standard_ohlc',
+        'calc_on_every_history_tick'
       ];
       for (const arg of args) {
         if (arg.name) {
@@ -369,6 +479,18 @@ MethodDeclaration
         loc: loc()
       };
     }
+  / exported:("export" !IdentifierPart _)? overload:("overload" !IdentifierPart _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ head:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)+ _ LineTerminator? {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: [first, ...rest.map(t => t[3])],
+        body: buildExpressionBodyChain(head, tail),
+        isMethod: true,
+        overloaded: !!overload,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
   / exported:("export" !IdentifierPart _)? overload:("overload" !IdentifierPart _)? "method" !IdentifierPart _ name:Identifier _ "(" __ first:TypedParameter rest:(__ "," __ Parameter)* (__ ",")? __ ")" _ "=>" _ body:Expression _ LineTerminator? {
       return {
         type: 'FunctionDeclaration',
@@ -400,6 +522,16 @@ FunctionDeclaration
         name,
         params: params || [],
         body: [body],
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ head:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)+ _ LineTerminator? {
+      return {
+        type: 'FunctionDeclaration',
+        name,
+        params: params || [],
+        body: buildExpressionBodyChain(head, tail),
         exported: !!exported,
         loc: loc()
       };
@@ -482,6 +614,15 @@ ChainedStatement
   = TypedChainedVariableDeclaration
   / UntypedChainedVariableDeclaration
   / SingleAssignment
+  / InlineLoopControlStatement
+  / ChainedExpressionStatement
+
+FunctionChainedStatement
+  = FunctionForStatement
+  / TypedChainedVariableDeclaration
+  / UntypedChainedVariableDeclaration
+  / SingleAssignment
+  / InlineLoopControlStatement
   / ChainedExpressionStatement
 
 TypedChainedVariableDeclaration
@@ -634,6 +775,9 @@ TypeReferenceName
   = "array" !IdentifierPart _ "<" __ elementType:TypeReferenceName __ ">" {
       return formatTemplateType('array', [elementType]);
     }
+  / elementType:TypeName _ "[" _ "]" {
+      return formatTemplateType('array', [elementType]);
+    }
   / "matrix" !IdentifierPart _ "<" __ elementType:TypeReferenceName __ ">" {
       return formatTemplateType('matrix', [elementType]);
     }
@@ -656,9 +800,9 @@ TupleAssignment
 // Assignment: x := value, or comma-separated: x := 1, y := 2
 // Left side can be an identifier, member access, or index access
 AssignmentStatement
-  = head:SingleAssignment tail:(BeforeComma "," CommaContinuationSpace SingleAssignment)* _ LineTerminator? {
+  = head:SingleAssignment tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* _ LineTerminator? {
       if (tail.length === 0) return head;
-      return { type: 'MultiAssignment', assignments: [head, ...tail.map(t => t[3])], loc: loc() };
+      return buildStatementChain(head, tail);
     }
 
 SingleAssignment
@@ -676,7 +820,7 @@ SingleAssignment
 // These parallel SingleAssignment but allow FunctionIfStatement /
 // FunctionSwitchExpression as the RHS value.
 FunctionAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionIfStatement / FunctionSwitchExpression) {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionSwitchExpression / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -687,7 +831,7 @@ FunctionAssignmentStatement
     }
 
 FunctionNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionNestedIfStatement / FunctionNestedSwitchExpression) {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionNestedSwitchExpression / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -698,7 +842,7 @@ FunctionNestedAssignmentStatement
     }
 
 FunctionDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionDeepNestedIfStatement / FunctionDeepNestedSwitchExpression) {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionDeepNestedSwitchExpression / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -709,7 +853,7 @@ FunctionDeepNestedAssignmentStatement
     }
 
 FunctionVeryDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedSwitchExpression) {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionVeryDeepNestedSwitchExpression / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -720,7 +864,7 @@ FunctionVeryDeepNestedAssignmentStatement
     }
 
 FunctionUltraDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionUltraDeepNestedIfStatement {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -731,7 +875,7 @@ FunctionUltraDeepNestedAssignmentStatement
     }
 
 FunctionMegaDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionMegaDeepNestedIfStatement {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -742,7 +886,7 @@ FunctionMegaDeepNestedAssignmentStatement
     }
 
 FunctionSuperDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionSuperDeepNestedIfStatement {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionSuperDeepNestedSwitchExpression / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -753,7 +897,7 @@ FunctionSuperDeepNestedAssignmentStatement
     }
 
 FunctionHyperDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionHyperDeepNestedIfStatement {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -764,7 +908,7 @@ FunctionHyperDeepNestedAssignmentStatement
     }
 
 FunctionExtremeDeepNestedAssignmentStatement
-  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:FunctionExtremeDeepNestedIfStatement {
+  = left:AssignmentTarget _ op:AssignmentOperator InitializerSpace right:(FunctionArbitraryInlineIfStatement / FunctionCollectionForExpression / FunctionNumericForExpression / FunctionWhileExpression) {
       return {
         type: 'AssignmentStatement',
         operator: op,
@@ -823,21 +967,36 @@ StatementReservedWord
     ) !IdentifierPart
 
 ExpressionStatement
-  = !StatementReservedWord head:Expression tail:(BeforeComma "," CommaContinuationSpace !StatementReservedWord Expression)* _ LineTerminator? {
+  = !StatementReservedWord head:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* _ LineTerminator? {
       if (tail.length === 0) {
         return { type: 'ExpressionStatement', expression: head, loc: loc() };
       }
-      const exprs = [head, ...tail.map(t => t[4])];
-      return {
-        type: 'MultiExpressionStatement',
-        expressions: exprs,
-        loc: loc()
-      };
+      const chained = tail.map(t => t[3]);
+      if (chained.every(statement => statement.type === 'ExpressionStatement')) {
+        return {
+          type: 'MultiExpressionStatement',
+          expressions: [head, ...chained.map(statement => statement.expression)],
+          loc: loc()
+        };
+      }
+      return buildStatementChain(
+        { type: 'ExpressionStatement', expression: head, loc: loc() },
+        tail.map(t => [null, null, null, t[3]])
+      );
     }
 
 // If statement
 IfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
+  = "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -857,7 +1016,16 @@ IfStatement
     }
 
 ElseClause
-  = _ "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
+  = _ "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / _ "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:IndentedBlock alternate:ElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -894,7 +1062,7 @@ ForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:IndentedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -911,9 +1079,16 @@ CollectionForCounter
   = "[" _ indexCounter:Identifier _ "," _ valueCounter:Identifier _ "]" {
       return { indexCounter, valueCounter };
     }
+  / indexCounter:Identifier _ "," _ valueCounter:Identifier {
+      return { indexCounter, valueCounter };
+    }
   / valueCounter:Identifier {
       return { valueCounter };
     }
+
+NumericForCounter
+  = TypeAnnotation _ counter:Identifier { return counter; }
+  / Identifier
 
 // While loop
 WhileStatement
@@ -936,19 +1111,33 @@ ContinueStatement
       return { type: 'ContinueStatement', loc: loc() };
     }
 
-// Indented block (simplified: just look for indented lines)
 IndentedBlock
-  = statements:(BlockIgnorableLine / IndentedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
+  = leading:BlockIgnorableLine* first:IndentedFirstStatement rest:(
+      BlockIgnorableLine
+      / indentation:$([ \t]+) &{ return indentation.replace(/\t/g, '    ').length >= first.indentation; } _ stmt:IndentedStatementBody { return stmt; }
+    )* {
+      return [
+        ...leading.filter(s => s !== null),
+        first.statement,
+        ...rest.filter(s => s !== null)
+      ].flatMap(flattenTransientStatement);
     }
 
-IndentedStatement
-  = &Indent Indent stmt:(IndentedLocalFunctionDeclaration / FunctionSwitchExpressionStatement / FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / FunctionAssignmentStatement / Statement) {
+IndentedFirstStatement
+  = indentation:$([ \t]+) _ stmt:IndentedStatementBody {
+      return {
+        indentation: indentation.replace(/\t/g, '    ').length,
+        statement: stmt
+      };
+    }
+
+IndentedStatementBody
+  = stmt:(IndentedLocalFunctionDeclaration / FunctionSwitchExpressionStatement / FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / FunctionAssignmentStatement / Statement) {
       return stmt;
     }
 
 IndentedLocalFunctionDeclaration
-  = exported:("export" !IdentifierPart _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ LineTerminator body:FunctionNestedBlock {
+  = exported:("export" !IdentifierPart _)? name:Identifier _ "(" __ params:ParameterList? __ ")" _ "=>" _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'FunctionDeclaration',
         name,
@@ -965,7 +1154,7 @@ FunctionIndentedBlock
     }
 
 FunctionIndentedStatement
-  = &FunctionIndent FunctionIndent stmt:(FunctionSwitchExpressionStatement / FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / FunctionAssignmentStatement / Statement) {
+  = &FunctionIndent FunctionIndent _ stmt:(FunctionSwitchExpressionStatement / FunctionIfStatement / FunctionForStatement / FunctionWhileStatement / FunctionVariableDeclaration / FunctionAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -988,8 +1177,45 @@ FunctionSwitchExpression
       };
     }
 
+FunctionCollectionForExpression
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionNumericForExpression
+  = "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionWhileExpression
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
+    }
+
 FunctionSwitchCase
-  = FunctionNestedIndent _ "=>" _ LineTerminator consequent:FunctionDeepNestedBlock {
+  = FunctionNestedIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
       return {
         type: 'SwitchCase',
         test: null,
@@ -997,7 +1223,23 @@ FunctionSwitchCase
         loc: loc()
       };
     }
-  / FunctionNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionDeepNestedBlock {
+  / FunctionNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1023,7 +1265,16 @@ FunctionSwitchCase
     }
 
 FunctionIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+  = "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1043,7 +1294,7 @@ FunctionIfStatement
     }
 
 FunctionElseClause
-  = FunctionElseIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionNestedBlock alternate:FunctionElseClause? {
+  = FunctionElseIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1052,12 +1303,21 @@ FunctionElseClause
         loc: loc()
       };
     }
-  / FunctionElseIndent "else" !IdentifierPart _ LineTerminator? block:FunctionNestedBlock {
+  / FunctionElseIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionElseIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
 FunctionForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1068,7 +1328,7 @@ FunctionForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1082,7 +1342,7 @@ FunctionForStatement
     }
 
 FunctionWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1096,7 +1356,7 @@ FunctionVariableDeclaration
   / UntypedFunctionVariableDeclaration
 
 TypedFunctionVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1118,14 +1378,47 @@ TypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionCollectionForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionNumericForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionWhileExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:((BeforeComma "," CommaContinuationSpace FunctionChainedStatement) / (_ chained:FunctionChainedStatement { return [null, null, null, chained]; }))* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
     }
 
 UntypedFunctionVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1147,7 +1440,40 @@ UntypedFunctionVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionCollectionForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionNumericForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionWhileExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:((BeforeComma "," CommaContinuationSpace FunctionChainedStatement) / (_ chained:FunctionChainedStatement { return [null, null, null, chained]; }))* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
@@ -1159,7 +1485,7 @@ FunctionNestedBlock
     }
 
 FunctionNestedStatement
-  = &FunctionNestedIndent FunctionNestedIndent stmt:(FunctionNestedSwitchExpressionStatement / FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / FunctionNestedVariableDeclaration / FunctionNestedAssignmentStatement / Statement) {
+  = &FunctionNestedIndent FunctionNestedIndent _ stmt:(FunctionNestedSwitchExpressionStatement / FunctionNestedIfStatement / FunctionNestedForStatement / FunctionNestedWhileStatement / FunctionNestedVariableDeclaration / FunctionNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1183,7 +1509,7 @@ FunctionNestedSwitchExpression
     }
 
 FunctionNestedSwitchCase
-  = FunctionDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionVeryDeepNestedBlock {
+  = FunctionDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1191,7 +1517,23 @@ FunctionNestedSwitchCase
         loc: loc()
       };
     }
-  / FunctionDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionVeryDeepNestedBlock {
+  / FunctionDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1217,7 +1559,7 @@ FunctionNestedSwitchCase
     }
 
 FunctionNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1228,7 +1570,7 @@ FunctionNestedIfStatement
     }
 
 FunctionNestedElseClause
-  = FunctionNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionDeepNestedBlock alternate:FunctionNestedElseClause? {
+  = FunctionNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1237,12 +1579,21 @@ FunctionNestedElseClause
         loc: loc()
       };
     }
-  / FunctionNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionDeepNestedBlock {
+  / FunctionNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
 FunctionNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1253,7 +1604,7 @@ FunctionNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1267,7 +1618,7 @@ FunctionNestedForStatement
     }
 
 FunctionNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1281,7 +1632,7 @@ FunctionNestedVariableDeclaration
   / UntypedFunctionNestedVariableDeclaration
 
 TypedFunctionNestedVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionNestedIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1303,14 +1654,36 @@ TypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionCollectionForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionNumericForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: type,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
     }
 
 UntypedFunctionNestedVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionNestedIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1332,7 +1705,29 @@ UntypedFunctionNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionCollectionForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionNumericForExpression {
+      return {
+        type: 'VariableDeclaration',
+        kind: kind || 'none',
+        names: pattern,
+        typeAnnotation: null,
+        init,
+        exported: !!exported,
+        loc: loc()
+      };
+    }
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
@@ -1344,7 +1739,7 @@ FunctionDeepNestedBlock
     }
 
 FunctionDeepNestedStatement
-  = &FunctionDeepNestedIndent FunctionDeepNestedIndent stmt:(FunctionDeepNestedSwitchExpressionStatement / FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / FunctionDeepNestedVariableDeclaration / FunctionDeepNestedAssignmentStatement / Statement) {
+  = &FunctionDeepNestedIndent FunctionDeepNestedIndent _ stmt:(FunctionDeepNestedSwitchExpressionStatement / FunctionDeepNestedIfStatement / FunctionDeepNestedForStatement / FunctionDeepNestedWhileStatement / FunctionDeepNestedVariableDeclaration / FunctionDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1368,7 +1763,7 @@ FunctionDeepNestedSwitchExpression
     }
 
 FunctionDeepNestedSwitchCase
-  = FunctionVeryDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionUltraDeepNestedBlock {
+  = FunctionVeryDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1376,7 +1771,23 @@ FunctionDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / FunctionVeryDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionUltraDeepNestedBlock {
+  / FunctionVeryDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionVeryDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionVeryDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1402,7 +1813,7 @@ FunctionDeepNestedSwitchCase
     }
 
 FunctionDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1413,7 +1824,7 @@ FunctionDeepNestedIfStatement
     }
 
 FunctionDeepNestedElseClause
-  = FunctionDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionVeryDeepNestedBlock alternate:FunctionDeepNestedElseClause? {
+  = FunctionDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1422,12 +1833,21 @@ FunctionDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionVeryDeepNestedBlock {
+  / FunctionDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
 FunctionDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1438,7 +1858,7 @@ FunctionDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1452,7 +1872,7 @@ FunctionDeepNestedForStatement
     }
 
 FunctionDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionVeryDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1466,7 +1886,7 @@ FunctionDeepNestedVariableDeclaration
   / UntypedFunctionDeepNestedVariableDeclaration
 
 TypedFunctionDeepNestedVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionDeepNestedIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1488,14 +1908,14 @@ TypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
     }
 
 UntypedFunctionDeepNestedVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionDeepNestedIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1517,7 +1937,7 @@ UntypedFunctionDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
@@ -1529,7 +1949,7 @@ FunctionVeryDeepNestedBlock
     }
 
 FunctionVeryDeepNestedStatement
-  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent stmt:(FunctionVeryDeepNestedSwitchExpressionStatement / FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedForStatement / FunctionVeryDeepNestedWhileStatement / FunctionVeryDeepNestedVariableDeclaration / FunctionVeryDeepNestedAssignmentStatement / Statement) {
+  = &FunctionVeryDeepNestedIndent FunctionVeryDeepNestedIndent _ stmt:(FunctionVeryDeepNestedSwitchExpressionStatement / FunctionVeryDeepNestedIfStatement / FunctionVeryDeepNestedForStatement / FunctionVeryDeepNestedWhileStatement / FunctionVeryDeepNestedVariableDeclaration / FunctionVeryDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
@@ -1553,7 +1973,7 @@ FunctionVeryDeepNestedSwitchExpression
     }
 
 FunctionVeryDeepNestedSwitchCase
-  = FunctionUltraDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionMegaDeepNestedBlock {
+  = FunctionUltraDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
       return {
         type: 'SwitchCase',
         test: null,
@@ -1561,7 +1981,23 @@ FunctionVeryDeepNestedSwitchCase
         loc: loc()
       };
     }
-  / FunctionUltraDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionMegaDeepNestedBlock {
+  / FunctionUltraDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionUltraDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionUltraDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -1587,7 +2023,7 @@ FunctionVeryDeepNestedSwitchCase
     }
 
 FunctionVeryDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionUltraDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1598,7 +2034,7 @@ FunctionVeryDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionUltraDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1612,7 +2048,7 @@ FunctionVeryDeepNestedForStatement
     }
 
 FunctionVeryDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionUltraDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1626,7 +2062,7 @@ FunctionVeryDeepNestedVariableDeclaration
   / UntypedFunctionVeryDeepNestedVariableDeclaration
 
 TypedFunctionVeryDeepNestedVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionVeryDeepNestedIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1648,14 +2084,14 @@ TypedFunctionVeryDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ type:TypeAnnotation _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: type, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
     }
 
 UntypedFunctionVeryDeepNestedVariableDeclaration
-  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionVeryDeepNestedIfStatement {
+  = exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:FunctionArbitraryInlineIfStatement {
       return {
         type: 'VariableDeclaration',
         kind: kind || 'none',
@@ -1677,14 +2113,14 @@ UntypedFunctionVeryDeepNestedVariableDeclaration
         loc: loc()
       };
     }
-  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)* LineTerminator? {
+  / exported:("export" !IdentifierPart _)? kind:VarKind? _ pattern:DeclarationPattern DeclarationEqualsSpace AssignEquals InitializerSpace init:Expression tail:(BeforeComma "," CommaContinuationSpace FunctionChainedStatement)* LineTerminator? {
       const first = { type: 'VariableDeclaration', kind: kind || 'none', names: pattern, typeAnnotation: null, init, exported: !!exported, loc: loc() };
       if (tail.length === 0) return first;
       return buildStatementChain(first, tail);
     }
 
 FunctionVeryDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1695,7 +2131,7 @@ FunctionVeryDeepNestedIfStatement
     }
 
 FunctionVeryDeepNestedElseClause
-  = FunctionVeryDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionUltraDeepNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+  = FunctionVeryDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1704,7 +2140,16 @@ FunctionVeryDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionVeryDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionUltraDeepNestedBlock {
+  / FunctionVeryDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionVeryDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionVeryDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
@@ -1714,12 +2159,12 @@ FunctionUltraDeepNestedBlock
     }
 
 FunctionUltraDeepNestedStatement
-  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent stmt:(FunctionUltraDeepNestedIfStatement / FunctionUltraDeepNestedForStatement / FunctionUltraDeepNestedWhileStatement / FunctionUltraDeepNestedAssignmentStatement / Statement) {
+  = &FunctionUltraDeepNestedIndent FunctionUltraDeepNestedIndent _ stmt:(FunctionUltraDeepNestedIfStatement / FunctionUltraDeepNestedForStatement / FunctionUltraDeepNestedWhileStatement / FunctionUltraDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
 FunctionUltraDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionMegaDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1730,7 +2175,7 @@ FunctionUltraDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionMegaDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1744,7 +2189,7 @@ FunctionUltraDeepNestedForStatement
     }
 
 FunctionUltraDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionMegaDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1754,7 +2199,7 @@ FunctionUltraDeepNestedWhileStatement
     }
 
 FunctionUltraDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1765,7 +2210,7 @@ FunctionUltraDeepNestedIfStatement
     }
 
 FunctionUltraDeepNestedElseClause
-  = FunctionUltraDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionMegaDeepNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+  = FunctionUltraDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1774,7 +2219,16 @@ FunctionUltraDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionUltraDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionMegaDeepNestedBlock {
+  / FunctionUltraDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionUltraDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionUltraDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
@@ -1784,12 +2238,12 @@ FunctionMegaDeepNestedBlock
     }
 
 FunctionMegaDeepNestedStatement
-  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent stmt:(FunctionMegaDeepNestedIfStatement / FunctionMegaDeepNestedForStatement / FunctionMegaDeepNestedWhileStatement / FunctionMegaDeepNestedAssignmentStatement / Statement) {
+  = &FunctionMegaDeepNestedIndent FunctionMegaDeepNestedIndent _ stmt:(FunctionMegaDeepNestedIfStatement / FunctionMegaDeepNestedForStatement / FunctionMegaDeepNestedWhileStatement / FunctionMegaDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
 FunctionMegaDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionSuperDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1800,7 +2254,7 @@ FunctionMegaDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionSuperDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1814,7 +2268,7 @@ FunctionMegaDeepNestedForStatement
     }
 
 FunctionMegaDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionSuperDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1824,7 +2278,7 @@ FunctionMegaDeepNestedWhileStatement
     }
 
 FunctionMegaDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionSuperDeepNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1835,7 +2289,7 @@ FunctionMegaDeepNestedIfStatement
     }
 
 FunctionMegaDeepNestedElseClause
-  = FunctionMegaDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionSuperDeepNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
+  = FunctionMegaDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1844,7 +2298,16 @@ FunctionMegaDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionMegaDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionSuperDeepNestedBlock {
+  / FunctionMegaDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionMegaDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionMegaDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
@@ -1854,12 +2317,81 @@ FunctionSuperDeepNestedBlock
     }
 
 FunctionSuperDeepNestedStatement
-  = &FunctionSuperDeepNestedIndent FunctionSuperDeepNestedIndent stmt:(FunctionSuperDeepNestedIfStatement / FunctionSuperDeepNestedForStatement / FunctionSuperDeepNestedWhileStatement / FunctionSuperDeepNestedAssignmentStatement / Statement) {
+  = &FunctionSuperDeepNestedIndent FunctionSuperDeepNestedIndent _ stmt:(FunctionSuperDeepNestedSwitchExpressionStatement / FunctionSuperDeepNestedIfStatement / FunctionSuperDeepNestedForStatement / FunctionSuperDeepNestedWhileStatement / FunctionSuperDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
+FunctionSuperDeepNestedSwitchExpressionStatement
+  = !StatementReservedWord expr:FunctionSuperDeepNestedSwitchExpression {
+      return {
+        type: 'ExpressionStatement',
+        expression: expr,
+        loc: loc()
+      };
+    }
+
+FunctionSuperDeepNestedSwitchExpression
+  = "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator cases:(BlockIgnorableLine / FunctionSuperDeepNestedSwitchCase)+ {
+      return {
+        type: 'SwitchExpression',
+        discriminant: discriminant || null,
+        cases: cases.filter(c => c !== null),
+        loc: loc()
+      };
+    }
+
+FunctionSuperDeepNestedSwitchCase
+  = FunctionHyperDeepNestedIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test: null,
+        consequent,
+        loc: loc()
+      };
+    }
+  / FunctionHyperDeepNestedIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionHyperDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionHyperDeepNestedIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / FunctionHyperDeepNestedIndent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        type: 'SwitchCase',
+        test: null,
+        consequent,
+        loc: loc()
+      };
+    }
+  / FunctionHyperDeepNestedIndent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+
 FunctionSuperDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionHyperDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1870,7 +2402,7 @@ FunctionSuperDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionHyperDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1884,7 +2416,7 @@ FunctionSuperDeepNestedForStatement
     }
 
 FunctionSuperDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionHyperDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1894,7 +2426,7 @@ FunctionSuperDeepNestedWhileStatement
     }
 
 FunctionSuperDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionHyperDeepNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1905,7 +2437,7 @@ FunctionSuperDeepNestedIfStatement
     }
 
 FunctionSuperDeepNestedElseClause
-  = FunctionSuperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionHyperDeepNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
+  = FunctionSuperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1914,7 +2446,16 @@ FunctionSuperDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionSuperDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionHyperDeepNestedBlock {
+  / FunctionSuperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionSuperDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionSuperDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
@@ -1924,12 +2465,12 @@ FunctionHyperDeepNestedBlock
     }
 
 FunctionHyperDeepNestedStatement
-  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent stmt:(FunctionHyperDeepNestedIfStatement / FunctionHyperDeepNestedForStatement / FunctionHyperDeepNestedWhileStatement / FunctionHyperDeepNestedAssignmentStatement / Statement) {
+  = &FunctionHyperDeepNestedIndent FunctionHyperDeepNestedIndent _ stmt:(FunctionHyperDeepNestedIfStatement / FunctionHyperDeepNestedForStatement / FunctionHyperDeepNestedWhileStatement / FunctionHyperDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
 FunctionHyperDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionExtremeDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -1940,7 +2481,7 @@ FunctionHyperDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionExtremeDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -1954,7 +2495,7 @@ FunctionHyperDeepNestedForStatement
     }
 
 FunctionHyperDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionExtremeDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -1964,7 +2505,7 @@ FunctionHyperDeepNestedWhileStatement
     }
 
 FunctionHyperDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1975,7 +2516,7 @@ FunctionHyperDeepNestedIfStatement
     }
 
 FunctionHyperDeepNestedElseClause
-  = FunctionHyperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionExtremeDeepNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+  = FunctionHyperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -1984,7 +2525,16 @@ FunctionHyperDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionHyperDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionExtremeDeepNestedBlock {
+  / FunctionHyperDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionHyperDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionHyperDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
@@ -1994,12 +2544,12 @@ FunctionExtremeDeepNestedBlock
     }
 
 FunctionExtremeDeepNestedStatement
-  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent stmt:(FunctionExtremeDeepNestedIfStatement / FunctionExtremeDeepNestedForStatement / FunctionExtremeDeepNestedWhileStatement / FunctionExtremeDeepNestedAssignmentStatement / Statement) {
+  = &FunctionExtremeDeepNestedIndent FunctionExtremeDeepNestedIndent _ stmt:(FunctionExtremeDeepNestedIfStatement / FunctionExtremeDeepNestedForStatement / FunctionExtremeDeepNestedWhileStatement / FunctionExtremeDeepNestedAssignmentStatement / Statement) {
       return stmt;
     }
 
 FunctionExtremeDeepNestedForStatement
-  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionMaxDeepNestedBlock {
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'collection',
@@ -2010,7 +2560,7 @@ FunctionExtremeDeepNestedForStatement
         loc: loc()
       };
     }
-  / "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionMaxDeepNestedBlock {
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -2024,7 +2574,7 @@ FunctionExtremeDeepNestedForStatement
     }
 
 FunctionExtremeDeepNestedWhileStatement
-  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionMaxDeepNestedBlock {
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
       return {
         type: 'WhileStatement',
         test,
@@ -2034,7 +2584,7 @@ FunctionExtremeDeepNestedWhileStatement
     }
 
 FunctionExtremeDeepNestedIfStatement
-  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionMaxDeepNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
+  = "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -2045,7 +2595,7 @@ FunctionExtremeDeepNestedIfStatement
     }
 
 FunctionExtremeDeepNestedElseClause
-  = FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionMaxDeepNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
+  = FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
       return {
         type: 'IfStatement',
         test,
@@ -2054,19 +2604,242 @@ FunctionExtremeDeepNestedElseClause
         loc: loc()
       };
     }
-  / FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionMaxDeepNestedBlock {
+  / FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionExtremeDeepNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / FunctionExtremeDeepNestedIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
       return block;
     }
 
 FunctionMaxDeepNestedBlock
-  = statements:(BlockIgnorableLine / FunctionMaxDeepNestedStatement)+ {
-      return statements.filter(s => s !== null).flatMap(flattenTransientStatement);
+  = FunctionArbitraryNestedBlock
+
+FunctionArbitraryNestedBlock
+  = leading:BlockIgnorableLine* first:FunctionArbitraryNestedFirstStatement rest:(
+      BlockIgnorableLine
+      / indentation:$([ \t]+) &{ return indentation.replace(/\t/g, '    ').length >= first.indentation; } _ stmt:FunctionArbitraryNestedStatementBody { return stmt; }
+    )* {
+      return [
+        ...leading.filter(s => s !== null),
+        first.statement,
+        ...rest.filter(s => s !== null)
+      ].flatMap(flattenTransientStatement);
     }
 
-FunctionMaxDeepNestedStatement
-  = &FunctionMaxDeepNestedIndent FunctionMaxDeepNestedIndent stmt:Statement {
+FunctionArbitraryNestedFirstStatement
+  = indentation:$([ \t]+) _ stmt:FunctionArbitraryNestedStatementBody {
+      return {
+        indentation: indentation.replace(/\t/g, '    ').length,
+        statement: stmt
+      };
+    }
+
+FunctionArbitraryNestedStatementBody
+  = stmt:(FunctionArbitraryNestedIfStatement / FunctionArbitraryNestedForStatement / FunctionArbitraryNestedWhileStatement / FunctionArbitraryNestedSwitchExpressionStatement / FunctionNestedVariableDeclaration / FunctionNestedAssignmentStatement / Statement) {
       return stmt;
     }
+
+CurrentIndentation
+  = &{ return true; } {
+      return currentLineIndentation();
+    }
+
+FunctionArbitraryInlineIfStatement
+  = indentation:CurrentIndentation "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock &{
+      arbitraryElseIndentStack.push(indentation);
+      return true;
+    } alternate:FunctionArbitraryNestedElseClause? {
+      arbitraryElseIndentStack.pop();
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionArbitraryNestedIfStatement
+  = indentation:CurrentIndentation "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock &{
+      arbitraryElseIndentStack.push(indentation);
+      return true;
+    } alternate:FunctionArbitraryNestedElseClause? {
+      arbitraryElseIndentStack.pop();
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+
+FunctionArbitraryNestedElseClause
+  = &{ return currentLineIndentation() === currentArbitraryElseIndentation(); } FunctionArbitraryIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace "(" _ test:Expression _ ")" _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionArbitraryNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / &{ return currentLineIndentation() === currentArbitraryElseIndentation(); } FunctionArbitraryIndent "else" !IdentifierPart _ "if" !IdentifierPart IfConditionSpace test:Expression _ LineTerminator consequent:FunctionArbitraryNestedBlock alternate:FunctionArbitraryNestedElseClause? {
+      return {
+        type: 'IfStatement',
+        test,
+        consequent,
+        alternate,
+        loc: loc()
+      };
+    }
+  / &{ return currentLineIndentation() === currentArbitraryElseIndentation(); } FunctionArbitraryIndent "else" !IdentifierPart _ LineTerminator? block:FunctionArbitraryNestedBlock {
+      return block;
+    }
+
+FunctionArbitraryNestedForStatement
+  = "for" !IdentifierPart _ counter:CollectionForCounter _ "in" LoopHeaderContinuationSpace iterable:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'collection',
+        counter: counter.valueCounter,
+        indexCounter: counter.indexCounter,
+        iterable,
+        body,
+        loc: loc()
+      };
+    }
+  / "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:FunctionArbitraryNestedBlock {
+      return {
+        type: 'ForStatement',
+        kind: 'numeric',
+        counter,
+        start,
+        end,
+        step: step ? step[3] : null,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionArbitraryNestedWhileStatement
+  = "while" !IdentifierPart _ test:Expression _ LineTerminator body:FunctionArbitraryNestedBlock {
+      return {
+        type: 'WhileStatement',
+        test,
+        body,
+        loc: loc()
+      };
+    }
+
+FunctionArbitraryNestedSwitchExpressionStatement
+  = !StatementReservedWord expr:FunctionArbitraryNestedSwitchExpression {
+      return {
+        type: 'ExpressionStatement',
+        expression: expr,
+        loc: loc()
+      };
+    }
+
+FunctionArbitraryNestedSwitchExpression
+  = switchIndent:CurrentIndentation "switch" !IdentifierPart _ discriminant:ConditionalExpression? _ LineTerminator leading:BlockIgnorableLine* first:FunctionArbitraryNestedSwitchCase &{
+      return first.indentation > switchIndent;
+    } rest:(
+      BlockIgnorableLine
+      / &{ return currentLineIndentation() === first.indentation; } FunctionArbitraryNestedSwitchCase
+    )* {
+      return {
+        type: 'SwitchExpression',
+        discriminant: discriminant || null,
+        cases: [
+          first.case,
+          ...rest.map(item => Array.isArray(item) ? item[1].case : item).filter(c => c !== null)
+        ],
+        loc: loc()
+      };
+    }
+
+FunctionArbitraryNestedSwitchCase
+  = indentation:CurrentIndentation FunctionArbitraryIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        indentation,
+        case: {
+          type: 'SwitchCase',
+          test: null,
+          consequent,
+          loc: loc()
+        }
+      };
+    }
+  / indentation:CurrentIndentation FunctionArbitraryIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        indentation,
+        case: {
+          type: 'SwitchCase',
+          test,
+          consequent,
+          loc: loc()
+        }
+      };
+    }
+  / indentation:CurrentIndentation FunctionArbitraryIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        indentation,
+        case: {
+          type: 'SwitchCase',
+          test,
+          consequent,
+          loc: loc()
+        }
+      };
+    }
+  / indentation:CurrentIndentation FunctionArbitraryIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        indentation,
+        case: {
+          type: 'SwitchCase',
+          test,
+          consequent,
+          loc: loc()
+        }
+      };
+    }
+  / indentation:CurrentIndentation FunctionArbitraryIndent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        indentation,
+        case: {
+          type: 'SwitchCase',
+          test: null,
+          consequent,
+          loc: loc()
+        }
+      };
+    }
+  / indentation:CurrentIndentation FunctionArbitraryIndent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        indentation,
+        case: {
+          type: 'SwitchCase',
+          test,
+          consequent,
+          loc: loc()
+        }
+      };
+    }
+
+FunctionArbitraryIndent
+  = [ \t]+
+
+FunctionMaxDeepNestedStatement
+  = &FunctionMaxDeepNestedIndent FunctionMaxDeepNestedIndent _ stmt:Statement {
+    return stmt;
+  }
 
 FunctionIndent
   = "        "
@@ -2214,7 +2987,7 @@ CollectionForExpression
     }
 
 NumericForExpression
-  = "for" !IdentifierPart _ counter:Identifier _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:IndentedBlock {
+  = "for" !IdentifierPart _ counter:NumericForCounter _ "=" LoopHeaderContinuationSpace start:Expression _ "to" LoopHeaderContinuationSpace end:Expression step:(_ "by" LoopHeaderContinuationSpace Expression)? _ LineTerminator body:IndentedBlock {
       return {
         type: 'ForStatement',
         kind: 'numeric',
@@ -2238,7 +3011,7 @@ WhileExpression
     }
 
 SwitchCase
-  = Indent _ "=>" _ LineTerminator consequent:FunctionNestedBlock {
+  = FunctionIndent _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
       return {
         type: 'SwitchCase',
         test: null,
@@ -2246,7 +3019,7 @@ SwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionNestedBlock {
+  / FunctionIndent _ test:ConditionalExpression _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
       return {
         type: 'SwitchCase',
         test,
@@ -2254,7 +3027,23 @@ SwitchCase
         loc: loc()
       };
     }
-  / Indent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+  / indentation:CurrentIndentation FunctionIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ LineTerminator consequent:FunctionArbitraryNestedBlock {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / indentation:CurrentIndentation FunctionIndent _ test:ConditionalExpression _ LineTerminator &{ return currentLineIndentation() > indentation; } [ \t]+ _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+      return {
+        type: 'SwitchCase',
+        test,
+        consequent,
+        loc: loc()
+      };
+    }
+  / FunctionIndent _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test: null,
@@ -2262,7 +3051,7 @@ SwitchCase
         loc: loc()
       };
     }
-  / Indent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
+  / FunctionIndent _ test:ConditionalExpression _ "=>" _ consequent:SwitchConsequentExpression _ LineTerminator? {
       return {
         type: 'SwitchCase',
         test,
@@ -2272,7 +3061,13 @@ SwitchCase
     }
 
 SwitchConsequentExpression
-  = statement:SingleAssignment {
+  = head:ChainedStatement tail:(BeforeComma "," CommaContinuationSpace ChainedStatement)+ {
+      return [head, ...tail.map(t => t[3])].flatMap(flattenTransientStatement);
+    }
+  / statement:InlineLoopControlStatement {
+      return [statement];
+    }
+  / statement:SingleAssignment {
       return [statement];
     }
   / head:Expression tail:(BeforeComma "," CommaContinuationSpace Expression)* {
@@ -2282,6 +3077,14 @@ SwitchConsequentExpression
         expression,
         loc: loc()
       }));
+    }
+
+InlineLoopControlStatement
+  = "break" !IdentifierPart {
+      return { type: 'BreakStatement', loc: loc() };
+    }
+  / "continue" !IdentifierPart {
+      return { type: 'ContinueStatement', loc: loc() };
     }
 
 // Ternary: condition ? true : false
@@ -2305,7 +3108,7 @@ OrExpression
 
 // Logical AND
 AndExpression
-  = head:ComparisonExpression tail:(BeforeAndOperator AndOperator OpSpace ComparisonExpression)* {
+  = head:EqualityExpression tail:(BeforeAndOperator AndOperator OpSpace EqualityExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
@@ -2315,14 +3118,45 @@ OrOperator
 AndOperator
   = "and" !IdentifierPart { return "and"; }
 
-// Comparison: ==, !=, <, >, <=, >=
-ComparisonExpression
-  = head:AdditiveExpression tail:(BeforeComparisonOperator ComparisonOperator OpSpace AdditiveExpression)* {
+// Equality has lower precedence than relational comparisons in Pine v6.
+EqualityExpression
+  = head:RelationalExpression tail:(BeforeComparisonOperator EqualityOperator OpSpace RelationalExpression)* {
       return buildBinaryExpr(head, tail);
     }
 
+EqualityOperator
+  = "==" / "!="
+
+RelationalExpression
+  = head:BitwiseOrExpression tail:(BeforeComparisonOperator RelationalOperator OpSpace BitwiseOrExpression)* {
+      return buildBinaryExpr(head, tail);
+    }
+
+RelationalOperator
+  = "<=" / ">=" / "<" / ">"
+
 ComparisonOperator
-  = "==" / "!=" / "<=" / ">=" / "<" / ">"
+  = EqualityOperator / RelationalOperator
+
+BitwiseOrExpression
+  = head:BitwiseXorExpression tail:(BeforeBitwiseOrOperator "|" OpSpace BitwiseXorExpression)* {
+      return buildBinaryExpr(head, tail);
+    }
+
+BitwiseXorExpression
+  = head:BitwiseAndExpression tail:(BeforeBitwiseXorOperator "^" OpSpace BitwiseAndExpression)* {
+      return buildBinaryExpr(head, tail);
+    }
+
+BitwiseAndExpression
+  = head:ShiftExpression tail:(BeforeBitwiseAndOperator "&" OpSpace ShiftExpression)* {
+      return buildBinaryExpr(head, tail);
+    }
+
+ShiftExpression
+  = head:AdditiveExpression tail:(BeforeShiftOperator ("<<" / ">>") OpSpace AdditiveExpression)* {
+      return buildBinaryExpr(head, tail);
+    }
 
 // Addition/Subtraction
 AdditiveExpression
@@ -2356,7 +3190,7 @@ NotOperator
 PostfixExpression
   = head:PrimaryExpression tail:(
       _ "(" __ args:ArgumentList? __ ")" { return { type: 'call', args: args || [] }; }
-    / _ typeArguments:GenericTypeArguments { return { type: 'typeArgs', typeArguments }; }
+    / &(_ GenericTypeArguments _ "(") _ typeArguments:GenericTypeArguments { return { type: 'typeArgs', typeArguments }; }
     / PostfixContinuationSpace "." _ prop:IdentifierName { return { type: 'member', prop }; }
     / PostfixContinuationSpace "[" __ index:Expression __ "]" { return { type: 'index', index }; }
   )* {
@@ -2425,6 +3259,7 @@ LambdaParams
 // Primary expressions
 PrimaryExpression
   = LambdaExpression
+  / opens:("(" __)+ inner:Identifier closes:(")" _)+ &{ return opens.length === closes.length; } { return inner; }
   / "(" __ expr:Expression __ ")" { return expr; }
   / ArrayLiteral
   / NaFunctionIdentifier
@@ -2509,10 +3344,12 @@ TripleDoubleStringChar
 
 DoubleStringChar
   = !('"' / "\\" / LineTerminatorChar) . { return text(); }
+  / LineTerminator chars:WhiteSpace* { return text(); }
   / "\\" seq:EscapeSequence { return seq; }
 
 SingleStringChar
   = !("'" / "\\" / LineTerminatorChar) . { return text(); }
+  / LineTerminator chars:WhiteSpace* { return text(); }
   / "\\" seq:EscapeSequence { return seq; }
 
 EscapeSequence
@@ -2622,13 +3459,16 @@ Argument
 
 ArgumentName
   = Identifier
-  / name:"type" !IdentifierPart {
+  / name:ArgumentReservedName {
       return {
         type: 'Identifier',
         name,
         loc: loc()
       };
     }
+
+ArgumentReservedName
+  = ("to") !IdentifierPart { return text(); }
 
 // ============================================================================
 // Comments and Whitespace
@@ -2657,8 +3497,11 @@ _
 ContinuationLeadingSpace
   = [ \t]+
 
+BlankLine
+  = WhiteSpace* LineTerminator
+
 InitializerSpace
-  = &( _ LineTerminator ContinuationLeadingSpace) _ LineTerminator ContinuationLeadingSpace (LineCommentText LineTerminator ContinuationLeadingSpace)* _
+  = &( _ LineTerminator BlankLine* ContinuationLeadingSpace) _ LineTerminator BlankLine* ContinuationLeadingSpace (LineCommentText LineTerminator ContinuationLeadingSpace)* _
   / _
 
 DeclarationEqualsSpace
@@ -2703,12 +3546,23 @@ BeforeComparisonOperator
 
 BeforeAdditiveOperator
   = &(_ ("+" / "-")) _
-  / &(__ "+") __
-  / &(__ "-" !([0-9] / ".")) __
+  / &(__ "+") !{ return isBlockIndentedOperator(); } __
+  / &(__ "-" !([0-9] / ".")) !{ return isBlockIndentedOperator(); } __
 
 BeforeMultiplicativeOperator
   = &(__ ("*" / "/" / "%")) __
 
+BeforeBitwiseOrOperator
+  = &(__ "|") __
+
+BeforeBitwiseXorOperator
+  = &(__ "^") __
+
+BeforeBitwiseAndOperator
+  = &(__ "&") __
+
+BeforeShiftOperator
+  = &(__ ("<<" / ">>")) __
 OpSpace
   = (WhiteSpace / MultiLineComment / LineTerminator)*
 
@@ -2720,9 +3574,12 @@ TuplePatternAhead
 // Cross-line continuation: allow `.` always, allow `[` only when it is NOT a
 // tuple declaration on the next line. Same-line: consume horizontal whitespace.
 PostfixContinuationSpace
-  = &(_ LineTerminatorChar __ !TuplePatternAhead "[") _ LineTerminatorChar __
+  = &(_ LineTerminatorChar __ !TuplePatternAhead !SingleElementArrayStatementAhead "[") _ LineTerminatorChar __
   / &(_ LineTerminatorChar __ ".") _ LineTerminatorChar __
   / _
+
+SingleElementArrayStatementAhead
+  = "[" __ IdentifierName __ "]"
 
 WhiteSpace
   = [ \t]

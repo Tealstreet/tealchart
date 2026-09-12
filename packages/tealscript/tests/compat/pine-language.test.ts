@@ -1070,7 +1070,7 @@ holder
     .level := close + 1
 values
     [0] := holder.level
-plot(values[0], title="Assigned")
+plot(values.get(0), title="Assigned")
 `);
 
     expect(result.errors).toEqual([]);

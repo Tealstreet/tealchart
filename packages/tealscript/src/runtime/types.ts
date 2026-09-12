@@ -12,7 +12,7 @@ import type {
   TimeframeInfo,
 } from './context';
 import type { RequestDatafeed } from './requestDatafeed';
-import type { StrategyIntrabarDatafeed, StrategyLedger } from './strategy';
+import type { StrategyIntrabarDatafeed, StrategyIntrabarUnavailableReason, StrategyLedger, StrategyMarginApproximationReason } from './strategy';
 import type {
   TealscriptBackendSelectionOptions,
   TealscriptBackendSelectionSource,
@@ -78,6 +78,9 @@ export interface RuntimeProfile {
   backendSelectionSource?: TealscriptBackendSelectionSource;
   fallbackReason?: string;
   fallbackDiagnostics?: RuntimeFallbackDiagnostic[];
+  strategyIntrabarUnavailableReasons?: StrategyIntrabarUnavailableReason[];
+  strategyMarginApproximationReasons?: StrategyMarginApproximationReason[];
+  runtimeApproximations?: RuntimeApproximationSummary[];
   swallowedErrors?: RuntimeSwallowedErrorSummary[];
   compiledBarErrors?: {
     count: number;
@@ -92,6 +95,13 @@ export interface RuntimeProfile {
   requestContexts: number;
   maxBarsBack: number;
   errors: number;
+}
+
+export interface RuntimeApproximationSummary {
+  site: string;
+  count: number;
+  firstBarIndex?: number;
+  message: string;
 }
 
 export interface RuntimeSwallowedErrorSummary {

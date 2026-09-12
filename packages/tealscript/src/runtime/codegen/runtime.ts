@@ -15,9 +15,11 @@ export class NumericSeries {
   head: number = 0;
   size: number = 0;
   capacity: number;
+  maxOffset?: number;
 
-  constructor(capacity: number = 500) {
+  constructor(capacity: number = 500, maxOffset?: number) {
     this.capacity = Math.max(1, Math.trunc(capacity));
+    this.maxOffset = maxOffset === undefined ? undefined : Math.max(0, Math.trunc(maxOffset));
     this.buf = new Float64Array(this.capacity);
     this.buf.fill(NaN);
   }
@@ -44,6 +46,10 @@ export class NumericSeries {
 
   get(offset: number): number {
     offset = Math.trunc(offset);
+    if (!Number.isFinite(offset)) return NaN;
+    if (this.maxOffset !== undefined && offset > this.maxOffset) {
+      throw new Error(`Historical offset ${offset} exceeds max_bars_back ${this.maxOffset}`);
+    }
     if (offset < 0 || offset >= this.size) return NaN;
     let idx = this.head + offset;
     if (idx >= this.capacity) idx -= this.capacity;
@@ -104,9 +110,11 @@ export class ValueSeries {
   head: number = 0;
   size: number = 0;
   capacity: number;
+  maxOffset?: number;
 
-  constructor(capacity: number = 500) {
+  constructor(capacity: number = 500, maxOffset?: number) {
     this.capacity = Math.max(1, Math.trunc(capacity));
+    this.maxOffset = maxOffset === undefined ? undefined : Math.max(0, Math.trunc(maxOffset));
     this.buf = new Array(this.capacity).fill(undefined);
   }
 
@@ -132,6 +140,10 @@ export class ValueSeries {
 
   get(offset: number): unknown {
     offset = Math.trunc(offset);
+    if (!Number.isFinite(offset)) return NaN;
+    if (this.maxOffset !== undefined && offset > this.maxOffset) {
+      throw new Error(`Historical offset ${offset} exceeds max_bars_back ${this.maxOffset}`);
+    }
     if (offset < 0 || offset >= this.size) return NaN;
     let idx = this.head + offset;
     if (idx >= this.capacity) idx -= this.capacity;

@@ -179,11 +179,6 @@ export const int fast = 2
     mock.emit({
       type: 'result',
       scriptId: 'study-1',
-      plots: [],
-      drawings: [],
-      alerts: [],
-      logs: [],
-      inputs: [],
       output: {
         plots: [],
         drawings: [],
@@ -244,11 +239,6 @@ export const int fast = 2
     mock.emit({
       type: 'result',
       scriptId: 'study-1',
-      plots: [],
-      drawings: [],
-      alerts: [],
-      logs: [],
-      inputs: [],
       output: {
         plots: [
           {
@@ -269,11 +259,6 @@ export const int fast = 2
     mock.emit({
       type: 'result',
       scriptId: 'study-1',
-      plots: [],
-      drawings: [],
-      alerts: [],
-      logs: [],
-      inputs: [],
       output: {
         plots: [
           {

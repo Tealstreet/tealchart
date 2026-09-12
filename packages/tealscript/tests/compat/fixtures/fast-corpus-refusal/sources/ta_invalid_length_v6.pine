@@ -1,0 +1,3 @@
+//@version=6
+indicator("Fast refusal TA length")
+plot(ta.sma(close, 0), title="Bad")

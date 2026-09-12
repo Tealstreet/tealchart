@@ -211,6 +211,7 @@ export const PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX = {
     'math.acos',
     'math.asin',
     'math.atan',
+    'math.tanh',
     'math.avg',
     'math.ceil',
     'math.cos',

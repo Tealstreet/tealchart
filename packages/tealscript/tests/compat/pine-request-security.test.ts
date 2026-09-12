@@ -302,6 +302,23 @@ plot(htfAverage, title="HTF Average")
     expect(getPlot(result, 'HTF Average').values).toEqual([null, null, 15, 15, 25, 25]);
   });
 
+  it('propagates Pine runtime errors from request expressions', () => {
+    const result = runCompatScript(`
+indicator("HTF expression runtime error")
+length = input.int(9, minval=3)
+htfAverage = request.security(syminfo.tickerid, "2", ta.sma(close, length / 2), lookahead=barmerge.lookahead_on)
+plot(htfAverage, title="HTF Average")
+`, {
+      bars: chartBars,
+      engineOptions: { requestDatafeed: requestDatafeed() },
+    });
+
+    expect(result.errors.map((error) => error.message)).toEqual([
+      expect.stringContaining('TA length must be a positive integer; got 4.5'),
+    ]);
+    expect(result.profile?.swallowedErrors ?? []).toEqual([]);
+  });
+
   it('does not reuse cached values across conditional request expressions', () => {
     const result = runCompatScript(`
 indicator("HTF conditional requests")
@@ -486,18 +503,13 @@ plot(request.security(syminfo.tickerid, "2", close) and close > open ? 1 : 0, ti
       engineOptions: { requestDatafeed: requestDatafeed() },
     });
 
-    expect(local.errors.map((error) => error.message)).toEqual([
-      'request.* calls in local scopes require dynamic_requests=true: request.security',
-    ]);
-    expect(conditional.errors.map((error) => error.message)).toEqual([
-      'request.* calls in local scopes require dynamic_requests=true: request.security',
-    ]);
-    expect(initializer.errors.map((error) => error.message)).toEqual([
-      'request.* calls in local scopes require dynamic_requests=true: request.security',
-    ]);
-    expect(logical.errors.map((error) => error.message)).toEqual([
-      'request.* calls in local scopes require dynamic_requests=true: request.security',
-    ]);
+    const disabledLocalRequestMessage =
+      'request.* calls in local scopes require dynamic_requests=true: request.security. Non-exported request wrapper functions were valid without dynamic_requests in Pine v3-v5 but require dynamic_requests=true in Pine v6.';
+
+    expect(local.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
+    expect(conditional.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
+    expect(initializer.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
+    expect(logical.errors.map((error) => error.message)).toEqual([disabledLocalRequestMessage]);
   });
 
   it('rejects nested requests when dynamic_requests is false', () => {
@@ -577,7 +589,7 @@ ${requestPlots}
     });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'Too many unique request.* contexts: maximum is 40',
+      'Too many unique request.* contexts: maximum is 40 per script. Reuse the same symbol/timeframe/expression request or reduce dynamic symbol and timeframe combinations.',
     ]);
   });
 });
@@ -746,7 +758,7 @@ ${requestPlots}
     });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'Too many unique request.* contexts: maximum is 40',
+      'Too many unique request.* contexts: maximum is 40 per script. Reuse the same symbol/timeframe/expression request or reduce dynamic symbol and timeframe combinations.',
     ]);
   });
 });
@@ -855,7 +867,7 @@ ${requestPlots}
     });
 
     expect(result.errors.map((error) => error.message)).toEqual([
-      'Too many unique request.* contexts: maximum is 40',
+      'Too many unique request.* contexts: maximum is 40 per script. Reuse the same symbol/timeframe/expression request or reduce dynamic symbol and timeframe combinations.',
     ]);
   });
 });
@@ -916,9 +928,9 @@ plot(split, title="Split")
     });
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Dividend').values).toEqual([null, null, 0.24, 0.24, 0.25, 0.25]);
-    expect(getPlot(result, 'Earnings').values).toEqual([1.5, null, null, null, 1.8, null]);
-    expect(getPlot(result, 'Split').values).toEqual([null, null, null, 4, null, null]);
+    expect(getPlot(result, 'Dividend').values).toEqual([0.24, 0.24, 0.24, 0.25, 0.25, 0.25]);
+    expect(getPlot(result, 'Earnings').values).toEqual([1.5, 1.8, null, null, null, null]);
+    expect(getPlot(result, 'Split').values).toEqual([4, null, null, null, null, null]);
   });
 
   it('supports ignore_invalid_symbol for missing optional request series', () => {

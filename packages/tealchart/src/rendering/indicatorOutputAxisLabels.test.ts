@@ -68,6 +68,7 @@ describe('indicator output axis labels', () => {
 
   it('respects showLast windows and indicator precision', () => {
     expect(getLatestIndicatorPlotValue(plot({ values: [10, 20, null], showLast: 1 }), 3)).toBeNull();
+    expect(getLatestIndicatorPlotValue(plot({ values: [10, 20, 30], showLast: 0 }), 3)).toBeNull();
     expect(formatIndicatorOutputAxisValue(24.234, 300, 1)).toBe('24.2');
   });
 
@@ -116,6 +117,29 @@ describe('indicator output axis labels', () => {
       plots: [plot({ id: 'hidden', scriptId: 'hiddenScale', values: [42] })],
       totalBarCount: 1,
     })).toEqual([]);
+  });
+
+  it('requires the price-scale display bit for indicator output labels', () => {
+    const plots = [
+      plot({ id: 'pane', display: 1, values: [1] }),
+      plot({ id: 'status', display: 4, values: [2] }),
+      plot({ id: 'data-window', display: 2, values: [3] }),
+      plot({ id: 'price-scale', display: 8, values: [4] }),
+      plot({ id: 'pane-and-price-scale', display: 9, values: [5] }),
+    ];
+
+    const labels = getIndicatorOutputAxisLabelSources({
+      indicatorPaneInfo: { script: { overlay: false, paneId: 'pane_1' } },
+      panes: [{ id: 'pane_1', type: 'indicator' }],
+      plots,
+      totalBarCount: 1,
+    });
+
+    expect(labels.map((label) => label.plotId)).toEqual(['price-scale', 'pane-and-price-scale']);
+  });
+
+  it('formats explicit Pine plot precision through 16 decimals', () => {
+    expect(formatIndicatorOutputAxisValue(1 / 3, 1, 16)).toBe('0.3333333333333333');
   });
 
   it('resolves source time with plot offset applied', () => {

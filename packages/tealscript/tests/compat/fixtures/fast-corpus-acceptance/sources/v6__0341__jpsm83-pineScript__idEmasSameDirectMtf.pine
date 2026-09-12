@@ -1,0 +1,97 @@
+// Emas same direction multiple time frames
+
+//@version=5
+indicator("Emas same direction multiple time frames", overlay=true)
+
+// setting the time frames
+currentTimeFrame = timeframe.period
+higherTimeFrame = switch currentTimeFrame
+    "5" =>"30"
+    "30" => "180"
+    "60" => "360"
+    "240" => "1D"
+    "1D" => "4D"
+
+higherHtimeFrame = switch currentTimeFrame
+    "5" =>"180"
+    "30" => "360"
+    "60" => "1D"
+    "240" => "4D"
+    "1D" => "1W"
+
+// get indicators values
+[macdLine, signalLine, histLine] = ta.macd(close, 12, 26, 9)
+
+// get accumulation/distribution
+accDist = ta.accdist
+accDistMomentunVolume = accDist > accDist[3]
+
+vwap = ta.vwap(source = close)
+plot(series = vwap, title = "vwap", color = color.new(color = color.white, transp = 60), linewidth = 2)
+
+// get current emas
+ema9 = ta.ema(source = close, length = 9)
+plot(series = ema9, title = "ema9", color = color.new(color = color.green, transp = 60), linewidth = 1)
+ema21 = ta.ema(source = close, length = 21)
+plot(series = ema21, title = "ema21", color = color.new(color = color.yellow, transp = 60), linewidth = 1)
+ema50 = ta.ema(source = close, length = 50)
+plot(series = ema50, title = "ema50", color = color.new(color = color.red, transp = 60), linewidth = 1)
+ema200 = ta.ema(source = close, length = 200)
+plot(series = ema200, title = "ema200", color = color.new(color = color.orange, transp = 0), linewidth = 2)
+
+// get higher emas
+ema50FromHigherTf = request.security(syminfo.tickerid, higherTimeFrame, ta.ema(close, 50), gaps = barmerge.gaps_off, lookahead =  barmerge.lookahead_on) // Does not repaint 
+ema21FromHigherTf = request.security(syminfo.tickerid, higherTimeFrame, ta.ema(close, 21), gaps = barmerge.gaps_off, lookahead =  barmerge.lookahead_on) // Does not repaint
+ema9FromHigherTf = request.security(syminfo.tickerid, higherTimeFrame, ta.ema(close, 9), gaps = barmerge.gaps_off, lookahead =  barmerge.lookahead_on) // Does not repaint
+
+// get higher higher emas
+ema50FromHigherHtf = request.security(syminfo.tickerid, higherHtimeFrame, ta.ema(close, 50), gaps = barmerge.gaps_off, lookahead =  barmerge.lookahead_on) // Does not repaint 
+
+// offset distance from higher ema50
+higherOffsetEma200 = ta.ema(high, 200) + 2* (ta.ema(high, 200) - ema200)
+lowerOffsetEma200 = ta.ema(low, 200) - 2* (ema200 - ta.ema(low, 200))
+
+// ==================================================================================================================================================================================================
+// FOLLOW ===================================================================================================================================================
+// ==================================================================================================================================================================================================
+
+// price position open and close
+FOLLOW_BullishPricePosition = close > ema50
+FOLLOW_BearishPricePosition = close < ema50
+
+// emas direction
+FOLLOW_BullishEmasCrossover = ema9 > ema21
+FOLLOW_BearishEmasCrossover = ema9 < ema21
+
+// emas direction higher time frame
+FOLLOW_BullishEmasDirectionHtm = ema9FromHigherTf > ema21FromHigherTf and ema21FromHigherTf > ema50FromHigherTf
+FOLLOW_BearishEmasDirectionHtm = ema9FromHigherTf < ema21FromHigherTf and ema21FromHigherTf < ema50FromHigherTf
+
+// price position higher higher time frame
+FOLLOW_BullishEmasDirectionHhtm = close > ema50FromHigherHtf
+FOLLOW_BearishEmasDirectionHhtm = close < ema50FromHigherHtf
+
+// price open close relate to band ema50
+FOLLOW_BullishPriceBand = open > lowerOffsetEma200 and open < higherOffsetEma200
+FOLLOW_BearishPriceBand = open > lowerOffsetEma200 and open < higherOffsetEma200
+
+// macd divergence
+FOLLOW_BullishMacd = histLine > histLine[1]
+FOLLOW_BearishMacd = histLine < histLine[1]
+
+FOLLOW_BullishSetup = accDistMomentunVolume and FOLLOW_BullishPricePosition and FOLLOW_BullishEmasCrossover and FOLLOW_BullishEmasDirectionHtm and FOLLOW_BullishEmasDirectionHhtm and FOLLOW_BullishMacd and FOLLOW_BullishPriceBand
+FOLLOW_BearishSetup = accDistMomentunVolume and FOLLOW_BearishPricePosition and FOLLOW_BearishEmasCrossover and FOLLOW_BearishEmasDirectionHtm and FOLLOW_BearishEmasDirectionHhtm and FOLLOW_BearishMacd and FOLLOW_BearishPriceBand
+
+// draw data to chart
+plotshape(FOLLOW_BullishSetup, style=shape.arrowup, color=color.green, location=location.belowbar, size = size.huge, text = "FOLLOW\nBULL", textcolor = color.green)
+plotshape(FOLLOW_BearishSetup, style=shape.arrowdown, color=color.red, location=location.abovebar, size = size.huge, text = "FOLLOW\nBEAR", textcolor = color.red)
+
+// ==================================================================================================================================================================================================
+// alert =============================================================================================================================================================
+// ==================================================================================================================================================================================================
+
+repaintingDesable = false
+if (FOLLOW_BullishSetup or FOLLOW_BearishSetup) and barstate.isconfirmed
+    repaintingDesable := true
+
+alertcondition(repaintingDesable, title = "Emas same direction multiple time frames", message = "Oportunity at {{ticker}}")

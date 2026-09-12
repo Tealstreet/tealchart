@@ -47,6 +47,8 @@ import { type BuiltinIndicator } from '../indicators/builtinIndicators';
 import { PaneManager } from '../rendering/PaneManager';
 import { TealscriptManager } from '../tealscript/TealscriptManager';
 
+const DISPLAY_PANE = 1;
+
 /**
  * An active indicator instance
  */
@@ -824,14 +826,48 @@ export class MobileIndicatorManager {
       let max = Number.NEGATIVE_INFINITY;
       for (const plot of plots) {
         if (!plot.scriptId || !pane.indicatorIds?.includes(plot.scriptId) || plot.forceOverlay) continue;
-        if (Number.isFinite(plot.histbase)) {
-          min = Math.min(min, plot.histbase!);
-          max = Math.max(max, plot.histbase!);
+        if (!isPlotVisibleInPane(plot)) continue;
+
+        if (plot.type === 'hline') {
+          if (typeof plot.price === 'number' && Number.isFinite(plot.price)) {
+            min = Math.min(min, plot.price);
+            max = Math.max(max, plot.price);
+          }
+          continue;
         }
-        for (const value of plot.values) {
-          if (typeof value !== 'number' || !Number.isFinite(value)) continue;
-          min = Math.min(min, value);
-          max = Math.max(max, value);
+
+        if (plotUsesAbsoluteMarkerRange(plot)) {
+          if (!hasVisiblePlotSeries(plot)) continue;
+          for (let index = firstVisiblePlotIndex(plot, plot.values.length); index < plot.values.length; index += 1) {
+            const value = plot.values[index];
+            if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+          }
+          continue;
+        }
+
+        if (plot.type !== 'plot' && plot.type !== 'plotbar' && plot.type !== 'plotcandle') continue;
+        if (!hasVisiblePlotSeries(plot)) continue;
+
+        if (plot.type === 'plot' && plotUsesHistbaseForVisualScale(plot)) {
+          const histbase = getPlotHistbase(plot);
+          min = Math.min(min, histbase);
+          max = Math.max(max, histbase);
+        }
+
+        const values =
+          plot.type === 'plotbar' || plot.type === 'plotcandle'
+            ? [plot.openValues, plot.highValues, plot.lowValues, plot.closeValues]
+            : [plot.values];
+        for (const series of values) {
+          if (!series) continue;
+          for (let index = firstVisiblePlotIndex(plot, series.length); index < series.length; index += 1) {
+            const value = series[index];
+            if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+          }
         }
       }
 
@@ -841,4 +877,41 @@ export class MobileIndicatorManager {
       this._paneManager.updatePaneRange(pane.id, min - padding, max + padding);
     }
   }
+}
+
+function isPlotVisibleInPane(plot: Pick<PlotOutput, 'display'>): boolean {
+  return plot.display === undefined || (plot.display & DISPLAY_PANE) !== 0;
+}
+
+function firstVisiblePlotIndex(plot: Pick<PlotOutput, 'showLast'>, seriesLength: number): number {
+  if (plot.showLast === undefined) return 0;
+  if (plot.showLast <= 0) return seriesLength;
+  return Math.max(0, seriesLength - plot.showLast);
+}
+
+function hasVisiblePlotSeries(
+  plot: Pick<PlotOutput, 'closeValues' | 'highValues' | 'lowValues' | 'openValues' | 'showLast' | 'type' | 'values'>,
+): boolean {
+  const seriesLength =
+    plot.type === 'plotbar' || plot.type === 'plotcandle'
+      ? Math.max(
+          plot.openValues?.length ?? 0,
+          plot.highValues?.length ?? 0,
+          plot.lowValues?.length ?? 0,
+          plot.closeValues?.length ?? 0,
+        )
+      : plot.values.length;
+  return firstVisiblePlotIndex(plot, seriesLength) < seriesLength;
+}
+
+function getPlotHistbase(plot: Pick<PlotOutput, 'histbase'>): number {
+  return Number.isFinite(plot.histbase) ? plot.histbase! : 0;
+}
+
+function plotUsesHistbaseForVisualScale(plot: Pick<PlotOutput, 'histbase' | 'style'>): boolean {
+  return plot.style === 'area' || plot.style === 'columns' || plot.style === 'histogram';
+}
+
+function plotUsesAbsoluteMarkerRange(plot: Pick<PlotOutput, 'location' | 'type'>): boolean {
+  return (plot.type === 'plotshape' || plot.type === 'plotchar') && plot.location === 'absolute';
 }

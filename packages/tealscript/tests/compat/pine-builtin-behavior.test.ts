@@ -68,6 +68,7 @@ const namespaceCaseInputs: Record<(typeof behaviorNamespaces)[number], BehaviorC
         'math.sin',
         'math.sqrt',
         'math.tan',
+        'math.tanh',
         'math.todegrees',
         'math.toradians',
       ],
@@ -96,6 +97,7 @@ plot(math.sign(-42), title="Sign")
 plot(math.round(math.sin(math.pi / 2), 6), title="Sin")
 plot(math.sqrt(9), title="Sqrt")
 plot(math.round(math.tan(0), 6), title="Tan")
+plot(math.round(math.tanh(2), 6), title="Tanh")
 plot(math.todegrees(math.pi), title="Degrees")
 plot(math.round(math.toradians(180), 6), title="Radians")
 `,
@@ -122,6 +124,7 @@ plot(math.round(math.toradians(180), 6), title="Radians")
         Sin: 1,
         Sqrt: 3,
         Tan: 0,
+        Tanh: 0.964028,
         Degrees: 180,
         Radians: 3.141593,
       },
@@ -372,9 +375,12 @@ plot(array.variance(array.from(1, 2, 3), false), title="Variance Unbiased")
       source: `
 indicator("array mutation behavior")
 values = array.from(1, 2)
-pushSize = array.push(values, 3)
-unshiftSize = array.unshift(values, 0)
-insertSize = array.insert(values, 2, 9)
+array.push(values, 3)
+pushSize = array.size(values)
+array.unshift(values, 0)
+unshiftSize = array.size(values)
+array.insert(values, 2, 9)
+insertSize = array.size(values)
 array.set(values, 0, -1)
 removed = array.remove(values, 2)
 popped = array.pop(values)
@@ -787,7 +793,7 @@ matrix.reverse(m)
 headAfterReverse = matrix.get(m, 0, 0)
 matrix.sort(m, 0, order.ascending)
 concatTarget = matrix.new_int(1, 2, 1)
-matrix.concat(concatTarget, matrix.new_int(1, 2, 2))
+concatResult = matrix.concat(concatTarget, matrix.new_int(1, 2, 2))
 reshaped = matrix.new_int(2, 2, 1)
 matrix.reshape(reshaped, 1, 4)
 plot(matrix.get(copy, 0, 0), title="Copy Head")
@@ -797,7 +803,7 @@ plot(slice.columns(), title="Slice Columns")
 plot(slice.get(1, 1), title="Slice Tail")
 plot(array.get(removedRow, 0), title="Removed Row Head")
 plot(array.get(removedCol, 1), title="Removed Col Tail")
-plot(matrix.rows(concatTarget), title="Concat Rows")
+plot(matrix.rows(concatResult), title="Concat Rows")
 plot(matrix.columns(reshaped), title="Reshape Columns")
 plot(matrix.rows(m), title="Mutated Rows")
 plot(matrix.columns(m), title="Mutated Columns")
@@ -1126,13 +1132,13 @@ function expectBehaviorCase(entry: BehaviorCase): void {
 
 describe('Pine v6 builtin behavior tables', () => {
   it('covers every official math/str/array/matrix/map/color manual-index name', () => {
-    expect(manualBehaviorNames).toHaveLength(185);
+    expect(manualBehaviorNames).toHaveLength(186);
     expect(behaviorCaseCoverage()).toEqual(manualBehaviorNames);
   });
 
   it('declares provenance for every literal expected value and diagnostic string', () => {
     expect(expectedValueProvenanceCounts()).toEqual({
-      'independently-derived': 211,
+      'independently-derived': 212,
       'published-worked-example': 0,
       'tealscript-regression-pin': 15,
     });

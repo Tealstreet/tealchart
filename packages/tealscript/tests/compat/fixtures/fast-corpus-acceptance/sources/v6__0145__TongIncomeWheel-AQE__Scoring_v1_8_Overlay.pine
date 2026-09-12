@@ -1,0 +1,747 @@
+//@version=6
+indicator("Scoring v1.8.0 (Aegis Overlay)", overlay=true, max_bars_back=500)
+// ============================================================================
+// SCORING v1.6.0 — DSG-08 SPRINT RELEASE
+//
+// SUPERSEDES: v1.5.2, v1.5.3, v1.5.4. Remove ALL prior versions from TradingView.
+//
+// CHANGELOG from v1.5.2:
+//   v1.5.3 (DSG-04): Staircase consolidation Mode 2 — shallow pullback (1.5–8%)
+//     from local 10-bar high in confirmed uptrend counts as base days.
+//   v1.5.4 (DSG-06): Smooth trend Mode 3 — price within 1× ATR of rising 20EMA
+//     in uptrend counts as base days (trend IS the consolidation).
+//   v1.6.0 (DSG-07): Overextension caution flag — composite >85 + SL WIDE +
+//     price >2× ATR above EMA20 = CAUTION diagnostic.
+//   v1.6.0 (DSG-08): 3-mode BD counting unifies VCP, staircase, smooth trend.
+//     ATR compression ratio exported for committee reference.
+//     BD mode diagnostic exported (which mode triggered).
+//
+// RETAINED from v1.5.2:
+//   DSG-02 Base Days Latch (breakout snapshot + 10-bar decay).
+//   DSG-03 15% range threshold for Mode 1.
+//   Screener limit = 4 request.security calls (unchanged).
+//   All engine weights, gates, composites UNCHANGED.
+//
+// TWO PIPELINES, ONE INDICATOR:
+//   SC_MOMENTUM: Breakout 1-2wk. Flow30/Energy30/Struct20/MP20. Elder gate≥6.5.
+//   SC_POSITION: Base-building 3-6wk. Flow10/Energy30/Struct20/MP5/BQ35. K39 gate.
+//
+// Suite: Structure v1.4.3+, DSL v1.2 Core/v1.3 Tac, Flow v1.3, Energy v1.3,
+//   MP v1.2, Elder v1.
+// ============================================================================
+
+// ==================== INPUTS ====================
+benchmark_sym = input.symbol("SPY", "Benchmark Symbol", group="Benchmark")
+
+sc_strong     = input.float(65.0, "Strong Threshold", group="Thresholds")
+sc_qualified  = input.float(55.0, "Qualified Threshold", group="Thresholds")
+
+// Momentum gates
+elder_gate    = input.float(6.5, "Elder Gate [Momentum]", group="Momentum Gates")
+floor_flow_m  = input.float(60.0, "Flow Floor [Momentum]", group="Momentum Gates")
+floor_energy_m = input.float(60.0, "Energy Floor [Momentum]", group="Momentum Gates")
+floor_struct_m = input.float(55.0, "Structure Floor [Momentum]", group="Momentum Gates")
+floor_mp_m    = input.float(55.0, "MP Floor [Momentum]", group="Momentum Gates")
+
+// Position gates
+floor_flow_p  = input.float(40.0, "Flow Floor [Position]", group="Position Gates")
+floor_energy_p = input.float(60.0, "Energy Floor [Position]", group="Position Gates")
+floor_struct_p = input.float(65.0, "Structure Floor [Position]", group="Position Gates")
+floor_mp_p    = input.float(40.0, "MP Floor [Position]", group="Position Gates")
+floor_bq_p    = input.float(60.0, "BQ Floor [Position]", group="Position Gates")
+
+exh_trend_min = input.int(15, "Exhaustion Min Trend Bars", group="Energy", minval=5, maxval=40)
+
+show_signals    = input.bool(true, "Show Signal Markers", group="Signals")
+show_bg         = input.bool(false, "Show Background Shading", group="Display")
+show_state_lbl  = input.bool(true, "Show State Label", group="Display")
+tbl_pos         = input.string("Top Right", "Table Position", options=["Top Right","Top Left","Bottom Right","Bottom Left"], group="Display")
+show_table      = input.bool(true, "Show Dashboard Table", group="Display")
+
+// ==================== ENGINE 1: FLOW v1.3 — SHARED ====================
+// Institutional Flow (MFI + CMF + HA quality) — 17 pts max
+fl_len = 10
+fl_mu = 0.0
+fl_ml = 0.0
+for i = 0 to fl_len - 1
+    fl_p = hlc3[i] - hlc3[i+1]
+    fl_v = volume[i]
+    if fl_p > 0
+        fl_mu := fl_mu + fl_v * hlc3[i]
+    else
+        fl_ml := fl_ml + fl_v * hlc3[i]
+fl_mfi = fl_ml != 0 ? 100.0 - (100.0 / (1.0 + fl_mu / fl_ml)) : 50.0
+
+fl_cmfv = 0.0
+fl_cmfs = 0.0
+for i = 0 to fl_len - 1
+    fl_r = high[i] - low[i]
+    if fl_r != 0
+        fl_cmfv := fl_cmfv + (((close[i] - low[i]) - (high[i] - close[i])) / fl_r * volume[i])
+        fl_cmfs := fl_cmfs + volume[i]
+fl_cmf = fl_cmfs != 0 ? fl_cmfv / fl_cmfs : 0
+
+fl_fb = fl_mfi > 55 and fl_cmf > 0.05 ? 11.0 : fl_mfi > 48 and fl_cmf > 0.02 ? 8.0 : fl_mfi > 42 and fl_cmf > 0 ? 5.0 : fl_mfi > 38 or fl_cmf > -0.05 ? 2.5 : 0.0
+
+fl_atr = ta.atr(20)
+fl_hac = 0
+for i = 0 to 9
+    fl_hc = (open[i]+high[i]+low[i]+close[i])/4
+    fl_ho = i==0 ? (open+close)/2 : (open[i+1]+close[i+1])/2
+    if math.abs(fl_hc - fl_ho) < fl_atr * 0.5
+        fl_hac := fl_hac + 1
+fl_hab = fl_hac >= 5 ? 6.0 : fl_hac >= 3 ? 4.0 : fl_hac >= 2 ? 2.0 : 0.0
+fl_flow = math.min(fl_fb + fl_hab, 17.0)
+
+// Accumulation — 7.5 pts
+fl_ad = ta.cum(close==high and close==low or high==low ? 0 : ((2*close-low-high)/(high-low))*volume)
+fl_as = ta.linreg(fl_ad, 10, 0)
+fl_al = ta.linreg(fl_ad, 20, 0)
+fl_acc = fl_al != 0 and fl_as > fl_al*1.1 ? 7.5 : fl_al != 0 and fl_as > fl_al ? 5.5 : fl_al != 0 and fl_as > fl_al*0.85 ? 3.0 : fl_as > 0 ? 1.5 : 0.0
+
+// Volume Trend — 7.5 pts
+fl_v5 = ta.sma(volume,5)
+fl_v20 = ta.sma(volume,20)
+fl_vtr = fl_v20 != 0 ? fl_v5/fl_v20 : 1.0
+fl_spk = fl_v20 != 0 ? volume/fl_v20 : 1.0
+fl_spkb = fl_spk > 2.0 ? 2.0 : fl_spk > 1.5 ? 1.0 : 0.0
+fl_vtb = fl_vtr > 1.2 ? 5.5 : fl_vtr > 1.05 ? 4.0 : fl_vtr > 0.9 ? 2.0 : 0.0
+fl_vt = math.min(fl_vtb + fl_spkb, 7.5)
+
+// Volume Skew — 3.5 pts
+fl_uv = 0.0
+fl_dv = 0.0
+for i = 0 to 9
+    if close[i] > close[i+1]
+        fl_uv := fl_uv + volume[i]
+    else
+        fl_dv := fl_dv + volume[i]
+fl_udr = fl_dv != 0 ? fl_uv/fl_dv : 1.0
+fl_skew = fl_udr > 1.5 ? 3.5 : fl_udr > 1.2 ? 2.5 : fl_udr >= 0.8 ? 1.5 : 0.0
+
+// Extension — +5 to -8
+fl_hi20 = ta.highest(high,20)
+fl_hi20_prior = ta.highest(high[1], 20)
+fl_is_new_high = high >= fl_hi20_prior
+fl_lo20 = ta.lowest(low,20)
+fl_rng = fl_hi20 - fl_lo20
+fl_pp = fl_rng != 0 ? (close-fl_lo20)/fl_rng*100 : 50
+fl_ema = ta.ema(close,20)
+fl_de = fl_ema != 0 ? (close-fl_ema)/fl_ema*100 : 0
+fl_cr = (high-low) != 0 ? (close-low)/(high-low) : 0.5
+fl_vr = fl_v20 != 0 ? volume/fl_v20 : 1.0
+fl_r5 = ta.highest(high,5) - ta.lowest(low,5)
+fl_tra = ta.sma(ta.tr,20)
+fl_ra20 = fl_tra * 5
+fl_isc = fl_ra20 != 0 ? fl_r5/fl_ra20 < 0.6 : false
+fl_ext = fl_is_new_high and fl_vr > 1.5 and fl_cr > 0.6 ? 5.0 : fl_pp > 85 and fl_vr > 1.2 and fl_cr > 0.5 ? 3.0 : fl_de > 12 and fl_vr > 2.0 and fl_cr < 0.4 ? -8.0 : fl_de > 8 and not fl_isc and fl_cr < 0.4 ? -5.0 : fl_pp < 25 ? 3.0 : 0.0
+
+fl_raw = math.max(math.min(fl_flow + fl_acc + fl_vt + fl_skew + fl_ext, 38), 0)
+flow_100 = fl_raw / 38.0 * 100.0
+
+// ==================== ENGINE 2: ENERGY v1.3 — SHARED ====================
+// Range Position (50-bar proxy) — 17.5 pts
+en_hi50 = ta.highest(high,50)
+en_lo50 = ta.lowest(low,50)
+en_rng50 = en_hi50 - en_lo50
+en_pos50 = en_rng50 != 0 ? (close-en_lo50)/en_rng50*100 : 50
+en_psc = en_pos50 >= 90 ? 15.0 : en_pos50 >= 75 ? 17.0 : en_pos50 >= 60 ? 12.0 : en_pos50 >= 45 ? 8.0 : en_pos50 >= 30 ? 5.0 : 3.0
+en_atr = ta.atr(20)
+en_r5t = ta.highest(high,5) - ta.lowest(low,5)
+en_tt = en_pos50 > 75 and en_r5t < en_atr*2.0
+en_lvn = en_tt ? 1.5 : 0.0
+en_vp = math.min(en_psc + en_lvn, 17.5)
+
+// Price Action — 12.5 pts
+en_hlc = 0
+for i = 1 to 4
+    if low[i-1] > low[i]
+        en_hlc := en_hlc + 1
+en_str = en_hlc >= 4 ? 5.0 : en_hlc >= 3 ? 4.0 : en_hlc >= 2 ? 3.0 : en_hlc >= 1 ? 1.5 : 0.0
+en_r5d = ta.highest(high,5)-ta.lowest(low,5)
+en_r20d = ta.highest(high,20)-ta.lowest(low,20)
+en_comp = en_r20d != 0 ? en_r5d/en_r20d : 1.0
+en_tb = en_comp < 0.3 ? 4.5 : en_comp < 0.5 ? 3.5 : en_comp < 0.7 ? 2.0 : en_comp < 0.9 ? 1.0 : 0.0
+en_ema20 = ta.ema(close,20)
+en_tup = close > en_ema20 and close > close[5]
+en_ts = en_tup ? math.min(en_tb+1.5, 4.5) : en_tb
+en_rh = ta.highest(high,20)
+en_pbp = en_rh != 0 ? (en_rh-close)/en_rh*100 : 0
+en_pb = en_pbp < 5 ? 3.0 : en_pbp < 10 ? 2.5 : en_pbp < 15 ? 2.0 : en_pbp < 25 ? 1.0 : 0.0
+en_pa_raw = en_str + en_ts + en_pb
+en_pa = en_pos50 < 30 ? en_pa_raw * 0.5 : en_pos50 < 45 ? en_pa_raw * 0.7 : en_pa_raw
+
+// Squeeze — 12.5 pts
+en_bb = ta.sma(close,20)
+en_bd = 2.0 * ta.stdev(close,20)
+en_bu = en_bb + en_bd
+en_bl = en_bb - en_bd
+en_bw = en_bb != 0 ? (en_bu-en_bl)/en_bb*100 : 0
+en_bwl = ta.lowest(en_bw, 50)
+en_bwh = ta.highest(en_bw, 50)
+en_bwr = en_bwh - en_bwl
+en_bwp = en_bwr != 0 ? (en_bw-en_bwl)/en_bwr*100 : 50
+en_kcr = ta.atr(20)
+en_kcu = en_bb + en_kcr*1.5
+en_kcl = en_bb - en_kcr*1.5
+en_sq = en_bl > en_kcl and en_bu < en_kcu
+en_sqsc = en_sq and en_bwp < 20 ? 12.5 : en_sq and en_bwp < 35 ? 10.0 : en_sq and en_bwp < 50 ? 7.5 : en_sq ? 5.0 : en_bwp < 30 ? 8.5 : en_bwp < 50 ? 4.0 : 0.0
+
+// Exhaustion — 10 pts with trend-duration gate
+var int en_trend_bars = 0
+en_trend_bars := close > en_ema20 ? en_trend_bars + 1 : 0
+en_trend_mature = en_trend_bars >= exh_trend_min
+
+en_va20 = ta.sma(volume,20)
+en_evr = en_va20 != 0 ? volume/en_va20 : 1.0
+en_gn = close[1] != 0 ? (close-close[1])/close[1]*100 : 0
+en_cl = en_evr > 3.0 and en_gn < 2 ? -4.0 : en_evr > 2.5 and en_gn < 3 ? -2.5 : 0.0
+en_m14 = ta.mfi(close,14)
+en_mph = ta.highest(en_m14,5)[1]
+en_pnh = high == ta.highest(high,10)
+en_mlh = en_m14 < en_mph
+en_mac = ta.ema(close,12)-ta.ema(close,26)
+en_maph = ta.highest(en_mac,5)[1]
+en_malh = en_mac < en_maph
+en_div = en_pnh and en_mlh ? -3.0 : en_pnh and en_malh ? -2.0 : 0.0
+en_br = high-low
+en_brr = en_atr != 0 ? en_br/en_atr : 1.0
+en_ft = 0.0
+if en_brr > 2.0
+    en_ft := close[1] < close and high[1] < high ? 1.0 : 0.0
+en_ws = en_brr > 2.0 and en_evr > 2.0 and en_ft == 0 ? -3.0 : en_brr > 1.5 and en_evr > 1.5 ? -1.5 : 0.0
+en_exh = en_trend_mature ? math.max(10.0+en_cl+en_div+en_ws, 0.0) : 10.0
+
+// ATR Expansion — 7.0 pts
+en_a5 = ta.sma(en_atr,5)
+en_a20 = ta.sma(en_atr,20)
+en_aexp = en_a20 != 0 ? (en_a5-en_a20)/en_a20*100 : 0
+en_aq = en_aexp >= 20 and en_aexp <= 80 ? 7.0 : en_aexp > 150 ? 2.0 : en_aexp > 80 ? 4.0 : en_aexp >= 15 ? 5.5 : en_aexp >= 10 ? 4.0 : en_aexp >= 0 ? 1.0 : en_aexp >= -10 ? 0.5 : 0.0
+
+en_raw = en_vp + en_pa + en_sqsc + en_exh + en_aq
+energy_100 = math.max(math.min(en_raw / 59.5 * 100.0, 100), 0)
+
+// ==================== ENGINE 3: STRUCTURE v1.5.0 — SHARED ====================
+// v1.5.0: 3-mode BD counting (DSG-04 + DSG-06 + DSG-08)
+bench_close = request.security(benchmark_sym, timeframe.period, close)
+
+// RS vs SPY (15)
+ms_rl = 60
+ms_sp = (close-close[ms_rl])/close[ms_rl]*100
+ms_bp = (bench_close-bench_close[ms_rl])/bench_close[ms_rl]*100
+ms_rs = ms_sp - ms_bp
+ms_rsc = ms_rs > 10 ? 15.0 : ms_rs > 5 ? 12.0 : ms_rs > 2 ? 10.0 : ms_rs > 0 ? 6.0 : ms_rs > -3 ? 3.0 : 0.0
+
+// RS Acceleration (15)
+ms_rs_short = (close-close[20])/close[20]*100 - (bench_close-bench_close[20])/bench_close[20]*100
+ms_rsa = ms_rs_short - ms_rs
+ms_rsac = ms_rsa > 5 ? 15.0 : ms_rsa > 2 ? 12.0 : ms_rsa > 0 ? 9.0 : ms_rsa > -2 ? 6.0 : ms_rsa > -5 ? 3.0 : 0.0
+
+// ---------- BASE DURATION (15) — 3-MODE SYSTEM (DSG-04/06/08) ----------
+// Mode 1: VCP/flat base — 10-bar range ≤ 15% of price (original)
+// Mode 2: DSG-04 Staircase — shallow pullback in confirmed uptrend + higher lows
+// Mode 3: DSG-06 Smooth trend — price hugging rising 20EMA (trend IS consolidation)
+//
+// All modes feed the SAME counter. DSG-02 latch preserved.
+
+ms_atr = ta.atr(20)
+ms_r10 = ta.highest(high,10)-ta.lowest(low,10)
+ms_rpct = close != 0 ? ms_r10 / close * 100 : 100
+ms_rpct_thresh = 15.0
+
+// Mode 1: VCP/flat base (unchanged from v1.5.2)
+ms_mode1 = ms_rpct <= ms_rpct_thresh
+
+// Mode 2: DSG-04 Staircase consolidation
+// Requires: confirmed uptrend (close > SMA50, SMA50 rising),
+//   shallow pullback 1.5–8% from local 10-bar high,
+//   at least 2 higher lows in last 5 bars (staircase structure)
+ms_sma50 = ta.sma(close, 50)
+ms_uptrend = close > ms_sma50 and ms_sma50 > ms_sma50[5]
+ms_hi10 = ta.highest(high, 10)
+ms_pb_depth = ms_hi10 != 0 ? (ms_hi10 - close) / ms_hi10 * 100 : 0
+ms_shallow_pb = ms_pb_depth >= 1.5 and ms_pb_depth <= 8.0
+ms_stair_hl = 0
+for i = 1 to 5
+    if low[i-1] > low[i]
+        ms_stair_hl := ms_stair_hl + 1
+ms_has_stair = ms_stair_hl >= 2
+ms_mode2 = ms_uptrend and ms_shallow_pb and ms_has_stair
+
+// Mode 3: DSG-06 Smooth trend (trend IS the consolidation)
+// Requires: EMA20 rising over 3 bars, close within 1× ATR of EMA20,
+//   confirmed uptrend (close > SMA50). Captures stocks that advance
+//   steadily without producing classical bases or staircase steps.
+ms_ema20_str = ta.ema(close, 20)
+ms_ema20_rising = ms_ema20_str > ms_ema20_str[3]
+ms_near_ema20 = ms_atr != 0 ? math.abs(close - ms_ema20_str) <= ms_atr * 1.0 : false
+ms_mode3 = ms_ema20_rising and ms_near_ema20 and close > ms_sma50
+
+// Combined base detection — ANY mode qualifies
+ms_in_base = ms_mode1 or ms_mode2 or ms_mode3
+
+// BD mode diagnostic: which mode triggered (for export)
+// 0=none, 1=VCP, 2=staircase, 3=smooth, 4=multi (2+ modes)
+ms_mode_count = (ms_mode1 ? 1 : 0) + (ms_mode2 ? 1 : 0) + (ms_mode3 ? 1 : 0)
+ms_bd_mode = ms_mode_count >= 2 ? 4 : ms_mode3 ? 3 : ms_mode2 ? 2 : ms_mode1 ? 1 : 0
+
+// Phase 1: Raw accumulation counter
+var int ms_raw_base = 0
+if ms_in_base
+    ms_raw_base := ms_raw_base + 1
+else
+    ms_raw_base := 0
+
+// Phase 2: Breakout detection — consolidation_high from accumulated base
+ms_min_bd = 3
+ms_vol_sma20 = ta.sma(volume, 20)
+ms_prev_len = math.max(ms_raw_base[1], 1)
+ms_cap_len = math.min(ms_prev_len, 60)
+float ms_cons_high = high[1]
+for i = 1 to 60
+    if i <= ms_cap_len
+        if high[i] > ms_cons_high
+            ms_cons_high := high[i]
+
+ms_breakout = close > ms_cons_high and not ms_in_base and ms_raw_base[1] >= ms_min_bd and volume > ms_vol_sma20
+
+// Phase 3: Latch (DSG-02 preserved)
+var int ms_latched_bd = 0
+var int ms_bars_since_bo = 999
+if ms_breakout
+    ms_latched_bd := ms_raw_base[1]
+    ms_bars_since_bo := 0
+else
+    ms_bars_since_bo := ms_bars_since_bo + 1
+
+// Phase 4: Reported value with decay
+ms_decay = 10
+ms_bd = ms_bars_since_bo <= ms_decay ? ms_latched_bd : ms_raw_base
+
+ms_braw = ms_bd < 3 ? 0.0 : ms_bd < 5 ? 3.0 : ms_bd < 7 ? 6.0 : ms_bd < 10 ? 10.0 : ms_bd <= 25 ? 15.0 : ms_bd <= 30 ? 12.0 : ms_bd <= 35 ? 8.0 : 5.0
+
+// Higher-Lows quality multiplier
+ms_hl_lookback = math.min(ms_bd, 10)
+ms_hl = 0
+for i = 1 to 10
+    if i <= ms_hl_lookback
+        if low[i] > low[i+1]
+            ms_hl := ms_hl + 1
+ms_bqm = ms_hl >= 4 ? 1.0 : ms_hl >= 2 ? 0.8 : 0.6
+ms_base = math.min(ms_braw * ms_bqm, 15.0)
+
+// NR7/NR4 contraction diagnostics (Collin Seow — Joint Convene, not in scoring)
+ms_nr_dr = high - low
+ms_nr7 = ms_nr_dr <= ta.lowest(ms_nr_dr, 7)
+ms_nr4 = ms_nr_dr <= ta.lowest(ms_nr_dr, 4)
+ms_nr_in_base = ms_in_base and ms_nr7
+
+// Range Position (15) — 50-bar
+ms_h50 = ta.highest(high,50)
+ms_l50 = ta.lowest(low,50)
+ms_r50 = ms_h50 - ms_l50
+ms_p50 = ms_r50 != 0 ? (close-ms_l50)/ms_r50*100 : 50
+ms_pos = ms_p50 >= 95 ? 15.0 : ms_p50 >= 85 ? 13.0 : ms_p50 >= 75 ? 10.0 : ms_p50 >= 60 ? 7.0 : ms_p50 >= 45 ? 4.0 : 0.0
+
+// Resistance Clearance (10)
+ms_nr = ms_h50
+ms_dr = close != 0 ? (ms_nr-close)/close*100 : 0
+ms_res = ms_dr <= 0 ? 7.0 : ms_dr <= 3 ? 10.0 : ms_dr <= 8 ? 5.0 : ms_dr <= 15 ? 3.0 : 0.0
+
+// Weekly Trend (15) — TUPLE: 1 request.security call
+[wk_sma10, wk_sma10_prev, wk_close] = request.security(syminfo.tickerid, "W",
+     [ta.sma(close, 10)[1], ta.sma(close, 10)[2], close[1]],
+     barmerge.gaps_off, barmerge.lookahead_on)
+wk_rising = not na(wk_sma10) and not na(wk_sma10_prev) ? wk_sma10 > wk_sma10_prev : false
+ms_wk = na(wk_sma10) or na(wk_close) or na(wk_sma10_prev) ? 7.5 : wk_close > wk_sma10 and wk_rising ? 15.0 : wk_close > wk_sma10 ? 10.0 : wk_close > wk_sma10 * 0.97 ? 5.0 : wk_close > wk_sma10 * 0.93 ? 2.0 : 0.0
+
+// Earnings (10)
+ms_et = request.security(syminfo.tickerid, timeframe.period, earnings.future_time, barmerge.gaps_on, barmerge.lookahead_on, ignore_invalid_symbol=true)
+ms_de = na(ms_et) ? 999 : math.max(math.round((ms_et-time)/(24*60*60*1000)), 0)
+ms_ew = ms_de <= 5
+ms_earn = ms_de <= 5 ? 0.0 : ms_de <= 10 ? 4.0 : ms_de <= 20 ? 7.0 : 10.0
+
+// Structure headline
+ms_raw = ms_rsc + ms_rsac + ms_base + ms_pos + ms_res + ms_wk + ms_earn
+structure_100 = math.max(math.min(ms_raw / 95.0 * 100.0, 100), 0)
+
+// ==================== ELDER IMPULSE SCORE — GATE (SC_MOMENTUM ONLY) ====================
+imp_e = ta.ema(close,13)
+[imp_m, imp_signal, imp_h] = ta.macd(close, 12, 26, 9)
+imp_bull = imp_e > imp_e[1] and imp_h > imp_h[1]
+imp_bear = imp_e < imp_e[1] and imp_h < imp_h[1]
+imp_state = imp_bull ? 1 : imp_bear ? -1 : 0
+imp_state_sc = imp_bull ? 4.0 : (not imp_bull and not imp_bear) ? 2.0 : 0.0
+imp_slope = imp_e != 0 ? (imp_e - imp_e[3]) / imp_e * 100 : 0
+imp_slope_sc = imp_slope > 1.0 ? 3.0 : imp_slope > 0.3 ? 2.0 : imp_slope > 0.0 ? 1.0 : 0.0
+imp_accel = imp_h - imp_h[1]
+imp_hist_sc = imp_h > 0 and imp_accel > 0 ? 3.0 : imp_h > 0 ? 2.0 : imp_accel > 0 ? 1.0 : 0.0
+elder_score = imp_state_sc + imp_slope_sc + imp_hist_sc
+
+// ==================== ENGINE 5: MOMENTUM PERSISTENCE v1.2 — SHARED ====================
+mp_roc = ta.roc(close, 20)
+mp_roc_sma = ta.sma(mp_roc, 50)
+mp_roc_sd = ta.stdev(mp_roc, 50)
+mp_z = mp_roc_sd != 0 ? (mp_roc - mp_roc_sma) / mp_roc_sd : 0
+mp_abs = mp_z >= 2.0 ? 30.0 : mp_z >= 1.5 ? 26.0 : mp_z >= 1.0 ? 22.0 : mp_z >= 0.5 ? 16.0 : mp_z >= 0 ? 10.0 : mp_z >= -0.5 ? 5.0 : 0.0
+
+[mp_dip, mp_dim, mp_adx] = ta.dmi(14, 14)
+mp_dib = mp_dip > mp_dim
+mp_adxsc = mp_adx >= 40 and mp_dib ? 25.0 : mp_adx >= 30 and mp_dib ? 22.0 : mp_adx >= 25 and mp_dib ? 18.0 : mp_adx >= 20 and mp_dib ? 12.0 : 0.0
+
+mp_broc = ta.roc(bench_close, 20)
+mp_excess = mp_roc - mp_broc
+mp_rel = mp_excess >= 15 ? 25.0 : mp_excess >= 10 ? 22.0 : mp_excess >= 5 ? 18.0 : mp_excess >= 2 ? 13.0 : mp_excess >= 0 ? 8.0 : mp_excess >= -3 ? 3.0 : 0.0
+
+mp_ma50 = ta.sma(close, 50)
+mp_ma20 = ta.ema(close, 20)
+mp_50r = mp_ma50 > mp_ma50[5]
+mp_20r = mp_ma20 > mp_ma20[3]
+mp_a50 = close > mp_ma50
+mp_a20 = close > mp_ma20
+mp_trend = mp_a20 and mp_a50 and mp_20r and mp_50r ? 20.0 : mp_a20 and mp_a50 and mp_50r ? 16.0 : mp_a50 and mp_50r ? 12.0 : mp_a50 ? 8.0 : mp_a20 ? 5.0 : 0.0
+
+mp_raw = mp_abs + mp_adxsc + mp_rel + mp_trend
+mp_100 = math.max(math.min(mp_raw, 100), 0)
+
+// MP State: colour tells you what to do
+mp_rising = mp_100 > mp_100[3]
+mp_state = mp_rising and mp_100 < 75 ? 1 : mp_rising and mp_100 >= 75 ? 2 : 3
+// 1=BUILDING(green), 2=STRONG(yellow), 3=FADING(red)
+
+// ==================== SL DIAGNOSTIC (shared, not a gate) ====================
+sl_atr14 = ta.atr(14)
+sl_struct = ta.lowest(low, 5)
+sl_buf = sl_struct - (sl_atr14 * 0.5)
+sl_dist = close - sl_buf
+sl_tight = sl_dist <= (sl_atr14 * 2.0) and sl_dist >= (sl_atr14 * 0.5)
+// v1.6.0: ATR floor diagnostic — minimum 2.0× ATR from entry for viable stop
+sl_atr_floor = close - (sl_atr14 * 2.0)
+sl_atr_floor_wide = close - (sl_atr14 * 2.5)
+sl_viable = sl_buf >= sl_atr_floor  // structural stop outside ATR floor = viable
+
+// ==================== DSG-07: OVEREXTENSION FLAG ====================
+// Composite >85 + SL WIDE + price >2× ATR above EMA20 = CAUTION
+// Diagnostic only — not a gate, not a penalty. Committee visibility.
+dsg07_composite_hot = false  // set after SC_MOMENTUM computed
+dsg07_sl_wide = not sl_tight
+dsg07_overext_price = ms_atr != 0 ? close > (en_ema20 + ms_atr * 2.0) : false
+// Final flag set after composite available (see below)
+
+// ==================== ATR COMPRESSION RATIO (Raschke — committee reference) ====================
+// ATR(5)/ATR(20). <0.7 = consolidating regardless of BD count.
+// Exported for PTRS context modifier discussion. Not in scoring.
+atr_comp_ratio = ms_atr != 0 ? ta.atr(5) / ms_atr : 1.0
+
+// ==================== K39 WEEKLY GATE (SC_POSITION ONLY) ====================
+[wk_k39_raw, wk_obv, wk_obv_sma] = request.security(syminfo.tickerid, "W",
+     [ta.stoch(close, high, low, 39)[1], ta.obv[1], ta.sma(ta.obv, 30)[1]],
+     barmerge.gaps_off, barmerge.lookahead_on)
+k39_val = na(wk_k39_raw) ? 50.0 : wk_k39_raw
+k39_bullish = k39_val > 50.0
+obv_confirmed = not na(wk_obv) and not na(wk_obv_sma) ? wk_obv > wk_obv_sma : true
+k39_gate = k39_bullish and obv_confirmed
+
+// ==================== BASE QUALITY (SC_POSITION ONLY) ====================
+// Range Tightness 30, Vol Dry-up 25, Base Duration 20, EMA Convergence 25
+
+// BQ1: Range Tightness
+bq_atr5 = ta.atr(5)
+bq_atr20 = ta.atr(20)
+bq_rt_ratio = bq_atr20 != 0 ? bq_atr5 / bq_atr20 : 1.0
+bq_rt = bq_rt_ratio < 0.5 ? 30.0 : bq_rt_ratio < 0.6 ? 25.0 : bq_rt_ratio < 0.7 ? 20.0 : bq_rt_ratio < 0.8 ? 14.0 : bq_rt_ratio < 0.9 ? 8.0 : bq_rt_ratio < 1.0 ? 4.0 : 0.0
+
+// BQ2: Volume Dry-up
+bq_v5 = ta.sma(volume, 5)
+bq_v20 = ta.sma(volume, 20)
+bq_vd_ratio = bq_v20 != 0 ? bq_v5 / bq_v20 : 1.0
+bq_vd = bq_vd_ratio < 0.5 ? 25.0 : bq_vd_ratio < 0.65 ? 20.0 : bq_vd_ratio < 0.8 ? 15.0 : bq_vd_ratio < 0.95 ? 10.0 : bq_vd_ratio < 1.1 ? 5.0 : 0.0
+
+// BQ3: Base Duration — latched (DSG-02 pattern), 3-mode aware
+// Uses same 3-mode detection as Structure BD for consistency
+var int bq_raw_base = 0
+bq_pivot = ta.highest(high, 60)
+bq_band = bq_pivot * 0.08
+bq_in_band = (bq_pivot - close) <= bq_band
+
+// BQ3 also benefits from Mode 2/3: staircase or smooth trend within 8% of pivot
+bq_in_band_ext = bq_in_band or (ms_mode2 and bq_in_band) or (ms_mode3 and bq_in_band)
+
+if bq_in_band_ext
+    bq_raw_base := bq_raw_base + 1
+else
+    bq_raw_base := 0
+
+bq_prior_high = ta.highest(high[1], 60)
+bq_breakout = high > bq_prior_high and bq_in_band_ext[1] and bq_raw_base[1] >= 3 and volume > ta.sma(volume, 20)
+
+var int bq_latched_bd = 0
+var int bq_bars_since_bo = 999
+if bq_breakout
+    bq_latched_bd := bq_raw_base[1]
+    bq_bars_since_bo := 0
+else
+    bq_bars_since_bo := bq_bars_since_bo + 1
+
+bq_decay = 10
+bq_base_days = bq_bars_since_bo <= bq_decay ? bq_latched_bd : bq_raw_base
+
+bq_bd = bq_base_days >= 10 and bq_base_days <= 25 ? 20.0 : bq_base_days >= 7 and bq_base_days < 10 ? 14.0 : bq_base_days >= 25 and bq_base_days <= 35 ? 14.0 : bq_base_days >= 5 and bq_base_days < 7 ? 8.0 : bq_base_days > 35 ? 8.0 : bq_base_days >= 3 ? 4.0 : 0.0
+
+// BQ4: EMA Convergence
+bq_e8 = ta.ema(close, 8)
+bq_e13 = ta.ema(close, 13)
+bq_e21 = ta.ema(close, 21)
+bq_ema_spread = math.max(bq_e8, math.max(bq_e13, bq_e21)) - math.min(bq_e8, math.min(bq_e13, bq_e21))
+bq_ema_norm = bq_atr20 != 0 ? bq_ema_spread / bq_atr20 : 5.0
+bq_ec = bq_ema_norm < 0.5 ? 25.0 : bq_ema_norm < 0.8 ? 20.0 : bq_ema_norm < 1.2 ? 15.0 : bq_ema_norm < 1.8 ? 10.0 : bq_ema_norm < 2.5 ? 5.0 : 0.0
+
+bq_raw = bq_rt + bq_vd + bq_bd + bq_ec
+bq_100 = math.max(math.min(bq_raw, 100), 0)
+
+// ==================== SC_MOMENTUM COMPOSITE ====================
+// Weights: Flow 30%, Energy 30%, Structure 20%, MP 20%
+sc_m_raw = (flow_100 * 0.30) + (energy_100 * 0.30) + (structure_100 * 0.20) + (mp_100 * 0.20)
+
+elder_passes = elder_score >= elder_gate
+engines_pass_m = flow_100 >= floor_flow_m and energy_100 >= floor_energy_m and structure_100 >= floor_struct_m and mp_100 >= floor_mp_m
+all_gates_m = elder_passes and engines_pass_m
+sc_momentum = sc_m_raw  // v1.8: sub-component floors removed from gating. Weighted composite speaks for itself. Elder gate (charter §6) enforced at qualification, not here.
+
+// ==================== SC_POSITION COMPOSITE ====================
+// Weights: Flow 10%, Energy 30%, Structure 20%, MP 5%, BQ 35%
+sc_p_raw = (flow_100 * 0.10) + (energy_100 * 0.30) + (structure_100 * 0.20) + (mp_100 * 0.05) + (bq_100 * 0.35)
+
+engines_pass_p = flow_100 >= floor_flow_p and energy_100 >= floor_energy_p and structure_100 >= floor_struct_p and mp_100 >= floor_mp_p and bq_100 >= floor_bq_p
+all_gates_p = engines_pass_p and k39_gate
+sc_position = sc_p_raw  // v1.8: sub-component floors removed from gating. K39 gate (charter §6) enforced at qualification, not here.
+
+// ==================== DSG-07 FLAG (needs composites) ====================
+dsg07_composite_hot := sc_momentum > 85
+dsg07_flag = dsg07_composite_hot and dsg07_sl_wide and dsg07_overext_price
+
+// ==================== DUAL QUALIFICATION ====================
+dual_qual = sc_momentum >= sc_qualified and sc_position >= sc_qualified
+earn_warn = ms_ew
+
+// ==================== SIGNAL STATE MACHINE ====================
+// v1.8: Charter gates only. Elder (SC_M), K39 (SC_P). Sub-component floors are diagnostic.
+is_m_strong    = sc_momentum >= sc_strong and elder_passes
+is_m_qualified = sc_momentum >= sc_qualified and elder_passes and not is_m_strong
+is_p_qualified = sc_position >= sc_qualified and k39_gate
+is_any_qual    = is_m_strong or is_m_qualified or is_p_qualified
+
+sig_m_strong = is_m_strong and not (sc_momentum[1] >= sc_strong and elder_passes[1])
+sig_m_qual   = is_m_qualified and not (sc_momentum[1] >= sc_qualified and elder_passes[1])
+sig_p_qual   = is_p_qualified and not (sc_position[1] >= sc_qualified and k39_gate[1])
+sig_dual     = dual_qual and not dual_qual[1]
+
+// ==================== PLOTSHAPE SIGNALS ====================
+plotshape(show_signals and sig_m_strong ? low : na, title="Mom Strong", style=shape.triangleup, location=location.belowbar, color=color.new(color.lime, 0), size=size.tiny, text="MS", textcolor=color.lime)
+
+plotshape(show_signals and sig_m_qual ? low : na, title="Mom Qualified", style=shape.triangleup, location=location.belowbar, color=color.new(color.green, 0), size=size.tiny, text="MQ", textcolor=color.green)
+
+plotshape(show_signals and sig_p_qual ? low : na, title="Pos Qualified", style=shape.triangleup, location=location.belowbar, color=color.new(color.teal, 0), size=size.tiny, text="PQ", textcolor=color.teal)
+
+plotshape(show_signals and sig_dual ? low : na, title="Dual Qualified", style=shape.diamond, location=location.belowbar, color=color.new(color.yellow, 0), size=size.tiny, text="DQ", textcolor=color.yellow)
+
+plotshape(show_signals and earn_warn and not earn_warn[1] ? low : na, title="Earnings Warning", style=shape.diamond, location=location.belowbar, color=color.new(color.fuchsia, 0), size=size.tiny, text="E", textcolor=color.fuchsia)
+
+// DSG-07: Overextension caution marker
+plotshape(show_signals and dsg07_flag and not dsg07_flag[1] ? high : na, title="Overextension", style=shape.xcross, location=location.abovebar, color=color.new(color.orange, 0), size=size.tiny, text="OX", textcolor=color.orange)
+
+// ==================== BACKGROUND SHADING ====================
+bg_clr = not show_bg ? na : dsg07_flag ? color.new(color.orange, 90) : earn_warn ? color.new(color.fuchsia, 92) : dual_qual ? color.new(color.yellow, 93) : is_m_strong ? color.new(color.lime, 93) : is_any_qual ? color.new(color.green, 95) : na
+bgcolor(bg_clr, title="State Background")
+
+// ==================== STATE LABEL ====================
+var label state_label = na
+if show_state_lbl and barstate.islast
+    label.delete(state_label)
+    string m_txt = is_m_strong ? "M:STRONG" : is_m_qualified ? "M:QUAL" : not elder_passes ? "M:NO ELDER" : "M:WEAK"
+    string p_txt = is_p_qualified ? "P:QUAL" : not k39_gate ? "P:NO K39" : "P:WEAK"
+    string d_txt = dual_qual ? " [DUAL]" : ""
+    string ox_txt = dsg07_flag ? " ⚠OX" : ""
+    string lbl_txt = m_txt + " | " + p_txt + d_txt + ox_txt
+    color lbl_clr = dsg07_flag ? color.orange : dual_qual ? color.yellow : is_m_strong ? color.lime : is_any_qual ? color.green : color.red
+    state_label := label.new(bar_index, high * 1.005, lbl_txt, style=label.style_label_down, color=color.new(lbl_clr, 20), textcolor=color.white, size=size.small)
+
+// ==================== DASHBOARD TABLE ====================
+var pos = tbl_pos == "Top Right" ? position.top_right : tbl_pos == "Top Left" ? position.top_left : tbl_pos == "Bottom Right" ? position.bottom_right : position.bottom_left
+var table tbl = table.new(pos, 4, 14, bgcolor=color.new(color.black, 80), border_width=1)
+
+if show_table and barstate.islast
+    // Header
+    table.cell(tbl, 0, 0, "ENGINE", bgcolor=color.new(#1a2744, 30), text_color=color.white, text_size=size.small)
+    table.cell(tbl, 1, 0, "SCORE", bgcolor=color.new(#1a2744, 30), text_color=color.white, text_size=size.small)
+    table.cell(tbl, 2, 0, "M.WT", bgcolor=color.new(#1a2744, 30), text_color=color.white, text_size=size.small)
+    table.cell(tbl, 3, 0, "P.WT", bgcolor=color.new(#1a2744, 30), text_color=color.white, text_size=size.small)
+
+    // Flow
+    color fc = flow_100 >= 84 ? color.lime : flow_100 >= 70 ? color.green : flow_100 >= 50 ? color.yellow : color.red
+    table.cell(tbl, 0, 1, "Flow", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 1, str.tostring(flow_100, "#"), text_color=fc, text_size=size.small)
+    table.cell(tbl, 2, 1, "30", text_color=flow_100 >= floor_flow_m ? color.lime : color.red, text_size=size.small)
+    table.cell(tbl, 3, 1, "10", text_color=flow_100 >= floor_flow_p ? color.lime : color.red, text_size=size.small)
+
+    // Energy
+    color ec2 = energy_100 >= 80 ? color.lime : energy_100 >= 64 ? color.green : energy_100 >= 50 ? color.yellow : color.red
+    table.cell(tbl, 0, 2, "Energy", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 2, str.tostring(energy_100, "#"), text_color=ec2, text_size=size.small)
+    table.cell(tbl, 2, 2, "30", text_color=energy_100 >= floor_energy_m ? color.lime : color.red, text_size=size.small)
+    table.cell(tbl, 3, 2, "30", text_color=energy_100 >= floor_energy_p ? color.lime : color.red, text_size=size.small)
+
+    // Structure
+    color mc = structure_100 >= 75 ? color.lime : structure_100 >= 55 ? color.green : structure_100 >= 40 ? color.yellow : color.red
+    table.cell(tbl, 0, 3, "Struct", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 3, str.tostring(structure_100, "#"), text_color=mc, text_size=size.small)
+    table.cell(tbl, 2, 3, "20", text_color=structure_100 >= floor_struct_m ? color.lime : color.red, text_size=size.small)
+    table.cell(tbl, 3, 3, "20", text_color=structure_100 >= floor_struct_p ? color.lime : color.red, text_size=size.small)
+
+    // MP
+    color mpc = mp_state == 1 ? color.lime : mp_state == 2 ? color.yellow : color.red
+    string mp_st = mp_state == 1 ? "BUILD" : mp_state == 2 ? "STRNG" : "FADE"
+    table.cell(tbl, 0, 4, "MP", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 4, str.tostring(mp_100, "#") + " " + mp_st, text_color=mpc, text_size=size.small)
+    table.cell(tbl, 2, 4, "20", text_color=mp_100 >= floor_mp_m ? color.lime : color.red, text_size=size.small)
+    table.cell(tbl, 3, 4, "5", text_color=mp_100 >= floor_mp_p ? color.lime : color.red, text_size=size.small)
+
+    // Elder
+    string it = imp_state == 1 ? "GRN" : imp_state == -1 ? "RED" : "BLU"
+    color g1c = elder_passes ? color.lime : color.red
+    table.cell(tbl, 0, 5, "Elder", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 5, str.tostring(elder_score, "#.0") + " " + it, text_color=g1c, text_size=size.small)
+    table.cell(tbl, 2, 5, elder_passes ? "PASS" : "FAIL", text_color=g1c, text_size=size.small)
+    table.cell(tbl, 3, 5, "N/A", text_color=color.gray, text_size=size.small)
+
+    // BQ
+    color bqc = bq_100 >= 80 ? color.lime : bq_100 >= 60 ? color.green : bq_100 >= 40 ? color.yellow : color.red
+    table.cell(tbl, 0, 6, "BaseQ", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 6, str.tostring(bq_100, "#"), text_color=bqc, text_size=size.small)
+    table.cell(tbl, 2, 6, "N/A", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 3, 6, "35", text_color=bq_100 >= floor_bq_p ? color.lime : color.red, text_size=size.small)
+
+    // K39 gate
+    color k39c = k39_gate ? color.lime : color.red
+    string k39_txt = str.tostring(k39_val, "#") + (obv_confirmed ? "+OBV" : "-OBV")
+    table.cell(tbl, 0, 7, "K39", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 7, k39_txt, text_color=k39c, text_size=size.small)
+    table.cell(tbl, 2, 7, "N/A", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 3, 7, k39_gate ? "PASS" : "FAIL", text_color=k39c, text_size=size.small)
+
+    // SL diagnostic + ATR floor (v1.6.0)
+    color g2c = sl_tight ? color.lime : color.orange
+    string sl_label = sl_viable ? (sl_tight ? "OK" : "WIDE") : "FLOOR!"
+    color sl_clr = sl_viable ? g2c : color.red
+    table.cell(tbl, 0, 8, "SL", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 8, sl_label, text_color=sl_clr, text_size=size.small)
+    table.cell(tbl, 2, 8, str.tostring(sl_dist / sl_atr14, "#.#") + "x", text_color=sl_clr, text_size=size.small)
+    table.cell(tbl, 3, 8, "", text_size=size.small)
+
+    // BD Mode (v1.6.0 — which mode triggered base day count)
+    string bd_mode_txt = ms_bd_mode == 4 ? "MULTI" : ms_bd_mode == 3 ? "SMOOTH" : ms_bd_mode == 2 ? "STAIR" : ms_bd_mode == 1 ? "VCP" : "NONE"
+    color bd_mode_clr = ms_bd >= 5 ? color.lime : ms_bd >= 3 ? color.yellow : color.red
+    table.cell(tbl, 0, 9, "BD", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 9, str.tostring(ms_bd) + "d", text_color=bd_mode_clr, text_size=size.small)
+    table.cell(tbl, 2, 9, bd_mode_txt, text_color=bd_mode_clr, text_size=size.small)
+    table.cell(tbl, 3, 9, "ATR:" + str.tostring(atr_comp_ratio, "#.##"), text_color=atr_comp_ratio < 0.7 ? color.lime : color.gray, text_size=size.small)
+
+    // Earnings
+    string et = ms_de >= 999 ? "N/A" : str.tostring(ms_de) + "d"
+    color erc = earn_warn ? color.fuchsia : ms_de <= 10 ? color.orange : color.lime
+    table.cell(tbl, 0, 10, "Earn", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 10, et, text_color=erc, text_size=size.small)
+    table.cell(tbl, 2, 10, "", text_size=size.small)
+    table.cell(tbl, 3, 10, "", text_size=size.small)
+
+    // DSG-07 Overextension (v1.6.0)
+    color ox_clr = dsg07_flag ? color.orange : color.new(color.gray, 50)
+    table.cell(tbl, 0, 11, "OvrExt", text_color=color.gray, text_size=size.small)
+    table.cell(tbl, 1, 11, dsg07_flag ? "⚠ CAUT" : "OK", text_color=ox_clr, text_size=size.small)
+    table.cell(tbl, 2, 11, "", text_size=size.small)
+    table.cell(tbl, 3, 11, "", text_size=size.small)
+
+    // SC_MOMENTUM score
+    color m_bg = is_m_strong ? color.green : is_m_qualified ? color.new(color.yellow, 40) : color.red
+    string m_lbl = earn_warn ? "EARN!" : not elder_passes ? "NO ELDER" : is_m_strong ? "STRONG" : is_m_qualified ? "QUAL" : "WEAK"
+    table.cell(tbl, 0, 12, "MOMENTUM", bgcolor=m_bg, text_color=color.white, text_size=size.small)
+    table.cell(tbl, 1, 12, str.tostring(sc_momentum, "#.0"), bgcolor=m_bg, text_color=color.white, text_size=size.normal)
+    table.cell(tbl, 2, 12, m_lbl, bgcolor=earn_warn ? color.fuchsia : not elder_passes ? color.red : m_bg, text_color=color.white, text_size=size.small)
+    table.cell(tbl, 3, 12, "", bgcolor=m_bg, text_size=size.small)
+
+    // SC_POSITION score
+    color p_bg = is_p_qualified ? color.new(color.teal, 30) : color.new(color.red, 50)
+    string p_lbl = not k39_gate ? "NO K39" : is_p_qualified ? "QUAL" : "WEAK"
+    table.cell(tbl, 0, 13, "POSITION", bgcolor=p_bg, text_color=color.white, text_size=size.small)
+    table.cell(tbl, 1, 13, str.tostring(sc_position, "#.0"), bgcolor=p_bg, text_color=color.white, text_size=size.normal)
+    table.cell(tbl, 2, 13, p_lbl, bgcolor=not k39_gate ? color.red : p_bg, text_color=color.white, text_size=size.small)
+    table.cell(tbl, 3, 13, dual_qual ? "DUAL" : "", bgcolor=dual_qual ? color.yellow : p_bg, text_color=color.black, text_size=size.small)
+
+// ==================== SCREENER EXPORTS ====================
+// Primary dual-score outputs
+plot(sc_momentum,       "SC_MOMENTUM",   display=display.none)
+plot(sc_position,       "SC_POSITION",   display=display.none)
+
+// Gate status
+plot(all_gates_m ? 1:0, "SC_M_GATES",   display=display.none)
+plot(all_gates_p ? 1:0, "SC_P_GATES",   display=display.none)
+plot(dual_qual ? 1:0,   "SC_DUAL_QUAL",  display=display.none)
+
+// Engine scores (shared)
+plot(flow_100,          "SC_FLOW",       display=display.none)
+plot(energy_100,        "SC_ENERGY",     display=display.none)
+plot(structure_100,     "SC_STRUCTURE",  display=display.none)
+plot(mp_100,            "SC_MP",         display=display.none)
+plot(float(mp_state),   "SC_MP_STATE",   display=display.none)
+plot(elder_score,       "SC_ELDER",      display=display.none)
+plot(bq_100,            "SC_BQ",         display=display.none)
+plot(k39_gate ? 1:0,    "SC_K39_GATE",   display=display.none)
+
+// Diagnostics
+plot(elder_passes?1:0,  "SC_ELDER_GATE", display=display.none)
+plot(sl_tight?1:0,      "SC_SL_TIGHT",   display=display.none)
+plot(ms_rs,             "SC_RS_SPY",     display=display.none)
+plot(mp_excess,         "SC_EXCESS_RET", display=display.none)
+plot(float(ms_de<=999?ms_de:0), "SC_DAYS_EARN", display=display.none)
+plot(float(en_trend_bars),  "SC_TREND_BARS",  display=display.none)
+plot(en_exh,                "SC_EXHAUSTION",   display=display.none)
+plot(k39_val,               "SC_K39_VAL",      display=display.none)
+plot(bq_rt,                 "SC_BQ_RT",        display=display.none)
+plot(bq_vd,                 "SC_BQ_VD",        display=display.none)
+plot(bq_bd,                 "SC_BQ_BD",        display=display.none)
+plot(bq_ec,                 "SC_BQ_EC",        display=display.none)
+
+// DSG-02 latch diagnostics (Structure engine)
+plot(float(ms_bd),              "SC_BD_REPORTED",   display=display.none)
+plot(float(ms_raw_base),        "SC_BD_RAW",        display=display.none)
+plot(float(ms_latched_bd),      "SC_BD_LATCHED",    display=display.none)
+plot(float(ms_bars_since_bo <= ms_decay ? 1 : 0), "SC_BD_IS_LATCHED", display=display.none)
+
+// DSG-02 latch diagnostics (BQ3 engine)
+plot(float(bq_base_days),       "SC_BQ3_REPORTED",  display=display.none)
+plot(float(bq_raw_base),        "SC_BQ3_RAW",       display=display.none)
+plot(float(bq_latched_bd),      "SC_BQ3_LATCHED",   display=display.none)
+
+// NR7/NR4 contraction diagnostics (Collin Seow)
+plot(ms_nr7 ? 1:0,        "SC_NR7",          display=display.none)
+plot(ms_nr4 ? 1:0,        "SC_NR4",          display=display.none)
+plot(ms_nr_in_base ? 1:0, "SC_NR7_IN_BASE",  display=display.none)
+
+// v1.6.0 NEW exports
+plot(float(ms_bd_mode),     "SC_BD_MODE",       display=display.none)  // 0=none,1=VCP,2=stair,3=smooth,4=multi
+plot(atr_comp_ratio,        "SC_ATR_COMP",      display=display.none)  // ATR(5)/ATR(20) — Raschke consolidation proxy
+plot(dsg07_flag ? 1:0,      "SC_OVEREXT",       display=display.none)  // DSG-07 overextension flag
+plot(sl_viable ? 1:0,       "SC_SL_VIABLE",     display=display.none)  // ATR floor viability
+plot(sl_atr_floor,          "SC_ATR_FLOOR",     display=display.none)  // 2.0× ATR floor level
+plot(sl_atr_floor_wide,     "SC_ATR_FLOOR_W",   display=display.none)  // 2.5× ATR floor level
+
+// ==================== ALERTS ====================
+alertcondition(sc_momentum >= sc_strong and sc_momentum[1] < sc_strong, "Momentum Strong", "SC_MOMENTUM crossed Strong threshold")
+alertcondition(sc_momentum >= sc_qualified and sc_momentum[1] < sc_qualified, "Momentum Qualified", "SC_MOMENTUM crossed Qualified threshold")
+alertcondition(sc_position >= sc_qualified and sc_position[1] < sc_qualified, "Position Qualified", "SC_POSITION crossed Qualified threshold")
+alertcondition(dual_qual and not dual_qual[1], "Dual Qualified", "Both SC_MOMENTUM and SC_POSITION qualified")
+alertcondition(sc_momentum < sc_qualified and sc_momentum[1] >= sc_qualified, "Momentum Dropped", "SC_MOMENTUM dropped below Qualified")
+alertcondition(not all_gates_m and all_gates_m[1], "Momentum Gates Closed", "Momentum gates just closed")
+alertcondition(earn_warn and not earn_warn[1], "Earnings Warning", "Earnings approaching")
+alertcondition(ms_breakout, "Structure Breakout Latched", "DSG-02: Structure base days latched on breakout")
+alertcondition(dsg07_flag and not dsg07_flag[1], "Overextension Caution", "DSG-07: Overextension flag triggered")

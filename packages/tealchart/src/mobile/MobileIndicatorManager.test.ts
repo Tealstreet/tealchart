@@ -636,3 +636,102 @@ describe('MobileIndicatorManager recomputation cache', () => {
     expect(manager.getPlotsRevision()).toBe(revisionBefore);
   });
 });
+
+describe('MobileIndicatorManager pane auto ranges', () => {
+  it('uses only pane-visible Pine outputs for native indicator pane ranges', () => {
+    const manager = new MobileIndicatorManager();
+    const updatePaneRange = vi.fn();
+    (manager as any)._paneManager = {
+      getIndicatorPanes: () => [{ id: 'pane_1', fixedRange: false, indicatorIds: ['script'] }],
+      updatePaneRange,
+    };
+
+    const plots: PlotOutput[] = [
+      {
+        id: 'visible',
+        type: 'plot',
+        title: 'Visible',
+        values: [10, 20, 30],
+        scriptId: 'script',
+        color: '#ffffff',
+        style: 'columns',
+        histbase: -50,
+      },
+      {
+        id: 'hidden',
+        type: 'plot',
+        title: 'Hidden',
+        values: [10_000, 10_000, 10_000],
+        scriptId: 'script',
+        color: '#ffffff',
+        display: 0,
+      },
+      {
+        id: 'priceScaleOnly',
+        type: 'plot',
+        title: 'Price scale only',
+        values: [-10_000, -10_000, -10_000],
+        scriptId: 'script',
+        color: '#ffffff',
+        display: 8,
+      },
+      {
+        id: 'showLastNone',
+        type: 'plot',
+        title: 'Show last none',
+        values: [5_000, 5_000, 5_000],
+        scriptId: 'script',
+        color: '#ffffff',
+        showLast: 0,
+      },
+      {
+        id: 'forced',
+        type: 'plot',
+        title: 'Forced',
+        values: [8_000, 8_000, 8_000],
+        scriptId: 'script',
+        color: '#ffffff',
+        forceOverlay: true,
+      },
+      {
+        id: 'limit',
+        type: 'hline',
+        title: 'Limit',
+        values: [],
+        scriptId: 'script',
+        color: '#ffffff',
+        price: 100,
+      },
+      {
+        id: 'absoluteShape',
+        type: 'plotshape',
+        title: 'Absolute shape',
+        values: [250, null, 300],
+        scriptId: 'script',
+        color: '#ffffff',
+        location: 'absolute',
+      },
+      {
+        id: 'absoluteChar',
+        type: 'plotchar',
+        title: 'Absolute char',
+        values: [null, -100, null],
+        scriptId: 'script',
+        color: '#ffffff',
+        location: 'absolute',
+      },
+      {
+        id: 'arrowMagnitude',
+        type: 'plotarrow',
+        title: 'Arrow magnitude',
+        values: [10_000, -10_000, 5_000],
+        scriptId: 'script',
+        color: '#ffffff',
+      },
+    ];
+
+    (manager as any)._updateAutoPaneRanges(plots);
+
+    expect(updatePaneRange).toHaveBeenCalledWith('pane_1', -140, 340);
+  });
+});

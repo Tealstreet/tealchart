@@ -22,6 +22,27 @@ export interface PineMatrix<T = unknown> {
 
 const MATRIX_EPSILON = 1e-10;
 
+export interface MatrixRuntimeApproximation {
+  site: string;
+  message: string;
+}
+
+type MatrixRuntimeApproximationReporter = (approximation: MatrixRuntimeApproximation) => void;
+
+const matrixRuntimeApproximationReporters: MatrixRuntimeApproximationReporter[] = [];
+
+export function pushMatrixRuntimeApproximationReporter(reporter: MatrixRuntimeApproximationReporter): () => void {
+  matrixRuntimeApproximationReporters.push(reporter);
+  return () => {
+    const index = matrixRuntimeApproximationReporters.lastIndexOf(reporter);
+    if (index >= 0) matrixRuntimeApproximationReporters.splice(index, 1);
+  };
+}
+
+function reportMatrixRuntimeApproximation(approximation: MatrixRuntimeApproximation): void {
+  matrixRuntimeApproximationReporters[matrixRuntimeApproximationReporters.length - 1]?.(approximation);
+}
+
 export function createPineMatrix<T = unknown>(rows: number = 0, columns: number = 0, initialValue?: T): PineMatrix<T> {
   const safeRows = normalizeDimension(rows, 'rows');
   const safeColumns = normalizeDimension(columns, 'columns');
@@ -181,13 +202,17 @@ export function copyMatrix<T = unknown>(matrix: PineMatrix<T>): PineMatrix<T> {
 export function concatMatrix<T = unknown>(matrix: PineMatrix<T>, other: PineMatrix<T>): PineMatrix<T> {
   if (other.rows === 0) return matrix;
   if (matrix.rows === 0 && matrix.columns === 0) {
+    matrix.rows = other.rows;
     matrix.columns = other.columns;
-  } else if (matrix.columns !== other.columns) {
+    matrix.values = [...other.values];
+    return matrix;
+  }
+  if (matrix.columns !== other.columns) {
     throw new Error(`Matrix concat requires matching column counts. Left has ${matrix.columns}, right has ${other.columns}`);
   }
 
-  matrix.values.push(...other.values);
   matrix.rows += other.rows;
+  matrix.values.push(...other.values);
   return matrix;
 }
 
@@ -536,16 +561,22 @@ export function pinvMatrixValue(matrix: PineMatrix): PineMatrix<number> {
 export function eigenvaluesMatrixValue(matrix: PineMatrix): PineArray<number> {
   assertSquareMatrix(matrix, 'Matrix eigenvalues');
   const values = createPineArray<number>();
-  computeEigenvalues(matrix).forEach((value) => pushArrayValue(values, value));
+  computeEigenvaluesOrNa(matrix).forEach((value) => pushArrayValue(values, value));
   return values;
 }
 
 export function eigenvectorsMatrixValue(matrix: PineMatrix): PineMatrix<number> {
   assertSquareMatrix(matrix, 'Matrix eigenvectors');
-  const eigenvalues = computeEigenvalues(matrix);
+  const eigenvalues = computeEigenvaluesOrNa(matrix);
   const result = createPineMatrix<number>(matrix.rows, matrix.columns, 0);
 
   eigenvalues.forEach((eigenvalue, column) => {
+    if (Number.isNaN(eigenvalue)) {
+      for (let row = 0; row < matrix.rows; row++) {
+        setMatrixValue(result, row, column, Number.NaN);
+      }
+      return;
+    }
     const vector = eigenvectorForValue(matrix, eigenvalue, column);
     vector.forEach((value, row) => setMatrixValue(result, row, column, value));
   });
@@ -573,9 +604,13 @@ export function kronMatrixValue(left: PineMatrix, right: PineMatrix): PineMatrix
   return result;
 }
 
+function isDescendingOrder(order: unknown): boolean {
+  return order === 'descending' || order === 'order.descending';
+}
+
 export function sortMatrixRows(matrix: PineMatrix, column: number = 0, order: unknown = 'ascending', sortField?: unknown): void {
   const columnIndex = normalizeExistingIndex(column, matrix.columns, 'column');
-  const descending = order === 'descending';
+  const descending = isDescendingOrder(order);
   const rows = Array.from({ length: matrix.rows }, (_value, row) => matrix.values.slice(row * matrix.columns, (row + 1) * matrix.columns));
   const shouldSortByField = sortField !== undefined || rows.some((row) => isPineUdtObject(row[columnIndex]));
   rows.sort((left, right) => {
@@ -676,6 +711,21 @@ function computeEigenvalues(matrix: PineMatrix): number[] {
   }
 
   return rows.map((row, index) => cleanMatrixNumber(row[index]));
+}
+
+function computeEigenvaluesOrNa(matrix: PineMatrix): number[] {
+  try {
+    return computeEigenvalues(matrix);
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('Matrix eigenvalues are complex')) {
+      reportMatrixRuntimeApproximation({
+        site: 'matrix.eigenvalues.complex-roots',
+        message: 'Complex matrix eigen roots are represented as na placeholders; TradingView no-data/error behavior is trace-required.',
+      });
+      return Array.from({ length: matrix.rows }, () => Number.NaN);
+    }
+    throw error;
+  }
 }
 
 function computeTwoByTwoEigenvalues(matrix: PineMatrix): number[] {

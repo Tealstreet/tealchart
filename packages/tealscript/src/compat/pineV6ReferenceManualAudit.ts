@@ -24,11 +24,6 @@ export const PINE_V6_REFERENCE_MANUAL_UNRESOLVED_BUILTIN_GROUPS = {
       'earnings.future_time',
     ],
   },
-  declarationsAndStrategyHelpers: {
-    reason:
-      'Manual strategy currency conversion helpers are strategy-only convenience queries outside the deterministic position-ledger slice.',
-    names: ['strategy.convert_to_account', 'strategy.convert_to_symbol'],
-  },
   providerRecommendationSeries: {
     reason:
       'Reference manual exposes provider-tail recommendation series not currently available through the host metadata seam.',
@@ -85,6 +80,7 @@ export const PINE_V6_REFERENCE_MANUAL_LOCAL_EXTENSION_GROUPS = {
       'ta.dema',
       'ta.kst',
       'ta.smma',
+      'ta.sum',
       'ta.tema',
       'timeframe.to_seconds',
     ],

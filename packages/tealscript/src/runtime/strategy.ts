@@ -16,6 +16,7 @@ export type StrategyExecutionTickKind =
   | 'intrabar_close';
 export type StrategyIntrabarSource = 'chart_ohlc' | 'lower_timeframe';
 export type StrategyIntrabarUnavailableReason = 'missing_context' | 'invalid_timeframe' | 'host_limit';
+export type StrategyMarginApproximationReason = 'margin_long' | 'margin_short';
 
 export interface StrategyExecutionTick {
   time: number;
@@ -169,6 +170,7 @@ export interface StrategyLedgerSettings {
   marginShort: number;
   calcOnOrderFills: boolean;
   calcOnEveryTick: boolean;
+  calcOnEveryHistoryTick: boolean;
   processOrdersOnClose: boolean;
   useBarMagnifier: boolean;
   riskFreeRate: number;
@@ -349,9 +351,13 @@ export const STRATEGY_HISTORY_PROPS = [
   'equity',
   'initial_capital',
   'netprofit',
+  'netprofit_percent',
   'grossprofit',
+  'grossprofit_percent',
   'grossloss',
+  'grossloss_percent',
   'openprofit',
+  'openprofit_percent',
   'avg_trade',
   'avg_trade_percent',
   'avg_winning_trade',
@@ -360,7 +366,12 @@ export const STRATEGY_HISTORY_PROPS = [
   'avg_losing_trade_percent',
   'percent_profitable',
   'max_runup',
+  'max_runup_percent',
   'max_drawdown',
+  'max_drawdown_percent',
+  'max_contracts_held_all',
+  'max_contracts_held_long',
+  'max_contracts_held_short',
   'opentrades.capital_held',
   'closedtrades.first_index',
   'capital_held',
@@ -380,6 +391,10 @@ export function isStrategyHistoryProp(name: string): name is StrategyHistoryProp
 }
 
 export function readStrategyHistoryProp(ledger: StrategyLedger, name: StrategyHistoryProp): unknown {
+  const percentOfInitialCapital = (value: number): number => ledger.initialCapital === 0
+    ? Number.NaN
+    : (value / ledger.initialCapital) * 100;
+  const maxEquity = Math.max(ledger.initialCapital, ...ledger.equityCurve.map((point) => point.equity));
   const tradeProfitPercent = (trade: StrategyTrade): number => {
     const notional = Math.abs(trade.entryPrice * trade.qty);
     return notional === 0 ? 0 : (trade.profit / notional) * 100;
@@ -397,12 +412,20 @@ export function readStrategyHistoryProp(ledger: StrategyLedger, name: StrategyHi
       return ledger.initialCapital;
     case 'netprofit':
       return ledger.netProfit;
+    case 'netprofit_percent':
+      return percentOfInitialCapital(ledger.netProfit);
     case 'grossprofit':
       return ledger.grossProfit;
+    case 'grossprofit_percent':
+      return percentOfInitialCapital(ledger.grossProfit);
     case 'grossloss':
       return ledger.grossLoss;
+    case 'grossloss_percent':
+      return percentOfInitialCapital(ledger.grossLoss);
     case 'openprofit':
       return ledger.position.openProfit;
+    case 'openprofit_percent':
+      return percentOfInitialCapital(ledger.position.openProfit);
     case 'avg_trade':
       return ledger.closedTrades.length === 0 ? Number.NaN : ledger.netProfit / ledger.closedTrades.length;
     case 'avg_trade_percent':
@@ -429,8 +452,18 @@ export function readStrategyHistoryProp(ledger: StrategyLedger, name: StrategyHi
       return ledger.closedTrades.length === 0 ? Number.NaN : (ledger.closedTrades.filter((trade) => trade.profit > 0).length / ledger.closedTrades.length) * 100;
     case 'max_runup':
       return ledger.maxRunup;
+    case 'max_runup_percent':
+      return percentOfInitialCapital(ledger.maxRunup);
     case 'max_drawdown':
       return ledger.maxDrawdown;
+    case 'max_drawdown_percent':
+      return maxEquity === 0 ? Number.NaN : (ledger.maxDrawdown / maxEquity) * 100;
+    case 'max_contracts_held_all':
+      return ledger.maxContractsHeldAll;
+    case 'max_contracts_held_long':
+      return ledger.maxContractsHeldLong;
+    case 'max_contracts_held_short':
+      return ledger.maxContractsHeldShort;
     case 'opentrades.capital_held':
     case 'capital_held':
       return ledger.openTrades.reduce((total, trade) => total + (trade.entryPrice * Math.abs(trade.qty)), 0);
@@ -465,6 +498,7 @@ export function createDefaultStrategySettings(settings: Partial<StrategyLedgerSe
     marginShort: 100,
     calcOnOrderFills: false,
     calcOnEveryTick: false,
+    calcOnEveryHistoryTick: false,
     processOrdersOnClose: false,
     useBarMagnifier: false,
     riskFreeRate: 2,
@@ -714,6 +748,42 @@ export function submitOrReplaceStrategyExitOrder(ledger: StrategyLedger, input: 
   existing.disableAlert = input.disableAlert;
   existing.updatedBarIndex = input.barIndex;
   existing.updatedTime = input.time;
+}
+
+export function submitOrReplaceStrategyEntryOrder(ledger: StrategyLedger, input: StrategyOrderInput): StrategyOrder {
+  const existing = ledger.orders.find((order) => (
+    order.status === 'pending'
+    && order.isEntry
+    && order.id === input.id
+  ));
+  if (!existing) {
+    return submitStrategyOrder(ledger, input);
+  }
+
+  existing.direction = input.direction;
+  existing.sourceId = input.sourceId;
+  existing.type = inferStrategyOrderType(
+    input.limitPrice,
+    input.stopPrice,
+    input.trailActivationPrice,
+    input.trailOffset,
+  );
+  existing.qty = input.qty;
+  existing.qtyType = input.qtyType;
+  existing.qtyValue = input.qtyValue;
+  existing.requestedQty = input.requestedQty ?? input.qty;
+  existing.limitPrice = input.limitPrice;
+  existing.stopPrice = input.stopPrice;
+  existing.trailActivationPrice = input.trailActivationPrice;
+  existing.trailOffset = input.trailOffset;
+  existing.ocaName = input.ocaName;
+  existing.ocaType = input.ocaType;
+  existing.comment = input.comment;
+  existing.alertMessage = input.alertMessage;
+  existing.disableAlert = input.disableAlert;
+  existing.updatedBarIndex = input.barIndex;
+  existing.updatedTime = input.time;
+  return existing;
 }
 
 export function hasReachedStrategyIntradayFilledOrderLimit(ledger: StrategyLedger, time: number): boolean {
@@ -983,7 +1053,7 @@ function fillStrategyOrder(
   ledger.fills.push(fill);
   applyStrategyCommission(ledger, commission);
   applyStrategyFillToTrades(ledger, fill);
-  applyStrategyFillToPosition(ledger, fill);
+  applyStrategyFillToPosition(ledger);
   return fill;
 }
 
@@ -1452,29 +1522,23 @@ function validateOptionalPrice(value: number | undefined, name: string): void {
   }
 }
 
-function applyStrategyFillToPosition(ledger: StrategyLedger, fill: StrategyFill): void {
-  const signedQty = fill.direction === 'long' ? fill.qty : -fill.qty;
-  const currentSize = ledger.position.size;
-  const nextSize = currentSize + signedQty;
-
-  if (currentSize === 0 || Math.sign(currentSize) === Math.sign(signedQty)) {
-    const currentAbs = Math.abs(currentSize);
-    const nextAbs = Math.abs(nextSize);
-    const currentAvg = ledger.position.avgPrice ?? fill.price;
-    ledger.position.avgPrice = nextAbs === 0 ? null : ((currentAvg * currentAbs) + (fill.price * fill.qty)) / nextAbs;
-  } else if (nextSize === 0) {
-    ledger.position.avgPrice = null;
-  } else if (Math.sign(nextSize) !== Math.sign(currentSize)) {
-    ledger.position.avgPrice = fill.price;
+function applyStrategyFillToPosition(ledger: StrategyLedger): void {
+  let signedSize = 0;
+  let absSize = 0;
+  let entryValue = 0;
+  for (const trade of ledger.openTrades) {
+    signedSize += trade.direction === 'long' ? trade.qty : -trade.qty;
+    absSize += trade.qty;
+    entryValue += trade.entryPrice * trade.qty;
   }
 
-  ledger.position.size = nextSize;
-  ledger.position.direction = nextSize > 0 ? 'long' : nextSize < 0 ? 'short' : null;
+  ledger.position.size = signedSize;
+  ledger.position.direction = signedSize > 0 ? 'long' : signedSize < 0 ? 'short' : null;
+  ledger.position.avgPrice = absSize === 0 ? null : entryValue / absSize;
 
-  const absSize = Math.abs(nextSize);
   if (absSize > ledger.maxContractsHeldAll) ledger.maxContractsHeldAll = absSize;
-  if (nextSize > 0 && nextSize > ledger.maxContractsHeldLong) ledger.maxContractsHeldLong = nextSize;
-  if (nextSize < 0 && -nextSize > ledger.maxContractsHeldShort) ledger.maxContractsHeldShort = -nextSize;
+  if (signedSize > 0 && signedSize > ledger.maxContractsHeldLong) ledger.maxContractsHeldLong = signedSize;
+  if (signedSize < 0 && -signedSize > ledger.maxContractsHeldShort) ledger.maxContractsHeldShort = -signedSize;
 }
 
 function applyStrategyFillToTrades(ledger: StrategyLedger, fill: StrategyFill): void {

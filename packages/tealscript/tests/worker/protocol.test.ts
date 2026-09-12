@@ -43,48 +43,22 @@ describe('worker protocol output bundles', () => {
     },
   };
 
-  it('creates result messages with bundled and legacy output fields', () => {
+  it('creates result messages with one atomic output bundle', () => {
     const message = createResultMessage('study-1', output);
 
     expect(message).toMatchObject({
       type: 'result',
       scriptId: 'study-1',
       output,
-      plots: output.plots,
-      drawings: output.drawings,
-      alerts: output.alerts,
-      logs: output.logs,
-      inputs: output.inputs,
-      profile: output.profile,
     });
   });
 
-  it('prefers bundled output when normalizing a result message', () => {
-    const message = {
-      ...createResultMessage('study-1', output),
-      plots: [],
-    };
-
-    expect(getResultOutput(message)).toEqual(output);
-  });
-
-  it('normalizes legacy result messages without a bundled output', () => {
-    const message: ResultMessage = {
-      type: 'result',
-      scriptId: 'study-1',
-      plots: output.plots,
-      drawings: output.drawings,
-      alerts: output.alerts,
-      inputs: output.inputs,
-    };
+  it('normalizes bundled output logs', () => {
+    const message: ResultMessage = createResultMessage('study-1', { ...output, logs: undefined });
 
     expect(getResultOutput(message)).toEqual({
-      plots: output.plots,
-      drawings: output.drawings,
-      alerts: output.alerts,
+      ...output,
       logs: [],
-      inputs: output.inputs,
-      profile: undefined,
     });
   });
 });

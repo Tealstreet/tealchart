@@ -491,10 +491,10 @@ plot(swingLow, title="Support")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Public Support Resistance Checkpoint');
     expect(getPlot(result, 'Resistance').values).toEqual([
-      103, 106, 108, 109, 109, 109, 109, 110, 111, 112, 114, 114,
+      null, null, null, null, 109, 109, 109, 110, 111, 112, 114, 114,
     ]);
     expect(getPlot(result, 'Support').values).toEqual([
-      99, 99, 99, 99, 98, 96, 96, 96, 96, 96, 99, 103,
+      null, null, null, null, 98, 96, 96, 96, 96, 96, 99, 103,
     ]);
     // At least one line drawing should be produced (swing high or low hit)
     expect(result.drawings.filter((d) => d.type === 'line').length).toBeGreaterThan(0);
@@ -606,14 +606,14 @@ plot(snCustom, title="Custom Norm")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Norm').values)).toEqual([
-      50, 100, 100, 20, 0, 12.5, 62.5, 100, 90, 100, 85.714286, 100,
+      null, null, null, null, 0, 12.5, 62.5, 100, 90, 100, 85.714286, 100,
     ]);
     expect(roundSeries(getPlot(result, 'Smoothed Norm').values)).toEqual([
-      50, 83.333333, 94.444444, 44.814815, 14.938272, 13.312757,
-      46.104252, 82.034751, 87.344917, 95.781639, 89.07007, 96.35669,
+      null, null, null, null, 0, 8.333333, 44.444444, 81.481481,
+      87.160494, 95.720165, 89.049579, 96.34986,
     ]);
     expect(roundSeries(getPlot(result, 'Custom Norm').values)).toEqual([
-      50, 65, 72.5, 52.25, 36.125, 31.8125, 44.65625, 62.328125, 68.164063, 74.082031, 72.755301, 76.377651,
+      null, null, null, null, 20, 23.75, 40.625, 60.3125, 67.15625, 73.578125, 72.503348, 76.251674,
     ]);
   });
 
@@ -935,10 +935,10 @@ plot(m, title="Mid")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Edge Tuple Return Checkpoint');
     expect(getPlot(result, 'High').values).toEqual([
-      102, 105, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112,
+      null, null, 107, 107, 107, 103, 104, 109, 109, 111, 111, 112,
     ]);
     expect(getPlot(result, 'Low').values).toEqual([
-      102, 102, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110,
+      null, null, 102, 103, 99, 99, 99, 100, 104, 108, 108, 110,
     ]);
     expect(roundSeries(getPlot(result, 'Mid').values)).toEqual([
       null, null,
@@ -2638,15 +2638,15 @@ plot(convAbove ? 1 : 0, title="ConvAbove")
       ['Base', 'int'],
     ]);
     expect(getPlot(result, 'Conversion').values).toEqual([
-      101, 102.5, 103.5, 105, 103.5, 102.5, 100.5, 103, 105, 107.5, 110, 110.5,
+      null, null, 103.5, 105, 103.5, 102.5, 100.5, 103, 105, 107.5, 110, 110.5,
     ]);
     expect(getPlot(result, 'Base').values).toEqual([
-      101, 102.5, 103.5, 104, 103.5, 102.5, 102.5, 103, 103.5, 104, 106.5, 108.5,
+      null, null, null, null, 103.5, 102.5, 102.5, 103, 103.5, 104, 106.5, 108.5,
     ]);
     // convAbove: conv > base
-    expect(getPlot(result, 'ConvAbove').values).toEqual([0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1]);
-    // bullCross fires at bar3 (conv crosses above base) and bar8
-    expect(getPlot(result, 'BullCross').values).toEqual([null, null, null, 1, null, null, null, null, 1, null, null, null]);
+    expect(getPlot(result, 'ConvAbove').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+    // bullCross fires once both rolling extrema have completed warm-up.
+    expect(getPlot(result, 'BullCross').values).toEqual([null, null, null, null, null, null, null, null, 1, null, null, null]);
     // fill between Conversion and Base plots is present
     expect(result.plots.some((p) => p.type === 'fill')).toBe(true);
   });
@@ -4503,7 +4503,7 @@ plot(v, title="Div")
   });
 
   it('locks modulo operator — positive, negative, and float operands', () => {
-    // Pine % uses JavaScript remainder semantics: sign follows the dividend.
+    // Pine v5/v6 % uses floor-modulo semantics.
     // Source search: https://www.tradingview.com/pine-script-docs/language/operators/
     const result = runCompatScript(`
 indicator("Ops Modulo Checkpoint")
@@ -4514,9 +4514,9 @@ plot(5.5 % 2.0, title="Float")
 
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Ops Modulo Checkpoint');
-    // 7 % 3 = 1, -7 % 3 = -1 (sign of dividend), 5.5 % 2.0 = 1.5
+    // 7 % 3 = 1, -7 % 3 = 2, 5.5 % 2.0 = 1.5
     expect(getPlot(result, 'Pos').values).toEqual(Array(compatibilityBars.length).fill(1));
-    expect(getPlot(result, 'Neg').values).toEqual(Array(compatibilityBars.length).fill(-1));
+    expect(getPlot(result, 'Neg').values).toEqual(Array(compatibilityBars.length).fill(2));
     expect(getPlot(result, 'Float').values).toEqual(Array(compatibilityBars.length).fill(1.5));
   });
 
@@ -5940,10 +5940,10 @@ plot(trend, title="Trend")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Replica SMC Structure Checkpoint');
     expect(result.inputs.map((i) => [i.title, i.type])).toEqual([['Pivot Length', 'int']]);
-    expect(getPlot(result, 'Swing High').values).toEqual([103, 106, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
-    expect(getPlot(result, 'Swing Low').values).toEqual([99, 99, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
-    // trend: 0 → 1 (bar1 new HH) → stays 1 → -1 (bar4 new LL) → stays → 1 (bar7 new HH)
-    expect(getPlot(result, 'Trend').values).toEqual([0, 1, 1, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
+    expect(getPlot(result, 'Swing High').values).toEqual([null, null, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
+    expect(getPlot(result, 'Swing Low').values).toEqual([null, null, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
+    // trend stays neutral until swing extrema complete warm-up, then follows breaks.
+    expect(getPlot(result, 'Trend').values).toEqual([0, 0, 0, 1, -1, -1, -1, 1, 1, 1, 1, 1]);
   });
 
   it('replicates the Heikin-Ashi Smoothed Oscillator — custom HA calculation + EMA smoothing + oscillator plot', () => {
@@ -6391,10 +6391,10 @@ const naEdgeBars = [
 ];
 
 describe('Built-in na propagation and edge cases', () => {
-  it('ta.sma propagates na when any window value is na', () => {
-    // Pine: if any source value in the SMA window is na, the result is na for that bar.
+  it('ta.sma skips na source bars when forming the rolling window', () => {
+    // Pine: ta.sma ignores na source bars and averages the latest qualifying values.
     // Source: close > 101 ? close : na → [102, 105, 107, 103, na]
-    // ta.sma(src, 3): bars 0-1 null (window not full), bar 4 null (na in window)
+    // ta.sma(src, 3): bars 0-1 null (window not full), bar 4 keeps the latest three non-na values.
     const result = runCompatScript(`
 indicator("SMA na propagation")
 src = close > 101 ? close : na
@@ -6405,9 +6405,9 @@ plot(ta.sma(src, 3), title="SMA")
     // close values: 102, 105, 107, 103, 99
     // src: 102, 105, 107, 103, na  (99 <= 101 → na on bar 4)
     // bar 0: null (< 3 bars), bar 1: null, bar 2: (102+105+107)/3 = 104.667
-    // bar 3: (105+107+103)/3 = 105, bar 4: na in window → null
+    // bar 3: (105+107+103)/3 = 105, bar 4: latest qualifying values stay 105, 107, 103
     expect(roundSeries(getPlot(result, 'SMA').values)).toEqual([
-      null, null, 104.666667, 105, null,
+      null, null, 104.666667, 105, 105,
     ]);
   });
 
@@ -6483,15 +6483,15 @@ plot(na(c) ? 1 : 0, title="ColorIsNa")
     expect(getPlot(result, 'ColorIsNa').values).toEqual([1, 1, 1, 1, 1]);
   });
 
-  it('ta.highest returns na when length is 0', () => {
-    // Pine: ta.highest(close, 0) returns na — empty window produces na.
+  it('ta.highest reports an error when length is 0', () => {
     const result = runCompatScript(`
 indicator("ta.highest length 0")
 plot(ta.highest(close, 0), title="Highest0")
 `, { bars: naEdgeBars });
 
-    expect(result.errors).toEqual([]);
-    expect(roundSeries(getPlot(result, 'Highest0').values)).toEqual([null, null, null, null, null]);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]?.message).toContain('TA length must be a positive integer');
+    expect(result.errors[0]?.message).toContain('got 0');
   });
 
   it('nz(na, na) returns na when replacement is also na', () => {
@@ -6783,10 +6783,10 @@ plot(fib382, title="Fib382")
     expect(result.errors).toEqual([]);
     expect(result.indicatorTitle).toBe('Fibonacci Retracement Checkpoint');
     expect(roundSeries(getPlot(result, 'Fib618').values)).toEqual([
-      100.528, 101.674, 102.438, 102.82, 102.202, 100.966, 100.966, 101.348, 101.73, 102.112, 104.73, 107.202,
+      null, null, null, null, 102.202, 100.966, 100.966, 101.348, 101.73, 102.112, 104.73, 107.202,
     ]);
     expect(roundSeries(getPlot(result, 'Fib382').values)).toEqual([
-      101.472, 103.326, 104.562, 105.18, 104.798, 104.034, 104.034, 104.652, 105.27, 105.888, 108.27, 109.798,
+      null, null, null, null, 104.798, 104.034, 104.034, 104.652, 105.27, 105.888, 108.27, 109.798,
     ]);
   });
 });

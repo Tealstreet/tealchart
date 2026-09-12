@@ -30,6 +30,27 @@ export interface DrawingBuiltinRuntime {
   interpolateLinePrice(line: LineDrawingOutput, x: number): number;
 }
 
+export interface DrawingRuntimeApproximation {
+  site: string;
+  message: string;
+}
+
+type DrawingRuntimeApproximationReporter = (approximation: DrawingRuntimeApproximation) => void;
+
+const drawingRuntimeApproximationReporters: DrawingRuntimeApproximationReporter[] = [];
+
+export function pushDrawingRuntimeApproximationReporter(reporter: DrawingRuntimeApproximationReporter): () => void {
+  drawingRuntimeApproximationReporters.push(reporter);
+  return () => {
+    const index = drawingRuntimeApproximationReporters.lastIndexOf(reporter);
+    if (index >= 0) drawingRuntimeApproximationReporters.splice(index, 1);
+  };
+}
+
+function reportDrawingRuntimeApproximation(approximation: DrawingRuntimeApproximation): void {
+  drawingRuntimeApproximationReporters[drawingRuntimeApproximationReporters.length - 1]?.(approximation);
+}
+
 function isChartPoint(value: unknown): value is ChartPoint {
   return (
     typeof value === 'object'
@@ -107,8 +128,14 @@ function optionalBoolean(value: unknown): boolean | undefined {
   return value === undefined ? undefined : Boolean(value);
 }
 
-function positiveInteger(runtime: DrawingBuiltinRuntime, value: unknown, fallback: number): number {
+function positiveInteger(runtime: DrawingBuiltinRuntime, value: unknown, fallback: number, site?: string): number {
   const parsed = Math.trunc(runtime.toNumber(value ?? fallback));
+  if ((!Number.isFinite(parsed) || parsed <= 0) && site) {
+    reportDrawingRuntimeApproximation({
+      site,
+      message: `${site} was not a positive integer and fell back to ${fallback}; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.`,
+    });
+  }
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
@@ -128,11 +155,11 @@ const PINE_COLOR_BLACK = '#363A45';
 const PINE_COLOR_WHITE = '#FFFFFF';
 
 function normalizeTableColumn(runtime: DrawingBuiltinRuntime, value: unknown): number {
-  return Math.max(0, Math.trunc(runtime.toNumber(value)));
+  return Math.trunc(runtime.toNumber(value));
 }
 
 function normalizeTableRow(runtime: DrawingBuiltinRuntime, value: unknown): number {
-  return Math.max(0, Math.trunc(runtime.toNumber(value)));
+  return Math.trunc(runtime.toNumber(value));
 }
 
 function callArg(
@@ -220,12 +247,12 @@ export function registerLabelBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       && !usesPointOverload
       && args.length === 12
       && typeof textFontFamilyOrLegacyForceOverlay === 'boolean';
-    const textFontFamily = usesLegacyForceOverlaySlot ? undefined : optionalString(runtime, textFontFamilyOrLegacyForceOverlay);
+    const textFontFamily = usesLegacyForceOverlaySlot ? undefined : optionalString(runtime, textFontFamilyOrLegacyForceOverlay ?? 'default');
     const forceOverlay = optionalBoolean(
-      usesLegacyForceOverlaySlot ? textFontFamilyOrLegacyForceOverlay : orderedCallArg(args, namedArgs, parameterNames, forceOverlayIndex),
+      usesLegacyForceOverlaySlot ? textFontFamilyOrLegacyForceOverlay : orderedCallArg(args, namedArgs, parameterNames, forceOverlayIndex, false),
     );
-    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, textFormattingIndex));
-    const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 9));
+    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, textFormattingIndex, 'none'));
+    const textAlign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 8 : 9, 'center'));
     const drawing: LabelDrawingOutput = {
       id,
       type: 'label',
@@ -563,6 +590,10 @@ export function registerLineBuiltins(builtins: BuiltinRegistry, runtime: Drawing
   builtins.set('line.get_x2', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.x2 ?? Number.NaN));
   builtins.set('line.get_y1', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.y1 ?? Number.NaN));
   builtins.set('line.get_y2', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.y2 ?? Number.NaN));
+  builtins.set('line.get_color', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.color ?? Number.NaN));
+  builtins.set('line.get_extend', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.extend));
+  builtins.set('line.get_style', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.style));
+  builtins.set('line.get_width', (args, namedArgs, ctx) => runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => line.width));
   builtins.set('line.get_price', (args, namedArgs, ctx) => {
     const x = runtime.toNumber(callArg(args, namedArgs, 1, 'x', undefined, ['id']));
     return runtime.getLineValue(callArg(args, namedArgs, 0, 'id'), ctx, (line) => runtime.interpolateLinePrice(line, x));
@@ -683,12 +714,12 @@ export function registerBoxBuiltins(builtins: BuiltinRegistry, runtime: DrawingB
     const parameterNames = usesPointOverload ? boxNewPointArgs : boxNewCoordinateArgs;
     const xloc = runtime.toStringValue(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 6 : 8, 'bar_index'));
 
-    const textHalign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 11 : 13));
-    const textValign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 12 : 14));
-    const textWrap = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 13 : 15));
-    const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 14 : 16));
-    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 15 : 17));
-    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 16 : 18));
+    const textHalign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 11 : 13, 'center'));
+    const textValign = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 12 : 14, 'center'));
+    const textWrap = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 13 : 15, 'none'));
+    const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 14 : 16, 'default'));
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 15 : 17, false));
+    const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, parameterNames, usesPointOverload ? 16 : 18, 'none'));
     const drawing: BoxDrawingOutput = {
       id,
       type: 'box',
@@ -997,7 +1028,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       .reduce((sum, drawing) => sum + tableCellCapacity(drawing), 0);
 
     if (nextCells + currentCells > MAX_TABLE_CELLS) {
-      throw new Error(`Too many table cells: maximum is ${MAX_TABLE_CELLS}`);
+      throw new Error(`Too many table cells: maximum is ${MAX_TABLE_CELLS} per script. Reduce table.new() rows or columns, or reuse an existing table instead of creating more table cells.`);
     }
   };
   const createDefaultCell = (column: number, row: number): TableCellDrawingOutput => ({
@@ -1036,7 +1067,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       || normalizedRow < 0
       || normalizedRow >= table.rows
     ) {
-      throw new Error(`Table cell coordinates out of bounds: column ${normalizedColumn}, row ${normalizedRow}`);
+      throw new Error(`Table cell coordinates out of bounds: column ${normalizedColumn}, row ${normalizedRow}. This table has columns 0-${table.columns - 1} and rows 0-${table.rows - 1}.`);
     }
 
     return { column: normalizedColumn, row: normalizedRow };
@@ -1094,8 +1125,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
 
   builtins.set('table.new', (args, namedArgs, ctx, _scope, callId) => {
     const id = `table_${callId}_${ctx.bar_index}`;
-    const columns = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 1), 1);
-    const rows = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 2), 1);
+    const columns = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 1), 1, 'table.new.columns-fallback');
+    const rows = positiveInteger(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 2), 1, 'table.new.rows-fallback');
     assertTableCellCapacity(ctx, { columns, rows });
 
     const drawing: TableDrawingOutput = {
@@ -1112,7 +1143,7 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
       borderWidth: tableBorderWidth(runtime, orderedCallArg(args, namedArgs, tableNewArgs, 7)),
       cells: [],
     };
-    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, tableNewArgs, 8));
+    const forceOverlay = optionalBoolean(orderedCallArg(args, namedArgs, tableNewArgs, 8, false));
     if (forceOverlay !== undefined) drawing.forceOverlay = forceOverlay;
 
     ctx.addDrawing(drawing);
@@ -1214,8 +1245,8 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         orderedCallArg(args, namedArgs, tableCellArgs, 1),
         orderedCallArg(args, namedArgs, tableCellArgs, 2),
       );
-      const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 11));
-      const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 12));
+      const textFontFamily = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 11, 'default'));
+      const textFormatting = optionalString(runtime, orderedCallArg(args, namedArgs, tableCellArgs, 12, 'none'));
       const tooltip = runtime.toOptionalString(orderedCallArg(args, namedArgs, tableCellArgs, 13));
       const cell: TableCellDrawingOutput = {
         column,
@@ -1227,9 +1258,9 @@ export function registerTableBuiltins(builtins: BuiltinRegistry, runtime: Drawin
         height: namedArgs.has('height') || orderedCallArg(args, namedArgs, tableCellArgs, 5) !== undefined
           ? runtime.toNullableNumber(orderedCallArg(args, namedArgs, tableCellArgs, 5))
           : undefined,
-        textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 6)),
+        textColor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 6, PINE_COLOR_BLACK)),
         textHalign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 7, 'center')),
-        textValign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 8, 'middle')),
+        textValign: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 8, 'center')),
         textSize: runtime.toStringValue(orderedCallArg(args, namedArgs, tableCellArgs, 9, 'normal')),
         bgcolor: runtime.toNullableColor(orderedCallArg(args, namedArgs, tableCellArgs, 10)),
       };

@@ -174,6 +174,7 @@ export function NativeChartCanvasLayersImpl({
             plots={indicatorPlots}
             sharedViewport={sharedViewport}
             staticProjection={staticProjection}
+            textFont={textFont}
             totalBarCount={indicatorTotalBarCount}
             visibleBars={visibleBars}
           />

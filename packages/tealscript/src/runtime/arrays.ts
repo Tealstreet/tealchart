@@ -13,6 +13,27 @@ export interface PineArray<T = unknown> {
 
 const MAX_ARRAY_SIZE = 100_000;
 
+export interface ArrayRuntimeApproximation {
+  site: string;
+  message: string;
+}
+
+type ArrayRuntimeApproximationReporter = (approximation: ArrayRuntimeApproximation) => void;
+
+const arrayRuntimeApproximationReporters: ArrayRuntimeApproximationReporter[] = [];
+
+export function pushArrayRuntimeApproximationReporter(reporter: ArrayRuntimeApproximationReporter): () => void {
+  arrayRuntimeApproximationReporters.push(reporter);
+  return () => {
+    const index = arrayRuntimeApproximationReporters.lastIndexOf(reporter);
+    if (index >= 0) arrayRuntimeApproximationReporters.splice(index, 1);
+  };
+}
+
+function reportArrayRuntimeApproximation(approximation: ArrayRuntimeApproximation): void {
+  arrayRuntimeApproximationReporters[arrayRuntimeApproximationReporters.length - 1]?.(approximation);
+}
+
 export function createPineArray<T = unknown>(size: number = 0, initialValue?: T): PineArray<T> {
   const safeSize = Math.trunc(Number(size));
   if (!Number.isFinite(safeSize) || safeSize < 0) {
@@ -21,9 +42,10 @@ export function createPineArray<T = unknown>(size: number = 0, initialValue?: T)
   if (safeSize > MAX_ARRAY_SIZE) {
     throw new Error(`Array is too large. Maximum size is ${MAX_ARRAY_SIZE}`);
   }
+  const value = initialValue === undefined ? Number.NaN : initialValue;
   return {
     __tealscriptArray: true,
-    values: Array.from({ length: safeSize }, () => initialValue as T),
+    values: Array.from({ length: safeSize }, () => value as T),
   };
 }
 
@@ -197,8 +219,12 @@ export function removeArrayValue<T = unknown>(array: PineArray<T>, index: number
   return array.values.splice(normalizedIndex, 1)[0];
 }
 
+function isDescendingOrder(order: unknown): boolean {
+  return order === 'descending' || order === 'order.descending';
+}
+
 export function sortArray(array: PineArray, order: unknown = 'ascending', sortField?: unknown): void {
-  const descending = order === 'descending';
+  const descending = isDescendingOrder(order);
   const values = getArrayValues(array);
   values.sort((left, right) => {
     const leftValue = comparableArraySortValue(left, sortField);
@@ -209,11 +235,13 @@ export function sortArray(array: PineArray, order: unknown = 'ascending', sortFi
   values.forEach((value, index) => setArrayValue(array, index, value));
 }
 
-export function sortIndicesArrayValue(array: PineArray, order: unknown = 'ascending'): PineArray<number> {
-  const descending = order === 'descending';
+export function sortIndicesArrayValue(array: PineArray, order: unknown = 'ascending', sortField?: unknown): PineArray<number> {
+  const descending = isDescendingOrder(order);
   const indices = getArrayValues(array).map((_value, index) => index);
   indices.sort((leftIndex, rightIndex) => {
-    const result = compareArrayValues(getArrayValue(array, leftIndex), getArrayValue(array, rightIndex));
+    const leftValue = comparableArraySortValue(getArrayValue(array, leftIndex), sortField);
+    const rightValue = comparableArraySortValue(getArrayValue(array, rightIndex), sortField);
+    const result = compareArrayValues(leftValue, rightValue);
     return descending ? -result : result;
   });
 
@@ -249,7 +277,7 @@ export function sliceArray<T = unknown>(array: PineArray<T>, from: number, to: n
   if (!Number.isFinite(normalizedFrom) || !Number.isFinite(normalizedTo)) {
     throw new Error('Slice indices must be finite numbers');
   }
-  if (normalizedFrom >= normalizedTo) {
+  if (normalizedFrom > normalizedTo) {
     throw new Error("Index 'from' should be less than index 'to'");
   }
   if (normalizedFrom < 0 || normalizedTo > getArraySize(array)) {
@@ -325,14 +353,26 @@ export function absArrayValue(array: PineArray): PineArray<number> {
   return result;
 }
 
-export function minArrayValue(array: PineArray): number {
-  const values = numericArrayValues(array);
-  return values.length === 0 ? Number.NaN : Math.min(...values);
+function arrayRankIndex(nth: unknown): number {
+  const value = Number(nth);
+  if (Number.isNaN(value)) return 0;
+  return Math.trunc(value);
 }
 
-export function maxArrayValue(array: PineArray): number {
+export function minArrayValue(array: PineArray, nth: unknown = 0): number {
   const values = numericArrayValues(array);
-  return values.length === 0 ? Number.NaN : Math.max(...values);
+  const index = arrayRankIndex(nth);
+  return values.length === 0 || index < 0 || index >= values.length
+    ? Number.NaN
+    : values.sort((left, right) => left - right)[index]!;
+}
+
+export function maxArrayValue(array: PineArray, nth: unknown = 0): number {
+  const values = numericArrayValues(array);
+  const index = arrayRankIndex(nth);
+  return values.length === 0 || index < 0 || index >= values.length
+    ? Number.NaN
+    : values.sort((left, right) => right - left)[index]!;
 }
 
 export function sumArrayValue(array: PineArray): number {
@@ -420,6 +460,12 @@ export function percentileNearestRankArrayValue(array: PineArray, percentage: nu
   const values = sortedNumericArrayValues(array);
   if (values.length === 0 || !Number.isFinite(percentage)) return Number.NaN;
 
+  if (percentage < 0 || percentage > 100) {
+    reportArrayRuntimeApproximation({
+      site: 'array.percentile_nearest_rank.percentage-clamp',
+      message: 'array.percentile_nearest_rank percentage was outside the documented percentile range and was clamped to 0..100; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+    });
+  }
   const clampedPercentage = Math.min(100, Math.max(0, percentage));
   const rank = Math.ceil((clampedPercentage / 100) * values.length);
   return values[Math.max(0, rank - 1)]!;
@@ -430,6 +476,12 @@ export function percentileLinearInterpolationArrayValue(array: PineArray, percen
   if (values.length === 0 || !Number.isFinite(percentage)) return Number.NaN;
   if (values.length === 1) return values[0]!;
 
+  if (percentage < 0 || percentage > 100) {
+    reportArrayRuntimeApproximation({
+      site: 'array.percentile_linear_interpolation.percentage-clamp',
+      message: 'array.percentile_linear_interpolation percentage was outside the documented percentile range and was clamped to 0..100; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+    });
+  }
   const clampedPercentage = Math.min(100, Math.max(0, percentage));
   const rank = (clampedPercentage / 100) * (values.length - 1);
   const lowerIndex = Math.floor(rank);
@@ -442,7 +494,13 @@ export function percentRankArrayValue(array: PineArray, index: number): number {
   const values = numericArrayValues(array);
   if (values.length === 0) return Number.NaN;
 
-  const reference = Number(getArrayValue(array, index));
+  const numericIndex = Number(index);
+  if (Number.isNaN(numericIndex)) return Number.NaN;
+  const normalizedIndex = Math.trunc(numericIndex);
+  const reference =
+    normalizedIndex >= 0 && normalizedIndex < getArraySize(array)
+      ? Number(getArrayValue(array, normalizedIndex))
+      : numericIndex;
   if (Number.isNaN(reference)) return Number.NaN;
 
   const lessOrEqualCount = values.filter((value) => value <= reference).length;
@@ -460,8 +518,12 @@ export function standardizeArrayValue(array: PineArray): PineArray<number> {
   return result;
 }
 
-export function binarySearchArrayValue(array: PineArray, value: unknown): number {
-  const values = getArrayValues(array);
+function binarySearchComparableValues(array: PineArray, sortField?: unknown): unknown[] {
+  return getArrayValues(array).map((arrayValue) => comparableArraySortValue(arrayValue, sortField));
+}
+
+export function binarySearchArrayValue(array: PineArray, value: unknown, sortField?: unknown): number {
+  const values = binarySearchComparableValues(array, sortField);
   let low = 0;
   let high = values.length - 1;
 
@@ -479,8 +541,8 @@ export function binarySearchArrayValue(array: PineArray, value: unknown): number
   return -1;
 }
 
-export function binarySearchLeftmostArrayValue(array: PineArray, value: unknown): number {
-  const values = getArrayValues(array);
+export function binarySearchLeftmostArrayValue(array: PineArray, value: unknown, sortField?: unknown): number {
+  const values = binarySearchComparableValues(array, sortField);
   let low = 0;
   let high = values.length;
 
@@ -496,8 +558,8 @@ export function binarySearchLeftmostArrayValue(array: PineArray, value: unknown)
   return values[low] !== undefined && compareArrayValues(values[low], value) === 0 ? low : low - 1;
 }
 
-export function binarySearchRightmostArrayValue(array: PineArray, value: unknown): number {
-  const values = getArrayValues(array);
+export function binarySearchRightmostArrayValue(array: PineArray, value: unknown, sortField?: unknown): number {
+  const values = binarySearchComparableValues(array, sortField);
   let low = 0;
   let high = values.length;
 

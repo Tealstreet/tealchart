@@ -76,8 +76,8 @@ describe('Pine v6 grammar coverage inventory', () => {
 
   it('reports the committed v6 grammar coverage count', () => {
     expect(summarizePineV6GrammarCoverage()).toMatchObject({
-      total: 63,
-      covered: 63,
+      total: 85,
+      covered: 85,
       missing: 0,
     });
   });

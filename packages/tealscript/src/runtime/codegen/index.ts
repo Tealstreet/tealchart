@@ -2,7 +2,7 @@ export { NumericSeries, ValueSeries } from './runtime';
 export type { NumericSeriesSnapshot, ValueSeriesSnapshot } from './runtime';
 
 export {
-  SMA, EMA, RMA, RSI, BarsSince, ValueWhen,
+  SMA, Sum, EMA, RMA, RSI, BarsSince, ValueWhen,
   Cross, Crossover, Crossunder, Change,
   Highest, Lowest, HighestBars, LowestBars, PivotHigh, PivotLow, Range, Rising, Falling, Max, Min,
   MACD, ATR, DMI, ADX, Supertrend, SAR, Stoch, StdDev, Variance, Dev,
@@ -27,6 +27,6 @@ export {
   collectCompiledRequestDataQueryCollection,
   executeCompiled,
   tryCompile,
-  tryExecuteScript,
+  executeCompiledScript,
 } from './execute';
 export type { CompiledExecutionOptions, CompiledRequestDataQuery, CompiledRequestDataQueryCollection } from './execute';

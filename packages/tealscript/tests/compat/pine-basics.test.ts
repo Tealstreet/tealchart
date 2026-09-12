@@ -19,6 +19,10 @@ plot(basis, title="Basis", color=color.blue)
         type: 'int',
         title: 'Length',
         defval: 3,
+        step: 1,
+        confirm: false,
+        display: 31,
+        active: true,
       },
     ]);
 
@@ -68,8 +72,8 @@ plot(momentum, title="RSI")
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Fast EMA').values)).toEqual([102, 103.5, 105.25, 104.125, 101.5625, 100.78125, 102.390625, 105.695313, 106.847656, 108.923828, 109.461914, 110.730957]);
     expect(roundSeries(getPlot(result, 'Slow SMA').values)).toEqual([null, null, null, null, 103.2, 102.8, 102.6, 103, 104, 106.4, 108.4, 110]);
-    expect(getPlot(result, 'Highest').values).toEqual([103, 106, 108, 109, 109, 104, 105, 110, 111, 112, 114, 114]);
-    expect(getPlot(result, 'Lowest').values).toEqual([99, 99, 101, 102, 98, 96, 96, 99, 103, 106, 107, 108]);
+    expect(getPlot(result, 'Highest').values).toEqual([null, 106, 108, 109, 109, 104, 105, 110, 111, 112, 114, 114]);
+    expect(getPlot(result, 'Lowest').values).toEqual([null, 99, 101, 102, 98, 96, 96, 99, 103, 106, 107, 108]);
     expect(getPlot(result, 'Cross Flags').values).toHaveLength(compatibilityBars.length);
     expect(getPlot(result, 'RSI').values).toHaveLength(compatibilityBars.length);
   });

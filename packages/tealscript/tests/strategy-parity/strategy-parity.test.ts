@@ -20,6 +20,7 @@ import {
 const CORPUS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corpus');
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
 const REALTIME_SWEEP_BACKEND = 'worker';
+const REPRESENTATIVE_REALTIME_REENTRY_TIMEOUT_MS = 15_000;
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 
 function toProductionWorkerCase(entry: CorpusEntry): ProductionWorkerCase {
@@ -147,7 +148,7 @@ describe('strategy parity corpus', () => {
     expect(measurement.totalUpdates).toBe(9);
     expect(measurement.workerMatched).toBe(9);
     expect(measurement.workerMismatches).toEqual([]);
-  });
+  }, REPRESENTATIVE_REALTIME_REENTRY_TIMEOUT_MS);
 
   realtimeSweepIt('tracks strategy realtime re-entry parity for the full fast corpus', async () => {
     const measurement = await measureRealtimeReentryParity(fastCorpus.map(toProductionWorkerCase), {

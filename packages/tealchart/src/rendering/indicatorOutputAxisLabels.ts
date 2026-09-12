@@ -2,6 +2,9 @@ import type { PlotOutput } from '@tealstreet/tealscript';
 
 import { getDecimalPlacesFromPrecision } from '../state/chartState';
 
+const DISPLAY_PRICE_SCALE = 8;
+const PINE_PLOT_PRECISION_MAX = 16;
+
 export interface IndicatorOutputPaneInfo {
   overlay: boolean;
   paneId?: string;
@@ -71,7 +74,9 @@ export function getIndicatorPlotColor(color: PlotOutput['color'], sourceIndex: n
 }
 
 export function shouldUseIndicatorPlotForAxisLabel(plot: PlotOutput): boolean {
-  return plot.type === 'plot' && plot.display !== 0 && !plot.forceOverlay;
+  return plot.type === 'plot'
+    && (plot.display === undefined || (plot.display & DISPLAY_PRICE_SCALE) !== 0)
+    && !plot.forceOverlay;
 }
 
 export function getLatestIndicatorPlotValue(
@@ -80,9 +85,10 @@ export function getLatestIndicatorPlotValue(
 ): { sourceIndex: number; value: number } | null {
   if (!shouldUseIndicatorPlotForAxisLabel(plot)) return null;
   if (totalBarCount <= 0 || plot.values.length === 0) return null;
+  if (plot.showLast !== undefined && plot.showLast <= 0) return null;
 
   const lastIndex = Math.min(totalBarCount - 1, plot.values.length - 1);
-  const firstAllowedIndex = plot.showLast && plot.showLast > 0 ? Math.max(0, totalBarCount - plot.showLast) : 0;
+  const firstAllowedIndex = plot.showLast !== undefined ? Math.max(0, totalBarCount - plot.showLast) : 0;
 
   for (let index = lastIndex; index >= firstAllowedIndex; index -= 1) {
     const value = plot.values[index];
@@ -173,7 +179,7 @@ export function getIndicatorOutputAxisLabelDecimals(
   context?: IndicatorOutputAxisLabelFormatContext,
 ): number {
   if (typeof precision === 'number' && Number.isFinite(precision) && precision >= 0) {
-    return Math.min(8, Math.floor(precision));
+    return Math.min(PINE_PLOT_PRECISION_MAX, Math.floor(precision));
   }
 
   if (context?.paneType === 'main' && context.pricePrecision && context.pricePrecision > 0) {

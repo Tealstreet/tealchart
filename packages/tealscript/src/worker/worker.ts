@@ -14,7 +14,7 @@ import {
   applyTealscriptBackendSelectionProfile,
   selectTealscriptExecutionBackend,
 } from '../runtime/backendSelection';
-import { collectCompiledRequestDataQueryCollection, tryExecuteScript } from '../runtime/codegen';
+import { collectCompiledRequestDataQueryCollection, executeCompiledScript } from '../runtime/codegen';
 import type { CompiledRequestDataQuery } from '../runtime/codegen';
 import { checkProgram } from '../semantic';
 import type { Program } from '../parser/ast';
@@ -360,23 +360,21 @@ function executeAndSendResults(metadata?: WorkerOutputMetadata): void {
       state.requestDiscoveryFetchRounds = 0;
     }
 
-    let fallbackReason: string | undefined;
-    const compiledResult = tryExecuteScript(state.ast, state.bars, inputsMap, {
+    const execution = executeCompiledScript(state.ast, state.bars, inputsMap, {
       runtime: state.runtime,
       libraries: state.libraries,
       requestDatafeed: cacheBackedRequestDatafeed,
       realtimeLastBar: state.realtimeLastBar,
       confirmedRealtimeBarIndex: state.confirmedRealtimeBarIndex,
       confirmedRealtimeBarStartIndex: state.confirmedRealtimeBarStartIndex,
-      onFallback: (reason) => {
-        fallbackReason = reason;
-      },
     });
-    if (!compiledResult) {
-      postCompiledUnsupported(backendSelection, fallbackReason ?? 'compiled-execution-unavailable', [], metadata);
+    if (execution.status === 'failure') {
+      postCompiledUnsupported(backendSelection, execution.reason, [
+        { reason: execution.reason, construct: execution.kind, message: execution.reason },
+      ], metadata);
       return;
     }
-    sendExecutionResult(applyTealscriptBackendSelectionProfile(compiledResult, backendSelection), metadata);
+    sendExecutionResult(applyTealscriptBackendSelectionProfile(execution.result, backendSelection), metadata);
   } catch (error) {
     handleError(error, metadata);
   }
@@ -388,7 +386,7 @@ function discoverRuntimeRequestDataMisses(
   if (!state) throw new Error('Worker not initialized');
 
   const discoveryDatafeed = new CacheDiscoveringRequestDatafeed(state.requestCache);
-  const discoveryResult = tryExecuteScript(state.ast, state.bars, inputsMap, {
+  const discoveryExecution = executeCompiledScript(state.ast, state.bars, inputsMap, {
     runtime: state.runtime,
     libraries: state.libraries,
     requestDatafeed: discoveryDatafeed,
@@ -399,7 +397,9 @@ function discoverRuntimeRequestDataMisses(
 
   return {
     misses: discoveryDatafeed.discoveredQueries.filter(({ cacheKey }) => !state?.requestCache.has(cacheKey)),
-    errors: discoveryResult?.errors ?? [{ message: 'Compiled runtime request discovery failed' }],
+    errors: discoveryExecution.status === 'success'
+      ? discoveryExecution.result.errors
+      : [{ message: discoveryExecution.reason }],
   };
 }
 

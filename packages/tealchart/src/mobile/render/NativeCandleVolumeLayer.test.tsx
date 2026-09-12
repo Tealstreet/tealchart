@@ -1,5 +1,5 @@
-import type { ReactElement, ReactNode } from 'react';
 import type { PlotOutput } from '@tealstreet/tealscript';
+import type { ReactElement, ReactNode } from 'react';
 import type { RenderOptions } from '../../types';
 import type { NativeVisibleBar } from './nativeVisibleBars';
 
@@ -9,10 +9,10 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   getNativeLiveCandleGeometry,
   getNativeLiveCandlesPath,
+  getNativeLiveVolumeGeometry,
   getNativeLiveVolumePath,
   getNativeProjectedCandlesPath,
   getNativeProjectedVolumePath,
-  getNativeLiveVolumeGeometry,
   NativeCandleVolumeLayerImpl,
 } from './NativeCandleVolumeLayer';
 import { createNativeChartFrameFromPanes } from './nativeChartFrame';
@@ -261,6 +261,33 @@ describe('NativeCandleVolumeLayer', () => {
     const paths = collectElementsByType([rendered[0], rendered[1], ...downLayer], SkiaPath);
 
     expect(paths.map((path) => path.props.color)).toContain('#7c3aed');
+  });
+
+  it('honors the Pine display pane bit before applying barcolor overrides', () => {
+    const barColorPlots: PlotOutput[] = [
+      {
+        color: [null, '#7c3aed'],
+        display: 2,
+        id: 'data_window_only',
+        title: 'Data Window Only',
+        type: 'barcolor',
+        values: [null, 1],
+      },
+    ];
+    const rendered = renderFunctionChildren(
+      NativeCandleVolumeLayerImpl({
+        barColorPlots,
+        frame,
+        options,
+        sharedViewport,
+        visibleBars: bars,
+        volumeHeight: 0,
+      }),
+    );
+    const downLayer = renderFunctionChildren(rendered[1]);
+    const paths = collectElementsByType([rendered[0], rendered[1], ...downLayer], SkiaPath);
+
+    expect(paths.map((path) => path.props.color)).not.toContain('#7c3aed');
   });
 
   it('routes each bar into the path for its own side', () => {

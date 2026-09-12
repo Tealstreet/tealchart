@@ -1,0 +1,3 @@
+//@version=6
+indicator("Fast refusal v6 linewidth")
+plot(close, title="Bad", linewidth=0)

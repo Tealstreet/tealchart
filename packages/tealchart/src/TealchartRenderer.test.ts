@@ -709,6 +709,43 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fill).toHaveBeenCalledTimes(1);
     });
 
+    it('uses Pine default histbase zero as the area baseline when omitted', () => {
+      const moveTo = vi.fn();
+      const lineTo = vi.fn();
+      const fill = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        moveTo,
+        lineTo,
+        fill,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: -10,
+        priceMax: 30,
+      };
+      const plots: PlotOutput[] = [
+        {
+          id: 'plot_AreaDefaultHistbase',
+          type: 'plot',
+          title: 'AreaDefaultHistbase',
+          values: [10, 20],
+          color: '#2196F3',
+          style: 'area',
+        },
+      ];
+
+      renderer.renderPlots(plots, bars, viewport);
+
+      const baselineY = renderer.publicPriceToY(0, viewport);
+      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
+      expect(lineTo).toHaveBeenCalledWith(expect.any(Number), baselineY);
+      expect(fill).toHaveBeenCalledTimes(1);
+    });
+
     it('renders plot trackprice at the latest finite plot value', () => {
       const lineTo = vi.fn();
       const roundRect = vi.fn();
@@ -1093,7 +1130,7 @@ describe('TealchartRenderer coordinate transforms', () => {
       (renderer as any).renderLinePlotInPane(plot, bars, viewport, paneOffset);
 
       expect(fill).toHaveBeenCalledTimes(2);
-      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), paneOffset.top);
+      expect(moveTo).toHaveBeenCalledWith(expect.any(Number), paneOffset.top + paneOffset.height);
       expect(ctx.globalAlpha).toBe(1);
     });
 
@@ -1296,7 +1333,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         type: 'plot',
         title: 'JoinedColorFallback',
         values: [100, 110, 120],
-        color: [null, '#ff0000', null],
+        color: '#2196F3',
         style: 'circles',
         join: true,
       };
@@ -1949,6 +1986,7 @@ describe('TealchartRenderer coordinate transforms', () => {
         id: 'plotshape_Below',
         title: 'Below',
         values: [null, 1],
+        color: '#2196F3',
         text: 'Buy\nNow',
         location: 'belowbar',
       };
@@ -2205,6 +2243,138 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(linebrStroke).toHaveBeenCalledTimes(2);
     });
 
+    it('treats per-bar plot color na as a visibility break', () => {
+      const lineTo = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        lineTo,
+        stroke: vi.fn(),
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_ColorNaBreak',
+        type: 'plot',
+        title: 'Color na break',
+        values: [95, 110, 125],
+        color: ['#2196F3', null, '#4CAF50'],
+        linewidth: 2,
+        style: 'line',
+      };
+
+      (renderer as any).renderLinePlot(plot, bars, viewport);
+
+      expect(lineTo).not.toHaveBeenCalled();
+    });
+
+    it('skips histogram bars with per-bar color na', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plot_HistogramColorNa',
+        type: 'plot',
+        title: 'Histogram color na',
+        values: [95, 110],
+        color: [null, '#4CAF50'],
+        linewidth: 2,
+        style: 'histogram',
+      };
+
+      (renderer as any).renderLinePlot(plot, bars, viewport);
+
+      expect(fillRect).toHaveBeenCalledOnce();
+      expect(ctx.fillStyle).toBe('#4CAF50');
+    });
+
+    it('skips plotbar bars with per-bar color na', () => {
+      const stroke = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        stroke,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotbar_ColorNa',
+        type: 'plotbar',
+        title: 'Plotbar color na',
+        values: [95, 110],
+        color: [null, '#4CAF50'],
+        openValues: [90, 105],
+        highValues: [100, 115],
+        lowValues: [80, 95],
+        closeValues: [95, 110],
+      };
+
+      (renderer as any).renderOhlcPlot(plot, bars, viewport, 800, (value: number) => value);
+
+      expect(stroke).toHaveBeenCalledOnce();
+      expect(ctx.strokeStyle).toBe('#4CAF50');
+    });
+
+    it('skips plotcandle bodies with per-bar color na and skips na wick or border subparts', () => {
+      const fillRect = vi.fn();
+      const stroke = vi.fn();
+      const strokeRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        stroke,
+        strokeRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(3, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[2]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'plotcandle_ColorNa',
+        type: 'plotcandle',
+        title: 'Plotcandle color na',
+        values: [95, 110, 125],
+        color: [null, '#4CAF50', '#2196F3'],
+        wickColor: ['#111111', null, '#222222'],
+        borderColor: ['#333333', '#444444', null],
+        openValues: [90, 105, 120],
+        highValues: [100, 115, 130],
+        lowValues: [80, 95, 110],
+        closeValues: [95, 110, 125],
+      };
+
+      (renderer as any).renderOhlcPlot(plot, bars, viewport, 800, (value: number) => value);
+
+      expect(fillRect).toHaveBeenCalledTimes(2);
+      expect(stroke).toHaveBeenCalledOnce();
+      expect(strokeRect).toHaveBeenCalledOnce();
+      expect(ctx.strokeStyle).toBe('#222222');
+    });
+
     it('breaks missing values for Pine steplinebr plots', () => {
       const bars = makeBars(3, 1_000_000, 60_000, 100);
       const viewport: Viewport = {
@@ -2320,6 +2490,34 @@ describe('TealchartRenderer coordinate transforms', () => {
         type: 'bgcolor',
         title: 'Session',
         values: [null, 1],
+        color: [null, '#2196F333'],
+      };
+
+      (renderer as any).renderBgcolor(plot, bars, viewport);
+
+      expect(fillRect).toHaveBeenCalledOnce();
+      expect(ctx.fillStyle).toBe('#2196F333');
+    });
+
+    it('skips bgcolor bars with color na', () => {
+      const fillRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(2, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[1]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const plot: PlotOutput = {
+        id: 'bgcolor_ColorNa',
+        type: 'bgcolor',
+        title: 'Color na',
+        values: [1, 1],
         color: [null, '#2196F333'],
       };
 
@@ -2529,6 +2727,40 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(fillText).not.toHaveBeenCalledWith('fallback', expect.any(Number), expect.any(Number));
     });
 
+    it('hides plotshape marks with color na while keeping marker text visible', () => {
+      const fillRect = vi.fn();
+      const fillText = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        fillText,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600, showVolume: false });
+      const bars = makeBars(1, 1_000_000, 60_000, 100);
+      const viewport: Viewport = {
+        startTime: bars[0]!.time,
+        endTime: bars[0]!.time,
+        priceMin: 50,
+        priceMax: 200,
+      };
+      const marker: PlotOutput = {
+        id: 'plotshape_TextOnly',
+        type: 'plotshape',
+        title: 'Text only',
+        values: [1],
+        color: [null],
+        shape: 'square',
+        location: 'abovebar',
+        text: 'Signal',
+        textColor: '#FFFFFF',
+      };
+
+      (renderer as any).renderPlotShape(marker, bars, viewport);
+
+      expect(fillRect).not.toHaveBeenCalled();
+      expect(fillText).toHaveBeenCalledWith('Signal', expect.any(Number), expect.any(Number));
+    });
+
     it('skips rendering plots with display.none while keeping them available as fill sources', () => {
       const fill = vi.fn();
       const stroke = vi.fn();
@@ -2575,6 +2807,24 @@ describe('TealchartRenderer coordinate transforms', () => {
 
       expect(stroke).not.toHaveBeenCalled();
       expect(fill).toHaveBeenCalled();
+    });
+
+    it.each([
+      [undefined, true],
+      [0, false],
+      [1, true],
+      [2, false],
+      [4, false],
+      [8, false],
+      [16, false],
+      [2 + 4, false],
+      [1 + 2, true],
+      [1 + 4 + 8 + 16, true],
+      [31, true],
+    ])('renders a plot only when display includes the pane bit (%i)', (display, expected) => {
+      const renderer = new TealchartRenderer(createMockCtx().ctx, { width: 800, height: 600 });
+
+      expect((renderer as any).shouldRenderPlot({ display })).toBe(expected);
     });
 
     it('routes fills, hlines, markers, and backgrounds through renderPlots', () => {
@@ -3719,6 +3969,52 @@ describe('TealchartRenderer coordinate transforms', () => {
       expect(strokeRect).toHaveBeenCalled();
       expect(setLineDash).toHaveBeenCalledWith([2, 4]);
       expect(fillText).toHaveBeenCalledWith('Zone', expect.any(Number), expect.any(Number));
+    });
+
+    it('does not render table chrome until the table has at least one populated cell', () => {
+      const fillRect = vi.fn();
+      const strokeRect = vi.fn();
+      const ctx = {
+        ...createMockCtx(),
+        fillRect,
+        strokeRect,
+      };
+      const renderer = new TealchartRenderer(ctx, { width: 800, height: 600 });
+      const pane: ComputedPane = {
+        id: 'main',
+        type: 'main',
+        heightRatio: 1,
+        yMin: 50,
+        yMax: 200,
+        fixedRange: false,
+        top: 0,
+        bottom: 570,
+        height: 570,
+      };
+      const table: DrawingOutput = {
+        id: 'table-1',
+        type: 'table',
+        barIndex: 0,
+        position: 'top_right',
+        columns: 2,
+        rows: 2,
+        bgcolor: '#111111',
+        frameColor: '#222222',
+        frameWidth: 1,
+        borderColor: '#333333',
+        borderWidth: 1,
+        cells: [],
+      };
+
+      (renderer as any).renderTealScriptDrawings(
+        { boxes: [], labels: [], lines: [], linefills: [], linesById: new Map(), polylines: [], tables: [table] },
+        [],
+        { startTime: 0, endTime: 1, priceMin: 50, priceMax: 200 },
+        pane,
+      );
+
+      expect(fillRect).not.toHaveBeenCalled();
+      expect(strokeRect).not.toHaveBeenCalled();
     });
 
     it('renders countdown text for simple price lines with countdownToTime', () => {

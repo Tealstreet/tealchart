@@ -16,8 +16,57 @@ import {
   PINE_V6_BUILTIN_NAMED_FORM_FORBIDDEN_SIGNATURES,
   resolvesBuiltinReferenceNameForCoverage,
 } from './checker';
+import { checkSemanticTypeInvariants } from './semanticTypeInvariants';
 
 describe('semantic checker', () => {
+  const boolNaV6Message = (subject: string): string =>
+    `${subject} because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).`;
+  const numericBoolV6Message = (kind: string): string =>
+    `Numeric ${kind} expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).`;
+  const computedBarmergeMessage = (calleeName: string, parameterName: 'gaps' | 'lookahead'): string =>
+    `${calleeName} ${parameterName} must be a compile-time barmerge value. Use barmerge.${parameterName}_on/off directly, or choose between those constants with an input or other non-series value; it cannot depend on bar_index, close, or another series value.`;
+
+  it('accepts builtin type names as arguments to na casts', () => {
+    const diagnostics = checkProgram(parse(`//@version=5
+indicator("typed na")
+float displacementStart = na(float)
+plot(na(displacementStart) ? 1 : 0)
+`));
+
+    expect(diagnostics.diagnostics.filter((diagnostic) => diagnostic.code === 'unknown-identifier')).toEqual([]);
+  });
+
+  it('reports JavaScript-looking unknown identifiers with Pine namespace guidance', () => {
+    const cases = [
+      {
+        source: `//@version=6
+indicator("Math")
+x = Math.max(close, open)`,
+        message: 'Unknown identifier: Math. Pine namespaces are lowercase; use `math`, for example `math.max(...)`.',
+      },
+      {
+        source: `//@version=6
+indicator("Array")
+x = Array.from(close)`,
+        message: 'Unknown identifier: Array. Pine namespaces are lowercase; use `array`, for example `array.new_float(...)` or array methods.',
+      },
+      {
+        source: `//@version=6
+indicator("Console")
+console.log(close)`,
+        message: 'Unknown identifier: console. Pine Script has no JavaScript `console.log`; use Pine `log.info(...)`, `log.warning(...)`, or `log.error(...)` when logging is available.',
+      },
+    ] as const;
+
+    for (const testCase of cases) {
+      const result = checkProgram(parse(testCase.source));
+      expect(result.diagnostics[0]).toEqual(expect.objectContaining({
+        code: 'unknown-identifier',
+        message: testCase.message,
+      }));
+    }
+  });
+
   it('reports paste-fix diagnostics with precise locations and actionable symbols', () => {
     const library = parse(`
 library("Helper")
@@ -81,7 +130,7 @@ plot(ta.sma(source=close, bogus=14))`,
         source: `//@version=6
 indicator("Qualifier")
 len = close > open ? 10 : 20
-smooth(src, length) => ta.sma(src, length)
+smooth(src, length) => ta.ema(src, length)
 plot(smooth(close, len))`,
         options: undefined,
         expected: {
@@ -128,7 +177,7 @@ plot(close)`,
         options: undefined,
         expected: {
           code: 'type-mismatch',
-          message: "Cannot assign string value to float variable 'bad'",
+          message: "Cannot assign string value to float variable bad",
           line: 3,
           column: 1,
         },
@@ -166,6 +215,89 @@ plot(ta.rsi(close, 14))`;
     expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
   });
 
+  it('resolves every official TradingView library/version referenced by the v5 and v6 corpora', () => {
+    const cases = [
+      ['TradingView/ta/10', 'plot(tvta.atr2(14))'],
+      ['TradingView/LibraryCOT/5', 'plot(str.length(cot.getCFTCCode("ES1!")))'],
+      ['TradingView/RelativeValue/3', 'plot(rv.calcCumulativeSeries(close, close > open))'],
+      ['TradingView/TechnicalRating/1', 'plot(tr.ratingStatus(1.0))'],
+    ] as const;
+
+    for (const [path, expression] of cases) {
+      const alias = path.split('/')[1]!.toLowerCase().replace('value', 'v');
+      const pine = `//@version=6
+indicator("Official library")
+import ${path} as ${alias}
+${expression.replace(/\b(tvta|cot|rv|tr)\b/, alias)}`;
+      expect(checkProgram(parse(pine)).diagnostics, path).toEqual([]);
+    }
+  });
+
+  it('supports the official ta/9 Ichimoku defaults used by TechnicalRating', () => {
+    const pine = `//@version=6
+indicator("Official TechnicalRating dependency")
+import TradingView/ta/9 as tvta
+[con, base, lead1, lead2, chikou] = tvta.ichimoku()
+plot(con + base + lead1 + lead2 + chikou)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('keeps TradingView ta v4 pinned to its documented v3 export surface', () => {
+    const pine = `//@version=6
+indicator("Official ta v4")
+import TradingView/ta/4 as tvta
+[up, down] = tvta.aroon(14)
+plot(up + down + tvta.trima2(close, 5))`;
+    const v7Only = `//@version=6
+indicator("Official ta v4")
+import TradingView/ta/4 as tvta
+plot(tvta.atr2(14))`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(v7Only)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unknown-function',
+      message: 'Unknown library function: tvta.atr2',
+    }));
+  });
+
+  it('checks assignment-only else-if selector ladders without exponential inference', () => {
+    const arms = Array.from({ length: 48 }, (_, index) => `
+    else if k == "k${index + 1}"
+        out := v${index + 1}`).join('');
+    const globals = Array.from({ length: 49 }, (_, index) => `float v${index} = close + ${index}`).join('\n');
+    const calls = Array.from({ length: 48 }, (_, index) => `plot(select_metric("k${index + 1}"))`).join('\n');
+    const pine = `//@version=6
+indicator("Selector")
+${globals}
+select_metric(string k) =>
+    float out = v0
+    if k == "k0"
+        out := v0${arms}
+    out
+${calls}`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('resolves documented official TradingView ta v1 exports without widening to v7', () => {
+    const pine = `//@version=6
+indicator("Official ta v1")
+import TradingView/ta/1 as tvta
+plot(tvta.cagr(time[10], close[10], time, close))`;
+
+    const newerExport = `//@version=6
+indicator("Official ta v1")
+import TradingView/ta/1 as tvta
+plot(tvta.changePercent(close, open))`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(newerExport)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unknown-function',
+      message: 'Unknown library function: tvta.changePercent',
+    }));
+  });
+
   it('keeps official TradingView ta imports version-pinned', () => {
     const pine = `//@version=6
 indicator("Official ta v7")
@@ -179,15 +311,106 @@ plot(delta)`;
     }));
   });
 
-  it('reports documented but unimplemented official TradingView ta functions explicitly', () => {
+  it('resolves documented official TradingView ta v7 exports as implemented builtins', () => {
     const pine = `//@version=6
-indicator("Official ta unsupported")
+indicator("Official ta v7")
+import TradingView/ta/7 as tvta
+[aroonUp, aroonDown] = tvta.aroon(14)
+plot(tvta.atr2(14))
+plot(tvta.highestSince(close > open, high))
+plot(aroonUp + aroonDown)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('resolves documented official TradingView ta v8, v9, and v10 request-volume exports', () => {
+    const pine = `//@version=6
+indicator("Official ta request volume")
 import TradingView/ta/10 as tvta
-plot(tvta.atr2(14))`;
+import TradingView/ta/9 as tvta9
+import TradingView/ta/8 as tvta8
+[up, down, delta] = tvta.requestUpAndDownVolume("1")
+[openDelta, highDelta, lowDelta, closeDelta] = tvta9.requestVolumeDelta("1", "D")
+[up8, down8, delta8] = tvta8.requestUpAndDownVolume("1")
+plot(delta + openDelta + highDelta + lowDelta + closeDelta + up8 + down8 + delta8)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('falls back from official TradingView ta aliases to builtin namespace members', () => {
+    const pine = `//@version=6
+indicator("Official ta alias fallback")
+import TradingView/ta/9 as ta
+plot(ta.rsi(close, 14))
+plot(ta.tr(true))
+plot(ta.crossover(close, ta.sma(close, 10)) ? close : na)
+plot(ta.correlation(close, open, 5))
+[openDelta, highDelta, lowDelta, closeDelta] = ta.requestVolumeDelta("1", "D")
+plot(openDelta + highDelta + lowDelta + closeDelta)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('resolves bare official TradingView ta exports before builtin namespace fallback', () => {
+    const pine = `//@version=5
+indicator("Official ta bare alias export")
+import TradingView/ta/7
+squeeze = ta.change(ta.ao(close, 5, 34)) - ta.change(close, 5)
+plot(squeeze)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('does not widen official TradingView alias fallback to unavailable members', () => {
+    const pine = `//@version=6
+indicator("Official ta export still pinned")
+import TradingView/ta/9 as ta
+plot(ta.allTimeHigh(close))`;
 
     expect(checkProgram(parse(pine)).diagnostics[0]).toEqual(expect.objectContaining({
-      code: 'unsupported-feature',
-      message: "Official TradingView library function 'TradingView/ta/10.atr2' is documented but not implemented by TealScript yet",
+      code: 'unknown-function',
+      message: expect.stringContaining('ta.allTimeHigh'),
+    }));
+  });
+
+  it('resolves documented official TradingView ta v14 exports without widening older versions', () => {
+    const pine = `//@version=6
+indicator("Official ta v14")
+import TradingView/ta/14 as tvta
+plot(tvta.allTimeHigh(close))
+plot(tvta.allTimeLow(close))
+plot(tvta.trima2(close, 5))`;
+
+    const olderPine = `//@version=6
+indicator("Official ta v10")
+import TradingView/ta/10 as tvta
+plot(tvta.allTimeHigh(close))`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(olderPine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unknown-function',
+      message: 'Unknown library function: tvta.allTimeHigh',
+    }));
+  });
+
+  it('resolves documented official TradingView ta v12 exports without widening v10', () => {
+    const pine = `//@version=6
+indicator("Official ta v12")
+import TradingView/ta/12 as tvta
+[longStop, shortStop] = tvta.chandelier(10, 14, 3.0)
+[macd, signal, hist] = tvta.macd2(close, 12, 26, 9)
+[pmo, pmoSignal] = tvta.pmo(close, 35, 20, 10)
+plot(longStop + shortStop + tvta.er(close, 10) + tvta.kama(close, 10, 2, 30) + macd + signal + hist + pmo + pmoSignal + tvta.ulcerIndex(close, 14))`;
+
+    const olderPine = `//@version=6
+indicator("Official ta v10")
+import TradingView/ta/10 as tvta
+plot(tvta.chandelier(10, 14, 3.0))`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(olderPine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unknown-function',
+      message: 'Unknown library function: tvta.chandelier',
     }));
   });
 
@@ -205,15 +428,173 @@ plot(changed ? array.size(pivots) : 0)`;
     expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
   });
 
+  it('resolves official TradingView ZigZag v7 as the pinned pre-v6 surface', () => {
+    const pine = `//@version=6
+indicator("Official ZigZag v7")
+import TradingView/ZigZag/7 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zigZag.update()
+last = zlib.lastPivot(zigZag)
+plot(changed ? 1 : 0)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('resolves official TradingView ZigZag v6 with its documented Point surface', () => {
+    const pine = `//@version=6
+indicator("Official ZigZag v6")
+import TradingView/ZigZag/6 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zigZag.update()
+last = zlib.lastPivot(zigZag)
+zlib.Point point = na(last) ? zlib.Point.new(time, close, bar_index) : last.end
+plot(changed ? point.barIndex : 0)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('preserves integer math floor results through min and max clamps with untyped parameters', () => {
+    const pine = `//@version=6
+indicator("floor clamp")
+f_compute(bins) =>
+    _binIdx = math.floor(close / 10)
+    _binIdx := math.max(0, math.min(bins - 1, _binIdx))
+    _binIdx
+plot(f_compute(input.int(10)))`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('keeps namespace receiver arity, conditional tuple inference, and integer math typing aligned', () => {
+    const pine = `//@version=6
+indicator("Systematic Semantic Guards")
+matrix<float> values = matrix.new<float>(1, 1, 0.0)
+matrix.add_row(values, 0, array.from(1.0, 2.0))
+line trend = line.new(bar_index, close, bar_index + 1, close)
+line.get_y1(trend)
+var table dashboard = table.new(position.top_right, 2, 2)
+table.clear(dashboard, 0, 0, 1, 1)
+choose(float value, bool upper) => upper ? [value, value + 1] : [value - 1, value]
+[lower, upper] = choose(close, close > open)
+int bins = 10
+int index = math.floor(close)
+index := math.max(0, math.min(bins - 1, index))
+plot(lower + upper + index)
+`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('keeps namespace calls distinct when variables shadow drawing and collection namespaces', () => {
+    const pine = `//@version=6
+indicator("Shadowed namespaces")
+matrix<float> matrix = matrix.new<float>(1, 1, 0.0)
+matrix.add_row(matrix, 0, array.from(1.0, 2.0))
+line line = line.new(bar_index, close, bar_index + 1, close)
+float y = line.get_y1(line)
+table table = table.new(position.top_right, 2, 2)
+table.clear(table, 0, 0, 1, 1)
+plot(y)
+`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('accepts table.cell named first parameter table_id', () => {
+    const pine = `//@version=6
+indicator("table id")
+var table dashboard = table.new(position.top_right, 1, 1)
+if barstate.islast
+    table.cell(table_id = dashboard, column = 0, row = 0, text = "ok")
+plot(close)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('accepts table receiver methods with named style arguments', () => {
+    const pine = `//@version=6
+indicator("table receiver")
+var table dashboard = table.new(position.top_right, 1, 1)
+if barstate.islast
+    dashboard.cell(0, 0, "ok", text_color = color.white, bgcolor = color.black)
+plot(close)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
   it('keeps official TradingView ZigZag imports version-pinned', () => {
     const pine = `//@version=6
-indicator("Official ZigZag v9")
-import TradingView/ZigZag/9 as zlib
+indicator("Official ZigZag v10")
+import TradingView/ZigZag/10 as zlib
 plot(close)`;
 
     expect(checkProgram(parse(pine)).diagnostics[0]).toEqual(expect.objectContaining({
       code: 'unresolved-import',
-      message: "Official TradingView library 'TradingView/ZigZag' version 9 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import",
+      message: "Official TradingView library 'TradingView/ZigZag' version 10 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import",
+    }));
+  });
+
+  it('resolves official TradingView ZigZag v9 as the current documented surface', () => {
+    const pine = `//@version=6
+indicator("Official ZigZag v9")
+import TradingView/ZigZag/9 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zlib.update(zigZag)
+plot(changed ? 1 : 0)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+  });
+
+  it('resolves official TradingView Color v2 documented exports as builtin functions', () => {
+    const pine = `//@version=6
+indicator("Official Color v2")
+import TradingView/Color/2 as col
+[r, g, b, t] = col.getRGB(color.red)
+hex = col.getHexString(r, g, b, t)
+roundTrip = col.hexStringToColor(hex)
+[h, s, l, ht] = col.getHSL(roundTrip)
+palette = col.gradientPalette(color.red, color.blue, 3)
+harmony = col.harmonyPalette(color.orange, "triadic", 0.5, 2)
+plot(col.contrastRatio(color.white, color.black) + (col.isLightTheme(roundTrip) ? 1 : 0) + array.size(palette) + matrix.rows(harmony))
+plot(1, color=col.overlay(col.complement(roundTrip), col.grayscale(color.blue)))`;
+
+    const olderPine = `//@version=6
+indicator("Official Color v1")
+import TradingView/Color/1 as col
+plot(close)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(olderPine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unresolved-import',
+      message: "Official TradingView library 'TradingView/Color' version 1 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import",
+    }));
+  });
+
+  it('resolves official TradingView ValueAtTime v2 types, functions, and methods', () => {
+    const pine = `//@version=6
+indicator("Official ValueAtTime v2")
+import TradingView/ValueAtTime/2 as vat
+periods = vat.getArrayFromString("1D, 2W")
+data = vat.collectData(close)
+[fromData, fromDataTime] = data.valueAtTime(time)
+[fromSource, fromSourceTime, current] = vat.valueAtTime(close, time)
+[offsetValue, offsetTime] = vat.valueAtTimeOffset(data, 60000)
+[periodValue, periodTime] = data.valueAtPeriodOffset(array.get(periods, 0))
+[values, times, requestCurrent, description] = vat.getDataAtPeriodOffsets(periods, close)
+plot(fromData + fromSource + current + offsetValue + periodValue + array.size(values) + array.size(times) + str.length(description))`;
+
+    const olderPine = `//@version=6
+indicator("Official ValueAtTime v1")
+import TradingView/ValueAtTime/1 as vat
+plot(close)`;
+
+    expect(checkProgram(parse(pine)).diagnostics).toEqual([]);
+    expect(checkProgram(parse(olderPine)).diagnostics[0]).toEqual(expect.objectContaining({
+      code: 'unresolved-import',
+      message: "Official TradingView library 'TradingView/ValueAtTime' version 1 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import",
     }));
   });
 
@@ -274,6 +655,7 @@ plot(close)`;
 
     expect(untrackedReferenceNames).toEqual([]);
     expect(mismatches).toEqual([]);
+    expect(signatureNames.size).toBe(372);
   });
 
   it('accepts legacy study resolution declaration aliases', () => {
@@ -393,8 +775,8 @@ plot(scalar + anchored)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot assign float value to string variable 'badScalar'",
-      "Cannot assign float value to string variable 'badAnchored'",
+      "Cannot assign float value to string variable badScalar",
+      "Cannot assign float value to string variable badAnchored",
     ]);
   });
 
@@ -528,7 +910,7 @@ badDateString = timestamp(1700000000000, 1, 5, 9, timezone="UTC")
       'hour time must be a number, got bool',
       'timestamp year must be a number, got string',
       'timestamp month must be a number, got string',
-      'Argument \'timezone\' for timestamp() was supplied multiple times',
+      'Argument \'timezone\' for timestamp() was supplied multiple times. Pine parameters can be set only once; remove one of the values.',
     ]);
   });
 
@@ -649,11 +1031,11 @@ plot(na or close > open ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
-      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
-      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
-      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
-      'na cannot be used as a boolean expression; wrap it in bool(...) or test a value with na(...)',
+      boolNaV6Message('na cannot be used as a boolean expression'),
+      boolNaV6Message('na cannot be used as a boolean expression'),
+      boolNaV6Message('na cannot be used as a boolean expression'),
+      boolNaV6Message('na cannot be used as a boolean expression'),
+      boolNaV6Message('na cannot be used as a boolean expression'),
     ]);
   });
 
@@ -668,7 +1050,7 @@ plot(converted ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign na value to bool variable reassigned',
+      boolNaV6Message('Cannot assign na value to bool variable reassigned'),
     ]);
   });
 
@@ -684,11 +1066,23 @@ plot((close > open) and volume ? 1 : 0)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Numeric float expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
-      'Numeric float expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
-      'Numeric int expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
-      'Numeric float expression cannot be used as a boolean; compare it explicitly or wrap it in bool(...)',
+      numericBoolV6Message('float'),
+      numericBoolV6Message('float'),
+      numericBoolV6Message('int'),
+      numericBoolV6Message('float'),
     ]);
+  });
+
+  it('allows declared-v5 bool assignments from numeric values and na-capable numeric ternaries', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("Legacy Numeric Bool Assignments")
+bool timeChange = ta.change(time)
+float rthOpenCurrent = open
+float rthClosePrev = close[1]
+bool gapPoints = not na(rthOpenCurrent) and not na(rthClosePrev) ? math.abs(rthOpenCurrent - rthClosePrev) : na
+plot(timeChange or gapPoints ? 1 : 0)`));
+
+    expect(result.diagnostics).toEqual([]);
   });
 
   it('accepts timeframe utility functions with named arguments', () => {
@@ -1075,6 +1469,21 @@ plot(close)
     expect(result.diagnostics).toEqual([]);
   });
 
+  it('requires alertcondition declarations to remain global and const-qualified', () => {
+    const result = checkProgram(parse(`
+indicator("Scoped Alerts")
+title = input.string("runtime title")
+if close > open
+    alertcondition(true, title=title, message="local")
+alertcondition(true, title="Global", message="const")
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'alertcondition() must be called from the global scope; move the call out of the local block',
+      'Cannot pass input string title to alertcondition(); use a const string',
+    ]);
+  });
+
   it('reports invalid Pine alert arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Alerts")
@@ -1126,7 +1535,7 @@ alert(1, message="ok")
       'log.warning message must be a string, got int',
       'log.error message must be a string, got int',
       'runtime.error message must be a string, got int',
-      "Argument 'message' for alert() was supplied multiple times",
+      "Argument 'message' for alert() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -1162,12 +1571,12 @@ max_bars_back(close, 10, 20)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'title' for plot() was supplied multiple times",
-      "Argument 'series' for plot() was supplied multiple times",
+      "Argument 'title' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      "Argument 'series' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'typo' for plot()",
-      "Argument 'price' for hline() was supplied multiple times",
+      "Argument 'price' for hline() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'style' for hline()",
-      "Argument 'hline1' for fill() was supplied multiple times",
+      "Argument 'hline1' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'fill() expects at least 3 arguments',
       "fill() missing required argument 'plot2'",
       "Unknown argument 'caption' for plotshape()",
@@ -1278,6 +1687,49 @@ request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", gaps="bad_gaps")
     ]);
   });
 
+  it('reports runtime-computed request barmerge modes', () => {
+    const result = checkProgram(parse(`
+indicator("Computed Request Barmerge Modes")
+mode = bar_index >= 0 ? barmerge.gaps_on : barmerge.gaps_off
+ahead = bar_index >= 0 ? barmerge.lookahead_on : barmerge.lookahead_off
+request.security(syminfo.tickerid, "1D", close, gaps=mode)
+request.dividends("NASDAQ:AAPL", dividends.gross, lookahead=ahead)
+request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", gaps=mode)
+request.economic("US", "GDP", gaps=mode)
+request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", gaps=mode)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      computedBarmergeMessage('request.security', 'gaps'),
+      computedBarmergeMessage('request.dividends', 'lookahead'),
+      computedBarmergeMessage('request.financial', 'gaps'),
+      computedBarmergeMessage('request.economic', 'gaps'),
+      computedBarmergeMessage('request.quandl', 'gaps'),
+    ]);
+  });
+
+  it('allows legacy boolean security barmerge switches in Pine v4', () => {
+    const result = checkProgram(parse(`//@version=4
+study("Legacy Security Barmerge")
+estimate = security(syminfo.tickerid, "D", open, true, lookahead=true)
+plot(estimate)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('allows simple barmerge-mode selections in official-style request wrappers', () => {
+    const result = checkProgram(parse(`//@version=6
+library("Request")
+export fred(simple string fredCode, simple bool gaps = false) =>
+    var gapStrategy = gaps ? barmerge.gaps_on : barmerge.gaps_off
+    var string symbol = str.format("FRED:{0}", fredCode)
+    float result = request.security(symbol, timeframe.isintraday ? "1D" : timeframe.period, close, gapStrategy)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
   it('reports invalid OHLC visual output argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Invalid OHLC Visual Bindings")
@@ -1293,11 +1745,11 @@ plotcandle(open, high, low, close, close=close)
       'plotbar() expects at least 4 arguments',
       "plotbar() missing required argument 'close'",
       "Unknown argument 'candle_color' for plotbar()",
-      "Argument 'open' for plotbar() was supplied multiple times",
+      "Argument 'open' for plotbar() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'plotcandle() expects at least 4 arguments',
       "plotcandle() missing required argument 'close'",
       "Unknown argument 'wick_color' for plotcandle()",
-      "Argument 'close' for plotcandle() was supplied multiple times",
+      "Argument 'close' for plotcandle() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -1333,10 +1785,10 @@ plotarrow(close - open, format=format.bad, precision=3.5)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Invalid plot format: bad',
       'plot precision must be a non-negative integer',
-      "Unknown argument 'format' for plotbar()",
-      "Unknown argument 'precision' for plotbar()",
-      "Unknown argument 'format' for plotcandle()",
-      "Unknown argument 'precision' for plotcandle()",
+      'Invalid plotbar format: format.bad',
+      'plotbar precision must be a non-negative integer',
+      'Invalid plotcandle format: ticks',
+      'plotcandle precision must be a non-negative integer',
       'Invalid plotshape format: format.bad',
       'plotshape precision must be a non-negative integer',
       'Invalid plotchar format: invalid',
@@ -1373,13 +1825,94 @@ plotarrow(close - open, minheight=0, maxheight=1.5)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'plot linewidth must be a positive integer',
+      'plot linewidth must be at least 1 in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6.',
       'plot linewidth must be a positive integer',
       'hline linewidth must be a positive integer',
       'hline linewidth must be a positive integer',
       'plotarrow minheight must be a positive integer',
       'plotarrow maxheight must be a positive integer',
     ]);
+  });
+
+  it('accepts legacy zero-width plot and hline values before v6', () => {
+    for (const version of [4, 5]) {
+      const result = checkProgram(parse(`//@version=${version}
+${version <= 4 ? 'study' : 'indicator'}("Legacy Zero Width")
+plot(close, linewidth=0)
+hline(100, linewidth=0)
+`));
+
+      expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    }
+  });
+
+  it.each([
+    [3, true],
+    [4, true],
+    [5, true],
+    [6, false],
+  ] as const)('applies linewidth zero rule for declared Pine v%d', (version, allowed) => {
+    const result = checkProgram(parse(`//@version=${version}
+${version <= 4 ? 'study' : 'indicator'}("Versioned Line Width")
+plot(close, linewidth=0)
+hline(100, linewidth=0)
+`));
+
+    const errors = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    expect(errors.length === 0).toBe(allowed);
+    if (!allowed) {
+      expect(errors.map((diagnostic) => diagnostic.code)).toEqual([
+        'type-mismatch',
+        'type-mismatch',
+      ]);
+    }
+  });
+
+  it.each([
+    [3, true],
+    [4, true],
+    [5, true],
+    [6, false],
+  ] as const)('applies boolean na/nz helper rule for declared Pine v%d', (version, allowed) => {
+    const result = checkProgram(parse(`//@version=${version}
+${version <= 4 ? 'study' : 'indicator'}("Versioned Boolean NA")
+signal = close > open
+filled = nz(signal, false)
+missing = na(signal)
+plot(filled ? 1 : 0)
+`));
+
+    const errors = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    expect(errors.length === 0).toBe(allowed);
+    if (!allowed) {
+      expect(errors.map((diagnostic) => diagnostic.code)).toEqual([
+        'type-mismatch',
+        'type-mismatch',
+        'type-mismatch',
+      ]);
+      expect(errors.map((diagnostic) => diagnostic.message)).toEqual([
+        boolNaV6Message('nz source cannot be a boolean'),
+        boolNaV6Message('nz replacement cannot be a boolean'),
+        boolNaV6Message('na x cannot be a boolean'),
+      ]);
+    }
+  });
+
+  it.each([
+    [3, true],
+    [4, true],
+    [5, true],
+    [6, false],
+  ] as const)('applies declared-version rules to bare na boolean contexts for Pine v%d', (version, allowed) => {
+    const result = checkProgram(parse(`//@version=${version}
+${version <= 4 ? 'study' : 'indicator'}("Versioned Bare NA")
+if na
+    plot(close)
+`));
+
+    const errors = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+    expect(errors.length === 0).toBe(allowed);
+    if (!allowed) expect(errors.map((diagnostic) => diagnostic.code)).toEqual(['invalid-na-bool']);
   });
 
   it('accepts legacy visual transp arguments', () => {
@@ -1512,6 +2045,119 @@ plot(length)
     expect(modern.diagnostics.map((diagnostic) => diagnostic.message)).toContain("Unknown argument 'minval' for input()");
   });
 
+  it('centralizes legacy generic input type arguments by declared Pine version', () => {
+    const legacy = checkProgram(parse(`//@version=4
+study("Legacy input type")
+length = input(5, type=input.integer)
+plot(length)
+`));
+    const modern = checkProgram(parse(`//@version=5
+indicator("Modern input type")
+length = input(5, type=input.integer)
+plot(length)
+`));
+
+    expect(legacy.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modern.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
+      expect.objectContaining({
+        code: 'version-mismatch',
+        message: 'Generic input(..., type=input.integer) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      }),
+    ]);
+  });
+
+  it('centralizes legacy global builtin aliases by declared Pine version', () => {
+    const legacy = checkProgram(parse(`//@version=4
+study("Legacy globals")
+plot(sma(close, 2))
+`));
+    const modern = checkProgram(parse(`//@version=5
+indicator("Modern globals")
+plot(sma(close, 2))
+`));
+
+    expect(legacy.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modern.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
+      expect.objectContaining({
+        code: 'version-mismatch',
+        message: 'sma() is a legacy Pine v3-v4 global. Use ta.sma() in Pine v5.',
+      }),
+    ]);
+  });
+
+  it('centralizes untyped na declaration and bool-to-number arithmetic version rules', () => {
+    const legacyNa = checkProgram(parse(`//@version=3
+study("Legacy na")
+x = na
+plot(na(x) ? 1 : 0)
+`));
+    const modernNa = checkProgram(parse(`//@version=4
+study("Modern na")
+x = na
+plot(na(x) ? 1 : 0)
+`));
+    const boolArithmetic = checkProgram(parse(`//@version=3
+study("Bool arithmetic")
+plot((close > open) + 1)
+`));
+
+    expect(legacyNa.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modernNa.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
+      expect.objectContaining({
+        code: 'version-mismatch',
+        message: 'Untyped declarations initialized with na are invalid from Pine v4 onward. Add an explicit type, for example float x = na.',
+      }),
+    ]);
+    expect(boolArithmetic.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
+      expect.objectContaining({
+        code: 'version-mismatch',
+        message: 'Pine v3 and later do not allow bool-to-number arithmetic. Use condition ? 1 : 0 when you need a numeric flag.',
+      }),
+    ]);
+  });
+
+  it('centralizes removed iff and offset compatibility by declared Pine version', () => {
+    const legacy = checkProgram(parse(`//@version=4
+study("Legacy helpers")
+plot(iff(close > open, offset(close, 1), close))
+`));
+    const modern = checkProgram(parse(`//@version=5
+indicator("Modern helpers")
+plot(iff(close > open, offset(close, 1), close))
+`));
+
+    expect(legacy.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modern.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
+      expect.objectContaining({
+        code: 'version-mismatch',
+        message: 'iff() was removed in Pine v5. Use the conditional operator: condition ? thenValue : elseValue.',
+      }),
+      expect.objectContaining({
+        code: 'version-mismatch',
+        message: 'offset() was removed in Pine v5. Use the history operator: source[offset].',
+      }),
+    ]);
+  });
+
+  it('allows no-op strategy.exit only before Pine v5', () => {
+    const legacy = checkProgram(parse(`//@version=4
+strategy("Legacy no-op exit")
+strategy.exit("Exit")
+`));
+    const modern = checkProgram(parse(`//@version=5
+strategy("Modern no-op exit")
+strategy.exit("Exit")
+`));
+
+    expect(legacy.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(modern.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([
+      expect.objectContaining({
+        code: 'type-mismatch',
+        message: 'strategy.exit requires a limit, stop, profit, loss, or trailing stop price',
+      }),
+    ]);
+  });
+
   it('accepts na casts for color and drawing object handles', () => {
     const result = checkProgram(parse(`//@version=6
 indicator("Object Casts")
@@ -1538,6 +2184,28 @@ plot(valuewhen(changeValue, close, 1))
 `));
 
     expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('accepts v5 numeric expressions in boolean built-in arguments', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("V5 numeric bool builtins")
+changeValue = ta.change(close)
+plot(ta.valuewhen(changeValue, close, 1))
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('keeps v6 numeric expressions rejected in boolean built-in arguments', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("V6 numeric bool builtins")
+changeValue = ta.change(close)
+plot(ta.valuewhen(changeValue, close, 1))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'ta.valuewhen condition must be a boolean, got float',
+    ]);
   });
 
   it('accepts v4 boolean strategy directions without loosening modern signatures', () => {
@@ -1727,7 +2395,7 @@ plot(close, 1, title="Duplicate")
       'plotchar char must be a string, got int',
       'plotchar text must be a string, got int',
       'plotarrow title must be a string, got int',
-      "Argument 'title' for plot() was supplied multiple times",
+      "Argument 'title' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -1764,7 +2432,7 @@ plot(close, 1, color=color.red, title="ok")
       'plotchar textcolor must be a color, got int',
       'plotarrow colorup must be a color, got int',
       'plotarrow colordown must be a color, got int',
-      "Argument 'title' for plot() was supplied multiple times",
+      "Argument 'title' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -1784,22 +2452,22 @@ plotarrow(close - open, series=open - close)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'plotshape() expects at least 1 argument',
       "plotshape() missing required argument 'series'",
-      "Argument 'series' for plotshape() was supplied multiple times",
+      "Argument 'series' for plotshape() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'plotchar() expects at least 1 argument',
       "plotchar() missing required argument 'series'",
       "Unknown argument 'glyph' for plotchar()",
-      "Argument 'series' for plotchar() was supplied multiple times",
+      "Argument 'series' for plotchar() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'plotarrow() expects at least 1 argument',
       "plotarrow() missing required argument 'series'",
       "Unknown argument 'color_up' for plotarrow()",
-      "Argument 'series' for plotarrow() was supplied multiple times",
+      "Argument 'series' for plotarrow() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
   it('reports invalid Pine declaration arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Indicator", initial_capital=1000, risk_free_rate=2, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true, typo=true)
-strategy("Bad Strategy", initial_capital=1000, typo=true)
+strategy("Bad Strategy", initial_capital=1000, defaultQtyValue=10, typo=true)
 library("Bad Library", precision=2, dynamic_requests=true)
 export f(float x) => x
 `));
@@ -1811,8 +2479,19 @@ export f(float x) => x
       "Unknown argument 'close_entries_rule' for indicator()",
       "Unknown argument 'fill_orders_on_standard_ohlc' for indicator()",
       "Unknown argument 'typo' for indicator()",
+      "Unknown argument 'defaultQtyValue' for strategy(); Pine uses snake_case here, so use 'default_qty_value'",
       "Unknown argument 'typo' for strategy()",
       "Unknown argument 'precision' for library()",
+    ]);
+  });
+
+  it('rejects indicator-only timeframe options on strategies', () => {
+    const result = checkProgram(parse(`//@version=6
+strategy("Invalid strategy timeframe", timeframe="60", timeframe_gaps=true)`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Unknown argument 'timeframe' for strategy(); 'timeframe' is an indicator() option, not a strategy() option",
+      "Unknown argument 'timeframe_gaps' for strategy(); 'timeframe_gaps' is an indicator() option, not a strategy() option",
     ]);
   });
 
@@ -1909,6 +2588,7 @@ strategy("Bad Strategy Settings",
 strategy("Bad Strategy Boolean Settings",
     calc_on_order_fills="yes",
     calc_on_every_tick=1,
+    calc_on_every_history_tick=close,
     process_orders_on_close="no",
     use_bar_magnifier=close,
     fill_orders_on_standard_ohlc="true")
@@ -1917,6 +2597,7 @@ strategy("Bad Strategy Boolean Settings",
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'strategy calc_on_order_fills must be a boolean, got string',
       'strategy calc_on_every_tick must be a boolean, got int',
+      'strategy calc_on_every_history_tick must be a boolean, got float',
       'strategy process_orders_on_close must be a boolean, got string',
       'strategy use_bar_magnifier must be a boolean, got float',
       'strategy fill_orders_on_standard_ohlc must be a boolean, got string',
@@ -1950,6 +2631,66 @@ strategy("Bad Strategy Numeric Settings",
     ]);
   });
 
+  it('accepts non-default strategy margin settings as executable metadata', () => {
+    const result = checkProgram(parse(`
+strategy("Trace Required Margin", margin_long=25, margin_short=50)
+plot(close)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports strategy calc_on_order_fills=true as trace-required instead of accepted metadata', () => {
+    const result = checkProgram(parse(`
+strategy("Trace Required Fill Reentry", calc_on_order_fills=true)
+plot(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => ({
+      code: diagnostic.code,
+      message: diagnostic.message,
+    }))).toEqual([
+      {
+        code: 'unsupported-feature',
+        message: 'strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it',
+      },
+    ]);
+  });
+
+  it('reports non-default strategy risk_free_rate as trace-required instead of accepted metadata', () => {
+    const result = checkProgram(parse(`
+strategy("Trace Required Risk Report", risk_free_rate=5)
+plot(strategy.equity)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => ({
+      code: diagnostic.code,
+      message: diagnostic.message,
+    }))).toEqual([
+      {
+        code: 'unsupported-feature',
+        message: 'strategy risk_free_rate=5 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it',
+      },
+    ]);
+  });
+
+  it('reports strategy fill_orders_on_standard_ohlc=true as trace-required instead of accepted metadata', () => {
+    const result = checkProgram(parse(`
+strategy("Trace Required Standard OHLC", fill_orders_on_standard_ohlc=true)
+plot(strategy.equity)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => ({
+      code: diagnostic.code,
+      message: diagnostic.message,
+    }))).toEqual([
+      {
+        code: 'unsupported-feature',
+        message: 'strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it',
+      },
+    ]);
+  });
+
   it('reports invalid Pine strategy declaration string values', () => {
     const result = checkProgram(parse(`
 strategy("Bad Strategy String Settings",
@@ -1978,7 +2719,7 @@ export f(float x) => x
 
   it('accepts Pine strategy order and trade accessor calls', () => {
     const result = checkProgram(parse(`
-strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1, risk_free_rate=1.75, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=true)
+strategy("Strategy", initial_capital=1000, pyramiding=1, default_qty_type=strategy.fixed, default_qty_value=1, risk_free_rate=2, backtest_fill_limits_assumption=3, close_entries_rule="ANY", fill_orders_on_standard_ohlc=false)
 strategy.risk.allow_entry_in(strategy.direction.long)
 strategy.risk.max_position_size(3)
 strategy.risk.max_drawdown(value=25, type=strategy.percent_of_equity, alert_message="drawdown")
@@ -1999,6 +2740,8 @@ strategy.cancel("Add")
 strategy.cancel_all()
 plot(strategy.default_entry_qty(close))
 plot(strategy.default_entry_qty(fill_price=close))
+plot(strategy.convert_to_account(close))
+plot(strategy.convert_to_symbol(close))
 plot(strategy.opentrades.capital_held)
 plot(strategy.opentrades.entry_price(0))
 plot(str.length(strategy.opentrades.entry_comment(0)))
@@ -2057,6 +2800,8 @@ closedRunup = strategy.closedtrades.max_runup(0)
 closedDrawdown = strategy.closedtrades.max_drawdown(0)
 closedRunupPercent = strategy.closedtrades.max_runup_percent(0)
 closedDrawdownPercent = strategy.closedtrades.max_drawdown_percent(0)
+accountValue = strategy.convert_to_account(close)
+symbolValue = strategy.convert_to_symbol(accountValue)
 equity := "bad"
 netProfitPercent := "bad"
 grossProfitPercent := "bad"
@@ -2091,6 +2836,8 @@ closedRunup := "bad"
 closedDrawdown := "bad"
 closedRunupPercent := "bad"
 closedDrawdownPercent := "bad"
+accountValue := "bad"
+symbolValue := "bad"
 plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openProfitPercentState + positionSize + openTrades + capitalHeld + closedTrades + winTrades + entryBar + entryTime + entryPrice + openProfitPercent + openRunup + openDrawdown + openRunupPercent + openDrawdownPercent + exitBar + exitTime + exitPrice + closedProfit + closedProfitPercent + closedRunup + closedDrawdown + closedRunupPercent + closedDrawdownPercent + str.length(accountCurrency) + str.length(positionEntryName) + str.length(entryId) + str.length(entryComment) + str.length(closedEntryComment) + str.length(exitId) + str.length(exitComment))
 `));
 
@@ -2131,6 +2878,8 @@ plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openPro
       'Cannot assign string value to float variable closedDrawdown',
       'Cannot assign string value to float variable closedRunupPercent',
       'Cannot assign string value to float variable closedDrawdownPercent',
+      'Cannot assign string value to float variable accountValue',
+      'Cannot assign string value to float variable symbolValue',
     ]);
     expect(types.get('equity')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('netProfitPercent')).toMatchObject({ kind: 'float', qualifier: 'series' });
@@ -2166,6 +2915,8 @@ plot(equity + netProfitPercent + grossProfitPercent + grossLossPercent + openPro
     expect(types.get('closedDrawdown')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('closedRunupPercent')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('closedDrawdownPercent')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('accountValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
+    expect(types.get('symbolValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
   });
 
   it('reports invalid Pine strategy call arguments', () => {
@@ -2258,10 +3009,10 @@ strategy.exit("TrailPriceNaPointsOk", "Long", trail_price=na, trail_points=5, tr
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'strategy.exit requires a limit, stop, profit, loss, or trailing stop price',
       'strategy.exit requires a limit, stop, profit, loss, or trailing stop price',
-      'strategy.exit trailing stop requires trail_offset',
-      'strategy.exit trailing stop requires trail_offset',
-      'strategy.exit trailing stop requires trail_offset',
-      'strategy.exit trailing stop requires trail_offset',
+      'strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points',
+      'strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points',
+      'strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points',
+      'strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points',
     ]);
   });
 
@@ -2334,7 +3085,7 @@ strategy.entry("Duplicate", 1, direction=strategy.short)
       'strategy.risk.allow_entry_in value must be a string, got int',
       'strategy.risk.max_drawdown type must be a string, got int',
       'strategy.risk.max_intraday_loss type must be a string, got int',
-      "Argument 'direction' for strategy.entry() was supplied multiple times",
+      "Argument 'direction' for strategy.entry() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -2361,6 +3112,40 @@ strategy.risk.max_intraday_filled_orders(count="two")
       'strategy.risk.max_position_size contracts must be a number, got string',
       'strategy.risk.max_drawdown value must be a number, got string',
       'strategy.risk.max_intraday_filled_orders count must be a number, got string',
+    ]);
+  });
+
+  it('reports assignments from void-returning builtin side effects', () => {
+    const result = checkProgram(parse(`//@version=6
+strategy("Void Returns", overlay=true)
+plot p = plot(close)
+label lab = label.new(bar_index, close, "x")
+line ln = line.new(bar_index, close, bar_index + 1, close)
+table tbl = table.new(position.top_right, 1, 1)
+matrix<float> mat = matrix.new<float>(2, 2, 1.0)
+float a = bgcolor(color.red)
+float b = plotshape(close > open)
+float c = label.delete(lab)
+float d = lab.set_text("x")
+float e = table.cell(tbl, 0, 0, "x")
+float f = matrix.add_row(mat, 0)
+float g = matrix.set(mat, 0, 0, 2.0)
+float h = strategy.entry("L", strategy.long)
+float i = log.info("x")
+float j = max_bars_back(close, 10)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign result of bgcolor() to variable a. bgcolor() returns no value; call it on its own line instead.',
+      'Cannot assign result of plotshape() to variable b. plotshape() returns no value; call it on its own line instead.',
+      'Cannot assign result of label.delete() to variable c. label.delete() returns no value; call it on its own line instead.',
+      'Cannot assign result of lab.set_text() to variable d. lab.set_text() returns no value; call it on its own line instead.',
+      'Cannot assign result of table.cell() to variable e. table.cell() returns no value; call it on its own line instead.',
+      'Cannot assign result of matrix.add_row() to variable f. matrix.add_row() returns no value; call it on its own line instead.',
+      'Cannot assign result of matrix.set() to variable g. matrix.set() returns no value; call it on its own line instead.',
+      'Cannot assign result of strategy.entry() to variable h. strategy.entry() returns no value; call it on its own line instead.',
+      'Cannot assign result of log.info() to variable i. log.info() returns no value; call it on its own line instead.',
+      'Cannot assign result of max_bars_back() to variable j. max_bars_back() returns no value; call it on its own line instead.',
     ]);
   });
 
@@ -2391,7 +3176,21 @@ length = 5
     expect(result.diagnostics).toEqual([
       expect.objectContaining({
         code: 'duplicate-symbol',
-        message: 'Duplicate declaration: length',
+        message: 'Duplicate declaration: length; first declared on line 3. Rename one declaration or remove the duplicate.',
+      }),
+    ]);
+  });
+
+  it('reports misplaced linewidth arguments inside color.new values', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Misplaced Linewidth")
+plot(close, color=color.new(color.red, 80, linewidth=2))
+`));
+
+    expect(result.diagnostics).toEqual([
+      expect.objectContaining({
+        code: 'unknown-argument',
+        message: "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
       }),
     ]);
   });
@@ -2460,6 +3259,8 @@ export string tablePosition = position.bottom_right
 export string textAlignment = text.align_center
 export string fontFamily = font.family_monospace
 export string labelSize = size.small
+export const color supportZone = color.new(color.green, 92)
+export const color resistanceZone = color.rgb(220, 40, 40, 75)
 export prefix(simple string value) => value
 `));
 
@@ -2571,7 +3372,7 @@ export lateShadow(float value) =>
       'Exported function assignsGlobal cannot use non-const global variable: scale',
       'Exported function usesInput cannot call input.*() functions',
       'Exported function lateShadow cannot use non-const global variable: scale',
-      'Cannot assign float value to int variable scale',
+      'Cannot assign float value to int variable scale. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.',
     ]);
   });
 
@@ -2624,7 +3425,7 @@ bad(left, left) => left
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Duplicate declaration: left',
+      'Duplicate declaration: left; first declared on line 3. Rename one declaration or remove the duplicate.',
       'Duplicate declaration: a',
     ]);
   });
@@ -2655,7 +3456,7 @@ plot(price)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign float value to int variable count',
+      'Cannot assign float value to int variable count. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.',
       'Cannot assign int value to string variable title',
       'Cannot assign line value to label variable marker',
       'Cannot assign string value to float variable price',
@@ -2718,6 +3519,27 @@ plot(markerValue)
     expect(types.get('marker')).toMatchObject({ kind: 'label' });
     expect(types.get('unknownValue')).toMatchObject({ kind: 'unknown' });
     expect(types.get('unknownTitle')).toMatchObject({ kind: 'unknown' });
+  });
+
+  it('infers mixed tuple types returned through request.security expressions', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("Request Tuple Types")
+f_sc(string symbol) =>
+    request.security(symbol, "D", [ta.rsi(close, 14), syminfo.ticker])
+[rsiA, tickerA] = f_sc("NASDAQ:AAPL")
+[rsiB, tickerB] = f_sc("NASDAQ:MSFT")
+rsiA := "bad"
+tickerA := 1
+rsiB := "bad"
+tickerB := 1
+plot(rsiA)`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable rsiA',
+      'Cannot assign int value to string variable tickerA',
+      'Cannot assign string value to float variable rsiB',
+      'Cannot assign int value to string variable tickerB',
+    ]);
   });
 
   it('infers tuple destructuring element types from compatible user function branch tuple returns', () => {
@@ -2818,6 +3640,25 @@ plot(branchValue + partialValue)
     expect(types.get('branchTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
     expect(types.get('partialValue')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('partialTitle')).toMatchObject({ kind: 'string', qualifier: 'const' });
+  });
+
+  it('treats na as a tuple-compatible arm when the other arm returns a tuple', () => {
+    const result = checkProgram(parse(`
+indicator("Tuple NA Arm")
+pair(series float source) =>
+    if na(source)
+        na
+    else
+        [source, source]
+[first, second] = pair(close)
+first := "bad"
+second := "bad"
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign string value to float variable first',
+      'Cannot assign string value to float variable second',
+    ]);
   });
 
   it('infers tuple destructuring element types from switch initializer returns', () => {
@@ -3208,9 +4049,9 @@ plot(close)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot assign string value to float variable 'ternaryValue'",
-      "Cannot assign string value to float variable 'switchValue'",
-      "Cannot assign string value to float variable 'ifValue'",
+      "Cannot assign string value to float variable ternaryValue",
+      "Cannot assign string value to float variable switchValue",
+      "Cannot assign string value to float variable ifValue",
     ]);
   });
 
@@ -3319,6 +4160,7 @@ plot(price)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Untyped declarations initialized with na are invalid from Pine v4 onward. Add an explicit type, for example float x = na.',
       'Cannot assign int value to string variable name',
       'Cannot assign line value to label variable tag',
       'Cannot assign array<string> value to array<float> variable values',
@@ -3633,6 +4475,35 @@ plot(priceValue + constValue)
     expect(types.get('mixedValue')).toMatchObject({ kind: 'unknown', qualifier: 'series' });
   });
 
+  it('keeps legacy iff helper version-gated before Pine v5', () => {
+    const legacy = checkProgram(parse(`
+//@version=4
+study("Legacy IFF")
+bad = iff(1, close, open)
+plot(bad)
+`));
+    const removedV5 = checkProgram(parse(`
+//@version=5
+indicator("Removed IFF")
+value = iff(close > open, close, open)
+plot(value)
+`));
+    const removedV6 = checkProgram(parse(`
+//@version=6
+indicator("Removed IFF")
+value = iff(close > open, close, open)
+plot(value)
+`));
+
+    expect(legacy.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([]);
+    expect(removedV5.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'iff() was removed in Pine v5. Use the conditional operator: condition ? thenValue : elseValue.',
+    ]);
+    expect(removedV6.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'iff() was removed in Pine v5. Use the conditional operator: condition ? thenValue : elseValue.',
+    ]);
+  });
+
   it('reports plain identifier reassignment qualifier mismatches', () => {
     const result = checkProgram(parse(`
 indicator("Assignment Qualifier Mismatches")
@@ -3673,10 +4544,11 @@ plot(total)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign float value to int variable badCount',
+      'Untyped declarations initialized with na are invalid from Pine v4 onward. Add an explicit type, for example float x = na.',
+      'Cannot assign float value to int variable badCount. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.',
       'Compound assignment -= requires numeric operands, got string and string',
       'Compound assignment += requires numeric or string operands, got label and int',
-      'Cannot assign float value to int variable count',
+      'Cannot assign float value to int variable count. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.',
       'Cannot assign series value to simple int variable simpleCount',
     ]);
   });
@@ -3729,14 +4601,88 @@ plot(badUnknown + badDuplicate + badTooMany + badMissing + badMethodUnknown + ba
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'source' for function scale",
-      "Argument 'value' for function scale was supplied multiple times",
+      "Argument 'value' for function scale was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'Too many arguments for function scale: expected 2, got 3',
       "function required missing required argument 'factor'",
       "Unknown argument 'source' for method add",
-      "Argument 'value' for method add was supplied multiple times",
+      "Argument 'value' for method add was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'Too many arguments for method add: expected 2, got 3',
       "method add missing required argument 'value'",
     ]);
+  });
+
+  it('lets user callables shadow builtin names during semantic binding', () => {
+    const result = checkProgram(parse(`
+indicator("User Callable Builtin Shadowing")
+vwap(bool enabled) => enabled ? close : open
+custom = vwap(bar_index > 0)
+plot(custom)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('lets UDT constructors shadow builtin namespace constructors', () => {
+    const result = checkProgram(parse(`
+indicator("UDT Constructor Builtin Shadowing")
+type ticker
+    string id
+    label tag
+var array<ticker> values = array.new<ticker>()
+array.push(values, ticker.new(syminfo.tickerid, label.new(na, na)))
+plot(array.size(values))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('allows functions and methods to share names when receiver signatures differ', () => {
+    const result = checkProgram(parse(`
+indicator("Function Method Name Sharing")
+type Box
+    float value
+badReturn() => 1
+method badReturn(Box this) => this.value
+box = Box.new(2)
+plot(badReturn() + box.badReturn())
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('allows value names to share identifiers with methods and UDT types', () => {
+    const result = checkProgram(parse(`
+//@version=6
+indicator("Published duplicate namespace patterns")
+method ma(string type, int length) => length
+ma = "EMA".ma(5)
+n = bar_index
+method n(float piv) => not na(piv)
+type lab
+    int x
+lab[] lab = array.new<lab>()
+lab.push(lab.new(1))
+plot(ma + n + array.size(lab) + (close.n() ? 1 : 0))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('allows method overloads distinguished by receiver type', () => {
+    const result = checkProgram(parse(`
+indicator("Receiver Method Overloads")
+type Box
+    float value
+type Marker
+    float value
+method first(Box this) => this.value
+method first(Marker this) => this.value + 1
+box = Box.new(2)
+marker = Marker.new(3)
+plot(box.first() + marker.first())
+`));
+
+    expect(result.diagnostics).toEqual([]);
   });
 
   it('reports literal na passed to bool user-callable parameters', () => {
@@ -3768,13 +4714,13 @@ plot(badFunction + badFunctionNamed + okFunction + badMethod + okMethod + badImp
     });
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign na value to bool parameter function enabled.flag',
-      'Cannot assign na value to bool parameter method toggled.flag',
-      'Cannot pass na value to bool parameter flag for function enabled',
-      'Cannot pass na value to bool parameter flag for function enabled',
-      'Cannot pass na value to bool parameter flag for method keep',
-      'Cannot pass na value to bool parameter flag for library function bt.score',
-      'Cannot pass na value to bool parameter flag for library method bt.score',
+      boolNaV6Message('Cannot assign na value to bool parameter function enabled.flag'),
+      boolNaV6Message('Cannot assign na value to bool parameter method toggled.flag'),
+      boolNaV6Message('Cannot pass na value to bool parameter flag for function enabled'),
+      boolNaV6Message('Cannot pass na value to bool parameter flag for function enabled'),
+      boolNaV6Message('Cannot pass na value to bool parameter flag for method keep'),
+      boolNaV6Message('Cannot pass na value to bool parameter flag for library function bt.score'),
+      boolNaV6Message('Cannot pass na value to bool parameter flag for library method bt.score'),
     ]);
   });
 
@@ -3982,6 +4928,9 @@ map.clear(id=right)
 plot(previous + value + removed + prefixPrevious + prefixValue + prefixRemoved + size + array.size(keys) + array.size(values) + (exists ? 1 : 0) + (prefixExists ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(types.get('size')).toMatchObject({ kind: 'int' });
     expect(result.diagnostics).toEqual([]);
   });
 
@@ -3998,7 +4947,7 @@ badPutAll = map.put_all(id=prices, other=prices)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'id' for map.size() was supplied multiple times",
+      "Argument 'id' for map.size() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'name' for map.get()",
       'map.get() expects at least 2 arguments',
       "map.get() missing required argument 'key'",
@@ -4018,6 +4967,7 @@ indicator("Array Core Signatures")
 values = array.new_int(size=2, initial_value=1)
 mixed = array.new_float(2, initial_value=2.5)
 fromValues = array.from(1, 2, 3)
+fromNamedValues = array.from(arg0=4, arg1=5, arg2=6)
 array.push(id=values, value=3)
 array.unshift(id=values, value=0)
 array.set(id=values, index=1, value=5)
@@ -4031,10 +4981,45 @@ popped = array.pop(id=copied)
 shifted = array.shift(id=copied)
 size = array.size(id=copied)
 array.clear(id=copied)
-plot(first + last + value + removed + popped + shifted + size + array.size(fromValues) + array.size(mixed))
+plot(first + last + value + removed + popped + shifted + size + array.size(fromValues) + array.size(fromNamedValues) + array.size(mixed))
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('rejects void-returning array mutators used as values', () => {
+    const result = checkProgram(parse(`
+indicator("Array Void Mutators")
+var values = array.new_float(0)
+pushResult = array.push(values, close)
+values := array.push(values, close)
+array.sort(values, order.ascending)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign result of array.push() to variable pushResult. array.push() returns no value; call it on its own line instead.',
+      'Cannot assign result of array.push() to array<float> variable values. array.push() returns no value; call it on its own line instead.',
+    ]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+      'type-mismatch',
+      'type-mismatch',
+    ]);
+  });
+
+  it('rejects v4 void-returning array mutators used as values', () => {
+    const result = checkProgram(parse(`
+//@version=4
+study("Array Void Mutators")
+var values = array.new_float(0)
+pushResult = array.push(values, close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign result of array.push() to variable pushResult. array.push() returns no value; call it on its own line instead.',
+    ]);
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual([
+      'type-mismatch',
+    ]);
   });
 
   it('reports invalid core array helper named arguments', () => {
@@ -4052,7 +5037,7 @@ badFrom = array.from(value=1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'id' for array.size() was supplied multiple times",
+      "Argument 'id' for array.size() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'item' for array.get()",
       'array.get() expects at least 2 arguments',
       "array.get() missing required argument 'index'",
@@ -4077,10 +5062,11 @@ other = array.from(4, 5)
 array.fill(id=values, value=7, index_from=0, index_to=1)
 window = array.slice(id=values, index_from=0, index_to=2)
 array.reverse(id=window)
+array.concat(id1=values, id2=other)
 array.concat(id=values, id2=other)
 array.sort(id=values, order=order.ascending)
 array.sort(id=values, order=order.descending, sort_field=0)
-indices = array.sort_indices(id=values, order=order.descending)
+indices = array.sort_indices(id=values, order=order.descending, sort_field=0)
 joined = array.join(id=window, separator=",")
 plain = array.join(id=window)
 plot(array.size(values) + array.size(window) + array.size(indices) + str.length(joined) + str.length(plain))
@@ -4100,13 +5086,13 @@ missingSlice = array.slice(id=values, index_from=0)
 tooManyReverse = array.reverse(values, other)
 tooManyJoin = array.join(values, ",", ";")
 unknownSort = array.sort(id=values, direction=order.ascending)
-tooManySortIndices = array.sort_indices(values, order.ascending, 1)
+tooManySortIndices = array.sort_indices(values, order.ascending, 1, 2)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'array.concat() expects at least 2 arguments',
       "array.concat() missing required argument 'id2'",
-      "Argument 'id' for array.concat() was supplied multiple times",
+      "Argument 'id' for array.concat() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'item' for array.fill()",
       'array.fill() expects at least 2 arguments',
       "array.fill() missing required argument 'value'",
@@ -4115,7 +5101,7 @@ tooManySortIndices = array.sort_indices(values, order.ascending, 1)
       'array.reverse() expects at most 1 argument',
       'array.join() expects at most 2 arguments',
       "Unknown argument 'direction' for array.sort()",
-      'array.sort_indices() expects at most 2 arguments',
+      'array.sort_indices() expects at most 3 arguments',
     ]);
   });
 
@@ -4127,12 +5113,13 @@ flags = array.from(true, true)
 hasValue = array.includes(id=values, value=2)
 index = array.indexof(id=values, value=2)
 lastIndex = array.lastindexof(id=values, value=2)
-binary = array.binary_search(id=values, value=2)
-left = array.binary_search_leftmost(id=values, value=2)
-right = array.binary_search_rightmost(id=values, value=2)
+binary = array.binary_search(id=values, val=2)
+legacyBinary = array.binary_search(id=values, value=2)
+left = array.binary_search_leftmost(id=values, val=2, sort_field=0)
+right = array.binary_search_rightmost(id=values, val=2)
 allFlags = array.every(id=flags)
 someFlags = array.some(id=flags)
-plot(index + lastIndex + binary + left + right + (hasValue ? 1 : 0) + (allFlags ? 1 : 0) + (someFlags ? 1 : 0))
+plot(index + lastIndex + binary + legacyBinary + left + right + (hasValue ? 1 : 0) + (allFlags ? 1 : 0) + (someFlags ? 1 : 0))
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -4147,23 +5134,23 @@ unknownIncludes = array.includes(id=values, item=2)
 missingBinary = array.binary_search(id=values)
 tooManyEvery = array.every(values, values)
 unknownSome = array.some(items=values)
-tooManyRight = array.binary_search_rightmost(values, 2, 3)
+tooManyRight = array.binary_search_rightmost(values, 2, 3, 4)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'array.indexof() expects at least 2 arguments',
       "array.indexof() missing required argument 'value'",
-      "Argument 'id' for array.indexof() was supplied multiple times",
+      "Argument 'id' for array.indexof() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'item' for array.includes()",
       'array.includes() expects at least 2 arguments',
       "array.includes() missing required argument 'value'",
       'array.binary_search() expects at least 2 arguments',
-      "array.binary_search() missing required argument 'value'",
+      "array.binary_search() missing required argument 'val'",
       'array.every() expects at most 1 argument',
       "Unknown argument 'items' for array.some()",
       'array.some() expects at least 1 argument',
       "array.some() missing required argument 'id'",
-      'array.binary_search_rightmost() expects at most 2 arguments',
+      'array.binary_search_rightmost() expects at most 3 arguments',
     ]);
   });
 
@@ -4176,8 +5163,8 @@ absolute = array.abs(id=values)
 standardized = array.standardize(id=values)
 total = array.sum(id=values)
 average = array.avg(id=values)
-minimum = array.min(id=values)
-maximum = array.max(id=values)
+minimum = array.min(id=values, nth=1)
+maximum = array.max(id=values, nth=1)
 spread = array.range(id=values)
 middle = array.median(id=values)
 common = array.mode(id=values)
@@ -4187,8 +5174,38 @@ covariance = array.covariance(id1=values, id2=other, biased=true)
 covarianceAlias = array.covariance(id=values, id2=other)
 nearest = array.percentile_nearest_rank(id=values, percentage=50)
 linear = array.percentile_linear_interpolation(id=values, percentage=50)
-rank = array.percentrank(id=values, value=2)
+rank = array.percentrank(id=values, index=2)
 plot(total + average + minimum + maximum + spread + middle + common + variance + deviation + covariance + covarianceAlias + nearest + linear + rank + array.size(absolute) + array.size(standardized))
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('reports invalid array statistic helper value types', () => {
+    const result = checkProgram(parse(`
+indicator("Bad Array Statistic Value Types")
+values = array.from(1, 2, 3)
+nearest = array.percentile_nearest_rank(values, "50")
+linear = array.percentile_linear_interpolation(id=values, percentage="50")
+plot(nearest + linear)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'array.percentile_nearest_rank percentage must be a number, got string',
+      'array.percentile_linear_interpolation percentage must be a number, got string',
+    ]);
+  });
+
+  it('preserves integer element types for array element aggregate helpers', () => {
+    const result = checkProgram(parse(`
+indicator("Array Integer Element Aggregates")
+var array<int> values = array.new<int>()
+array.push(values, bar_index)
+int minimum = array.min(values)
+int maximum = array.max(values)
+int common = array.mode(values)
+float average = array.avg(values)
+plot(minimum + maximum + common + average)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -4201,6 +5218,7 @@ values = array.from(1, 2, 3)
 other = array.from(2, 4, 6)
 unknownSum = array.sum(values=values)
 tooManyAbs = array.abs(values, other)
+tooManyMin = array.min(values, 1, 2)
 missingPercentile = array.percentile_nearest_rank(id=values)
 unknownStdev = array.stdev(id=values, sample=false)
 duplicateCovariance = array.covariance(values, id1=other)
@@ -4213,14 +5231,15 @@ tooManyVariance = array.variance(values, true, false)
       'array.sum() expects at least 1 argument',
       "array.sum() missing required argument 'id'",
       'array.abs() expects at most 1 argument',
+      'array.min() expects at most 2 arguments',
       'array.percentile_nearest_rank() expects at least 2 arguments',
       "array.percentile_nearest_rank() missing required argument 'percentage'",
       "Unknown argument 'sample' for array.stdev()",
       'array.covariance() expects at least 2 arguments',
       "array.covariance() missing required argument 'id2'",
-      "Argument 'id1' for array.covariance() was supplied multiple times",
+      "Argument 'id1' for array.covariance() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'array.percentrank() expects at least 2 arguments',
-      "array.percentrank() missing required argument 'value'",
+      "array.percentrank() missing required argument 'index'",
       'array.variance() expects at most 2 arguments',
     ]);
   });
@@ -4262,6 +5281,12 @@ valid = matrix.is_valid(id=m)
 plot(rows + columns + elements + first + matrix.rows(id=generic) + matrix.rows(id=flags) + (valid ? 1 : 0))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(types.get('rows')).toMatchObject({ kind: 'int' });
+    expect(types.get('columns')).toMatchObject({ kind: 'int' });
+    expect(types.get('elements')).toMatchObject({ kind: 'int' });
+    expect(types.get('valid')).toMatchObject({ kind: 'bool' });
     expect(result.diagnostics).toEqual([]);
   });
 
@@ -4279,7 +5304,7 @@ tooManyGet = matrix.get(m, 0, 0, 0)
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'extra' for matrix.new_int()",
-      "Argument 'id' for matrix.rows() was supplied multiple times",
+      "Argument 'id' for matrix.rows() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'item' for matrix.get()",
       'matrix.get() expects at least 3 arguments',
       "matrix.get() missing required argument 'row'",
@@ -4308,6 +5333,22 @@ matrix.reverse(id=m)
 plot(matrix.rows(id=m) + matrix.columns(id=m) + array.size(removedRow) + array.size(removedCol) + array.size(removedColumn))
 `));
 
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+
+    expect(types.get('removedRow')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('removedCol')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(types.get('removedColumn')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('resolves matrix.fill method receivers returned from calls', () => {
+    const result = checkProgram(parse(`
+indicator("Matrix Fill Receiver")
+values = matrix.new<float>(2, 2, 1.0)
+values.inv().fill(2.0)
+plot(1)
+`));
+
     expect(result.diagnostics).toEqual([]);
   });
 
@@ -4332,7 +5373,7 @@ missingSwapColumn = matrix.swap_columns(id=m, column1=0)
       'matrix.reshape() expects at least 3 arguments',
       "matrix.reshape() missing required argument 'columns'",
       'matrix.reverse() expects at most 1 argument',
-      "Argument 'id' for matrix.add_row() was supplied multiple times",
+      "Argument 'id' for matrix.add_row() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'row' for matrix.add_col()",
       'matrix.remove_column() expects at least 2 arguments',
       "matrix.remove_column() missing required argument 'column'",
@@ -4379,7 +5420,7 @@ tooManyCol = matrix.col(m, 0, 1)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'matrix.concat() expects at least 2 arguments',
       "matrix.concat() missing required argument 'id2'",
-      "Argument 'id' for matrix.concat() was supplied multiple times",
+      "Argument 'id' for matrix.concat() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'matrix.concat() expects at least 2 arguments',
       "matrix.concat() missing required argument 'id2'",
       "Unknown argument 'start_row' for matrix.submatrix()",
@@ -4435,7 +5476,7 @@ tooManyInv = matrix.inv(m, m)
       'matrix.trace() expects at most 1 argument',
       'matrix.det() expects at least 1 argument',
       "matrix.det() missing required argument 'id'",
-      "Argument 'id' for matrix.rank() was supplied multiple times",
+      "Argument 'id' for matrix.rank() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'matrix' for matrix.eigenvalues()",
       'matrix.eigenvalues() expects at least 1 argument',
       "matrix.eigenvalues() missing required argument 'id'",
@@ -4454,11 +5495,32 @@ diffNamed = matrix.diff(id1=a, id2=b)
 multNamed = matrix.mult(id1=a, id2=b)
 kronNamed = matrix.kron(id1=a, id2=b)
 powNamed = matrix.pow(id=a, power=2)
-matrix.sort(id=a, column=1, order=order.descending, sort_field=0)
+matrix.sort(id=a, column=1, order=order.descending)
 plot(matrix.rows(id=sumNamed) + matrix.rows(id=sumAlias) + matrix.rows(id=diffNamed) + matrix.rows(id=multNamed) + matrix.rows(id=kronNamed) + matrix.rows(id=powNamed))
 `));
 
     expect(result.diagnostics).toEqual([]);
+  });
+
+  it('infers matrix-vector and mixed numeric matrix calculation return types', () => {
+    const result = checkProgram(parse(`
+//@version=6
+indicator("Matrix Calculation Return Types")
+mf = matrix.new<float>(2, 2, 1.0)
+mi = matrix.new<int>(2, 2, 1)
+vf = array.new<float>(2, 1.0)
+matrix<float> mixedKron = matrix.kron(mi, mf)
+matrix<float> mixedDiff = mi.diff(mf)
+matrix<float> inverse = matrix.inv(mi)
+matrix<float> power = mi.pow(2)
+array<float> vector = matrix.mult(mf, vf)
+matrix<int> bad = matrix.mult(mf, mf)
+plot(matrix.get(mixedKron, 0, 0) + matrix.get(mixedDiff, 0, 0) + matrix.get(inverse, 0, 0) + matrix.get(power, 0, 0) + array.get(vector, 0) + matrix.get(bad, 0, 0))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Cannot assign matrix<float> value to matrix<int> variable bad',
+    ]);
   });
 
   it('reports invalid matrix calculation helper named arguments', () => {
@@ -4481,7 +5543,7 @@ unknownSort = matrix.sort(id=a, direction=order.ascending)
       "matrix.sum() missing required argument 'id2'",
       'matrix.diff() expects at least 2 arguments',
       "matrix.diff() missing required argument 'id2'",
-      "Argument 'id' for matrix.diff() was supplied multiple times",
+      "Argument 'id' for matrix.diff() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'left' for matrix.mult()",
       'matrix.mult() expects at least 2 arguments',
       "matrix.mult() missing required argument 'id1'",
@@ -4533,7 +5595,7 @@ duplicateIdentity = matrix.is_identity(m, id=m)
       'matrix.is_zero() expects at most 1 argument',
       'matrix.is_binary() expects at least 1 argument',
       "matrix.is_binary() missing required argument 'id'",
-      "Argument 'id' for matrix.is_identity() was supplied multiple times",
+      "Argument 'id' for matrix.is_identity() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -4647,17 +5709,17 @@ for i = 0 to 2
     ]);
   });
 
-  it('infers array element read types', () => {
+  it('infers array helper element read and history read types', () => {
     const result = checkProgram(parse(`
 indicator("Array Read Types")
 prices = array.new_float()
 ints = array.new_int()
-fromIndex = prices[0]
+fromHistory = prices[0]
 fromGet = prices.get(0)
 fromFirst = array.first(prices)
 fromLast = prices.last()
 fromRemove = prices.remove(0)
-ints.push(fromIndex)
+ints.push(fromHistory)
 ints.push(fromGet)
 ints.push(fromFirst)
 ints.push(fromLast)
@@ -4666,13 +5728,13 @@ ints.push(fromRemove)
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
-    expect(types.get('fromIndex')).toMatchObject({ kind: 'float' });
+    expect(types.get('fromHistory')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('fromGet')).toMatchObject({ kind: 'float' });
     expect(types.get('fromFirst')).toMatchObject({ kind: 'float' });
     expect(types.get('fromLast')).toMatchObject({ kind: 'float' });
     expect(types.get('fromRemove')).toMatchObject({ kind: 'float' });
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot use float value as int array element',
+      'Cannot use array value as int array element',
       'Cannot use float value as int array element',
       'Cannot use float value as int array element',
       'Cannot use float value as int array element',
@@ -4727,8 +5789,9 @@ const string scoreField = "score"
 const int nameField = 1
 matrix.sort(values, 0, order.ascending, scoreField)
 values.sort(0, order.descending, nameField)
-values.sort(0, order.ascending, "score")
-matrix.sort(values, 0, order.ascending, 1)
+matrix.sort(values, 0, order.ascending, "score")
+values.sort(0, order.descending, 1)
+matrix.sort(id=values, column=0, order=order.ascending, sort_field="score")
 inputField = input.string("score")
 simple string simpleField = "score"
 seriesIndex = bar_index
@@ -4771,8 +5834,7 @@ values.sort(order.ascending, simpleField)
 values.sort(order.ascending, seriesIndex)
 values.sort(order.ascending, unqualifiedField)
 values.sort(order.ascending, true)
-matrixValues = matrix.new<float>()
-matrixValues.sort(0, order.ascending, inputField)
+array.binary_search(values, 1, inputField)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
@@ -4781,7 +5843,7 @@ matrixValues.sort(0, order.ascending, inputField)
       'array.sort() sort_field requires const int or const string, got series int',
       'array.sort() sort_field requires const int or const string, got unqualified int',
       'array.sort() sort_field must be a const int or const string, got bool',
-      'matrix.sort() sort_field requires const int or const string, got input string',
+      'array.binary_search() sort_field requires const int or const string, got input string',
     ]);
   });
 
@@ -4812,6 +5874,23 @@ plot(array.size(points))
     expect(types.get('points')).toMatchObject({ kind: 'array', elementType: { kind: 'chart.point' } });
   });
 
+  it('types chart point coordinates as series values', () => {
+    const result = checkProgram(parse(`
+indicator("Chart Point Coordinates")
+point = chart.point.now(close)
+float price = point.price
+int pointTime = point.time
+int pointIndex = point.index
+plot(price + pointTime * 0 + pointIndex * 0)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+    const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
+    expect(types.get('price')).toMatchObject({ kind: 'float' });
+    expect(types.get('pointTime')).toMatchObject({ kind: 'int' });
+    expect(types.get('pointIndex')).toMatchObject({ kind: 'int' });
+  });
+
   it('reports invalid chart point helper named arguments', () => {
     const result = checkProgram(parse(`
 indicator("Bad Chart Point Signatures")
@@ -4829,7 +5908,7 @@ duplicateCopy = chart.point.copy(point, id=point)
       'chart.point.from_index() expects at least 2 arguments',
       "chart.point.from_index() missing required argument 'price'",
       'chart.point.now() expects at most 1 argument',
-      "Argument 'id' for chart.point.copy() was supplied multiple times",
+      "Argument 'id' for chart.point.copy() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -4889,7 +5968,7 @@ tooMany = label.new(bar_index, close, "A", xloc.bar_index, yloc.price, color.gre
       'label.new() expects at least 2 arguments',
       "label.new() missing required argument 'x'",
       "label.new() missing required argument 'y'",
-      "Argument 'x' for label.new() was supplied multiple times",
+      "Argument 'x' for label.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'label.new() expects at most 14 arguments',
     ]);
   });
@@ -5017,7 +6096,7 @@ label.set_text(marker, 1, id=marker)
       'table.cell tooltip must be a string, got int',
       'table.cell_set_text text must be a string, got int',
       'table.cell_set_tooltip tooltip must be a string, got int',
-      "Argument 'id' for label.set_text() was supplied multiple times",
+      "Argument 'id' for label.set_text() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -5171,7 +6250,7 @@ label.set_color(marker, 1, id=marker)
       'table.cell bgcolor must be a color, got int',
       'table.cell_set_bgcolor bgcolor must be a color, got int',
       'table.cell_set_text_color text_color must be a color, got int',
-      "Argument 'id' for label.set_color() was supplied multiple times",
+      "Argument 'id' for label.set_color() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -5312,13 +6391,13 @@ unknownGetter = label.get_text(marker, format="raw")
       "Unknown argument 'caption' for label.set_text()",
       'label.set_xy() expects at least 3 arguments',
       "label.set_xy() missing required argument 'y'",
-      "Argument 'id' for label.set_color() was supplied multiple times",
+      "Argument 'id' for label.set_color() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'label.set_textalign() expects at least 2 arguments',
       "label.set_textalign() missing required argument 'textalign'",
-      "Argument 'id' for label.set_textalign() was supplied multiple times",
+      "Argument 'id' for label.set_textalign() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'label.set_text_formatting() expects at least 2 arguments',
       "label.set_text_formatting() missing required argument 'text_formatting'",
-      "Argument 'id' for label.set_text_formatting() was supplied multiple times",
+      "Argument 'id' for label.set_text_formatting() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'font' for label.set_text_font_family()",
       'label.set_text_font_family() expects at least 2 arguments',
       "label.set_text_font_family() missing required argument 'text_font_family'",
@@ -5359,6 +6438,46 @@ plot(1)
     expect(types.get('clone')).toMatchObject({ kind: 'line' });
   });
 
+  it('resolves drawing receiver delete before incompatible user methods', () => {
+    const result = checkProgram(parse(`
+indicator("Drawing Receiver Delete")
+type PivotGraphic
+    line pivotLine
+    box pivotBox
+
+method delete(PivotGraphic graphic) =>
+    graphic.pivotLine.delete()
+    graphic.pivotBox.delete()
+
+lineHandle = line.new(bar_index, close, bar_index + 1, close)
+boxHandle = box.new(bar_index, high, bar_index + 1, low)
+lineHandle.delete()
+boxHandle.delete()
+plot(1)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('accepts type-qualified local method calls with explicit receivers', () => {
+    const result = checkProgram(parse(`
+indicator("Type Qualified Methods")
+type Anchor
+    int tag
+type Item
+    float value
+
+method expose(Anchor receiver, array<Item> values) => values
+
+anchor = Anchor.new(1)
+values = array.from(Item.new(close))
+qualified = Anchor.expose(anchor, values)
+plot(qualified.first().value)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('resolves line.new chart point overload argument bindings', () => {
     const result = checkProgram(parse(`
 indicator("Line Constructor Point Signatures")
@@ -5395,7 +6514,7 @@ unknownPoint = line.new(first_point=firstPoint, second_point=secondPoint, x1=bar
       'line.new() expects at least 4 arguments',
       "line.new() missing required argument 'x2'",
       "line.new() missing required argument 'y2'",
-      "Argument 'first_point' for line.new() was supplied multiple times",
+      "Argument 'first_point' for line.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'line.new() expects at most 8 arguments',
       "Unknown argument 'x1' for line.new()",
     ]);
@@ -5423,11 +6542,11 @@ missingCopy = line.copy()
       'line.set_xloc() expects at least 4 arguments',
       "line.set_xloc() missing required argument 'x2'",
       "line.set_xloc() missing required argument 'xloc'",
-      "Argument 'id' for line.set_xy1() was supplied multiple times",
+      "Argument 'id' for line.set_xy1() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'line.set_width() expects at most 2 arguments',
       'line.set_first_point() expects at least 2 arguments',
       "line.set_first_point() missing required argument 'first_point'",
-      "Argument 'id' for line.set_second_point() was supplied multiple times",
+      "Argument 'id' for line.set_second_point() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'line.set_first_point() expects at most 2 arguments',
       "Unknown argument 'point' for line.set_second_point()",
       'line.set_second_point() expects at least 2 arguments',
@@ -5507,7 +6626,7 @@ missingGetter = line.get_x2()
       "Unknown argument 'format' for line.get_x1()",
       'line.get_price() expects at least 2 arguments',
       "line.get_price() missing required argument 'x'",
-      "Argument 'id' for line.get_price() was supplied multiple times",
+      "Argument 'id' for line.get_price() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'line.get_y1() expects at most 1 argument',
       'line.get_x2() expects at least 1 argument',
       "line.get_x2() missing required argument 'id'",
@@ -5576,7 +6695,7 @@ unknownPoint = box.new(top_left=topLeft, bottom_right=bottomRight, left=bar_inde
       'box.new() expects at least 4 arguments',
       "box.new() missing required argument 'right'",
       "box.new() missing required argument 'bottom'",
-      "Argument 'top_left' for box.new() was supplied multiple times",
+      "Argument 'top_left' for box.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.new() expects at most 17 arguments',
       'Invalid box.new text_wrap: wrap',
       "Unknown argument 'left' for box.new()",
@@ -5607,16 +6726,16 @@ missingCopy = box.copy()
       "Unknown argument 'x' for box.set_left()",
       'box.set_lefttop() expects at least 3 arguments',
       "box.set_lefttop() missing required argument 'top'",
-      "Argument 'id' for box.set_rightbottom() was supplied multiple times",
+      "Argument 'id' for box.set_rightbottom() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.set_bottom() expects at most 2 arguments',
       'box.set_xloc() expects at least 4 arguments',
       "box.set_xloc() missing required argument 'right'",
       "box.set_xloc() missing required argument 'xloc'",
-      "Argument 'id' for box.set_xloc() was supplied multiple times",
+      "Argument 'id' for box.set_xloc() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.set_xloc() expects at most 4 arguments',
       'box.set_top_left_point() expects at least 2 arguments',
       "box.set_top_left_point() missing required argument 'point'",
-      "Argument 'id' for box.set_bottom_right_point() was supplied multiple times",
+      "Argument 'id' for box.set_bottom_right_point() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.set_top_left_point() expects at most 2 arguments',
       "Unknown argument 'top_left' for box.set_bottom_right_point()",
       'box.set_bottom_right_point() expects at least 2 arguments',
@@ -5655,7 +6774,7 @@ tooMany = box.set_extend(region, "right", "left")
       "Unknown argument 'bgcolor' for box.set_bgcolor()",
       'box.set_border_color() expects at least 2 arguments',
       "box.set_border_color() missing required argument 'color'",
-      "Argument 'id' for box.set_border_width() was supplied multiple times",
+      "Argument 'id' for box.set_border_width() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.set_extend() expects at most 2 arguments',
     ]);
   });
@@ -5696,14 +6815,14 @@ unknownFormatting = box.set_text_formatting(region, formatting="italic")
       "Unknown argument 'tooltip' for box.set_text()",
       'box.set_text_color() expects at least 2 arguments',
       "box.set_text_color() missing required argument 'text_color'",
-      "Argument 'id' for box.set_text_size() was supplied multiple times",
+      "Argument 'id' for box.set_text_size() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'box.set_text_wrap() expects at most 2 arguments',
       "Unknown argument 'text_size' for box.set_text_size()",
       'box.set_text_size() expects at least 2 arguments',
       "box.set_text_size() missing required argument 'size'",
       'box.set_text_formatting() expects at least 2 arguments',
       "box.set_text_formatting() missing required argument 'text_formatting'",
-      "Argument 'id' for box.set_text_formatting() was supplied multiple times",
+      "Argument 'id' for box.set_text_formatting() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'formatting' for box.set_text_formatting()",
       'box.set_text_formatting() expects at least 2 arguments',
       "box.set_text_formatting() missing required argument 'text_formatting'",
@@ -5804,7 +6923,7 @@ duplicate = box.get_bgcolor(region, id=region)
       'box.get_top() expects at most 1 argument',
       'box.get_text() expects at least 1 argument',
       "box.get_text() missing required argument 'id'",
-      "Argument 'id' for box.get_bgcolor() was supplied multiple times",
+      "Argument 'id' for box.get_bgcolor() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -5922,7 +7041,7 @@ unknownDelete = polyline.delete(shape=points)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'opacity' for polyline.new()",
       "polyline.new() missing required argument 'points'",
-      "Argument 'points' for polyline.new() was supplied multiple times",
+      "Argument 'points' for polyline.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'polyline.new() expects at most 9 arguments',
       'polyline.copy() expects at least 1 argument',
       "polyline.copy() missing required argument 'id'",
@@ -5966,7 +7085,7 @@ tooMany = linefill.new(upper, lower, color.blue, color.red)
       "Unknown argument 'opacity' for linefill.new()",
       'linefill.new() expects at least 2 arguments',
       "linefill.new() missing required argument 'line2'",
-      "Argument 'line1' for linefill.new() was supplied multiple times",
+      "Argument 'line1' for linefill.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'linefill.new() expects at most 3 arguments',
     ]);
   });
@@ -6031,7 +7150,7 @@ missingGetter = linefill.get_line2()
       "Unknown argument 'opacity' for linefill.set_color()",
       'linefill.set_color() expects at least 2 arguments',
       "linefill.set_color() missing required argument 'color'",
-      "Argument 'id' for linefill.delete() was supplied multiple times",
+      "Argument 'id' for linefill.delete() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'linefill.get_line1() expects at most 1 argument',
       'linefill.get_line2() expects at least 1 argument',
       "linefill.get_line2() missing required argument 'id'",
@@ -6129,7 +7248,7 @@ tooMany = table.new(position.top_right, 2, 3, color.black, color.gray, 1, color.
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Unknown argument 'frame' for table.new()",
       "table.new() missing required argument 'rows'",
-      "Argument 'position' for table.new() was supplied multiple times",
+      "Argument 'position' for table.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.new force_overlay must be a boolean, got int',
     ]);
   });
@@ -6144,10 +7263,10 @@ table.set_position(compact, position="center")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Invalid table.new position: position.center',
-      'Invalid table.new position: center',
-      'Invalid table.set_position position: position.center',
-      'Invalid table.set_position position: center',
+      'Invalid table.new position: position.center. Use one of the position.* constants such as position.top_right or position.bottom_left.',
+      'Invalid table.new position: center. Use one of the position.* constants such as position.top_right or position.bottom_left.',
+      'Invalid table.set_position position: position.center. Use one of the position.* constants such as position.top_right or position.bottom_left.',
+      'Invalid table.set_position position: center. Use one of the position.* constants such as position.top_right or position.bottom_left.',
     ]);
   });
 
@@ -6195,16 +7314,16 @@ tooManyDelete = table.delete(dashboard, dashboard)
       "Unknown argument 'width' for table.clear()",
       'table.clear() expects at least 3 arguments',
       "table.clear() missing required argument 'start_row'",
-      "Argument 'table_id' for table.clear() was supplied multiple times",
+      "Argument 'table_id' for table.clear() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.clear() expects at most 5 arguments',
       'table.merge_cells() expects at least 5 arguments',
       "table.merge_cells() missing required argument 'end_row'",
-      "Argument 'table_id' for table.merge_cells() was supplied multiple times",
+      "Argument 'table_id' for table.merge_cells() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.merge_cells() expects at most 5 arguments',
       'table.set_position() expects at least 2 arguments',
       "table.set_position() missing required argument 'position'",
       "Unknown argument 'opacity' for table.set_bgcolor()",
-      "Argument 'table_id' for table.set_frame_color() was supplied multiple times",
+      "Argument 'table_id' for table.set_frame_color() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.set_border_width() expects at most 2 arguments',
       'table.delete() expects at most 1 argument',
     ]);
@@ -6278,7 +7397,7 @@ tooMany = table.cell(dashboard, 0, 0, "A", 1, 1, color.white, "left", "top", siz
       "Unknown argument 'label' for table.cell()",
       'table.cell() expects at least 3 arguments',
       "table.cell() missing required argument 'row'",
-      "Argument 'table_id' for table.cell() was supplied multiple times",
+      "Argument 'table_id' for table.cell() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.cell() expects at most 14 arguments',
       'Invalid table.cell text_font_family: mono',
     ]);
@@ -6324,13 +7443,13 @@ tooManyTooltip = table.cell_set_tooltip(dashboard, 0, 0, "Tip", "Extra")
       "Unknown argument 'tooltip' for table.cell_set_text()",
       'table.cell_set_bgcolor() expects at least 4 arguments',
       "table.cell_set_bgcolor() missing required argument 'bgcolor'",
-      "Argument 'table_id' for table.cell_set_text_color() was supplied multiple times",
+      "Argument 'table_id' for table.cell_set_text_color() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.cell_set_width() expects at most 4 arguments',
       'table.cell_set_height() expects at least 4 arguments',
       "table.cell_set_height() missing required argument 'column'",
       'table.cell_set_tooltip() expects at least 4 arguments',
       "table.cell_set_tooltip() missing required argument 'tooltip'",
-      "Argument 'table_id' for table.cell_set_tooltip() was supplied multiple times",
+      "Argument 'table_id' for table.cell_set_tooltip() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'table.cell_set_tooltip() expects at most 4 arguments',
     ]);
   });
@@ -6350,16 +7469,16 @@ fromPoints = array.from(chart.point.from_index(bar_index, close))
 ints = array.new_int()
 strings = array.new_string()
 labels = array.new_label()
-ints.push(literalInts[0])
-ints.push(literalFloats[0])
+ints.push(literalInts.get(0))
+ints.push(literalFloats.get(0))
 strings.push(array.get(fromStrings, 0))
 labels.push(array.get(fromLabels, 0))
 labels.push(array.get(fromConstructedLabels, 0))
-labels.push(literalLabels[0])
+labels.push(literalLabels.get(0))
 labels.push("bad")
 fromPoints.push(label.new(bar_index, close))
 ints.push(array.get(fromStrings, 0))
-ints.push(mixed[0])
+ints.push(mixed.get(0))
 `));
 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
@@ -6390,9 +7509,11 @@ name = "BTC"
 tint = #ff00ff
 values = [1, 2]
 floatValues = array.new_float()
+intValues = array.new_int()
 copied = floatValues.copy()
 sliced = array.slice(floatValues, 0, 1)
 absolute = array.abs(floatValues)
+absoluteInt = array.abs(intValues)
 standardized = floatValues.standardize()
 indices = floatValues.sort_indices()
 sizeValue = floatValues.size()
@@ -6414,6 +7535,7 @@ joinedValue = floatValues.join(",")
     expect(types.get('copied')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('sliced')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('absolute')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
+    expect(types.get('absoluteInt')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('standardized')).toMatchObject({ kind: 'array', elementType: { kind: 'float' } });
     expect(types.get('indices')).toMatchObject({ kind: 'array', elementType: { kind: 'int' } });
     expect(types.get('sizeValue')).toMatchObject({ kind: 'int' });
@@ -6486,7 +7608,7 @@ plot(total + copy + latest)
   it('requires simple UDF parameters when they feed stateful TA lengths', () => {
     const result = checkProgram(parse(`
 indicator("UDF TA Length Qualifiers")
-smooth(series float source, int length) => ta.sma(source, length)
+smooth(series float source, int length) => ta.ema(source, length)
 dynamicLength = bar_index + 1
 plot(smooth(close, dynamicLength))
 `));
@@ -6494,6 +7616,30 @@ plot(smooth(close, dynamicLength))
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Cannot pass series value to simple parameter 'length' for function smooth; use an input/simple value or declare a compatible parameter",
     ]);
+  });
+
+  it('requires simple-only builtin TA parameters in v5 and newer while allowing documented series lengths', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Builtin TA Length Qualifiers")
+dynamicLength = bar_index + 1
+plot(ta.sma(close, dynamicLength))
+plot(ta.highest(source=high, length=dynamicLength))
+plot(ta.ema(close, dynamicLength))
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Cannot pass series value to simple parameter 'length' for ta.ema; use an input/simple value or declare a compatible parameter",
+    ]);
+  });
+
+  it('does not apply TA simple builtin qualifier enforcement to v4 sources without a supporting manual statement', () => {
+    const result = checkProgram(parse(`//@version=4
+study("v4 TA Length Qualifiers")
+dynamicLength = bar_index + 1
+plot(sma(close, dynamicLength))
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.code === 'qualifier-mismatch')).toEqual([]);
   });
 
   it('propagates simple UDF parameter requirements through nested helper calls', () => {
@@ -6520,6 +7666,20 @@ bad = configured(input.int(10))
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "Cannot pass input value to const parameter 'length' for function configured; use an input/simple value or declare a compatible parameter",
+    ]);
+  });
+
+  it('requires const builtin input default values', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Builtin Input Default Qualifiers")
+base = input.int(10)
+badInput = input.int(base)
+badSeries = input.float(close)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      "Cannot pass input value to const parameter 'defval' for input.int; use an input/simple value or declare a compatible parameter",
+      "Cannot pass series value to const parameter 'defval' for input.float; use an input/simple value or declare a compatible parameter",
     ]);
   });
 
@@ -6604,8 +7764,8 @@ hline badLine = plot(high)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign hline value to plot variable upper',
       'Cannot assign plot value to hline variable level',
-      "Cannot assign hline value to plot variable 'badPlot'",
-      "Cannot assign plot value to hline variable 'badLine'",
+      "Cannot assign hline value to plot variable badPlot",
+      "Cannot assign plot value to hline variable badLine",
     ]);
   });
 
@@ -6616,7 +7776,7 @@ value = ta.sma(close, source=open, length=14)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'source' for ta.sma() was supplied multiple times",
+      "Argument 'source' for ta.sma() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -6777,7 +7937,7 @@ tooManyBarsSince = ta.barssince(close > open, true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'condition' for ta.valuewhen() was supplied multiple times",
+      "Argument 'condition' for ta.valuewhen() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'threshold' for ta.cross()",
       "ta.highest() missing required argument 'length'",
       'ta.highest() cannot use positional arguments after named arguments',
@@ -6829,7 +7989,7 @@ tooManyCum = ta.cum(close, open)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'source' for ta.variance() was supplied multiple times",
+      "Argument 'source' for ta.variance() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'average' for ta.dev()",
       'ta.covariance() expects at least 3 arguments',
       "ta.covariance() missing required argument 'length'",
@@ -6876,7 +8036,7 @@ tooManyMom = ta.mom(close, 2, 3)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'source' for ta.vwma() was supplied multiple times",
+      "Argument 'source' for ta.vwma() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'biased' for ta.alma()",
       'ta.wma() expects at least 2 arguments',
       "ta.wma() missing required argument 'length'",
@@ -6912,7 +8072,7 @@ tooManyKcw = ta.kcw(close, 3, 1.25, true, false)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'series' for ta.bbw() was supplied multiple times",
+      "Argument 'series' for ta.bbw() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'tr' for ta.kc()",
       'ta.bb() expects at least 3 arguments',
       "ta.bb() missing required argument 'mult'",
@@ -6926,17 +8086,23 @@ indicator("TA Oscillator Signatures")
 stoch = ta.stoch(source=close, high=high, low=low, length=3)
 stochMixed = ta.stoch(source=close, high, low, 3)
 mfi = ta.mfi(source=hlc3, length=3)
-mfiMixed = ta.mfi(source=hlc3, 3)
+mfiLive = ta.mfi(series=hlc3, length=3)
+mfiMixed = ta.mfi(series=hlc3, 3)
 wpr = ta.wpr(length=3)
 cmo = ta.cmo(source=close, length=3)
-cmoMixed = ta.cmo(source=close, 3)
+cmoLive = ta.cmo(series=close, length=3)
+cmoMixed = ta.cmo(series=close, 3)
 rsi = ta.rsi(source=close, length=3)
 rsiMixed = ta.rsi(source=close, 3)
+allTimeMax = ta.max(source1=close)
+allTimeMaxLive = ta.max(source=close)
+allTimeMin = ta.min(source1=close)
+allTimeMinLive = ta.min(source=close)
 tsi = ta.tsi(source=close, short_length=2, long_length=3)
 tsiMixed = ta.tsi(source=close, 2, 3)
 cci = ta.cci(source=hlc3, length=3)
 cciMixed = ta.cci(source=hlc3, 3)
-plot(stoch + stochMixed + mfi + mfiMixed + wpr + cmo + cmoMixed + rsi + rsiMixed + tsi + tsiMixed + cci + cciMixed)
+plot(stoch + stochMixed + mfi + mfiLive + mfiMixed + wpr + cmo + cmoLive + cmoMixed + rsi + rsiMixed + allTimeMax + allTimeMaxLive + allTimeMin + allTimeMinLive + tsi + tsiMixed + cci + cciMixed)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -6949,14 +8115,18 @@ duplicateStoch = ta.stoch(close, source=open, high=high, low=low, length=3)
 unknownMfi = ta.mfi(source=hlc3, length=3, volume=volume)
 shortTsi = ta.tsi(source=close, short_length=2)
 tooManyWpr = ta.wpr(3, 4)
+tooManyMax = ta.max(close, open)
+unknownMin = ta.min(source=close, source2=open)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'source' for ta.stoch() was supplied multiple times",
+      "Argument 'source' for ta.stoch() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'volume' for ta.mfi()",
       'ta.tsi() expects at least 3 arguments',
       "ta.tsi() missing required argument 'long_length'",
       'ta.wpr() expects at most 1 argument',
+      'ta.max() expects at most 1 argument',
+      "Unknown argument 'source2' for ta.min()",
     ]);
   });
 
@@ -6999,10 +8169,10 @@ shortLinreg = ta.linreg(source=close, length=3)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'diLength' for ta.dmi() was supplied multiple times",
+      "Argument 'diLength' for ta.dmi() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'step' for ta.sar()",
       "ta.pivothigh() missing required argument 'rightbars'",
-      "Argument 'leftbars' for ta.pivotlow() was supplied multiple times",
+      "Argument 'leftbars' for ta.pivotlow() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'ta.pivothigh() cannot use positional arguments after named arguments',
       'ta.linreg() expects at least 3 arguments',
       "ta.linreg() missing required argument 'offset'",
@@ -7039,7 +8209,7 @@ unknownTr = ta.tr(handle_na=true, fallback=true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'source' for ta.macd() was supplied multiple times",
+      "Argument 'source' for ta.macd() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'signal' for ta.macd()",
       'ta.macd() expects at least 4 arguments',
       "ta.macd() missing required argument 'siglen'",
@@ -7098,7 +8268,7 @@ badIff = iff(1, close, open)
       'ta.vwap source must be a number, got string',
       'ta.vwap stdev_mult must be a number, got string',
       'ta.vwap anchor must be a boolean, got int',
-      'iff condition must be a boolean, got int',
+      'iff() was removed in Pine v5. Use the conditional operator: condition ? thenValue : elseValue.',
     ]);
   });
 
@@ -7106,10 +8276,11 @@ badIff = iff(1, close, open)
     const result = checkProgram(parse(`
 indicator("Color Signatures")
 base = color.rgb(red=1, green=2, blue=3, transp=25)
+castBase = color(x=color.red)
 aliasBase = color.rgb(red=10, green=20, blue=30, transparency=40)
 aliasNew = color.new(color=aliasBase, transparency=50)
 derived = color.rgb(color.r(color=base), color.g(color=base), color.b(color=base), color.t(color=base))
-gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=base, top_color=derived)
+gradient = color.from_gradient(value=close, bottom_value=0, top_value=100, bottom_color=castBase, top_color=derived)
 prefixBase = color.rgb(red=4, 5, 6)
 prefixAlpha = color.rgb(red=7, green=8, 9, 10)
 prefixNew = color.new(color=prefixBase, 35)
@@ -7253,8 +8424,8 @@ gradientShort = color.from_gradient(close, 0, 100, color.red)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'red' for color.rgb() was supplied multiple times",
-      "Argument 'transparency' for color.rgb() was supplied multiple times",
+      "Argument 'red' for color.rgb() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      "Argument 'transparency' for color.rgb() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'alpha' for color.rgb()",
       "Unknown argument 'source' for color.r()",
       'color.from_gradient() expects at least 5 arguments',
@@ -7289,7 +8460,7 @@ badDuplicate = color.new(1, 20, color=color.red)
       'color.from_gradient value must be a number, got string',
       'color.from_gradient bottom_value must be a number, got string',
       'color.from_gradient top_value must be a number, got bool',
-      "Argument 'color' for color.new() was supplied multiple times",
+      "Argument 'color' for color.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -7304,6 +8475,7 @@ parsedInt = str.tointeger(string="42.9")
 timeText = str.format_time(time=time, format="yyyy-MM-dd", timezone=syminfo.timezone)
 prefixTimeText = str.format_time(time=time, "yyyy-MM-dd", syminfo.timezone)
 message = str.format(format="close={0}", close)
+liveMessage = str.format(formatString="live={0}", arg0=close)
 hasUsdt = str.contains(string=text, substring="USDT")
 prefixHasUsdt = str.contains(source=text, "USDT")
 starts = str.startswith(source=text, target="BTC")
@@ -7327,7 +8499,7 @@ replaceOne = str.replace(string=text, substring="USDT", replacement="PERP", occu
 prefixReplaceOne = str.replace(source=text, "USDT", "PERP", 1)
 replaceAll = str.replace_all(source=text, str="USDT", replacement="PERP")
 prefixReplaceAll = str.replace_all(string=text, "USDT", "PERP")
-plot(parsed + parsedInt + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + prefix + prefixSlice + match + prefixMatch + repeated + officialRepeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
+plot(parsed + parsedInt + position + prefixPosition + str.length(string=formatted + prefixFormatted + timeText + prefixTimeText + message + liveMessage + prefix + prefixSlice + match + prefixMatch + repeated + officialRepeated + prefixRepeated + upper + lower + trimmed + replaceOne + prefixReplaceOne + replaceAll + prefixReplaceAll))
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -7339,6 +8511,7 @@ indicator("String Return Types")
 text = "BTC-USDT"
 seriesText = str.tostring(close)
 formatted = str.format(format="close={0}", close)
+liveFormatted = str.format(formatString="close={0}", arg0=close)
 timeText = str.format_time(time=time)
 parsed = str.tonumber("42.5")
 parsedInt = str.tointeger("42.9")
@@ -7353,6 +8526,7 @@ upper = str.upper(text)
 parts = str.split(source=text, separator="-")
 seriesText := 1
 formatted := 2
+liveFormatted := 2
 timeText := 3
 parsed := "bad"
 parsedInt := "bad"
@@ -7373,6 +8547,7 @@ plot(hasUsdt and starts ? 1 : 0)
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign int value to string variable seriesText',
       'Cannot assign int value to string variable formatted',
+      'Cannot assign int value to string variable liveFormatted',
       'Cannot assign int value to string variable timeText',
       'Cannot assign string value to float variable parsed',
       'Cannot assign string value to int variable parsedInt',
@@ -7387,6 +8562,7 @@ plot(hasUsdt and starts ? 1 : 0)
     ]);
     expect(types.get('seriesText')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('formatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
+    expect(types.get('liveFormatted')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('timeText')).toMatchObject({ kind: 'string', qualifier: 'series' });
     expect(types.get('parsed')).toMatchObject({ kind: 'float', qualifier: 'const' });
     expect(types.get('length')).toMatchObject({ kind: 'int', qualifier: 'const' });
@@ -7410,8 +8586,8 @@ shortReplace = str.replace(source="BTC", target="B")
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'source' for str.contains() was supplied multiple times",
-      "Argument 'substring' for str.replace() was supplied multiple times",
+      "Argument 'source' for str.contains() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      "Argument 'substring' for str.replace() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'start' for str.substring()",
       "str.substring() expects at least 2 arguments",
       "str.substring() missing required argument 'begin_pos'",
@@ -7427,6 +8603,7 @@ badTostring = str.tostring(close, format=1)
 badTonumber = str.tonumber(1)
 badTime = str.format_time(time="now", format=1, timezone=2)
 badFormat = str.format(1, close)
+badLiveFormat = str.format(formatString=1, arg0=close)
 badLength = str.length(1)
 badContains = str.contains(1, 2)
 badSubstring = str.substring(1, begin_pos="0", end_pos="3")
@@ -7445,6 +8622,7 @@ badDuplicate = str.contains("BTC", 1, source="ETH")
       'str.format_time format must be a string, got int',
       'str.format_time timezone must be a string, got int',
       'str.format_time time must be a number, got string',
+      'str.format format must be a string, got int',
       'str.format format must be a string, got int',
       'str.length source must be a string, got int',
       'str.contains source must be a string, got int',
@@ -7467,7 +8645,7 @@ badDuplicate = str.contains("BTC", 1, source="ETH")
       'str.replace_all source must be a string, got int',
       'str.replace_all target must be a string, got int',
       'str.replace_all replacement must be a string, got int',
-      "Argument 'source' for str.contains() was supplied multiple times",
+      "Argument 'source' for str.contains() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -7480,8 +8658,9 @@ powered = math.pow(base=2, exponent=3)
 prefixPowered = math.pow(base=2, 3)
 root = math.sqrt(number=16)
 logged = math.log(number=math.e) + math.log10(number=100) + math.exp(number=1)
-trig = math.sin(number=0) + math.cos(number=0) + math.tan(number=0) + math.asin(number=0) + math.acos(number=1) + math.atan(number=1)
+trig = math.sin(number=0) + math.cos(angle=0) + math.tan(angle=0) + math.asin(angle=0) + math.acos(angle=1) + math.atan(angle=1)
 converted = math.toradians(number=180) + math.todegrees(number=math.pi)
+convertedLive = math.toradians(degrees=180) + math.todegrees(radians=math.pi)
 unary = math.abs(number=-5) + math.trunc(number=-1.9) + math.floor(number=-1.2) + math.ceil(number=1.2) + math.sign(number=-5)
 namedMax = math.max(number0=1, number1=2, number2=3)
 namedMin = math.min(number0=1, number1=2, number2=3)
@@ -7529,7 +8708,7 @@ plot(absFloat + maxInt + maxFloat + avgSimple + roundedFloat + mintickSimple + r
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Cannot assign string value to float variable piValue',
       'Cannot assign string value to int variable absInt',
-      'Cannot assign float value to int variable roundedInt',
+      'Cannot assign float value to int variable roundedInt. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.',
       'Cannot assign string value to int variable floored',
       'Cannot assign string value to float variable powered',
       'Cannot assign string value to float variable runningSum',
@@ -7580,13 +8759,13 @@ tooManyMintick = math.round_to_mintick(1.0, 2)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'number' for math.round() was supplied multiple times",
+      "Argument 'number' for math.round() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'power' for math.pow()",
       "math.pow() expects at least 2 arguments",
       "math.pow() missing required argument 'exponent'",
       'math.avg() expects at least 2 arguments',
       "math.avg() missing required argument 'number1'",
-      "Argument 'number0' for math.max() was supplied multiple times",
+      "Argument 'number0' for math.max() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'value' for math.min()",
       'math.min() expects at least 2 arguments',
       "math.min() missing required argument 'number1'",
@@ -7625,7 +8804,7 @@ badDuplicate = math.round("1", number=2)
       'math.max number2 must be a number, got bool',
       'math.avg number0 must be a number, got string',
       'math.avg number2 must be a number, got string',
-      "Argument 'number' for math.round() was supplied multiple times",
+      "Argument 'number' for math.round() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -7656,11 +8835,25 @@ badFixnan = fixnan(source=true)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'na x cannot be a boolean',
-      'nz source cannot be a boolean',
-      'nz replacement cannot be a boolean',
-      'fixnan source cannot be a boolean',
+      boolNaV6Message('na x cannot be a boolean'),
+      boolNaV6Message('nz source cannot be a boolean'),
+      boolNaV6Message('nz replacement cannot be a boolean'),
+      boolNaV6Message('fixnan source cannot be a boolean'),
     ]);
+  });
+
+  it('accepts boolean na helpers before v6', () => {
+    for (const version of [4, 5]) {
+      const result = checkProgram(parse(`//@version=${version}
+${version <= 4 ? 'study' : 'indicator'}("Legacy Bool NA Helpers")
+signal = close > open
+filled = nz(signal, false)
+fixed = fixnan(signal)
+plot((na(signal) or filled or fixed) ? 1 : 0)
+`));
+
+      expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    }
   });
 
   it('infers global helper return types for downstream diagnostics', () => {
@@ -7716,6 +8909,8 @@ prefixRenko = ticker.renko(symbol="NASDAQ:AAPL", "ATR", 10, true, "Close")
 lineBreak = ticker.linebreak(symbol="NASDAQ:AAPL", number_of_lines=3)
 prefixLineBreak = ticker.linebreak(symbol="NASDAQ:AAPL", 3)
 kagi = ticker.kagi(symbol="NASDAQ:AAPL", style="ATR", param=10)
+liveKagi = ticker.kagi(tickerid="NASDAQ:AAPL", reversal=10)
+legacyLiveKagi = ticker.kagi(symbol="NASDAQ:AAPL", param=10, style="ATR")
 prefixKagi = ticker.kagi(symbol="NASDAQ:AAPL", "ATR", 10)
 pointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", source="hl", style="ATR", param=14, reversal=3)
 prefixPointFigure = ticker.pointfigure(symbol="NASDAQ:AAPL", "hl", "ATR", 14, 3)
@@ -7785,7 +8980,7 @@ missingModifyTicker = ticker.modify(session=session.extended)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'prefix' for ticker.new() was supplied multiple times",
+      "Argument 'prefix' for ticker.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'bad' for ticker.modify()",
       'ticker.renko() expects at least 3 arguments',
       "ticker.renko() missing required argument 'param'",
@@ -7822,9 +9017,12 @@ htf = request.security(symbol=syminfo.tickerid, "2", close, barmerge.gaps_on, ba
 ltf = request.security_lower_tf(symbol=syminfo.tickerid, "1", close, false, na, false, 2)
 rate = request.currency_rate(currency.USD, "GBP", ignore_invalid_currency=true)
 prefixRate = request.currency_rate(from=currency.USD, "GBP", true)
+namedRate = request.currency_rate(from=currency.USD, to="EUR")
 dividend = request.dividends("NASDAQ:AAPL", dividends.gross, barmerge.gaps_on, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false, currency=currency.USD)
+futureDividend = request.dividends("NASDAQ:AAPL", dividends.future_ex_date, ignore_invalid_symbol=true)
 prefixDividend = request.dividends(ticker="NASDAQ:AAPL", dividends.gross, barmerge.gaps_on, barmerge.lookahead_off, false, currency.USD)
 earning = request.earnings("NASDAQ:AAPL", earnings.actual, barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false, currency="USD")
+futureEarning = request.earnings("NASDAQ:AAPL", earnings.future_time, ignore_invalid_symbol=true)
 prefixEarning = request.earnings(ticker="NASDAQ:AAPL", earnings.actual, barmerge.gaps_off, barmerge.lookahead_off, false, "USD")
 split = request.splits("NASDAQ:AAPL", splits.denominator, barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
 prefixSplit = request.splits(ticker="NASDAQ:AAPL", splits.denominator, barmerge.gaps_off, barmerge.lookahead_off, false)
@@ -7836,7 +9034,7 @@ quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", gaps=barmerge.gaps_off,
 prefixQuandl = request.quandl(ticker="MULTPL/SP500_PE_RATIO_MONTH", barmerge.gaps_on, 0, true)
 seeded = request.seed("seed", "SYM", close, ignore_invalid_symbol=false, calc_bars_count=2)
 prefixSeeded = request.seed(source="seed", "SYM", close, false, 2)
-plot(rate + dividend + earning + split + revenue + econ + quandl + seeded)
+plot(rate + namedRate + dividend + futureDividend + earning + futureEarning + split + revenue + econ + quandl + seeded)
 `));
 
     expect(result.diagnostics).toEqual([]);
@@ -7910,7 +9108,7 @@ quandl = request.quandl("MULTPL/SHILLER_PE_RATIO_MONTH", unexpected=1)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'from' for request.currency_rate() was supplied multiple times",
+      "Argument 'from' for request.currency_rate() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       "Unknown argument 'currency' for request.splits()",
       "Unknown argument 'unexpected' for request.economic()",
       "Unknown argument 'unexpected' for request.quandl()",
@@ -7937,7 +9135,7 @@ plot(badDividendConstant + badDividendString + badEarningsConstant + badEarnings
       'Invalid request.earnings field: estimate',
       'Invalid request.splits field: splits.adjusted',
       'Invalid request.splits field: numerator',
-      "Argument 'ticker' for request.dividends() was supplied multiple times",
+      "Argument 'ticker' for request.dividends() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -7970,7 +9168,8 @@ plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ 
       'request.economic ignore_invalid_symbol must be a boolean, got int',
       'request.quandl ignore_invalid_symbol must be a boolean, got string',
       'request.seed ignore_invalid_symbol must be a boolean, got string',
-      "Argument 'symbol' for request.security() was supplied multiple times",
+      "Argument 'symbol' for request.security() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      'Operator + does not support operands float and string',
     ]);
   });
 
@@ -8013,7 +9212,8 @@ plot(htf + array.size(ltf) + rate + dividend + earning + split + revenue + econ 
       'request.quandl ticker must be a string, got int',
       'request.seed source must be a string, got int',
       'request.seed symbol must be a string, got int',
-      "Argument 'symbol' for request.security() was supplied multiple times",
+      "Argument 'symbol' for request.security() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      'Operator + does not support operands float and string',
     ]);
   });
 
@@ -8036,6 +9236,7 @@ colorInput = input.color(defval=color.red, "Mixed Color", "Color tooltip")
 start = input.time(defval=1700000000000, "Mixed Start", "Start tooltip")
 symbol = input.symbol(defval="BINANCE:BTCUSDT", "Mixed Symbol", "Symbol tooltip")
 session = input.session(defval="0930-1600", "Mixed Session", "Session tooltip")
+optionSession = input.session("0930-1600", title="Option Session", options=["0930-1600", "0000-2359"])
 memo = input.text_area(defval="notes", "Mixed Notes", "Notes tooltip")
 enum Direction
     long = "Long"
@@ -8116,6 +9317,15 @@ plot(source + level + multiplier + length + genericLength + genericMultiplier + 
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Generic input(..., type=input.integer) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.float) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.bool) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.string) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.resolution) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.symbol) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.session) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.color) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
+      'Generic input(..., type=input.source) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'Cannot assign string value to int variable length',
       'Cannot assign string value to float variable multiplier',
       'Cannot assign int value to bool variable enabled',
@@ -8184,6 +9394,7 @@ start = input.time("1700000000000")
 tf = input.timeframe(60)
 symbol = input.symbol(1)
 session = input.session(930)
+sessionOptions = input.session("0930-1600", options=[1])
 memo = input.text_area(1)
 enum Direction
     long = "Long"
@@ -8212,15 +9423,22 @@ legacyTf = input(60, "Legacy Timeframe", type=input.resolution)
       'input.timeframe defval must be a string',
       'input.symbol defval must be a string',
       'input.session defval must be a string',
+      'input.session options must contain string values, got int',
       'input.text_area defval must be a string',
       'input.enum defval must be an enum member',
       'input.enum options must use the same enum type as defval',
       'input.price defval must be a number',
+      'Generic input(..., type=input.integer) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'input.int defval must be an integer',
+      'Generic input(..., type=input.float) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'input.float defval must be a number',
+      'Generic input(..., type=input.bool) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'input.bool defval must be a boolean',
+      'Generic input(..., type=input.color) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'input.color defval must be a color',
+      'Generic input(..., type=input.string) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'input.string defval must be a string',
+      'Generic input(..., type=input.resolution) was replaced in Pine v5. Use the typed helper, for example input.int(...), input.float(...), input.bool(...), or input.string(...).',
       'input.timeframe defval must be a string',
     ]);
   });
@@ -8324,6 +9542,18 @@ plot(badTitle + badTooltip + badGroup + okGroup + badGenericTitle)
     ]);
   });
 
+  it('checks display metadata against the selected input range/options overload', () => {
+    const result = checkProgram(parse(`
+indicator("Input Display Overloads")
+rangeLength = input.int(1, "Range", 0, 10, 1, "tip", "inline", "group", false, display.all, true)
+rangeMultiplier = input.float(1.5, "Range Float", 0.0, 10.0, 0.5, "tip", "inline", "group", false, display.all, true)
+optionLength = input.int(1, "Options", [1, 2], "tip", "inline", "group", false, display.none, true)
+plot(rangeLength + rangeMultiplier + optionLength)
+`));
+
+    expect(result.diagnostics).toEqual([]);
+  });
+
   it('reports duplicate Pine input bindings against the selected overload', () => {
     const result = checkProgram(parse(`
 indicator("Duplicate Input Args")
@@ -8332,8 +9562,8 @@ optionLength = input.int(14, "Length", [7, 14, 21], options=[14, 21])
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Argument 'minval' for input.int() was supplied multiple times",
-      "Argument 'options' for input.int() was supplied multiple times",
+      "Argument 'minval' for input.int() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      "Argument 'options' for input.int() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
     ]);
   });
 
@@ -8416,9 +9646,9 @@ badScale = pivot.scale(2)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'No method lift() overload accepts Other receiver',
+      'No method lift() overload accepts series Other receiver',
       'No method lift() overload accepts const int receiver',
-      'No method scale() overload accepts Pivot receiver',
+      'No method scale() overload accepts series Pivot receiver',
     ]);
   });
 
@@ -8511,8 +9741,8 @@ plot(validPivot.y)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot assign Mode value to Direction variable 'badDirection'",
-      "Cannot assign Other value to Pivot variable 'badPivot'",
+      "Cannot assign Mode value to Direction variable badDirection",
+      "Cannot assign Other value to Pivot variable badPivot",
     ]);
   });
 
@@ -8531,12 +9761,12 @@ plot(validFloat)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot assign int value to string variable 'badString'",
-      "Cannot assign int value to bool variable 'badBool'",
-      "Cannot assign line value to label variable 'badLabel'",
-      "Cannot assign array<string> value to array<float> variable 'badValues'",
-      "Cannot assign matrix<float> value to matrix<int> variable 'badGrid'",
-      "Cannot assign map<int, float> value to map<string, float> variable 'badPrices'",
+      "Cannot assign int value to string variable badString",
+      "Cannot assign int value to bool variable badBool",
+      "Cannot assign line value to label variable badLabel",
+      "Cannot assign array<string> value to array<float> variable badValues",
+      "Cannot assign matrix<float> value to matrix<int> variable badGrid",
+      "Cannot assign map<int, float> value to map<string, float> variable badPrices",
     ]);
   });
 
@@ -8625,7 +9855,7 @@ plot(valid.value + str.length(enumDescription) + missing.value + unknown.value +
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "library method pivots.lifted missing required argument 'amount'",
       "Unknown argument 'source' for library method pivots.lifted",
-      "Argument 'amount' for library method pivots.lifted was supplied multiple times",
+      "Argument 'amount' for library method pivots.lifted was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'Too many arguments for library method pivots.lifted: expected 2, got 3',
       'library method pivots.lifted cannot use positional arguments after named arguments',
     ]);
@@ -8668,7 +9898,7 @@ plot(valid + kept.value + str.length(enumDescription) + missing + unknown + dupl
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       "library function rt.spread missing required argument 'lowValue'",
       "Unknown argument 'source' for library function rt.spread",
-      "Argument 'highValue' for library function rt.spread was supplied multiple times",
+      "Argument 'highValue' for library function rt.spread was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
       'Too many arguments for library function rt.spread: expected 3, got 4',
       'library function rt.spread cannot use positional arguments after named arguments',
     ]);
@@ -8746,7 +9976,7 @@ plot(weighted + fast + (isBull ? 1 : 0) + str.length(description))
     const types = new Map(result.symbols.map((symbol) => [symbol.name, symbol.type]));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      "Cannot assign string value to float variable 'badPeriod'",
+      "Cannot assign string value to float variable badPeriod",
     ]);
     expect(types.get('fast')).toMatchObject({ kind: 'int', qualifier: 'const' });
     expect(types.get('weighted')).toMatchObject({ kind: 'float' });
@@ -8887,7 +10117,9 @@ plot(helper.value(close))
       ]),
     });
 
-    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toContain('Duplicate declaration: helper');
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toContain(
+      'Duplicate declaration: helper; first declared on line 3. Rename one declaration or remove the duplicate.'
+    );
   });
 
   it('does not report user method receiver mismatches for builtin collection member calls', () => {
@@ -8975,10 +10207,23 @@ plot(state.value)
 `));
 
     expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
-      'Cannot assign na value to bool field State.defaulted',
-      'Cannot assign na value to bool field State.active',
-      'Cannot assign na value to bool field State.active',
+      boolNaV6Message('Cannot assign na value to bool field State.defaulted'),
+      boolNaV6Message('Cannot assign na value to bool field State.active'),
+      boolNaV6Message('Cannot assign na value to bool field State.active'),
     ]);
+  });
+
+  it('allows nullable bool UDT fields in declared Pine v5', () => {
+    const result = checkProgram(parse(`//@version=5
+indicator("Legacy UDT Boolean NA")
+type State
+    bool active
+state = State.new(na)
+state.active := na
+plot(state.active ? 1 : 0)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
   });
 
   it('reports user-defined type field assignment qualifier mismatches', () => {
@@ -9330,5 +10575,82 @@ plot(plain + persistent + intrabar + typed + fixed)
     expect(types.get('intrabar')).toMatchObject({ kind: 'int', qualifier: 'series' });
     expect(types.get('typed')).toMatchObject({ kind: 'float', qualifier: 'series' });
     expect(types.get('fixed')).toMatchObject({ kind: 'float', qualifier: 'const' });
+  });
+
+  it('allows a variable to reference its own history in its initializer', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("Self history")
+float value = nz(value[1]) + 1
+plot(value)
+`));
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+  });
+
+  it('checks doc-derived semantic type invariants on known-good scalar declarations', () => {
+    const source = `//@version=6
+indicator("Semantic Invariants")
+whole = 1 + 2 * 3
+quotient = 5 / 2
+promoted = whole + 1.5
+compared = quotient > promoted
+logical = compared and close > open
+title = "EUR" + "USD"
+series float price = input.source(close)
+input int length = input.int(14)
+series label marker = label.new(bar_index, close)
+[tupleCount, tupleTitle, tupleMarker] = [1, "A", label.new(bar_index, close)]
+mixed = compared ? whole : promoted
+plot(promoted + mixed)
+`;
+    const ast = parse(source);
+    const result = checkProgram(ast);
+
+    expect(result.diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([]);
+    expect(checkSemanticTypeInvariants(ast, result)).toEqual([]);
+  });
+
+  it('rejects invalid operator operand pairs without rejecting legal string equality', () => {
+    const result = checkProgram(parse(`//@version=6
+indicator("invalid operator operands")
+badStringArithmetic = "5" - 2
+badMixedPlus = "price: " + close
+badOrderedStringComparison = "b" > "a"
+badOrderedColorComparison = color.red > color.blue
+badLogicalString = close > open and "yes"
+badUnaryString = -"5"
+okStringEquality = "b" == "a"
+plot(okStringEquality ? 1 : 0)
+`));
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+      'Operator - does not support operands string and int',
+      'Operator + does not support operands string and float',
+      'Operator > does not support operands string and string',
+      'Operator > does not support operands color and color',
+      'Operator and does not support operands bool and string',
+      'Operator - requires a numeric operand, got string',
+    ]);
+  });
+
+  it('reports semantic type invariant disagreements without changing acceptance', () => {
+    const source = `//@version=6
+indicator("Semantic Invariant Drift")
+quotient = 5 / 2
+plot(quotient)
+`;
+    const ast = parse(source);
+    const result = checkProgram(ast);
+    const quotient = result.symbols.find((symbol) => symbol.name === 'quotient');
+    if (quotient) quotient.type = { kind: 'int', qualifier: 'const' };
+
+    expect(checkSemanticTypeInvariants(ast, result)).toEqual([
+      expect.objectContaining({
+        code: 'semantic-type-mismatch',
+        symbolName: 'quotient',
+        expected: 'const float',
+        actual: 'const int',
+      }),
+    ]);
   });
 });

@@ -1,0 +1,3 @@
+//@version=6
+indicator("Fast refusal iff v6")
+plot(iff(close > open, high, low), title="Bad")

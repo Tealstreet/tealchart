@@ -55,6 +55,14 @@ describe('PineArray', () => {
     expect(array.values).toEqual([7, 7, 7]);
   });
 
+  it('fills sized arrays with Pine na when the initial value is omitted', () => {
+    const array = createPineArray<number>(2);
+
+    expect(getArraySize(array)).toBe(2);
+    expect(getArrayValue(array, 0)).toBeNaN();
+    expect(getArrayValue(array, -1)).toBeNaN();
+  });
+
   it('rejects negative array sizes', () => {
     expect(() => createPineArray(-1)).toThrow('Cannot create an array with a negative size');
   });
@@ -149,6 +157,7 @@ describe('PineArray', () => {
   it('rejects first and last reads from empty arrays', () => {
     const array = createPineArray<number>();
 
+    expect(() => getArrayValue(array, 0)).toThrow('Array index 0 is out of bounds. Array size is 0');
     expect(() => firstArrayValue(array)).toThrow('Array index 0 is out of bounds. Array size is 0');
     expect(() => lastArrayValue(array)).toThrow('Array index -1 is out of bounds. Array size is 0');
   });
@@ -176,6 +185,15 @@ describe('PineArray', () => {
 
     reverseArray(array);
     expect(array.values).toEqual([1, 2, 3, Number.NaN]);
+  });
+
+  it('sorts using Pine order enum values', () => {
+    const array = createPineArray<number>();
+    [3, 1, 2].forEach((value) => pushArrayValue(array, value));
+
+    sortArray(array, 'order.descending');
+    expect(array.values).toEqual([3, 2, 1]);
+    expect(sortIndicesArrayValue(array, 'order.ascending').values).toEqual([2, 1, 0]);
   });
 
   it('concatenates arrays in place and joins values with a separator', () => {
@@ -298,7 +316,8 @@ describe('PineArray', () => {
     removeArrayValue(array, 0);
 
     expect(() => getArraySize(slice)).toThrow('Slice is out of bounds of the parent array');
-    expect(() => sliceArray(array, 2, 2)).toThrow("Index 'from' should be less than index 'to'");
+    expect(getArraySize(sliceArray(array, 2, 2))).toBe(0);
+    expect(() => sliceArray(array, 3, 2)).toThrow("Index 'from' should be less than index 'to'");
     expect(() => sliceArray(array, Number.NaN, 3)).toThrow('Slice indices must be finite numbers');
   });
 
@@ -336,6 +355,11 @@ describe('PineArray', () => {
     expect(maxArrayValue(array)).toBeNaN();
     expect(sumArrayValue(array)).toBeNaN();
     expect(avgArrayValue(array)).toBeNaN();
+    expect(rangeArrayValue(array)).toBeNaN();
+    expect(medianArrayValue(array)).toBeNaN();
+    expect(modeArrayValue(array)).toBeNaN();
+    expect(varianceArrayValue(array)).toBeNaN();
+    expect(stdevArrayValue(array)).toBeNaN();
   });
 
   it('calculates biased and unbiased covariance for numeric arrays', () => {
@@ -373,6 +397,10 @@ describe('PineArray', () => {
     expect(percentileNearestRankArrayValue(array, 50)).toBe(2);
     expect(percentileLinearInterpolationArrayValue(array, 50)).toBe(2.5);
     expect(percentRankArrayValue(array, 2)).toBe(75);
+    expect(percentRankArrayValue(array, 4.0)).toBe(100);
+    const sparse = createPineArray<number>();
+    [1, 2, 4, 7].forEach((value) => pushArrayValue(sparse, value));
+    expect(percentRankArrayValue(sparse, 4.0)).toBe(75);
     expect(standardizeArrayValue(array).values).toEqual([
       -1.3416407864998738,
       -0.4472135954999579,
@@ -391,5 +419,19 @@ describe('PineArray', () => {
     expect(binarySearchLeftmostArrayValue(array, 3)).toBe(2);
     expect(binarySearchRightmostArrayValue(array, 2)).toBe(2);
     expect(binarySearchRightmostArrayValue(array, 3)).toBe(3);
+  });
+
+  it('searches UDT arrays by sort_field', () => {
+    const array = createPineArray();
+    [
+      createPineUdtObject('Ranked', [['score', 1], ['name', 'low']]),
+      createPineUdtObject('Ranked', [['score', 3], ['name', 'mid']]),
+      createPineUdtObject('Ranked', [['score', 5], ['name', 'high']]),
+    ].forEach((value) => pushArrayValue(array, value));
+
+    expect(binarySearchArrayValue(array, 3, 'score')).toBe(1);
+    expect(binarySearchArrayValue(array, 'mid', 1)).toBe(1);
+    expect(binarySearchLeftmostArrayValue(array, 4, 'score')).toBe(1);
+    expect(binarySearchRightmostArrayValue(array, 4, 'score')).toBe(2);
   });
 });

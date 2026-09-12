@@ -13,6 +13,8 @@ Four-layer design: **Parser → Semantic/Runtime → Compiled Runtime → Worker
 - `ast.ts` — Strongly-typed AST node definitions
 - `generated.js` / `generated.d.ts` — Auto-generated Peggy parser output (git-tracked)
 
+Function bodies use the established fixed-depth rules for ordinary nesting and a recursive indentation-aware parser beyond that depth; this avoids a hard maximum while preserving block boundaries.
+
 **Rebuilding the parser:**
 
 ```bash
@@ -32,6 +34,15 @@ patterns whose `=` starts on the following continuation line. The parser
 wrapper's small-indent normalizer must skip obvious continuation lines,
 including leading-comma argument/declaration continuations, so it does not
 promote them into structural block indentation.
+Parser-wrapper diagnostics intentionally explain already-rejected JavaScript
+idioms and invisible whitespace without widening grammar acceptance. Keep these
+as message/location shims unless TradingView evidence supports accepting the
+syntax.
+`src/compat/pineInvariantGate.test.ts` is the standing fast gate for parser and
+semantic invariants found during corpus audits. Keep AST structural,
+doc-derived operator precedence, and semantic type/qualifier invariant cases
+there when a silent wrong-tree or wrong-type class is fixed; a one-off corpus
+sweep is not enough to defend against reintroducing it.
 
 ### Runtime (`src/runtime/`)
 
@@ -41,6 +52,12 @@ promote them into structural block indentation.
 - `series.ts` — `Series<T>` class: time-series values with history access
 - `scope.ts` — Variable scoping with `var`/`varip`/regular semantics
 - `codegen/` — Compiled execution path. Emits and runs a generated script class.
+- There is one Pine evaluation path: compiled codegen. `executeScript(...)` in
+  `compiledOnly.ts` is a public wrapper around `executeCompiledScript(...)`, not
+  an interpreter or semantic alternative. A compiled-versus-interpreter
+  differential over corpus scripts is therefore tautological unless a genuinely
+  separate evaluator is reintroduced; it only proves the compiled path agrees
+  with itself.
 - Backend selection is centralized in `src/runtime/backendSelection.ts` and
   `executeSelectedTealscriptBackend(...)`. Hosts pass an explicit override first,
   then their safe default. Web/worker/CLI default to compiled. Mobile must fail
@@ -56,6 +73,59 @@ promote them into structural block indentation.
   Generic legacy `input(close, ...)` preserves source identity through its
   first positional `defval` argument; treating it like an ordinary scalar input
   silently flattens downstream TA output.
+- Commit `39757006c2` deliberately changed invalid TA lookback lengths from
+  silent normalization to loud reference-correct refusal. TradingView documents
+  that TA lengths cannot be zero; non-finite, fractional, zero, and negative
+  runtime lengths now error. Corpus output counts for v5, v6, or v7 may drop at
+  or after this commit because we stopped producing plausible wrong output for
+  scripts TradingView refuses. Treat that as expected, not a regression, and do
+  not revert this behavior to improve corpus output numbers.
+- Builtin argument qualifier checks use the same declaration tables as UDF
+  inference, but the TA table must be derived per parameter from TradingView's
+  live reference `allowedTypeIDs`, not generalized from the `ta.ema()` example.
+  Declared Pine v5 direct `ta.*` simple-only enforcement covers 21 parameter
+  slots; v6+ covers those plus `ta.rci:length`. Common TA length slots such as
+  `ta.sma`, `ta.highest`, `ta.lowest`, `ta.correlation`, and `ta.vwma` are
+  documented as accepting `series int` lengths in both v5 and v6 and must not
+  be refused. Direct `input.*` default values still reject `input`, `simple`,
+  or `series` values where the typed input helper requires a `const` `defval`.
+  The earlier six-row TA blast-radius report was a false refusal measurement:
+  it judged documented-series TA length calls against one builtin's simple-only
+  rule.
+- Corpus and differential measurements must suspect the instrument before
+  trusting a surprising uniform movement. Tonight's false/incomplete instruments
+  included the external consensus plot-count ceiling, missing syminfo context,
+  output-family under-capture, JavaScript string coercion inherited by both
+  external voters, a qualifier blast-radius classifier that treated
+  `int()`/`float()`/`bool()` casts as `input.*` constructors, and a shipped TA
+  qualifier table that generalized the `ta.ema()` simple-length example across
+  documented-series TA length parameters. Durable gates beat note-shaped
+  conventions, but the gate's input data still needs suspicion.
+- Semantic builtin rules are especially prone to partial implementation:
+  argument type checking first missed only `array.percentile_*` while sibling
+  numeric builtins already refused strings; direct builtin qualifier checking
+  missed the live-reference-derived TA simple-only slots while UDF inference
+  already carried the same table; and builtin return checking missed 114
+  side-effect `void` returns while array mutators and `map.clear()`/
+  `map.put_all()` already refused assignment. Treat these as one transferable
+  defect shape: a shared Pine rule implemented for some members and not others,
+  masked by the correctly handled siblings. Prefer reference/declaration-table
+  derived sweeps over member spot checks when auditing semantic builtin
+  coverage, and verify each parameter's declared qualifier rather than
+  generalizing across a namespace. The array-mutator `void` path is not limited
+  to that v5+ 114-name cluster: declared-v4 `array.push()` used as a value is
+  correctly refused too.
+- Parser continuation edge recorded on 2026-09-12: a single-line UDF header
+  such as `f(x) => x` is no longer treated as assignment-like by
+  `startsWithAssignmentStatement`, so a following zero-indent leading `+`/`-`
+  can attach as a binary continuation. Both reported parses are invalid Pine;
+  do not chase this without a valid-script trace or corpus row.
+- Generated expression-source series for optimized `ta.sma(...)` calls must be
+  updated at the call site, after the declarations that feed the source and
+  length have executed. Pre-updating those hidden series at the top of `onBar`
+  makes nested public-script shapes such as `sma(stoch(src, high, low, period),
+  smooth)` construct `stoch` with the previous bar's input-backed length, which
+  appears as an invalid `na` TA length once silent length coercion is removed.
 - History reads in generated backends must normalize missing identifier or
   built-in series history to Pine `na` (`Number.NaN`), not JavaScript
   `undefined`. Public legacy accumulators rely on `nz(local[1])` seeding from
@@ -63,6 +133,11 @@ promote them into structural block indentation.
   resolving to the previous bar coordinate instead of `na`.
 - History offsets are Pine integer offsets. Truncate fractional offsets toward
   zero before reading history; negative offsets still return `na`.
+- `max_bars_back` is an offset limit, not a raw ring-buffer capacity. Generated
+  history series need one current slot plus the declared/history-hint depth.
+  Declaration `max_bars_back` and static literal history references size the
+  general runtime buffer; `max_bars_back(var, num)` is target-scoped and must
+  size only that target's history series.
 - Non-identifier history expressions in generated backends, such as
   `ta.highest(high, 2)[1]` or `(close - open)[1]`, are per-call-site series.
   Treating them as unsupported runtime errors drops plots/alerts on public
@@ -71,16 +146,52 @@ promote them into structural block indentation.
   values as halt signals. Historical execution stops for `runtime.error`
   exceptions, not because a plotting or expression statement evaluated to
   boolean `true`.
+- Barstate at compiled bar boundaries is composed in `executeCompiled()` before
+  the emitted `onBar()` sees the bar. When a run includes a realtime last bar,
+  the immediately preceding historical bar is
+  `barstate.islastconfirmedhistory`; that boundary exists even when the host
+  uses only `realtimeLastBar` rather than an explicit confirmed-realtime start
+  index. Keep this transition aligned with plot/history output replacement:
+  user code must observe the settled barstate before it writes series,
+  strategy, drawing, or plot output for that bar.
 - Generated backend assignment emission must route expression-valued RHSs
   through the normal assignment writer rather than assigning directly into an
   emitted read expression. History-read variables and UDT fields can compile to
   reads such as `series.get(0)` or field getters; those are values, not
   JavaScript lvalues.
+- Generated switch arm statement blocks are expression-valued: if the selected
+  arm's final statement is a nested `if`, loop, or expression statement, that
+  final selected value is the switch value. Do not lower unsupported tail
+  statement shapes to `na` without a value-vector or trace-backed reason.
+- Value-vector expected-reds are an executable register, not a parking list.
+  Every `EXPECTED_VALUE_VECTOR_FAILURES` entry must include an owner lane, a
+  reason (`trace-required`, `other-lane`, or `open-defect`), and a named
+  `openDefect` when it is fixable. The value-vector gate fails entries that
+  omit this metadata.
+- New value-vector cases must carry red-first discrimination metadata unless
+  they are explicitly listed in
+  `reports/pine-value-vector-red-first-exemptions-v1.json`. There is no
+  coverage-snapshot grandfather baseline: `run-pine-value-vectors.ts` is new in
+  this PR, so `pine-value-vectors-coverage-v174.json` is not a pre-rule
+  baseline. The exemption report is closed-ended: its checker fails on drift
+  and does not add rows automatically, so a new exemption must be a deliberate
+  tracked edit. A valid proof must assert bar-count output length and include a
+  value-flipping mutation (`flip-first-value` or
+  `flip-first-non-null-value`) that the gate verifies would make the case fail.
+  Length-only mutations such as truncating or dropping an output are not
+  accepted as proofs. Null-output expected diagnostics/expected reds are
+  unprovable by output mutation and must stay on the exemption list until they
+  have a different discriminator. New helper-derived expectations must also
+  cite a concrete published formula, reference composition, or equivalent
+  implementation; broad family-level docs are not enough for new helper
+  vectors.
 - Generated JavaScript identifiers and state member suffixes must be escaped
   from Pine names at emission time. Pine permits names such as `delete` that
   are JavaScript syntax errors when emitted raw, and the same escaping must be
   used for locals, UDFs, loop counters, state slots, snapshots, and history
-  members.
+  members. UDF parameter locals and ordinary UDF body locals also need
+  generated-private prefixes so Pine names like `ctx`, `_state`, etc. cannot
+  collide with hidden generated parameters.
 - Generated UDF local lookup is block-scoped for regular locals and
   function-scoped for `var`/`varip` state. Public libraries use a temporary
   `sum` during scale initialization and a persistent `sum` accumulator later in
@@ -96,9 +207,160 @@ promote them into structural block indentation.
   history reads must not be confused with array element indexing. Receiver
   methods reached dynamically, such as UDT-field arrays, still need Pine-to-JS
   helper-name aliases (`indexof` -> `indexOf`) before dispatch.
+- Array helper signatures must keep live v6 parameter names and compatibility
+  aliases in sync between semantic binding and codegen ordering. In particular,
+  `array.concat(id1, id2)` still accepts legacy `id=` as `id1`, and
+  `array.binary_search*()` uses live `val`/`sort_field` while preserving
+  `value=` as an alias. `sort_field` must reach the runtime helper for UDT-field
+  comparison; accepting the named argument and then comparing whole objects is a
+  silent binding defect.
+- Live-reference integrity comparisons must include zero-argument callable
+  entries and normalize packed variadic labels such as
+  `number0, number1, ...` on both sides before diffing. Otherwise the report
+  invents snapshot-extra rows for documented functions like
+  `strategy.cancel_all()` or variadic helpers and sends people toward false
+  removals.
+- Sized `array.new*()` calls without `initial_value` fill elements with Pine
+  `na` (`Number.NaN`), not JavaScript `undefined`; `array.get()` must expose
+  those elements as `na` while ordinary out-of-bounds reads still throw.
+- Collection sort helpers must recognize Pine `order.*` enum values at runtime
+  (`order.descending` as descending) as well as the legacy bare strings used by
+  older helper-level tests.
+- `ta.highestbars()` and `ta.lowestbars()` return negative-or-zero offsets from
+  the current bar back to the extremum, not positive bars-ago distances. The
+  official TradingView `ta` library's `aroon()` calculation is the built-in
+  endpoint form: it queries `ta.highestbars(..., length + 1)` /
+  `ta.lowestbars(..., length + 1)` and then adds `length`. The public
+  TradingView `ta` library v4 release note says Aroon was updated to match the
+  built-in indicator values; with negative offsets, a `length`-only window
+  cannot reach the 0 endpoint. Do not compensate by flipping the sign again in
+  Aroon or corpus-facing helpers.
+- `matrix.concat(id1, id2)` appends the rows of `id2` into `id1` and returns
+  `id1`, matching array-style left mutation. Do not "fix" corpus rows by
+  returning a detached combined copy; scripts that need an unmutated left matrix
+  must copy before concatenating.
+- `ticker.kagi()` has live v6 overloads for `ticker.kagi(symbol, reversal)` and
+  `ticker.kagi(symbol, param, style)`. Keep the checker overload selection and
+  runtime lowering explicit; older style-first positional tests are compatibility
+  evidence, not a reason to collapse the live overloads into one parameter list.
+- Compiled enum lowering is family-specific. Visual/chart enum families such as
+  `shape.*`, `location.*`, `size.*`, `format.*`, `scale.*`, `xloc.*`, `yloc.*`,
+  `extend.*`, and `position.*` lower to bare suffix strings; `display.*` lowers
+  to numeric bitmask values; `barmerge.*` lowers to fully qualified strings;
+  `session.*` goes through `ctx.sessionValue(...)`; strategy declaration/risk
+  families normalize to bare suffix strings or AST-derived declaration chains.
+  When an enum-valued runtime parameter silently defaults, first measure which
+  representation the compiled path is actually receiving before changing the
+  consumer.
+- Semantic binding for collection receiver methods must use the receiver type
+  even when the receiver is a call result. `matrix.inv().fill(...)` is
+  `matrix.fill`, not the visual `fill()` builtin.
+- Semantic type inference must keep Pine reference/special values as `series`
+  unless an explicit stronger local rule says otherwise. Drawing constructors,
+  collection constructors/helpers, UDT constructors, `plot()`/`hline()` handles,
+  and typed annotations for arrays, maps, matrices, drawing handles, plots,
+  hlines, and UDTs all inherit this series behavior from Pine's type system.
+  Do not "simplify" absent qualifiers on those values back to unqualified
+  handles; that loses the distinction checked by semantic invariants.
+- Pine keeps value identifiers separate from method names and user-defined type
+  names. Published TradingView scripts use patterns such as `method n(...)`
+  beside `n = bar_index` and `type lab` beside `lab[] lab`; semantic duplicate
+  checks must not collapse those namespaces. Ordinary function/value same-name
+  rows still need compiler evidence before accepting them.
+- Version-sensitive boolean rules must follow `pineVersionRules.ts`. Pine v3-v5
+  allow implicit numeric-to-bool assignment and bool `na` behavior that Pine v6
+  rejects; do not apply the v6 bool diagnostics uniformly to declared-v5
+  scripts.
+- Declared Pine v5 comparison expressions preserve legacy boolean `na` when an
+  operand is unavailable: `na(close[10] == 1)` must observe `na`, while
+  `(close[10] == 1) ? ...` still takes the false branch because v5 boolean `na`
+  casts false in conditions. The compiled runtime therefore uses v5-specific
+  comparison helpers for equality and ordered comparisons. Pine v6 keeps the
+  false-returning comparison helpers because bool values are never `na`; v4 was
+  not changed by the 2026-09-12 audit because the v4 operators page did not
+  carry the v5 comparison-result wording.
+- Declared Pine v5+ `%` is floor-quotient modulo, not JavaScript remainder:
+  lower `%` and `%=` through the compiled `_mod(a, b)` helper so negative
+  operands follow `a - b * floor(a / b)`. TealScript clamps forward-declared
+  versions such as v7 onto the v6 rule set, so they must use `_mod()` too. The
+  v4 operators page consulted on 2026-09-12 did not state the negative-operand
+  formula, so do not extend this behavior to v4 without version-specific
+  evidence.
+- Pine v5 documentation distinguishes `const int / const int` from runtime int
+  division, but the negative quotient rule for legacy const-int division is not
+  yet evidenced. Do not implement floor or truncation for negative v5/v4 const
+  division from inference; settle it through the compile-evidence queue first.
+- Operator operand validation is a semantic rule, not a runtime coercion rule.
+  Pine arithmetic accepts numeric operands, with `+` also accepting two strings
+  for concatenation; ordered comparisons accept numeric operands; equality and
+  inequality may compare non-numeric fundamental values; logical operators
+  accept bool operands, with the existing version rules preserving legacy
+  numeric-to-bool behavior before v6. Do not inherit JavaScript coercions such
+  as `"5" - 2`, `"price: " + close`, `"b" > "a"`, `color.red > color.blue`, or
+  `"yes" and flag`.
+- The legacy global `iff(condition, then, else)` helper is available only before
+  Pine v5. Declared v5/v6 scripts should receive the migration diagnostic that
+  points authors to the `condition ? thenValue : elseValue` operator rather than
+  silently accepting a helper removed from modern Pine.
+- `security`/`request.security` barmerge arguments reject runtime-series
+  computation, but the semantic check must still accept TradingView-published
+  legacy forms: Pine v4 `security(..., true, lookahead=true)` boolean switches,
+  and non-series conditionals selecting between allowed `barmerge.gaps_*` or
+  `barmerge.lookahead_*` constants, including official library wrappers that
+  store that selection in a local variable.
+- `array.slice(id, from, to)` permits `from == to` and returns an empty slice.
+  Only `from > to` is an invalid range; empty for-in expressions over such a
+  slice should evaluate to `na`, not throw before global plots run.
+- Runtime helper errors that are Pine runtime failures must be classified by
+  `isKnownPineRuntimeError()` in `src/runtime/codegen/execute.ts`. Otherwise the
+  compiled bar/global-initialization and request-expression replay boundaries
+  record them as swallowed generated errors and the script can look like
+  `errors: []`, `plots: []`, or produced output with `profile.swallowedErrors`
+  only. Keep broad Pine-facing families such as array/map/matrix/table/TA/output
+  limit errors on that boundary list; do not add internal codegen/backend
+  guardrails there.
+- `src/runtime/approximationSurface.test.ts` is the standing guard for the
+  runtime/tealchart approximation audit. It derives its scope from the
+  Pine-facing runtime and tealchart rendering roots, then requires each
+  clamp/floor/fallback/coercion/error-swallowing candidate to be scanned or
+  explicitly excluded with a documented reason. A new match should either
+  become loud/reference-correct behavior, be reported through
+  `RuntimeProfile.runtimeApproximations`, join `codegen/fallbackInventory.ts`,
+  join tealchart's `pineVisualNormalizationRegister.ts`, or be added to the
+  explicit allowlist with a documented reason. Do not widen the detector or add
+  noisy file exclusions just to make a new red go away. The same guard also
+  checks that generated-code/request replay swallow catches consult
+  `isKnownPineRuntimeError(error)` before demoting an exception into
+  `RuntimeProfile.swallowedErrors`; a profiled swallow is not sufficient when
+  the thrown value is already a known Pine runtime failure.
+- Four scoped class sweeps in the runtime/tealchart parity effort found
+  isolated defects rather than systemic shared-normalizer failures:
+  `extractStrategySettings()` dropped only
+  `backtest_fill_limits_assumption`, point-data request scalar shortcuts were
+  limited to `request.economic()`, receiver-method named argument binding for
+  `table.cell()` was a shadowing one-off rather than a general method binder
+  break, and `positiveInteger()` only feeds `table.new()` columns/rows. Treat
+  suspected classes as measurement questions; these precedents say to grep and
+  prove the caller set before generalizing from a single silent normalization.
 - Local method overloads keep distinct generated identities by receiver type
   and arity. Resolve user/imported methods before generic collection method
   fallback so script methods named like `copy` or `size` are not swallowed.
+- For Pine handle receiver methods, codegen must only let compatible local
+  methods/functions shadow the builtin namespace method. Incompatible helper
+  names such as a wrapper `cell(...)` must fall through to `table.cell(...)`
+  with the receiver prepended so named arguments bind against the builtin
+  signature.
+- Official TradingView import aliases do not hide builtin namespaces. Exported
+  library members resolve first, then unresolved members fall back to the
+  builtin namespace with the same alias. This priority still applies when the
+  import's default alias is the builtin namespace name (`import TradingView/ta/7`
+  -> `ta`): exported official members own signature checks before builtin
+  fallback. Do not add builtin members to official export lists to fix alias
+  fallback.
+- Semantic inference for `else if` ladders must avoid re-walking assignment-only
+  alternate chains for type after a branch has no expression return. Public v6
+  alert dashboards use 50+ arm selector UDFs; exponential inference there turns
+  semantic checking into a CPU-bound hang.
 - Enum values keep stable runtime identities for equality; `.title()` on a
   variable-held enum value must look up that identity's display title instead
   of replacing the enum value with its title string.
@@ -160,6 +422,19 @@ promote them into structural block indentation.
   `max_labels_count` before the first bar creates drawings. Otherwise public
   scanner scripts that request larger limits silently prune to the default
   retained drawing count.
+- Strategy declaration extraction owns declaration-to-ledger plumbing. Every
+  declaration argument that affects `StrategyLedgerSettings` must be mapped in
+  `extractStrategySettings()` before bar execution starts; for example,
+  `backtest_fill_limits_assumption` feeds
+  `backtestFillLimitsAssumptionTicks`, which the order engine already uses for
+  verified limit fills. Trace-required strategy options remain loud semantic
+  refusals rather than inferred approximations.
+- `scripts/check-strategy-ledger-invariants.ts` is the trace-free consistency
+  gate for strategy ledgers over external corpora. It checks internal arithmetic
+  relationships such as equity decomposition, open/closed trade counts,
+  realized P/L versus closed trades and commissions, open size, and average
+  price reconstructed from remaining lots. A violation is a runtime money bug
+  even without a TradingView trace.
 - Drawing ID-producing builtins need per-bar invocation identity when a single
   call site executes more than once on the same bar. Reusing only source
   location plus `bar_index` aliases handles and makes later mutators update the
@@ -205,6 +480,16 @@ promote them into structural block indentation.
   first message, and surface the same summary in external corpus rows. This
   applies to compiled top-level bar execution and compiled request-expression
   evaluation; loop-control catches are not error swallowing.
+- Dynamic array percentile percentages and color constructor channels outside
+  the documented Pine ranges are still clamped so scripts can continue, but the
+  exact TradingView runtime behavior for dynamic out-of-range values is
+  trace-required. Keep these visible through `RuntimeProfile.runtimeApproximations`
+  instead of treating the clamp as proven parity.
+- Color transparency values inside the documented 0..100 range must stay
+  floating point until conversion to the underlying 8-bit alpha channel.
+  TradingView documents float transparency as the way color functions access
+  all 256 alpha values; rounding `color.new()`/`color.rgb()` transparency before
+  alpha conversion silently shifts colors such as `12.5` by one alpha step.
 - Request-expression replay must be dependency-selected for both globals and
   request-local statements. Replaying every prior statement is correct-looking
   but unaffordable: one public scanner request sat after 100+ replayable
@@ -217,6 +502,11 @@ promote them into structural block indentation.
   capturing the chart-context value makes request expressions use the chart's
   source instead of the requested series. Unknown or series-like dependencies
   stay replayed.
+- Provider-backed point requests must preserve event timestamps when Pine
+  `gaps=barmerge.gaps_on` is requested. Scalar provider shortcuts are only safe
+  for fill-forward modes; `request.economic()` uses the generic point-series
+  merge path for `gaps_on` so bars without a new point return `na`, matching the
+  documented `request.*()` gaps rule.
 - `request.security_lower_tf()` accepts tick timeframes such as `1T` as lower
   than time-based chart periods. Tuple expressions return one intrabar
   `PineArray` per tuple item, including `bid`/`ask` source fields; returning an
@@ -238,6 +528,9 @@ promote them into structural block indentation.
 - Highest/lowest window helpers do not clamp non-positive lengths to one.
   `ta.highest`, `ta.lowest`, `ta.highestbars`, and `ta.lowestbars` return `na`
   for zero or negative lengths after consuming the current bar.
+- `ta.max(source)` and `ta.min(source)` are v6 all-time extrema helpers. Do not
+  accept a second Pine argument for pairwise comparison; the runtime TA class has
+  an internal two-input compute mode, but the Pine-facing callable is one-arg.
 
 **Execution flow:**
 
@@ -277,6 +570,40 @@ series[n]   // n bars ago
 - Block-local `var`/`varip` declarations initialize the first time their
   statement executes, not necessarily on bar zero; compiled code must use an
   init flag for delayed blocks such as `if barstate.islast`.
+- Persistent state identity is declaration-scoped, not name-scoped. A
+  block-local `var`/`varip` may shadow an outer persistent variable with the
+  same identifier, so generated state members and init flags must not key only
+  on the Pine name.
+- Identifier history resolution must honor user declarations before builtin
+  fallbacks. A local `n`, `bar_index`, `last_bar_index`, or price-field name
+  shadows the builtin; `name[1]` is then the user series history, not the
+  fallback runtime series.
+- Function call-site parameter/local history follows Pine local-scope time
+  series rules. Each written call owns independent buffers, and history is
+  built from successive calls, not chart bars with filled holes. A skipped call
+  does not commit a new value; repeated loop executions on one bar update one
+  slot, not multiple prior-history entries.
+- Dynamic `request.*()` calls in loops split context from expression semantics:
+  loop variables and loop-mutated values may select the requested context, but
+  Pine forbids the evaluated expression from depending on them. Reject that
+  shape before runtime; otherwise the request subprogram can swallow the
+  generated missing-local error and return plausible `na` values. Root block
+  locals named like builtins or legacy input aliases (`symbol`, `n`, `close`,
+  etc.) must enter the local-name stack before request argument emission.
+- User identifiers shadow builtins and legacy aliases in every generated path.
+  This is an invariant, not one resolver: ordinary reads, history reads,
+  request source descriptors/captures, assignment targets, analyzer
+  classification, and persistent-state identity make separate decisions today.
+  Keep analyzer declared-name collection aligned with emitter root/block
+  promotion so a user `close`, `n`, `symbol`, or `source` cannot silently fall
+  through to a builtin/alias on only one surface. `compile.test.ts` carries the
+  structural gate for the general rule: branch-local declarations named like
+  builtin series, generated values, legacy aliases, colors, and visual constants
+  must classify as user history series and write the scoped value into the same
+  `_sv_*` buffer that `name[1]` reads. The opposite side of the same rule is
+  guarded too: in legacy scripts with no user declaration, bare TA variable
+  aliases such as `pvt` must stay on their TA-variable path instead of becoming
+  unresolved generated JavaScript.
 - Untyped variables inferred from literal initializers can widen qualifiers on later reassignment or compound assignment; explicit `const`/`input`/`simple` annotations remain enforced.
 - Unary numeric literals such as `-1` and `+1` are numeric literals for type inference, not `unknown`; sentinel locals initialized that way must still widen when reassigned from loop or series values.
 - Explicit type annotations can initialize from `na`, including `bool flag = na`;
@@ -321,6 +648,13 @@ pending order parameters without resetting the original activation bar/time.
 Historical price-based exits then fill against the default chart-OHLC tick path;
 resetting activation on each dynamic price update leaves valid exits pending
 forever on common moving-stop scripts.
+`strategy(calc_on_every_history_tick=true)` executes the historical strategy
+body for each synthetic OHLC tick. Generated series update in place after the
+first tick so repeated historical executions do not duplicate bar history.
+Per-bar visual outputs must follow the same replacement rule: `plot()`,
+`fill()`, `plotshape()`/`plotchar()`, `plotarrow()`, `plotbar()`/`plotcandle()`,
+`bgcolor()`, `barcolor()`, and `alertcondition()` write by `bar_index` so
+same-bar recalculations leave one output value per chart bar.
 Default strategies still process pending broker fills on unconfirmed realtime
 ticks even though they skip statement execution and equity finalization; do not
 trim the ledger after the fact. Confirmed realtime close replay must mirror the
@@ -522,11 +856,14 @@ count plus first bar/message. A script that silently throws before every output
 call is a diagnosable corpus/runtime gap, not an empty-output mystery. Current
 v1 instrumentation is zero; any future nonzero count is a finding to investigate.
 
-The default `pine-composite-performance.test.ts` cases are smoke checks only;
-full assertions stay behind `TEALSCRIPT_PERF_ASSERT=1`. Do not increase the
-default smoke workload to make a timeout pass. The request-backed worker smokes
-have 10s local timeouts because the CI-shaped Turbo run stretches sub-second
-isolated checks under package concurrency.
+`pine-composite-performance.test.ts` keeps threshold assertions behind
+`TEALSCRIPT_PERF_ASSERT=1` because the full package Vitest suite runs enough
+concurrent work to make microbenchmark timing noisy. CI must run that opt-in
+mode as a separate isolated step; a perf gate that only exists locally is not a
+gate. Do not increase the benchmark workload or thresholds to make a timeout
+pass. The request-backed worker smokes have 10s local timeouts because the
+CI-shaped Turbo run stretches sub-second isolated checks under package
+concurrency.
 
 Behavior tables that assert literal expected values must declare provenance for
 those values: independently derived from Pine v6/reference semantics, taken
@@ -603,6 +940,12 @@ legacy `input()` type selectors, bare color/style constants, old ticker helpers,
 bare `tickerid`, v3 `n` as `bar_index`, numeric truthiness in boolean built-in
 parameters, legacy visual `transp`, and boolean `strategy.entry()`/`order()`
 directions; v6 signatures remain strict unless the reference says otherwise.
+Non-exported request wrappers may run from local blocks without
+`dynamic_requests=true` in v3-v5; v6 requires it for wrapped requests invoked
+from local blocks. Keep this rule in `src/pineVersionRules.ts`.
+Version-sensitive v6 migration rules live in `src/pineVersionRules.ts`; do not
+hard-code `<= 5` checks at enforcement sites when the rule belongs in that
+table.
 
 External public-corpus reports are metadata only, read source from
 `/tmp/pine-corpus-v1` or `/tmp/pine-corpus-v2`, and carry row-level validity
@@ -613,16 +956,41 @@ non-Pine corpus hygiene, corpus input gaps, and permanent unsupported-by-design
 policy outcomes. Rows not proven invalid, hygiene, corpus-input, or
 unsupported-by-design remain in the product denominator as TealScript or
 host-dependency gaps so the corpus cannot flatter TealScript by guessing.
+`yarn workspace @tealstreet/tealscript pine:external-corpus:fast-gate` is the
+standing cheap acceptance-regression gate over a 12-row committed real-script
+fixture selected from v5/v6/v7. It catches parse/semantic/compile/execute/output
+regressions on that subset only; it does not replace a full pinned corpus rerun
+or prove output correctness.
+`yarn workspace @tealstreet/tealscript pine:external-corpus:refusal-gate` is
+the sibling expected-refusal gate over a 6-row committed fixture. It asserts
+specific refusal diagnostics for invalid TA lengths, modern `iff()`, computed
+request barmerge modes, v6 migration linewidth, and surfaced array.slice range
+errors. It catches refusals silently becoming accepted or changing into the
+wrong failure, but it also does not replace a full pinned corpus rerun.
+`pine:external-corpus:pinned` archives `packages/tealscript` before importing
+the runner from the measured commit. The report directory is large enough that
+the archive needs a 1GB `maxBuffer`; lowering it can make current reruns fail
+with `spawnSync git ENOBUFS` before any corpus measurement starts.
 
 See `PINE_PARITY_AUDIT.md`, `PINE_COMPATIBILITY_INVENTORY.md`, and `PINE_BUILTINS_COVERAGE.md` before claiming PineScript compatibility.
 
 ## Commands
+
+The package `typecheck` script intentionally runs with
+`NODE_OPTIONS=--max-old-space-size=12288`. This was first raised to 8GB when
+the post-parity TypeScript graph outgrew Node's default heap, then raised again
+on 2026-09-12 after a package typecheck OOMed at 8192MB before diagnostics.
+The same growth moved the healthy-gate wall time from an earlier 86s baseline
+to a 2:16 12GB pass; keep dated heap and timing measurements with any future
+change.
 
 ```bash
 yarn build:parser     # Regenerate parser from grammar.peggy
 yarn build-force      # Build with tsup
 yarn dev-force        # Watch mode
 yarn test             # Vitest
+yarn pine:external-corpus:fast-gate # Fast real-script corpus acceptance gate
+yarn pine:external-corpus:refusal-gate # Fast expected-refusal corpus gate
 yarn typecheck        # tsc --noEmit
 yarn lint             # ESLint
 ```
@@ -647,3 +1015,5 @@ yarn lint             # ESLint
 - ESLint ignores generated parser files (configured in `eslint.config.mjs`)
 - The worker entry point requires bundler URL resolution: `new URL('@tealstreet/tealscript/worker', import.meta.url)`
 - Compiled tuple/control codegen must treat `_` as discard-only, read tuple elements through runtime indexing, and propagate expression-result assignment through nested if/loop tails.
+- **Generated value-vector coverage snapshots are gitignored** (`reports/.gitignore`). `pine:value-vectors` writes one every run and adjacent generations are near-identical — a 2026-09 audit measured **0 of 931 cases changed between consecutive versions** — so the committed series had grown to ~570MB of history carrying no reviewable signal, and it was stripped from the parity branch before merge. `coverage-v117.json` and `coverage-v174.json` stay **tracked** because scripts import them; gitignore does not untrack existing files. **If a future generation is genuinely needed as a committed input it will be silently ignored** — the same failure mode as the bare `coverage/` rule in the root `.gitignore` that once kept a real source file out of a build. Stage it with `git add -f` and say why in the commit message.
+- **A blast-radius sample is a lower bound; an exposure count is an upper bound.** Both were measured on 2026-09-12: the TA qualifier enforcement predicted 6 newly-refusing corpus rows and the full rerun found **10**, while negative modulo had **165** definite negative-capable rows and a measured value impact of **5**. Neither method is a forecast — quote them as bounds, and measure the real delta before claiming one.

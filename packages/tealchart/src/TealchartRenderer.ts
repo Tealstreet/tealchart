@@ -2146,8 +2146,7 @@ export class TealchartRenderer {
       return;
     }
 
-    // Get base color (first color if array, otherwise the string)
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
 
     ctx.strokeStyle = baseColor;
     ctx.lineWidth = linewidth;
@@ -2195,18 +2194,28 @@ export class TealchartRenderer {
         continue;
       }
 
+      const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (barColor === null) {
+        if (isDrawing) {
+          ctx.stroke();
+          ctx.beginPath();
+          isDrawing = false;
+        }
+        continue;
+      }
+
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.priceToY(value, viewport, priceHeight);
 
       // Handle per-bar color if available
-      if (Array.isArray(color) && color[i]) {
+      if (Array.isArray(color)) {
         // Stroke previous segment and start new with different color
         if (isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(lastX, lastY);
         }
-        ctx.strokeStyle = color[i] || baseColor;
+        ctx.strokeStyle = barColor;
       }
 
       if (!isDrawing) {
@@ -2260,7 +2269,7 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const { values, color, linewidth = 1 } = plot;
-    const baseColor = markerOptions?.color ?? (Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3');
+    const baseColor = markerOptions?.color ?? this.getPlotBaseColor(color, '#2196F3');
     const markerLinewidth = markerOptions?.linewidth ?? linewidth;
     const markerSize = Math.max(3, markerLinewidth * 2);
 
@@ -2272,7 +2281,8 @@ export class TealchartRenderer {
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
       if (value === null || value === undefined || isNaN(value)) continue;
 
-      const markerColor = markerOptions?.color === undefined && Array.isArray(color) && color[i] ? color[i] : baseColor;
+      const markerColor =
+        markerOptions?.color === undefined ? this.getVisiblePlotColorAt(color, i, baseColor) : baseColor;
       if (!markerColor) continue;
 
       ctx.fillStyle = markerColor as string;
@@ -2293,7 +2303,7 @@ export class TealchartRenderer {
     const priceHeight = chartHeight - volumeHeight;
 
     const { values, color, linewidth = 1, style = 'histogram' } = plot;
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
 
     // Calculate bar width
     const viewportTimeRange = viewport.endTime - viewport.startTime;
@@ -2325,8 +2335,8 @@ export class TealchartRenderer {
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.priceToY(value, viewport, priceHeight);
 
-      // Use per-bar color if available
-      const barColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
+      const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (barColor === null) continue;
       ctx.fillStyle = barColor as string;
 
       const barTop = Math.min(y, baselineY);
@@ -2358,7 +2368,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
 
     const { values, color, linewidth = 1 } = plot;
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
     const markerSize = Math.max(3, linewidth * 2);
 
     this.renderJoinedPointLine(plot, bars, viewport, valueToY, baseColor);
@@ -2379,7 +2389,8 @@ export class TealchartRenderer {
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = valueToY(value);
-      const markerColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
+      const markerColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (markerColor === null) continue;
 
       ctx.strokeStyle = markerColor as string;
       ctx.fillStyle = markerColor as string;
@@ -2446,13 +2457,23 @@ export class TealchartRenderer {
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = valueToY(value);
 
+      const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (barColor === null) {
+        if (isDrawing) {
+          ctx.stroke();
+          ctx.beginPath();
+          isDrawing = false;
+        }
+        continue;
+      }
+
       if (Array.isArray(color)) {
         if (isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(lastX, lastY);
         }
-        ctx.strokeStyle = color[i] || baseColor;
+        ctx.strokeStyle = barColor;
       }
 
       if (!isDrawing) {
@@ -2473,11 +2494,44 @@ export class TealchartRenderer {
     ctx.setLineDash([]);
   }
 
-  private getPerBarColor(color: string | (string | null)[] | undefined, barIndex: number, fallback: string): string {
+  private getPlotBaseColor(color: string | (string | null)[] | undefined, fallback: string): string {
     if (Array.isArray(color)) {
-      return color[barIndex] || fallback;
+      return color.find((value): value is string => Boolean(value)) ?? fallback;
     }
     return color || fallback;
+  }
+
+  private getVisiblePlotColorAt(
+    color: string | (string | null)[] | undefined,
+    barIndex: number,
+    fallback: string,
+  ): string | null {
+    if (Array.isArray(color)) {
+      return color[barIndex] ?? null;
+    }
+    return color || fallback;
+  }
+
+  private getPerBarColor(color: string | (string | null)[] | undefined, barIndex: number, fallback: string): string | null {
+    if (Array.isArray(color)) {
+      return color[barIndex] ?? null;
+    }
+    return color || fallback;
+  }
+
+  private applyColorOpacity(color: string, opacity: number): string {
+    if (opacity >= 100) return color;
+
+    const alphaHex = Math.round(opacity * 2.55)
+      .toString(16)
+      .padStart(2, '0');
+    if (color.length === 9) {
+      return color.slice(0, 7) + alphaHex;
+    }
+    if (color.length === 7) {
+      return color + alphaHex;
+    }
+    return color;
   }
 
   private getSlotWidth(bars: Bar[], viewport: Viewport, chartWidth: number): number {
@@ -2542,8 +2596,9 @@ export class TealchartRenderer {
     if (!latest || latest.value < yMin || latest.value > yMax) return;
 
     const { ctx, options, margins } = this;
-    const fallbackColor = Array.isArray(plot.color) ? plot.color.find(Boolean) || '#2196F3' : plot.color || '#2196F3';
-    const color = this.getPerBarColor(plot.color, latest.index, fallbackColor);
+    const fallbackColor = this.getPlotBaseColor(plot.color, '#2196F3');
+    const color = this.getVisiblePlotColorAt(plot.color, latest.index, fallbackColor);
+    if (color === null) return;
     const y = valueToY(latest.value);
 
     ctx.strokeStyle = color;
@@ -2646,6 +2701,7 @@ export class TealchartRenderer {
       const lowY = valueToY(low);
       const closeY = valueToY(close);
       const bodyColor = this.getPerBarColor(plot.color, i, fallbackColor);
+      if (bodyColor === null) continue;
 
       if (plot.type === 'plotbar') {
         ctx.strokeStyle = bodyColor;
@@ -2666,18 +2722,22 @@ export class TealchartRenderer {
       const bodyTop = Math.min(openY, closeY);
       const bodyHeight = Math.max(1, Math.abs(closeY - openY));
 
-      ctx.strokeStyle = wickColor;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x, highY);
-      ctx.lineTo(x, lowY);
-      ctx.stroke();
+      if (wickColor !== null) {
+        ctx.strokeStyle = wickColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, highY);
+        ctx.lineTo(x, lowY);
+        ctx.stroke();
+      }
 
       ctx.fillStyle = bodyColor;
       ctx.fillRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
 
-      ctx.strokeStyle = borderColor;
-      ctx.strokeRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
+      if (borderColor !== null) {
+        ctx.strokeStyle = borderColor;
+        ctx.strokeRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
+      }
     }
   }
 
@@ -2704,16 +2764,12 @@ export class TealchartRenderer {
 
   private getAreaFillBaselineY(
     plot: PlotOutput,
-    fillFromTop: boolean,
-    top: number,
-    height: number,
+    _fillFromTop: boolean,
+    _top: number,
+    _height: number,
     valueToY: (value: number) => number,
   ): number {
-    if (this.hasPlotHistbase(plot)) {
-      return valueToY(this.getPlotHistbase(plot));
-    }
-
-    return fillFromTop ? top : top + height;
+    return valueToY(this.getPlotHistbase(plot));
   }
 
   private renderAreaFillWithY(
@@ -2727,7 +2783,7 @@ export class TealchartRenderer {
     const { ctx, options, margins } = this;
     const chartWidth = options.width - margins.left;
     const { values, color } = plot;
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
     const hasPerBarColor = Array.isArray(color);
 
     if (hasPerBarColor) {
@@ -2791,7 +2847,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
     const { values, color } = plot;
     const colors = Array.isArray(color) ? color : [];
-    const baseColor = colors[0] || '#2196F3';
+    const baseColor = this.getPlotBaseColor(colors, '#2196F3');
 
     let prevX: number | null = null;
     let prevY: number | null = null;
@@ -2818,7 +2874,12 @@ export class TealchartRenderer {
 
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = valueToY(value);
-      const barColor = colors[i] || baseColor;
+      const barColor = this.getVisiblePlotColorAt(colors, i, baseColor);
+      if (barColor === null) {
+        prevX = null;
+        prevY = null;
+        continue;
+      }
 
       if (prevX !== null && prevY !== null) {
         ctx.fillStyle = this.areaFillColor(barColor);
@@ -2951,7 +3012,7 @@ export class TealchartRenderer {
     }
 
     const y = this.priceToY(price, viewport, priceHeight);
-    const color = Array.isArray(plot.color) ? plot.color[0] || '#787B86' : plot.color || '#787B86';
+    const color = this.getPlotBaseColor(plot.color, '#787B86');
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
@@ -3012,10 +3073,9 @@ export class TealchartRenderer {
       }
 
       const x = this.timeToX(bar.time, viewport, chartWidth);
-      const barColor =
-        Array.isArray(color) && color[i]
-          ? color[i]
-          : (Array.isArray(color) ? color[0] : color) || 'rgba(33, 150, 243, 0.2)';
+      const fallbackColor = this.getPlotBaseColor(color, 'rgba(33, 150, 243, 0.2)');
+      const barColor = this.getVisiblePlotColorAt(color, i, fallbackColor);
+      if (barColor === null) continue;
 
       ctx.fillStyle = barColor as string;
       ctx.fillRect(x - slotWidth / 2, regionTop, slotWidth, regionHeight);
@@ -3048,7 +3108,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
 
     const { values, color, location = 'abovebar', shape = 'circle', size = 'small' } = plot;
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
     const textColor = Array.isArray(plot.textColor) ? plot.textColor[0] || '#FFFFFF' : plot.textColor || '#FFFFFF';
 
     // Size mapping
@@ -3114,19 +3174,20 @@ export class TealchartRenderer {
           y = valueToY(bar.close);
       }
 
-      const shapeColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
-      if (!shapeColor) continue;
-      ctx.fillStyle = shapeColor as string;
-      ctx.strokeStyle = shapeColor as string;
+      const shapeColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (shapeColor !== null) {
+        ctx.fillStyle = shapeColor as string;
+        ctx.strokeStyle = shapeColor as string;
 
-      if (plot.type === 'plotchar') {
-        ctx.font = `${Math.max(10, markerSize * 2)}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(plot.char || '●', x, y);
-      } else {
-        const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
-        this.drawShape(x, y, markerShape, markerSize);
+        if (plot.type === 'plotchar') {
+          ctx.font = `${Math.max(10, markerSize * 2)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(plot.char || '●', x, y);
+        } else {
+          const markerShape = plot.type === 'plotarrow' ? (value > 0 ? 'arrowup' : 'arrowdown') : shape || 'circle';
+          this.drawShape(x, y, markerShape, markerSize);
+        }
       }
 
       const markerText = Array.isArray(plot.textValues) ? plot.textValues[i] : plot.text;
@@ -3166,11 +3227,13 @@ export class TealchartRenderer {
 
   private getVisiblePlotArrowMaxMagnitude(plot: PlotOutput, bars: Bar[], viewport: Viewport): number {
     let maxMagnitude = 0;
+    const baseColor = this.getPlotBaseColor(plot.color, '#2196F3');
 
     for (let i = 0; i < bars.length && i < plot.values.length; i++) {
       if (!this.shouldRenderPlotBar(plot, bars, i)) continue;
       const plotTime = this.getPlotTime(plot, bars, i);
       if (plotTime < viewport.startTime || plotTime > viewport.endTime) continue;
+      if (this.getVisiblePlotColorAt(plot.color, i, baseColor) === null) continue;
 
       const value = plot.values[i];
       if (typeof value === 'number' && Number.isFinite(value)) {
@@ -5078,7 +5141,7 @@ export class TealchartRenderer {
   }
 
   private shouldRenderPlot(plot: Pick<PlotOutput, 'display'>): boolean {
-    return plot.display !== 0;
+    return plot.display === undefined || (plot.display & 1) !== 0;
   }
 
   private shouldRenderPlotBar(plot: Pick<PlotOutput, 'showLast'>, bars: { length: number }, index: number): boolean {
@@ -5131,7 +5194,7 @@ export class TealchartRenderer {
     }
 
     const y = this.valueToY(price, pane);
-    const color = Array.isArray(plot.color) ? plot.color[0] || '#787B86' : plot.color || '#787B86';
+    const color = this.getPlotBaseColor(plot.color, '#787B86');
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;
@@ -5192,7 +5255,7 @@ export class TealchartRenderer {
     }
 
     // Get base color from plot
-    const plotBaseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const plotBaseColor = this.getPlotBaseColor(color, '#2196F3');
 
     // Check for style overrides
     const override = plotStyleOverrides?.get(plot.id);
@@ -5201,19 +5264,7 @@ export class TealchartRenderer {
     const effectiveLineStyle = override?.lineStyle ?? plot.lineStyle ?? 'solid';
     const effectiveOpacity = override?.opacity ?? 100;
 
-    // Apply opacity to color if needed
-    let renderColor = effectiveColor;
-    if (effectiveOpacity < 100) {
-      const alphaHex = Math.round(effectiveOpacity * 2.55)
-        .toString(16)
-        .padStart(2, '0');
-      // Handle colors with existing alpha (8 chars) or without (6 chars after #)
-      if (renderColor.length === 9) {
-        renderColor = renderColor.slice(0, 7) + alphaHex;
-      } else if (renderColor.length === 7) {
-        renderColor = renderColor + alphaHex;
-      }
-    }
+    const renderColor = this.applyColorOpacity(effectiveColor, effectiveOpacity);
 
     ctx.strokeStyle = renderColor;
     ctx.lineWidth = effectiveLinewidth;
@@ -5245,28 +5296,27 @@ export class TealchartRenderer {
         continue;
       }
 
+      const rawBarColor = override?.color ? effectiveColor : this.getVisiblePlotColorAt(color, i, plotBaseColor);
+      if (rawBarColor === null) {
+        if (isDrawing) {
+          ctx.stroke();
+          ctx.beginPath();
+          isDrawing = false;
+        }
+        continue;
+      }
+
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToY(value, pane);
 
       // Handle per-bar colors (only if no override is set)
-      if (!override?.color && Array.isArray(color) && color[i]) {
+      if (!override?.color && Array.isArray(color)) {
         if (isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(lastX, lastY);
         }
-        let perBarColor = color[i] || plotBaseColor;
-        if (effectiveOpacity < 100) {
-          const alphaHex = Math.round(effectiveOpacity * 2.55)
-            .toString(16)
-            .padStart(2, '0');
-          if (perBarColor.length === 9) {
-            perBarColor = perBarColor.slice(0, 7) + alphaHex;
-          } else if (perBarColor.length === 7) {
-            perBarColor = perBarColor + alphaHex;
-          }
-        }
-        ctx.strokeStyle = perBarColor;
+        ctx.strokeStyle = this.applyColorOpacity(rawBarColor, effectiveOpacity);
       }
 
       if (!isDrawing) {
@@ -5330,7 +5380,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
 
     const { values, color, linewidth = 1, style = 'histogram' } = plot;
-    const plotBaseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const plotBaseColor = this.getPlotBaseColor(color, '#2196F3');
 
     // Check for style overrides
     const override = plotStyleOverrides?.get(plot.id);
@@ -5364,26 +5414,15 @@ export class TealchartRenderer {
       const y = this.valueToY(value, pane);
 
       // Get color - prefer override, then per-bar color, then base color
-      let barColor: string;
+      let barColor: string | null;
       if (override?.color) {
         barColor = override.color;
-      } else if (Array.isArray(color) && color[i]) {
-        barColor = color[i] || plotBaseColor;
       } else {
-        barColor = effectiveColor;
+        barColor = this.getVisiblePlotColorAt(color, i, plotBaseColor);
       }
+      if (barColor === null) continue;
 
-      // Apply opacity if needed
-      if (effectiveOpacity < 100) {
-        const alphaHex = Math.round(effectiveOpacity * 2.55)
-          .toString(16)
-          .padStart(2, '0');
-        if (barColor.length === 9) {
-          barColor = barColor.slice(0, 7) + alphaHex;
-        } else if (barColor.length === 7) {
-          barColor = barColor + alphaHex;
-        }
-      }
+      barColor = this.applyColorOpacity(barColor, effectiveOpacity);
 
       ctx.fillStyle = barColor;
       if (value >= this.getPlotHistbase(plot)) {
@@ -5950,7 +5989,7 @@ export class TealchartRenderer {
       return;
     }
 
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
 
     ctx.strokeStyle = baseColor;
     ctx.lineWidth = linewidth;
@@ -5984,16 +6023,26 @@ export class TealchartRenderer {
         continue;
       }
 
+      const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (barColor === null) {
+        if (isDrawing) {
+          ctx.stroke();
+          ctx.beginPath();
+          isDrawing = false;
+        }
+        continue;
+      }
+
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToPaneY(value, paneOffset);
 
-      if (Array.isArray(color) && color[i]) {
+      if (Array.isArray(color)) {
         if (isDrawing) {
           ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(lastX, lastY);
         }
-        ctx.strokeStyle = color[i] || baseColor;
+        ctx.strokeStyle = barColor;
       }
 
       if (!isDrawing) {
@@ -6044,7 +6093,7 @@ export class TealchartRenderer {
     const chartWidth = options.width - margins.left;
 
     const { values, color, linewidth = 1, style = 'histogram' } = plot;
-    const baseColor = Array.isArray(color) ? color[0] || '#2196F3' : color || '#2196F3';
+    const baseColor = this.getPlotBaseColor(color, '#2196F3');
 
     // Calculate bar width
     const viewportTimeRange = viewport.endTime - viewport.startTime;
@@ -6076,7 +6125,8 @@ export class TealchartRenderer {
       const x = this.timeToX(plotTime, viewport, chartWidth);
       const y = this.valueToPaneY(value, paneOffset);
 
-      const barColor = Array.isArray(color) && color[i] ? color[i] : baseColor;
+      const barColor = this.getVisiblePlotColorAt(color, i, baseColor);
+      if (barColor === null) continue;
       ctx.fillStyle = barColor as string;
 
       const barTop = Math.min(y, baselineY);
@@ -6100,7 +6150,7 @@ export class TealchartRenderer {
     }
 
     const y = this.valueToPaneY(price, paneOffset);
-    const color = Array.isArray(plot.color) ? plot.color[0] || '#787B86' : plot.color || '#787B86';
+    const color = this.getPlotBaseColor(plot.color, '#787B86');
 
     ctx.strokeStyle = color;
     ctx.lineWidth = plot.linewidth || 1;

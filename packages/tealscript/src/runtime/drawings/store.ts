@@ -201,7 +201,11 @@ export class DrawingStore {
   private enforceLimit(type: DrawingObjectType | keyof DrawingLimits): void {
     if (!isLimitedDrawingType(type)) return;
 
-    let excess = this.drawings.filter((drawing) => drawing.type === type).length - this.limits[type];
+    let count = 0;
+    for (const drawing of this.drawings) {
+      if (drawing.type === type) count += 1;
+    }
+    let excess = count - this.limits[type];
     while (excess > 0) {
       const oldestIndex = this.drawings.findIndex((drawing) => drawing.type === type);
       if (oldestIndex === -1) return;

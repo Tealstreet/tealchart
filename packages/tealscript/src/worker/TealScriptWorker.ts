@@ -213,10 +213,10 @@ export class TealscriptWorker {
    * Handle successful execution result
    */
   private handleResult(message: ResultMessage): void {
-    if (this.isStaleMessage(message.output?.metadata)) {
+    if (this.isStaleMessage(message.output.metadata)) {
       return;
     }
-    this.markRequestSettled(message.output?.metadata);
+    this.markRequestSettled(message.output.metadata);
     this.onResult?.(getResultOutput(message));
   }
 

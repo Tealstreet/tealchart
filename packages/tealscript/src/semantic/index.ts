@@ -10,3 +10,10 @@ export {
   type SemanticType,
   type SemanticTypeKind,
 } from './checker';
+export {
+  analyzeSemanticTypeInvariantCoverage,
+  checkSemanticTypeInvariants,
+  type SemanticTypeInvariantCoverage,
+  type SemanticTypeInvariantCode,
+  type SemanticTypeInvariantIssue,
+} from './semanticTypeInvariants';

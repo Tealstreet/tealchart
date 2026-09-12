@@ -113,6 +113,35 @@ for user-authored or host-specific catalogs. Keep those categories neutral:
 Tealchart renders them only when matching indicators are available and must not
 hardcode Tealstreet-only buckets into `builtinIndicators.ts`.
 
+**TealScript drawing outputs on native:** `MobileIndicatorManager` stores
+TealScript `DrawingOutput` objects so hosts can observe them, but the native Skia
+chart renderer currently does not consume those outputs. The web renderer has
+`TealScriptDrawing*` renderers; native drawing code under `mobile/` is the
+interactive user-drawing surface plus the generated WebView runtime, not a
+native renderer for TealScript `line`/`box`/`label`/`polyline` outputs. Do not
+count TealScript drawing objects as a web-vs-native renderer differential until
+a native `DrawingOutput` consumer exists.
+Native TealScript indicator colors are passed to Skia as strings; the installed
+Skia CSS color parser supports `#rrggbbaa`, and
+`NativeWebIndicatorRendererDifferential.test.tsx` guards eight-digit alpha
+preservation across plot, fill, bgcolor, barcolor, plotshape, plotchar,
+plotarrow, plotbar, and plotcandle.
+`src/mobile/generatedTealscriptWebViewRuntimeHtml.ts` is a checked-in generated
+bundle of the TealScript worker runtime. Regenerate it with
+`yarn workspace @tealstreet/tealchart build:mobile-tealscript-runtime` after
+TealScript runtime/codegen changes that must reach mobile. As of 2026-09-12,
+no CI/test freshness gate was found for this artifact; checking for runtime
+symbols in the committed bundle is manual until a gate is added.
+
+**Pine visual normalization register:** Renderer-side Pine normalizations whose
+TradingView behavior is not documented live in
+`src/rendering/pineVisualNormalizationRegister.ts`. Keep unresolved visual
+questions there rather than only in audit prose. The current trace-undetermined
+entries cover label price-coordinate clamping, area fill alpha normalization,
+plotarrow height flooring/reordering, table explicit width/height invalid-input
+normalization, and `plotshape`/`plotchar` `textcolor=na` fallback. Do not turn
+these into behavior fixes or quiet assumptions without a TradingView trace.
+
 ## Directory Structure
 
 ```

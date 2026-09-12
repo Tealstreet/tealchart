@@ -13,6 +13,8 @@ import type { Bar, Viewport, ViewScaleState } from '../types';
 import { TealchartRenderer } from '../TealchartRenderer';
 import { intervalToMs } from '../utils/intervalMs';
 
+const DISPLAY_PANE = 1;
+
 export const VIEWPORT_ZOOM_IN_FACTOR = 0.8;
 
 /** What `captureViewScale` falls back to when it cannot measure the price axis. */
@@ -285,11 +287,9 @@ export function getVisiblePlotRange(
 ): { min: number; max: number } | null {
   if (bars.length === 0) return null;
 
-  // Binary search for visible bar index range
+  // Track whether raw bars intersect so horizontal levels follow the visible chart window.
   const startIdx = lowerBound(bars, startTime);
   const endIdx = upperBound(bars, endTime);
-
-  if (startIdx >= endIdx) return null;
 
   let min = Infinity;
   let max = -Infinity;
@@ -298,17 +298,53 @@ export function getVisiblePlotRange(
   for (const plot of plots) {
     const scriptId = plot.scriptId ?? 'unknown';
     if (!indicatorIds.includes(scriptId)) continue;
+    if (plot.forceOverlay || !isPlotVisibleInPane(plot)) continue;
+
+    if (plot.type === 'hline') {
+      if (startIdx >= endIdx) continue;
+      if (typeof plot.price === 'number' && Number.isFinite(plot.price)) {
+        if (plot.price < min) min = plot.price;
+        if (plot.price > max) max = plot.price;
+        hasValue = true;
+      }
+      continue;
+    }
+
+    if (plotUsesAbsoluteMarkerRange(plot)) {
+      if (!hasVisiblePlotBar(plot, bars, startTime, endTime)) continue;
+      const seriesScanEnd = Math.min(bars.length, plot.values.length);
+      for (let i = 0; i < seriesScanEnd; i++) {
+        if (!isPlotBarVisible(plot, bars, i, startTime, endTime)) continue;
+        const v = plot.values[i];
+        if (v !== null && !isNaN(v)) {
+          if (v < min) min = v;
+          if (v > max) max = v;
+          hasValue = true;
+        }
+      }
+      continue;
+    }
+
     if (plot.type !== 'plot' && plot.type !== 'plotbar' && plot.type !== 'plotcandle') continue;
+    if (!hasVisiblePlotBar(plot, bars, startTime, endTime)) continue;
 
     const values =
       plot.type === 'plotbar' || plot.type === 'plotcandle'
         ? [plot.openValues, plot.highValues, plot.lowValues, plot.closeValues]
         : [plot.values];
+    if (plot.type === 'plot' && plotUsesHistbaseForVisualScale(plot)) {
+      const histbase = getPlotHistbase(plot);
+      if (histbase < min) min = histbase;
+      if (histbase > max) max = histbase;
+      hasValue = true;
+    }
+
     for (const series of values) {
       if (!series) continue;
       // Scan only the visible range (plot values are parallel to bars)
-      const seriesScanEnd = Math.min(endIdx, series.length);
-      for (let i = startIdx; i < seriesScanEnd; i++) {
+      const seriesScanEnd = Math.min(bars.length, series.length);
+      for (let i = 0; i < seriesScanEnd; i++) {
+        if (!isPlotBarVisible(plot, bars, i, startTime, endTime)) continue;
         const v = series[i];
         if (v !== null && !isNaN(v)) {
           if (v < min) min = v;
@@ -332,4 +368,56 @@ export function getVisiblePlotRange(
     min: min - range * padding,
     max: max + range * padding,
   };
+}
+
+function hasVisiblePlotBar(
+  plot: Pick<PlotOutput, 'offset' | 'showLast'>,
+  bars: readonly Bar[],
+  startTime: number,
+  endTime: number,
+): boolean {
+  for (let i = 0; i < bars.length; i++) {
+    if (isPlotBarVisible(plot, bars, i, startTime, endTime)) return true;
+  }
+  return false;
+}
+
+function isPlotVisibleInPane(plot: Pick<PlotOutput, 'display'>): boolean {
+  return plot.display === undefined || (plot.display & DISPLAY_PANE) !== 0;
+}
+
+function isPlotBarVisible(
+  plot: Pick<PlotOutput, 'offset' | 'showLast'>,
+  bars: readonly Bar[],
+  index: number,
+  startTime: number,
+  endTime: number,
+): boolean {
+  if (plot.showLast !== undefined) {
+    if (plot.showLast <= 0) return false;
+    if (index < Math.max(0, bars.length - plot.showLast)) return false;
+  }
+
+  const plotTime = getPlotTime(plot, bars, index);
+  return plotTime >= startTime && plotTime <= endTime;
+}
+
+function getPlotTime(plot: Pick<PlotOutput, 'offset'>, bars: readonly Bar[], index: number): number {
+  const bar = bars[index];
+  if (!bar) return Number.NaN;
+  const offset = Number.isFinite(plot.offset ?? NaN) ? plot.offset! : 0;
+  if (offset === 0 || bars.length < 2) return bar.time;
+  return bar.time + offset * (bars[1]!.time - bars[0]!.time);
+}
+
+function getPlotHistbase(plot: Pick<PlotOutput, 'histbase'>): number {
+  return Number.isFinite(plot.histbase) ? plot.histbase! : 0;
+}
+
+function plotUsesHistbaseForVisualScale(plot: Pick<PlotOutput, 'histbase' | 'style'>): boolean {
+  return plot.style === 'area' || plot.style === 'columns' || plot.style === 'histogram';
+}
+
+function plotUsesAbsoluteMarkerRange(plot: Pick<PlotOutput, 'location' | 'type'>): boolean {
+  return (plot.type === 'plotshape' || plot.type === 'plotchar') && plot.location === 'absolute';
 }

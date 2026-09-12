@@ -53,8 +53,8 @@ plot(ta.lowestbars(low, 4), title="Lowest Offset")
       111.023256,
     ]);
     expect(roundSeries(getPlot(result, 'Named VWMA').values)).toEqual(roundSeries(getPlot(result, 'VWMA').values));
-    expect(roundSeries(getPlot(result, 'Highest Offset').values)).toEqual([0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1]);
-    expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([0, 1, 2, 3, 0, 0, 1, 2, 3, 3, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Highest Offset').values)).toEqual([null, null, null, 0, -1, -2, -3, 0, 0, 0, 0, -1]);
+    expect(roundSeries(getPlot(result, 'Lowest Offset').values)).toEqual([null, null, null, -3, 0, 0, -1, -2, -3, -3, -3, -3]);
   });
 
   it('accepts legacy global TA aliases for supported helper breadth', () => {
@@ -209,7 +209,7 @@ plot(directionChangedMixed ? 1 : 0, title="Direction Changed Mixed")
 
     expect(result.errors).toEqual([]);
     expect(getPlot(result, 'Cross Threshold').values).toEqual([false, true, false, true, false, false, false, true, false, false, false, false]);
-    expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([0, 3, 5, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
+    expect(roundSeries(getPlot(result, 'Close Range').values)).toEqual([null, null, null, 5, 8, 8, 5, 10, 9, 7, 3, 4]);
     expect(getPlot(result, 'Direction Changed').values).toEqual([0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1]);
     expect(getPlot(result, 'Direction Changed 2').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
     expect(getPlot(result, 'Direction Changed Mixed').values).toEqual([0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0]);
@@ -1185,24 +1185,32 @@ plot(namedGeneric == 4, title="Named Generic")
         type: 'int',
         title: 'Length',
         defval: 3,
+        display: 31,
+        active: true,
       },
       {
         id: 'input_Enabled',
         type: 'bool',
         title: 'Enabled',
         defval: true,
+        display: 0,
+        active: true,
       },
       {
         id: 'input_Label',
         type: 'string',
         title: 'Label',
         defval: 'BTC',
+        display: 31,
+        active: true,
       },
       {
         id: 'input_Named Generic',
         type: 'int',
         title: 'Named Generic',
         defval: 4,
+        display: 31,
+        active: true,
       },
     ]);
     expect(roundSeries(getPlot(result, 'Basis').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
@@ -1344,6 +1352,8 @@ plot(mixedTf == tf, title="Mixed Timeframe")
         group: 'Calculation',
         inline: 'ma',
         confirm: true,
+        display: 31,
+        active: true,
       },
       {
         id: 'input_Mixed Mode',
@@ -1355,6 +1365,8 @@ plot(mixedTf == tf, title="Mixed Timeframe")
         group: 'Calculation',
         inline: 'ma',
         confirm: true,
+        display: 31,
+        active: true,
       },
       {
         id: 'input_Fast',
@@ -1464,6 +1476,9 @@ plot(level, title="Level")
         type: 'bool',
         title: 'Enabled',
         defval: true,
+        confirm: false,
+        display: 0,
+        active: true,
       },
       {
         id: 'input_Level',
@@ -1471,6 +1486,8 @@ plot(level, title="Level")
         title: 'Level',
         defval: 101.5,
         tooltip: 'Drag level',
+        confirm: false,
+        display: 31,
         active: true,
       },
     ]);
@@ -1642,10 +1659,10 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       null,
       null,
-      '#0A141EBD',
-      '#0A141EBF',
+      '#0A141EBC',
+      '#0A141EC0',
       '#0A141EBA',
-      '#0A141EBD',
+      '#0A141EBE',
       '#0A141EBA',
     ]);
     expect(getPlot(result, 'Signal').color).toEqual([
@@ -1656,11 +1673,11 @@ plot(signal, title="Prefix Signal", color=prefixSignalColor)
       null,
       null,
       null,
-      '#59A600AD',
+      '#59A600AC',
       '#619E00B0',
-      '#53AC00A8',
-      '#5CA300AD',
-      '#52AD00A8',
+      '#53AC00A9',
+      '#5CA300AE',
+      '#52AD00A9',
     ]);
   });
 
@@ -1844,7 +1861,7 @@ plot(ta.hma(source=close, 5), title="Mixed HMA")
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'SWMA').values)).toEqual([null, null, null, 104.833333, 104, 101.833333, 100.833333, 102.666667, 105.666667, 108.166667, 109.5, 110.333333]);
-    expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 103.054518, 100.423829, 100.807119, 104.100703, 107.305873, 108.841976, 109.980877, 110.662894]);
+    expect(roundSeries(getPlot(result, 'ALMA').values)).toEqual([null, null, null, null, 101.918274, 99.97516, 101.504063, 105.458142, 107.88929, 109.296928, 110.200868, 110.912922]);
     expect(roundSeries(getPlot(result, 'Named SWMA').values)).toEqual(roundSeries(getPlot(result, 'SWMA').values));
     expect(roundSeries(getPlot(result, 'Named ALMA').values)).toEqual(roundSeries(getPlot(result, 'ALMA').values));
     expect(roundSeries(getPlot(result, 'Mixed ALMA').values)).toEqual(roundSeries(getPlot(result, 'ALMA').values));
@@ -1876,14 +1893,14 @@ plot(ta.falling(source=close, 2), title="Mixed Falling")
     expect(roundSeries(getPlot(result, 'Named SMA').values)).toEqual([null, null, 104.666667, 105, 103, 100.666667, 101, 104.333333, 107, 109.333333, 109.666667, 111]);
     expect(roundSeries(getPlot(result, 'Mixed SMA').values)).toEqual(roundSeries(getPlot(result, 'Named SMA').values));
     expect(roundSeries(getPlot(result, 'Named Change').values)).toEqual([null, null, 5, -2, -8, -3, 5, 9, 4, 2, 2, 1]);
-    expect(roundSeries(getPlot(result, 'Default Highest').values)).toEqual([103, 106, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
-    expect(roundSeries(getPlot(result, 'Default Lowest').values)).toEqual([99, 99, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
-    expect(getPlot(result, 'Default Highest Offset').values).toEqual([0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1]);
-    expect(getPlot(result, 'Default Lowest Offset').values).toEqual([0, 1, 2, 2, 0, 0, 1, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Default Highest').values)).toEqual([null, null, 108, 109, 109, 109, 105, 110, 111, 112, 114, 114]);
+    expect(roundSeries(getPlot(result, 'Default Lowest').values)).toEqual([null, null, 99, 101, 98, 96, 96, 96, 99, 103, 106, 107]);
     expect(roundSeries(getPlot(result, 'Mixed Default Highest').values)).toEqual(roundSeries(getPlot(result, 'Default Highest').values));
     expect(roundSeries(getPlot(result, 'Mixed Default Lowest').values)).toEqual(roundSeries(getPlot(result, 'Default Lowest').values));
-    expect(getPlot(result, 'Mixed Default Highest Offset').values).toEqual(getPlot(result, 'Default Highest Offset').values);
-    expect(getPlot(result, 'Mixed Default Lowest Offset').values).toEqual(getPlot(result, 'Default Lowest Offset').values);
+    expect(getPlot(result, 'Mixed Default Highest Offset').values).toEqual([null, null, 0, 0, -1, -2, 0, 0, 0, 0, 0, -1]);
+    expect(getPlot(result, 'Mixed Default Lowest Offset').values).toEqual([null, null, -2, -2, 0, 0, -1, -2, -2, -2, -2, -2]);
+    expect(getPlot(result, 'Default Highest Offset').values).toEqual(getPlot(result, 'Mixed Default Highest Offset').values);
+    expect(getPlot(result, 'Default Lowest Offset').values).toEqual(getPlot(result, 'Mixed Default Lowest Offset').values);
     expect(getPlot(result, 'Named Rising').values).toEqual([false, false, true, false, false, false, true, true, false, true, false, true]);
     expect(getPlot(result, 'Mixed Rising').values).toEqual(getPlot(result, 'Named Rising').values);
     expect(getPlot(result, 'Named Falling').values).toEqual([false, false, false, true, true, false, false, false, false, false, false, false]);
@@ -1933,11 +1950,11 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Mixed Spread WMA').values)).toEqual(roundSeries(getPlot(result, 'Spread WMA').values));
     expect(roundSeries(getPlot(result, 'Named Spread HMA').values)).toEqual(roundSeries(getPlot(result, 'Spread HMA').values));
     expect(roundSeries(getPlot(result, 'Mixed Spread HMA').values)).toEqual(roundSeries(getPlot(result, 'Spread HMA').values));
-    expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([2, 3, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
+    expect(roundSeries(getPlot(result, 'Spread Highest').values)).toEqual([null, null, 3, 3, 2, 1, 4, 5, 5, 5, 3, 3]);
     expect(roundSeries(getPlot(result, 'Mixed Spread Highest').values)).toEqual(roundSeries(getPlot(result, 'Spread Highest').values));
-    expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([2, 2, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
+    expect(roundSeries(getPlot(result, 'Spread Lowest').values)).toEqual([null, null, 2, -4, -4, -4, -4, 1, -1, -1, -1, -1]);
     expect(roundSeries(getPlot(result, 'Mixed Spread Lowest').values)).toEqual(roundSeries(getPlot(result, 'Spread Lowest').values));
-    expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([0, 1, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
+    expect(roundSeries(getPlot(result, 'Spread Range').values)).toEqual([null, null, 1, 7, 6, 5, 8, 4, 6, 6, 4, 4]);
     expect(roundSeries(getPlot(result, 'Mixed Spread Range').values)).toEqual(roundSeries(getPlot(result, 'Spread Range').values));
     expect(roundSeries(getPlot(result, 'Spread Momentum').values)).toEqual([null, null, 0, -7, -6, 5, 8, 4, -5, -2, 0, -1]);
     expect(roundSeries(getPlot(result, 'Named Spread Momentum').values)).toEqual(roundSeries(getPlot(result, 'Spread Momentum').values));
@@ -1946,7 +1963,7 @@ plot(ta.roc(source=spread, 2), title="Mixed Spread ROC")
     expect(roundSeries(getPlot(result, 'Mixed Spread ROC').values)).toEqual(roundSeries(getPlot(result, 'Spread ROC').values));
   });
 
-  it('preserves real bar offsets through na values for TA offset helpers', () => {
+  it('preserves real bar offsets after TA offset helpers collect length non-na values', () => {
     const result = runCompatScript(`
 indicator("TA offset na smoke")
 source = bar_index == 1 ? na : close
@@ -1955,7 +1972,7 @@ plot(ta.lowestbars(source, 3), title="Lowest Offset")
 `);
 
     expect(result.errors).toEqual([]);
-    expect(getPlot(result, 'Highest Offset').values.slice(0, 5)).toEqual([0, 1, 0, 1, 2]);
-    expect(getPlot(result, 'Lowest Offset').values.slice(0, 5)).toEqual([0, 1, 2, 0, 0]);
+    expect(getPlot(result, 'Highest Offset').values.slice(0, 5)).toEqual([null, null, null, -1, -2]);
+    expect(getPlot(result, 'Lowest Offset').values.slice(0, 5)).toEqual([null, null, null, -3, 0]);
   });
 });

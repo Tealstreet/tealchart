@@ -80,6 +80,12 @@ describe('NumericSeries', () => {
     expect(s.get(-1)).toBeNaN();
   });
 
+  it('non-finite offset returns NaN', () => {
+    const s = new NumericSeries(10);
+    s.push(1);
+    expect(s.get(NaN)).toBeNaN();
+  });
+
   it('save and restore', () => {
     const s = new NumericSeries(10);
     s.push(1);
@@ -185,6 +191,12 @@ describe('ValueSeries', () => {
     expect(s.get(1)).toBe('open');
     expect(s.get(2)).toBe(false);
     expect(s.get(3)).toBeNaN();
+  });
+
+  it('non-finite offset returns NaN', () => {
+    const s = new ValueSeries(3);
+    s.push('value');
+    expect(s.get(NaN)).toBeNaN();
   });
 
   it('save/restore preserves value identity and ring order', () => {

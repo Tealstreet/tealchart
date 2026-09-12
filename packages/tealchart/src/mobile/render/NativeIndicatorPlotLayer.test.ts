@@ -3,7 +3,7 @@ import type { NativeVisibleBar } from './nativeVisibleBars';
 
 import { describe, expect, it } from 'vitest';
 
-import { getNativeIndicatorPlotPoints } from './NativeIndicatorPlotLayer';
+import { getNativeIndicatorPlotPoints, isNativeIndicatorPlotVisible } from './NativeIndicatorPlotLayer';
 
 function bar(sourceIndex: number, time: number): NativeVisibleBar {
   return {
@@ -55,5 +55,13 @@ describe('NativeIndicatorPlotLayer', () => {
       { interval: 1_000, time: 32_000, value: 13 },
       { interval: 1_000, time: 42_000, value: 14 },
     ]);
+  });
+
+  it('requires the pane bit for chart-visible display masks', () => {
+    expect(isNativeIndicatorPlotVisible(plot({ display: undefined }))).toBe(true);
+    expect(isNativeIndicatorPlotVisible(plot({ display: 0 }))).toBe(false);
+    expect(isNativeIndicatorPlotVisible(plot({ display: 1 }))).toBe(true);
+    expect(isNativeIndicatorPlotVisible(plot({ display: 4 }))).toBe(false);
+    expect(isNativeIndicatorPlotVisible(plot({ display: 5 }))).toBe(true);
   });
 });

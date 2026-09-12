@@ -64,6 +64,18 @@ plot(strategy.position_size)
 `),
   },
   {
+    id: 'declarations.strategy-risk-options',
+    category: 'declarations',
+    name: 'strategy declaration with execution options',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.scriptStructure,
+    snippet: script(`
+strategy("Grammar strategy options", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10, commission_type=strategy.commission.percent, commission_value=0.1)
+if close > open
+    strategy.entry("L", strategy.long)
+plot(strategy.position_size)
+`),
+  },
+  {
     id: 'declarations.library-export-function',
     category: 'declarations',
     name: 'library declaration with exported function',
@@ -82,6 +94,17 @@ export add(float x, float y) => x + y
 indicator("Import alias")
 import TestUser/RangeTools/1 as rt
 plot(close)
+`),
+  },
+  {
+    id: 'imports.explicit-alias-call',
+    category: 'imports',
+    name: 'import declaration with explicit alias member call',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.scriptStructure,
+    snippet: script(`
+indicator("Import alias call")
+import TestUser/RangeTools/1 as rt
+plot(rt.spread(high, low))
 `),
   },
   {
@@ -169,6 +192,19 @@ plot(value)
 `),
   },
   {
+    id: 'variables.assignment-minus-block',
+    category: 'variables',
+    name: 'minus reassignment inside a local block',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.variableDeclarations,
+    snippet: script(`
+indicator("Minus reassignment block")
+value = close + open
+if close > open
+    value -= open
+plot(value)
+`),
+  },
+  {
     id: 'variables.multi-declaration',
     category: 'variables',
     name: 'comma-separated declarations',
@@ -177,6 +213,17 @@ plot(value)
 indicator("Multi declaration")
 float first = close, float second = open
 plot(first + second)
+`),
+  },
+  {
+    id: 'variables.multi-declaration-untyped',
+    category: 'variables',
+    name: 'comma-separated untyped declarations',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.variableDeclarations,
+    snippet: script(`
+indicator("Multi declaration untyped")
+first = close + 1, second = open + 2
+plot(first * 10 + second)
 `),
   },
   {
@@ -209,6 +256,18 @@ plot(ta.sma(value, fast + slow + smoothing))
 `),
   },
   {
+    id: 'types.qualifier-annotations-references',
+    category: 'types',
+    name: 'qualified reference annotations',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.typeSystem,
+    snippet: script(`
+indicator("Qualifier reference annotations", overlay=true)
+series label marker = label.new(bar_index, close)
+series array<float> values = array.from(close, open)
+plot(marker.get_y() + values.get(0))
+`),
+  },
+  {
     id: 'types.casts',
     category: 'types',
     name: 'explicit type casting calls',
@@ -231,6 +290,19 @@ plot(asBool ? asInt : str.length(asString))
 indicator("Typed NA")
 float maybe = na
 plot(maybe)
+`),
+  },
+  {
+    id: 'types.na-typed-initializer-reference',
+    category: 'types',
+    name: 'typed na initializer for reference values',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.variableDeclarations,
+    snippet: script(`
+indicator("Typed na reference", overlay=true)
+label marker = na
+if barstate.islast
+    marker := label.new(bar_index, close, text="last")
+plot(na(marker) ? 0 : marker.get_y())
 `),
   },
   {
@@ -280,6 +352,34 @@ plot(map.get(values, "close"))
 `),
   },
   {
+    id: 'types.udt-collection-field',
+    category: 'types',
+    name: 'UDT field with collection type',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.objects,
+    snippet: script(`
+indicator("UDT collection field")
+type Bucket
+    array<float> values
+Bucket bucket = Bucket.new(array.from(close, open))
+plot(bucket.values.get(0))
+`),
+  },
+  {
+    id: 'types.nested-udt-field',
+    category: 'types',
+    name: 'nested UDT field access',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.objects,
+    snippet: script(`
+indicator("Nested UDT field")
+type Pivot
+    float price
+type Zone
+    Pivot highPoint
+Zone zone = Zone.new(Pivot.new(close))
+plot(zone.highPoint.price)
+`),
+  },
+  {
     id: 'types.object-provider-annotations',
     category: 'types',
     name: 'built-in object and provider type annotations',
@@ -309,6 +409,17 @@ plot(p.price + footprint.total_volume(fp) + volume_row.up_price(row))
     snippet: script(`
 indicator("Arithmetic")
 value = ((close + open) - low) * high / 2 % 5
+plot(value)
+`),
+  },
+  {
+    id: 'operators.bitwise',
+    category: 'operators',
+    name: 'bitwise operators',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.operators,
+    snippet: script(`
+indicator("Bitwise")
+value = (bar_index & 1) | 2
 plot(value)
 `),
   },
@@ -367,6 +478,17 @@ plot(close[1])
 `),
   },
   {
+    id: 'operators.history-reference-expression',
+    category: 'operators',
+    name: 'history-reference on expressions and calls',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.operators,
+    snippet: script(`
+indicator("Expression history")
+shifted(series float source) => source + 1
+plot((close + open)[1] + shifted(high)[1])
+`),
+  },
+  {
     id: 'operators.member-access',
     category: 'operators',
     name: 'member access operator',
@@ -386,6 +508,25 @@ indicator("Method call")
 values = array.new_float()
 values.push(close)
 plot(values.get(0))
+`),
+  },
+  {
+    id: 'operators.drawing-receiver-method-call',
+    category: 'operators',
+    name: 'drawing receiver method call syntax',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.methods,
+    snippet: script(`
+indicator("Drawing receiver methods", overlay=true)
+var table panel = table.new(position.top_right, 1, 1)
+var label marker = label.new(bar_index, close, text="seed")
+var line guide = line.new(bar_index - 1, close[1], bar_index, close)
+var box zone = box.new(bar_index - 1, high, bar_index, low, text="seed")
+if barstate.islast
+    panel.cell(column=0, row=0, text="ok", text_color=color.white)
+    marker.set_text(text="last")
+    guide.set_color(color=color.green)
+    zone.set_bgcolor(color=color.new(color.red, 80))
+plot(marker.get_y())
 `),
   },
   {
@@ -421,6 +562,22 @@ plot(value)
 `),
   },
   {
+    id: 'conditionals.else-if-expression',
+    category: 'conditionals',
+    name: 'else if expression chain',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.conditionalStructures,
+    snippet: script(`
+indicator("Else if expression")
+value = if close > open
+    high
+else if close < open
+    low
+else
+    close
+plot(value)
+`),
+  },
+  {
     id: 'conditionals.if-expression',
     category: 'conditionals',
     name: 'if used as an expression',
@@ -445,6 +602,20 @@ state = close > open ? 1 : 0
 value = switch state
     1 => high
     => low
+plot(value)
+`),
+  },
+  {
+    id: 'conditionals.switch-discriminant-parenthesized',
+    category: 'conditionals',
+    name: 'switch expression with parenthesized discriminant',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.conditionalStructures,
+    snippet: script(`
+indicator("Switch parenthesized discriminant")
+value = switch (close > open ? 1 : -1)
+    1 => high
+    -1 => low
+    => close
 plot(value)
 `),
   },
@@ -516,6 +687,22 @@ plot(sum)
 `),
   },
   {
+    id: 'loops.for-in-value-break',
+    category: 'loops',
+    name: 'for...in value loop with break',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.loops,
+    snippet: script(`
+indicator("For in value break")
+values = array.from(close, open, high)
+sum = 0.0
+for value in values
+    if value > high
+        break
+    sum += value
+plot(sum)
+`),
+  },
+  {
     id: 'loops.for-in-index-value',
     category: 'loops',
     name: 'for...in index/value loop',
@@ -539,6 +726,23 @@ indicator("While")
 sum = 0
 i = 0
 while i < 3
+    sum += i
+    i += 1
+plot(sum)
+`),
+  },
+  {
+    id: 'loops.while-break',
+    category: 'loops',
+    name: 'while loop with break',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.loops,
+    snippet: script(`
+indicator("While break")
+sum = 0
+i = 0
+while i < 5
+    if i == 3
+        break
     sum += i
     i += 1
 plot(sum)
@@ -596,6 +800,35 @@ scale(float value) =>
     adjusted = value * 2
     adjusted
 plot(scale(close))
+`),
+  },
+  {
+    id: 'functions.block-body-default-parameter',
+    category: 'functions-methods',
+    name: 'function block body with default parameter',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.userDefinedFunctions,
+    snippet: script(`
+indicator("Function block default")
+scale(series float value, float multiplier=2.0) =>
+    adjusted = value * multiplier
+    adjusted
+plot(scale(close))
+`),
+  },
+  {
+    id: 'functions.block-body-nested-tail',
+    category: 'functions-methods',
+    name: 'function block body with nested tail expression',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.userDefinedFunctions,
+    snippet: script(`
+indicator("Function block nested tail")
+choose(series float source) =>
+    adjusted = source + 1
+    if adjusted > open
+        adjusted
+    else
+        open
+plot(choose(close))
 `),
   },
   {
@@ -666,6 +899,23 @@ type Pivot
     float price = close
 Pivot point = Pivot.new(close)
 point.price := high
+plot(point.price)
+`),
+  },
+  {
+    id: 'objects.field-assignment-nested',
+    category: 'types',
+    name: 'UDT field reassignment inside a block',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.objects,
+    snippet: script(`
+indicator("UDT assignment nested")
+type Pivot
+    float price = close
+Pivot point = Pivot.new(close)
+if close > open
+    point.price := high
+else
+    point.price := low
 plot(point.price)
 `),
   },
@@ -754,6 +1004,17 @@ plot(values.get(2))
 `),
   },
   {
+    id: 'arrays.array-literal-nested',
+    category: 'arrays-matrices-maps',
+    name: 'array literal with nested expressions',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.arrays,
+    snippet: script(`
+indicator("Array literal nested")
+values = [close + 1, open + 2, high > low ? high : low]
+plot(values.get(0) + values.get(1) + values.get(2))
+`),
+  },
+  {
     id: 'arrays.generic-new-call',
     category: 'arrays-matrices-maps',
     name: 'generic collection constructor call',
@@ -778,6 +1039,20 @@ plot(
 `),
   },
   {
+    id: 'formatting.call-continuation-nested',
+    category: 'formatting',
+    name: 'multi-line call continuation with nested expression',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.scriptStructure,
+    snippet: script(`
+indicator("Call continuation nested")
+plot(
+    close > open ? high : low,
+    title="Selected",
+    color=close > open ? color.green : color.red
+)
+`),
+  },
+  {
     id: 'formatting.expression-continuation',
     category: 'formatting',
     name: 'multi-line expression continuation',
@@ -787,6 +1062,19 @@ indicator("Expression continuation")
 value = close +
     open -
     low
+plot(value)
+`),
+  },
+  {
+    id: 'formatting.expression-continuation-nested',
+    category: 'formatting',
+    name: 'multi-line nested expression continuation',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.scriptStructure,
+    snippet: script(`
+indicator("Expression continuation nested")
+value = close +
+    open * 2 +
+    (high - low)
 plot(value)
 `),
   },
@@ -840,6 +1128,26 @@ export float defaultPrice = 1.0
 export message() => "fill"
 `),
     notes: 'Pine doc annotations are comment syntax for parser compatibility here; TealScript does not interpret their metadata payloads.',
+  },
+  {
+    id: 'formatting.doc-annotations-function-extra',
+    category: 'formatting',
+    name: 'doc-comment annotations before function and variable forms',
+    source: PINE_V6_GRAMMAR_REFERENCE_SOURCES.scriptStructure,
+    snippet: script(`
+library("DocAnnotationsExtra")
+//@description Extra library docs
+//@function Spreads two values
+//@param highValue higher value
+//@param lowValue lower value
+//@returns distance between values
+export spread(float highValue, float lowValue) =>
+    result = highValue - lowValue
+    result
+//@variable seed Default seed
+export float seed = 1.0
+`),
+    notes: 'Pine doc annotations remain parser-level comments; this snippet keeps multiline function and exported variable forms covered.',
   },
 ] as const satisfies readonly PineV6GrammarConstruct[];
 

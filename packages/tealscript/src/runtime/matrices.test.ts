@@ -87,17 +87,30 @@ describe('PineMatrix', () => {
     const right = createPineMatrix<number>(1, 2, 0);
     right.values = [5, 6];
 
-    expect(concatMatrix(left, right)).toBe(left);
+    const concatenated = concatMatrix(left, right);
+    expect(concatenated).toBe(left);
+    expect(concatenated.rows).toBe(3);
+    expect(concatenated.columns).toBe(2);
+    expect(concatenated.values).toEqual([1, 2, 3, 4, 5, 6]);
     expect(left.rows).toBe(3);
     expect(left.columns).toBe(2);
     expect(left.values).toEqual([1, 2, 3, 4, 5, 6]);
     expect(right.values).toEqual([5, 6]);
 
     const empty = createPineMatrix<number>();
-    concatMatrix(empty, right);
+    const emptyConcat = concatMatrix(empty, right);
+    expect(emptyConcat).toBe(empty);
     expect(empty.rows).toBe(1);
     expect(empty.columns).toBe(2);
     expect(empty.values).toEqual([5, 6]);
+    expect(emptyConcat.rows).toBe(1);
+    expect(emptyConcat.columns).toBe(2);
+    expect(emptyConcat.values).toEqual([5, 6]);
+
+    const emptyOtherResult = concatMatrix(left, createPineMatrix<number>(0, 2, 0));
+    expect(emptyOtherResult).toBe(left);
+    expect(left.rows).toBe(3);
+    expect(left.values).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
   it('rejects matrix concat with mismatched columns', () => {
@@ -249,6 +262,17 @@ describe('PineMatrix', () => {
     expect(modeMatrixValue(matrix)).toBe(2);
   });
 
+  it('matches array-equivalent na behavior for empty matrix summaries', () => {
+    const matrix = createPineMatrix<number>();
+
+    expect(avgMatrixValue(matrix)).toBeNaN();
+    expect(minMatrixValue(matrix)).toBeNaN();
+    expect(maxMatrixValue(matrix)).toBeNaN();
+    expect(medianMatrixValue(matrix)).toBeNaN();
+    expect(modeMatrixValue(matrix)).toBeNaN();
+    expect(isSquareMatrix(matrix)).toBe(true);
+  });
+
   it('adds and subtracts matrices and scalar values without mutating inputs', () => {
     const left = createPineMatrix<number>(2, 2, 0);
     setMatrixValue(left, 0, 0, 1);
@@ -361,6 +385,14 @@ describe('PineMatrix', () => {
     expect(() => detMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix determinant requires a square matrix. Matrix is 2x3');
   });
 
+  it('rejects all documented square-only operations for non-square matrices', () => {
+    const rectangular = createPineMatrix<number>(2, 3, 1);
+
+    expect(() => invMatrixValue(rectangular)).toThrow('Matrix inverse requires a square matrix. Matrix is 2x3');
+    expect(() => eigenvaluesMatrixValue(rectangular)).toThrow('Matrix eigenvalues requires a square matrix. Matrix is 2x3');
+    expect(() => eigenvectorsMatrixValue(rectangular)).toThrow('Matrix eigenvectors requires a square matrix. Matrix is 2x3');
+  });
+
   it('inverts square nonsingular matrices without mutating inputs', () => {
     const matrix = createPineMatrix<number>(2, 2, 0);
     matrix.values = [4, 7, 2, 6];
@@ -423,17 +455,18 @@ describe('PineMatrix', () => {
     expect(values.values).toEqual([2, 4, 6, 8]);
   });
 
-  it('rejects eigenvalues for non-square matrices or complex roots', () => {
+  it('rejects eigenvalues for non-square matrices and returns na structures for complex roots', () => {
     expect(() => eigenvaluesMatrixValue(createPineMatrix<number>(2, 3, 1))).toThrow('Matrix eigenvalues requires a square matrix. Matrix is 2x3');
 
     const rotation = createPineMatrix<number>(2, 2, 0);
     rotation.values = [0, -1, 1, 0];
-    expect(() => eigenvaluesMatrixValue(rotation)).toThrow('Matrix eigenvalues are complex and cannot be represented as real values');
+    expect(eigenvaluesMatrixValue(rotation).values).toEqual([Number.NaN, Number.NaN]);
+    expect(eigenvectorsMatrixValue(rotation).values).toEqual([Number.NaN, Number.NaN, Number.NaN, Number.NaN]);
 
     const blockRotation = createPineMatrix<number>(3, 3, 0);
     blockRotation.values = [0, -1, 0, 1, 0, 0, 0, 0, 2];
-    expect(() => eigenvaluesMatrixValue(blockRotation)).toThrow('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
-    expect(() => eigenvectorsMatrixValue(blockRotation)).toThrow('Matrix eigenvalues are complex or QR iteration did not converge to real diagonal values');
+    expect(eigenvaluesMatrixValue(blockRotation).values).toEqual([Number.NaN, Number.NaN, Number.NaN]);
+    expect(eigenvectorsMatrixValue(blockRotation).values).toEqual(Array(9).fill(Number.NaN));
   });
 
   it('rejects matrix inverses for non-square or singular matrices', () => {
@@ -472,6 +505,15 @@ describe('PineMatrix', () => {
     expect(submatrix.values).toEqual([9, 1, 7, 3]);
 
     setMatrixValue(submatrix, 0, 0, 100);
+    expect(matrix.values).toEqual([3, 9, 1, 2, 7, 3, 1, 5, 2]);
+  });
+
+  it('sorts rows using Pine order enum values', () => {
+    const matrix = createPineMatrix<number>(3, 3, 0);
+    matrix.values = [3, 9, 1, 1, 5, 2, 2, 7, 3];
+
+    sortMatrixRows(matrix, 1, 'order.descending');
+
     expect(matrix.values).toEqual([3, 9, 1, 2, 7, 3, 1, 5, 2]);
   });
 

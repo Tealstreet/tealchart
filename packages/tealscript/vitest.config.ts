@@ -9,6 +9,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     passWithNoTests: true,
+    testTimeout: 30_000,
     cache: {
       dir: '../../.cache/vitest/tealscript',
     },

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../parser';
+import { pineVersionRules } from '../../pineVersionRules';
 import { executeScript } from '../compiledOnly';
-import { tryCompile, tryExecuteScript, executeCompiled } from './execute';
-import type { Bar, DrawingOutput, PlotOutput } from '../context';
+import { tryCompile, executeCompiledScript, executeCompiled } from './execute';
+import type { Bar, ChartInfo, DrawingOutput, PlotOutput } from '../context';
 import {
   corporateActionRequestKey,
   currencyRateRequestKey,
@@ -29,6 +30,13 @@ function makeBars(closes: number[]): Bar[] {
     volume: 100 + i,
   }));
 }
+
+const COMPLETE_RUNTIME_CONTEXT: NonNullable<Parameters<typeof executeCompiled>[3]>['runtime'] = {
+  syminfo: { ticker: 'TEST', pricescale: 100 },
+  chart: { type: 'standard' },
+  timeframe: { period: '60', multiplier: 60, isminutes: true, isintraday: true },
+  session: { regular: '0000-2359:1234567', timezone: 'UTC' },
+};
 
 function approxArrayEqual(a: (number | null)[], b: (number | null)[], tol = 1e-10): boolean {
   if (a.length !== b.length) return false;
@@ -109,6 +117,71 @@ describe('executeCompiled — full integration parity', () => {
   const closes = [10, 11, 12, 11.5, 13, 12, 14, 15, 13, 12, 11, 14, 16, 15, 13, 12, 14, 15, 16, 17];
   const bars = makeBars(closes);
 
+  it('parses and executes Pine v6 bitwise integer expressions', () => {
+    const pine = `//@version=6
+indicator("bitwise operators")
+int shifted = 3 << 2
+int combined = (shifted | 1) & 15
+plot(combined)
+`;
+    const result = assertPlotParity(pine, bars);
+    expect(result.compiledResult.plots[0]?.values).toEqual(Array(bars.length).fill(13));
+  });
+
+  it('binds live-documented named aliases for color, arrays, and trig math', () => {
+    const pine = `//@version=6
+indicator("live named aliases")
+values = array.from(arg1=5, arg0=4, arg2=6)
+cast = color(x=color.rgb(12, 34, 56, 40))
+plot(array.get(values, 0), "Arg0")
+plot(array.get(values, 1), "Arg1")
+plot(array.get(values, 2), "Arg2")
+plot(color.r(cast), "Cast R")
+plot(math.cos(angle=0), "Cos Angle")
+plot(math.todegrees(radians=math.pi), "To Degrees")
+plot(math.toradians(degrees=180), "To Radians")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, bars.slice(0, 3));
+    expect(result?.errors).toEqual([]);
+    expect(result?.plots.map((plot) => plot.values)).toEqual([
+      [4, 4, 4],
+      [5, 5, 5],
+      [6, 6, 6],
+      [12, 12, 12],
+      [1, 1, 1],
+      [180, 180, 180],
+      [Math.PI, Math.PI, Math.PI],
+    ]);
+  });
+
+  it('resolves function-style calls to local methods with collection receivers', () => {
+    const pine = `//@version=6
+indicator("function-style method")
+method scale(matrix<float> this) =>
+    result = matrix.new<float>(1, 1, 0.0)
+    matrix.set(result, 0, 0, matrix.get(this, 0, 0) * 2)
+    result
+matrix<float> source = matrix.new<float>(1, 1, 3.0)
+plot(matrix.get(scale(source), 0, 0))
+`;
+    const result = assertPlotParity(pine, bars);
+    expect(result.compiledResult.plots[0]?.values).toEqual(Array(bars.length).fill(6));
+  });
+
+  it('keeps bar_index usable when its history is also referenced', () => {
+    const pine = `//@version=6
+indicator("bar index history")
+plot(bar_index + nz(bar_index[1], 0))
+`;
+    const result = assertPlotParity(pine, bars);
+    expect(result.compiledResult.plots[0]?.values).toEqual(bars.map((_, i) => i + (i > 0 ? i - 1 : 0)));
+  });
+
   it('escapes Pine identifiers that collide with JavaScript reserved words', () => {
     const ast = parse(`//@version=6
 indicator("reserved identifiers", overlay=false)
@@ -183,6 +256,23 @@ plot(store.values.indexof(2) + store.values.lastindexof(2))
     expect(result.plots[0]?.values.at(-1)).toBe(2);
   });
 
+  it('dispatches collection methods on UDT fields despite local method collisions', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("UDT collection method collision")
+type Store
+    array<int> values
+type Marker
+    int value
+method set(Marker this, int value) => value
+var Store store = Store.new(array.from(0))
+store.values.set(0, 7)
+plot(store.values.get(0), "Value")`, bars.slice(0, 3));
+
+    expect(compiledResult.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(findPlot(compiledResult, 'Value').values).toEqual([7, 7, 7]);
+  });
+
   it('matches v6 warmup/na first-valid bars across compiled TA state machines', () => {
     const warmupBars: Bar[] = Array.from({ length: 40 }, (_, index) => {
       const close = 20 + index * 0.8 + Math.sin(index / 2) * 2;
@@ -209,15 +299,15 @@ plot(store.values.indexof(2) + store.values.lastindexof(2))
       { name: 'ta.hma', expression: 'ta.hma(close, 9)', expectedFirstValidBar: 10 },
       { name: 'ta.mom', expression: 'ta.mom(close, 5)', expectedFirstValidBar: 5 },
       { name: 'ta.roc', expression: 'ta.roc(close, 5)', expectedFirstValidBar: 5 },
-      { name: 'ta.highest', expression: 'ta.highest(close, 5)', expectedFirstValidBar: 0 },
-      { name: 'ta.lowest', expression: 'ta.lowest(close, 5)', expectedFirstValidBar: 0 },
-      { name: 'ta.highestbars', expression: 'ta.highestbars(close, 5)', expectedFirstValidBar: 0 },
-      { name: 'ta.lowestbars', expression: 'ta.lowestbars(close, 5)', expectedFirstValidBar: 0 },
-      { name: 'ta.range', expression: 'ta.range(close, 5)', expectedFirstValidBar: 0 },
+      { name: 'ta.highest', expression: 'ta.highest(close, 5)', expectedFirstValidBar: 4 },
+      { name: 'ta.lowest', expression: 'ta.lowest(close, 5)', expectedFirstValidBar: 4 },
+      { name: 'ta.highestbars', expression: 'ta.highestbars(close, 5)', expectedFirstValidBar: 4 },
+      { name: 'ta.lowestbars', expression: 'ta.lowestbars(close, 5)', expectedFirstValidBar: 4 },
+      { name: 'ta.range', expression: 'ta.range(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.rising', expression: 'ta.rising(close, 5) ? 1 : 0', expectedFirstValidBar: 0 },
       { name: 'ta.falling', expression: 'ta.falling(close, 5) ? 1 : 0', expectedFirstValidBar: 0 },
-      { name: 'ta.max', expression: 'ta.max(close, open)', expectedFirstValidBar: 0 },
-      { name: 'ta.min', expression: 'ta.min(close, open)', expectedFirstValidBar: 0 },
+      { name: 'ta.max', expression: 'ta.max(close)', expectedFirstValidBar: 0 },
+      { name: 'ta.min', expression: 'ta.min(close)', expectedFirstValidBar: 0 },
       { name: 'ta.variance', expression: 'ta.variance(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.dev', expression: 'ta.dev(close, 5)', expectedFirstValidBar: 4 },
       { name: 'ta.stdev', expression: 'ta.stdev(close, 5)', expectedFirstValidBar: 4 },
@@ -284,6 +374,17 @@ plot(${entry.expression}, "${entry.name}")`;
     assertPlotParity(`//@version=6\nindicator("test")\nplot(close)`, bars);
   });
 
+  it('matches ta.sum warmup and interior-na values across execution paths', () => {
+    const sumBars = makeBars([1, 2, 3, 4, 5]);
+    const script = `//@version=6
+indicator("ta.sum parity")
+float source = bar_index == 2 ? na : close
+plot(ta.sum(source, 3), "sum")`;
+    const { compiledResult, interpResult } = assertPlotParity(script, sumBars);
+    expect(findPlot(compiledResult, 'sum').values).toEqual([null, null, null, 7, 11]);
+    expect(findPlot(interpResult, 'sum').values).toEqual([null, null, null, 7, 11]);
+  });
+
   it('treats comparisons with na as false', () => {
     assertPlotParity(`//@version=6
 indicator("compiled na comparison")
@@ -314,6 +415,25 @@ plot(upper, title="Highest")
 plot(lower, title="Lowest")
 plot(crossed + up + down, title="Cross Flags")
 plot(momentum, title="RSI")`, bars);
+  });
+
+  it('compiles legacy TA bare variable aliases without unresolved identifiers', () => {
+    const result = executeScript(parse(`//@version=4
+study("compiled legacy TA variable aliases")
+plot(accdist, title="AD")
+plot(iii, title="III")
+plot(nvi, title="NVI")
+plot(obv, title="OBV")
+plot(pvi, title="PVI")
+plot(pvt, title="PVT")
+plot(wad, title="WAD")
+plot(wvad, title="WVAD")
+plot(pvt[1], title="PVT History")`), bars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots).toHaveLength(9);
+    expect(result.plots[5]?.values.some((value) => value !== null)).toBe(true);
   });
 
   it('compiles legacy iff helper with reference parity', () => {
@@ -351,6 +471,61 @@ indicator("compiled max bars back")
 max_bars_back(close, 2)
 max_bars_back(open, num=3)
 plot(close[1], title="Previous Close")`, bars);
+  });
+
+  it('uses declaration max_bars_back for long history references', () => {
+    const longBars = makeBars(Array.from({ length: 1002 }, (_, index) => index));
+    const ast = parse(`//@version=6
+indicator("declaration history capacity", max_bars_back=1000)
+plot(close[750], title="Long History")`);
+    const compiled = tryCompile(ast);
+    if (!compiled.success) throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+
+    const result = executeCompiled(compiled, longBars);
+    if (!result) throw new Error('executeCompiled returned null');
+    expect(result.profile.maxBarsBack).toBe(1000);
+    expect(findPlot(result, 'Long History').values.slice(748, 752)).toEqual([null, null, 0, 1]);
+  });
+
+  it('auto-sizes undeclared static history references beyond the default buffer', () => {
+    const longBars = makeBars(Array.from({ length: 752 }, (_, index) => index));
+    const result = executeScript(parse(`//@version=6
+indicator("auto history capacity")
+plot(close[750], title="Long History")`), longBars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.maxBarsBack).toBeGreaterThanOrEqual(750);
+    expect(findPlot(result, 'Long History').values.slice(748, 752)).toEqual([null, null, 0, 1]);
+  });
+
+  it('reports declared history references deeper than max_bars_back', () => {
+    const result = executeScript(parse(`//@version=6
+indicator("shallow history capacity", max_bars_back=2)
+plot(close[3], title="Too Deep")`), makeBars([1, 2, 3, 4]));
+
+    expect(result.errors[0]?.message).toMatch(/Historical offset 3 exceeds max_bars_back 2/);
+  });
+
+  it('uses max_bars_back function hints for dynamic history offsets', () => {
+    const longBars = makeBars(Array.from({ length: 752 }, (_, index) => index));
+    const result = executeScript(parse(`//@version=6
+indicator("function history capacity")
+max_bars_back(close, 750)
+offset = bar_index >= 750 ? 750 : 1
+plot(close[offset], title="Dynamic Long History")`), longBars);
+
+    expect(result.errors).toEqual([]);
+    expect(findPlot(result, 'Dynamic Long History').values.slice(748, 752)).toEqual([747, 748, 0, 1]);
+  });
+
+  it('keeps max_bars_back function hints scoped to their target series', () => {
+    const result = executeScript(parse(`//@version=6
+indicator("function history capacity scope")
+max_bars_back(close, 750)
+offset = 750
+plot(open[offset], title="Unhinted Open")`), makeBars(Array.from({ length: 752 }, (_, index) => index)));
+
+    expect(result.errors[0]?.message).toMatch(/Historical offset 750 exceeds max_bars_back 500/);
   });
 
   it('compiles mixed source-length helper calls with reference parity', () => {
@@ -394,15 +569,28 @@ plot(ta.rising(close, 2) ? 1 : 0, "Rising")
 plot(ta.falling(close, 2) ? 1 : 0, "Falling")`, bars);
   });
 
-  it('compiles max and min with reference parity', () => {
-    assertPlotParity(`//@version=6
+  it('compiles one-argument ta.min as all-time minimum', () => {
+    const { compiledResult } = assertPlotParity(`//@version=6
 indicator("test")
-plot(ta.max(close, open), "Max")
-plot(ta.min(close, open), "Min")
-plot(ta.max(source1=close, source2=open), "Named Max")
-plot(ta.min(source1=close, source2=open), "Named Min")
-plot(ta.max(source1=close, open), "Mixed Max")
-plot(ta.min(source1=close, open), "Mixed Min")`, bars);
+plot(ta.min(close), "All Time Min")
+plot(ta.min(source1=close), "Named All Time Min")
+plot(ta.min(source=close), "Live Named All Time Min")`, makeBars([5, 7, 4, 6, 3]));
+
+    expect(findPlot(compiledResult, 'All Time Min').values).toEqual([5, 5, 4, 4, 3]);
+    expect(findPlot(compiledResult, 'Named All Time Min').values).toEqual([5, 5, 4, 4, 3]);
+    expect(findPlot(compiledResult, 'Live Named All Time Min').values).toEqual([5, 5, 4, 4, 3]);
+  });
+
+  it('compiles one-argument ta.max as all-time maximum', () => {
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("test")
+plot(ta.max(close), "All Time Max")
+plot(ta.max(source1=close), "Named All Time Max")
+plot(ta.max(source=close), "Live Named All Time Max")`, makeBars([5, 7, 4, 6, 3]));
+
+    expect(findPlot(compiledResult, 'All Time Max').values).toEqual([5, 7, 7, 7, 7]);
+    expect(findPlot(compiledResult, 'Named All Time Max').values).toEqual([5, 7, 7, 7, 7]);
+    expect(findPlot(compiledResult, 'Live Named All Time Max').values).toEqual([5, 7, 7, 7, 7]);
   });
 
   it('compiles highestbars and lowestbars with reference parity', () => {
@@ -412,6 +600,20 @@ plot(ta.highestbars(4), "Default Highest Offset")
 plot(ta.lowestbars(4), "Default Lowest Offset")
 plot(ta.highestbars(high, 4), "Highest Offset")
 plot(ta.lowestbars(low, 4), "Lowest Offset")`, bars);
+  });
+
+  it('uses high and low for source-omitted highestbars and lowestbars', () => {
+    const { compiledResult } = assertPlotParity(`//@version=5
+indicator("source omitted extremebars")
+plot(ta.highest(close, 3), "Highest")
+plot(ta.lowest(open, 2), "Lowest")
+plot(ta.highestbars(4), "Default HighestBars")
+plot(ta.highestbars(high, 4), "Explicit HighestBars")
+plot(ta.lowestbars(length=5), "Default LowestBars")
+plot(ta.lowestbars(low, 5), "Explicit LowestBars")`, makeBars([100, 101, 102, 103, 104, 105, 106]));
+
+    expect(findPlot(compiledResult, 'Default HighestBars').values).toEqual(findPlot(compiledResult, 'Explicit HighestBars').values);
+    expect(findPlot(compiledResult, 'Default LowestBars').values).toEqual(findPlot(compiledResult, 'Explicit LowestBars').values);
   });
 
   it('compiles variance and dev with reference parity', () => {
@@ -489,12 +691,58 @@ plot(ta.atr(5), "ATR")
 plot(ta.atr(length=5), "Named ATR")`, bars);
   });
 
+  it('preserves RMA state across middle na holes for ATR, DMI, and KC', () => {
+    const closes = [0, -2, 0, 2, -1, 3, 0, -3, 1, 0, -2, 2];
+    const hostileBars: Bar[] = closes.map((close, index) => ({
+      time: index * 60_000,
+      open: close,
+      high: close + 1,
+      low: close - 1,
+      close,
+      volume: 100,
+    }));
+    for (const index of [2, 7, 10]) {
+      hostileBars[index]!.high = NaN;
+      hostileBars[index]!.low = NaN;
+      hostileBars[index]!.close = NaN;
+    }
+
+    const pine = `//@version=6
+indicator("RMA middle holes")
+[plus, minus, adx] = ta.dmi(3, 3)
+[basis, upper, lower] = ta.kc(close, 3, 1.5)
+plot(ta.atr(3))
+plot(plus)
+plot(minus)
+plot(adx)
+plot(basis)
+plot(upper)
+plot(lower)`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, hostileBars);
+    const expected = [
+      [null, null, null, 2.3333333333333335, 2.8888888888888893, 3.592592592592593, 3.7283950617283956, 3.7283950617283956, 3.1522633744855972, 2.7681755829903985, 2.7681755829903985, 2.5121170553269323],
+      [null, null, null, 0, 0, 37.113402061855666, 23.841059602649004, 15.894039735099334, 12.532637075718013, 9.514370664023783, 6.3429137760158545, 4.659628685839096],
+      [null, null, null, 28.571428571428566, 49.999999999999986, 26.8041237113402, 44.03973509933774, 29.359823399558493, 23.15056570931244, 29.61678229269904, 19.744521528466024, 14.504712211301218],
+      [null, null, null, null, null, 72.04301075268818, 57.94737302211732, 48.550281201736745, 42.28555332148303, 45.314331171687996, 47.33351640515798, 48.67963989413797],
+      [0, -1, -1, 0.5, -0.25, 1.375, 0.6875, 0.6875, 0.84375, 0.421875, 0.421875, 1.2109375],
+      [3, 2.75, 2.75, 3.875, 4.4375, 7.46875, 6.734375, 6.734375, 5.3671875, 4.18359375, 4.18359375, 4.591796875],
+      [-3, -4.75, -4.75, -2.875, -4.9375, -4.71875, -5.359375, -5.359375, -3.6796875, -3.33984375, -3.33984375, -2.169921875],
+    ];
+    for (const result of [compiledResult, interpResult]) {
+      expect(result.plots.length).toBe(expected.length);
+      result.plots.forEach((plot, index) => {
+        expect(approxArrayEqual(plot.values, expected[index]!)).toBe(true);
+      });
+    }
+  });
+
   it('compiles mfi with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("test")
 plot(ta.mfi(hlc3, 3), "MFI")
 plot(ta.mfi(source=hlc3, length=3), "Named MFI")
-plot(ta.mfi(source=hlc3, 3), "Mixed MFI")
+plot(ta.mfi(series=hlc3, length=3), "Live Named MFI")
+plot(ta.mfi(series=hlc3, 3), "Live Mixed MFI")
 plot(ta.mfi(close - open, 3), "Derived MFI")`, bars);
   });
 
@@ -662,8 +910,266 @@ count := count + 1
 plot(count)`, bars);
   });
 
+  it('reinitializes regular declarations while var and historical varip persist', () => {
+    const persistenceBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("global persistence")
+regular = 0
+regular += 1
+var persisted = 0
+persisted += 1
+varip ip = 0
+ip += 1
+plot(regular, "Regular")
+plot(persisted, "Var")
+plot(ip, "Varip")`, persistenceBars);
+
+    expect(findPlot(compiledResult, 'Regular').values).toEqual([1, 1, 1, 1]);
+    expect(findPlot(compiledResult, 'Var').values).toEqual([1, 2, 3, 4]);
+    expect(findPlot(compiledResult, 'Varip').values).toEqual([1, 2, 3, 4]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('initializes block-local var only when the block first executes', () => {
+    const persistenceBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("block persistence")
+var float observed = na
+if bar_index >= 2
+    var seeded = close
+    seeded += 1
+    observed := seeded
+plot(observed, "Observed")`, persistenceBars);
+
+    expect(findPlot(compiledResult, 'Observed').values).toEqual([null, null, 31, 32]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps shadowed block-local var state separate from outer var state', () => {
+    const persistenceBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("shadowed block persistence")
+var value = 100
+var float observed = na
+if bar_index >= 1
+    var value = close
+    value += 1
+    observed := value
+plot(value, "Outer")
+plot(observed, "Inner")`, persistenceBars);
+
+    expect(findPlot(compiledResult, 'Outer').values).toEqual([100, 100, 100, 100]);
+    expect(findPlot(compiledResult, 'Inner').values).toEqual([null, 21, 22, 23]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps shadowed once-local var state separate from outer var state', () => {
+    const persistenceBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("shadowed once persistence")
+var value = 100
+var float observed = na
+once bar_index >= 1
+    var value = close
+    value += 1
+    observed := value
+plot(value, "Outer")
+plot(observed, "Inner")`, persistenceBars);
+
+    expect(findPlot(compiledResult, 'Outer').values).toEqual([100, 100, 100, 100]);
+    expect(findPlot(compiledResult, 'Inner').values).toEqual([null, 21, 21, 21]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps shadowed loop-local var state separate from outer var state', () => {
+    const persistenceBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("shadowed loop persistence")
+var value = 100
+var float observed = na
+if bar_index >= 1
+    for i = 0 to 0
+        var value = close
+        value += 1
+        observed := value
+plot(value, "Outer")
+plot(observed, "Inner")`, persistenceBars);
+
+    expect(findPlot(compiledResult, 'Outer').values).toEqual([100, 100, 100, 100]);
+    expect(findPlot(compiledResult, 'Inner').values).toEqual([null, 21, 22, 23]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps conditional function-local var state isolated per call site', () => {
+    const persistenceBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("function persistence")
+gate(start, step) =>
+    float result = na
+    if bar_index >= start
+        var acc = close
+        acc += step
+        result := acc
+    result
+plot(gate(1, 1), "First")
+plot(gate(2, 10), "Second")`, persistenceBars);
+
+    expect(findPlot(compiledResult, 'First').values).toEqual([null, 21, 22, 23]);
+    expect(findPlot(compiledResult, 'Second').values).toEqual([null, null, 40, 50]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps root block locals ahead of builtin aliases', () => {
+    const localBars = makeBars([10, 20, 30, 40]);
+    const ast = parse(`//@version=6
+indicator("root block local aliases")
+ifScore = 0
+if true
+    symbol = 7
+    n = 5
+    close = 3
+    source = 2
+    ifScore := (symbol == 7 and n == 5 and close == 3 and source == 2) ? 1 : 0
+var onceScore = 0
+once bar_index == 0
+    symbol = 8
+    n = 6
+    close = 4
+    source = 3
+    onceScore := (symbol == 8 and n == 6 and close == 4 and source == 3) ? 1 : 0
+loopScore = 0
+for i = 0 to 0
+    symbol = 9
+    n = 7
+    close = 5
+    source = 4
+    loopScore := (symbol == 9 and n == 7 and close == 5 and source == 4) ? 1 : 0
+plot(ifScore, "If")
+plot(onceScore, "Once")
+plot(loopScore, "Loop")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, localBars);
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'If').values).toEqual([1, 1, 1, 1]);
+    expect(findPlot(result!, 'Once').values).toEqual([1, 1, 1, 1]);
+    expect(findPlot(result!, 'Loop').values).toEqual([1, 1, 1, 1]);
+  });
+
   it('history access', () => {
     assertPlotParity(`//@version=6\nindicator("test")\nplot(close[1])`, bars);
+  });
+
+  it('normalizes history-reference offsets across core series', () => {
+    const historyBars = makeBars([10, 20, 30, 40, 50]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("history offset normalization")
+offset = bar_index % 3
+maybe = bar_index % 2 == 0 ? close : na
+naOffset = bar_index == 2 ? na : 1
+plot(close[10], "Deep Close")
+plot(close[-1], "Negative Close")
+plot(close[1.9], "Fractional Close")
+plot(close[offset], "Dynamic Close")
+plot(close[naOffset], "NA Offset Close")
+plot(maybe[1], "Previous Maybe")
+plot(bar_index[10], "Deep Bar Index")
+plot(bar_index[-1], "Negative Bar Index")
+plot(bar_index[1.9], "Fractional Bar Index")
+plot(bar_index[offset], "Dynamic Bar Index")
+plot(last_bar_index[10], "Deep Last Bar Index")
+plot(last_bar_index[-1], "Negative Last Bar Index")
+plot(last_bar_index[1.9], "Fractional Last Bar Index")`, historyBars);
+
+    expect(findPlot(compiledResult, 'Deep Close').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Negative Close').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Fractional Close').values).toEqual([null, 10, 20, 30, 40]);
+    expect(findPlot(compiledResult, 'Dynamic Close').values).toEqual([10, 10, 10, 40, 40]);
+    expect(findPlot(compiledResult, 'NA Offset Close').values).toEqual([null, 10, null, 30, 40]);
+    expect(findPlot(compiledResult, 'Previous Maybe').values).toEqual([null, 10, null, 30, null]);
+    expect(findPlot(compiledResult, 'Deep Bar Index').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Negative Bar Index').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Fractional Bar Index').values).toEqual([null, 0, 1, 2, 3]);
+    expect(findPlot(compiledResult, 'Dynamic Bar Index').values).toEqual([0, 0, 0, 3, 3]);
+    expect(findPlot(compiledResult, 'Deep Last Bar Index').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Negative Last Bar Index').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Fractional Last Bar Index').values).toEqual([null, 4, 4, 4, 4]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('resolves history on user variables that shadow builtin series names', () => {
+    const historyBars = makeBars([10, 20, 30, 40]);
+    const cases: Array<[string, string, (number | null)[]]> = [
+      ['n', 'n = bar_index + close', [null, 10, 21, 32]],
+      ['bar_index', 'bar_index = close * 2', [null, 20, 40, 60]],
+      ['last_bar_index', 'last_bar_index = close * 3', [null, 30, 60, 90]],
+      ['close', 'close = open * 4', [null, 38, 78, 118]],
+    ];
+
+    for (const [name, declaration, expected] of cases) {
+      const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("shadowed builtin history ${name}")
+${declaration}
+plot(${name}[1], "Local")`, historyBars);
+
+      expect(findPlot(compiledResult, 'Local').values).toEqual(expected);
+      expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+    }
+  });
+
+  it('resolves history on promoted root block declarations that shadow builtin names', () => {
+    const historyBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("promoted block history shadows")
+if true
+    source = bar_index + 10
+    n = bar_index + 20
+    close = bar_index + 30
+    plot(source[1] + n[1] + close[1], "Score")`, historyBars);
+
+    expect(findPlot(compiledResult, 'Score').values).toEqual([null, 60, 63, 66]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('normalizes collection history-reference offsets', () => {
+    const historyBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("collection history offsets")
+arr = array.new_float(1, close)
+prev = arr[1]
+neg = arr[-1]
+frac = arr[0.9]
+plot(na(prev) ? na : array.get(prev, 0), "Previous Array")
+plot(na(neg) ? 1 : 0, "Negative Is NA")
+plot(na(frac) ? na : array.get(frac, 0), "Fractional Array")`, historyBars);
+
+    expect(findPlot(compiledResult, 'Previous Array').values).toEqual([null, 10, 20, 30]);
+    expect(findPlot(compiledResult, 'Negative Is NA').values).toEqual([1, 1, 1, 1]);
+    expect(findPlot(compiledResult, 'Fractional Array').values).toEqual([10, 20, 30, 40]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps var and varip history at committed bar granularity', () => {
+    const historyBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("persistent history")
+var total = 0.0
+varip ticks = 0.0
+total += close
+ticks += 1
+plot(total, "Var Total")
+plot(total[1], "Previous Var")
+plot(ticks, "Varip Ticks")
+plot(ticks[1], "Previous Varip")`, historyBars);
+
+    expect(findPlot(compiledResult, 'Var Total').values).toEqual([10, 30, 60, 100]);
+    expect(findPlot(compiledResult, 'Previous Var').values).toEqual([null, 10, 30, 60]);
+    expect(findPlot(compiledResult, 'Varip Ticks').values).toEqual([1, 2, 3, 4]);
+    expect(findPlot(compiledResult, 'Previous Varip').values).toEqual([null, 1, 2, 3]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
   });
 
   it('preserves boolean history values without numeric coercion', () => {
@@ -690,6 +1196,89 @@ sum = 0.0
 for i = 0 to 4
     sum := sum + close
 plot(sum)`, bars);
+  });
+
+  it('counts down through both endpoints when a for loop starts above its end', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("reverse for loop")
+float total = 0.0
+for i = 2 to 0
+    total += close[i]
+plot(total)`, bars);
+    const expected = bars.map((_bar, index) => index < 2
+      ? null
+      : closes[index - 2]! + closes[index - 1]! + closes[index]!);
+    expect(compiledResult.plots[0]?.values).toEqual(expected);
+    expect(interpResult.plots[0]?.values).toEqual(expected);
+  });
+
+  it('uses the declared Pine version for mutable for loop end boundaries', () => {
+    const source = (version: 5 | 6) => `//@version=${version}
+indicator("mutable loop boundary", overlay=true)
+var array<line> lines = array.new_line()
+if bar_index == 0
+    array.push(lines, line.new(bar_index, close, bar_index, close))
+    array.push(lines, line.new(bar_index, close, bar_index, close))
+if barstate.islast and array.size(lines) > 0
+    for i = 1 to array.size(lines)
+        line.delete(array.shift(lines))
+plot(array.size(lines), "Remaining")`;
+
+    const v5Compiled = tryCompile(parse(source(5)));
+    const v6Compiled = tryCompile(parse(source(6)));
+    expect(v5Compiled.success).toBe(true);
+    expect(v6Compiled.success).toBe(true);
+    if (!v5Compiled.success || !v6Compiled.success) return;
+
+    const v5Result = executeCompiled(v5Compiled, bars);
+    const v6Result = executeCompiled(v6Compiled, bars);
+
+    expect(v5Result?.errors).toEqual([]);
+    expect(v6Result?.errors).toEqual([]);
+    expect(v5Result?.plots.find((plot) => plot.title === 'Remaining')?.values).toEqual([
+      ...Array.from({ length: bars.length - 1 }, () => 2),
+      0,
+    ]);
+    expect(v6Result?.plots.find((plot) => plot.title === 'Remaining')?.values).toEqual([
+      ...Array.from({ length: bars.length - 1 }, () => 2),
+      1,
+    ]);
+  });
+
+  it('preserves legacy v5 boolean na comparison results while keeping v6 false', () => {
+    const source = (version: 5 | 6) => `//@version=${version}
+indicator("comparison na")
+x = close[10]
+plot(na(x == 1) ? 1 : 0, "eq_na")
+plot(na(x != 1) ? 1 : 0, "neq_na")
+plot(na(x > 1) ? 1 : 0, "gt_na")
+plot((x == 1) ? 1 : 0, "eq_truth")
+plot((x != 1) ? 1 : 0, "neq_truth")
+plot((x > 1) ? 1 : 0, "gt_truth")`;
+
+    const v5Compiled = tryCompile(parse(source(5)));
+    const v6Compiled = tryCompile(parse(source(6)));
+    expect(v5Compiled.success).toBe(true);
+    expect(v6Compiled.success).toBe(true);
+    if (!v5Compiled.success || !v6Compiled.success) return;
+
+    const v5Result = executeCompiled(v5Compiled, bars);
+    const v6Result = executeCompiled(v6Compiled, bars);
+    if (!v5Result || !v6Result) throw new Error('executeCompiled returned null');
+
+    const unavailable = bars.map((_bar, index) => index < 10 ? 1 : 0);
+    const zeros = bars.map(() => 0);
+
+    expect(findPlot(v5Result, 'eq_na').values).toEqual(unavailable);
+    expect(findPlot(v5Result, 'neq_na').values).toEqual(unavailable);
+    expect(findPlot(v5Result, 'gt_na').values).toEqual(unavailable);
+    expect(findPlot(v5Result, 'eq_truth').values).toEqual(zeros);
+    expect(findPlot(v5Result, 'neq_truth').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...bars.slice(10).map(() => 1)]);
+    expect(findPlot(v5Result, 'gt_truth').values).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...bars.slice(10).map(() => 1)]);
+
+    expect(findPlot(v6Result, 'eq_na').values).toEqual(zeros);
+    expect(findPlot(v6Result, 'neq_na').values).toEqual(zeros);
+    expect(findPlot(v6Result, 'gt_na').values).toEqual(zeros);
   });
 
   it('nz function', () => {
@@ -1111,6 +1700,33 @@ plot(ta.wvad, "WVAD")
 plot(ta.pvt[1], "PVT History")`, bars);
   });
 
+  it('keeps NVI and PVI seeded at one across zero-change bars', () => {
+    const volumeBars: Bar[] = [
+      [10, 100], [12, 90], [12, 90], [9, 100], [9, 90],
+    ].map(([close, volume], index) => ({
+      time: index * 60_000,
+      open: close - 0.5,
+      high: close + 1,
+      low: close - 1,
+      close,
+      volume,
+    }));
+    const pine = `//@version=6
+indicator("volume index seed")
+plot(ta.nvi, "NVI")
+plot(ta.pvi, "PVI")`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, volumeBars);
+    const expected = [
+      [1, 1.2, 1.2, 1.2, 1.2],
+      [1, 1, 1, 0.75, 0.75],
+    ];
+    for (const result of [compiledResult, interpResult]) {
+      result.plots.forEach((plot, index) => {
+        expect(approxArrayEqual(plot.values, expected[index]!)).toBe(true);
+      });
+    }
+  });
+
   it('compiles ta.bar_index with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("test")
@@ -1150,6 +1766,27 @@ plot(ta.swma(close), "SWMA")
 plot(ta.alma(close, 5, 0.85, 6), "ALMA")`, bars);
   });
 
+  it('applies ALMA weights to the documented oldest-to-newest window', () => {
+    const almaBars = makeBars([1, 2, 4, 8, 16]);
+    const pine = `//@version=6
+indicator("ALMA direction")
+plot(ta.alma(close, 5, 0.2, 4, false))`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, almaBars);
+    const expected = [null, null, null, null, 2.83866782122486];
+    expect(approxArrayEqual(compiledResult.plots[0]!.values, expected)).toBe(true);
+    expect(approxArrayEqual(interpResult.plots[0]!.values, expected)).toBe(true);
+  });
+
+  it('returns na for CCI zero-deviation windows', () => {
+    const flatBars = makeBars([10, 10, 10, 10, 10, 10]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("CCI flat")
+plot(ta.cci(close, 3))`, flatBars);
+    const expected = [null, null, null, null, null, null];
+    expect(compiledResult.plots[0]!.values).toEqual(expected);
+    expect(interpResult.plots[0]!.values).toEqual(expected);
+  });
+
   it('compiles CCI, CMO, and WPR with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("test")
@@ -1159,8 +1796,33 @@ plot(ta.cci(source=close, 7), "Mixed CCI")
 plot(ta.cmo(close, 5), "CMO")
 plot(ta.cmo(close), "Default CMO")
 plot(ta.cmo(source=close, 7), "Mixed CMO")
+plot(ta.cmo(series=close, 7), "Live Mixed CMO")
 plot(ta.wpr(5), "WPR")
 plot(ta.wpr(), "Default WPR")`, bars);
+  });
+
+  it('formats Pine arrays through str.tostring instead of object coercion', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("Array formatting")
+values = array.new<float>()
+values.push(1.25)
+values.push(na)
+plot(str.tostring(values) == "[1.25, NaN]" ? 1 : 0)`, bars.slice(0, 1));
+    expect(compiledResult.plots[0]!.values).toEqual([1]);
+    expect(interpResult.plots[0]!.values).toEqual([1]);
+  });
+
+  it('formats Pine matrices through str.tostring', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("Matrix formatting")
+matrix<float> values = matrix.new<float>(2, 2, 0.0)
+values.set(0, 0, 1.25)
+values.set(0, 1, na)
+values.set(1, 0, -2.5)
+values.set(1, 1, 4.0)
+plot(str.tostring(values) == "[[1.25, NaN], [-2.5, 4]]" ? 1 : 0)`, bars.slice(0, 1));
+    expect(compiledResult.plots[0]!.values).toEqual([1]);
+    expect(interpResult.plots[0]!.values).toEqual([1]);
   });
 
   it('boolean logic with TA', () => {
@@ -1233,6 +1895,218 @@ plot(conditional, title="Conditional")
     expect(compiledResult.indicatorDrawingLimits).toEqual({ label: 50, line: 50, box: 50, polyline: 50 });
   });
 
+  it('reports synthetic context defaults in the runtime profile', () => {
+    const pine = `//@version=6
+indicator("context defaults")
+plot(syminfo.pricescale, "Scale")
+plot(chart.is_standard ? 1 : 0, "Chart")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const defaulted = executeCompiled(compiled, bars.slice(0, 2));
+    expect(defaulted?.profile.runtimeApproximations?.map((entry) => entry.site)).toEqual([
+      'context.chart.synthetic-defaults',
+      'context.session.inferred-defaults',
+      'context.syminfo.synthetic-defaults',
+      'context.timeframe.synthetic-defaults',
+    ]);
+
+    const supplied = executeCompiled(compiled, bars.slice(0, 2), undefined, {
+      runtime: COMPLETE_RUNTIME_CONTEXT,
+    });
+    expect(supplied?.profile.runtimeApproximations).toBeUndefined();
+  });
+
+  it('reports complex matrix eigen placeholders in the runtime profile', () => {
+    const pine = `//@version=6
+indicator("complex eigen profile")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 1, -1)
+values.set(1, 0, 1)
+eigenvalues = matrix.eigenvalues(values)
+plot(array.get(eigenvalues, 0), "First")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 2), undefined, {
+      runtime: COMPLETE_RUNTIME_CONTEXT,
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(result?.profile.runtimeApproximations).toEqual([
+      {
+        site: 'matrix.eigenvalues.complex-roots',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'Complex matrix eigen roots are represented as na placeholders; TradingView no-data/error behavior is trace-required.',
+      },
+    ]);
+  });
+
+  it('reports array percentile percentage clamps in the runtime profile', () => {
+    const pine = `//@version=6
+indicator("array percentile profile")
+values = array.from(1, 2, 3, 4)
+plot(array.percentile_nearest_rank(values, close > 0 ? -10 : 50), "Nearest")
+plot(array.percentile_linear_interpolation(values, close > 0 ? 125 : 50), "Linear")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 2), undefined, {
+      runtime: COMPLETE_RUNTIME_CONTEXT,
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(result?.profile.runtimeApproximations).toEqual([
+      {
+        site: 'array.percentile_linear_interpolation.percentage-clamp',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'array.percentile_linear_interpolation percentage was outside the documented percentile range and was clamped to 0..100; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+      },
+      {
+        site: 'array.percentile_nearest_rank.percentage-clamp',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'array.percentile_nearest_rank percentage was outside the documented percentile range and was clamped to 0..100; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+      },
+    ]);
+  });
+
+  it('reports dynamic color constructor channel clamps in the runtime profile', () => {
+    const pine = `//@version=6
+indicator("color clamp profile")
+r = close > 0 ? 300 : 12
+g = close > 0 ? -5 : 34
+t = close > 0 ? 150 : 40
+rgb = color.rgb(r, g, 56, t)
+fresh = color.new(color.blue, t)
+plot(color.r(rgb), "R")
+plot(color.g(rgb), "G")
+plot(color.t(fresh), "T")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 2), undefined, {
+      runtime: COMPLETE_RUNTIME_CONTEXT,
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(result?.profile.runtimeApproximations).toEqual([
+      {
+        site: 'color.new.transparency-clamp',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'color.new transparency was outside the documented 0..100 range and was clamped; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+      },
+      {
+        site: 'color.rgb.channel-clamp',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'color.rgb RGB channel value was outside the documented 0..255 range and was clamped; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+      },
+      {
+        site: 'color.rgb.transparency-clamp',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'color.rgb transparency was outside the documented 0..100 range and was clamped; exact TradingView runtime behavior for dynamic out-of-range values is trace-required.',
+      },
+    ]);
+  });
+
+  it('reports dynamic table dimension fallbacks in the runtime profile', () => {
+    const pine = `//@version=6
+indicator("table dimension profile")
+columns = close > 0 ? 0 : 2
+rows = close > 0 ? -1 : 2
+t = table.new(position.top_right, columns, rows)
+plot(1)`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 2), undefined, {
+      runtime: COMPLETE_RUNTIME_CONTEXT,
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(result?.profile.runtimeApproximations).toEqual([
+      {
+        site: 'table.new.columns-fallback',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'table.new.columns-fallback was not a positive integer and fell back to 1; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.',
+      },
+      {
+        site: 'table.new.rows-fallback',
+        count: 2,
+        firstBarIndex: 0,
+        message: 'table.new.rows-fallback was not a positive integer and fell back to 1; exact TradingView runtime behavior for dynamic invalid table dimensions is trace-required.',
+      },
+    ]);
+  });
+
+  it('keeps color.from_gradient endpoint clamping quiet because Pine documents it', () => {
+    const pine = `//@version=6
+indicator("gradient endpoints")
+below = color.from_gradient(-10, 0, 100, color.red, color.green)
+above = color.from_gradient(110, 0, 100, color.red, color.green)
+plot(color.r(below), "Below R")
+plot(color.g(above), "Above G")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 2), undefined, {
+      runtime: COMPLETE_RUNTIME_CONTEXT,
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(result?.profile.runtimeApproximations).toBeUndefined();
+  });
+
+  it('constructs documented color transparency values as plot colors', () => {
+    const pine = `//@version=6
+indicator("color constructor precision")
+plot(1, "Opaque Blue", color=color.new(color.blue, 0))
+plot(1, "Half Blue", color=color.new(color.blue, 50))
+plot(1, "Float Blue", color=color.new(color.blue, 12.5))
+plot(1, "Olive Forty", color=color.new(color.olive, 40))
+plot(1, "RGB Float", color=color.rgb(33, 150, 243, 12.5))
+plot(1, "Gradient Float", color=color.from_gradient(50, 0, 100, color.new(color.red, 12.5), color.new(color.green, 12.5)))
+plot(1, "No Color", color=color.new(na, 40))`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 1), undefined, {
+      runtime: {
+        syminfo: { ticker: 'TEST', pricescale: 100 },
+        chart: { type: 'standard' },
+      },
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Opaque Blue').color).toEqual(['#2196F3FF']);
+    expect(findPlot(result!, 'Half Blue').color).toEqual(['#2196F380']);
+    expect(findPlot(result!, 'Float Blue').color).toEqual(['#2196F3DF']);
+    expect(findPlot(result!, 'Olive Forty').color).toEqual(['#80800099']);
+    expect(findPlot(result!, 'RGB Float').color).toEqual(['#2196F3DF']);
+    expect(findPlot(result!, 'Gradient Float').color).toEqual(['#9F734BDF']);
+    expect(findPlot(result!, 'No Color').color).toEqual([null]);
+  });
+
   it('compiles static declaration metadata with reference parity', () => {
     const pine = `//@version=6
 indicator("Compiled Metadata", shorttitle="CM", overlay=true, format=format.price, precision=3, scale=scale.right, timeframe="60", timeframe_gaps=false, explicit_plot_zorder=true, behind_chart=false, max_bars_back=50, max_labels_count=2, max_lines_count=3, max_boxes_count=4, max_polylines_count=5, calc_bars_count=250, dynamic_requests=false)
@@ -1261,6 +2135,46 @@ plot(close)`;
     expect(compiledResult?.indicatorMaxBarsBack).toBe(interpResult.indicatorMaxBarsBack);
     expect(compiledResult?.indicatorDynamicRequests).toBe(interpResult.indicatorDynamicRequests);
     expect(compiledResult?.indicatorDrawingLimits).toEqual(interpResult.indicatorDrawingLimits);
+  });
+
+  it('lowers compiled visual enum parameters to their runtime representations', () => {
+    const pine = `//@version=6
+indicator("Compiled Enum Visual Surface", overlay=true, format=format.volume, scale=scale.left)
+plot(close, "Line", style=plot.style_stepline, linestyle=plot.linestyle_dashed, display=display.pane + display.status_line, format=format.price)
+hline(11, "Level", linestyle=hline.style_dotted, display=display.none)
+plotshape(close > open, "Shape", style=shape.labelup, location=location.belowbar, color=color.green, offset=0, text="", textcolor=color.white, editable=true, size=size.huge, display=display.price_scale, format=format.volume)
+alert("tick", alert.freq_all)`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const compiledResult = executeCompiled(compiled, bars.slice(0, 2));
+    const interpResult = executeScript(ast, bars.slice(0, 2));
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult?.indicatorFormat).toBe('volume');
+    expect(compiledResult?.indicatorScale).toBe('left');
+    expect(compiledResult?.alerts).toEqual(interpResult.alerts);
+
+    expect(findPlot(compiledResult!, 'Line')).toMatchObject({
+      style: 'stepline',
+      lineStyle: 'dashed',
+      display: 5,
+      format: 'price',
+    });
+    expect(findPlot(compiledResult!, 'Level')).toMatchObject({
+      lineStyle: 'dotted',
+      display: 0,
+    });
+    expect(findPlot(compiledResult!, 'Shape')).toMatchObject({
+      shape: 'labelup',
+      location: 'belowbar',
+      size: 'huge',
+      display: 8,
+      format: 'volume',
+    });
   });
 
   it('preserves omitted declaration precision as unspecified', () => {
@@ -1387,6 +2301,28 @@ plot(fast == slow ? 1 : 0, title="Collapsed")`;
     expect(compiledResult?.inputs.map((input) => input.id)).toEqual(interpResult.inputs.map((input) => input.id));
     expect(findPlot(compiledResult!, 'Collapsed').values.at(-1)).toBe(0);
     expect(compiledResult?.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('evaluates nested legacy TA expression sources after input-backed lengths are assigned', () => {
+    const pine = `//@version=4
+study("legacy stochastic")
+periodK = input(title="K", minval=1, defval=3)
+periodD = input(title="D", minval=1, defval=2)
+smoothK = input(title="Smooth", minval=1, defval=2)
+src = input(title="Source", type=input.source, defval=close)
+k = sma(stoch(src, high, low, periodK), smoothK)
+d = sma(k, periodD)
+plot(k, title="%K")
+plot(d, title="%D")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const compiledResult = executeCompiled(compiled, bars.slice(0, 8));
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(findPlot(compiledResult!, '%K').values.some((value) => value !== null)).toBe(true);
+    expect(findPlot(compiledResult!, '%D').values.some((value) => value !== null)).toBe(true);
   });
 
   it('compiles legacy v2/v3 tickerid and n globals with reference parity', () => {
@@ -1539,7 +2475,9 @@ plotcandle(open, high, low, close, title="Candles", color=color.green, wickcolor
       color: interpMid.color,
       lineStyle: interpMid.lineStyle,
       linewidth: interpMid.linewidth,
+      values: interpMid.values,
     });
+    expect(compiledMid.values).toEqual(Array.from({ length: bars.length }, () => 12));
 
     const compiledFill = findPlot(compiledResult, 'Band Fill');
     const interpFill = findPlot(interpResult, 'Band Fill');
@@ -1880,6 +2818,37 @@ plotcandle(open, high, low, close, title="Transparent Plotcandle", color=color.g
       if (interpPlot.colordown !== undefined) expect(compiledPlot.colordown).toEqual(interpPlot.colordown);
     }
 
+    expect(findPlot(compiledResult, 'Range Fill').color).toEqual(Array(5).fill('#2196F380'));
+    expect(findPlot(compiledResult, 'Transparent Close').color).toEqual(Array(5).fill('#4CAF50BF'));
+    expect(findPlot(compiledResult, 'Transparent Background').color).toEqual(Array(5).fill('#2196F366'));
+    expect(findPlot(compiledResult, 'Transparent Bars').color).toEqual(Array(5).fill('#4CAF5099'));
+    expect(findPlot(compiledResult, 'Transparent Shape').color).toEqual(Array(5).fill('#4CAF50CC'));
+    expect(findPlot(compiledResult, 'Transparent Char').color).toEqual([
+      '#FDD835B3',
+      '#FDD835B3',
+      '#FDD835B3',
+      '#FDD835B3',
+      null,
+    ]);
+    expect(findPlot(compiledResult, 'Transparent Arrow').color).toEqual([
+      '#F23645E6',
+      '#F23645E6',
+      '#F23645E6',
+      '#F23645E6',
+      null,
+    ]);
+    expect(findPlot(compiledResult, 'Transparent Arrow').colordown).toEqual([
+      '#F23645E6',
+      '#F23645E6',
+      '#F23645E6',
+      '#F23645E6',
+      null,
+    ]);
+    expect(findPlot(compiledResult, 'Transparent Plotbar').color).toEqual(Array(5).fill('#4CAF50D9'));
+    expect(findPlot(compiledResult, 'Transparent Plotcandle').color).toEqual(Array(5).fill('#4CAF50A6'));
+    expect(findPlot(compiledResult, 'Transparent Plotcandle').wickColor).toEqual(Array(5).fill('#2196F3A6'));
+    expect(findPlot(compiledResult, 'Transparent Plotcandle').borderColor).toEqual(Array(5).fill('#F23645A6'));
+
     expect(findPlot(compiledResult, 'Range Fill')).toMatchObject({
       plot1Id: findPlot(interpResult, 'Range Fill').plot1Id,
       plot2Id: findPlot(interpResult, 'Range Fill').plot2Id,
@@ -1927,6 +2896,57 @@ if barstate.islast
     expect(compiledResult?.errors).toEqual([]);
     expect(interpResult.errors).toEqual([]);
     expect(compiledResult?.drawings).toEqual(interpResult.drawings);
+  });
+
+  it('compiles table receiver cell named arguments inside wrapper functions', () => {
+    const pine = `//@version=6
+indicator("table receiver wrapper", overlay=true)
+cell(table t_able, int column, int row, string data, color textCol = color.white) =>
+    t_able.cell(column, row, data, text_color=textCol)
+
+var table dashboard = table.new(position.top_right, 1, 1)
+if barstate.islast
+    cell(dashboard, 0, 0, "x")
+plot(close)`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const compiledResult = executeCompiled(compiled, bars);
+    const interpResult = executeScript(ast, bars);
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult?.drawings).toEqual(interpResult.drawings);
+  });
+
+  it('compiles receiver-method named arguments across builtin handle namespaces', () => {
+    const pine = `//@version=6
+indicator("builtin receiver named args", overlay=true)
+var table panel = table.new(position.top_right, 1, 1)
+var label tag = label.new(bar_index, close, text="seed")
+var line trend = line.new(bar_index - 1, close[1], bar_index, close)
+var box zone = box.new(bar_index - 1, high, bar_index, low, text="seed")
+var array<float> values = array.new<float>()
+if barstate.islast
+    panel.cell(column=0, row=0, text="P", text_color=color.white, bgcolor=color.black)
+    panel.cell_set_text_color(column=0, row=0, text_color=color.yellow)
+    panel.set_bgcolor(bgcolor=color.new(color.blue, 80))
+    tag.set_text(text="L")
+    tag.set_textcolor(textcolor=color.orange)
+    trend.set_color(color=color.green)
+    trend.set_width(width=2)
+    zone.set_text(text="B")
+    zone.set_text_color(text_color=color.black)
+    zone.set_bgcolor(color=color.new(color.red, 80))
+    values.push(value=close)
+plot(array.size(values), title="Values")`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, bars);
+
+    expect(compiledResult.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult.drawings).toEqual(interpResult.drawings);
   });
 
   it('compiles block-local persistent drawings initialized after the first bar', () => {
@@ -2131,6 +3151,126 @@ plot(array.size(table.all), title="Table Count")`;
     expect(compiledResult.errors).toEqual([]);
     expect(interpResult.errors).toEqual([]);
     expect(compiledResult.drawings).toEqual(interpResult.drawings);
+  });
+
+  it('compiles managed annotation dashboards with concrete drawing lifecycle output', () => {
+    const annotationBars: Bar[] = [10, 12, 11, 14, 13, 15].map((close, index) => ({
+      time: (index + 1) * 60_000,
+      open: close - 0.25,
+      high: close + 1,
+      low: close - 1,
+      close,
+      volume: 1_000 + index,
+    }));
+    const pine = `//@version=6
+indicator("Managed Annotation Dashboard", overlay=true, max_labels_count=10, max_lines_count=10)
+var signal = label.new(0, close, "seed", style=label.style_label_left, textcolor=color.white)
+var staleLabel = label.new(0, high, "stale")
+var upper = line.new(0, high, 1, high, color=color.orange, width=2)
+var lower = line.new(0, low, 1, low, color=color.teal, width=2)
+var channel = linefill.new(upper, lower, color=color.new(color.orange, 80))
+var panel = table.new(position.top_right, 2, 2, bgcolor=color.new(color.black, 75), frame_color=color.white, frame_width=1)
+var stalePanel = table.new(position.bottom_right, 1, 1)
+if bar_index == 1
+    label.delete(staleLabel)
+if bar_index == 2
+    table.delete(stalePanel)
+if bar_index >= 2
+    swingPoint = chart.point.from_index(bar_index - 1, low[1])
+    label.set_point(signal, swingPoint)
+    label.set_text(signal, close > close[1] ? "Breakout" : "Pullback")
+    label.set_color(signal, close > close[1] ? color.green : color.red)
+    line.set_xy1(upper, bar_index - 2, high[2])
+    line.set_xy2(upper, bar_index, high)
+    lowerFromFill = linefill.get_line2(channel)
+    line.set_xy1(lowerFromFill, bar_index - 1, low[1])
+    line.set_xy2(lowerFromFill, bar_index, low)
+    table.cell(panel, 0, 0, "Trend")
+    table.cell(panel, 1, 0, close > close[1] ? "Breakout" : "Pullback")
+    table.cell(panel, 0, 1, "Tables")
+    table.cell(panel, 1, 1, str.tostring(array.size(table.all)))
+    table.cell_set_bgcolor(panel, 1, 0, close > close[1] ? color.green : color.red)
+    table.cell_set_width(panel, 1, 0, 96)
+    table.cell_set_text_font_family(panel, 1, 0, font.family_monospace)
+    table.cell_set_text_formatting(panel, 1, 0, text.format_bold)
+    table.cell_set_text_valign(panel, 1, 0, text.align_bottom)
+    table.cell_set_tooltip(panel, 1, 0, "latest swing")
+plot(array.size(label.all), "Labels")
+plot(array.size(table.all), "Tables")
+plot(label.get_x(signal), "Signal X")
+plot(label.get_y(signal), "Signal Y")`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, annotationBars);
+
+    expect(compiledResult.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult.drawings).toEqual(interpResult.drawings);
+    expect(findPlot(compiledResult, 'Labels').values).toEqual([2, 1, 1, 1, 1, 1]);
+    expect(findPlot(compiledResult, 'Tables').values).toEqual([2, 2, 1, 1, 1, 1]);
+    expect(findPlot(compiledResult, 'Signal X').values).toEqual([0, 0, 1, 2, 3, 4]);
+    expect(findPlot(compiledResult, 'Signal Y').values).toEqual([10, 10, 11, 10, 13, 12]);
+
+    const label = compiledResult.drawings.find((drawing) => drawing.type === 'label');
+    expect(label).toMatchObject({
+      type: 'label',
+      x: 4,
+      y: 12,
+      text: 'Breakout',
+      color: '#4CAF50',
+      textColor: '#FFFFFF',
+      style: 'label_left',
+    });
+
+    const [upperLine, lowerLine] = compiledResult.drawings.filter((drawing) => drawing.type === 'line');
+    expect(upperLine).toMatchObject({
+      type: 'line',
+      x1: 3,
+      y1: 15,
+      x2: 5,
+      y2: 16,
+      color: '#FF9800',
+      width: 2,
+    });
+    expect(lowerLine).toMatchObject({
+      type: 'line',
+      x1: 4,
+      y1: 12,
+      x2: 5,
+      y2: 14,
+      color: '#089981',
+      width: 2,
+    });
+
+    const linefill = compiledResult.drawings.find((drawing) => drawing.type === 'linefill');
+    expect(linefill).toMatchObject({
+      type: 'linefill',
+      line1: upperLine?.id,
+      line2: lowerLine?.id,
+      color: '#FF980033',
+    });
+
+    const table = compiledResult.drawings.find((drawing) => drawing.type === 'table');
+    expect(table).toMatchObject({
+      type: 'table',
+      position: 'top_right',
+      columns: 2,
+      rows: 2,
+      cells: expect.arrayContaining([
+        expect.objectContaining({ column: 0, row: 0, text: 'Trend' }),
+        expect.objectContaining({
+          column: 1,
+          row: 0,
+          text: 'Breakout',
+          width: 96,
+          bgcolor: '#4CAF50',
+          textFontFamily: 'monospace',
+          textFormatting: 'bold',
+          textValign: 'bottom',
+          tooltip: 'latest swing',
+        }),
+        expect.objectContaining({ column: 0, row: 1, text: 'Tables' }),
+        expect.objectContaining({ column: 1, row: 1, text: '1' }),
+      ]),
+    });
   });
 
   it('compiles drawing delete and all handles with reference parity', () => {
@@ -2440,6 +3580,33 @@ plot(math.sum(source=close, length=3), "Named Sum")
 plot(math.sum(open, 2), "Positional Sum")`, bars);
   });
 
+  it('evaluates math.tanh with compiled wrapper and direct compiled parity', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("compiled hyperbolic math")
+plot(math.tanh(-2), "Negative")
+plot(math.tanh(0), "Zero")
+plot(math.tanh(2), "Positive")`, bars);
+    const expected = [Math.tanh(-2), 0, Math.tanh(2)];
+    for (const result of [compiledResult, interpResult]) {
+      expect(result.plots.map((plot) => plot.values[0])).toEqual(expected);
+      expect(result.plots.every((plot) => plot.values.every((value) => value === plot.values[0]))).toBe(true);
+    }
+  });
+
+  it('preserves same-line var declarations in compiled UDF execution', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("same-line vars")
+f(series float source) =>
+    var float first = na var float second = na
+    first := source
+    second := first
+    second
+plot(f(close))`, bars);
+    const expected = bars.map((bar) => bar.close);
+    expect(compiledResult.plots[0]?.values).toEqual(expected);
+    expect(interpResult.plots[0]?.values).toEqual(expected);
+  });
+
   it('compiles legacy math global aliases with reference parity', () => {
     assertPlotParity(`//@version=4
 study("compiled legacy math globals")
@@ -2503,7 +3670,8 @@ plot(str.format("{0,number,currency}", -12.5) == "-$12.50" ? 1 : 0, "Negative Cu
 plot(str.format("{0, number, percent} - {1, number, percent}", 0.1, 0.2) == "10% - 20%" ? 1 : 0, "Percent Style")
 plot(str.format("{0} != {0, number, #.#}", 1.34) == "1.34 != 1.3" ? 1 : 0, "Repeated")
 plot(str.format("{0,number,#.#}", na) == "NaN" ? 1 : 0, "NA Number")
-plot(str.format(format="value={0:#.0}", 100.2) == "value=100.2" ? 1 : 0, "Named Format")`, bars);
+plot(str.format(format="value={0:#.0}", 100.2) == "value=100.2" ? 1 : 0, "Named Format")
+plot(str.format(formatString="live={0}", arg0=close) == str.format("live={0}", close) ? 1 : 0, "Live Named Args")`, bars);
   });
 
   it('compiles str.format_time with reference parity', () => {
@@ -2630,6 +3798,55 @@ plot(chart.right_visible_bar_time, "Default Right")
 plot(chart.is_standard ? 1 : 0, "Default Standard")`, bars.slice(0, 4));
   });
 
+  it('uses documented chart foreground defaults for light and dark backgrounds', () => {
+    const source = `//@version=6
+indicator("compiled chart foreground defaults")
+plot(color.r(chart.fg_color), "Fg R")
+plot(color.g(chart.fg_color), "Fg G")
+plot(color.b(chart.fg_color), "Fg B")
+plot(color.r(chart.bg_color), "Bg R")
+plot(color.g(chart.bg_color), "Bg G")
+plot(color.b(chart.bg_color), "Bg B")`;
+
+    const run = (chart?: Partial<ChartInfo>) => {
+      const ast = parse(source);
+      const compiled = tryCompile(ast);
+      if (!compiled.success) {
+        throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+      }
+      const result = executeCompiled(compiled, bars.slice(0, 2), undefined, chart ? { runtime: { chart } } : undefined);
+      if (!result) throw new Error('executeCompiled returned null');
+      return Object.fromEntries(result.plots.map((plot) => [plot.title, plot.values[0]]));
+    };
+
+    expect(run()).toMatchObject({
+      'Fg R': 15,
+      'Fg G': 15,
+      'Fg B': 15,
+      'Bg R': 255,
+      'Bg G': 255,
+      'Bg B': 255,
+    });
+    expect(run({ bgColor: '#000000' })).toMatchObject({
+      'Fg R': 219,
+      'Fg G': 219,
+      'Fg B': 219,
+      'Bg R': 0,
+      'Bg G': 0,
+      'Bg B': 0,
+    });
+    expect(run({ bgColor: '#FFFFFF' })).toMatchObject({
+      'Fg R': 15,
+      'Fg G': 15,
+      'Fg B': 15,
+    });
+    expect(run({ bgColor: '#000000', fgColor: '#ABCDEF' })).toMatchObject({
+      'Fg R': 171,
+      'Fg G': 205,
+      'Fg B': 239,
+    });
+  });
+
   it('compiles extended syminfo fields with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("compiled extended syminfo")
@@ -2663,6 +3880,7 @@ plot(syminfo.target_price_median, "Target Median")`, bars.slice(0, 4), {
           industry: 'Software',
           isin: 'US0378331005',
           current_contract: 'AAPL1!',
+          volumetype: 'quote',
           mincontract: 0.1,
           employees: 164000,
           shareholders: 1000,
@@ -2679,6 +3897,23 @@ plot(syminfo.target_price_median, "Target Median")`, bars.slice(0, 4), {
         },
       },
     });
+
+    const explicitVolumeType = assertPlotParity(`//@version=6
+indicator("explicit volume metadata")
+plot(str.length(syminfo.volumetype), "Volume Type Length")`, bars.slice(0, 3), {
+      runtime: { syminfo: { volumetype: 'quote' } },
+    });
+    expect(findPlot(explicitVolumeType.compiledResult, 'Volume Type Length').values).toEqual([5, 5, 5]);
+    expect(findPlot(explicitVolumeType.interpResult, 'Volume Type Length').values).toEqual([5, 5, 5]);
+  });
+
+  it('returns the documented no-data volume type without host metadata', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("no host volume metadata")
+plot(str.length(syminfo.volumetype), "Volume Type Length")`, bars.slice(0, 3));
+
+    expect(findPlot(compiledResult, 'Volume Type Length').values).toEqual([3, 3, 3]);
+    expect(findPlot(interpResult, 'Volume Type Length').values).toEqual([3, 3, 3]);
   });
 
   it('compiles collection method calls with reference parity', () => {
@@ -2708,7 +3943,157 @@ plot(sliced.size(), "Slice Size")
 plot(stats.get("count"), "Count")
 plot(keys.size(), "Key Count")
 plot(m.get(0, 1), "Matrix High")
-plot(row.get(0), "Row Close")`, bars.slice(0, 6));
+    plot(row.get(0), "Row Close")`, bars.slice(0, 6));
+  });
+
+  it('mutates and returns the left matrix from matrix.concat', () => {
+    const ast = parse(`//@version=6
+indicator("matrix concat mutates")
+m = matrix.new<float>(1, 2, 1.0)
+m2 = matrix.new<float>(1, 2, 2.0)
+cc = matrix.concat(m, m2)
+plot(matrix.rows(m), "Left Rows")
+plot(matrix.rows(cc), "Returned Rows")
+plot(matrix.get(m, 1, 0), "Left Appended")
+plot(matrix.get(cc, 1, 1), "Returned Appended")`);
+
+    const result = executeScript(ast, bars.slice(0, 3));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots.map((plot) => plot.values)).toEqual([
+      [2, 2, 2],
+      [2, 2, 2],
+      [2, 2, 2],
+      [2, 2, 2],
+    ]);
+  });
+
+  it('keeps collection methods ahead of colliding local methods', () => {
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("collection method collision")
+type Marker
+    int value
+method set(Marker this, int value) => value
+
+var values = array.from(0)
+values.set(0, 7)
+plot(values.get(0), "Array Value")`, bars.slice(0, 3));
+
+    expect(compiledResult.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult.plots).toHaveLength(1);
+    expect(compiledResult.plots[0]?.values).toEqual([7, 7, 7]);
+  });
+
+  it('allows empty array slices in for-in expressions', () => {
+    const ast = parse(`//@version=6
+indicator("empty slice expression")
+source = array.from(close)
+value = for item in array.slice(source, 1, 1)
+    item
+plot(value)
+`);
+
+    const result = executeScript(ast, bars.slice(0, 3));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots[0]?.values).toEqual([null, null, null]);
+  });
+
+  it('reports descending array slices created during global initialization', () => {
+    const ast = parse(`//@version=6
+indicator("descending slice expression")
+source = array.from(1.0, 2.0)
+window = array.slice(source, 2, 1)
+plot(array.size(window))
+`);
+
+    const result = executeScript(ast, bars.slice(0, 1));
+
+    expect(result.errors.map((error) => error.message)).toEqual(["Index 'from' should be less than index 'to'"]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots).toEqual([]);
+  });
+
+  it.each([
+    {
+      name: 'map capacity',
+      bars: bars.slice(0, 6),
+      message: 'Map cannot contain more than 50000 key-value pairs. Remove old keys or update existing keys before adding more entries.',
+      pine: `//@version=6
+indicator("map capacity")
+var m = map.new<int, int>()
+for i = 0 to 10000
+    map.put(m, bar_index * 10001 + i, i)
+plot(map.size(m))
+`,
+    },
+    {
+      name: 'table capacity',
+      message: 'Too many table cells: maximum is 10000 per script. Reduce table.new() rows or columns, or reuse an existing table instead of creating more table cells.',
+      pine: `//@version=6
+indicator("table capacity")
+t = table.new(position.top_left, 101, 101)
+plot(1)
+`,
+    },
+    {
+      name: 'table cell coordinates',
+      message: 'Table cell coordinates out of bounds: column 1, row 0. This table has columns 0-0 and rows 0-0.',
+      pine: `//@version=6
+indicator("table coordinates")
+t = table.new(position.top_left, 1, 1)
+table.cell(t, 1, 0, "x")
+plot(1)
+`,
+    },
+    {
+      name: 'negative table cell coordinates',
+      message: 'Table cell coordinates out of bounds: column -1, row 0. This table has columns 0-0 and rows 0-0.',
+      pine: `//@version=6
+indicator("negative table coordinates")
+t = table.new(position.top_left, 1, 1)
+table.cell(t, -1, 0, "x")
+plot(1)
+`,
+    },
+    {
+      name: 'table merged-cell overlap',
+      message: 'Table merged cell range overlaps existing merged cells: columns 1-1, rows 1-1',
+      pine: `//@version=6
+indicator("table merge overlap")
+t = table.new(position.top_left, 2, 2)
+table.merge_cells(t, 0, 0, 1, 1)
+table.merge_cells(t, 1, 1, 1, 1)
+plot(1)
+`,
+    },
+    {
+      name: 'matrix-vector dimensions',
+      message: 'Matrix-vector multiplication requires matrix columns to match array size. Matrix is 2x2, array size is 1',
+      pine: `//@version=6
+indicator("matrix vector dimensions")
+m = matrix.new<float>(2, 2, 1)
+a = array.from(1.0)
+r = matrix.mult(m, a)
+plot(array.size(r))
+`,
+    },
+    {
+      name: 'plot capacity',
+      message: 'Too many plot outputs: maximum is 64 per script. Remove or combine output calls; plot(), plotshape(), plotchar(), plotarrow(), plotbar(), plotcandle(), bgcolor(), barcolor(), fill(), and alertcondition() each use an output slot.',
+      pine: `//@version=6
+indicator("plot capacity")
+${Array.from({ length: 65 }, (_value, index) => `plot(close, "p${index}")`).join('\n')}
+`,
+    },
+  ])('reports $name errors instead of swallowing them', ({ bars: caseBars = bars.slice(0, 1), message, pine }) => {
+    const result = executeScript(parse(pine), caseBars);
+
+    expect(result.errors.map((error) => error.message)).toEqual([message]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
   });
 
   it('compiles named global array calls with isolated call-site state', () => {
@@ -2734,6 +4119,30 @@ plot(head, "Sorted Head")`, bars.slice(0, 6));
 
     expect(findPlot(compiledResult, 'Left Size').values.at(-1)).toBe(3);
     expect(findPlot(compiledResult, 'Right Size').values.at(-1)).toBe(3);
+  });
+
+  it('compiles live-named array concat and binary search arguments', () => {
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("compiled live array names")
+type Ranked
+    float score
+    string name
+var values = array.new<Ranked>()
+if bar_index == 0
+    array.push(values, Ranked.new(1, "low"))
+    array.push(values, Ranked.new(3, "mid"))
+    array.push(values, Ranked.new(5, "high"))
+copy = array.copy(values)
+array.concat(id1=copy, id2=array.from(Ranked.new(7, "top")))
+exact = array.binary_search(id=values, val=3, sort_field="score")
+named = array.binary_search(id=values, value="mid", sort_field=1)
+left = array.binary_search_leftmost(id=values, val=4, sort_field="score")
+right = array.binary_search_rightmost(id=values, val=4, sort_field="score")
+plot(array.size(copy), "Concat Size")
+plot(exact + named + left + right, "Search Sum")`, bars.slice(0, 2));
+
+    expect(findPlot(compiledResult, 'Concat Size').values).toEqual([4, 4]);
+    expect(findPlot(compiledResult, 'Search Sum').values).toEqual([5, 5]);
   });
 
   it('compiles named array.clear calls without dropping the receiver', () => {
@@ -2781,7 +4190,7 @@ plot(close, "Close")`);
     ]);
   });
 
-  it('records swallowed compiled request expression errors in the runtime profile', () => {
+  it('propagates Pine runtime errors from compiled request expressions', () => {
     const ast = parse(`//@version=6
 indicator("compiled swallowed request errors")
 broken = request.security("TEST", "D", array.get(array.new_float(0), 0))
@@ -2794,16 +4203,10 @@ plot(broken, "Broken Request")`);
     ]);
     const compiledResult = executeCompiled(compiled, bars.slice(0, 4), undefined, { requestDatafeed });
 
-    expect(compiledResult?.errors).toEqual([]);
-    expect(findPlot(compiledResult!, 'Broken Request').values).toEqual([null, null, null, null]);
-    expect(compiledResult?.profile.swallowedErrors).toEqual([
-      {
-        site: 'compiled-request-expression:request.security:0',
-        count: 4,
-        firstBarIndex: 0,
-        firstMessage: 'Array index 0 is out of bounds. Array size is 0',
-      },
+    expect(compiledResult?.errors).toEqual([
+      { message: 'Array index 0 is out of bounds. Array size is 0' },
     ]);
+    expect(compiledResult?.profile.swallowedErrors ?? []).toEqual([]);
   });
 
   it('compiles map for-in accumulation with reference parity', () => {
@@ -2841,6 +4244,31 @@ plot(pb.norm, "Norm")
 plot(close.double(), "Double")`, bars.slice(0, 6));
   });
 
+  it('preserves UDT receiver type through nested method calls', () => {
+    const ast = parse(`//@version=6
+indicator("nested UDT receiver methods", overlay=false)
+type Marker
+    float value = na
+
+method retain(Marker this) =>
+    this
+
+method choose(Marker this) =>
+    receiver = this.retain()
+    receiver
+
+marker = Marker.new(close)
+chosen = marker.choose()
+plot(chosen.value)
+`);
+
+    const result = executeScript(ast, bars.slice(0, 5));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.swallowedErrors).toBeUndefined();
+    expect(result.plots[0]?.values).toEqual([10, 11, 12, 11.5, 13]);
+  });
+
   it('compiles named and default user function arguments with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("compiled UDF arguments")
@@ -2866,7 +4294,34 @@ classify(value) =>
     else
         0
 plot(doubleWithLocal(close), "Doubled")
-plot(classify(close - open), "Direction")`, bars.slice(0, 8));
+    plot(classify(close - open), "Direction")`, bars.slice(0, 8));
+  });
+
+  it('keeps root locals named after built-in bar fields in UDF call-site outputs', () => {
+    const udfBars = makeBars([1, 2, 13, 14]);
+    const pine = `//@version=6
+indicator("UDF local shadowing")
+since(level) => ta.barssince(close > level)
+remember(level) => ta.valuewhen(close > level, close, 0)
+low = since(0)
+high = since(12)
+lowValue = remember(0)
+highValue = remember(12)
+plot(low, "Barssince low")
+plot(high, "Barssince high")
+plot(lowValue, "Valuewhen low")
+plot(highValue, "Valuewhen high")`;
+
+    const { compiledResult, interpResult } = assertPlotParity(pine, udfBars);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual([
+      [0, 0, 0, 0],
+      [null, null, 0, 0],
+      [1, 2, 13, 14],
+      [null, null, 13, 14],
+    ]);
+    expect(compiledResult.plots.map((plot) => plot.values)).toEqual(
+      interpResult.plots.map((plot) => plot.values),
+    );
   });
 
   it('resolves bare user functions before compiled compatibility aliases', () => {
@@ -3014,6 +4469,41 @@ else
 plot(trail, "Trail")`, bars.slice(0, 6));
   });
 
+  it('compiles history reads from non-identifier series expressions', () => {
+    const bars = makeBars([10, 12, 15, 11]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("compiled expression history")
+plot((close + open)[1], "Previous midpoint")`, bars);
+
+    expect(findPlot(compiledResult, 'Previous midpoint').values).toEqual([null, 19.5, 23.5, 29.5]);
+    expect(findPlot(interpResult, 'Previous midpoint').values).toEqual([null, 19.5, 23.5, 29.5]);
+  });
+
+  it('keeps non-identifier UDF history independent at each call site', () => {
+    const bars = makeBars([10, 12, 15, 11]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("compiled UDF expression history")
+previousDouble(series float source) => (source * 2)[1]
+plot(previousDouble(close), "Close")
+plot(previousDouble(open), "Open")`, bars);
+
+    expect(findPlot(compiledResult, 'Close').values).toEqual([null, 20, 24, 30]);
+    expect(findPlot(compiledResult, 'Open').values).toEqual([null, 19, 23, 29]);
+    expect(findPlot(interpResult, 'Close').values).toEqual([null, 20, 24, 30]);
+    expect(findPlot(interpResult, 'Open').values).toEqual([null, 19, 23, 29]);
+  });
+
+  it('preserves linreg state across an interior na source value', () => {
+    const bars = makeBars([10, 12, 15, 11, 14]);
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("linreg interior na")
+source = bar_index == 3 ? na : close
+plot(ta.linreg(source, 3, 0), "LinReg")`, bars);
+    const expected = [null, null, 14.833333333333334, null, null];
+    expect(findPlot(compiledResult, 'LinReg').values).toEqual(expected);
+    expect(findPlot(interpResult, 'LinReg').values).toEqual(expected);
+  });
+
   it('keeps local ticker variables ahead of legacy ticker aliases', () => {
     const pine = `//@version=5
 strategy("compiled local ticker shadow")
@@ -3159,6 +4649,57 @@ selected = switch
 plot(selected, "Selected")`, bars.slice(0, 6));
   });
 
+  it('returns nested statement tails from block-valued constructs', () => {
+    const result = assertPlotParity(`//@version=6
+indicator("compiled nested block-valued tails")
+ifValue = if close > 0
+    seed = 1
+    if close > 1
+        7
+    else
+        5
+else
+    3
+loopValue = for i = 0 to 0
+    seed = 1
+    if close > 1
+        7
+    else
+        5
+switchIfTail = switch
+    close > 0 =>
+        seed = 1
+        if close > 1
+            7
+        else
+            5
+    => 3
+switchForTail = switch
+    close > 0 =>
+        seed = 1
+        for i = 0 to 0
+            close > 1 ? 7 : 5
+    => 3
+switchSwitchTail = switch
+    close > 0 =>
+        seed = 1
+        switch
+            close > 1 => 7
+            => 5
+    => 3
+plot(ifValue, "If")
+plot(loopValue, "Loop")
+plot(switchIfTail, "Switch If")
+plot(switchForTail, "Switch For")
+plot(switchSwitchTail, "Switch Switch")`, makeBars([2, 0.5, -1]));
+
+    expect(findPlot(result.compiledResult, 'If').values).toEqual([7, 5, 3]);
+    expect(findPlot(result.compiledResult, 'Loop').values).toEqual([7, 5, 5]);
+    expect(findPlot(result.compiledResult, 'Switch If').values).toEqual([7, 5, 3]);
+    expect(findPlot(result.compiledResult, 'Switch For').values).toEqual([7, 5, 3]);
+    expect(findPlot(result.compiledResult, 'Switch Switch').values).toEqual([7, 5, 3]);
+  });
+
   it('compiles function-local var state per call site with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("compiled UDF local var state")
@@ -3242,6 +4783,72 @@ indicator("compiled UDF parameter history")
 trend(series float value) =>
     value > nz(value[1], value) ? 1 : value < nz(value[1], value) ? -1 : 0
 plot(trend(close), "Trend")`, bars.slice(0, 6));
+  });
+
+  it('preserves sparse UDF parameter history across skipped call bars', () => {
+    const historyBars = makeBars([10, 20, 30, 40, 50]);
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("compiled sparse UDF parameter history")
+sample(series float source, simple int offset) =>
+    source[offset]
+one = bar_index == 0 or bar_index == 3 or bar_index == 4 ? sample(close, 1) : na
+two = bar_index == 0 or bar_index == 3 or bar_index == 4 ? sample(close, 2) : na
+three = bar_index == 0 or bar_index == 3 or bar_index == 4 ? sample(close, 3) : na
+four = bar_index == 0 or bar_index == 3 or bar_index == 4 ? sample(close, 4) : na
+plot(one, "One")
+plot(two, "Two")
+plot(three, "Three")
+plot(four, "Four")`, historyBars);
+
+    expect(findPlot(compiledResult, 'One').values).toEqual([null, null, null, 10, 40]);
+    expect(findPlot(compiledResult, 'Two').values).toEqual([null, null, null, null, 10]);
+    expect(findPlot(compiledResult, 'Three').values).toEqual([null, null, null, null, null]);
+    expect(findPlot(compiledResult, 'Four').values).toEqual([null, null, null, null, null]);
+  });
+
+  it('preserves sparse UDF local and expression history across skipped call bars', () => {
+    const historyBars = makeBars([10, 20, 30, 40, 50]);
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("compiled sparse UDF local history")
+localSample(series float source, simple int offset) =>
+    basis = source + 1
+    basis[offset]
+expressionSample(series float source, simple int offset) =>
+    (source + 2)[offset]
+localOne = bar_index == 0 or bar_index == 3 or bar_index == 4 ? localSample(close, 1) : na
+localTwo = bar_index == 0 or bar_index == 3 or bar_index == 4 ? localSample(close, 2) : na
+exprOne = bar_index == 0 or bar_index == 3 or bar_index == 4 ? expressionSample(close, 1) : na
+exprTwo = bar_index == 0 or bar_index == 3 or bar_index == 4 ? expressionSample(close, 2) : na
+plot(localOne, "Local One")
+plot(localTwo, "Local Two")
+plot(exprOne, "Expression One")
+plot(exprTwo, "Expression Two")`, historyBars);
+
+    expect(findPlot(compiledResult, 'Local One').values).toEqual([null, null, null, 11, 41]);
+    expect(findPlot(compiledResult, 'Local Two').values).toEqual([null, null, null, null, 11]);
+    expect(findPlot(compiledResult, 'Expression One').values).toEqual([null, null, null, 12, 42]);
+    expect(findPlot(compiledResult, 'Expression Two').values).toEqual([null, null, null, null, 12]);
+  });
+
+  it('updates one UDF history slot for repeated loop calls on the same bar', () => {
+    const historyBars = makeBars([10, 20, 30, 40]);
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("compiled looped UDF history")
+paramPrevious(series float source) =>
+    source[1]
+localPrevious(series float source) =>
+    basis = source + 1
+    basis[1]
+paramSum = 0.0
+localSum = 0.0
+for i = 0 to 1
+    paramSum += nz(paramPrevious(close + i), 0)
+    localSum += nz(localPrevious(close + i), 0)
+plot(paramSum, "Param Sum")
+plot(localSum, "Local Sum")`, historyBars);
+
+    expect(findPlot(compiledResult, 'Param Sum').values).toEqual([0, 22, 42, 62]);
+    expect(findPlot(compiledResult, 'Local Sum').values).toEqual([0, 24, 44, 64]);
   });
 
   it('compiles UDF tuple locals with local history at multiple call sites', () => {
@@ -3382,6 +4989,40 @@ wrapped(series float source, int window) => smooth(source, window)
 plot(wrapped(close, length), "Wrapped")`, bars.slice(0, 8));
   });
 
+  it('reports invalid input-qualified TA lengths instead of silently normalizing them', () => {
+    const pine = `//@version=6
+indicator("compiled invalid TA length")
+length = input.int(3, "Length", minval=1)
+plot(ta.sma(close, length), "Average")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 4), new Map([['input_Length', 0]]));
+
+    expect(result?.errors).toHaveLength(1);
+    expect(result?.errors[0]?.message).toContain('TA length must be a positive integer');
+    expect(result?.errors[0]?.message).toContain('got 0');
+    expect(result?.errors[0]?.message).toContain('add one before calling TA functions');
+  });
+
+  it('reports invalid KST lengths instead of using the zero-length shortcut', () => {
+    const pine = `//@version=6
+indicator("compiled invalid KST length")
+[kst, signal] = ta.kst(close, 0, 3, 4, 5, 2, 2, 2, 3, 2)
+plot(kst, "KST")`;
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, bars.slice(0, 4));
+
+    expect(result?.errors).toHaveLength(1);
+    expect(result?.errors[0]?.message).toContain('ta.kst roclength1 must be a positive integer');
+  });
+
   it('compiles timeframe.change with reference parity', () => {
     const timeBars = [
       { time: Date.UTC(2024, 0, 5, 0, 0), open: 10, high: 11, low: 9, close: 10, volume: 100 },
@@ -3519,6 +5160,46 @@ plot(minute(time=closeStamp, timezone="America/New_York"), "Close Minute")`, tim
     expect(findPlot(compiledResult, 'Sunday Session').values).toEqual([0, 0, 1, 0, 0]);
     expect(findPlot(compiledResult, 'Close Hour').values).toEqual([10, null, null, 10, null]);
     expect(findPlot(compiledResult, 'Close Minute').values).toEqual([30, null, null, 30, null]);
+  });
+
+  it('uses declared-version defaults for bare session day masks', () => {
+    const timeBars = [
+      { time: Date.UTC(2024, 2, 10, 13, 30), open: 10, high: 11, low: 9, close: 10, volume: 100 },
+      { time: Date.UTC(2024, 2, 11, 13, 30), open: 11, high: 12, low: 10, close: 11, volume: 101 },
+      { time: Date.UTC(2024, 2, 12, 13, 30), open: 12, high: 13, low: 11, close: 12, volume: 102 },
+    ];
+
+    const v4 = executeScript(parse(`//@version=4
+study("v4 session days")
+plot(na(time(timeframe.period, "0930-1600", "America/New_York")) ? 0 : 1, "In Session")
+`), timeBars, undefined, {
+      runtime: {
+        timeframe: { period: '60', multiplier: 60, isminutes: true, isdaily: false, isweekly: false, ismonthly: false, isintraday: true, isseconds: false, isticks: false },
+        syminfo: { timezone: 'America/New_York' },
+      },
+    });
+    const v5 = executeScript(parse(`//@version=5
+indicator("v5 session days")
+plot(na(time(timeframe.period, "0930-1600", "America/New_York")) ? 0 : 1, "In Session")
+`), timeBars, undefined, {
+      runtime: {
+        timeframe: { period: '60', multiplier: 60, isminutes: true, isdaily: false, isweekly: false, ismonthly: false, isintraday: true, isseconds: false, isticks: false },
+        syminfo: { timezone: 'America/New_York' },
+      },
+    });
+
+    expect(findPlot(v4, 'In Session').values).toEqual([0, 1, 1]);
+    expect(findPlot(v5, 'In Session').values).toEqual([1, 1, 1]);
+  });
+
+  it('executes legacy offset() as history access before Pine v5', () => {
+    const result = executeScript(parse(`//@version=4
+study("Legacy offset")
+plot(offset(close, 1), "Previous Close")
+`), makeBars([10, 20, 30]));
+
+    expect(result.errors).toEqual([]);
+    expect(findPlot(result, 'Previous Close').values).toEqual([null, 10, 20]);
   });
 
   it('compiles time filters with runtime closed dates with reference parity', () => {
@@ -4048,6 +5729,115 @@ plot(strategy.opentrades, title="Open")`;
     );
   });
 
+  it('replaces a pending strategy.entry with the same ID', () => {
+    const strategyBars: Bar[] = [
+      { time: 60000, open: 100, high: 105, low: 95, close: 100, volume: 100 },
+      { time: 120000, open: 100, high: 110, low: 99, close: 105, volume: 100 },
+      { time: 180000, open: 100, high: 116, low: 99, close: 110, volume: 100 },
+    ];
+    const pine = `//@version=6
+strategy("Replace pending entry", pyramiding=1)
+if bar_index < 2
+    strategy.entry("Long", strategy.long, qty=1, stop=high + 5)
+plot(strategy.position_size, title="Position")`;
+
+    const { compiledResult, interpResult } = assertPlotParity(pine, strategyBars);
+    expect(compiledResult.strategy.fills).toHaveLength(1);
+    expect(compiledResult.strategy.fills[0]?.price).toBe(115);
+    expect(compiledResult.strategy.fills).toEqual(interpResult.strategy.fills);
+    expect(findPlot(compiledResult, 'Position').values).toEqual([0, 0, 0]);
+  });
+
+  it('recalculates after an order fill when calc_on_order_fills is enabled', () => {
+    const strategyBars: Bar[] = [100, 105].map((price, i) => ({
+      time: (i + 1) * 60000,
+      open: price,
+      high: price,
+      low: price,
+      close: price,
+      volume: 100,
+    }));
+    const pine = `//@version=6
+strategy("Order fill recalculation", calc_on_order_fills=true, process_orders_on_close=true)
+var executions = 0
+executions += 1
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=1)
+plot(executions, title="Executions")`;
+
+    const { compiledResult, interpResult } = assertPlotParity(pine, strategyBars);
+
+    expect(findPlot(compiledResult, 'Executions').values).toEqual([2, 3]);
+    expect(compiledResult.strategy.fills).toHaveLength(1);
+    expect(compiledResult.strategy.fills).toEqual(interpResult.strategy.fills);
+  });
+
+  it('replaces historical OHLC tick visual outputs at the current strategy bar', () => {
+    const strategyBars: Bar[] = [100, 105].map((price, i) => ({
+      time: (i + 1) * 60000,
+      open: price,
+      high: price + 2,
+      low: price - 1,
+      close: price + 1,
+      volume: 100,
+    }));
+    const pine = `//@version=6
+strategy("Historical tick recalculation", calc_on_every_history_tick=true)
+var executions = 0
+varip ipExecutions = 0
+regular = 0
+executions += 1
+ipExecutions += 1
+regular += 1
+upper = plot(close, title="Upper")
+lower = plot(open, title="Lower")
+fill(upper, lower, color=color.new(color.blue, 50), title="Range")
+plot(executions, title="Executions")
+plot(ipExecutions, title="Varip Executions")
+plot(regular, title="Regular Executions")
+plotshape(close > open, title="Shape")
+plotarrow(close - open, title="Arrow")
+plotbar(open, high, low, close, title="Bars")`;
+
+    const { compiledResult, interpResult } = assertPlotParity(pine, strategyBars);
+
+    expect(findPlot(compiledResult, 'Upper').values).toEqual([101, 106]);
+    expect(findPlot(compiledResult, 'Range').values).toEqual([1, 1]);
+    expect(findPlot(compiledResult, 'Shape').values).toEqual([1, 1]);
+    expect(findPlot(compiledResult, 'Arrow').values).toEqual([1, 1]);
+    expect(findPlot(compiledResult, 'Bars').values).toEqual([101, 106]);
+    expect(findPlot(compiledResult, 'Executions').values).toEqual([4, 8]);
+    expect(findPlot(compiledResult, 'Varip Executions').values).toEqual([4, 8]);
+    expect(findPlot(compiledResult, 'Regular Executions').values).toEqual([1, 1]);
+    expect(findPlot(interpResult, 'Executions').values).toEqual([4, 8]);
+    expect(findPlot(interpResult, 'Varip Executions').values).toEqual([4, 8]);
+    expect(findPlot(interpResult, 'Regular Executions').values).toEqual([1, 1]);
+    expect(compiledResult.strategy.settings.calcOnEveryHistoryTick).toBe(true);
+    expect(interpResult.strategy.settings.calcOnEveryHistoryTick).toBe(true);
+  });
+
+  it('applies strategy.commission.cash_per_order as a fixed fee in compiled execution', () => {
+    const strategyBars: Bar[] = [100, 110].map((close, i) => ({
+      time: (i + 1) * 60000,
+      open: close,
+      high: close,
+      low: close,
+      close,
+      volume: 100,
+    }));
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+strategy("Cash Per Order", initial_capital=1000, process_orders_on_close=true,
+    commission_type=strategy.commission.cash_per_order, commission_value=2)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=2)
+if bar_index == 1
+    strategy.close("Long")
+plot(strategy.closedtrades.commission(0), "Commission")`, strategyBars);
+
+    expect(findPlot(compiledResult, 'Commission').values).toEqual([null, 4]);
+    expect(findPlot(interpResult, 'Commission').values).toEqual([null, 4]);
+  });
+
   it('matches expected when restricted strategy.entry closes without reversing', () => {
     const strategyBars: Bar[] = [100, 105, 110].map((price, i) => ({
       time: (i + 1) * 60000,
@@ -4078,6 +5868,49 @@ plot(strategy.closedtrades, title="Closed")`;
     expect(compiledResult.strategy.position).toEqual(interpResult.strategy.position);
     expect(compiledResult.strategy.openTrades).toHaveLength(0);
     expect(compiledResult.strategy.closedTrades.map((trade) => trade.profit)).toEqual([10]);
+  });
+
+  it('lowers compiled strategy enum parameters to their runtime representations', () => {
+    const strategyBars: Bar[] = [100, 101, 102].map((price, i) => ({
+      time: (i + 1) * 60000,
+      open: price,
+      high: price,
+      low: price,
+      close: price,
+      volume: 100 + i,
+    }));
+    const pine = `//@version=6
+strategy("Compiled Strategy Enum Surface", initial_capital=1000, default_qty_type=strategy.cash, default_qty_value=200, commission_type=strategy.commission.cash_per_order, commission_value=1, process_orders_on_close=true)
+if bar_index == 0
+    strategy.risk.allow_entry_in(strategy.direction.short)
+    strategy.risk.max_drawdown(10, strategy.percent_of_equity, "dd")
+    strategy.risk.max_intraday_loss(100, strategy.cash, "loss")
+    strategy.entry("Long", strategy.long, qty=1)
+    strategy.entry("Short", strategy.short, qty=1, oca_name="Entry", oca_type=strategy.oca.cancel)
+plot(strategy.position_size, "Position")
+plot(strategy.netprofit, "Net")`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, strategyBars);
+
+    expect(compiledResult.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult.strategy.settings).toMatchObject({
+      defaultQtyType: 'cash',
+      commissionType: 'cash_per_order',
+      commissionValue: 1,
+      processOrdersOnClose: true,
+    });
+    expect(compiledResult.strategy.settings).toMatchObject(interpResult.strategy.settings);
+    expect(compiledResult.strategy.settings.allowedEntryDirection).toBe('short');
+    expect(compiledResult.strategy.settings.riskRules).toEqual(interpResult.strategy.settings.riskRules);
+    expect(compiledResult.strategy.orders.map((order) => ({
+      id: order.id,
+      direction: order.direction,
+      ocaType: order.ocaType,
+    }))).toEqual(interpResult.strategy.orders.map((order) => ({
+      id: order.id,
+      direction: order.direction,
+      ocaType: order.ocaType,
+    })));
   });
 
   it('compiles public-style strategy foundations with reference parity', () => {
@@ -4151,6 +5984,71 @@ plot(strategy.closedtrades.first_index, title="First Closed")`;
     expect(compiledResult.strategy.fills.length).toBe(interpResult.strategy.fills.length);
   });
 
+  it('compiles public-style strategy performance dashboard percent metrics', () => {
+    const dashboardBars: Bar[] = [100, 110, 105, 101, 108, 108, 106, 104].map((close, index) => ({
+      time: (index + 1) * 60_000,
+      open: close - 0.5,
+      high: close + 2,
+      low: close - 2,
+      close,
+      volume: 1_000 + index,
+    }));
+    const pine = `//@version=6
+strategy("Strategy Performance Dashboard", overlay=true, process_orders_on_close=true, initial_capital=1000)
+fast = ta.ema(close, 2)
+slow = ta.sma(close, 3)
+if bar_index == 0 and close > open
+    strategy.entry("Breakout Long", strategy.long, qty=2, comment="breakout")
+if bar_index == 1 and strategy.position_size > 0 and close > strategy.position_avg_price
+    strategy.close("Breakout Long", comment="target")
+if bar_index == 2 and fast < fast[1]
+    strategy.entry("Pullback Long", strategy.long, qty=1, comment="pullback")
+if bar_index == 3 and strategy.position_size > 0
+    strategy.close("Pullback Long", comment="stop")
+if bar_index == 4 and close >= close[1]
+    strategy.entry("Scratch Long", strategy.long, qty=1, comment="scratch")
+if bar_index == 5 and strategy.position_size > 0
+    strategy.close("Scratch Long", comment="scratch-exit")
+if bar_index == 6 and close < slow
+    strategy.entry("Breakdown Short", strategy.short, qty=3, comment="breakdown")
+lastClosed = strategy.closedtrades - 1
+closedPct = strategy.closedtrades > 0 ? strategy.closedtrades.profit_percent(lastClosed) : na
+openPct = strategy.opentrades > 0 ? strategy.opentrades.profit_percent(0) : na
+dashboardScore = strategy.netprofit_percent + strategy.openprofit_percent - strategy.max_drawdown_percent
+plot(strategy.netprofit_percent, "Net %")
+plot(strategy.grossprofit_percent, "Gross Profit %")
+plot(strategy.grossloss_percent, "Gross Loss %")
+plot(strategy.avg_trade_percent, "Avg Trade %")
+plot(strategy.avg_winning_trade_percent, "Avg Win %")
+plot(strategy.avg_losing_trade_percent, "Avg Loss %")
+plot(strategy.max_runup_percent, "Runup %")
+plot(strategy.max_drawdown_percent, "Drawdown %")
+plot(strategy.openprofit_percent, "Open Profit %")
+plot(closedPct, "Latest Closed %")
+plot(openPct, "Open Trade %")
+plot(dashboardScore, "Dashboard Score")`;
+
+    const { compiledResult, interpResult } = assertPlotParity(pine, dashboardBars);
+
+    expect(compiledResult.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    const expectApproxPlot = (title: string, expected: Array<number | null>) => {
+      expect(approxArrayEqual(findPlot(compiledResult, title).values, expected, 1e-9), title).toBe(true);
+    };
+    expectApproxPlot('Net %', [0, 2, 2, 1.6, 1.6, 1.6, 1.6, 1.6]);
+    expectApproxPlot('Gross Profit %', [0, 2, 2, 2, 2, 2, 2, 2]);
+    expectApproxPlot('Gross Loss %', [0, 0, 0, -0.4, -0.4, -0.4, -0.4, -0.4]);
+    expectApproxPlot('Avg Trade %', [null, 10, 10, 3.0952380952380953, 3.0952380952380953, 2.0634920634920637, 2.0634920634920637, 2.0634920634920637]);
+    expectApproxPlot('Avg Win %', [null, 10, 10, 10, 10, 10, 10, 10]);
+    expectApproxPlot('Avg Loss %', [null, null, null, -3.8095238095238093, -3.8095238095238093, -3.8095238095238093, -3.8095238095238093, -3.8095238095238093]);
+    expectApproxPlot('Runup %', [0, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4]);
+    expectApproxPlot('Drawdown %', [0, 0, 0, 0.5882352941176471, 0.5882352941176471, 0.5882352941176471, 0.5882352941176471, 0.5870841487279843]);
+    expectApproxPlot('Open Profit %', [0, 0, 0, 0, 0, 0, 0, 0.6]);
+    expectApproxPlot('Latest Closed %', [null, 10, 10, -3.8095238095238093, -3.8095238095238093, 0, 0, 0]);
+    expectApproxPlot('Open Trade %', [0, null, 0, null, 0, null, 0, 1.8867924528301887]);
+    expectApproxPlot('Dashboard Score', [0, 2, 2, 1.011764705882353, 1.011764705882353, 1.011764705882353, 1.011764705882353, 1.6129158512720159]);
+  });
+
   it('compiles strategy.default_entry_qty from default sizing settings', () => {
     const singleBar = [{ time: 1, open: 100, high: 100, low: 100, close: 100, volume: 100 }];
     const run = (pine: string, title: string): (number | null)[] => {
@@ -4173,6 +6071,34 @@ plot(strategy.default_entry_qty(fill_price=200), "Cash")`, 'Cash')).toEqual([10]
     expect(run(`//@version=6
 strategy("Default fixed quantity", default_qty_type=strategy.fixed, default_qty_value=7)
 plot(strategy.default_entry_qty(close), "Fixed")`, 'Fixed')).toEqual([7]);
+  });
+
+  it('converts symbol values to the strategy account currency', () => {
+    const pine = `//@version=6
+strategy("Account currency conversion", currency=currency.EUR)
+plot(strategy.convert_to_account(close), "Account")
+plot(strategy.convert_to_symbol(strategy.convert_to_account(close)), "Symbol")
+plot(strategy.account_currency == "EUR" ? 1 : 0, "Currency")`;
+    const localBars = makeBars([10, 20, 30, 40]);
+    const requestDatafeed = new InMemoryRequestDatafeed([], [], [
+      seedCurrencyRate('USD', 'EUR', [
+        { time: localBars[0]!.time, value: 0.9 },
+        { time: localBars[2]!.time, value: 0.95 },
+      ]),
+    ]);
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    if (!compiled.success) throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+    const result = executeCompiled(compiled, localBars, undefined, {
+      requestDatafeed,
+      runtime: { syminfo: { currency: 'USD' } },
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Account').values).toEqual([9, 18, 28.5, 38]);
+    expect(findPlot(result!, 'Symbol').values).toEqual([10, 20, 30, 40]);
+    expect(findPlot(result!, 'Currency').values).toEqual([1, 1, 1, 1]);
   });
 
   it('preserves strategy.entry OCA groups for compiled sibling cancellation', () => {
@@ -4211,6 +6137,67 @@ plot(strategy.position_size, "Position")`;
     })));
     expect(compiledResult?.strategy.orders.map((order) => order.status)).toEqual(['filled', 'cancelled']);
   });
+
+  it('uses strategy.exit oca_name for compiled reduce groups', () => {
+    const pine = `//@version=6
+strategy("Compiled exit OCA name", process_orders_on_close=false)
+if bar_index == 0
+    strategy.entry("Long", strategy.long, qty=6)
+if bar_index == 1 and strategy.position_size > 0
+    strategy.exit("Take", from_entry="Long", qty=3, limit=105, oca_name="Bracket")
+    strategy.exit("Stop", from_entry="Long", qty=6, stop=95, oca_name="Bracket")
+plot(strategy.position_size, "Position")`;
+    const localBars: Bar[] = [
+      { time: 1, open: 100, high: 100, low: 100, close: 100, volume: 100 },
+      { time: 2, open: 100, high: 101, low: 99, close: 100, volume: 100 },
+      { time: 3, open: 100, high: 106, low: 99, close: 104, volume: 100 },
+    ];
+
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    if (!compiled.success) throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+    const compiledResult = executeCompiled(compiled, localBars);
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(compiledResult?.strategy.orders.map((order) => ({
+      id: order.id,
+      status: order.status,
+      ocaName: order.ocaName,
+      ocaType: order.ocaType,
+      qty: order.qty,
+      filledQty: order.filledQty,
+    }))).toEqual([
+      { id: 'Long', status: 'filled', ocaName: undefined, ocaType: undefined, qty: 6, filledQty: 6 },
+      { id: 'Take', status: 'filled', ocaName: 'Bracket', ocaType: 'reduce', qty: 3, filledQty: 3 },
+      { id: 'Stop', status: 'pending', ocaName: 'Bracket', ocaType: 'reduce', qty: 3, filledQty: 0 },
+    ]);
+  });
+});
+
+describe('executeCompiled — versioned session defaults', () => {
+  const sessionBars: Bar[] = [
+    { time: Date.UTC(2024, 0, 7, 10, 0), open: 1, high: 1, low: 1, close: 1, volume: 1 },
+    { time: Date.UTC(2024, 0, 8, 10, 0), open: 2, high: 2, low: 2, close: 2, volume: 2 },
+    { time: Date.UTC(2024, 0, 9, 10, 0), open: 3, high: 3, low: 3, close: 3, volume: 3 },
+  ];
+
+  function sessionMaskValues(version: 4 | 5, session: string): (number | null)[] {
+    const source = `//@version=${version}
+${version === 4 ? 'study' : 'indicator'}("session defaults")
+plot(not na(time(timeframe.period, "${session}", "UTC")) ? 1 : 0, "In Session")`;
+    const compiled = tryCompile(parse(source));
+    if (!compiled.success) throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+    const result = executeCompiled(compiled, sessionBars);
+    expect(result?.errors).toEqual([]);
+    return findPlot(result!, 'In Session').values;
+  }
+
+  it('uses weekday-only bare session day masks for v4 and all-days masks for v5+', () => {
+    expect(sessionMaskValues(4, '0930-1600')).toEqual([0, 1, 1]);
+    expect(sessionMaskValues(5, '0930-1600')).toEqual([1, 1, 1]);
+    expect(sessionMaskValues(4, '0930-1600:1234567')).toEqual([1, 1, 1]);
+    expect(sessionMaskValues(5, '0930-1600:23456')).toEqual([0, 1, 1]);
+  });
 });
 
 describe('executeCompiled — request.security integration', () => {
@@ -4244,8 +6231,135 @@ describe('executeCompiled — request.security integration', () => {
 
   const datafeed = new InMemoryRequestDatafeed([
     { symbol: 'TEST', timeframe: 'D', bars: htfBars },
+    { symbol: 'TEST', timeframe: '60', bars: chartBars.map((bar) => ({ ...bar, close: bar.close + 100 })) },
     { symbol: 'TEST', timeframe: '1', bars: lowerTfBars },
   ]);
+
+  it('uses the version matrix for wrapped request scope rules', () => {
+    expect([3, 4, 5].map((version) => pineVersionRules(version).allowsNonExportedFunctionRequestsWithoutDynamicRequests)).toEqual([true, true, true]);
+    expect(pineVersionRules(6).allowsNonExportedFunctionRequestsWithoutDynamicRequests).toBe(false);
+    expect([3, 4, 5].map((version) => pineVersionRules(version).allowsConditionalOperandRequestsWithoutDynamicRequests)).toEqual([true, true, true]);
+    expect(pineVersionRules(6).allowsConditionalOperandRequestsWithoutDynamicRequests).toBe(false);
+  });
+
+  it('uses the declared Pine version for default dynamic request availability', () => {
+    const source = (version: 5 | 6) => `//@version=${version}
+indicator("Dynamic Requests Default")
+value = na
+if close > open
+    value := request.security("TEST", "D", close)
+plot(value, "Requested")`;
+
+    const v5Compiled = tryCompile(parse(source(5)));
+    const v6Compiled = tryCompile(parse(source(6)));
+    if (!v5Compiled.success) throw new Error(`Compilation failed: ${v5Compiled.unsupported.join(', ')}`);
+    if (!v6Compiled.success) throw new Error(`Compilation failed: ${v6Compiled.unsupported.join(', ')}`);
+
+    const v5Result = executeCompiled(v5Compiled, chartBars, undefined, { requestDatafeed: datafeed });
+    const v6Result = executeCompiled(v6Compiled, chartBars, undefined, { requestDatafeed: datafeed });
+
+    expect(v5Result?.errors.map((error) => error.message)).toContain('request.* calls in local scopes require dynamic_requests=true: request.security');
+    expect(v6Result?.errors).toEqual([]);
+  });
+
+  it('maps v4 raw bool request lookahead to the legacy lookahead-on enum', () => {
+    const source = `//@version=4
+study("v4 raw security lookahead")
+value = security("TEST", "D", close, lookahead=true)
+plot(value, "Requested")`;
+    const compiled = tryCompile(parse(source));
+    if (!compiled.success) throw new Error(`Compilation failed: ${compiled.unsupported.join(', ')}`);
+
+    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Requested').values).toEqual([12, 12, 14, 14, 16, 16]);
+  });
+
+  it('allows v5 non-exported request wrappers without dynamic_requests', () => {
+    const ast = parse(`//@version=5
+indicator("Static wrapper")
+wrapped(string symbol) => request.security(symbol, "D", close, lookahead=barmerge.lookahead_on)
+value = na
+if close > open
+    value := wrapped("TEST")
+plot(value, "Wrapped")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    const compiledResult = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
+    const interpResult = executeScript(ast, chartBars, undefined, { requestDatafeed: datafeed });
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult?.plots.find((plot) => plot.title === 'Wrapped')?.values).toEqual([12, 12, 14, 14, 16, 16]);
+    expect(compiledResult?.plots.find((plot) => plot.title === 'Wrapped')?.values).toEqual(
+      interpResult.plots.find((plot) => plot.title === 'Wrapped')?.values,
+    );
+  });
+
+  it('keeps documented no-data syminfo sentinels in request contexts', () => {
+    const ast = parse(`//@version=6
+indicator("Request no-data metadata")
+volumeTypeLength = request.security("TEST", "D", str.length(syminfo.volumetype))
+plot(volumeTypeLength, "Volume Type Length")`);
+    const requestContextWithoutMetadata = new InMemoryRequestDatafeed([
+      { symbol: 'TEST', timeframe: 'D', bars: htfBars },
+    ]);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const options = { requestDatafeed: requestContextWithoutMetadata };
+    const compiledResult = executeCompiled(compiled, chartBars, undefined, options);
+    const compiledWrapperResult = executeScript(ast, chartBars, undefined, options);
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(compiledWrapperResult.errors).toEqual([]);
+    expect(findPlot(compiledResult!, 'Volume Type Length').values).toEqual([null, null, 3, 3, 3, 3]);
+    expect(findPlot(compiledWrapperResult, 'Volume Type Length').values).toEqual([null, null, 3, 3, 3, 3]);
+  });
+
+  it('allows v5 global conditional request operands without dynamic_requests', () => {
+    const ast = parse(`//@version=5
+indicator("Static conditional request")
+canRender(string tf) => timeframe.period == tf
+requested = canRender("1") ? request.security("TEST", "D", close, lookahead=barmerge.lookahead_on) : 0
+plot(requested, "Requested")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    const compiledResult = executeCompiled(compiled, chartBars, undefined, {
+      requestDatafeed: datafeed,
+      runtime: { timeframe: { period: '1' } },
+    });
+    const interpResult = executeScript(ast, chartBars, undefined, {
+      requestDatafeed: datafeed,
+      runtime: { timeframe: { period: '1' } },
+    });
+
+    expect(compiledResult?.errors).toEqual([]);
+    expect(interpResult.errors).toEqual([]);
+    expect(compiledResult?.plots.find((plot) => plot.title === 'Requested')?.values).toEqual([12, 12, 14, 14, 16, 16]);
+    expect(compiledResult?.plots.find((plot) => plot.title === 'Requested')?.values).toEqual(
+      interpResult.plots.find((plot) => plot.title === 'Requested')?.values,
+    );
+  });
+
+  it('keeps v6 explicit dynamic_requests=false strict for request wrappers', () => {
+    const ast = parse(`//@version=6
+indicator("Strict wrapper", dynamic_requests=false)
+wrapped() => request.security("TEST", "D", close)
+value = na
+if close > open
+    value := wrapped()
+plot(value, "Wrapped")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
+    expect(result?.errors.map((error) => error.message)).toContain(
+      'request.* calls in local scopes require dynamic_requests=true: request.security. Non-exported request wrapper functions were valid without dynamic_requests in Pine v3-v5 but require dynamic_requests=true in Pine v6.',
+    );
+  });
+
   const multiSymbolDatafeed = new InMemoryRequestDatafeed([
     { symbol: 'TEST', timeframe: 'D', bars: htfBars },
     {
@@ -4347,6 +6461,31 @@ describe('executeCompiled — request.security integration', () => {
     seedCorporateAction('splits', 'NASDAQ:AAPL', [
       { time: chartBars[3]!.time, value: { kind: 'splits', numerator: 2, denominator: 1 } },
     ]),
+  ]);
+  const corporateActionSeriesDatafeed = new InMemoryRequestDatafeed([], [
+    {
+      family: 'dividends',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'dividends.gross', 'USD'),
+      points: [
+        { time: chartBars[1]!.time, value: 0.24 },
+        { time: chartBars[4]!.time, value: 0.25 },
+      ],
+    },
+    {
+      family: 'earnings',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'earnings.actual', 'USD'),
+      points: [
+        { time: chartBars[0]!.time, value: 1.5 },
+        { time: chartBars[4]!.time, value: 1.8 },
+      ],
+    },
+    {
+      family: 'splits',
+      key: corporateActionRequestKey('NASDAQ:AAPL', 'splits.denominator'),
+      points: [
+        { time: chartBars[3]!.time, value: 1 },
+      ],
+    },
   ]);
   const financialMetricDatafeed = new InMemoryRequestDatafeed([], [], [], [], [], [
     seedFinancialMetric('NASDAQ:AAPL', 'TOTAL_REVENUE', 'FQ', [
@@ -4515,6 +6654,17 @@ plot(lookaheadGaps, "Lookahead Gaps")
 plot(mixed, "Mixed")`, chartBars, { requestDatafeed: datafeed });
   });
 
+  it('maps v4 raw boolean security lookahead to lookahead_on', () => {
+    const result = executeScript(parse(`//@version=4
+study("Legacy boolean lookahead")
+value = security("TEST", "D", close, lookahead=true)
+plot(value, "Requested")
+`), chartBars, undefined, { requestDatafeed: datafeed });
+
+    expect(result.errors).toEqual([]);
+    expect(findPlot(result, 'Requested').values).toEqual([12, 12, 14, 14, 16, 16]);
+  });
+
   it('request.security treats empty timeframe as chart timeframe in compiled host contexts', () => {
     const emptyTimeframeDatafeed = new InMemoryRequestDatafeed([
       { symbol: 'TEST', timeframe: '60', bars: chartBars.map((bar) => ({ ...bar, close: bar.close + 100 })) },
@@ -4575,6 +6725,148 @@ plot(onGapsOn, "On Gaps On")`, chartBars, { requestDatafeed: datafeed });
     }
   });
 
+  it('request.security exposes same-timeframe gaps_on values on their matching v5 bars', () => {
+    const ast = parse(`//@version=5
+indicator("same timeframe gaps")
+sparse = request.security("TEST", "60", bar_index == 2 ? close : na, gaps=barmerge.gaps_on)
+plot(sparse, "Sparse")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Sparse').values).toEqual([null, null, 113, null, null, null]);
+  });
+
+  it('request.security replays math builtins in same-timeframe v5 pivot drawing expressions', () => {
+    const pivotBars: Bar[] = [
+      { time: 900000, open: 9, high: 10, low: 8, close: 9, volume: 100 },
+      { time: 1800000, open: 9, high: 11, low: 7, close: 9, volume: 101 },
+      { time: 2700000, open: 9, high: 12, low: 6, close: 9, volume: 102 },
+      { time: 3600000, open: 9, high: 20, low: 5, close: 9, volume: 103 },
+      { time: 4500000, open: 9, high: 13, low: 6, close: 9, volume: 104 },
+      { time: 5400000, open: 9, high: 12, low: 7, close: 9, volume: 105 },
+      { time: 6300000, open: 9, high: 11, low: 8, close: 9, volume: 106 },
+    ];
+    const pivotDatafeed = new InMemoryRequestDatafeed([
+      { symbol: 'BTCUSDT', timeframe: '15', bars: pivotBars },
+    ]);
+    const ast = parse(`//@version=5
+indicator("same timeframe pivot drawing", overlay=true)
+var line[] resistanceLines = array.new_line()
+var float[] resistancePrices = array.new_float()
+detectAndDrawPivots(tf) =>
+    [pivotHigh, pivotLow] = request.security(syminfo.tickerid, tf, [math.round_to_mintick(ta.pivothigh(3, 2)), math.round_to_mintick(ta.pivotlow(3, 2))], gaps=barmerge.gaps_on)
+    pivotBarTime = time(tf)[2]
+    if not na(pivotHigh) and not array.includes(resistancePrices, pivotHigh)
+        newLine = line.new(x1=pivotBarTime, y1=pivotHigh, x2=time, y2=pivotHigh, xloc=xloc.bar_time)
+        array.push(resistanceLines, newLine)
+        array.push(resistancePrices, pivotHigh)
+detectAndDrawPivots("15")
+plot(array.size(resistanceLines), "Resistance Count")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, pivotBars, undefined, {
+      requestDatafeed: pivotDatafeed,
+      runtime: { timeframe: { period: '15' } },
+    });
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Resistance Count').values).toEqual([0, 0, 0, 0, 0, 1, 1]);
+    expect(result?.drawings.filter((drawing) => drawing.type === 'line')).toHaveLength(1);
+  });
+
+  it('request.security preserves cached dispatch and requested holes across merge modes', () => {
+    const holeDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'HOLES',
+        timeframe: 'D',
+        bars: [
+          { time: 100, open: 10, high: 13, low: 9, close: 12, volume: 210 },
+          { time: 300, open: 12, high: 15, low: 11, close: Number.NaN, volume: 250 },
+          { time: 500, open: 14, high: 17, low: 13, close: 16, volume: 290 },
+        ],
+      },
+    ]);
+    let getBarsCalls = 0;
+    const countingDatafeed: RequestDatafeed = {
+      getBars(query) {
+        getBarsCalls += 1;
+        return holeDatafeed.getBars(query);
+      },
+    };
+    const { compiledResult, interpResult } = assertPlotParity(`//@version=6
+indicator("compiled request hole parity")
+offGapsOff = request.security("HOLES", "D", close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+offGapsOn = request.security("HOLES", "D", close, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_off)
+onGapsOff = request.security("HOLES", "D", close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on)
+onGapsOn = request.security("HOLES", "D", close, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_on)
+repeat = request.security("HOLES", "D", close, gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+plot(offGapsOff, "Off Gaps Off")
+plot(offGapsOn, "Off Gaps On")
+plot(onGapsOff, "On Gaps Off")
+plot(onGapsOn, "On Gaps On")
+plot(repeat, "Repeat")`, chartBars, { requestDatafeed: countingDatafeed });
+
+    const expected = new Map<string, Array<number | null>>([
+      ['Off Gaps Off', [null, null, 12, 12, null, null]],
+      ['Off Gaps On', [null, null, 12, null, null, null]],
+      ['On Gaps Off', [12, 12, null, null, 16, 16]],
+      ['On Gaps On', [12, null, null, null, 16, null]],
+      ['Repeat', [null, null, 12, 12, null, null]],
+    ]);
+
+    for (const [title, values] of expected) {
+      expect(findPlot(compiledResult, title).values).toEqual(values);
+      expect(findPlot(interpResult, title).values).toEqual(values);
+    }
+    expect(getBarsCalls).toBe(10);
+  });
+
+  it('request.security invalidates cached dispatch when dynamic symbols change', () => {
+    const dynamicDatafeed = new InMemoryRequestDatafeed([
+      {
+        symbol: 'AAA',
+        timeframe: 'D',
+        bars: htfBars,
+      },
+      {
+        symbol: 'BBB',
+        timeframe: 'D',
+        bars: htfBars.map((bar) => ({ ...bar, close: bar.close + 100 })),
+      },
+    ]);
+    const ast = parse(`//@version=6
+indicator("compiled dynamic request dispatch")
+symbol = bar_index < 3 ? "AAA" : "BBB"
+requested = request.security(symbol, "D", close, lookahead=barmerge.lookahead_on)
+plot(requested, "Requested")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: dynamicDatafeed });
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Requested').values).toEqual([12, 12, 14, 114, 116, 116]);
+  });
+
+  it('request.security selects first versus last LTF intrabar by lookahead', () => {
+    const ast = parse(`//@version=6
+indicator("compiled request LTF lookahead")
+first = request.security("TEST", "1", close, lookahead=barmerge.lookahead_on)
+last = request.security("TEST", "1", close, lookahead=barmerge.lookahead_off)
+plot(first, "First")
+plot(last, "Last")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    const compiledResult = executeCompiled(compiled, lowerChartBars, undefined, {
+      requestDatafeed: datafeed,
+      runtime: { timeframe: { period: '2' } },
+    });
+    expect(compiledResult?.errors).toEqual([]);
+    expect(findPlot(compiledResult!, 'First').values).toEqual([11, 21, 31]);
+    expect(findPlot(compiledResult!, 'Last').values).toEqual([13, 24, 34]);
+  });
+
   it('request.security replays prior computed globals in requested context during realtime reconstruction', () => {
     const ast = parse(`//@version=6
 indicator("compiled realtime HTF computed request")
@@ -4599,6 +6891,29 @@ plot(htf, "HTF")`);
     expect(findPlot(compiledResult!, 'HTF').values).toEqual([null, null, null, null, 15]);
     expect(findPlot(compiledResult!, 'HTF').values.at(-1)).toBe(15);
     expect(findPlot(compiledResult!, 'HTF').values.at(-1)).not.toBe(directChartBasis);
+  });
+
+  it('marks the historical bar before a realtime last bar as last-confirmed history', () => {
+    const ast = parse(`//@version=6
+indicator("compiled realtime barstate boundary")
+lch = barstate.islastconfirmedhistory ? 1 : 0
+plot(lch, "LCH")
+plot(lch[1], "PrevLCH")
+plot(barstate.islast ? 1 : 0, "Last")
+plot(barstate.isrealtime ? 1 : 0, "Realtime")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const compiledResult = executeCompiled(compiled, chartBars.slice(0, 4), undefined, {
+      realtimeLastBar: { isNew: true },
+    });
+
+    expect(compiledResult).not.toBeNull();
+    expect(compiledResult?.errors).toEqual([]);
+    expect(findPlot(compiledResult!, 'LCH').values).toEqual([0, 0, 1, 0]);
+    expect(findPlot(compiledResult!, 'PrevLCH').values).toEqual([null, 0, 0, 1]);
+    expect(findPlot(compiledResult!, 'Last').values).toEqual([0, 0, 1, 1]);
+    expect(findPlot(compiledResult!, 'Realtime').values).toEqual([0, 0, 0, 1]);
   });
 
   it('compiles host-provided imported helpers used by request and timeframe logic', () => {
@@ -4686,6 +7001,42 @@ plot(left.score(), "Left Score")
 plot(right.score(), "Right Score")`, chartBars, {
       libraries: new Map([['PublicUser/OverloadedObjects/1', library]]),
     });
+  });
+
+  it('dispatches user methods on typed UDT na receivers', () => {
+    assertPlotParity(`//@version=6
+indicator("typed UDT na method receivers")
+type Marker
+    label id
+method retain(Marker value) =>
+    value
+method nestedRetain(Marker value) =>
+    value.retain()
+Marker marker = na
+receiverChoice = marker.retain()
+nestedChoice = marker.nestedRetain()
+plot(na(receiverChoice) ? 1 : 0, "Receiver")
+plot(na(nestedChoice) ? 1 : 0, "Nested")
+plot(na(receiverChoice[1]) ? 1 : 0, "Receiver History")
+plot(na(nestedChoice[1]) ? 1 : 0, "Nested History")`, chartBars);
+  });
+
+  it('compiles type-qualified local method calls with explicit receivers', () => {
+    assertPlotParity(`//@version=6
+indicator("type qualified local method")
+type Anchor
+    int tag
+type Item
+    float value
+
+method expose(Anchor receiver, array<Item> values) => values
+
+anchor = Anchor.new(1)
+values = array.from(Item.new(close))
+qualified = Anchor.expose(anchor, values)
+postfix = Anchor.expose(anchor, values).copy().first()
+plot(qualified.first().value, "Qualified")
+plot(postfix.value, "Postfix")`, chartBars);
   });
 
   it('compiles versioned library imports and export-to-export calls with reference parity', () => {
@@ -4866,6 +7217,151 @@ plot(closeSlow, "Requested Close Slow")`, chartBars, { requestDatafeed: datafeed
     expect(findPlot(compiledResult, 'Requested Open Fast').values).toEqual([null, null, 11, 11, 13, 13]);
     expect(findPlot(compiledResult, 'Requested Close Slow').values).toEqual([null, null, null, null, 14, 14]);
     expect(compiledResult.plots.map((plot) => plot.values)).toEqual(interpResult.plots.map((plot) => plot.values));
+  });
+
+  it('keeps request expression var state isolated from chart UDF state', () => {
+    const ast = parse(`//@version=6
+indicator("compiled request context UDF var isolation")
+step(series float delta) =>
+    var acc = 0.0
+    acc += delta
+    acc
+chart = step(100)
+requested = request.security("TEST", "60", step(1), lookahead=barmerge.lookahead_on)
+plot(chart, "Chart")
+plot(requested, "Requested")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, chartBars, undefined, {
+      requestDatafeed: datafeed,
+      runtime: { timeframe: { period: '60' } },
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Chart').values).toEqual([100, 200, 300, 400, 500, 600]);
+    expect(findPlot(result!, 'Requested').values).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  it('keeps request wrapper var state isolated per dynamic capture', () => {
+    const ast = parse(`//@version=6
+indicator("compiled request wrapper capture UDF var isolation")
+step(series float delta) =>
+    var acc = 0.0
+    acc += delta
+    acc
+wrapped(series float delta) =>
+    request.security("TEST", "60", step(delta), lookahead=barmerge.lookahead_on)
+one = wrapped(1)
+ten = wrapped(10)
+plot(one, "One")
+plot(ten, "Ten")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, chartBars, undefined, {
+      requestDatafeed: datafeed,
+      runtime: { timeframe: { period: '60' } },
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'One').values).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(findPlot(result!, 'Ten').values).toEqual([10, 20, 30, 40, 50, 60]);
+  });
+
+  it('advances request expression var state on requested bars, not chart bars', () => {
+    const ast = parse(`//@version=6
+indicator("compiled request context var advancement")
+step() =>
+    var acc = 0
+    acc += 1
+    acc
+requested = request.security("TEST", "D", step(), lookahead=barmerge.lookahead_on)
+plot(requested, "Requested")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: datafeed });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Requested').values).toEqual([1, 1, 2, 2, 3, 3]);
+  });
+
+  it('advances request.security_lower_tf expression state once per intrabar', () => {
+    const ast = parse(`//@version=6
+indicator("compiled lower request var advancement", timeframe="2")
+step() =>
+    var acc = 0
+    acc += 1
+    acc
+values = request.security_lower_tf("TEST", "1", step())
+plot(array.size(values) > 0 ? array.get(values, 0) : na, "First")
+plot(array.size(values) > 1 ? array.get(values, 1) : na, "Second")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, lowerChartBars, undefined, {
+      requestDatafeed: datafeed,
+      runtime: { timeframe: { period: '2' } },
+    });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'First').values).toEqual([1, 3, 5]);
+    expect(findPlot(result!, 'Second').values).toEqual([2, 4, 6]);
+  });
+
+  it('rejects loop-dependent dynamic request expressions before silent runtime na', () => {
+    const ast = parse(`//@version=6
+indicator("compiled request loop capture state", dynamic_requests=true)
+step(series float delta) =>
+    var acc = 0.0
+    acc += delta
+    acc
+sum = 0.0
+for i = 0 to 1
+    sum += request.security("TEST", "60", step(i + 1), lookahead=barmerge.lookahead_on)
+plot(sum, "Sum")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(false);
+    expect(compiled.unsupported).toContain('request.* expression in loop scopes cannot depend on loop variables or loop-mutated values');
+  });
+
+  it('allows dynamic request loop contexts when the evaluated expression is loop-invariant', () => {
+    const ast = parse(`//@version=6
+indicator("compiled request legal loop contexts", dynamic_requests=true)
+sum = 0.0
+for i = 0 to 1
+    symbol = i == 0 ? "TEST" : "NASDAQ:AAPL"
+    sum += request.security(symbol, "D", close, lookahead=barmerge.lookahead_on)
+plot(sum, "Sum")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const result = executeCompiled(compiled, chartBars, undefined, { requestDatafeed: multiSymbolDatafeed });
+
+    expect(result?.errors).toEqual([]);
+    expect(findPlot(result!, 'Sum').values).toEqual([24, 24, 28, 28, 32, 32]);
+  });
+
+  it('rejects loop-dependent request.security_lower_tf and request.seed expressions', () => {
+    const lower = tryCompile(parse(`//@version=6
+indicator("compiled lower loop capture", dynamic_requests=true, timeframe="2")
+for i = 0 to 1
+    request.security_lower_tf("TEST", "1", close + i)`));
+    const seed = tryCompile(parse(`//@version=6
+indicator("compiled seed loop capture", dynamic_requests=true)
+for i = 0 to 1
+    request.seed("tradingview-pine-seeds/demo", "BTC_DEV", close + i)`));
+
+    expect(lower.success).toBe(false);
+    expect(seed.success).toBe(false);
+    expect(lower.unsupported).toContain('request.* expression in loop scopes cannot depend on loop variables or loop-mutated values');
+    expect(seed.unsupported).toContain('request.* expression in loop scopes cannot depend on loop variables or loop-mutated values');
   });
 
   it('request.security wrapper helpers can read root inputs in compiled subprograms', () => {
@@ -5276,11 +7772,54 @@ plot(array.size(missing), "Missing")
 plot(array.size(sameTf), "Same TF")`, [lowerChartBars[0]!], { requestDatafeed: datafeed });
   });
 
+  it('request.security_lower_tf preserves tuple arity for ignored invalid contexts', () => {
+    const ast = parse(`//@version=6
+indicator("compiled lower tf invalid tuple", timeframe="2")
+[fast, slow, gate] = request.security_lower_tf("TEST", "", [close, open, high], ignore_invalid_timeframe=true)
+plot(array.size(fast), "Fast")
+plot(array.size(slow), "Slow")
+plot(array.size(gate), "Gate")`);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+
+    const result = executeCompiled(compiled, [lowerChartBars[0]!], undefined, { requestDatafeed: datafeed });
+
+    expect(result?.errors).toEqual([]);
+    expect(result?.plots.map((plot) => plot.values)).toEqual([[0], [0], [0]]);
+  });
+
   it('request.currency_rate merges series points with reference parity', () => {
     assertPlotParity(`//@version=6
 indicator("compiled currency rate")
 rate = request.currency_rate(currency.USD, "GBP")
 plot(rate, "USDGBP")`, chartBars, { requestDatafeed: currencyRateDatafeed });
+  });
+
+  it('request.security tuple wrappers preserve block-bodied returns at two call sites', () => {
+    assertPlotParity(`//@version=6
+indicator("compiled block tuple request wrapper")
+securityPair(string symbol) =>
+    [value, ticker] = request.security(symbol, "D", [close, syminfo.ticker])
+[first, firstTicker] = securityPair("TEST")
+[second, secondTicker] = securityPair("TEST")
+plot(first, "First")
+plot(second, "Second")`, chartBars, { requestDatafeed: datafeed });
+  });
+
+  it('direct compiled and compiled wrapper tuple returns agree when an if arm is na', () => {
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("tuple na arm")
+pair(series float source) =>
+    if na(source)
+        na
+    else
+        [source, source]
+[first, second] = pair(close)
+plot(first, "First")
+plot(second, "Second")`, chartBars);
+
+    expect(findPlot(compiledResult, 'First').values).toEqual(chartBars.map((bar) => bar.close));
+    expect(findPlot(compiledResult, 'Second').values).toEqual(chartBars.map((bar) => bar.close));
   });
 
   it('request.currency_rate resolves seeded provider rates with reference parity', () => {
@@ -5347,6 +7886,24 @@ plot(splitDen, "Split Denominator")`, chartBars, { requestDatafeed: corporateAct
     expect(findPlot(compiledResult, 'Standardized EPS Gaps').values).toEqual([1.45, null, null, null, 1.75, null]);
     expect(findPlot(compiledResult, 'Split Numerator').values).toEqual([null, null, null, 2, 2, 2]);
     expect(findPlot(compiledResult, 'Split Denominator').values).toEqual([null, null, null, 1, 1, 1]);
+  });
+
+  it('corporate-action requests honor lookahead when merging point series', () => {
+    const { compiledResult } = assertPlotParity(`//@version=6
+indicator("compiled corporate action lookahead")
+dividend = request.dividends("NASDAQ:AAPL", dividends.gross, lookahead=barmerge.lookahead_on, currency="USD")
+dividendGaps = request.dividends("NASDAQ:AAPL", dividends.gross, gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_on, currency="USD")
+earn = request.earnings("NASDAQ:AAPL", earnings.actual, lookahead=barmerge.lookahead_on, currency="USD")
+split = request.splits("NASDAQ:AAPL", splits.denominator, lookahead=barmerge.lookahead_on)
+plot(dividend, "Dividend")
+plot(dividendGaps, "Dividend Gaps")
+plot(earn, "Earnings")
+plot(split, "Split")`, chartBars, { requestDatafeed: corporateActionSeriesDatafeed });
+
+    expect(findPlot(compiledResult, 'Dividend').values).toEqual([0.24, 0.24, 0.25, 0.25, 0.25, 0.25]);
+    expect(findPlot(compiledResult, 'Dividend Gaps').values).toEqual([0.24, null, 0.25, null, null, null]);
+    expect(findPlot(compiledResult, 'Earnings').values).toEqual([1.5, 1.8, 1.8, 1.8, 1.8, 1.8]);
+    expect(findPlot(compiledResult, 'Split').values).toEqual([1, 1, 1, 1, 1, 1]);
   });
 
   it('corporate-action requests return na for unseeded provider events with reference parity', () => {
@@ -5555,22 +8112,46 @@ plot(htfClose, "HTF Close")`;
     expect(compiledResult?.profile.executionMode).toBe('compiled');
   });
 
-  it('reports tryExecuteScript request errors when compiled requests lack a datafeed', () => {
+  it('reports compiled request errors with an explicit runtime failure kind', () => {
     const pine = `//@version=6
 indicator("compiled request fallback reason")
 htfClose = request.security("TEST", "D", close)
 plot(htfClose, "HTF Close")`;
     const ast = parse(pine);
-    const fallbackReasons: string[] = [];
+    const execution = executeCompiledScript(ast, [chartBars[0]!]);
 
-    const result = tryExecuteScript(ast, [chartBars[0]!], undefined, {
-      onFallback: (reason) => fallbackReasons.push(reason),
-    });
+    expect(execution.status).toBe('success');
+    if (execution.status === 'success') {
+      expect(execution.result.errors[0]?.message).toBe('request.security requires a request datafeed');
+      expect(findPlot(execution.result, 'HTF Close').values).toEqual([null]);
+      expect(execution.result.profile.executionMode).toBe('compiled');
+    }
+  });
 
-    expect(result?.errors[0]?.message).toBe('request.security requires a request datafeed');
-    expect(findPlot(result!, 'HTF Close').values).toEqual([null]);
-    expect(result?.profile.executionMode).toBe('compiled');
-    expect(fallbackReasons).toEqual([]);
+  it('surfaces unavailable strategy intrabar data in the compiled result profile', () => {
+    const pine = `//@version=6
+strategy("bar magnifier availability", use_bar_magnifier=true)
+strategy.entry("Long", strategy.long)
+strategy.exit("Exit", "Long", limit=close + 1)`;
+    const result = executeScript(parse(pine), chartBars.slice(0, 2));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.strategyIntrabarUnavailableReasons).toEqual(['missing_context']);
+    expect(result.strategy.intrabarContexts).toHaveLength(2);
+    expect(result.strategy.intrabarContexts.every((context) => context.unavailableReason === 'missing_context')).toBe(true);
+  });
+
+  it('executes non-default strategy margins and preserves the approximation signal', () => {
+    const pine = `//@version=6
+strategy("margin approximation", margin_long=25, margin_short=50)
+strategy.entry("Long", strategy.long)
+plot(strategy.position_size, "Position")`;
+    const result = executeScript(parse(pine), chartBars.slice(0, 2));
+
+    expect(result.errors).toEqual([]);
+    expect(result.strategy.settings.marginLong).toBe(25);
+    expect(result.strategy.settings.marginShort).toBe(50);
+    expect(result.profile.strategyMarginApproximationReasons).toEqual(['margin_long', 'margin_short']);
   });
 
   it('keeps imported library scripts on the compiled path when the host supplies libraries', () => {
@@ -5583,25 +8164,24 @@ indicator("worker libraries")
 import TestUser/WorkerTools/1 as wt
 plot(wt.smooth(close), "Smooth")`;
     const ast = parse(pine);
-    const fallbackReasons: string[] = [];
-
-    const missingLibraryResult = tryExecuteScript(ast, chartBars, undefined, {
-      onFallback: (reason) => fallbackReasons.push(reason),
-    });
-    const compiledResult = tryExecuteScript(ast, chartBars, undefined, {
+    const missingLibraryExecution = executeCompiledScript(ast, chartBars);
+    const compiledExecution = executeCompiledScript(ast, chartBars, undefined, {
       libraries: new Map([['TestUser/WorkerTools/1', library]]),
     });
     const interpResult = executeScript(ast, chartBars, undefined, {
       libraries: new Map([['TestUser/WorkerTools/1', library]]),
     });
 
-    expect(missingLibraryResult?.errors.map((error) => error.message)).toEqual([
-      'import not found in deterministic library registry: TestUser/WorkerTools/1 as wt',
-    ]);
-    expect(fallbackReasons).toEqual([]);
-    expect(compiledResult?.profile.executionMode).toBe('compiled');
-    expect(compiledResult?.errors).toEqual([]);
-    expect(compiledResult?.plots[0]?.values).toEqual(interpResult.plots[0]?.values);
+    expect(missingLibraryExecution).toMatchObject({ status: 'success' });
+    expect(compiledExecution.status).toBe('success');
+    if (missingLibraryExecution.status === 'success' && compiledExecution.status === 'success') {
+      expect(missingLibraryExecution.result.errors.map((error) => error.message)).toEqual([
+        'import not found in deterministic library registry: TestUser/WorkerTools/1 as wt',
+      ]);
+      expect(compiledExecution.result.profile.executionMode).toBe('compiled');
+      expect(compiledExecution.result.errors).toEqual([]);
+      expect(compiledExecution.result.plots[0]?.values).toEqual(interpResult.plots[0]?.values);
+    }
   });
 
   it('executes official TradingView ta library builtins without host-supplied source', () => {
@@ -5626,6 +8206,31 @@ plot(ta.rsi(close, 14), "Native RSI")`;
     expect(result.plots[2]?.title).toBe('Native RSI');
   });
 
+  it('executes the version-pinned TradingView ta v4 exports with parity', () => {
+    const pine = `//@version=6
+indicator("official ta v4")
+import TradingView/ta/4 as tvta
+[up, down] = tvta.aroon(3)
+plot(up + down, "Aroon")`;
+    const { compiledResult, interpResult } = assertPlotParity(pine, makeBars([10, 11, 12, 13, 14]));
+
+    expect(compiledResult.plots[0]?.values).toEqual([null, null, null, 100, 100]);
+    expect(interpResult.plots[0]?.values).toEqual([null, null, null, 100, 100]);
+  });
+
+  it('keeps TradingView ta v10 aroon on the built-in endpoint calculation', () => {
+    const pine = `//@version=6
+indicator("official ta v10 aroon")
+import TradingView/ta/10 as tvta
+[up, down] = tvta.aroon(3)
+plot(up, "Up")
+plot(down, "Down")`;
+    const result = executeScript(parse(pine), makeBars([10, 11, 12, 13, 14]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.plots[1]?.values).toEqual([null, null, null, 0, 0]);
+  });
+
   it('executes aliased official TradingView ta supertrend through the native TA state machine', () => {
     const pine = `//@version=6
 indicator("official ta aliased supertrend")
@@ -5640,6 +8245,141 @@ plot(direction, "Direction")`;
     expect(result.plots.map((plot) => plot.title)).toEqual(['Trend', 'Direction']);
     expect(result.plots[0]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
     expect(result.plots[1]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
+  });
+
+  it('executes builtin ta calls through official TradingView ta alias fallback', () => {
+    const pine = `//@version=6
+indicator("official ta alias fallback")
+import TradingView/ta/9 as ta
+plot(ta.rsi(close, 5), "RSI")
+plot(ta.tr(true), "TR")
+plot(ta.crossover(close, ta.sma(close, 3)) ? 1 : 0, "Cross")
+plot(ta.correlation(close, open, 5), "Correlation")`;
+    const result = executeScript(parse(pine), makeBars([100, 102, 101, 105, 103, 106]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['RSI', 'TR', 'Cross', 'Correlation']);
+    expect(result.plots.some((plot) => plot.values.some((value) => value !== null && Number.isFinite(value)))).toBe(true);
+  });
+
+  it('executes documented official TradingView ta v8 imports without host-supplied source', () => {
+    const pine = `//@version=6
+indicator("official ta v8 surface")
+import TradingView/ta/8 as tvta
+plot(tvta.changePercent(close, open), "Change")
+plot(tvta.dema(close, 2), "Official DEMA")`;
+    const result = executeScript(parse(pine), makeBars([100, 105, 110, 103, 99, 101]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Change', 'Official DEMA']);
+    expect(result.plots[0]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
+    expect(result.plots[1]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
+  });
+
+  it('executes the documented official TradingView ta v1 export surface', () => {
+    const pine = `//@version=6
+indicator("official ta v1 surface")
+import TradingView/ta/1 as tvta
+plot(tvta.cagr(time[2], close[2], time, close), "CAGR")`;
+    const bars = [100, 102, 104, 108].map((close, index) => ({
+      time: 1700000000000 + index * 86400000,
+      open: close - 0.5,
+      high: close + 1,
+      low: close - 1,
+      close,
+      volume: 100 + index,
+    }));
+    const result = executeScript(parse(pine), bars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['CAGR']);
+    expect(result.plots[0]?.values[3]).toBeGreaterThan(0);
+  });
+
+  it('executes the documented official TradingView ta v7 export surface', () => {
+    const pine = `//@version=6
+indicator("official ta v7 surface")
+import TradingView/ta/7 as tvta
+[aroonUp, aroonDown] = tvta.aroon(5)
+[donHi, donLo, donMid] = tvta.donchian(5)
+[tenkan, kijun, span1, span2, chikou] = tvta.ichimoku(3, 5, 8)
+[kvo, kvoSignal] = tvta.kvo(3, 5, 3)
+[rwiHigh, rwiLow] = tvta.rwi(5)
+[stochK, stochD] = tvta.stochFull(5, 3, 3)
+[rsiK, rsiD] = tvta.stochRsi(5, 5, 3, 3, close)
+[st, dir] = tvta.supertrend(2.0, 5)
+[st2, dir2] = tvta.supertrend2(2.0, 5)
+[trix, trixSignal, trixHist] = tvta.trix(close, 5, 3)
+[viPlus, viMinus] = tvta.vi(5)
+[vStop, vStopUp] = tvta.vStop(close, 5, 1.5)
+[vStop2, vStopUp2] = tvta.vStop2(close, 5, 1.5)
+[fractalUp, fractalDown] = tvta.williamsFractal(2)
+plot(tvta.ao(hl2, 3, 5) + tvta.atr2(5) + tvta.cagr(time[10], close[10], time, close), "A")
+plot(tvta.changePercent(close, open) + tvta.coppock(close, 5, 3, 3) + tvta.dema(close, 5), "B")
+plot(tvta.dema2(close, 5) + tvta.dm(5) + donMid + tvta.ema2(close, 5), "C")
+plot(tvta.eom(5) + tvta.frama(close, 8) + tvta.ft(close, 5) + tvta.highestSince(close > open, high), "D")
+plot(tvta.ht(close) + tenkan + kijun + span1 + span2 + chikou + tvta.ift(close / 100), "E")
+plot(kvo + kvoSignal + tvta.lowestSince(close < open, low) + tvta.pzo(5), "F")
+plot(tvta.rma2(close, 5) + tvta.rms(close, 5) + rwiHigh + rwiLow + tvta.stc(close, 3, 5, 5, 3, 3), "G")
+plot(stochK + stochD + rsiK + rsiD + st + dir + st2 + dir2 + tvta.szo(close, 5), "H")
+plot(tvta.t3(close, 5, 0.7) + tvta.t3Alt(close, 5, 0.7) + tvta.tema(close, 5) + tvta.tema2(close, 5), "I")
+plot(tvta.trima(close, 5) + trix + trixSignal + trixHist + tvta.uo(3, 5, 7), "J")
+plot(tvta.vhf(close, 5) + viPlus + viMinus + vStop + (vStopUp ? 1 : 0) + vStop2 + (vStopUp2 ? 1 : 0), "K")
+plot(tvta.vzo(5) + (fractalUp ? 1 : 0) + (fractalDown ? 1 : 0) + tvta.wpo(5) + aroonUp + aroonDown + donHi + donLo, "L")`;
+    const result = executeScript(parse(pine), makeBars(Array.from({ length: 40 }, (_, index) => 100 + Math.sin(index / 3) * 6 + index * 0.4)));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots).toHaveLength(12);
+    expect(result.plots.some((plot) => plot.values.some((value) => value !== null && Number.isFinite(value)))).toBe(true);
+  });
+
+  it('executes the documented official TradingView ta v12 export surface', () => {
+    const pine = `//@version=6
+indicator("official ta v12 surface")
+import TradingView/ta/12 as tvta
+[longStop, shortStop] = tvta.chandelier(8, 5, 2.0)
+[longStop2, shortStop2] = tvta.chandelier2(8, 5, 2.0)
+[macd, signal, hist] = tvta.macd2(close, 3, 6, 3)
+[pmo, pmoSignal] = tvta.pmo(close, 5, 3, 3)
+[ppo, ppoSignal, ppoHist] = tvta.ppo(close, 3, 6, 3)
+[ppo2, ppoSignal2, ppoHist2] = tvta.ppo2(close, 3, 6, 3)
+[specialK, specialKSignal] = tvta.specialK(close, 3, 3)
+plot(longStop + shortStop + longStop2 + shortStop2, "Chandelier")
+plot(tvta.er(close, 5), "ER")
+plot(tvta.kama(close, 5, 2, 10), "KAMA")
+plot(macd + signal + hist, "MACD")
+plot(pmo + pmoSignal + ppo + ppoSignal + ppoHist + ppo2 + ppoSignal2 + ppoHist2, "Momentum")
+plot(specialK + specialKSignal + tvta.ulcerIndex(close, 5), "Risk")`;
+    const bars = makeBars(Array.from({ length: 80 }, (_, index) => 100 + Math.sin(index / 4) * 7 + index * 0.35));
+    const result = executeScript(parse(pine), bars);
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Chandelier', 'ER', 'KAMA', 'MACD', 'Momentum', 'Risk']);
+    for (const plot of result.plots) {
+      expect(plot.values.some((value) => value !== null && Number.isFinite(value)), plot.title).toBe(true);
+    }
+  });
+
+  it('executes the documented official TradingView ta v14 additions', () => {
+    const pine = `//@version=6
+indicator("official ta v14 surface")
+import TradingView/ta/14 as tvta
+plot(tvta.allTimeHigh(close), "All-Time High")
+plot(tvta.allTimeLow(close), "All-Time Low")
+plot(tvta.trima2(close, 3), "TRIMA2")`;
+    const result = executeScript(parse(pine), makeBars([100, 103, 99, 105, 101]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['All-Time High', 'All-Time Low', 'TRIMA2']);
+    expect(result.plots[0]?.values).toEqual([100, 103, 103, 105, 105]);
+    expect(result.plots[1]?.values).toEqual([100, 100, 99, 99, 99]);
+    expect(result.plots[2]?.values.some((value) => value !== null && Number.isFinite(value))).toBe(true);
   });
 
   it('executes official TradingView ZigZag v8 imports without host-supplied source', () => {
@@ -5662,6 +8402,148 @@ plot(na(last) ? 1 : last.end.index - last.start.index, "Last Span")`;
     expect(result.plots[1]?.values).toEqual([1, 1, 1]);
   });
 
+  it('executes official TradingView ZigZag v7 imports without host-supplied source', () => {
+    const pine = `//@version=6
+indicator("official zigzag v7")
+import TradingView/ZigZag/7 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zigZag.update()
+last = zlib.lastPivot(zigZag)
+plot(changed ? 1 : 0, "Changed")
+plot(na(last) ? na : last.end.index - last.start.index, "Last Span")`;
+    const result = executeScript(parse(pine), makeBars(Array.from({ length: 60 }, (_, index) => 100 + Math.sin(index / 2) * 14)));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Changed', 'Last Span']);
+    expect(result.plots[0]?.values.some((value) => value === 1)).toBe(true);
+  });
+
+  it('executes official TradingView ZigZag v6 imports with its Point UDT surface', () => {
+    const pine = `//@version=6
+indicator("official zigzag v6")
+import TradingView/ZigZag/6 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zigZag.update()
+last = zlib.lastPivot(zigZag)
+plot(changed ? 1 : 0, "Changed")
+plot(na(last) ? na : last.end.barIndex - last.start.barIndex, "Last Span")`;
+    const result = executeScript(parse(pine), makeBars(Array.from({ length: 60 }, (_, index) => 100 + Math.sin(index / 2) * 14)));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Changed', 'Last Span']);
+    expect(result.plots[0]?.values.some((value) => value === 1)).toBe(true);
+  });
+
+  it('executes official TradingView ZigZag v9 imports without host-supplied source', () => {
+    const pine = `//@version=6
+indicator("official zigzag v9")
+import TradingView/ZigZag/9 as zlib
+settings = zlib.Settings.new(devThreshold=3.0, depth=12, allowZigZagOnOneBar=true)
+var zlib.ZigZag zigZag = zlib.newInstance(settings)
+changed = zlib.update(zigZag)
+last = zigZag.lastPivot()
+plot(changed ? 1 : 0, "Changed")
+plot(na(last) ? na : last.end.index - last.start.index, "Last Span")`;
+    const result = executeScript(parse(pine), makeBars(Array.from({ length: 60 }, (_, index) => 100 + Math.sin(index / 2) * 14)));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Changed', 'Last Span']);
+    expect(result.plots[0]?.values.some((value) => value === 1)).toBe(true);
+  });
+
+  it('executes the documented official TradingView Color v2 export surface', () => {
+    const pine = `//@version=6
+indicator("official color v2 surface")
+import TradingView/Color/2 as col
+[r, g, b, t] = col.getRGB(color.new(color.red, 25))
+hex = col.getHexString(r, g, b, t)
+[hr, hg, hb, ht] = col.hexStringToRGB(hex)
+roundTrip = col.hexStringToColor(hex)
+[lr, lg, lb, lt] = col.getLRGB(roundTrip)
+[rr, rg, rb, rt] = col.lrgbToRGB(lr, lg, lb, lt)
+linearColor = col.lrgbToColor(lr, lg, lb, lt)
+[hslH, hslS, hslL, hslT] = col.getHSL(roundTrip)
+hslColor = col.hslToColor(hslH, hslS, hslL, hslT)
+[hsvH, hsvS, hsvV, hsvT] = col.getHSV(roundTrip)
+hsvColor = col.hsvToColor(hsvH, hsvS, hsvV, hsvT)
+[hwbH, hwbW, hwbB, hwbT] = col.getHWB(roundTrip)
+hwbColor = col.hwbToColor(hwbH, hwbW, hwbB, hwbT)
+[x, y, z, xt] = col.getXYZ(roundTrip)
+xyzColor = col.xyzToColor(x, y, z, xt)
+[xc, yc, yy, xyt] = col.getXYY(roundTrip)
+xyyColor = col.xyyToColor(xc, yc, yy, xyt)
+[labL, labA, labB, labT] = col.getLAB(roundTrip)
+labColor = col.labToColor(labL, labA, labB, labT)
+[okL, okA, okB, okT] = col.getOKLAB(roundTrip)
+oklabColor = col.oklabToColor(okL, okA, okB, okT)
+[lchL, lchC, lchH, lchT] = col.getLCH(roundTrip)
+lchColor = col.lchToColor(lchL, lchC, lchH, lchT)
+[oklchL, oklchC, oklchH, oklchT] = col.getOKLCH(roundTrip)
+oklchColor = col.oklchToColor(oklchL, oklchC, oklchH, oklchT)
+[analogA, analogB] = col.analogousColors(roundTrip)
+[splitA, splitB] = col.splitComplements(roundTrip)
+[triA, triB] = col.triadicColors(roundTrip)
+[tetA, tetB, tetC] = col.tetradicColors(roundTrip, "HSL", true)
+[pentA, pentB, pentC, pentD] = col.pentadicColors(roundTrip)
+[hexA, hexB, hexC, hexD, hexE] = col.hexadicColors(roundTrip)
+steps = array.from(0.0, 50.0, 100.0)
+colors = array.from(color.red, color.yellow, color.green)
+multi = col.fromMultiStepGradient(75, steps, colors)
+palette = col.gradientPalette(color.red, color.blue, 4)
+mono = col.monoPalette(color.orange, 0.5, 3)
+harmony = col.harmonyPalette(color.aqua, "triadic", 0.5, 2)
+plot(r + g + b + t + hr + hg + hb + ht + rr + rg + rb + rt, "Tuples")
+plot(col.contrastRatio(color.white, color.black) + (col.isLightTheme(color.white) ? 1 : 0) + array.size(palette) + array.size(mono) + matrix.rows(harmony), "Metrics")
+plot(1, "Composites", color=col.overlay(col.add(linearColor, hslColor), col.negative(col.grayscale(hsvColor))))
+plot(2, "Conversions", color=col.fromGradient(close, low, high, hwbColor, xyzColor))
+plot(3, "More Conversions", color=col.overlay(xyyColor, col.overlay(labColor, col.overlay(oklabColor, col.overlay(lchColor, oklchColor)))))
+plot(4, "Palettes", color=col.overlay(multi, col.overlay(analogA, col.overlay(splitA, col.overlay(triA, col.overlay(tetA, col.overlay(pentA, hexA)))))))`;
+    const result = executeScript(parse(pine), makeBars([100, 104, 98, 110]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Tuples', 'Metrics', 'Composites', 'Conversions', 'More Conversions', 'Palettes']);
+    expect(result.plots[0]?.values.every((value) => value !== null && Number.isFinite(value))).toBe(true);
+    expect(result.plots[1]?.values.every((value) => value !== null && value > 0)).toBe(true);
+    expect(result.plots.slice(2).map((plot) => plot.color)).toEqual([
+      ['#FF6C8AFF', '#FF6C8AFF', '#FF6C8AFF', '#FF6C8AFF'],
+      ['#F23645BF', '#F23645BF', '#F23645BF', '#F23645BF'],
+      ['#F23645FF', '#F23645FF', '#F23645FF', '#F23645FF'],
+      ['#A5C443FF', '#A5C443FF', '#A5C443FF', '#A5C443FF'],
+    ]);
+  });
+
+  it('executes official TradingView ValueAtTime v2 imports without host-supplied source', () => {
+    const pine = `//@version=6
+indicator("official ValueAtTime v2")
+import TradingView/ValueAtTime/2 as vat
+periods = vat.getArrayFromString("1D,  2W,")
+data = vat.collectData(close)
+[fromData, fromDataTime] = data.valueAtTime(time - 60000)
+[fromMethod, fromMethodTime] = data.valueAtTimeOffset(60000)
+[fromSource, fromSourceTime, current] = vat.valueAtTimeOffset(close, 60000)
+[periodValue, periodTime] = data.valueAtPeriodOffset("1D")
+offsets = array.from(0, 60000)
+[offsetValues, offsetTimes, offsetCurrent, offsetDescription] = vat.getDataAtTimeOffsets(offsets, close)
+[periodValues, periodTimes, periodCurrent, periodDescription] = vat.getDataAtPeriodOffsets(periods, close)
+plot(fromData + fromMethod + fromSource + current, "Values")
+plot(array.size(periods) + array.size(offsetValues) + array.size(offsetTimes) + array.size(periodValues) + array.size(periodTimes), "Array Sizes")
+plot(str.length(offsetDescription) + str.length(periodDescription) + (na(periodValue) ? 0 : 1) + (na(periodTime) ? 0 : 1), "Metadata")`;
+    const result = executeScript(parse(pine), makeBars([100, 105, 110, 115]));
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.plots.map((plot) => plot.title)).toEqual(['Values', 'Array Sizes', 'Metadata']);
+    expect(result.plots[0]?.values).toEqual([400, 405, 425, 445]);
+    expect(result.plots[1]?.values).toEqual([10, 10, 10, 10]);
+    expect(result.plots[2]?.values.every((value) => value !== null && value > 0)).toBe(true);
+  });
+
   it('returns na for missing currency rates with reference parity', () => {
     const pine = `//@version=6
 indicator("compiled missing currency rate")
@@ -5682,6 +8564,25 @@ plot(na(rate) ? 1 : 0, "Missing Is NA")`;
     expect(interpResult.errors).toEqual([]);
     expect(findPlot(compiledResult!, 'Missing Is NA').values).toEqual(findPlot(interpResult, 'Missing Is NA').values);
     expect(findPlot(compiledResult!, 'Missing Is NA').values).toEqual([1]);
+  });
+  it('evaluates self-history initializers with compiled wrapper and direct compiled parity', () => {
+    const pine = `//@version=6
+indicator("Self history")
+float value = nz(value[1]) + 1
+plot(value, "Value")
+`;
+    const bars = makeBars([10, 11, 12, 13]);
+    const ast = parse(pine);
+    const compiled = tryCompile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    const compiledResult = executeCompiled(compiled, bars);
+    const compiledWrapperResult = executeScript(ast, bars);
+    expect(compiledResult?.errors).toEqual([]);
+    expect(compiledWrapperResult.errors).toEqual([]);
+    expect(compiledResult?.plots[0]?.values).toEqual([1, 2, 3, 4]);
+    expect(compiledResult?.plots[0]?.values).toEqual(compiledWrapperResult.plots[0]?.values);
   });
 
   it('enforces unique request context caps with reference parity', () => {
@@ -5712,6 +8613,21 @@ plot(rate40, "Last Rate")`;
     });
 
     expect(compiledResult?.errors[0]?.message).toBe(interpResult.errors[0]?.message);
-    expect(compiledResult?.errors[0]?.message).toBe('Too many unique request.* contexts: maximum is 40');
+    expect(compiledResult?.errors[0]?.message).toBe('Too many unique request.* contexts: maximum is 40 per script. Reuse the same symbol/timeframe/expression request or reduce dynamic symbol and timeframe combinations.');
+  });
+
+  it('keeps block-local collection names distinct from persistent function locals', () => {
+    const pine = `//@version=6
+indicator("block collection scope")
+readValue() =>
+    var vals = array.new_float()
+    array.size(vals)
+
+if barstate.islast
+    vals = array.from(7.0)
+    plot(vals.get(0), "Value")
+`;
+    const result = assertPlotParity(pine, makeBars([10, 11, 12]));
+    expect(findPlot(result.compiledResult, 'Value').values).toEqual([null, null, 7]);
   });
 });

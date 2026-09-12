@@ -18,7 +18,7 @@ function makeBars(closes: number[]): Bar[] {
   }));
 }
 
-function getInterpreterPlots(pine: string, bars: Bar[]): Map<number, (number | null)[]> {
+function getCompiledWrapperPlots(pine: string, bars: Bar[]): Map<number, (number | null)[]> {
   const ast = parse(pine);
   const result = executeScript(ast, bars);
   const plots = new Map<number, (number | null)[]>();
@@ -74,7 +74,7 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
       input(_id: string, _funcName: string, defval: unknown) { return defval; },
       strategyEntry() {}, strategyExit() {}, strategyClose() {},
       strategyCloseAll() {}, strategyCancel() {}, strategyCancelAll() {},
-      strategyOrder() {}, strategyDefaultEntryQty() { return NaN; }, strategyProp() { return 0; }, strategyPropHistory() { return NaN; },
+      strategyOrder() {}, strategyDefaultEntryQty() { return NaN; }, strategyConvertToAccount() { return NaN; }, strategyConvertToSymbol() { return NaN; }, strategyProp() { return 0; }, strategyPropHistory() { return NaN; },
       strategyTradeProp() { return NaN; }, strategyRisk() { return undefined; },
       alert() {}, alertCondition() {},
       logInfo() {}, logWarning() {}, logError() {},
@@ -131,17 +131,64 @@ function runCompiledSimple(pine: string, bars: Bar[]): Map<number, (number | nul
 }
 
 describe('Compile end-to-end', () => {
+  it('escapes the implicit function state parameter when Pine uses _state', () => {
+    const ast = parse(`//@version=6
+indicator("state parameter")
+f(_state) => _state + 1
+plot(f(2))`);
+    const compiled = compile(ast);
+
+    expect(compiled.success).toBe(true);
+    expect(compiled.unsupported).toEqual([]);
+  });
+
+  it('escapes Pine parameters that collide with generated runtime parameters', () => {
+    const ast = parse(`//@version=6
+indicator("ctx parameter")
+f(ctx) => ctx + 1
+plot(f(2))`);
+    const compiled = compile(ast);
+
+    expect(compiled.success).toBe(true);
+    expect(compiled.unsupported).toEqual([]);
+  });
+
+  it('escapes UDF body locals that collide with generated runtime parameters', () => {
+    const plots = runCompiledSimple(`//@version=6
+indicator("runtime local names")
+f() =>
+    int ctx = 2
+    int _state = ctx + 3
+    _state
+plot(f())`, makeBars([10, 11]));
+
+    expect(plots.get(0)).toEqual([5, 5]);
+  });
+
+  it('avoids colliding loop guards with a Pine loop variable named _iter', () => {
+    const ast = parse(`//@version=6
+indicator("iterator name")
+int total = 0
+for _iter = 0 to 2
+    total += _iter
+plot(total)`);
+    const compiled = compile(ast);
+
+    expect(compiled.success).toBe(true);
+    expect(compiled.unsupported).toEqual([]);
+  });
+
   const closes = [10, 11, 12, 11.5, 13, 12, 14, 15, 13, 12, 11, 14, 16, 15, 13, 12, 14, 15, 16, 17];
   const bars = makeBars(closes);
 
   it('compiles a simple SMA indicator', () => {
     const pine = `//@version=6\nindicator("test")\nplot(ta.sma(close, 5))`;
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
     expect(compiled.get(0)?.length).toBe(bars.length);
-    expect(interpreted.get(0)?.length).toBe(bars.length);
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(compiledWrapper.get(0)?.length).toBe(bars.length);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles EMA + crossover', () => {
@@ -154,10 +201,10 @@ plot(slow)
 plot(ta.crossover(fast, slow) ? 1 : 0)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
     for (const [idx, values] of compiled) {
-      expect(approxArrayEqual(values, interpreted.get(idx)!)).toBe(true);
+      expect(approxArrayEqual(values, compiledWrapper.get(idx)!)).toBe(true);
     }
   });
 
@@ -169,11 +216,59 @@ plot(close - open)
 plot(high - low)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
     for (const [idx, values] of compiled) {
-      expect(approxArrayEqual(values, interpreted.get(idx)!)).toBe(true);
+      expect(approxArrayEqual(values, compiledWrapper.get(idx)!)).toBe(true);
     }
+  });
+
+  it('uses Pine floor-quotient modulo for v5 and newer negative operands', () => {
+    for (const version of [5, 6, 7]) {
+      const pine = `//@version=${version}
+indicator("negative modulo")
+plot(-5 % 3)
+plot(5 % -3)
+plot(-5 % -3)
+plot(5 % 3)`;
+
+      const result = executeScript(parse(pine), bars);
+
+      expect(result.plots.map((plot) => plot.values)).toEqual([
+        Array.from({ length: bars.length }, () => 1),
+        Array.from({ length: bars.length }, () => -1),
+        Array.from({ length: bars.length }, () => -2),
+        Array.from({ length: bars.length }, () => 2),
+      ]);
+    }
+  });
+
+  it('uses Pine floor-quotient modulo for compound assignments in v6', () => {
+    const pine = `//@version=6
+indicator("compound negative modulo")
+type Holder
+    float value
+localValue = -5
+localValue %= 3
+var float persistentValue = -5
+persistentValue %= 3
+Holder holder = Holder.new(-5)
+holder.value %= 3
+array<float> values = array.from(-5.0)
+values[0] %= 3
+plot(localValue)
+plot(persistentValue)
+plot(holder.value)
+plot(array.get(values, 0))`;
+
+    const result = executeScript(parse(pine), bars);
+
+    expect(result.plots.map((plot) => plot.values)).toEqual([
+      Array.from({ length: bars.length }, () => 1),
+      Array.from({ length: bars.length }, () => 1),
+      Array.from({ length: bars.length }, () => 1),
+      Array.from({ length: bars.length }, () => 1),
+    ]);
   });
 
   it('compiles if/else expressions', () => {
@@ -182,9 +277,9 @@ indicator("test")
 plot(close > open ? 1 : -1)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles var persistence', () => {
@@ -195,9 +290,9 @@ count := count + 1
 plot(count)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles math functions', () => {
@@ -207,10 +302,10 @@ plot(math.abs(close - open))
 plot(math.max(high, close))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
     for (const [idx, values] of compiled) {
-      expect(approxArrayEqual(values, interpreted.get(idx)!)).toBe(true);
+      expect(approxArrayEqual(values, compiledWrapper.get(idx)!)).toBe(true);
     }
   });
 
@@ -221,9 +316,9 @@ x = ta.sma(close, 5)
 plot(nz(x, 0))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles RSI', () => {
@@ -232,9 +327,9 @@ indicator("test")
 plot(ta.rsi(close, 14))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles history access', () => {
@@ -243,9 +338,9 @@ indicator("test")
 plot(close[1])`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles highest/lowest', () => {
@@ -255,10 +350,10 @@ plot(ta.highest(close, 5))
 plot(ta.lowest(close, 5))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
     for (const [idx, values] of compiled) {
-      expect(approxArrayEqual(values, interpreted.get(idx)!)).toBe(true);
+      expect(approxArrayEqual(values, compiledWrapper.get(idx)!)).toBe(true);
     }
   });
 
@@ -371,6 +466,107 @@ plot(htfClose)`;
     expect(site.expressionExpr.type).toBe('CallExpression');
     expect(site.taCallSites.length).toBe(1);
     expect(site.taCallSites[0].className).toBe('SMA');
+  });
+
+  it('classifies promoted root block shadow names as user history series', () => {
+    const pine = `//@version=6
+indicator("promoted block shadow classification")
+if true
+    source = bar_index + 10
+    n = bar_index + 20
+    close = bar_index + 30
+    plot(source[1] + n[1] + close[1])`;
+
+    const ast = parse(pine);
+    const compiled = compile(ast);
+    expect(compiled.success).toBe(true);
+    if (!compiled.success) return;
+
+    expect(compiled.analysis.seriesVars.has('source')).toBe(true);
+    expect(compiled.analysis.seriesVars.has('n')).toBe(true);
+    expect(compiled.analysis.seriesVars.has('close')).toBe(true);
+    expect(compiled.analysis.barFieldSeriesVars.has('close')).toBe(false);
+    expect(compiled.generatedCode).toContain('this._sv_source.get(1)');
+    expect(compiled.generatedCode).toContain('this._sv_n.get(1)');
+    expect(compiled.generatedCode).toContain('this._sv_close.get(1)');
+    expect(compiled.generatedCode).not.toContain('this._s_close.get(1)');
+  });
+
+  it('writes branch-local shadow declarations into their user history series', () => {
+    const shadowableNames = [
+      'open', 'high', 'low', 'close', 'volume', 'time', 'bid', 'ask',
+      'hl2', 'hlc3', 'ohlc4', 'hlcc4',
+      'bar_index', 'last_bar_index', 'n', 'source', 'symbol', 'ticker', 'tickerid', 'tr',
+      'accdist', 'iii', 'nvi', 'obv', 'pvi', 'pvt', 'wad', 'wvad',
+      'time_close', 'year', 'month', 'dayofmonth', 'dayofweek', 'hour', 'minute', 'second',
+      'red', 'blue', 'green', 'black', 'white',
+      'line', 'area', 'solid', 'dashed', 'dotted',
+    ];
+
+    const cases = [
+      (name: string) => `//@version=6
+indicator("root if-expression shadow ${name}")
+value = if bar_index >= 0
+    ${name} = close + 10
+    ${name}[1]
+else
+    na
+plot(value)`,
+      (name: string) => `//@version=6
+indicator("nested if-expression shadow ${name}")
+value = if bar_index >= 0
+    if close > -100
+        ${name} = close + 20
+        ${name}[1]
+    else
+        na
+else
+    na
+plot(value)`,
+    ];
+
+    for (const name of shadowableNames) {
+      for (const pineForName of cases) {
+        const compiled = compile(parse(pineForName(name)));
+        expect(compiled.success, name).toBe(true);
+        if (!compiled.success) continue;
+        const member = `_sv_${name}`;
+        const escapedMember = member.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        expect(compiled.analysis.seriesVars.has(name), name).toBe(true);
+        expect(compiled.generatedCode, name).toContain(`this.${member}.get(1)`);
+        expect(compiled.generatedCode, name).toMatch(new RegExp(`this\\.${escapedMember}\\.(push|update)\\(_l_${name}\\)`));
+      }
+    }
+  });
+
+  it('keeps unshadowed legacy bare TA variable aliases on their builtin path', () => {
+    const aliases = [
+      ['accdist', 'AccumulationDistribution'],
+      ['iii', 'IntradayIntensityIndex'],
+      ['nvi', 'NegativeVolumeIndex'],
+      ['obv', 'OBV'],
+      ['pvi', 'PositiveVolumeIndex'],
+      ['pvt', 'PriceVolumeTrend'],
+      ['wad', 'WilliamsAccumulationDistribution'],
+      ['wvad', 'WilliamsVariableAccumulationDistribution'],
+    ];
+
+    for (const [name, className] of aliases) {
+      const compiled = compile(parse(`//@version=4
+study("legacy bare ${name}")
+plot(${name})
+plot(${name}[1])`));
+
+      expect(compiled.success, name).toBe(true);
+      if (!compiled.success) continue;
+      expect(compiled.analysis.taVarSites.map((site) => site.className), name).toContain(className);
+      expect(compiled.analysis.seriesVars.has(name), name).toBe(false);
+      expect(compiled.generatedCode, name).toContain(`new deps.${className}()`);
+      expect(compiled.generatedCode, name).toContain('.get(0)');
+      expect(compiled.generatedCode, name).toContain('.get(1)');
+      expect(compiled.generatedCode, name).not.toMatch(new RegExp(`[^._A-Za-z0-9]${name}[^A-Za-z0-9]`));
+    }
   });
 
   it('compiles source-parameter and computed request wrappers', () => {
@@ -499,9 +695,9 @@ for i = 0 to 4
 plot(sum)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles boolean logic', () => {
@@ -510,9 +706,9 @@ indicator("test")
 plot(close > open and high > close[1] ? 1 : 0)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles array.new and array.push/size/get', () => {
@@ -525,10 +721,10 @@ plot(array.size(arr))
 plot(array.get(arr, 0))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles array.from', () => {
@@ -539,10 +735,10 @@ plot(array.sum(arr))
 plot(array.avg(arr))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles array.min/max', () => {
@@ -551,13 +747,18 @@ indicator("test")
 var arr = array.new_float(0)
 array.push(arr, close)
 plot(array.min(arr))
-plot(array.max(arr))`;
+plot(array.max(arr))
+ranked = array.from(5, -2, 0, 9, 1)
+plot(array.min(ranked, nth=1))
+plot(array.max(ranked, 2))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(2)!, compiledWrapper.get(2)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(3)!, compiledWrapper.get(3)!)).toBe(true);
   });
 
   it('compiles for-in loop over array', () => {
@@ -570,9 +771,9 @@ for val in arr
 plot(sum)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles for-in loop with index counter', () => {
@@ -585,9 +786,9 @@ for [idx, val] in arr
 plot(sum)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles array with sort', () => {
@@ -599,10 +800,10 @@ plot(array.get(arr, 0))
 plot(array.get(arr, 2))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles map.new and map.put/get/size', () => {
@@ -615,10 +816,10 @@ plot(map.size(m))
 plot(map.get(m, "a"))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles user-defined types', () => {
@@ -632,10 +833,10 @@ plot(p.x)
 plot(p.y)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles UDT field assignment', () => {
@@ -648,9 +849,9 @@ i.val := close
 plot(i.val)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 
   it('compiles map.contains and map.keys', () => {
@@ -662,10 +863,10 @@ plot(map.contains(m, "x") ? 1 : 0)
 plot(map.contains(m, "y") ? 1 : 0)`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles matrix.new and matrix operations', () => {
@@ -680,10 +881,10 @@ plot(matrix.get(m, 0, 0))
 plot(matrix.rows(m))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
-    expect(approxArrayEqual(compiled.get(1)!, interpreted.get(1)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(1)!, compiledWrapper.get(1)!)).toBe(true);
   });
 
   it('compiles matrix.det', () => {
@@ -697,8 +898,8 @@ matrix.set(m, 1, 1, 4.0)
 plot(matrix.det(m))`;
 
     const compiled = runCompiledSimple(pine, bars);
-    const interpreted = getInterpreterPlots(pine, bars);
+    const compiledWrapper = getCompiledWrapperPlots(pine, bars);
 
-    expect(approxArrayEqual(compiled.get(0)!, interpreted.get(0)!)).toBe(true);
+    expect(approxArrayEqual(compiled.get(0)!, compiledWrapper.get(0)!)).toBe(true);
   });
 });

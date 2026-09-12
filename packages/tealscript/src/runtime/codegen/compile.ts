@@ -46,7 +46,7 @@ export interface ArrayHelpers {
   clear(arr: arrFuncs.PineArray): void;
   copy(arr: arrFuncs.PineArray): arrFuncs.PineArray;
   sort(arr: arrFuncs.PineArray, order?: unknown): void;
-  sortIndices(arr: arrFuncs.PineArray, order?: unknown): arrFuncs.PineArray;
+  sortIndices(arr: arrFuncs.PineArray, order?: unknown, sortField?: unknown): arrFuncs.PineArray;
   reverse(arr: arrFuncs.PineArray): void;
   concat(arr: arrFuncs.PineArray, other: arrFuncs.PineArray): arrFuncs.PineArray;
   join(arr: arrFuncs.PineArray, sep?: unknown): string;
@@ -58,8 +58,8 @@ export interface ArrayHelpers {
   remove(arr: arrFuncs.PineArray, idx: number): unknown;
   first(arr: arrFuncs.PineArray): unknown;
   last(arr: arrFuncs.PineArray): unknown;
-  min(arr: arrFuncs.PineArray): number;
-  max(arr: arrFuncs.PineArray): number;
+  min(arr: arrFuncs.PineArray, nth?: unknown): number;
+  max(arr: arrFuncs.PineArray, nth?: unknown): number;
   sum(arr: arrFuncs.PineArray): number;
   avg(arr: arrFuncs.PineArray): number;
   range(arr: arrFuncs.PineArray): number;
@@ -70,9 +70,9 @@ export interface ArrayHelpers {
   stdev(arr: arrFuncs.PineArray, biased?: boolean): number;
   covariance(left: arrFuncs.PineArray, right: arrFuncs.PineArray, biased?: boolean): number;
   standardize(arr: arrFuncs.PineArray): arrFuncs.PineArray;
-  binarySearch(arr: arrFuncs.PineArray, val: unknown): number;
-  binarySearchLeftmost(arr: arrFuncs.PineArray, val: unknown): number;
-  binarySearchRightmost(arr: arrFuncs.PineArray, val: unknown): number;
+  binarySearch(arr: arrFuncs.PineArray, val: unknown, sortField?: unknown): number;
+  binarySearchLeftmost(arr: arrFuncs.PineArray, val: unknown, sortField?: unknown): number;
+  binarySearchRightmost(arr: arrFuncs.PineArray, val: unknown, sortField?: unknown): number;
   percentileNearestRank(arr: arrFuncs.PineArray, pct: number): number;
   percentileLinearInterpolation(arr: arrFuncs.PineArray, pct: number): number;
   percentRank(arr: arrFuncs.PineArray, idx: number): number;
@@ -269,6 +269,8 @@ export interface CompiledBarContext {
   strategyCancelAll(...args: unknown[]): void;
   strategyOrder(...args: unknown[]): void;
   strategyDefaultEntryQty(args: unknown[], named?: Record<string, unknown>): unknown;
+  strategyConvertToAccount(args: unknown[], named?: Record<string, unknown>): unknown;
+  strategyConvertToSymbol(args: unknown[], named?: Record<string, unknown>): unknown;
   strategyProp(name: string): unknown;
   strategyPropHistory(name: string, offset: unknown): unknown;
   strategyTradeProp(name: string, args: unknown[], named?: Record<string, unknown>): unknown;
@@ -294,7 +296,7 @@ export interface CompiledBarContext {
   timestamp(args: unknown[], named?: Record<string, unknown>): number;
   timeFilter(closeTime: boolean, args: unknown[], named?: Record<string, unknown>): number;
   calendarPart(part: string, args: unknown[], named?: Record<string, unknown>): number;
-  runtimeTimeValue(name: string, offset?: number): number;
+  runtimeTimeValue(name: string, offset?: number, maxBarsBack?: number): number;
   sessionValue(name: string): unknown;
   requestSecurity(
     secId: number,
@@ -318,6 +320,7 @@ export interface CompiledBarContext {
     calcBarsCount: unknown,
     sourceDescriptor?: unknown,
     captures?: Record<string, unknown>,
+    tupleArity?: number,
   ): unknown;
   requestCurrencyRate(args: unknown[], named?: Record<string, unknown>): unknown;
   requestPointSeries(name: string, args: unknown[], named?: Record<string, unknown>): unknown;

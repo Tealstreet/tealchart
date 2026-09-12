@@ -294,8 +294,8 @@ async function waitForTerminalMeasurement(args: {
       if (isResultMessage(terminal)) {
         return {
           scriptId,
-          executionMode: terminal.profile?.executionMode ?? 'unknown',
-          fallbackReason: terminal.profile?.fallbackReason,
+          executionMode: terminal.output.profile?.executionMode ?? 'unknown',
+          fallbackReason: terminal.output.profile?.fallbackReason,
           output: includeOutput ? normalizeWorkerResult(terminal, includeStrategyOutput) : undefined,
         };
       }

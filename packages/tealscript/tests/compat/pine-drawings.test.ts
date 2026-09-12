@@ -3,6 +3,35 @@ import { describe, expect, it } from 'vitest';
 import { PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX } from '../../src/compat/pineV6ReferenceManualIndex';
 import { compatibilityBars, getPlot, roundSeries, runCompatScript } from './fixtures';
 
+const defaultLabelMetadata = {
+  forceOverlay: false,
+  textAlign: 'center',
+  textFontFamily: 'default',
+  textFormatting: 'none',
+};
+
+const defaultBoxMetadata = {
+  forceOverlay: false,
+  textHalign: 'center',
+  textValign: 'center',
+  textWrap: 'none',
+  textFontFamily: 'default',
+  textFormatting: 'none',
+};
+
+const defaultTableMetadata = {
+  forceOverlay: false,
+};
+
+const defaultTableCellMetadata = {
+  textColor: '#363A45',
+  textHalign: 'center',
+  textValign: 'center',
+  textSize: 'normal',
+  textFontFamily: 'default',
+  textFormatting: 'none',
+};
+
 const manualDrawingObjectNames = [...new Set(Object.values(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX).flat())]
   .filter((name) => (
     name === 'box'
@@ -216,6 +245,7 @@ if barstate.islast
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_11',
+        ...defaultLabelMetadata,
         type: 'label',
         barIndex: 11,
         x: 11,
@@ -253,6 +283,7 @@ plot(label.get_x(marker), title="Marker X")
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_0',
+        ...defaultLabelMetadata,
         type: 'label',
         persistent: true,
         barIndex: 11,
@@ -296,6 +327,7 @@ plot(label.get_text(id=marker) == "Named 112", title="Named Marker Text")
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_0',
+        ...defaultLabelMetadata,
         type: 'label',
         persistent: true,
         barIndex: 11,
@@ -330,6 +362,7 @@ if barstate.islast
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_11',
+        ...defaultLabelMetadata,
         type: 'label',
         barIndex: 11,
         x: 10,
@@ -345,6 +378,7 @@ if barstate.islast
       },
       {
         id: 'label_label.new_1_11',
+        ...defaultLabelMetadata,
         type: 'label',
         barIndex: 11,
         x: compatibilityBars[11]!.time,
@@ -386,6 +420,7 @@ plot(array.size(label.all), title="Label Count")
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_0',
+        ...defaultLabelMetadata,
         type: 'label',
         persistent: true,
         barIndex: 11,
@@ -418,6 +453,7 @@ if barstate.islast
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_11',
+        ...defaultLabelMetadata,
         type: 'label',
         barIndex: 11,
         x: 11,
@@ -498,6 +534,7 @@ plot(line.get_price(upper, bar_index), title="Upper Price")
       },
       {
         id: 'box_box.new_0_0',
+        ...defaultBoxMetadata,
         type: 'box',
         persistent: true,
         barIndex: 11,
@@ -548,6 +585,7 @@ if barstate.islast
       },
       {
         id: 'box_box.new_0_11',
+        ...defaultBoxMetadata,
         type: 'box',
         barIndex: 11,
         left: 10,
@@ -792,6 +830,7 @@ plot(box.get_text_valign(id=zone) == "bottom", title="Named Box VAlign")
     expect(result.drawings).toEqual([
       {
         id: 'box_box.new_0_0',
+        ...defaultBoxMetadata,
         type: 'box',
         persistent: true,
         barIndex: 11,
@@ -846,6 +885,7 @@ plot(array.size(box.all), title="Box Count")
     expect(result.drawings).toEqual([
       {
         id: 'box_box.new_0_0',
+        ...defaultBoxMetadata,
         type: 'box',
         persistent: true,
         barIndex: 11,
@@ -949,6 +989,7 @@ if barstate.islast
     expect(result.drawings).toEqual([
       {
         id: 'table_table.new_0_0',
+        ...defaultTableMetadata,
         type: 'table',
         persistent: true,
         barIndex: 0,
@@ -962,27 +1003,23 @@ if barstate.islast
         borderWidth: 1,
         cells: [
           {
+            ...defaultTableCellMetadata,
             column: 0,
             row: 0,
             text: 'Close',
             width: undefined,
             height: undefined,
             textColor: '#FFFFFF',
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             bgcolor: '#2196F3',
           },
           {
+            ...defaultTableCellMetadata,
             column: 1,
             row: 0,
             text: '112',
             width: undefined,
             height: undefined,
             textColor: '#363A45',
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             bgcolor: '#4CAF50',
           },
         ],
@@ -1024,6 +1061,7 @@ plot(array.size(table.all), title="Named Table Count")
     expect(result.drawings).toEqual([
       {
         id: 'table_table.new_0_0',
+        ...defaultTableMetadata,
         type: 'table',
         persistent: true,
         barIndex: 0,
@@ -1037,19 +1075,18 @@ plot(array.size(table.all), title="Named Table Count")
         borderWidth: 3,
         cells: [
           {
+            ...defaultTableCellMetadata,
             column: 0,
             row: 0,
             text: 'Label',
             width: undefined,
             height: undefined,
             textColor: '#FFFFFF',
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             tooltip: 'Label details',
             bgcolor: '#2196F3',
           },
           {
+            ...defaultTableCellMetadata,
             column: 1,
             row: 0,
             text: 'Close',
@@ -1093,6 +1130,7 @@ plot(array.size(table.all), title="Table Lifecycle Count")
     expect(result.drawings).toEqual([
       {
         id: 'table_table.new_0_11',
+        ...defaultTableMetadata,
         type: 'table',
         barIndex: 11,
         position: 'top_right',
@@ -1105,15 +1143,12 @@ plot(array.size(table.all), title="Table Lifecycle Count")
         borderWidth: 0,
         cells: [
           {
+            ...defaultTableCellMetadata,
             column: 0,
             row: 0,
             text: 'keep',
             width: undefined,
             height: undefined,
-            textColor: null,
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             bgcolor: null,
           },
         ],
@@ -1142,6 +1177,7 @@ if barstate.islast
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_11',
+        ...defaultLabelMetadata,
         type: 'label',
         barIndex: 11,
         x: 11,
@@ -1195,6 +1231,7 @@ if barstate.islast
       },
       {
         id: 'box_box.new_0_11',
+        ...defaultBoxMetadata,
         type: 'box',
         barIndex: 11,
         left: 9,
@@ -1230,6 +1267,7 @@ if barstate.islast
       },
       {
         id: 'table_table.new_0_11',
+        ...defaultTableMetadata,
         type: 'table',
         barIndex: 11,
         position: 'top_right',
@@ -1242,27 +1280,22 @@ if barstate.islast
         borderWidth: 1,
         cells: [
           {
+            ...defaultTableCellMetadata,
             column: 0,
             row: 0,
             text: 'Mixed',
             width: undefined,
             height: undefined,
             textColor: '#FFFFFF',
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             bgcolor: null,
           },
           {
+            ...defaultTableCellMetadata,
             column: 1,
             row: 0,
             text: '112',
             width: undefined,
             height: undefined,
-            textColor: null,
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             bgcolor: '#4CAF50',
           },
         ],
@@ -1311,6 +1344,7 @@ plot(mixedPrice, title="Mixed Line Price")
     expect(result.drawings).toEqual([
       {
         id: 'label_label.new_0_11',
+        ...defaultLabelMetadata,
         type: 'label',
         barIndex: 11,
         x: 11,
@@ -1364,6 +1398,7 @@ plot(mixedPrice, title="Mixed Line Price")
       },
       {
         id: 'box_box.new_0_11',
+        ...defaultBoxMetadata,
         type: 'box',
         barIndex: 11,
         left: 9,
@@ -1382,6 +1417,7 @@ plot(mixedPrice, title="Mixed Line Price")
       },
       {
         id: 'table_table.new_0_11',
+        ...defaultTableMetadata,
         type: 'table',
         barIndex: 11,
         position: 'bottom_right',
@@ -1394,15 +1430,13 @@ plot(mixedPrice, title="Mixed Line Price")
         borderWidth: 0,
         cells: [
           {
+            ...defaultTableCellMetadata,
             column: 0,
             row: 0,
             text: 'Mixed',
             width: 42,
             height: undefined,
             textColor: '#FFFFFF',
-            textHalign: 'center',
-            textValign: 'middle',
-            textSize: 'normal',
             bgcolor: '#4CAF50',
           },
         ],

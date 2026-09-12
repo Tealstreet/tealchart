@@ -133,6 +133,7 @@ export const PINE_V6_REFERENCE_BUILTINS = {
     'ta.rsi',
     'ta.sar',
     'ta.sma',
+    'ta.sum',
     'ta.smma',
     'ta.stdev',
     'ta.stoch',
@@ -155,6 +156,7 @@ export const PINE_V6_REFERENCE_BUILTINS = {
     'math.acos',
     'math.asin',
     'math.atan',
+    'math.tanh',
     'math.avg',
     'math.ceil',
     'math.clamp',
@@ -966,11 +968,6 @@ export const PINE_V6_KNOWN_MISSING_BUILTIN_GROUPS = {
       'syminfo.recommendations_total',
     ],
   },
-  strategyConversionHelpers: {
-    reason:
-      'These helpers are strategy-only currency conversion conveniences and are outside the current deterministic strategy ledger slice.',
-    names: ['strategy.convert_to_account', 'strategy.convert_to_symbol'],
-  },
 } as const satisfies Record<string, PineV6KnownMissingBuiltinGroup>;
 
 export const PINE_V6_KNOWN_MISSING_BUILTINS = uniqueSorted(
@@ -1055,20 +1052,6 @@ export const PINE_V6_KNOWN_MISSING_BUILTIN_REVIEW = {
     traffic: 'low-provider-tail',
     decision: 'keep-allowlisted',
     reason: 'Requires a recommendations provider series; public indicators rarely depend on analyst recommendation counts.',
-  },
-  'strategy.convert_to_account': {
-    manualCategories: ['functions'],
-    traffic: 'medium-strategy-only',
-    decision: 'keep-allowlisted',
-    reason:
-      'Strategy-only currency conversion helper; it is not an indicator paste blocker and sits outside the deterministic position-ledger slice.',
-  },
-  'strategy.convert_to_symbol': {
-    manualCategories: ['functions'],
-    traffic: 'medium-strategy-only',
-    decision: 'keep-allowlisted',
-    reason:
-      'Strategy-only currency conversion helper; it is not an indicator paste blocker and sits outside the deterministic position-ledger slice.',
   },
 } as const satisfies Record<string, PineV6KnownMissingBuiltinReview>;
 

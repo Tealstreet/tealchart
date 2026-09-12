@@ -925,7 +925,9 @@ export class InMemoryRequestDatafeed implements RequestDatafeed {
   }
 
   getSeries(query: RequestSeriesQuery): RequestSeriesResult {
-    const context = this.seriesContexts.get(requestSeriesKey(query.family, query.key));
+    const economicContext = query.family === 'economic' ? this.economicSeries.get(query.key) : undefined;
+    const context = this.seriesContexts.get(requestSeriesKey(query.family, query.key))
+      ?? (economicContext ? { ...query, points: economicContext.points } : undefined);
     if (!context) {
       return {
         ok: false,

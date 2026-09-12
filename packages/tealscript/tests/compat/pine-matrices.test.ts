@@ -149,14 +149,14 @@ matrix.reverse(id=reversed)
 row = matrix.row(id=m, row=1)
 column = matrix.column(id=m, column=0)
 tail = matrix.new_int(rows=1, columns=2, initial_value=5)
-matrix.concat(id=m, id2=tail)
+concat = matrix.concat(id=m, id2=tail)
 mixed = matrix.new_int(rows=2, columns=2, initial_value=0)
 matrix.set(id=mixed, 0, 1, 2)
 matrix.add_row(id=mixed, array.from(3, 4))
 matrix.fill(id=mixed, 6, 0, 1, 0, 1)
 mixedSlice = matrix.submatrix(id=mixed, 0, 2, 0, 2)
 mixedTail = matrix.new_int(rows=1, columns=2, initial_value=13)
-matrix.concat(id=mixed, mixedTail)
+mixedConcat = matrix.concat(id=mixed, mixedTail)
 partial = matrix.new_int(rows=2, columns=3, initial_value=0)
 matrix.set(id=partial, row=1, 2, 99)
 partialGet = matrix.get(id=partial, row=1, 2)
@@ -174,14 +174,14 @@ plot(copy.columns(), title="Copy Columns")
 plot(reversed.get(row=0, column=0), title="Reversed First")
 plot(array.get(row, 1), title="Row Value")
 plot(array.get(column, 2), title="Column Value")
-plot(m.rows(), title="Concat Rows")
-plot(m.get(row=3, column=1), title="Concat Value")
+plot(concat.rows(), title="Concat Rows")
+plot(concat.get(row=3, column=1), title="Concat Value")
 plot(matrix.get(id=mixed, 0, 1), title="Mixed Get")
 plot(matrix.get(id=mixed, 2, 1), title="Mixed Add Row")
 plot(matrix.get(id=mixed, 0, 0), title="Mixed Fill")
 plot(mixedSlice.get(0, 1), title="Mixed Slice")
-plot(mixed.rows(), title="Mixed Concat Rows")
-plot(mixed.get(3, 0), title="Mixed Concat Value")
+plot(mixedConcat.rows(), title="Mixed Concat Rows")
+plot(mixedConcat.get(3, 0), title="Mixed Concat Value")
 plot(partialGet, title="Partial Get")
 plot(matrix.get(id=partial, 0, 0), title="Partial Fill")
 plot(partialSlice.get(0, 0), title="Partial Slice")
@@ -258,21 +258,23 @@ left.set(1, 1, 4)
 right = matrix.new_int(1, 2, 0)
 right.set(0, 0, 5)
 right.set(0, 1, 6)
-left.concat(right)
+combined = left.concat(right)
 namespace = matrix.new_int()
-matrix.concat(namespace, right)
-plot(left.rows(), title="Rows")
-plot(left.get(2, 0), title="Appended First")
-plot(left.get(2, 1), title="Appended Second")
+namespaceCombined = matrix.concat(namespace, right)
+plot(combined.rows(), title="Rows")
+plot(combined.get(2, 0), title="Appended First")
+plot(combined.get(2, 1), title="Appended Second")
+plot(left.rows(), title="Left Rows")
 plot(right.rows(), title="Right Rows")
-plot(namespace.rows(), title="Namespace Rows")
-plot(namespace.get(0, 1), title="Namespace Value")
+plot(namespaceCombined.rows(), title="Namespace Rows")
+plot(namespaceCombined.get(0, 1), title="Namespace Value")
 `);
 
     expect(result.errors).toEqual([]);
     expect(roundSeries(getPlot(result, 'Rows').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Appended First').values)).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
     expect(roundSeries(getPlot(result, 'Appended Second').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    expect(roundSeries(getPlot(result, 'Left Rows').values)).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
     expect(roundSeries(getPlot(result, 'Right Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Namespace Rows').values)).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     expect(roundSeries(getPlot(result, 'Namespace Value').values)).toEqual([6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
@@ -444,6 +446,29 @@ plot(vectors.get(1, 1), title="Second Y")
     expect(roundSeries(getPlot(result, 'Second Y').values)).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
+  it('keeps matrix eigen complex-root results structurally usable', () => {
+    const result = runCompatScript(`
+indicator("Matrix complex eigen roots")
+values = matrix.new_float(2, 2, 0)
+values.set(0, 1, -1)
+values.set(1, 0, 1)
+eigenvalues = matrix.eigenvalues(values)
+eigenvectors = matrix.eigenvectors(values)
+plot(array.size(eigenvalues), title="Eigenvalue Count")
+plot(eigenvectors.rows(), title="Eigenvector Rows")
+plot(eigenvectors.columns(), title="Eigenvector Columns")
+plot(array.get(eigenvalues, 0), title="First Eigenvalue")
+plot(eigenvectors.get(0, 0), title="First Eigenvector Cell")
+`);
+
+    expect(result.errors).toEqual([]);
+    expect(roundSeries(getPlot(result, 'Eigenvalue Count').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Eigenvector Rows').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(roundSeries(getPlot(result, 'Eigenvector Columns').values)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    expect(getPlot(result, 'First Eigenvalue').values).toEqual(Array(12).fill(null));
+    expect(getPlot(result, 'First Eigenvector Cell').values).toEqual(Array(12).fill(null));
+  });
+
   it('runs matrix UDT sort field idioms', () => {
     const result = runCompatScript(`
 indicator("Matrix UDT sort fields")
@@ -454,9 +479,9 @@ values = matrix.new<Ranked>()
 values.add_row(array.from(Ranked.new(3, "C"), Ranked.new(30, "cc")))
 values.add_row(array.from(Ranked.new(1, "A"), Ranked.new(10, "aa")))
 values.add_row(array.from(Ranked.new(2, "B"), Ranked.new(20, "bb")))
-values.sort(0, order.ascending, "score")
+values.sort(0, order.ascending)
 firstByName = values.get(0, 0)
-matrix.sort(id=values, column=1, order=order.descending, sort_field=1)
+matrix.sort(id=values, column=1, order=order.descending)
 firstByIndex = values.get(0, 1)
 plot(firstByName.score, title="First Score")
 plot(firstByIndex.score, title="First Column Score")

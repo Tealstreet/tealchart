@@ -292,6 +292,8 @@ const longEngineOptions: TealscriptExecutionOptions = {
   },
 };
 
+// These public-style fixtures intentionally run many full compiled executions
+// in one suite, so they keep an explicit long-suite budget.
 describe('composite public-style indicator parity', { timeout: LONG_COMPOSITE_TIMEOUT_MS }, () => {
   afterAll(() => {
     for (const [groupId, results] of [
@@ -964,8 +966,8 @@ alertcondition(spread > 0, title="Object Spread", message="Imported object sprea
       'while array.size(volumeBins) > 60',
       '    array.shift(volumeBins)',
       'profileSum = 0.0',
-      'profileHigh = na',
-      'profileLow = na',
+      'float profileHigh = na',
+      'float profileLow = na',
       'for item in volumeBins',
       '    profileSum += nz(item)',
       '    profileHigh := na(profileHigh) ? item : math.max(profileHigh, item)',
@@ -1231,8 +1233,8 @@ alertcondition(spread > 0, title="Object Spread", message="Imported object sprea
       'if array.size(ranges) > 120',
       '    array.shift(ranges)',
       'rangeSum = 0.0',
-      'rangeMax = na',
-      'rangeMin = na',
+      'float rangeMax = na',
+      'float rangeMin = na',
       'for item in ranges',
       '    rangeSum += nz(item)',
       '    rangeMax := na(rangeMax) ? item : math.max(rangeMax, item)',
@@ -1318,8 +1320,8 @@ alertcondition(spread > 0, title="Object Spread", message="Imported object sprea
       'while array.size(pulses) > 100',
       '    array.shift(pulses)',
       'pulseSum = 0.0',
-      'pulseMax = na',
-      'pulseMin = na',
+      'float pulseMax = na',
+      'float pulseMin = na',
       'for item in pulses',
       '    pulseSum += nz(item)',
       '    pulseMax := na(pulseMax) ? item : math.max(pulseMax, item)',

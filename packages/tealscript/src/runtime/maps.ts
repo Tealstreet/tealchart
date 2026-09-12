@@ -87,7 +87,7 @@ export function mapEntries(map: PineMap): Array<[PineMapKey, unknown]> {
 
 function assertMapCapacity(map: PineMap, key: unknown): void {
   if (!map.entries.has(normalizeMapKey(key)) && map.entries.size >= 50_000) {
-    throw new Error('Map cannot contain more than 50000 key-value pairs');
+    throw new Error('Map cannot contain more than 50000 key-value pairs. Remove old keys or update existing keys before adding more entries.');
   }
 }
 

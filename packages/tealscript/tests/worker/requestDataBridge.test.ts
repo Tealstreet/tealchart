@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const codegenMocks = vi.hoisted(() => ({
-  tryExecuteScript: vi.fn(),
-  actualTryExecuteScript: undefined as undefined | typeof import('../../src/runtime/codegen').tryExecuteScript,
+  executeCompiledScript: vi.fn(),
+  actualExecuteCompiledScript: undefined as undefined | typeof import('../../src/runtime/codegen').executeCompiledScript,
 }));
 
 vi.mock('../../src/runtime/codegen', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../src/runtime/codegen')>();
-  codegenMocks.actualTryExecuteScript = actual.tryExecuteScript;
-  codegenMocks.tryExecuteScript.mockImplementation(actual.tryExecuteScript);
+  codegenMocks.actualExecuteCompiledScript = actual.executeCompiledScript;
+  codegenMocks.executeCompiledScript.mockImplementation(actual.executeCompiledScript);
   return {
     ...actual,
-    tryExecuteScript: codegenMocks.tryExecuteScript,
+    executeCompiledScript: codegenMocks.executeCompiledScript,
   };
 });
 
@@ -49,13 +49,13 @@ function isResultMessage(message: FromWorkerMessage): message is ResultMessage {
 
 describe('worker requestData bridge', () => {
   beforeEach(() => {
-    if (codegenMocks.actualTryExecuteScript) {
-      codegenMocks.tryExecuteScript.mockImplementation(codegenMocks.actualTryExecuteScript);
+    if (codegenMocks.actualExecuteCompiledScript) {
+      codegenMocks.executeCompiledScript.mockImplementation(codegenMocks.actualExecuteCompiledScript);
     }
   });
 
   afterEach(() => {
-    codegenMocks.tryExecuteScript.mockClear();
+    codegenMocks.executeCompiledScript.mockClear();
     vi.resetModules();
     vi.unstubAllGlobals();
   });
@@ -121,11 +121,11 @@ plot(reqClose, "Requested Close")`;
     workerGlobal.onmessage?.({ data: response } as MessageEvent<ToWorkerMessage>);
 
     const result = posted.find((message) => message.type === 'result');
-    expect(result?.profile?.executionMode).toBe('compiled');
-    expect(result?.profile?.fallbackReason).toBeUndefined();
-    expect(result?.plots.map((plot) => plot.title)).toEqual(['Requested Open', 'Requested Close']);
-    expect(result?.plots[0]?.values).toEqual([null, 20, 20, 30, 30, 30]);
-    expect(result?.plots[1]?.values).toEqual([null, 22, 22, 34, 34, 34]);
+    expect(result?.output.profile?.executionMode).toBe('compiled');
+    expect(result?.output.profile?.fallbackReason).toBeUndefined();
+    expect(result?.output.plots.map((plot) => plot.title)).toEqual(['Requested Open', 'Requested Close']);
+    expect(result?.output.plots[0]?.values).toEqual([null, 20, 20, 30, 30, 30]);
+    expect(result?.output.plots[1]?.values).toEqual([null, 22, 22, 34, 34, 34]);
   });
   it('preloads every supported request family and keeps compiled execution enabled', async () => {
     const posted: FromWorkerMessage[] = [];
@@ -196,8 +196,8 @@ plot(reqClose, "Requested Close")`;
       }
 
       const result = posted.slice(start).find(isResultMessage);
-      expect(result?.profile?.executionMode, name).toBe('compiled');
-      expect(result?.profile?.fallbackReason, name).toBeUndefined();
+      expect(result?.output.profile?.executionMode, name).toBe('compiled');
+      expect(result?.output.profile?.fallbackReason, name).toBeUndefined();
       assertResult(result!);
     };
 
@@ -209,7 +209,7 @@ intrabars = request.security_lower_tf("TEST", "1", close)
 plot(array.size(intrabars), "Lower Count")`,
       'bars',
       { symbol: 'TEST', timeframe: '1', bars: chartBars },
-      (result) => expect(result.plots[0]?.values).toEqual([2, 2, 2]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([2, 2, 2]),
       twoMinuteBars,
     );
 
@@ -221,7 +221,7 @@ seedClose = request.seed("tradingview-pine-seeds/demo", "BTC_DEV", close)
 plot(seedClose, "Seed Close")`,
       'bars',
       { symbol: 'seed\u0000tradingview-pine-seeds/demo\u0000BTC_DEV', timeframe: '60', bars: requestedBars },
-      (result) => expect(result.plots[0]?.values).toEqual([null, null, null, 22, 22, 22]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([null, null, null, 22, 22, 22]),
     );
 
     runCase(
@@ -231,7 +231,7 @@ indicator("Currency")
 plot(request.currency_rate("USD", "GBP"), "USDGBP")`,
       'currency_rate',
       pointValues,
-      (result) => expect(result.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
     );
 
     runCase(
@@ -241,7 +241,17 @@ indicator("Economic")
 plot(request.economic("US", "GDP"), "GDP")`,
       'economic',
       pointValues,
-      (result) => expect(result.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
+    );
+
+    runCase(
+      'economic-gaps-on',
+      `//@version=6
+indicator("Economic Gaps")
+plot(request.economic("US", "GDP", gaps=barmerge.gaps_on), "GDP")`,
+      'series',
+      pointValues,
+      (result) => expect(result.output.plots[0]?.values).toEqual([1, null, null, 2, null, null]),
     );
 
     runCase(
@@ -254,7 +264,7 @@ plot(request.dividends("NASDAQ:AAPL", dividends.gross, currency="USD"), "Dividen
         { time: chartBars[0]!.time, value: { kind: 'dividends', gross: 0.24 } },
         { time: chartBars[3]!.time, value: { kind: 'dividends', gross: 0.25 } },
       ],
-      (result) => expect(result.plots[0]?.values).toEqual([0.24, 0.24, 0.24, 0.25, 0.25, 0.25]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([0.24, 0.24, 0.24, 0.25, 0.25, 0.25]),
     );
 
     runCase(
@@ -264,7 +274,7 @@ indicator("Splits")
 plot(request.splits("NASDAQ:AAPL", splits.denominator), "Split")`,
       'corporate_action',
       [{ time: chartBars[3]!.time, value: { kind: 'splits', denominator: 4 } }],
-      (result) => expect(result.plots[0]?.values).toEqual([null, null, null, 4, 4, 4]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([null, null, null, 4, 4, 4]),
     );
 
     runCase(
@@ -277,7 +287,7 @@ plot(request.earnings("NASDAQ:AAPL", earnings.actual, currency="USD"), "Earnings
         { time: chartBars[0]!.time, value: { kind: 'earnings', actual: 1.5 } },
         { time: chartBars[3]!.time, value: { kind: 'earnings', actual: 1.8 } },
       ],
-      (result) => expect(result.plots[0]?.values).toEqual([1.5, 1.5, 1.5, 1.8, 1.8, 1.8]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([1.5, 1.5, 1.5, 1.8, 1.8, 1.8]),
     );
 
     runCase(
@@ -287,7 +297,7 @@ indicator("Financial")
 plot(request.financial("NASDAQ:AAPL", "TOTAL_REVENUE", "FQ", currency="USD"), "Revenue")`,
       'financial',
       pointValues,
-      (result) => expect(result.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
     );
 
     runCase(
@@ -297,7 +307,7 @@ indicator("Quandl")
 plot(request.quandl("MULTPL/SP500_PE_RATIO_MONTH", index=1), "Quandl")`,
       'quandl',
       pointValues,
-      (result) => expect(result.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
+      (result) => expect(result.output.plots[0]?.values).toEqual([1, 1, 1, 2, 2, 2]),
     );
 
     runCase(
@@ -326,10 +336,10 @@ plot(firstBuyImbalance ? 1 : 0, "First Buy Imbalance")`,
         ],
       }],
       (result) => {
-        expect(result.plots[0]?.values).toEqual([100, 100, 100, 100, 100, 100]);
-        expect(result.plots[1]?.values).toEqual([30, 30, 30, 30, 30, 30]);
-        expect(result.plots[2]?.values).toEqual([40, 40, 40, 40, 40, 40]);
-        expect(result.plots[3]?.values).toEqual([0, 0, 0, 0, 0, 0]);
+        expect(result.output.plots[0]?.values).toEqual([100, 100, 100, 100, 100, 100]);
+        expect(result.output.plots[1]?.values).toEqual([30, 30, 30, 30, 30, 30]);
+        expect(result.output.plots[2]?.values).toEqual([40, 40, 40, 40, 40, 40]);
+        expect(result.output.plots[3]?.values).toEqual([0, 0, 0, 0, 0, 0]);
       },
     );
   });
@@ -419,9 +429,9 @@ plot(na(missingFootprintTotal) ? 1 : 0, "Footprint Accessor NA")`;
     }
 
     const result = posted.find(isResultMessage);
-    expect(result?.profile?.executionMode).toBe('compiled');
-    expect(result?.profile?.fallbackReason).toBeUndefined();
-    expect(result?.plots.map((plot) => plot.values)).toEqual([
+    expect(result?.output.profile?.executionMode).toBe('compiled');
+    expect(result?.output.profile?.fallbackReason).toBeUndefined();
+    expect(result?.output.plots.map((plot) => plot.values)).toEqual([
       [1, 1, 1],
       [0, 0, 0],
       [1, 1, 1],
@@ -492,8 +502,8 @@ plot(na(rate) ? 1 : 0, "Rate NA")`;
 
     const result = posted.find(isResultMessage);
     expect(posted.some((message) => message.type === 'error')).toBe(false);
-    expect(result?.profile?.executionMode).toBe('compiled');
-    expect(result?.plots.map((plot) => plot.values)).toEqual([
+    expect(result?.output.profile?.executionMode).toBe('compiled');
+    expect(result?.output.plots.map((plot) => plot.values)).toEqual([
       [1, 1, 1],
       [1, 1, 1],
     ]);
@@ -574,14 +584,14 @@ plot(financialValue, "Financial")`;
     }
 
     const result = posted.find(isResultMessage);
-    expect(result?.profile?.executionMode).toBe('compiled');
-    expect(result?.profile?.fallbackReason).toBeUndefined();
-    expect(result?.plots.map((plot) => plot.values)).toEqual([
+    expect(result?.output.profile?.executionMode).toBe('compiled');
+    expect(result?.output.profile?.fallbackReason).toBeUndefined();
+    expect(result?.output.plots.map((plot) => plot.values)).toEqual([
       [50, 50, 200],
       [7, 7, 9],
     ]);
-    expect(result?.logs?.map((log) => log.message)).toEqual(['discovery side effect']);
-    expect(result?.alerts.flatMap((alert) => alert.events.map((event) => event.message))).toEqual(['discovery alert']);
+    expect(result?.output.logs?.map((log) => log.message)).toEqual(['discovery side effect']);
+    expect(result?.output.alerts.flatMap((alert) => alert.events.map((event) => event.message))).toEqual(['discovery alert']);
   });
 
 
@@ -644,8 +654,8 @@ plot(rt.midpoint(high, low) + remote, "Combined")`;
     } as MessageEvent<ToWorkerMessage>);
 
     const initialResult = posted.find(isResultMessage);
-    expect(initialResult?.profile?.executionMode).toBe('compiled');
-    expect(initialResult?.plots[0]?.values).toEqual([110, 111, 112]);
+    expect(initialResult?.output.profile?.executionMode).toBe('compiled');
+    expect(initialResult?.output.plots[0]?.values).toEqual([110, 111, 112]);
 
     const firstUpdate = { ...chartBars[2]!, close: 13, high: 14 };
     const secondUpdate = { ...chartBars[2]!, close: 14, high: 15 };
@@ -667,9 +677,9 @@ plot(rt.midpoint(high, low) + remote, "Combined")`;
       const tickMessages = posted.slice(start);
       expect(tickMessages.some(isRequestDataMessage), `tick ${index + 1}`).toBe(false);
       const result = tickMessages.find(isResultMessage);
-      expect(result?.profile?.executionMode, `tick ${index + 1}`).toBe('compiled');
-      expect(result?.profile?.fallbackReason, `tick ${index + 1}`).toBeUndefined();
-      expect(result?.plots[0]?.values, `tick ${index + 1}`).toEqual(update.expected);
+      expect(result?.output.profile?.executionMode, `tick ${index + 1}`).toBe('compiled');
+      expect(result?.output.profile?.fallbackReason, `tick ${index + 1}`).toBeUndefined();
+      expect(result?.output.plots[0]?.values, `tick ${index + 1}`).toEqual(update.expected);
     }
 
     expect(posted.filter(isRequestDataMessage)).toHaveLength(1);

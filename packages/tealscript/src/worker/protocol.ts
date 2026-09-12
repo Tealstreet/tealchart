@@ -207,24 +207,11 @@ export interface NormalizedWorkerOutputBundle extends Omit<WorkerOutputBundle, '
 export interface ResultMessage {
   type: 'result';
   scriptId: string;
-  output?: WorkerOutputBundle;
-
-  /**
-   * Legacy top-level fields kept while Tealchart consumers migrate to
-   * ResultMessage.output.
-   */
-  plots: PlotOutput[];
-  drawings: DrawingOutput[];
-  alerts: AlertOutput[];
-  logs?: LogOutput[];
-  inputs: InputDefinition[];
-  declaration?: IndicatorDeclarationMetadata;
-  strategy?: StrategyLedger;
-  profile?: RuntimeProfile;
+  output: WorkerOutputBundle;
 }
 
 /**
- * Build a result message with both the atomic output bundle and legacy fields.
+ * Build a result message with one atomic output bundle.
  */
 export function createResultMessage(scriptId: string, output: WorkerOutputBundle): ResultMessage {
   const normalizedOutput: NormalizedWorkerOutputBundle = {
@@ -236,35 +223,16 @@ export function createResultMessage(scriptId: string, output: WorkerOutputBundle
     type: 'result',
     scriptId,
     output: normalizedOutput,
-    plots: normalizedOutput.plots,
-    drawings: normalizedOutput.drawings,
-    alerts: normalizedOutput.alerts,
-    logs: normalizedOutput.logs,
-    inputs: normalizedOutput.inputs,
-    declaration: normalizedOutput.declaration,
-    profile: normalizedOutput.profile,
   };
 }
 
 /**
- * Normalize result messages from bundled or legacy workers into one payload.
+ * Normalize the optional log field into the public output shape.
  */
 export function getResultOutput(message: ResultMessage): NormalizedWorkerOutputBundle {
-  if (message.output) {
-    return {
-      ...message.output,
-      logs: message.output.logs ?? [],
-    };
-  }
-
   return {
-    plots: message.plots,
-    drawings: message.drawings,
-    alerts: message.alerts,
-    logs: message.logs ?? [],
-    inputs: message.inputs,
-    declaration: message.declaration,
-    profile: message.profile,
+    ...message.output,
+    logs: message.output.logs ?? [],
   };
 }
 

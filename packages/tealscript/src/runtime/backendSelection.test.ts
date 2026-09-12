@@ -40,6 +40,21 @@ describe('Tealscript backend selection', () => {
     expect(result.plots[0]?.values).toEqual([101, 102, 103]);
   });
 
+  it('annotates explicit compiled backend selection', () => {
+    const ast = parse('indicator("Backend")\nplot(close)');
+    const result = executeSelectedTealscriptBackend(ast, makeBars(2), undefined, {
+      runtime: {
+        backend: { executionBackendOverride: 'compiled' },
+      },
+    });
+
+    expect(result.errors).toEqual([]);
+    expect(result.profile.executionMode).toBe('compiled');
+    expect(result.profile.selectedBackend).toBe('compiled');
+    expect(result.profile.backendSelectionSource).toBe('explicit');
+    expect(result.plots[0]?.values).toEqual([101, 102]);
+  });
+
   it('fails loudly when compiled cannot execute', () => {
     const ast = parse(`//@version=6
 indicator("Fallback")

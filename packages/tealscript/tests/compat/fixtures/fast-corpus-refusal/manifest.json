@@ -1,0 +1,60 @@
+{
+  "description": "Small expected-refusal corpus gate. These rows must fail with specific diagnostics; this catches correct refusals becoming silent acceptances.",
+  "selectedAtCommit": "00aa86c1a4",
+  "scripts": [
+    {
+      "localPath": "sources/ta_invalid_length_v6.pine",
+      "sourceRepoUrl": "synthetic:tealscript-fast-refusal-gate",
+      "sourceFilePath": "ta_invalid_length_v6.pine",
+      "sourceSha256": "7f1011c27e09f1637b834ccf1d735284827ec9241ee0bc8bc87070a8e713cbc7",
+      "expectedFailureStage": "execute",
+      "expectedDiagnosticIncludes": "TA length must be a positive integer",
+      "gateSelectionReason": "Invalid TA length sentinel; this class moved 43 corpus rows when silent length coercion became a correct refusal."
+    },
+    {
+      "localPath": "sources/iff_removed_v5.pine",
+      "sourceRepoUrl": "synthetic:tealscript-fast-refusal-gate",
+      "sourceFilePath": "iff_removed_v5.pine",
+      "sourceSha256": "46b98e1e9ad4c16e21148081ef4abf1e8ba992a970fead83a57dca796a5f86ed",
+      "expectedFailureStage": "semantic",
+      "expectedDiagnosticIncludes": "iff() was removed in Pine v5",
+      "gateSelectionReason": "Modern Pine v5 must refuse the removed legacy iff() helper."
+    },
+    {
+      "localPath": "sources/iff_removed_v6.pine",
+      "sourceRepoUrl": "synthetic:tealscript-fast-refusal-gate",
+      "sourceFilePath": "iff_removed_v6.pine",
+      "sourceSha256": "c60ff778efe7196623d301cc965e51764acaf8a9f75382c06d841b486fda7300",
+      "expectedFailureStage": "semantic",
+      "expectedDiagnosticIncludes": "iff() was removed in Pine v5",
+      "gateSelectionReason": "Modern Pine v6 must refuse the removed legacy iff() helper."
+    },
+    {
+      "localPath": "sources/request_barmerge_runtime_v6.pine",
+      "sourceRepoUrl": "synthetic:tealscript-fast-refusal-gate",
+      "sourceFilePath": "request_barmerge_runtime_v6.pine",
+      "sourceSha256": "37a1e91570cabd75bb9a22bb73db7ad879740851b242544fb6638d004b643850",
+      "expectedFailureStage": "semantic",
+      "expectedDiagnosticIncludes": "request.security lookahead must be a compile-time barmerge value",
+      "gateSelectionReason": "Runtime-computed request.security barmerge mode must stay refused."
+    },
+    {
+      "localPath": "sources/v6_linewidth_zero.pine",
+      "sourceRepoUrl": "synthetic:tealscript-fast-refusal-gate",
+      "sourceFilePath": "v6_linewidth_zero.pine",
+      "sourceSha256": "73603c55efa77d886a367dfff409e8cd4fb84bd3aa6cbff5336f19016ba69c28",
+      "expectedFailureStage": "semantic",
+      "expectedDiagnosticIncludes": "plot linewidth must be at least 1 in Pine v6",
+      "gateSelectionReason": "Pine v6 migration sentinel: linewidth=0 was valid in v3-v5 and must stay refused under declared v6."
+    },
+    {
+      "localPath": "sources/array_slice_descending_v6.pine",
+      "sourceRepoUrl": "synthetic:tealscript-fast-refusal-gate",
+      "sourceFilePath": "array_slice_descending_v6.pine",
+      "sourceSha256": "d43ce7d1d33fe1cd14eb77870af2778332b350404a3df0a26e4531e7f37b164d",
+      "expectedFailureStage": "execute",
+      "expectedDiagnosticIncludes": "Index 'from' should be less than index 'to'",
+      "gateSelectionReason": "array.slice descending range must stay a Pine runtime refusal."
+    }
+  ]
+}

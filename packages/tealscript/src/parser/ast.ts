@@ -92,6 +92,7 @@ export interface IndicatorDeclaration extends BaseNode {
   margin_short?: Expression;
   calc_on_order_fills?: Expression;
   calc_on_every_tick?: Expression;
+  calc_on_every_history_tick?: Expression;
   process_orders_on_close?: Expression;
   use_bar_magnifier?: Expression;
   risk_free_rate?: Expression;
@@ -440,7 +441,12 @@ export type BinaryOperator =
   | '>='
   // Logical
   | 'and'
-  | 'or';
+  | 'or'
+  | '&'
+  | '|'
+  | '^'
+  | '<<'
+  | '>>';
 
 /**
  * Unary expression: op operand

@@ -38,7 +38,7 @@ interface NativeLiveVolumeGeometry {
 type NativeOhlcvPathSide = 'up' | 'down';
 
 function isNativeBarcolorPlotVisible(plot: Pick<PlotOutput, 'display'>): boolean {
-  return plot.display !== 0;
+  return plot.display === undefined || (plot.display & 1) !== 0;
 }
 
 function shouldRenderNativeBarcolorPlotBar(

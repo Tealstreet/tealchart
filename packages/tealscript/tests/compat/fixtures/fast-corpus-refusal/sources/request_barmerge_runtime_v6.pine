@@ -1,0 +1,4 @@
+//@version=6
+indicator("Fast refusal request barmerge")
+mode = close > open ? barmerge.lookahead_on : barmerge.lookahead_off
+plot(request.security(syminfo.tickerid, timeframe.period, close, lookahead=mode), title="Bad")

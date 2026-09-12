@@ -31,7 +31,7 @@ const manualCategoriesForBuiltin = (name: string): ManualBuiltinCategory[] =>
 
 describe('Pine v6 reference manual audit', () => {
   it('pins the official manual index snapshot shape', () => {
-    expect(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX.functions).toHaveLength(475);
+    expect(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX.functions).toHaveLength(476);
     expect(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX.variables).toHaveLength(161);
     expect(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX.methods).toHaveLength(213);
     expect(PINE_V6_REFERENCE_MANUAL_BUILTIN_INDEX.constants).toHaveLength(239);
@@ -45,11 +45,11 @@ describe('Pine v6 reference manual audit', () => {
   it('reports the committed inventory differences against the manual index', () => {
     const audit = summarizeManualAudit();
 
-    expect(audit.officialBuiltinNames).toBe(860);
-    expect(audit.committedBuiltinNames).toBe(899);
+    expect(audit.officialBuiltinNames).toBe(861);
+    expect(audit.committedBuiltinNames).toBe(901);
     expect(audit.builtinNamesAbsentFromCommittedListCount).toBe(0);
-    expect(audit.unresolvedManualBuiltinNamesCount).toBe(15);
-    expect(audit.committedBuiltinNamesAbsentFromManualCount).toBe(39);
+    expect(audit.unresolvedManualBuiltinNamesCount).toBe(13);
+    expect(audit.committedBuiltinNamesAbsentFromManualCount).toBe(40);
     expect(audit.grammarEntriesAbsentFromCommittedListCount).toBe(0);
   });
 

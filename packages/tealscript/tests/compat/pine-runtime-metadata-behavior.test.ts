@@ -336,15 +336,35 @@ plot(syminfo.ticker(symbol=modifiedTicker) == "A1CAP" ? 1 : 0, "Ticker Function"
     name: 'derived syminfo and provider absent values',
     expectedValueProvenance: 'independently-derived',
     expectedValueProvenanceNote:
-      'Expected values are derived from documented syminfo fallback semantics for derivable fields and absent provider-owned metadata.',
-    covers: ['syminfo.exchange'],
+      'Expected values are derived from Pine v6 documented syminfo fallback semantics for derivable fields and absent provider-owned metadata.',
+    covers: [
+      'syminfo.country',
+      'syminfo.current_contract',
+      'syminfo.employees',
+      'syminfo.expiration_date',
+      'syminfo.exchange',
+      'syminfo.isin',
+      'syminfo.main_tickerid',
+      'syminfo.sector',
+      'syminfo.shareholders',
+      'syminfo.shares_outstanding_float',
+      'syminfo.shares_outstanding_total',
+      'syminfo.volumetype',
+    ],
     source: `//@version=6
 indicator("Derived Syminfo")
 plot(syminfo.exchange == "NASDAQ" ? 1 : 0, "Derived Exchange")
 plot(syminfo.main_tickerid == "NASDAQ:MSFT" ? 1 : 0, "Derived Main Ticker")
+plot(syminfo.country == "" ? 1 : 0, "Missing Country")
+plot(syminfo.current_contract == "" ? 1 : 0, "Missing Current Contract")
+plot(syminfo.isin == "" ? 1 : 0, "Missing ISIN")
+plot(syminfo.sector == "" ? 1 : 0, "Missing Sector")
+plot(syminfo.volumetype == "n/a" ? 1 : 0, "Missing Volume Type")
 plot(na(syminfo.expiration_date) ? 1 : 0, "Missing Expiration")
-plot(na(syminfo.target_price_average) ? 1 : 0, "Missing Target")
 plot(na(syminfo.employees) ? 1 : 0, "Missing Employees")
+plot(na(syminfo.shareholders) ? 1 : 0, "Missing Shareholders")
+plot(na(syminfo.shares_outstanding_float) ? 1 : 0, "Missing Float Shares")
+plot(na(syminfo.shares_outstanding_total) ? 1 : 0, "Missing Total Shares")
 `,
     options: {
       runtime: {
@@ -357,9 +377,16 @@ plot(na(syminfo.employees) ? 1 : 0, "Missing Employees")
     expectedPlots: {
       'Derived Exchange': allBars(1),
       'Derived Main Ticker': allBars(1),
+      'Missing Country': allBars(1),
+      'Missing Current Contract': allBars(1),
+      'Missing ISIN': allBars(1),
+      'Missing Sector': allBars(1),
+      'Missing Volume Type': allBars(1),
       'Missing Expiration': allBars(1),
-      'Missing Target': allBars(1),
       'Missing Employees': allBars(1),
+      'Missing Shareholders': allBars(1),
+      'Missing Float Shares': allBars(1),
+      'Missing Total Shares': allBars(1),
     },
   },
   {
@@ -476,7 +503,7 @@ describe('Pine v6 runtime metadata behavior', () => {
 
   it('declares provenance for every literal expected value', () => {
     expect(expectedValueProvenanceCounts()).toEqual({
-      'independently-derived': 370,
+      'independently-derived': 398,
       'published-worked-example': 0,
       'tealscript-regression-pin': 0,
     });
