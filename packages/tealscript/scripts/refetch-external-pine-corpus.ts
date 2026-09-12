@@ -1,10 +1,12 @@
-import { createHash } from 'node:crypto';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import corpusV1Report from '../reports/external-pine-corpus-v1.report.json' with { type: 'json' };
+import { hashSource, normalizeHarvestedPineSource } from '../src/compat/externalCorpusSource.ts';
+
 import type { ExternalCorpusManifest, ExternalCorpusReport } from './run-external-pine-corpus.ts';
+
+export { hashSource, normalizeHarvestedPineSource };
 
 const repoRoot = resolve(new URL('../../..', import.meta.url).pathname);
 
@@ -95,44 +97,6 @@ export async function refetchExternalPineCorpus(options: RefetchOptions): Promis
   };
 }
 
-export function hashSource(source: string): string {
-  return createHash('sha256').update(source, 'utf8').digest('hex');
-}
-
-export function normalizeHarvestedPineSource(source: string): {
-  source: string;
-  transform?: NonNullable<ExternalCorpusManifest['scripts'][number]['sourceTransform']>;
-} {
-  const rawByteSize = Buffer.byteLength(source, 'utf8');
-  const lines = source.split(/\r?\n/);
-  const markerLine = lines.findIndex((line) => line.trim() === 'PineScript code:');
-  const startLine = lines.findIndex((line, index) => (
-    index > markerLine
-    && /^\s*(?:\/\/\s*@version\s*=|(?:indicator|strategy|study|library)\s*\()/u.test(normalizeCopiedCodeSpaces(line))
-  ));
-  if (markerLine === -1 || startLine === -1) return { source };
-
-  const bodyLines = lines.slice(startLine).map(normalizeCopiedCodeSpaces);
-  const expandMarkerIndex = bodyLines.findIndex((line) => /^Expand \(\d+ lines\)\s*$/u.test(line.trim()));
-  const sourceLines = expandMarkerIndex === -1 ? bodyLines : bodyLines.slice(0, expandMarkerIndex);
-  const transformed = `${sourceLines.join('\n').trimEnd()}\n`;
-  const transformedByteSize = Buffer.byteLength(transformed, 'utf8');
-  return {
-    source: transformed,
-    transform: {
-      kind: 'tradingview-copy-code-body',
-      startLine: startLine + 1,
-      removedTrailingExpandMarker: expandMarkerIndex !== -1,
-      normalizedCopiedCodeSpaces: transformed !== lines.slice(startLine, expandMarkerIndex === -1 ? undefined : startLine + expandMarkerIndex).join('\n').trimEnd() + '\n',
-      rawByteSize,
-      transformedByteSize,
-    },
-  };
-}
-
-function normalizeCopiedCodeSpaces(line: string): string {
-  return line.replace(/[\u00a0\u2007\u202f\u2009\u200a\u200b\u2060]/gu, ' ');
-}
 
 function requireField(row: ManifestRefetchRow, field: 'sourceRepoUrl' | 'sourceFilePath' | 'commitSha'): string {
   const value = row[field];
@@ -145,7 +109,10 @@ async function readRefetchRows(options: RefetchOptions): Promise<ManifestRefetch
     const manifest = await readManifest(resolveInputPath(options.manifestPath));
     return manifest.scripts;
   }
-  const report = options.reportPath ? await readReport(resolveInputPath(options.reportPath)) : corpusV1Report as unknown as ExternalCorpusReport;
+  // `reports/` is generated output and not tracked, so there is no committed
+  // default to import. An absent report throws here, which is the honest
+  // failure: run the corpus first.
+  const report = await readReport(resolveInputPath(options.reportPath ?? 'packages/tealscript/reports/external-pine-corpus-v1.report.json'));
   return report.rows;
 }
 

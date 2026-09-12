@@ -56,14 +56,12 @@ export interface ExternalCorpusManifest {
   scripts: ExternalCorpusManifestScript[];
 }
 
-export interface ExternalCorpusSourceTransform {
-  kind: 'tradingview-copy-code-body';
-  startLine: number;
-  removedTrailingExpandMarker: boolean;
-  normalizedCopiedCodeSpaces: boolean;
-  rawByteSize: number;
-  transformedByteSize: number;
-}
+// Defined in `src/compat/externalCorpusSource.ts` and re-exported here so the
+// scripts that already import it from this module keep working. One definition:
+// `scripts/` may depend on `src/`, never the reverse.
+import type { ExternalCorpusSourceTransform } from '../src/compat/externalCorpusSource.ts';
+
+export type { ExternalCorpusSourceTransform };
 
 export interface ExternalCorpusStageResult {
   status: ExternalCorpusStageStatus;

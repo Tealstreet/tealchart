@@ -10,7 +10,7 @@ import {
   runExternalPineCorpus,
   visiblePlotsForCorpus,
 } from '../../scripts/run-external-pine-corpus.ts';
-import { normalizeHarvestedPineSource } from '../../scripts/refetch-external-pine-corpus.ts';
+import { normalizeHarvestedPineSource } from '../../src/compat/externalCorpusSource.ts';
 import type { ExecutionResult } from '../../src';
 
 describe('external Pine corpus runner', () => {

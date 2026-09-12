@@ -19,6 +19,7 @@ import type { DrawingOutput } from '../src/runtime/drawings/types.ts';
 import type { PlotOutput } from '../src/runtime/context.ts';
 import type { TealscriptExecutionOptions } from '../src/runtime/types.ts';
 import { pineV6ReferenceManualBuiltinNames } from '../src/compat/pineV6ReferenceManualAudit.ts';
+import { VALUE_VECTOR_RED_FIRST_EXEMPTION_IDS } from '../src/compat/valueVectorRedFirstExemptions.ts';
 
 type VectorValue = number | null;
 type ExpectedDrawingValue = Record<string, unknown>;
@@ -165,11 +166,7 @@ const COLOR_CONSTANT_CODES = [
 const OFFICIAL_VALUE_VECTOR_MEMBER_NAMES = pineV6ReferenceManualBuiltinNames();
 const OFFICIAL_VALUE_VECTOR_MEMBER_SET = new Set(OFFICIAL_VALUE_VECTOR_MEMBER_NAMES);
 const SOURCE_CITATION_PATTERN = /https:\/\/www\.tradingview\.com\/|TealScript local extension:/;
-const VALUE_VECTOR_DISCRIMINATION_EXEMPTIONS_REPORT = 'reports/pine-value-vector-red-first-exemptions-v1.json';
-const PROTECTED_VALUE_VECTOR_REPORT_PATHS = new Set([
-  VALUE_VECTOR_DISCRIMINATION_EXEMPTIONS_REPORT,
-  'reports/pine-value-vectors-coverage-v174.json',
-]);
+
 const VALUE_VECTOR_HELPER_NAMES = [
   'accdist',
   'alma',
@@ -11655,13 +11652,7 @@ function resolvePackagePath(path: string): string {
 
 function loadValueVectorDiscriminationExemptionIds(): Set<string> {
   if (discriminationExemptionIds) return discriminationExemptionIds;
-  const path = resolvePackagePath(VALUE_VECTOR_DISCRIMINATION_EXEMPTIONS_REPORT);
-  if (!existsSync(path)) {
-    throw new Error(`Missing value-vector red-first exemption report: ${VALUE_VECTOR_DISCRIMINATION_EXEMPTIONS_REPORT}`);
-  }
-  const report = JSON.parse(readFileSync(path, 'utf8')) as { exemptions?: ValueVectorDiscriminationExemption[] };
-  const ids = report.exemptions?.map((entry) => entry.id).filter((id): id is string => typeof id === 'string') ?? [];
-  discriminationExemptionIds = new Set(ids);
+  discriminationExemptionIds = new Set(VALUE_VECTOR_RED_FIRST_EXEMPTION_IDS);
   return discriminationExemptionIds;
 }
 
@@ -11794,18 +11785,6 @@ export function validateValueVectorDiscriminationProofs(
   return failures;
 }
 
-function assertSafeValueVectorOutputPath(outputPath: string): void {
-  const normalized = outputPath.replaceAll('\\', '/').replace(/^packages\/tealscript\//, '');
-  if (PROTECTED_VALUE_VECTOR_REPORT_PATHS.has(normalized)) {
-    throw new Error(`Refusing to overwrite protected value-vector baseline/exemption artifact: ${outputPath}`);
-  }
-  const resolvedOutput = resolve(outputPath);
-  for (const protectedPath of PROTECTED_VALUE_VECTOR_REPORT_PATHS) {
-    if (resolvedOutput === resolve(protectedPath) || resolvedOutput === resolve('packages/tealscript', protectedPath)) {
-      throw new Error(`Refusing to overwrite protected value-vector baseline/exemption artifact: ${outputPath}`);
-    }
-  }
-}
 
 function failedCaseResult(args: {
   testCase: ValueVectorCase;
@@ -12083,7 +12062,6 @@ async function main(): Promise<void> {
     },
   };
   const outputPath = process.argv[2] ?? 'reports/pine-value-vectors.report.json';
-  assertSafeValueVectorOutputPath(outputPath);
   await writeFile(outputPath, `${JSON.stringify(report)}\n`, 'utf8');
   process.stdout.write(`${JSON.stringify(report.summary, null, 2)}\n`);
   const gateFailure = formatValueVectorGateFailure(gate);

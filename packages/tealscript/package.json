@@ -28,7 +28,6 @@
     "pine:external-corpus:pinned": "tsx scripts/run-pinned-external-pine-corpus.ts",
     "pine:external-corpus:merge-pinned": "tsx scripts/merge-pinned-pine-corpus.ts",
     "pine:external-corpus:compare": "tsx scripts/compare-pinned-pine-corpus.ts",
-    "pine:external-corpus:harvest-v5": "tsx scripts/harvest-external-pine-corpus-v5.ts",
     "pine:value-vectors": "tsx scripts/run-pine-value-vectors.ts",
     "pine:external-corpus:long-bars": "tsx scripts/measure-long-bar-corpus-parity.ts",
     "pine:external-corpus:output-differential": "tsx scripts/measure-corpus-plot-value-differential.ts",
