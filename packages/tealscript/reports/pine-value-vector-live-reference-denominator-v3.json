@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 3,
+  "measurementCommit": "d9d1620246",
+  "basis": {
+    "supersedes": "packages/tealscript/reports/pine-value-vector-live-reference-denominator-v1.{md,json}",
+    "valueVectorMemberMap": "packages/tealscript/reports/pine-value-vector-member-map-v31.json at d9d1620246",
+    "liveReferenceIntegrity": "packages/tealscript/reports/pine-v6-reference-snapshot-integrity-v1.json at 30075c8727",
+    "engineProbe": "Direct parser, semantic, public compiled-wrapper compile, and execution probes at ad7d956139.",
+    "corpusUsage": "Direct v5/v6 source scan over packages/tealscript/.cache/tealscript/pine-corpus-v5-20260910/sources (1000 files) and pine-corpus-v6-20260911/sources (999 files), plus runtime.error count from pine-corpus-vector-depth-gap-v1.json where available."
+  },
+  "snapshotCoverage": {
+    "denominator": 861,
+    "covered": 814,
+    "percent": 94.54
+  },
+  "liveReferenceCorrection": {
+    "newLiveNamesBeyondSnapshot": 25,
+    "correctedDenominator": 886,
+    "correctedCovered": 814,
+    "correctedPercent": 91.87,
+    "practicalNoTraceDenominator": 814,
+    "practicalNoTraceCovered": 814,
+    "practicalNoTracePercent": 100
+  },
+  "ownershipSplit": {
+    "notImplemented": [],
+    "implementedButLocallyVectorCoverable": [],
+    "implementedButTraceHostDeclarationOrErrorBound": [
+      "footprint.buy_volume",
+      "footprint.delta",
+      "footprint.get_row_by_price",
+      "footprint.poc",
+      "footprint.rows",
+      "footprint.sell_volume",
+      "footprint.total_volume",
+      "footprint.vah",
+      "footprint.val",
+      "library",
+      "math.random",
+      "request.footprint",
+      "request.quandl",
+      "request.seed",
+      "runtime.error",
+      "strategy.risk.max_cons_loss_days",
+      "strategy.risk.max_intraday_filled_orders",
+      "volume_row.buy_volume",
+      "volume_row.delta",
+      "volume_row.down_price",
+      "volume_row.has_buy_imbalance",
+      "volume_row.has_sell_imbalance",
+      "volume_row.sell_volume",
+      "volume_row.total_volume",
+      "volume_row.up_price"
+    ]
+  },
+  "correctionToV1": {
+    "issue": "traceOrHostRequired entries are objects with a member field, not strings. V1 did not normalize them before testing whether live-only names were already classified.",
+    "effect": "All 25 live-only names are already trace/host/declaration/error-bound classifications rather than missing implementations or local vector gaps."
+  },
+  "usageRanking": [
+    { "member": "runtime.error", "scripts": 433, "references": 640, "source": "pine-corpus-vector-depth-gap-v1.json 2506-script report; direct v5/v6 scan found 395 scripts / 571 refs" },
+    { "member": "library", "scripts": 26, "references": 26, "source": "direct v5/v6 source scan" },
+    { "member": "math.random", "scripts": 2, "references": 10, "source": "direct v5/v6 source scan" },
+    { "member": "request.seed", "scripts": 2, "references": 4, "source": "direct v5/v6 source scan" },
+    { "member": "strategy.risk.max_intraday_filled_orders", "scripts": 2, "references": 2, "source": "direct v5/v6 source scan" }
+  ],
+  "zeroUsageInDirectV5V6Scan": [
+    "footprint.buy_volume",
+    "footprint.delta",
+    "footprint.get_row_by_price",
+    "footprint.poc",
+    "footprint.rows",
+    "footprint.sell_volume",
+    "footprint.total_volume",
+    "footprint.vah",
+    "footprint.val",
+    "request.footprint",
+    "request.quandl",
+    "strategy.risk.max_cons_loss_days",
+    "volume_row.buy_volume",
+    "volume_row.delta",
+    "volume_row.down_price",
+    "volume_row.has_buy_imbalance",
+    "volume_row.has_sell_imbalance",
+    "volume_row.sell_volume",
+    "volume_row.total_volume",
+    "volume_row.up_price"
+  ]
+}

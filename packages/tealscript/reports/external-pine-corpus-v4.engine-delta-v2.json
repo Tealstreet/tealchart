@@ -1,0 +1,33 @@
+{
+  "supersededBy": "external-pine-corpus-v4.engine-delta-v4.md",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "schemaVersion": 1,
+  "corpus": "external-pine-corpus-v4",
+  "reharvested": false,
+  "completedRows": 649,
+  "timeoutRows": 1,
+  "timeoutLocalPath": "sources/0254__davidadff7-blip-CODE23__Aoi_alert_all.pine",
+  "parserProbe": {"status": "passed", "programBodyEntries": 692},
+  "previousNormalized": {
+    "supported": 516,
+    "tealscript-gap": 42,
+    "invalid-pine": 61,
+    "unsupported-by-design": 20,
+    "corpus-hygiene": 11,
+    "achievableDenominator": 558,
+    "funnel": {"parse": 558, "semantic": 535, "compile": 535, "execute": 519, "output": 501}
+  },
+  "postFixNormalized": {
+    "supported": 516,
+    "tealscript-gap": 42,
+    "invalid-pine": 61,
+    "unsupported-by-design": 20,
+    "corpus-hygiene": 11,
+    "achievableDenominator": 558,
+    "funnel": {"parse": 558, "semantic": 535, "compile": 535, "execute": 519, "output": 501}
+  },
+  "rawRerun": {"parse": 618, "semantic": 535, "compile": 535, "execute": 520, "output": 501},
+  "delta": {"supported": 0, "tealscript-gap": 0, "invalid-pine": 0, "unsupported-by-design": 0, "parse": 0, "semantic": 0, "compile": 0, "execute": 0, "output": 0},
+  "remainingAliasFallbackRows": ["0069", "0202", "0226", "0324", "0401"],
+  "remainingImportedExportRows": ["0294", "0300", "0394"]
+}

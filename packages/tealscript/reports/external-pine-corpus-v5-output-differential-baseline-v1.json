@@ -1,0 +1,7 @@
+{
+  "supersededBy": "pine-value-vectors-index-v1.md",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "schemaVersion": 2,
+  "generatedFromReport": "packages/tealscript/.cache/tealscript/pine-corpus-v5-20260910/value-differential/report-abdbd149a7-current-current-output.json",
+  "expectedDivergences": []
+}

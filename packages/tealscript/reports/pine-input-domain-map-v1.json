@@ -1,0 +1,5856 @@
+{
+  "schemaVersion": 1,
+  "basis": {
+    "officialMembers": 861,
+    "source": "Committed Pine v6 manual member index plus TradingView reference/manual pages cited per domain group.",
+    "vectorReport": "pine-value-vectors-coverage-v117.json",
+    "rule": "A domain enters the map only when the reference states it. If semantic checking already refuses it, the map records semantic-blocked and no runtime vector is added. A documented valid range does not by itself settle the runtime consequence of dynamic invalid inputs."
+  },
+  "summary": {
+    "documentedDomainGroups": 12,
+    "membersWithDocumentedDomains": 93,
+    "membersWithoutDocumentedDomainInAudit": 768,
+    "domainVectorCases": 245,
+    "taLengthRejectionCases": 244,
+    "expectedRedDomainCases": 0,
+    "unexpectedDomainFailures": [],
+    "unexpectedDomainPasses": [],
+    "statusCounts": {
+      "vector-covered-green": 43,
+      "expected-red-runtime-gap": 0,
+      "semantic-blocked": 29,
+      "runtime-loud": 19,
+      "trace-or-host-required": 2,
+      "no-documented-domain-in-audit": 768
+    }
+  },
+  "domainEntries": [
+    {
+      "id": "ta-positive-integer-lengths",
+      "members": [
+        "ta.adx",
+        "ta.alma",
+        "ta.atr",
+        "ta.bb",
+        "ta.bbw",
+        "ta.cci",
+        "ta.change",
+        "ta.cmo",
+        "ta.cog",
+        "ta.correlation",
+        "ta.covariance",
+        "ta.dema",
+        "ta.dev",
+        "ta.dmi",
+        "ta.ema",
+        "ta.falling",
+        "ta.highest",
+        "ta.highestbars",
+        "ta.hma",
+        "ta.kc",
+        "ta.kcw",
+        "ta.kst",
+        "ta.linreg",
+        "ta.lowest",
+        "ta.lowestbars",
+        "ta.median",
+        "ta.mfi",
+        "ta.mode",
+        "ta.mom",
+        "ta.percentile_linear_interpolation",
+        "ta.percentile_nearest_rank",
+        "ta.percentrank",
+        "ta.range",
+        "ta.rci",
+        "ta.rising",
+        "ta.rma",
+        "ta.roc",
+        "ta.rsi",
+        "ta.sma",
+        "ta.smma",
+        "ta.stdev",
+        "ta.stoch",
+        "ta.sum",
+        "ta.supertrend",
+        "ta.tema",
+        "ta.tsi",
+        "ta.variance",
+        "ta.vwma",
+        "ta.wma",
+        "ta.wpr"
+      ],
+      "status": "vector-covered-green",
+      "domain": "Documented TA length parameters must be positive integer values; zero, negative, fractional and non-finite values are invalid.",
+      "behavior": "244 rejection vectors cover 61 length slots and both compiled entry points reject with a positive-integer diagnostic.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/faq/functions/ https://www.tradingview.com/pine-script-reference/v6/",
+      "vectorCases": [
+        "ta.invalid-length.adx.diLength.zero",
+        "ta.invalid-length.adx.diLength.negative",
+        "ta.invalid-length.adx.diLength.fractional",
+        "ta.invalid-length.adx.diLength.nonfinite",
+        "ta.invalid-length.adx.adxSmoothing.zero",
+        "ta.invalid-length.adx.adxSmoothing.negative",
+        "ta.invalid-length.adx.adxSmoothing.fractional",
+        "ta.invalid-length.adx.adxSmoothing.nonfinite",
+        "ta.invalid-length.alma.zero",
+        "ta.invalid-length.alma.negative",
+        "ta.invalid-length.alma.fractional",
+        "ta.invalid-length.alma.nonfinite",
+        "ta.invalid-length.atr.zero",
+        "ta.invalid-length.atr.negative",
+        "ta.invalid-length.atr.fractional",
+        "ta.invalid-length.atr.nonfinite",
+        "ta.invalid-length.bb.zero",
+        "ta.invalid-length.bb.negative",
+        "ta.invalid-length.bb.fractional",
+        "ta.invalid-length.bb.nonfinite",
+        "ta.invalid-length.bbw.zero",
+        "ta.invalid-length.bbw.negative",
+        "ta.invalid-length.bbw.fractional",
+        "ta.invalid-length.bbw.nonfinite",
+        "ta.invalid-length.cci.zero",
+        "ta.invalid-length.cci.negative",
+        "ta.invalid-length.cci.fractional",
+        "ta.invalid-length.cci.nonfinite",
+        "ta.invalid-length.change.zero",
+        "ta.invalid-length.change.negative",
+        "ta.invalid-length.change.fractional",
+        "ta.invalid-length.change.nonfinite",
+        "ta.invalid-length.cmo.zero",
+        "ta.invalid-length.cmo.negative",
+        "ta.invalid-length.cmo.fractional",
+        "ta.invalid-length.cmo.nonfinite",
+        "ta.invalid-length.cog.zero",
+        "ta.invalid-length.cog.negative",
+        "ta.invalid-length.cog.fractional",
+        "ta.invalid-length.cog.nonfinite",
+        "ta.invalid-length.correlation.zero",
+        "ta.invalid-length.correlation.negative",
+        "ta.invalid-length.correlation.fractional",
+        "ta.invalid-length.correlation.nonfinite",
+        "ta.invalid-length.covariance.zero",
+        "ta.invalid-length.covariance.negative",
+        "ta.invalid-length.covariance.fractional",
+        "ta.invalid-length.covariance.nonfinite",
+        "ta.invalid-length.dema.zero",
+        "ta.invalid-length.dema.negative",
+        "ta.invalid-length.dema.fractional",
+        "ta.invalid-length.dema.nonfinite",
+        "ta.invalid-length.dev.zero",
+        "ta.invalid-length.dev.negative",
+        "ta.invalid-length.dev.fractional",
+        "ta.invalid-length.dev.nonfinite",
+        "ta.invalid-length.dmi.diLength.zero",
+        "ta.invalid-length.dmi.diLength.negative",
+        "ta.invalid-length.dmi.diLength.fractional",
+        "ta.invalid-length.dmi.diLength.nonfinite",
+        "ta.invalid-length.dmi.adxSmoothing.zero",
+        "ta.invalid-length.dmi.adxSmoothing.negative",
+        "ta.invalid-length.dmi.adxSmoothing.fractional",
+        "ta.invalid-length.dmi.adxSmoothing.nonfinite",
+        "ta.invalid-length.ema.zero",
+        "ta.invalid-length.ema.negative",
+        "ta.invalid-length.ema.fractional",
+        "ta.invalid-length.ema.nonfinite",
+        "ta.invalid-length.falling.zero",
+        "ta.invalid-length.falling.negative",
+        "ta.invalid-length.falling.fractional",
+        "ta.invalid-length.falling.nonfinite",
+        "ta.invalid-length.highest.zero",
+        "ta.invalid-length.highest.negative",
+        "ta.invalid-length.highest.fractional",
+        "ta.invalid-length.highest.nonfinite",
+        "ta.invalid-length.highestbars.zero",
+        "ta.invalid-length.highestbars.negative",
+        "ta.invalid-length.highestbars.fractional",
+        "ta.invalid-length.highestbars.nonfinite",
+        "ta.invalid-length.hma.zero",
+        "ta.invalid-length.hma.negative",
+        "ta.invalid-length.hma.fractional",
+        "ta.invalid-length.hma.nonfinite",
+        "ta.invalid-length.kc.zero",
+        "ta.invalid-length.kc.negative",
+        "ta.invalid-length.kc.fractional",
+        "ta.invalid-length.kc.nonfinite",
+        "ta.invalid-length.kcw.zero",
+        "ta.invalid-length.kcw.negative",
+        "ta.invalid-length.kcw.fractional",
+        "ta.invalid-length.kcw.nonfinite",
+        "ta.invalid-length.kst.roclength1.zero",
+        "ta.invalid-length.kst.roclength1.negative",
+        "ta.invalid-length.kst.roclength1.fractional",
+        "ta.invalid-length.kst.roclength1.nonfinite",
+        "ta.invalid-length.kst.roclength2.zero",
+        "ta.invalid-length.kst.roclength2.negative",
+        "ta.invalid-length.kst.roclength2.fractional",
+        "ta.invalid-length.kst.roclength2.nonfinite",
+        "ta.invalid-length.kst.roclength3.zero",
+        "ta.invalid-length.kst.roclength3.negative",
+        "ta.invalid-length.kst.roclength3.fractional",
+        "ta.invalid-length.kst.roclength3.nonfinite",
+        "ta.invalid-length.kst.roclength4.zero",
+        "ta.invalid-length.kst.roclength4.negative",
+        "ta.invalid-length.kst.roclength4.fractional",
+        "ta.invalid-length.kst.roclength4.nonfinite",
+        "ta.invalid-length.kst.smalen1.zero",
+        "ta.invalid-length.kst.smalen1.negative",
+        "ta.invalid-length.kst.smalen1.fractional",
+        "ta.invalid-length.kst.smalen1.nonfinite",
+        "ta.invalid-length.kst.smalen2.zero",
+        "ta.invalid-length.kst.smalen2.negative",
+        "ta.invalid-length.kst.smalen2.fractional",
+        "ta.invalid-length.kst.smalen2.nonfinite",
+        "ta.invalid-length.kst.smalen3.zero",
+        "ta.invalid-length.kst.smalen3.negative",
+        "ta.invalid-length.kst.smalen3.fractional",
+        "ta.invalid-length.kst.smalen3.nonfinite",
+        "ta.invalid-length.kst.smalen4.zero",
+        "ta.invalid-length.kst.smalen4.negative",
+        "ta.invalid-length.kst.smalen4.fractional",
+        "ta.invalid-length.kst.smalen4.nonfinite",
+        "ta.invalid-length.kst.signalLength.zero",
+        "ta.invalid-length.kst.signalLength.negative",
+        "ta.invalid-length.kst.signalLength.fractional",
+        "ta.invalid-length.kst.signalLength.nonfinite",
+        "ta.invalid-length.linreg.zero",
+        "ta.invalid-length.linreg.negative",
+        "ta.invalid-length.linreg.fractional",
+        "ta.invalid-length.linreg.nonfinite",
+        "ta.invalid-length.lowest.zero",
+        "ta.invalid-length.lowest.negative",
+        "ta.invalid-length.lowest.fractional",
+        "ta.invalid-length.lowest.nonfinite",
+        "ta.invalid-length.lowestbars.zero",
+        "ta.invalid-length.lowestbars.negative",
+        "ta.invalid-length.lowestbars.fractional",
+        "ta.invalid-length.lowestbars.nonfinite",
+        "ta.invalid-length.median.zero",
+        "ta.invalid-length.median.negative",
+        "ta.invalid-length.median.fractional",
+        "ta.invalid-length.median.nonfinite",
+        "ta.invalid-length.mfi.zero",
+        "ta.invalid-length.mfi.negative",
+        "ta.invalid-length.mfi.fractional",
+        "ta.invalid-length.mfi.nonfinite",
+        "ta.invalid-length.mode.zero",
+        "ta.invalid-length.mode.negative",
+        "ta.invalid-length.mode.fractional",
+        "ta.invalid-length.mode.nonfinite",
+        "ta.invalid-length.mom.zero",
+        "ta.invalid-length.mom.negative",
+        "ta.invalid-length.mom.fractional",
+        "ta.invalid-length.mom.nonfinite",
+        "ta.invalid-length.percentile_linear_interpolation.zero",
+        "ta.invalid-length.percentile_linear_interpolation.negative",
+        "ta.invalid-length.percentile_linear_interpolation.fractional",
+        "ta.invalid-length.percentile_linear_interpolation.nonfinite",
+        "ta.invalid-length.percentile_nearest_rank.zero",
+        "ta.invalid-length.percentile_nearest_rank.negative",
+        "ta.invalid-length.percentile_nearest_rank.fractional",
+        "ta.invalid-length.percentile_nearest_rank.nonfinite",
+        "ta.invalid-length.percentrank.zero",
+        "ta.invalid-length.percentrank.negative",
+        "ta.invalid-length.percentrank.fractional",
+        "ta.invalid-length.percentrank.nonfinite",
+        "ta.invalid-length.range.zero",
+        "ta.invalid-length.range.negative",
+        "ta.invalid-length.range.fractional",
+        "ta.invalid-length.range.nonfinite",
+        "ta.invalid-length.rci.zero",
+        "ta.invalid-length.rci.negative",
+        "ta.invalid-length.rci.fractional",
+        "ta.invalid-length.rci.nonfinite",
+        "ta.invalid-length.rising.zero",
+        "ta.invalid-length.rising.negative",
+        "ta.invalid-length.rising.fractional",
+        "ta.invalid-length.rising.nonfinite",
+        "ta.invalid-length.rma.zero",
+        "ta.invalid-length.rma.negative",
+        "ta.invalid-length.rma.fractional",
+        "ta.invalid-length.rma.nonfinite",
+        "ta.invalid-length.roc.zero",
+        "ta.invalid-length.roc.negative",
+        "ta.invalid-length.roc.fractional",
+        "ta.invalid-length.roc.nonfinite",
+        "ta.invalid-length.rsi.zero",
+        "ta.invalid-length.rsi.negative",
+        "ta.invalid-length.rsi.fractional",
+        "ta.invalid-length.rsi.nonfinite",
+        "ta.invalid-length.sma.zero",
+        "ta.invalid-length.sma.negative",
+        "ta.invalid-length.sma.fractional",
+        "ta.invalid-length.sma.nonfinite",
+        "ta.invalid-length.smma.zero",
+        "ta.invalid-length.smma.negative",
+        "ta.invalid-length.smma.fractional",
+        "ta.invalid-length.smma.nonfinite",
+        "ta.invalid-length.stdev.zero",
+        "ta.invalid-length.stdev.negative",
+        "ta.invalid-length.stdev.fractional",
+        "ta.invalid-length.stdev.nonfinite",
+        "ta.invalid-length.stoch.zero",
+        "ta.invalid-length.stoch.negative",
+        "ta.invalid-length.stoch.fractional",
+        "ta.invalid-length.stoch.nonfinite",
+        "ta.invalid-length.sum.zero",
+        "ta.invalid-length.sum.negative",
+        "ta.invalid-length.sum.fractional",
+        "ta.invalid-length.sum.nonfinite",
+        "ta.invalid-length.supertrend.atrPeriod.zero",
+        "ta.invalid-length.supertrend.atrPeriod.negative",
+        "ta.invalid-length.supertrend.atrPeriod.fractional",
+        "ta.invalid-length.supertrend.atrPeriod.nonfinite",
+        "ta.invalid-length.tema.zero",
+        "ta.invalid-length.tema.negative",
+        "ta.invalid-length.tema.fractional",
+        "ta.invalid-length.tema.nonfinite",
+        "ta.invalid-length.tsi.short_length.zero",
+        "ta.invalid-length.tsi.short_length.negative",
+        "ta.invalid-length.tsi.short_length.fractional",
+        "ta.invalid-length.tsi.short_length.nonfinite",
+        "ta.invalid-length.tsi.long_length.zero",
+        "ta.invalid-length.tsi.long_length.negative",
+        "ta.invalid-length.tsi.long_length.fractional",
+        "ta.invalid-length.tsi.long_length.nonfinite",
+        "ta.invalid-length.variance.zero",
+        "ta.invalid-length.variance.negative",
+        "ta.invalid-length.variance.fractional",
+        "ta.invalid-length.variance.nonfinite",
+        "ta.invalid-length.vwma.zero",
+        "ta.invalid-length.vwma.negative",
+        "ta.invalid-length.vwma.fractional",
+        "ta.invalid-length.vwma.nonfinite",
+        "ta.invalid-length.wma.zero",
+        "ta.invalid-length.wma.negative",
+        "ta.invalid-length.wma.fractional",
+        "ta.invalid-length.wma.nonfinite",
+        "ta.invalid-length.wpr.zero",
+        "ta.invalid-length.wpr.negative",
+        "ta.invalid-length.wpr.fractional",
+        "ta.invalid-length.wpr.nonfinite"
+      ]
+    },
+    {
+      "id": "color-rgb-components",
+      "members": [
+        "color.rgb"
+      ],
+      "status": "trace-or-host-required",
+      "domain": "RGB components are defined in the 0-255 range.",
+      "behavior": "Current runtime accepts dynamic out-of-domain components and clamps while surfacing the approximation. TradingView documents the valid domain, but not the runtime consequence for dynamic invalid inputs, so this is trace-undetermined rather than a reference-backed expected-red.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/visuals/colors/"
+    },
+    {
+      "id": "color-transparency",
+      "members": [
+        "color.new",
+        "color.rgb"
+      ],
+      "status": "semantic-blocked",
+      "domain": "Transparency is defined in the 0-100 range.",
+      "behavior": "Semantic checking already rejects out-of-domain `transp` for color constructors, so no runtime vector is added.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/visuals/colors/"
+    },
+    {
+      "id": "legacy-bgcolor-transparency",
+      "members": [
+        "bgcolor"
+      ],
+      "status": "trace-or-host-required",
+      "domain": "Transparency is defined in the 0-100 range.",
+      "behavior": "Current runtime accepts dynamic out-of-domain legacy `bgcolor(transp=...)` and applies its compatibility path. TradingView documents the valid domain, but not the runtime consequence for dynamic invalid inputs, so this is trace-undetermined rather than a reference-backed expected-red.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/visuals/colors/"
+    },
+    {
+      "id": "visual-positive-integer-sizes",
+      "members": [
+        "plot",
+        "hline",
+        "plotarrow"
+      ],
+      "status": "semantic-blocked",
+      "domain": "Line widths and plotarrow min/max heights must be positive integer visual sizes.",
+      "behavior": "Semantic checking already rejects non-positive and fractional values for v6, so no runtime vector is added.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/visuals/plots/"
+    },
+    {
+      "id": "declaration-counts-and-precision",
+      "members": [
+        "indicator",
+        "strategy",
+        "library",
+        "max_bars_back"
+      ],
+      "status": "semantic-blocked",
+      "domain": "Declaration counts, precision and max_bars_back/calc_bars_count fields are documented numeric domains.",
+      "behavior": "Semantic checking already rejects negative, non-integer or wrongly typed declaration values.",
+      "consequence": "metadata-only",
+      "citation": "https://www.tradingview.com/pine-script-docs/language/script-structure/ https://www.tradingview.com/pine-script-reference/v6/"
+    },
+    {
+      "id": "input-ranges-and-options",
+      "members": [
+        "input",
+        "input.float",
+        "input.int",
+        "input.string",
+        "input.enum",
+        "input.timeframe"
+      ],
+      "status": "semantic-blocked",
+      "domain": "Input defval must match range/options overload domains when those domains are supplied.",
+      "behavior": "Semantic checking already rejects defval outside min/max, defval outside options, mixed option types and options combined with minval/maxval/step.",
+      "consequence": "metadata-only",
+      "citation": "https://www.tradingview.com/pine-script-docs/concepts/inputs/"
+    },
+    {
+      "id": "request-calc-bars-and-const-routing",
+      "members": [
+        "request.security",
+        "request.security_lower_tf",
+        "request.seed",
+        "request.dividends",
+        "request.earnings",
+        "request.financial",
+        "request.economic",
+        "request.quandl"
+      ],
+      "status": "semantic-blocked",
+      "domain": "Request calc_bars_count must be a valid count and routing enums such as gaps/lookahead must be allowed constants, not runtime values.",
+      "behavior": "Semantic checking already rejects invalid calc_bars_count and non-const routing values.",
+      "consequence": "host-dependent",
+      "citation": "https://www.tradingview.com/pine-script-docs/concepts/other-timeframes-and-data/"
+    },
+    {
+      "id": "time-bars-back-window",
+      "members": [
+        "time",
+        "time_close"
+      ],
+      "status": "semantic-blocked",
+      "domain": "bars_back/timeframe_bars_back are documented bounded integer offsets.",
+      "behavior": "Semantic checking already rejects non-integer and out-of-window offsets.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/concepts/time/"
+    },
+    {
+      "id": "strategy-declaration-and-order-domains",
+      "members": [
+        "strategy",
+        "strategy.entry",
+        "strategy.order",
+        "strategy.exit",
+        "strategy.close",
+        "strategy.close_all"
+      ],
+      "status": "semantic-blocked",
+      "domain": "Strategy declaration/order numeric, boolean, string and enum arguments have documented type/range domains.",
+      "behavior": "Semantic checking rejects invalid literal numeric ranges and argument types; exact broker/provider semantics remain separate trace-required surfaces.",
+      "consequence": "plausible-wrong-value",
+      "citation": "https://www.tradingview.com/pine-script-docs/concepts/strategies/"
+    },
+    {
+      "id": "array-index-and-empty-operations",
+      "members": [
+        "array.get",
+        "array.set",
+        "array.remove",
+        "array.insert",
+        "array.pop",
+        "array.shift",
+        "array.first",
+        "array.last",
+        "array.slice",
+        "array.percentrank"
+      ],
+      "status": "runtime-loud",
+      "domain": "Collection indices must address existing elements, empty pop/shift/first/last operations are invalid, and slices use half-open index ranges.",
+      "behavior": "Operations fail loudly at runtime, including `array.slice(from > to)` during global initialization.",
+      "consequence": "loud-error",
+      "citation": "https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-reference/v6/",
+      "vectorCases": [
+        "domain.array-slice-descending-range-rejection"
+      ]
+    },
+    {
+      "id": "matrix-index-and-shape-domains",
+      "members": [
+        "matrix.get",
+        "matrix.set",
+        "matrix.remove_row",
+        "matrix.remove_col",
+        "matrix.fill",
+        "matrix.row",
+        "matrix.col",
+        "matrix.submatrix",
+        "matrix.reshape"
+      ],
+      "status": "runtime-loud",
+      "domain": "Matrix row/column indices and ranges must fit the matrix shape.",
+      "behavior": "Runtime already fails loudly for out-of-bounds rows, columns and ranges in the probed accessors.",
+      "consequence": "loud-error",
+      "citation": "https://www.tradingview.com/pine-script-docs/language/matrices/ https://www.tradingview.com/pine-script-reference/v6/"
+    }
+  ],
+  "memberRows": [
+    {
+      "member": "adjustment.dividends",
+      "namespace": "adjustment",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "adjustment.none",
+      "namespace": "adjustment",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "adjustment.splits",
+      "namespace": "adjustment",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "alert",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "alert.freq_all",
+      "namespace": "alert",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "alert.freq_once_per_bar",
+      "namespace": "alert",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "alert.freq_once_per_bar_close",
+      "namespace": "alert",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "alertcondition",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.abs",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.avg",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.binary_search",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.binary_search_leftmost",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.binary_search_rightmost",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.clear",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.concat",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.copy",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.covariance",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.every",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.fill",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.first",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.from",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.get",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.includes",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.indexof",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.insert",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.join",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.last",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.lastindexof",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.max",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.median",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.min",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.mode",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_bool",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_box",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_color",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_float",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_int",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_label",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_line",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_linefill",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_string",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.new_table",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.percentile_linear_interpolation",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.percentile_nearest_rank",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.percentrank",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.pop",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.push",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.range",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.remove",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.reverse",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.set",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.shift",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.size",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.slice",
+      "namespace": "array",
+      "status": "runtime-loud",
+      "domains": [
+        "array-index-and-empty-operations"
+      ]
+    },
+    {
+      "member": "array.some",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.sort",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.sort_indices",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.standardize",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.stdev",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.sum",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.unshift",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "array.variance",
+      "namespace": "array",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ask",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "backadjustment.inherit",
+      "namespace": "backadjustment",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "backadjustment.off",
+      "namespace": "backadjustment",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "backadjustment.on",
+      "namespace": "backadjustment",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "bar_index",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barcolor",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barmerge.gaps_off",
+      "namespace": "barmerge",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barmerge.gaps_on",
+      "namespace": "barmerge",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barmerge.lookahead_off",
+      "namespace": "barmerge",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barmerge.lookahead_on",
+      "namespace": "barmerge",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.isconfirmed",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.isfirst",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.ishistory",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.islast",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.islastconfirmedhistory",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.isnew",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "barstate.isrealtime",
+      "namespace": "barstate",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "bgcolor",
+      "namespace": "(global)",
+      "status": "trace-or-host-required",
+      "domains": [
+        "legacy-bgcolor-transparency"
+      ]
+    },
+    {
+      "member": "bid",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "bool",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.all",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.copy",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.delete",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.get_bottom",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.get_left",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.get_right",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.get_top",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.new",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_bgcolor",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_border_color",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_border_style",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_border_width",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_bottom",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_bottom_right_point",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_extend",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_left",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_lefttop",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_right",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_rightbottom",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_color",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_font_family",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_formatting",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_halign",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_size",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_valign",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_text_wrap",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_top",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_top_left_point",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "box.set_xloc",
+      "namespace": "box",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.bg_color",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.fg_color",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_heikinashi",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_kagi",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_linebreak",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_pnf",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_range",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_renko",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.is_standard",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.left_visible_bar_time",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.point.copy",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.point.from_index",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.point.from_time",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.point.new",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.point.now",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "chart.right_visible_bar_time",
+      "namespace": "chart",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "close",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.aqua",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.b",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.black",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.blue",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.from_gradient",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.fuchsia",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.g",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.gray",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.green",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.lime",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.maroon",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.navy",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.new",
+      "namespace": "color",
+      "status": "semantic-blocked",
+      "domains": [
+        "color-transparency"
+      ]
+    },
+    {
+      "member": "color.olive",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.orange",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.purple",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.r",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.red",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.rgb",
+      "namespace": "color",
+      "status": "trace-or-host-required",
+      "domains": [
+        "color-rgb-components",
+        "color-transparency"
+      ]
+    },
+    {
+      "member": "color.silver",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.t",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.teal",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.white",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "color.yellow",
+      "namespace": "color",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.AED",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.ARS",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.AUD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.BDT",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.BHD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.BRL",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.BTC",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.CAD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.CHF",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.CLP",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.CNY",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.COP",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.CZK",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.DKK",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.EGP",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.ETH",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.EUR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.GBP",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.HKD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.HUF",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.IDR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.ILS",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.INR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.ISK",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.JPY",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.KES",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.KRW",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.KWD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.LKR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.MAD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.MXN",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.MYR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.NGN",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.NOK",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.NONE",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.NZD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.PEN",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.PHP",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.PKR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.PLN",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.QAR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.RON",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.RSD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.RUB",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.SAR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.SEK",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.SGD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.THB",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.TND",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.TRY",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.TWD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.USD",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.USDT",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.VES",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.VND",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "currency.ZAR",
+      "namespace": "currency",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofmonth",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.friday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.monday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.saturday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.sunday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.thursday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.tuesday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dayofweek.wednesday",
+      "namespace": "dayofweek",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.all",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.data_window",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.none",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.pane",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.pine_screener",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.price_scale",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "display.status_line",
+      "namespace": "display",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dividends.future_amount",
+      "namespace": "dividends",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dividends.future_ex_date",
+      "namespace": "dividends",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dividends.future_pay_date",
+      "namespace": "dividends",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dividends.gross",
+      "namespace": "dividends",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "dividends.net",
+      "namespace": "dividends",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.actual",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.estimate",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.future_eps",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.future_period_end_time",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.future_revenue",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.future_time",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "earnings.standardized",
+      "namespace": "earnings",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "extend.both",
+      "namespace": "extend",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "extend.left",
+      "namespace": "extend",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "extend.none",
+      "namespace": "extend",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "extend.right",
+      "namespace": "extend",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "false",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "fill",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "fixnan",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "float",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "font.family_default",
+      "namespace": "font",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "font.family_monospace",
+      "namespace": "font",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.buy_volume",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.delta",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.get_row_by_price",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.poc",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.rows",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.sell_volume",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.total_volume",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.vah",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "footprint.val",
+      "namespace": "footprint",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "format.inherit",
+      "namespace": "format",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "format.mintick",
+      "namespace": "format",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "format.percent",
+      "namespace": "format",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "format.price",
+      "namespace": "format",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "format.volume",
+      "namespace": "format",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "high",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hl2",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hlc3",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hlcc4",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hline",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "visual-positive-integer-sizes"
+      ]
+    },
+    {
+      "member": "hline.style_dashed",
+      "namespace": "hline",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hline.style_dotted",
+      "namespace": "hline",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hline.style_solid",
+      "namespace": "hline",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "hour",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "indicator",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "declaration-counts-and-precision"
+      ]
+    },
+    {
+      "member": "input",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "input-ranges-and-options"
+      ]
+    },
+    {
+      "member": "input.bool",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.color",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.enum",
+      "namespace": "input",
+      "status": "semantic-blocked",
+      "domains": [
+        "input-ranges-and-options"
+      ]
+    },
+    {
+      "member": "input.float",
+      "namespace": "input",
+      "status": "semantic-blocked",
+      "domains": [
+        "input-ranges-and-options"
+      ]
+    },
+    {
+      "member": "input.int",
+      "namespace": "input",
+      "status": "semantic-blocked",
+      "domains": [
+        "input-ranges-and-options"
+      ]
+    },
+    {
+      "member": "input.price",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.session",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.source",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.string",
+      "namespace": "input",
+      "status": "semantic-blocked",
+      "domains": [
+        "input-ranges-and-options"
+      ]
+    },
+    {
+      "member": "input.symbol",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.text_area",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.time",
+      "namespace": "input",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "input.timeframe",
+      "namespace": "input",
+      "status": "semantic-blocked",
+      "domains": [
+        "input-ranges-and-options"
+      ]
+    },
+    {
+      "member": "int",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.all",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.copy",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.delete",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.get_text",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.get_x",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.get_y",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.new",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_color",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_point",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_size",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_style",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_text",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_text_font_family",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_text_formatting",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_textalign",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_textcolor",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_tooltip",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_x",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_xloc",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_xy",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_y",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.set_yloc",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_arrowdown",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_arrowup",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_circle",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_cross",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_diamond",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_flag",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_center",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_down",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_left",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_lower_left",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_lower_right",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_right",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_up",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_upper_left",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_label_upper_right",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_none",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_square",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_text_outline",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_triangledown",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_triangleup",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "label.style_xcross",
+      "namespace": "label",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "last_bar_index",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "last_bar_time",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "library",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "declaration-counts-and-precision"
+      ]
+    },
+    {
+      "member": "line",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.all",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.copy",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.delete",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.get_price",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.get_x1",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.get_x2",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.get_y1",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.get_y2",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.new",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_color",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_extend",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_first_point",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_second_point",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_style",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_width",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_x1",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_x2",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_xloc",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_xy1",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_xy2",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_y1",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.set_y2",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.style_arrow_both",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.style_arrow_left",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.style_arrow_right",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.style_dashed",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.style_dotted",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "line.style_solid",
+      "namespace": "line",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill.all",
+      "namespace": "linefill",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill.delete",
+      "namespace": "linefill",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill.get_line1",
+      "namespace": "linefill",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill.get_line2",
+      "namespace": "linefill",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill.new",
+      "namespace": "linefill",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "linefill.set_color",
+      "namespace": "linefill",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "location.abovebar",
+      "namespace": "location",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "location.absolute",
+      "namespace": "location",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "location.belowbar",
+      "namespace": "location",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "location.bottom",
+      "namespace": "location",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "location.top",
+      "namespace": "location",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "log.error",
+      "namespace": "log",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "log.info",
+      "namespace": "log",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "log.warning",
+      "namespace": "log",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "low",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.clear",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.contains",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.copy",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.get",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.keys",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.new",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.put",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.put_all",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.remove",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.size",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "map.values",
+      "namespace": "map",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.abs",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.acos",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.asin",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.atan",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.avg",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.ceil",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.cos",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.e",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.exp",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.floor",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.log",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.log10",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.max",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.min",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.phi",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.pi",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.pow",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.random",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.round",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.round_to_mintick",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.rphi",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.sign",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.sin",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.sqrt",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.sum",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.tan",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.tanh",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.todegrees",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "math.toradians",
+      "namespace": "math",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.add_col",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.add_row",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.avg",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.col",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.columns",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.concat",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.copy",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.det",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.diff",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.eigenvalues",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.eigenvectors",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.elements_count",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.fill",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.get",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.inv",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_antidiagonal",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_antisymmetric",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_binary",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_diagonal",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_identity",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_square",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_stochastic",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_symmetric",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_triangular",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.is_zero",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.kron",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.max",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.median",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.min",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.mode",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.mult",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.new",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.pinv",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.pow",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.rank",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.remove_col",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.remove_row",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.reshape",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.reverse",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.row",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.rows",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.set",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.sort",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.submatrix",
+      "namespace": "matrix",
+      "status": "runtime-loud",
+      "domains": [
+        "matrix-index-and-shape-domains"
+      ]
+    },
+    {
+      "member": "matrix.sum",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.swap_columns",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.swap_rows",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.trace",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "matrix.transpose",
+      "namespace": "matrix",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "max_bars_back",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "declaration-counts-and-precision"
+      ]
+    },
+    {
+      "member": "minute",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "month",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "na",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "nz",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ohlc4",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "open",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "order.ascending",
+      "namespace": "order",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "order.descending",
+      "namespace": "order",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "visual-positive-integer-sizes"
+      ]
+    },
+    {
+      "member": "plot.linestyle_dashed",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.linestyle_dotted",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.linestyle_solid",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_area",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_areabr",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_circles",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_columns",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_cross",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_histogram",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_line",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_linebr",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_stepline",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_stepline_diamond",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plot.style_steplinebr",
+      "namespace": "plot",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plotarrow",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "visual-positive-integer-sizes"
+      ]
+    },
+    {
+      "member": "plotbar",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plotcandle",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plotchar",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "plotshape",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "polyline.all",
+      "namespace": "polyline",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "polyline.delete",
+      "namespace": "polyline",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "polyline.new",
+      "namespace": "polyline",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.bottom_center",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.bottom_left",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.bottom_right",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.middle_center",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.middle_left",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.middle_right",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.top_center",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.top_left",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "position.top_right",
+      "namespace": "position",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "request.currency_rate",
+      "namespace": "request",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "request.dividends",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.earnings",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.economic",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.financial",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.footprint",
+      "namespace": "request",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "request.quandl",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.security",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.security_lower_tf",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.seed",
+      "namespace": "request",
+      "status": "semantic-blocked",
+      "domains": [
+        "request-calc-bars-and-const-routing"
+      ]
+    },
+    {
+      "member": "request.splits",
+      "namespace": "request",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "runtime.error",
+      "namespace": "runtime",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "scale.left",
+      "namespace": "scale",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "scale.none",
+      "namespace": "scale",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "scale.right",
+      "namespace": "scale",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "second",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.extended",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.isfirstbar",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.isfirstbar_regular",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.islastbar",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.islastbar_regular",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.ismarket",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.ispostmarket",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.ispremarket",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "session.regular",
+      "namespace": "session",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "settlement_as_close.inherit",
+      "namespace": "settlement_as_close",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "settlement_as_close.off",
+      "namespace": "settlement_as_close",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "settlement_as_close.on",
+      "namespace": "settlement_as_close",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.arrowdown",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.arrowup",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.circle",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.cross",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.diamond",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.flag",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.labeldown",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.labelup",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.square",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.triangledown",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.triangleup",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "shape.xcross",
+      "namespace": "shape",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "size.auto",
+      "namespace": "size",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "size.huge",
+      "namespace": "size",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "size.large",
+      "namespace": "size",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "size.normal",
+      "namespace": "size",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "size.small",
+      "namespace": "size",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "size.tiny",
+      "namespace": "size",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "splits.denominator",
+      "namespace": "splits",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "splits.numerator",
+      "namespace": "splits",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.contains",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.endswith",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.format",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.format_time",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.length",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.lower",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.match",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.pos",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.repeat",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.replace",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.replace_all",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.split",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.startswith",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.substring",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.tonumber",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.tostring",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.trim",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "str.upper",
+      "namespace": "str",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "declaration-counts-and-precision",
+        "strategy-declaration-and-order-domains"
+      ]
+    },
+    {
+      "member": "strategy.account_currency",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.avg_losing_trade",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.avg_losing_trade_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.avg_trade",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.avg_trade_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.avg_winning_trade",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.avg_winning_trade_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.cancel",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.cancel_all",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.cash",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.close",
+      "namespace": "strategy",
+      "status": "semantic-blocked",
+      "domains": [
+        "strategy-declaration-and-order-domains"
+      ]
+    },
+    {
+      "member": "strategy.close_all",
+      "namespace": "strategy",
+      "status": "semantic-blocked",
+      "domains": [
+        "strategy-declaration-and-order-domains"
+      ]
+    },
+    {
+      "member": "strategy.closedtrades",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.commission",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.entry_bar_index",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.entry_comment",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.entry_id",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.entry_price",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.entry_time",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.exit_bar_index",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.exit_comment",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.exit_id",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.exit_price",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.exit_time",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.first_index",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.max_drawdown",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.max_drawdown_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.max_runup",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.max_runup_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.profit",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.profit_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.closedtrades.size",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.commission.cash_per_contract",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.commission.cash_per_order",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.commission.percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.convert_to_account",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.convert_to_symbol",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.default_entry_qty",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.direction.all",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.direction.long",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.direction.short",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.entry",
+      "namespace": "strategy",
+      "status": "semantic-blocked",
+      "domains": [
+        "strategy-declaration-and-order-domains"
+      ]
+    },
+    {
+      "member": "strategy.equity",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.eventrades",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.exit",
+      "namespace": "strategy",
+      "status": "semantic-blocked",
+      "domains": [
+        "strategy-declaration-and-order-domains"
+      ]
+    },
+    {
+      "member": "strategy.fixed",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.grossloss",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.grossloss_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.grossprofit",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.grossprofit_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.initial_capital",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.long",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.losstrades",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.margin_liquidation_price",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_contracts_held_all",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_contracts_held_long",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_contracts_held_short",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_drawdown",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_drawdown_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_runup",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.max_runup_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.netprofit",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.netprofit_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.oca.cancel",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.oca.none",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.oca.reduce",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.openprofit",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.openprofit_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.capital_held",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.commission",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.entry_bar_index",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.entry_comment",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.entry_id",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.entry_price",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.entry_time",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.max_drawdown",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.max_drawdown_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.max_runup",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.max_runup_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.profit",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.profit_percent",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.opentrades.size",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.order",
+      "namespace": "strategy",
+      "status": "semantic-blocked",
+      "domains": [
+        "strategy-declaration-and-order-domains"
+      ]
+    },
+    {
+      "member": "strategy.percent_of_equity",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.position_avg_price",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.position_entry_name",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.position_size",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.risk.allow_entry_in",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.risk.max_cons_loss_days",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.risk.max_drawdown",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.risk.max_intraday_filled_orders",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.risk.max_intraday_loss",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.risk.max_position_size",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.short",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "strategy.wintrades",
+      "namespace": "strategy",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "string",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.basecurrency",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.country",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.currency",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.current_contract",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.description",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.employees",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.expiration_date",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.industry",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.isin",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.main_tickerid",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.mincontract",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.minmove",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.mintick",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.pointvalue",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.prefix",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.pricescale",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_buy",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_buy_strong",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_date",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_hold",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_sell",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_sell_strong",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.recommendations_total",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.root",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.sector",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.session",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.shareholders",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.shares_outstanding_float",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.shares_outstanding_total",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.target_price_average",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.target_price_date",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.target_price_estimates",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.target_price_high",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.target_price_low",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.target_price_median",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.ticker",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.tickerid",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.timezone",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.type",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "syminfo.volumetype",
+      "namespace": "syminfo",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.accdist",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.alma",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.atr",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.barssince",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.bb",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.bbw",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.cci",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.change",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.cmo",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.cog",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.correlation",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.cross",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.crossover",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.crossunder",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.cum",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.dev",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.dmi",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.ema",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.falling",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.highest",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.highestbars",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.hma",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.iii",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.kc",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.kcw",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.linreg",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.lowest",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.lowestbars",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.macd",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.max",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.median",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.mfi",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.min",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.mode",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.mom",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.nvi",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.obv",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.percentile_linear_interpolation",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.percentile_nearest_rank",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.percentrank",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.pivot_point_levels",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.pivothigh",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.pivotlow",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.pvi",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.pvt",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.range",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.rci",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.rising",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.rma",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.roc",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.rsi",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.sar",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.sma",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.stdev",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.stoch",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.supertrend",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.swma",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.tr",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.tsi",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.valuewhen",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.variance",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.vwap",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.vwma",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.wad",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ta.wma",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.wpr",
+      "namespace": "ta",
+      "status": "vector-covered-green",
+      "domains": [
+        "ta-positive-integer-lengths"
+      ]
+    },
+    {
+      "member": "ta.wvad",
+      "namespace": "ta",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.all",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_bgcolor",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_height",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text_color",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text_font_family",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text_formatting",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text_halign",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text_size",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_text_valign",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_tooltip",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.cell_set_width",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.clear",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.delete",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.merge_cells",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.new",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.set_bgcolor",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.set_border_color",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.set_border_width",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.set_frame_color",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.set_frame_width",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "table.set_position",
+      "namespace": "table",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.align_bottom",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.align_center",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.align_left",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.align_right",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.align_top",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.format_bold",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.format_italic",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.format_none",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.wrap_auto",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "text.wrap_none",
+      "namespace": "text",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.heikinashi",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.inherit",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.kagi",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.linebreak",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.modify",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.new",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.pointfigure",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.renko",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "ticker.standard",
+      "namespace": "ticker",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "time",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "time-bars-back-window"
+      ]
+    },
+    {
+      "member": "time_close",
+      "namespace": "(global)",
+      "status": "semantic-blocked",
+      "domains": [
+        "time-bars-back-window"
+      ]
+    },
+    {
+      "member": "time_tradingday",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.change",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.from_seconds",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.in_seconds",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isdaily",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isdwm",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isintraday",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isminutes",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.ismonthly",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isseconds",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isticks",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.isweekly",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.main_period",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.multiplier",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timeframe.period",
+      "namespace": "timeframe",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timenow",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "timestamp",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "true",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.buy_volume",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.delta",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.down_price",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.has_buy_imbalance",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.has_sell_imbalance",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.sell_volume",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.total_volume",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "volume_row.up_price",
+      "namespace": "volume_row",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "weekofyear",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "xloc.bar_index",
+      "namespace": "xloc",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "xloc.bar_time",
+      "namespace": "xloc",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "year",
+      "namespace": "(global)",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "yloc.abovebar",
+      "namespace": "yloc",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "yloc.belowbar",
+      "namespace": "yloc",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    },
+    {
+      "member": "yloc.price",
+      "namespace": "yloc",
+      "status": "no-documented-domain-in-audit",
+      "domains": []
+    }
+  ]
+}

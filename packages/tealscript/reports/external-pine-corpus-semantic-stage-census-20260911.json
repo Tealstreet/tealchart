@@ -1,0 +1,2757 @@
+{
+  "stats": {
+    "total": 2000,
+    "parseFailed": 21,
+    "semanticPassed": 1767,
+    "semanticFailed": 212,
+    "corpora": {
+      "v5": {
+        "total": 1000,
+        "parseOk": 990,
+        "semanticOk": 898,
+        "semanticFailed": 92,
+        "parseFailed": 10
+      },
+      "v6": {
+        "total": 1000,
+        "parseOk": 989,
+        "semanticOk": 869,
+        "semanticFailed": 120,
+        "parseFailed": 11
+      }
+    },
+    "ms": 37783
+  },
+  "bucketOrder": [
+    "unresolved import: external library not in host registry",
+    "type/value mismatch",
+    "unknown argument",
+    "duplicate declaration",
+    "unknown identifier",
+    "unresolved import: synthetic user/udt fixture",
+    "trace-required strategy calc_on_order_fills",
+    "version mismatch",
+    "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+    "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+    "type-mismatch: Cannot use udt value as udt array element",
+    "type-mismatch: strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+    "duplicate-argument: Argument 'transp' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+    "invalid-type-template: Invalid array element type 'matrix'; collection template types must include their element templates",
+    "unknown function",
+    "unsupported-feature: strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+    "argument-count: ta.pivothigh() expects at least 2 arguments",
+    "argument-count: ta.vwma() expects at most 2 arguments",
+    "duplicate-argument: Argument 'size' for label.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+    "invalid-type-template: Invalid array element type 'map'; collection template types must include their element templates",
+    "library-export: Exported function getMOSTDirectionHTF request expression cannot depend on exported parameters",
+    "qualifier-mismatch: request.security lookahead must be a const barmerge constant and cannot be computed at runtime",
+    "scope-mismatch: alertcondition() must be called from the global scope; move the call out of the local block",
+    "tuple-shape-mismatch: Tuple declaration expects 2 values but initializer arm returns 3",
+    "type-mismatch: Cannot use float value as int array element",
+    "type-mismatch: input.float defval must be greater than or equal to minval",
+    "type-mismatch: Invalid plot style: plot.style_dashed",
+    "type-mismatch: Invalid table.new position: position.middle. Use one of the position.* constants such as position.top_right or position.bottom_left.",
+    "type-mismatch: Invalid table.set_position position: position.bad. Use one of the position.* constants such as position.top_right or position.bottom_left.",
+    "type-mismatch: str.length source must be a string, got float",
+    "type-mismatch: strategy.exit requires a limit, stop, profit, loss, or trailing stop price",
+    "type-mismatch: ta.highest length must be a number, got string"
+  ],
+  "buckets": {
+    "unresolved import: external library not in host registry": {
+      "count": 40,
+      "corpora": {
+        "v5": 6,
+        "v6": 34
+      },
+      "codes": {
+        "unresolved-import": 40
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0490__casoon-pine-scripts__mtf_trend_alignment.pine",
+          "version": "6",
+          "line": 23,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'WavesUnchained/RTAFramework/1' as alias 'RTA' was not supplied by the host library registry; provide Pine library source for WavesUnchained/RTAFramework version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import WavesUnchained/RTAFramework/1 as RTA"
+        },
+        {
+          "corpus": "v5",
+          "file": "0768__TraderOracle-TradingView__Total-Recall.pine",
+          "version": "5",
+          "line": 35,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'TradersReality/Traders_Reality_Lib/2' as alias 'trLib' was not supplied by the host library registry; provide Pine library source for TradersReality/Traders_Reality_Lib version 2, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import TradersReality/Traders_Reality_Lib/2 as trLib"
+        },
+        {
+          "corpus": "v5",
+          "file": "0784__deepentropy-lightweight-charts-indicators__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine",
+          "version": "5",
+          "line": 6,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'PineCoders/VisibleChart/4' as alias 'VisibleChart' was not supplied by the host library registry; provide Pine library source for PineCoders/VisibleChart version 4, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import PineCoders/VisibleChart/4"
+        },
+        {
+          "corpus": "v5",
+          "file": "0786__Electrified-Trading-Indicators__SuperTrend-Cleaned.pine",
+          "version": "5",
+          "line": 6,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'Electrified/SupportResitanceAndTrend/4' as alias 'SRT' was not supplied by the host library registry; provide Pine library source for Electrified/SupportResitanceAndTrend version 4, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import Electrified/SupportResitanceAndTrend/4 as SRT"
+        },
+        {
+          "corpus": "v5",
+          "file": "0848__unicorpuss-NormalizedIndicators_pine__commodities_rsps.pine",
+          "version": "5",
+          "line": 14,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'Unicorpus/NormalizedIndicators/1' as alias 'L' was not supplied by the host library registry; provide Pine library source for Unicorpus/NormalizedIndicators version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import Unicorpus/NormalizedIndicators/1 as L"
+        },
+        {
+          "corpus": "v5",
+          "file": "0994__g-moe-Trading-Indicators__text-motion-marquee-demo.pine",
+          "version": "5",
+          "line": 10,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'cryptolinx/Motion/8' as alias 'Motion' was not supplied by the host library registry; provide Pine library source for cryptolinx/Motion version 8, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import cryptolinx/Motion/8"
+        },
+        {
+          "corpus": "v6",
+          "file": "0078__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R2_Full_Window_Native_Clock_C2_Census.pine",
+          "version": "6",
+          "line": 4,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'I8th/OVC_C2_CSM_P3R5T2S2_DEV/1' as alias 'c2' was not supplied by the host library registry; provide Pine library source for I8th/OVC_C2_CSM_P3R5T2S2_DEV version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import I8th/OVC_C2_CSM_P3R5T2S2_DEV/1 as c2"
+        },
+        {
+          "corpus": "v6",
+          "file": "0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine",
+          "version": "6",
+          "line": 4,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'I8th/OVC_C2_CSM_P3R5T2S2_DEV/1' as alias 'c2' was not supplied by the host library registry; provide Pine library source for I8th/OVC_C2_CSM_P3R5T2S2_DEV version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import I8th/OVC_C2_CSM_P3R5T2S2_DEV/1 as c2"
+        },
+        {
+          "corpus": "v6",
+          "file": "0094__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__price-and-longitude-angles.pine",
+          "version": "6",
+          "line": 48,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'BlueprintResearch/lib_ephemeris/1' as alias 'eph' was not supplied by the host library registry; provide Pine library source for BlueprintResearch/lib_ephemeris version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import BlueprintResearch/lib_ephemeris/1 as eph"
+        },
+        {
+          "corpus": "v6",
+          "file": "0157__jonathan-nascimento51-tradeCripto2025__support_resistance_logistic_regression_example.pine",
+          "version": "6",
+          "line": 8,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'jonathanmoletta17/LogisticModelLib/3' as alias 'lm' was not supplied by the host library registry; provide Pine library source for jonathanmoletta17/LogisticModelLib version 3, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import jonathanmoletta17/LogisticModelLib/3 as lm"
+        },
+        {
+          "corpus": "v6",
+          "file": "0178__TraderOracle-TradingView__TheBorg.pine",
+          "version": "5",
+          "line": 9,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'chhagansinghmeena/BankNifty_CSM/16' as alias 'CSM' was not supplied by the host library registry; provide Pine library source for chhagansinghmeena/BankNifty_CSM version 16, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import chhagansinghmeena/BankNifty_CSM/16 as CSM"
+        },
+        {
+          "corpus": "v6",
+          "file": "0207__cetio-indicators__wolf.pine",
+          "version": "5",
+          "line": 19,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'mentalRock19315/Slope_TK/1' as alias 'TK' was not supplied by the host library registry; provide Pine library source for mentalRock19315/Slope_TK version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import mentalRock19315/Slope_TK/1 as TK"
+        },
+        {
+          "corpus": "v6",
+          "file": "0211__wanjo-tech-kk__MultiVolatility.pine",
+          "version": "5",
+          "line": 3,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'wanjo-tech/public/6' as alias 'public' was not supplied by the host library registry; provide Pine library source for wanjo-tech/public version 6, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import wanjo-tech/public/6 as public"
+        },
+        {
+          "corpus": "v6",
+          "file": "0213__cetio-indicators__wolfv2.pine",
+          "version": "5",
+          "line": 22,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'mentalRock19315/Slope_TK/1' as alias 'TK' was not supplied by the host library registry; provide Pine library source for mentalRock19315/Slope_TK version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import mentalRock19315/Slope_TK/1 as TK"
+        },
+        {
+          "corpus": "v6",
+          "file": "0232__unicorpuss-NormalizedIndicators_pine__healthcare_rsps.pine",
+          "version": "5",
+          "line": 14,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'Unicorpus/NormalizedIndicators/1' as alias 'L' was not supplied by the host library registry; provide Pine library source for Unicorpus/NormalizedIndicators version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import Unicorpus/NormalizedIndicators/1 as L"
+        },
+        {
+          "corpus": "v6",
+          "file": "0239__btcjon-pine__TTB_Signals.pine",
+          "version": "5",
+          "line": 5,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'thetradingbot/TTB_TableBuilder/1' as alias 'TTBTableBuilder' was not supplied by the host library registry; provide Pine library source for thetradingbot/TTB_TableBuilder version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import thetradingbot/TTB_TableBuilder/1 as TTBTableBuilder"
+        },
+        {
+          "corpus": "v6",
+          "file": "0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine",
+          "version": "5",
+          "line": 15,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'LucF/ta/2' as alias 'LucfTa' was not supplied by the host library registry; provide Pine library source for LucF/ta version 2, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import LucF/ta/2 as LucfTa"
+        },
+        {
+          "corpus": "v6",
+          "file": "0325__deepentropy-lightweight-charts-indicators__FVG-IFVG-ICT-TradingFinder-Inversion-Fair-Value-Gap-Signal.pine",
+          "version": "5",
+          "line": 8,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'TFlab/OrderBlockDrawing_TradingFinder/3' as alias 'Drawing' was not supplied by the host library registry; provide Pine library source for TFlab/OrderBlockDrawing_TradingFinder version 3, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import TFlab/OrderBlockDrawing_TradingFinder/3 as Drawing"
+        },
+        {
+          "corpus": "v6",
+          "file": "0327__TraderOracle-TradingView__TO-Method-1.4.pine",
+          "version": "5",
+          "line": 16,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'jdehorty/KernelFunctions/2' as alias 'kernels' was not supplied by the host library registry; provide Pine library source for jdehorty/KernelFunctions version 2, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import jdehorty/KernelFunctions/2 as kernels"
+        },
+        {
+          "corpus": "v6",
+          "file": "0335__itmakesyousick-HTF-Candles-Pivots__Next.pine",
+          "version": "5",
+          "line": 9,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'boitoki/AwesomeColor/4' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 4, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import boitoki/AwesomeColor/4 as ac"
+        },
+        {
+          "corpus": "v6",
+          "file": "0356__jpsm83-pineScript__machineLearning.pine",
+          "version": "5",
+          "line": 7,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'jdehorty/MLExtensions/2' as alias 'ml' was not supplied by the host library registry; provide Pine library source for jdehorty/MLExtensions version 2, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import jdehorty/MLExtensions/2 as ml"
+        },
+        {
+          "corpus": "v6",
+          "file": "0357__webcrack4-pine-script-combine__V5_14-16-21-27-34-35-36.pine",
+          "version": "5",
+          "line": 8,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'algotraderdev/contrast/1' as alias 'contrast' was not supplied by the host library registry; provide Pine library source for algotraderdev/contrast version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import algotraderdev/contrast/1"
+        },
+        {
+          "corpus": "v6",
+          "file": "0370__renessancek-tradingview_indicators__v-stop.pine",
+          "version": "5",
+          "line": 13,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'PineCoders/Time/1' as alias 'pcTimeLib' was not supplied by the host library registry; provide Pine library source for PineCoders/Time version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import PineCoders/Time/1 as pcTimeLib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0395__deepentropy-oakscriptJS__FVG-IFVG-ICT-TradingFinder-Inversion-Fair-Value-Gap-Signal.pine",
+          "version": "5",
+          "line": 8,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'TFlab/OrderBlockDrawing_TradingFinder/3' as alias 'Drawing' was not supplied by the host library registry; provide Pine library source for TFlab/OrderBlockDrawing_TradingFinder version 3, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import TFlab/OrderBlockDrawing_TradingFinder/3 as Drawing"
+        },
+        {
+          "corpus": "v6",
+          "file": "0397__itmakesyousick-HTF-Candles-Pivots__v14.0.pine",
+          "version": "5",
+          "line": 7,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'boitoki/AwesomeColor/3' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 3, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import boitoki/AwesomeColor/3 as ac"
+        },
+        {
+          "corpus": "v6",
+          "file": "0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine",
+          "version": "5",
+          "line": 8,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'kaigouthro/hsvColor/15' as alias 'kai' was not supplied by the host library registry; provide Pine library source for kaigouthro/hsvColor version 15, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import kaigouthro/hsvColor/15 as kai"
+        },
+        {
+          "corpus": "v6",
+          "file": "0430__turnupdigital-riskmanager__LuxAlgo.pine",
+          "version": "5",
+          "line": 21,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'ayvaliktrading/EyopsTelegram/1' as alias 'LAF' was not supplied by the host library registry; provide Pine library source for ayvaliktrading/EyopsTelegram version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import ayvaliktrading/EyopsTelegram/1 as LAF"
+        },
+        {
+          "corpus": "v6",
+          "file": "0463__theduffman-PineScript__market-sessions.pine",
+          "version": "5",
+          "line": 7,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'boitoki/AwesomeColor/9' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 9, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import boitoki/AwesomeColor/9 as ac"
+        },
+        {
+          "corpus": "v6",
+          "file": "0468__DefinitelyNotNoah-tradingview-indicators__PivotTrendlines.pine",
+          "version": "5",
+          "line": 7,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'HoanGhetti/SimpleTrendlines/4' as alias 'tl' was not supplied by the host library registry; provide Pine library source for HoanGhetti/SimpleTrendlines version 4, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import HoanGhetti/SimpleTrendlines/4 as tl"
+        },
+        {
+          "corpus": "v6",
+          "file": "0485__itmakesyousick-Currency-Strength-Chart__v33.0.pine",
+          "version": "5",
+          "line": 9,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'boitoki/TableColorTheme/1' as alias 'mycolor' was not supplied by the host library registry; provide Pine library source for boitoki/TableColorTheme version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import boitoki/TableColorTheme/1 as mycolor"
+        },
+        {
+          "corpus": "v6",
+          "file": "0530__sistemaon-pinescript__harami.pine",
+          "version": "5",
+          "line": 7,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'AugustoErni/uptrend_downtrend_loopback_candle_identification_lib/3' as alias 'upAndDownTrendsCandleIdentification' was not supplied by the host library registry; provide Pine library source for AugustoErni/uptrend_downtrend_loopback_candle_identification_lib version 3, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import AugustoErni/uptrend_downtrend_loopback_candle_identification_lib/3 as upAndDownTrendsCandleIdentification"
+        },
+        {
+          "corpus": "v6",
+          "file": "0551__Electrified-Trading-Indicators__MACD-Duo.pine",
+          "version": "5",
+          "line": 6,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'Electrified/Momentum/5' as alias 'Momentum' was not supplied by the host library registry; provide Pine library source for Electrified/Momentum version 5, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import Electrified/Momentum/5"
+        },
+        {
+          "corpus": "v6",
+          "file": "0559__btcjon-pine__TTB_MTF_SuperT.pine",
+          "version": "5",
+          "line": 7,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'DarkWaveAlgo/DarkWaveColorThemes/1' as alias 'ColorThemes' was not supplied by the host library registry; provide Pine library source for DarkWaveAlgo/DarkWaveColorThemes version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import DarkWaveAlgo/DarkWaveColorThemes/1 as ColorThemes"
+        },
+        {
+          "corpus": "v6",
+          "file": "0564__unicorpuss-NormalizedIndicators_pine__consumer_discretionary_rsps.pine",
+          "version": "5",
+          "line": 14,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'Unicorpus/NormalizedIndicators/1' as alias 'L' was not supplied by the host library registry; provide Pine library source for Unicorpus/NormalizedIndicators version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import Unicorpus/NormalizedIndicators/1 as L"
+        },
+        {
+          "corpus": "v6",
+          "file": "0604__TraderOracle-TradingView__TO-Method-v2.0.pine",
+          "version": "5",
+          "line": 384,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'jdehorty/KernelFunctions/2' as alias 'kernels' was not supplied by the host library registry; provide Pine library source for jdehorty/KernelFunctions version 2, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import jdehorty/KernelFunctions/2 as kernels"
+        },
+        {
+          "corpus": "v6",
+          "file": "0642__itmakesyousick-Currency-Strength-Chart__v39.0.pine",
+          "version": "5",
+          "line": 10,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'boitoki/AwesomeColor/3' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 3, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import boitoki/AwesomeColor/3 as ac"
+        },
+        {
+          "corpus": "v6",
+          "file": "0649__regalouisei-collect-tradingview__manual-harmonic-patterns-with-interactive-inputs.pine",
+          "version": "5",
+          "line": 18,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'HeWhoMustNotBeNamed/eHarmonicpatternsExtended/6' as alias 'hp' was not supplied by the host library registry; provide Pine library source for HeWhoMustNotBeNamed/eHarmonicpatternsExtended version 6, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import HeWhoMustNotBeNamed/eHarmonicpatternsExtended/6 as hp"
+        },
+        {
+          "corpus": "v6",
+          "file": "0683__helenananaa-pine-compat-runtime__unsupported_imported_method_field_mutation.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt_side_effect/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt_side_effect version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import user/udt_side_effect/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0986__heyphat-piner__1.pine",
+          "version": "6",
+          "line": 5,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'alice/mathx/1' as alias 'mx' was not supplied by the host library registry; provide Pine library source for alice/mathx version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import alice/mathx/1 as mx"
+        },
+        {
+          "corpus": "v6",
+          "file": "0998__jonathan-nascimento51-TradingViewFibo__FiboUtils_library.pine",
+          "version": "6",
+          "line": 3,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'joostraders/FractalUtils/1' as alias 'fractals' was not supplied by the host library registry; provide Pine library source for joostraders/FractalUtils version 1, or remove/change the import",
+          "bucket": "unresolved import: external library not in host registry",
+          "source": "import joostraders/FractalUtils/1 as fractals"
+        }
+      ]
+    },
+    "type/value mismatch": {
+      "count": 36,
+      "corpora": {
+        "v5": 28,
+        "v6": 8
+      },
+      "codes": {
+        "type-mismatch": 30,
+        "qualifier-mismatch": 5,
+        "unknown-assignment-target": 1
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0156__mihakralj-pinescript__betadist.pine",
+          "version": "6",
+          "line": 56,
+          "column": 13,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable mm. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int mm = m / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0157__mihakralj-pinescript__binomdist.pine",
+          "version": "6",
+          "line": 52,
+          "column": 39,
+          "code": "qualifier-mismatch",
+          "message": "Cannot pass series value to simple parameter 'i' for function lnBinom; use an input/simple value or declare a compatible parameter",
+          "bucket": "type/value mismatch",
+          "source": "float lnTerm = lnBinom(n, i) + i * lnP + (n - i) * lnQ"
+        },
+        {
+          "corpus": "v5",
+          "file": "0164__mihakralj-pinescript__fdist.pine",
+          "version": "6",
+          "line": 56,
+          "column": 13,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable mm. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int mm = m / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0165__mihakralj-pinescript__fft.pine",
+          "version": "6",
+          "line": 15,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable x. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "x := x / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0166__mihakralj-pinescript__gammadist.pine",
+          "version": "6",
+          "line": 44,
+          "column": 49,
+          "code": "qualifier-mismatch",
+          "message": "Cannot pass series value to simple parameter 'z' for function lnGamma; use an input/simple value or declare a compatible parameter",
+          "bucket": "type/value mismatch",
+          "source": "float lnPfx = a * math.log(x) - x - lnGamma(a)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0171__mihakralj-pinescript__ifft.pine",
+          "version": "6",
+          "line": 19,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable halfN. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int halfN = N / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0185__mihakralj-pinescript__poissondist.pine",
+          "version": "6",
+          "line": 44,
+          "column": 49,
+          "code": "qualifier-mismatch",
+          "message": "Cannot pass series value to simple parameter 'z' for function lnGamma; use an input/simple value or declare a compatible parameter",
+          "bucket": "type/value mismatch",
+          "source": "float lnPfx = a * math.log(x) - x - lnGamma(a)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0280__mihakralj-pinescript__trim.pine",
+          "version": "6",
+          "line": 22,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable trimCount. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "trimCount := (period - 1) / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0283__mihakralj-pinescript__wins.pine",
+          "version": "6",
+          "line": 20,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable winCount. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "winCount := (period - 1) / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0297__mihakralj-pinescript__hend.pine",
+          "version": "6",
+          "line": 39,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable half. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int half = (period - 1) / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0304__mihakralj-pinescript__nyqma.pine",
+          "version": "6",
+          "line": 21,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable n2. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int n2 = math.min(math.max(nyquist_period, 1), period / 2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+          "version": "6",
+          "line": 269,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "microPivotLen := math.max(2, pivotLen / 3)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+          "version": "6",
+          "line": 343,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "microPivotLen := math.max(2, pivotLen / 3)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0501__casoon-pine-scripts__trade_permission_engine_v1.pine",
+          "version": "6",
+          "line": 311,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "microPivotLen := math.max(2, pivotLen / 3)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0514__casoon-pine-scripts__market_tradability_engine.pine",
+          "version": "6",
+          "line": 548,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable shortWindow. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int shortWindow = math.max(3, qualityLength / 4)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0515__casoon-pine-scripts__market_tradability_engine_v2.pine",
+          "version": "6",
+          "line": 885,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable shortWindow. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int shortWindow = math.max(3, qualityLength / 4)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0535__casoon-pine-scripts__vwap_cross_visuals.pine",
+          "version": "6",
+          "line": 1663,
+          "column": 100,
+          "code": "qualifier-mismatch",
+          "message": "Cannot pass series value to simple parameter 'windowLength' for function calculateProfile; use an input/simple value or declare a compatible parameter",
+          "bucket": "type/value mismatch",
+          "source": "windowHigh, windowLow, binVolumes, binPrices] = calculateProfile(adaptiveConfig, windowStart, windowLength)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine",
+          "version": "6",
+          "line": 1107,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable cx. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int cx = xL + rotW / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0566__casoon-pine-scripts__relative_leg_efficiency.pine",
+          "version": "6",
+          "line": 255,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable mid. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int mid = count / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0629__knectardev-pine_scripts__rsi-divergence-indicator_v1.3.15.pine",
+          "version": "6",
+          "line": 46,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign int value to bool variable timeChange",
+          "bucket": "type/value mismatch",
+          "source": "bool timeChange = ta.change(time)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0650__knectardev-pine_scripts__v2.5.6_v2.5.9.pine",
+          "version": "6",
+          "line": 115,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to bool variable gapPoints",
+          "bucket": "type/value mismatch",
+          "source": "bool gapPoints = not na(rthOpenCurrent) and not na(rthClosePrev) ?"
+        },
+        {
+          "corpus": "v5",
+          "file": "0651__knectardev-pine_scripts__v2.5.6_v2.5.10.pine",
+          "version": "6",
+          "line": 115,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to bool variable gapPoints",
+          "bucket": "type/value mismatch",
+          "source": "bool gapPoints = not na(rthOpenCurrent) and not na(rthClosePrev) ?"
+        },
+        {
+          "corpus": "v5",
+          "file": "0652__knectardev-pine_scripts__v2.5.6_v2.5.11.pine",
+          "version": "6",
+          "line": 116,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to bool variable gapPoints",
+          "bucket": "type/value mismatch",
+          "source": "bool gapPoints = not na(rthOpenCurrent) and not na(rthClosePrev) ?"
+        },
+        {
+          "corpus": "v5",
+          "file": "0653__knectardev-pine_scripts__v2.5.6_v2.5.12.pine",
+          "version": "6",
+          "line": 117,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to bool variable gapPoints",
+          "bucket": "type/value mismatch",
+          "source": "bool gapPoints = not na(rthOpenCurrent) and not na(rthClosePrev) ?"
+        },
+        {
+          "corpus": "v5",
+          "file": "0733__mihakralj-QuanTAlib__trim.pine",
+          "version": "6",
+          "line": 24,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable trimCount. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "trimCount := (period - 1) / 2"
+        },
+        {
+          "corpus": "v5",
+          "file": "0783__deepentropy-lightweight-charts-indicators__Order-Blocks-with-signals.pine",
+          "version": "5",
+          "line": 8,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable sens. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "sens /= 100"
+        },
+        {
+          "corpus": "v5",
+          "file": "0949__g-moe-Trading-Indicators__xact-technical-analysis.pine",
+          "version": "5",
+          "line": 362,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable pDir. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "pDir := pDir % 2 == 0 ? pDir / 2 : pDir"
+        },
+        {
+          "corpus": "v5",
+          "file": "0997__grantj-re3-LingoLog__HashFunction.pine",
+          "version": "5",
+          "line": 16,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable _iValue. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "_iValue /= 64"
+        },
+        {
+          "corpus": "v6",
+          "file": "0185__TraderOracle-TradingView__Volume-Imbalances.pine",
+          "version": "5",
+          "line": 26,
+          "column": 9,
+          "code": "unknown-assignment-target",
+          "message": "Cannot assign to undeclared identifier: gapRed",
+          "bucket": "type/value mismatch",
+          "source": "gapRed := true"
+        },
+        {
+          "corpus": "v6",
+          "file": "0194__gorx1-TradingView__quick_scan_for_drift.pine",
+          "version": "5",
+          "line": 34,
+          "column": 22,
+          "code": "qualifier-mismatch",
+          "message": "Cannot pass series value to simple parameter 'len' for function qsfd; use an input/simple value or declare a compatible parameter",
+          "bucket": "type/value mismatch",
+          "source": "drift = nz(qsfd(src, len, type_), 1)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0243__middlechild0-gamechanger__ict_ts.pine",
+          "version": "5",
+          "line": 113,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable htfMins. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int htfMins = timeframe.in_seconds(higherTimeframe) / 60"
+        },
+        {
+          "corpus": "v6",
+          "file": "0288__klevler-tradingview_indicators__MarketSmith.pine",
+          "version": "5",
+          "line": 573,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable i_baseDepth. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "i_baseDepth  := i_baseDepth  /100"
+        },
+        {
+          "corpus": "v6",
+          "file": "0418__tthanhvu002sgu-ea__the-probality-cone.pine",
+          "version": "5",
+          "line": 71,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable active_vol_len. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int active_vol_len   = is_growth_regime ? fast_len / 2   : slow_len / 2"
+        },
+        {
+          "corpus": "v6",
+          "file": "0469__g-moe-Trading-Indicators__csw-technical-analysis-beta.pine",
+          "version": "5",
+          "line": 347,
+          "column": 9,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable pDir. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "pDir := pDir % 2 == 0 ? pDir / 2 : pDir"
+        },
+        {
+          "corpus": "v6",
+          "file": "0650__regalouisei-collect-tradingview__volume-analysis-heatmap-and-volume-profile.pine",
+          "version": "5",
+          "line": 60,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable tfis. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "var int tfis = timeframe.in_seconds(timeframe.period) / 60"
+        },
+        {
+          "corpus": "v6",
+          "file": "0914__lumduan-tradingview_tfex_usdthb__s50_tfex_strategy_copy.pine",
+          "version": "6",
+          "line": 26,
+          "column": 1,
+          "code": "type-mismatch",
+          "message": "Cannot assign float value to int variable riskPercent. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+          "bucket": "type/value mismatch",
+          "source": "int riskPercent = input(1, title=\"Risk % per Trade\") / 100"
+        }
+      ]
+    },
+    "unknown argument": {
+      "count": 28,
+      "corpora": {
+        "v5": 23,
+        "v6": 5
+      },
+      "codes": {
+        "unknown-argument": 28
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0070__mihakralj-pinescript__mae.pine",
+          "version": "6",
+          "line": 43,
+          "column": 66,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(error, \"MAE\", color.new(color.blue, 60, color=color.yellow, linewidth=2), linewidth = 2, style = plot.style_area)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0087__mihakralj-pinescript__rsquared.pine",
+          "version": "6",
+          "line": 73,
+          "column": 64,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(score, \"R²\", color.new(color.red, 60, color=color.yellow, linewidth=2), linewidth = 2, style = plot.style_area)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0257__mihakralj-pinescript__cummean.pine",
+          "version": "6",
+          "line": 26,
+          "column": 83,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(cummean_value, \"CumMean\", color=color.new(color.blue, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0263__mihakralj-pinescript__iqr.pine",
+          "version": "6",
+          "line": 65,
+          "column": 83,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(iqr_value, title=\"IQR\", color=color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0264__mihakralj-pinescript__jb.pine",
+          "version": "6",
+          "line": 72,
+          "column": 92,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(jb_value, \"Jarque-Bera Statistic\", color=color.new(color.teal, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0265__mihakralj-pinescript__kendall.pine",
+          "version": "6",
+          "line": 61,
+          "column": 90,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(kendall_value, \"Kendall's Tau\", color=color.new(color.yellow,0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0269__mihakralj-pinescript__median.pine",
+          "version": "6",
+          "line": 41,
+          "column": 83,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(median_value, \"Median\", color=color.new(color.orange, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0270__mihakralj-pinescript__mode.pine",
+          "version": "6",
+          "line": 43,
+          "column": 78,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(mode_value, \"Mode\", color=color.new(color.green, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0271__mihakralj-pinescript__percentile.pine",
+          "version": "6",
+          "line": 59,
+          "column": 91,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(percentile_value, \"Percentile\", color=color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0273__mihakralj-pinescript__quantile.pine",
+          "version": "6",
+          "line": 54,
+          "column": 93,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(quantile_value, title=\"Quantile\", color=color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0275__mihakralj-pinescript__spearman.pine",
+          "version": "6",
+          "line": 123,
+          "column": 93,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(spearman_value, \"Spearman's Rho\", color=color.new(color.orange, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0279__mihakralj-pinescript__theil.pine",
+          "version": "6",
+          "line": 47,
+          "column": 89,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(theil_value, \"Theil T Index\", color=color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0381__mihakralj-pinescript__vr.pine",
+          "version": "6",
+          "line": 47,
+          "column": 80,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(vrValue, title=\"VR\", color=color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0382__mihakralj-pinescript__yzv.pine",
+          "version": "6",
+          "line": 44,
+          "column": 82,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(yzvValue, title=\"YZV\", color=color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0384__mihakralj-pinescript__adosc.pine",
+          "version": "6",
+          "line": 39,
+          "column": 67,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(osc, \"ADOSC\", color.new(color.yellow, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0640__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.0.pine",
+          "version": "5",
+          "line": 20,
+          "column": 20,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "initialCapital = 50000,"
+        },
+        {
+          "corpus": "v5",
+          "file": "0641__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.1.pine",
+          "version": "5",
+          "line": 20,
+          "column": 20,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "initialCapital = 50000,"
+        },
+        {
+          "corpus": "v5",
+          "file": "0642__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.4_exec-gap.pine",
+          "version": "5",
+          "line": 20,
+          "column": 20,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "initialCapital = 50000,"
+        },
+        {
+          "corpus": "v5",
+          "file": "0648__knectardev-pine_scripts__v2.5.6_v2.5.7.pine",
+          "version": "6",
+          "line": 18,
+          "column": 87,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "\"ES Professional Fade v2.5.4 (Execution Gap Modeled)\", overlay=true, initialCapital=50000, defaultQtyValue=1, commissionType=strategy.commission.cash_per_contract, commissionValue=2.01)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0654__knectardev-pine_scripts__momentum-breakout-strategy_v1.0.0.pine",
+          "version": "5",
+          "line": 17,
+          "column": 71,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "strategy(\"Momentum Breakout v1.0.0\", overlay = true, initialCapital = 25000)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0655__knectardev-pine_scripts__momentum-breakout-strategy_v1.1.0_volume-filter.pine",
+          "version": "5",
+          "line": 17,
+          "column": 71,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "strategy(\"Momentum Breakout v1.1.0\", overlay = true, initialCapital = 25000)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0656__knectardev-pine_scripts__momentum-breakout-strategy.pine",
+          "version": "5",
+          "line": 16,
+          "column": 71,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'initialCapital' for strategy(); Pine uses snake_case here, so use 'initial_capital'",
+          "bucket": "unknown argument",
+          "source": "strategy(\"Momentum Breakout v1.2.0\", overlay = true, initialCapital = 25000)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0740__mihakralj-QuanTAlib__median.pine",
+          "version": "6",
+          "line": 41,
+          "column": 83,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'linewidth' for color.new(); linewidth belongs on plot(), hline(), or drawing calls, not inside a color.new(...) color value",
+          "bucket": "unknown argument",
+          "source": "plot(median_value, \"Median\", color=color.new(color.orange, 0, color=color.yellow, linewidth=2), linewidth=2)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0117__mushroom-men-Trading-clean-litter__wave-trend-j-oscillator.pine",
+          "version": "6",
+          "line": 66,
+          "column": 78,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'alpha' for hline()",
+          "bucket": "unknown argument",
+          "source": "hline(60, title=\"Overbought\", color=color.red, linestyle=hline.style_dotted, alpha=50)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0281__fercreek-vigil__Zenith_Suite_V12.pine",
+          "version": "5",
+          "line": 2,
+          "column": 80,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'margin_top' for indicator()",
+          "bucket": "unknown argument",
+          "source": "indicator(\"Zenith Trading Suite V12 (Institutional)\", overlay=true, margin_top=10)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0631__Alaamo7-pine-script-indicators__046-swing-trader-template-smart-egx-v2-3.pine",
+          "version": "5",
+          "line": 74,
+          "column": 191,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'bgcolor' for label.new()",
+          "bucket": "unknown argument",
+          "source": "bgcolor=color.gray"
+        },
+        {
+          "corpus": "v6",
+          "file": "0816__Young666YHF-xauusd_backtest__dollar_trader_martingale_adx.pine",
+          "version": "6",
+          "line": 20,
+          "column": 24,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'contract_size' for strategy()",
+          "bucket": "unknown argument",
+          "source": "contract_size=100,     // 【关键】1手 = 100盎司，与Python一致"
+        },
+        {
+          "corpus": "v6",
+          "file": "0931__helenananaa-pine-compat-runtime__unsupported_strategy_entry_when_v6.pine",
+          "version": "6",
+          "line": 4,
+          "column": 47,
+          "code": "unknown-argument",
+          "message": "Unknown argument 'when' for strategy.entry()",
+          "bucket": "unknown argument",
+          "source": "strategy.entry(\"L\", strategy.long, qty=1, when=true)"
+        }
+      ]
+    },
+    "duplicate declaration": {
+      "count": 17,
+      "corpora": {
+        "v5": 8,
+        "v6": 9
+      },
+      "codes": {
+        "duplicate-symbol": 17
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0053__mihakralj-pinescript__dmx.pine",
+          "version": "6",
+          "line": 92,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: dmx; first declared on line 9. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "dmx = dmx(i_period)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0066__mihakralj-pinescript__dirty.pine",
+          "version": "6",
+          "line": 26,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: dirty; first declared on line 10. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "dirty = dirty(source, interval, gap_size)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0249__mihakralj-pinescript__psar.pine",
+          "version": "6",
+          "line": 70,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: psar; first declared on line 12. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "psar = psar(i_af_start, i_af_increment, i_af_max)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0371__mihakralj-pinescript__jvolty.pine",
+          "version": "6",
+          "line": 47,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: jvolty; first declared on line 11. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "jvolty= jvolty(i_source, i_period)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0372__mihakralj-pinescript__jvoltyn.pine",
+          "version": "6",
+          "line": 48,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: jvoltyn; first declared on line 11. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "jvoltyn= jvoltyn(i_source, i_period)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0484__casoon-pine-scripts__candle_pressure_response_jma.pine",
+          "version": "6",
+          "line": 225,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: cBull; first declared on line 122. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "cBull = color.new(color.lime, 0)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0780__deepentropy-lightweight-charts-indicators__Custom-Pattern-Detection.pine",
+          "version": "5",
+          "line": 105,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: t; first declared on line 11. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "t = time[pivot_lb]"
+        },
+        {
+          "corpus": "v5",
+          "file": "0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine",
+          "version": "5",
+          "line": 871,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: lineStyle; first declared on line 936. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "lineStyle        = input.string('Dotted', 'Line Style + Width', ['Solid', 'Dashed', 'Dotted'], inline='l', group='Appearance')"
+        },
+        {
+          "corpus": "v6",
+          "file": "0061__mihakralj-QuanTAlib__sar.pine",
+          "version": "6",
+          "line": 70,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: sar; first declared on line 12. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "sar = sar(i_af_start, i_af_increment, i_af_max)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0199__dollarkillerx-statistics_demo__macd.pine",
+          "version": "5",
+          "line": 28,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: up; first declared on line 9. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "up = ta.crossover(fastMA, slowMA) // 記錄buy點"
+        },
+        {
+          "corpus": "v6",
+          "file": "0297__middlechild0-gamechanger__advanced_smc.pine",
+          "version": "5",
+          "line": 1530,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: lineStyle; first declared on line 479. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "lineStyle = input.string(\"....\", \"Line Style\", [\"____\", \"----\", \"....\"], group = \"Style\", display = display.none)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0426__regalouisei-collect-tradingview__probability-cones.pine",
+          "version": "5",
+          "line": 171,
+          "column": 6,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: coneValues; first declared on line 214. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "type coneValues"
+        },
+        {
+          "corpus": "v6",
+          "file": "0453__deepentropy-lightweight-charts-indicators__R_R-Trading-System-Framework.pine",
+          "version": "5",
+          "line": 127,
+          "column": 20,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: row; first declared on line 138. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "var int[]          row          = array.from(0)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0483__regalouisei-collect-tradingview__technical-ratings.pine",
+          "version": "5",
+          "line": 249,
+          "column": 7,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: signalColor; first declared on line 149. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "color signalColor  = signalColor(gradientLvl)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0537__deepentropy-oakscriptJS__R_R-Trading-System-Framework.pine",
+          "version": "5",
+          "line": 127,
+          "column": 20,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: row; first declared on line 138. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "var int[]          row          = array.from(0)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE",
+          "version": "5",
+          "line": 131,
+          "column": 2,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: supertrend; first declared on line 103. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "[supertrend, direction] = supertrend(close, sigsensiviti*2, 11)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0970__PirAhmedShah-learning-archive__t.pine",
+          "version": "6",
+          "line": 12,
+          "column": 1,
+          "code": "duplicate-symbol",
+          "message": "Duplicate declaration: a; first declared on line 5. Rename one declaration or remove the duplicate.",
+          "bucket": "duplicate declaration",
+          "source": "a = input.int(3, title=\"Key Value. 'This changes the sensitivity'\")"
+        }
+      ]
+    },
+    "unknown identifier": {
+      "count": 17,
+      "corpora": {
+        "v5": 5,
+        "v6": 12
+      },
+      "codes": {
+        "unknown-identifier": 17
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0489__casoon-pine-scripts__flow_bias.pine",
+          "version": "6",
+          "line": 160,
+          "column": 21,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: rsiLen",
+          "bucket": "unknown identifier",
+          "source": "rsi = ta.rsi(close, rsiLen)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0495__casoon-pine-scripts__wave_navigator.pine",
+          "version": "6",
+          "line": 1255,
+          "column": 34,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: pivotsToKeep",
+          "bucket": "unknown identifier",
+          "source": "while array.size(pivPrice) > pivotsToKeep"
+        },
+        {
+          "corpus": "v5",
+          "file": "0581__casoon-pine-scripts__vein_reversal_zones.pine",
+          "version": "6",
+          "line": 311,
+          "column": 84,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: relVol",
+          "bucket": "unknown identifier",
+          "source": "float conflScoreLong = (structureLong ? 3.0 : 0.0) + (momentumLong ? 2.0 : 0.0) + (relVol > 1.2 ? 2.0 : 0.0) + (emaLong ? 2.0 : 0.0) + (stLong ? 1.0 : 0.0)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0772__milocaetano-quantick__delta_histogram.pine",
+          "version": "5",
+          "line": 3,
+          "column": 6,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: delta",
+          "bucket": "unknown identifier",
+          "source": "plot(delta, title=\"delta\", style=plot.style_histogram, color=color.aqua)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0773__suyons-tradingview-indicators__02-rsi-signal.pine",
+          "version": "5",
+          "line": 44,
+          "column": 19,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: buy",
+          "bucket": "unknown identifier",
+          "source": "buy_series = not (buy[1] or buy[2] or buy[3] or buy[4] or buy[5])"
+        },
+        {
+          "corpus": "v6",
+          "file": "0181__TraderOracle-TradingView__RSI-Cloud.pine",
+          "version": "5",
+          "line": 14,
+          "column": 13,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: src",
+          "bucket": "unknown identifier",
+          "source": "ma = ta.sma(src, 20)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0193__jawauntb-trading-scripts__option-price-estimator.pine",
+          "version": "5",
+          "line": 20,
+          "column": 19,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: pi",
+          "bucket": "unknown identifier",
+          "source": "(1 / sqrt(2 * pi)) * exp(-x * x / 2)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0332__nathanssantos-marketmind__triple-ema-confluence.pine",
+          "version": "5",
+          "line": 23,
+          "column": 25,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: emaFast",
+          "bucket": "unknown identifier",
+          "source": "emaFast = ta.ema(close, emaFast)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0336__munlit-FxMarketSession-MarketStructureOsc-ZeroLag-Vidya-AiMfi-Adx-xTsi-xMtPanel__ZeroLag-Trend-Levels.pine",
+          "version": "5",
+          "line": 22,
+          "column": 22,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: _co_gbl_up",
+          "bucket": "unknown identifier",
+          "source": "co_zeLag_buy\t\t\t\t\t\t\t= _co_gbl_up"
+        },
+        {
+          "corpus": "v6",
+          "file": "0343__luckyJeffy-pinescript-harmonic-detector__harmonic_patterns.pine",
+          "version": "5",
+          "line": 337,
+          "column": 8,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: error_log_level",
+          "bucket": "unknown identifier",
+          "source": "if error_log_level == \"Disabled\""
+        },
+        {
+          "corpus": "v6",
+          "file": "0422__Hugs-4-Bugs-Trading-Indicator__Candle-Percent-Volatility-Alorse-.pine",
+          "version": "5",
+          "line": 14,
+          "column": 26,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: cleanTicker",
+          "bucket": "unknown identifier",
+          "source": "alert('{\"text\": \"' + cleanTicker + ': Cambió ' + timeframe.period + ' minutos\"}', alert.freq_once_per_bar_close)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0486__alboogycOdR-dev-projects__institutional_crt_frameworkv8.pine",
+          "version": "5",
+          "line": 643,
+          "column": 5,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: swept",
+          "bucket": "unknown identifier",
+          "source": "swept"
+        },
+        {
+          "corpus": "v6",
+          "file": "0621__munlit-FxMarketSession-MarketStructureOsc-ZeroLag-Vidya-AiMfi-Adx-xTsi-xMtPanel__Volumatic-Vidya.pine",
+          "version": "5",
+          "line": 21,
+          "column": 27,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: _co_gbl_up",
+          "bucket": "unknown identifier",
+          "source": "col_vVidya_uptrend\t\t\t\t\t\t= _co_gbl_up"
+        },
+        {
+          "corpus": "v6",
+          "file": "0728__lumduan-tradingview_tfex_usdthb__s50_scalping.pine",
+          "version": "6",
+          "line": 30,
+          "column": 1,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: macd_line",
+          "bucket": "unknown identifier",
+          "source": "macd_line, signal_line, _ = ta.macd(close, 12, 26, 9)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0742__penguin72487-tradebot__HullTakerQ.pine",
+          "version": "6",
+          "line": 44,
+          "column": 6,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: positionValue",
+          "bucket": "unknown identifier",
+          "source": "plot(positionValue , color=color.new(color.orange, 0), title=\"positionValue\")"
+        },
+        {
+          "corpus": "v6",
+          "file": "0908__raybird-pine-trading-strategies__tn_fakeout_sovereign_v6.pine",
+          "version": "6",
+          "line": 114,
+          "column": 97,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: day",
+          "bucket": "unknown identifier",
+          "source": "table.cell(board, 1, 4, str.tostring(year) + \"/\" + str.tostring(month) + \"/\" + str.tostring(day), bgcolor=color.gray)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0977__Jarvis-jpg-flask-trading-bot__jarvis_trading_strategy_LIVE.pine",
+          "version": "6",
+          "line": 246,
+          "column": 4,
+          "code": "unknown-identifier",
+          "message": "Unknown identifier: dayofyear",
+          "bucket": "unknown identifier",
+          "source": "if dayofyear != last_trade_day"
+        }
+      ]
+    },
+    "unresolved import: synthetic user/udt fixture": {
+      "count": 13,
+      "corpora": {
+        "v5": 4,
+        "v6": 9
+      },
+      "codes": {
+        "unresolved-import": 13
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0821__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_set_local_target_mixed_identity.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v5",
+          "file": "0822__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_indexof_local_target_method_mixed_identity.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v5",
+          "file": "0907__helenananaa-pine-compat-runtime__import_udt_array_history.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v5",
+          "file": "0934__helenananaa-pine-compat-runtime__history_dynamic_negative_offset_import_udt_field_udf_nested_return.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0172__helenananaa-pine-compat-runtime__supported_imported_udt_array_indexof_simple_return_qualifier.pine",
+          "version": "6",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0173__helenananaa-pine-compat-runtime__supported_imported_udt_array_element_method_return_qualifier.pine",
+          "version": "6",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0319__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_lastindexof_method_mixed_identity.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0448__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_push_local_target_mixed_identity.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0449__helenananaa-pine-compat-runtime__dynamic_history_series_max_bars_back_pure_user_method_imported_nested_receiver_alias_field_miss.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0523__helenananaa-pine-compat-runtime__import_udt_method_local_field_mutation.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0524__helenananaa-pine-compat-runtime__dynamic_history_series_max_bars_back_pure_user_method_imported_nested_receiver_field_alias_miss.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0684__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_sort_indices_unknown_field.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        },
+        {
+          "corpus": "v6",
+          "file": "0685__helenananaa-pine-compat-runtime__dynamic_history_series_max_bars_back_nested_pure_udf_imported_named_direct_nested_udt_arg_expr_miss.pine",
+          "version": "5",
+          "line": 2,
+          "column": 1,
+          "code": "unresolved-import",
+          "message": "Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import",
+          "bucket": "unresolved import: synthetic user/udt fixture",
+          "source": "import user/udt/1 as lib"
+        }
+      ]
+    },
+    "trace-required strategy calc_on_order_fills": {
+      "count": 10,
+      "corpora": {
+        "v5": 3,
+        "v6": 7
+      },
+      "codes": {
+        "unsupported-feature": 10
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+          "version": "6",
+          "line": 24,
+          "column": 28,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills = true,"
+        },
+        {
+          "corpus": "v5",
+          "file": "0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine",
+          "version": "6",
+          "line": 23,
+          "column": 28,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills = true,"
+        },
+        {
+          "corpus": "v5",
+          "file": "0611__casoon-pine-scripts__wavetrend_v4_strategy.pine",
+          "version": "6",
+          "line": 24,
+          "column": 28,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills = true,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0712__WaleA-Dev-wale-pinescript-engine__new.pine",
+          "version": "6",
+          "line": 8,
+          "column": 26,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills=true,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0718__Chioma-Nwankwo-Works__Pure_Price_Action.pine",
+          "version": "6",
+          "line": 10,
+          "column": 28,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills = true,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0746__iamrichardD-tradingview__strategy-v1.pine",
+          "version": "6",
+          "line": 19,
+          "column": 67,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "slippage=1, calc_on_every_tick=true, calc_on_order_fills=true,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0783__mush-dna-pinescript-vscode-extension__mysample.v6.pine",
+          "version": "6",
+          "line": 2,
+          "column": 97,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "strategy(\"TradingAlpha • Point-Clip Strategy v1.2 (Pine v6)\", overlay=true, calc_on_order_fills=true, calc_on_every_tick=false, pyramiding=0, initial_capital=10000, commission_type=strategy.commission.percent, commission_value=0.01)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0894__wesso80-marketscannerpros__MSP_Day_Trader_v2_AL.pine",
+          "version": "6",
+          "line": 21,
+          "column": 26,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills=true,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0897__vinay-veerappa-tvDownloadOHLC__orb_v6_tanja_trend.pine",
+          "version": "6",
+          "line": 9,
+          "column": 31,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills=true, use_bar_magnifier=true)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0966__eddoonn-Wickless-candle__Wickless_Reversal_Strategy_v1_0.pine",
+          "version": "6",
+          "line": 15,
+          "column": 28,
+          "code": "unsupported-feature",
+          "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+          "bucket": "trace-required strategy calc_on_order_fills",
+          "source": "calc_on_order_fills = true"
+        }
+      ]
+    },
+    "version mismatch": {
+      "count": 8,
+      "corpora": {
+        "v5": 5,
+        "v6": 3
+      },
+      "codes": {
+        "implicit-numeric-bool": 7,
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0628__knectardev-pine_scripts__rsi-divergence-indicator_v1.3.14.pine",
+          "version": "6",
+          "line": 55,
+          "column": 4,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if ta.change(time) or na(pivotHighPrice)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0630__knectardev-pine_scripts__rsi-divergence-indicator_v1.3.17.pine",
+          "version": "6",
+          "line": 53,
+          "column": 4,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if timeChange or naPivotHighPrice"
+        },
+        {
+          "corpus": "v5",
+          "file": "0631__knectardev-pine_scripts__rsi-divergence-indicator_v1.3.18.pine",
+          "version": "6",
+          "line": 53,
+          "column": 4,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if timeChange or naPivotHighPrice"
+        },
+        {
+          "corpus": "v5",
+          "file": "0632__knectardev-pine_scripts__rsi-divergence-indicator_v1.3.19.pine",
+          "version": "6",
+          "line": 65,
+          "column": 4,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if timeChange or naPivotHighPrice"
+        },
+        {
+          "corpus": "v5",
+          "file": "0635__knectardev-pine_scripts__rsi-divergence-indicator.pine",
+          "version": "6",
+          "line": 55,
+          "column": 4,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if ta.change(time) or na(pivotHighPrice)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0077__danielbodnar-skills__chart-visualization.pine",
+          "version": "6",
+          "line": 125,
+          "column": 29,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if timeframe.isintraday and ta.change(time(\"1D\"))"
+        },
+        {
+          "corpus": "v6",
+          "file": "0087__folknor-pine-tools__INV184-format-tail-poisoned-call.pine",
+          "version": "6",
+          "line": 13,
+          "column": 38,
+          "code": "type-mismatch",
+          "message": "na x cannot be a boolean because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).",
+          "bucket": "version mismatch",
+          "source": "plot(str.length(str.format(\"{0}\", na(b))))"
+        },
+        {
+          "corpus": "v6",
+          "file": "0938__raybird-pine-trading-strategies__TnSovereignVWAPV6.pine",
+          "version": "6",
+          "line": 28,
+          "column": 4,
+          "code": "implicit-numeric-bool",
+          "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+          "bucket": "version mismatch",
+          "source": "if is_new_session"
+        }
+      ]
+    },
+    "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.": {
+      "count": 7,
+      "corpora": {
+        "v5": 7
+      },
+      "codes": {
+        "duplicate-argument": 7
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0158__mihakralj-pinescript__change.pine",
+          "version": "6",
+          "line": 30,
+          "column": 38,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(result, \"Change %\", color.blue, color=color.yellow, linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0176__mihakralj-pinescript__log.pine",
+          "version": "6",
+          "line": 27,
+          "column": 66,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(transformedSource, \"Log Transformation\", color=color.green, color=color.yellow, linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0178__mihakralj-pinescript__logtrans.pine",
+          "version": "6",
+          "line": 27,
+          "column": 66,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(transformedSource, \"Log Transformation\", color=color.green, color=color.yellow, linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0254__mihakralj-pinescript__cointegration.pine",
+          "version": "6",
+          "line": 125,
+          "column": 58,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(coint_stat, \"Cointegration ADF Stat\", color.yellow, color=color.yellow, linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0258__mihakralj-pinescript__entropy.pine",
+          "version": "6",
+          "line": 67,
+          "column": 49,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(entropyValue, \"Entropy\", color=color.blue, color=color.yellow, linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0725__mihakralj-QuanTAlib__cointegration.pine",
+          "version": "6",
+          "line": 125,
+          "column": 58,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(coint_stat, \"Cointegration ADF Stat\", color.yellow, color=color.yellow, linewidth=2)"
+        },
+        {
+          "corpus": "v5",
+          "file": "0938__Leci37-tuisku_Web_selling__WklfMTVNaW5fMVdBVnR1aXNrdTFkMWY2MDZk.pine",
+          "version": "5",
+          "line": 201,
+          "column": 98,
+          "code": "duplicate-argument",
+          "message": "Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'color' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "plot(obLevel2, color=color.red, linewidth=2, style=plot.style_line, title=\"OB Level 2 (Dashed)\", color=color.red)"
+        }
+      ]
+    },
+    "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it": {
+      "count": 6,
+      "corpora": {
+        "v6": 6
+      },
+      "codes": {
+        "unsupported-feature": 6
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0706__equitymarkets-pine_script_quant_trading__EA_2.pine",
+          "version": "6",
+          "line": 4,
+          "column": 63,
+          "code": "unsupported-feature",
+          "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "source": "strategy(\"EA_2\", overlay=true, fill_orders_on_standard_ohlc = true)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0710__JoelPasapera-Strategies-in-Pine-Script-v6__Ultra-simple-strategy.pine",
+          "version": "6",
+          "line": 5,
+          "column": 73,
+          "code": "unsupported-feature",
+          "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "source": "strategy(\"Swing strategy\", overlay=true, fill_orders_on_standard_ohlc = true, initial_capital = 10000)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0745__Hugs-4-Bugs-Trading-Indicator__Simple-Strategy.pine",
+          "version": "6",
+          "line": 7,
+          "column": 74,
+          "code": "unsupported-feature",
+          "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "source": "strategy(\"Simple Strategy\", overlay=true, fill_orders_on_standard_ohlc = true, process_orders_on_close = true)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0772__YooooungLee-clever-meme__.pine",
+          "version": "6",
+          "line": 2,
+          "column": 66,
+          "code": "unsupported-feature",
+          "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "source": "strategy(\"动量策略-连续开单\", overlay=true, fill_orders_on_standard_ohlc=true)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0773__atanasvasilevjourney-trading-engine__strategy_template.pine",
+          "version": "6",
+          "line": 7,
+          "column": 36,
+          "code": "unsupported-feature",
+          "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "source": "fill_orders_on_standard_ohlc = true,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0821__JoelPasapera-Strategies-in-Pine-Script-v6__time_and_schedule.pine",
+          "version": "6",
+          "line": 9,
+          "column": 76,
+          "code": "unsupported-feature",
+          "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+          "source": "strategy(\"Time and schedule\", overlay=true, fill_orders_on_standard_ohlc = true, initial_capital = initial_balance, calc_on_every_tick = true)"
+        }
+      ]
+    },
+    "type-mismatch: Cannot use udt value as udt array element": {
+      "count": 3,
+      "corpora": {
+        "v6": 3
+      },
+      "codes": {
+        "type-mismatch": 3
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0376__helenananaa-pine-compat-runtime__unsupported_array_set_mixed_udt.pine",
+          "version": "5",
+          "line": 10,
+          "column": 22,
+          "code": "type-mismatch",
+          "message": "Cannot use udt value as udt array element",
+          "bucket": "type-mismatch: Cannot use udt value as udt array element",
+          "source": "array.set(values, 0, Marker.new(high))"
+        },
+        {
+          "corpus": "v6",
+          "file": "0440__helenananaa-pine-compat-runtime__unsupported_array_unshift_udt_method.pine",
+          "version": "5",
+          "line": 9,
+          "column": 16,
+          "code": "type-mismatch",
+          "message": "Cannot use udt value as udt array element",
+          "bucket": "type-mismatch: Cannot use udt value as udt array element",
+          "source": "values.unshift(Marker.new(high))"
+        },
+        {
+          "corpus": "v6",
+          "file": "0674__helenananaa-pine-compat-runtime__unsupported_array_insert_udt_method.pine",
+          "version": "5",
+          "line": 9,
+          "column": 18,
+          "code": "type-mismatch",
+          "message": "Cannot use udt value as udt array element",
+          "bucket": "type-mismatch: Cannot use udt value as udt array element",
+          "source": "values.insert(0, Marker.new(high))"
+        }
+      ]
+    },
+    "type-mismatch: strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points": {
+      "count": 3,
+      "corpora": {
+        "v5": 1,
+        "v6": 2
+      },
+      "codes": {
+        "type-mismatch": 3
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0955__hasnocool-tradingview-pine-scripts__BankNifty-5min-Supertrend-Based-Strategy.pine",
+          "version": "5",
+          "line": 55,
+          "column": 102,
+          "code": "type-mismatch",
+          "message": "strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+          "bucket": "type-mismatch: strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+          "source": "strategy.exit(\"My Long Exit Id\", \"My Long Entry Id\", stop=(entryPrice1 - stopLoss1),trail_points=onePercent )"
+        },
+        {
+          "corpus": "v6",
+          "file": "0721__hoox-sh-pyne-worker__big_strategy.pine",
+          "version": "6",
+          "line": 11,
+          "column": 89,
+          "code": "type-mismatch",
+          "message": "strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+          "bucket": "type-mismatch: strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+          "source": "strategy.exit(\"Long Exit\", \"Long\", stop=low * 0.97, limit=close * 1.08, trail_price=close * 0.03)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0942__folknor-pine-tools__p12-indented-call-anchor.pine",
+          "version": "6",
+          "line": 6,
+          "column": 56,
+          "code": "type-mismatch",
+          "message": "strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+          "bucket": "type-mismatch: strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+          "source": "strategy.exit(\"X\", from_entry = \"L\", trail_price = high)"
+        }
+      ]
+    },
+    "duplicate-argument: Argument 'transp' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.": {
+      "count": 2,
+      "corpora": {
+        "v6": 2
+      },
+      "codes": {
+        "duplicate-argument": 2
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0384__deepentropy-lightweight-charts-indicators__Moving-Average-Converging-LuxAlgo-.pine",
+          "version": "5",
+          "line": 56,
+          "column": 5,
+          "code": "duplicate-argument",
+          "message": "Argument 'transp' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'transp' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": ", transp = 80)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0451__deepentropy-oakscriptJS__Moving-Average-Converging-LuxAlgo-.pine",
+          "version": "5",
+          "line": 56,
+          "column": 5,
+          "code": "duplicate-argument",
+          "message": "Argument 'transp' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'transp' for fill() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": ", transp = 80)"
+        }
+      ]
+    },
+    "invalid-type-template: Invalid array element type 'matrix'; collection template types must include their element templates": {
+      "count": 2,
+      "corpora": {
+        "v6": 2
+      },
+      "codes": {
+        "invalid-type-template": 2
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0512__helenananaa-pine-compat-runtime__unsupported_array_concat_matrix.pine",
+          "version": "5",
+          "line": 3,
+          "column": 8,
+          "code": "invalid-type-template",
+          "message": "Invalid array element type 'matrix'; collection template types must include their element templates",
+          "bucket": "invalid-type-template: Invalid array element type 'matrix'; collection template types must include their element templates",
+          "source": "left = array.new<matrix>()"
+        },
+        {
+          "corpus": "v6",
+          "file": "0585__helenananaa-pine-compat-runtime__unsupported_array_slice_matrix.pine",
+          "version": "5",
+          "line": 3,
+          "column": 10,
+          "code": "invalid-type-template",
+          "message": "Invalid array element type 'matrix'; collection template types must include their element templates",
+          "bucket": "invalid-type-template: Invalid array element type 'matrix'; collection template types must include their element templates",
+          "source": "values = array.new<matrix>()"
+        }
+      ]
+    },
+    "unknown function": {
+      "count": 2,
+      "corpora": {
+        "v6": 2
+      },
+      "codes": {
+        "unknown-function": 2
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0434__helenananaa-pine-compat-runtime__polyline_cast.pine",
+          "version": "5",
+          "line": 6,
+          "column": 11,
+          "code": "unknown-function",
+          "message": "Unknown function: polyline",
+          "bucket": "unknown function",
+          "source": "cast_id = polyline(id)"
+        },
+        {
+          "corpus": "v6",
+          "file": "0903__raybird-pine-trading-strategies__adaptive_vol_regime_sovereign_v6.pine",
+          "version": "6",
+          "line": 56,
+          "column": 9,
+          "code": "unknown-function",
+          "message": "Unknown function: runtime.log",
+          "bucket": "unknown function",
+          "source": "runtime.log(\"Sovereign Buy Executed in \" + str.tostring(regime) + \" state.\")"
+        }
+      ]
+    },
+    "unsupported-feature: strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it": {
+      "count": 2,
+      "corpora": {
+        "v6": 2
+      },
+      "codes": {
+        "unsupported-feature": 2
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0758__LordGhostX-dex-market-maker__lighthouse.pine",
+          "version": "6",
+          "line": 6,
+          "column": 21,
+          "code": "unsupported-feature",
+          "message": "strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+          "source": "risk_free_rate=0,"
+        },
+        {
+          "corpus": "v6",
+          "file": "0901__Studentcodee-Coursework-technical-analysis__adaptive_strategy.pine",
+          "version": "6",
+          "line": 10,
+          "column": 25,
+          "code": "unsupported-feature",
+          "message": "strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+          "bucket": "unsupported-feature: strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+          "source": "risk_free_rate=0,"
+        }
+      ]
+    },
+    "argument-count: ta.pivothigh() expects at least 2 arguments": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "argument-count": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0648__hcindus-AOS-Brain__CRYPTONIO_190POINT_CONFLUENCE_INDICATOR.pine",
+          "version": "5",
+          "line": 59,
+          "column": 26,
+          "code": "argument-count",
+          "message": "ta.pivothigh() expects at least 2 arguments",
+          "bucket": "argument-count: ta.pivothigh() expects at least 2 arguments",
+          "source": "pivotHigh = ta.pivothigh(srLength)"
+        }
+      ]
+    },
+    "argument-count: ta.vwma() expects at most 2 arguments": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "argument-count": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0085__danielbodnar-skills__basic-usage.pine",
+          "version": "6",
+          "line": 68,
+          "column": 33,
+          "code": "argument-count",
+          "message": "ta.vwma() expects at most 2 arguments",
+          "bucket": "argument-count: ta.vwma() expects at most 2 arguments",
+          "source": "vwma20 = ta.vwma(close, volume, 20)"
+        }
+      ]
+    },
+    "duplicate-argument: Argument 'size' for label.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "duplicate-argument": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0566__voidrlm-TradingView-Indicators__CompleteBundle.pine",
+          "version": "5",
+          "line": 236,
+          "column": 129,
+          "code": "duplicate-argument",
+          "message": "Argument 'size' for label.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "bucket": "duplicate-argument: Argument 'size' for label.new() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+          "source": "var ATH_label = show_labels ? label.new(bar_index, high, 'ATH', style=label.style_none, textcolor=color.lime, size=size.normal, size=l_size, yloc=yloc.abovebar) : na"
+        }
+      ]
+    },
+    "invalid-type-template: Invalid array element type 'map'; collection template types must include their element templates": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "invalid-type-template": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0436__helenananaa-pine-compat-runtime__unsupported_array_concat_map.pine",
+          "version": "5",
+          "line": 3,
+          "column": 8,
+          "code": "invalid-type-template",
+          "message": "Invalid array element type 'map'; collection template types must include their element templates",
+          "bucket": "invalid-type-template: Invalid array element type 'map'; collection template types must include their element templates",
+          "source": "left = array.new<map>()"
+        }
+      ]
+    },
+    "library-export: Exported function getMOSTDirectionHTF request expression cannot depend on exported parameters": {
+      "count": 1,
+      "corpora": {
+        "v5": 1
+      },
+      "codes": {
+        "library-export": 1
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0604__casoon-pine-scripts__RTAStrategy.pine",
+          "version": "6",
+          "line": 1049,
+          "column": 10,
+          "code": "library-export",
+          "message": "Exported function getMOSTDirectionHTF request expression cannot depend on exported parameters",
+          "bucket": "library-export: Exported function getMOSTDirectionHTF request expression cannot depend on exported parameters",
+          "source": "calculateMOSTDirection(atrLength, multiplier),"
+        }
+      ]
+    },
+    "qualifier-mismatch: request.security lookahead must be a const barmerge constant and cannot be computed at runtime": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "qualifier-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine",
+          "version": "5",
+          "line": 76,
+          "column": 140,
+          "code": "qualifier-mismatch",
+          "message": "request.security lookahead must be a const barmerge constant and cannot be computed at runtime",
+          "bucket": "qualifier-mismatch: request.security lookahead must be a const barmerge constant and cannot be computed at runtime",
+          "source": "request.security(symbol=ticker.heikinashi(syminfo.tickerid), timeframe=_tf, expression=_src[barstate.isconfirmed ? 0 : 1], lookahead = _actualla ? barmerge.lookahead_on : na)"
+        }
+      ]
+    },
+    "scope-mismatch: alertcondition() must be called from the global scope; move the call out of the local block": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "scope-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0596__mitchell-917-tradingview-pinescript-lab__rsi-basic-indicator.pine",
+          "version": "5",
+          "line": 83,
+          "column": 5,
+          "code": "scope-mismatch",
+          "message": "alertcondition() must be called from the global scope; move the call out of the local block",
+          "bucket": "scope-mismatch: alertcondition() must be called from the global scope; move the call out of the local block",
+          "source": "alertcondition("
+        }
+      ]
+    },
+    "tuple-shape-mismatch: Tuple declaration expects 2 values but initializer arm returns 3": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "tuple-shape-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0988__deepentropy-lightweight-charts-indicators__ValueAtTime-v2.pine",
+          "version": "6",
+          "line": 346,
+          "column": 9,
+          "code": "tuple-shape-mismatch",
+          "message": "Tuple declaration expects 2 values but initializer arm returns 3",
+          "bucket": "tuple-shape-mismatch: Tuple declaration expects 2 values but initializer arm returns 3",
+          "source": "[foundValue, foundTime] = valueAtTime(data, eachTime)"
+        }
+      ]
+    },
+    "type-mismatch: Cannot use float value as int array element": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0223__DemasJ2k-Strategies-Indicators__flowrex_tradingview_indicator.pine",
+          "version": "5",
+          "line": 33,
+          "column": 15,
+          "code": "type-mismatch",
+          "message": "Cannot use float value as int array element",
+          "bucket": "type-mismatch: Cannot use float value as int array element",
+          "source": "array.push(t, time / 1000) // convert ms → seconds"
+        }
+      ]
+    },
+    "type-mismatch: input.float defval must be greater than or equal to minval": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0848__Finnlayy-ai_trading_jules_prompt_pack__Top1_HYPEUSDT_GA_CrossAlgo_Optimized.pine",
+          "version": "6",
+          "line": 162,
+          "column": 15,
+          "code": "type-mismatch",
+          "message": "input.float defval must be greater than or equal to minval",
+          "bucket": "type-mismatch: input.float defval must be greater than or equal to minval",
+          "source": "defval  = 0.300,"
+        }
+      ]
+    },
+    "type-mismatch: Invalid plot style: plot.style_dashed": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0617__caizongxun-bb-channel-ai-predictor__bb_predictor_final.pine",
+          "version": "5",
+          "line": 62,
+          "column": 133,
+          "code": "type-mismatch",
+          "message": "Invalid plot style: plot.style_dashed",
+          "bucket": "type-mismatch: Invalid plot style: plot.style_dashed",
+          "source": "plot(show_ai_prediction ? pred_bb_up  : na, \"Predicted BB Upper\",  color=color.new(color.green, 0),  linewidth=ai_line_width, style=plot.style_dashed)"
+        }
+      ]
+    },
+    "type-mismatch: Invalid table.new position: position.middle. Use one of the position.* constants such as position.top_right or position.bottom_left.": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0284__jfernandogg-pinescript_ind_estrat__stock_valuation_matrix.pine",
+          "version": "5",
+          "line": 62,
+          "column": 35,
+          "code": "type-mismatch",
+          "message": "Invalid table.new position: position.middle. Use one of the position.* constants such as position.top_right or position.bottom_left.",
+          "bucket": "type-mismatch: Invalid table.new position: position.middle. Use one of the position.* constants such as position.top_right or position.bottom_left.",
+          "source": "var table resultTable = table.new(position.middle, 4, 6, border_width=1)"
+        }
+      ]
+    },
+    "type-mismatch: Invalid table.set_position position: position.bad. Use one of the position.* constants such as position.top_right or position.bottom_left.": {
+      "count": 1,
+      "corpora": {
+        "v5": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v5",
+          "file": "0979__helenananaa-pine-compat-runtime__unsupported_table_set_position_values.pine",
+          "version": "5",
+          "line": 4,
+          "column": 24,
+          "code": "type-mismatch",
+          "message": "Invalid table.set_position position: position.bad. Use one of the position.* constants such as position.top_right or position.bottom_left.",
+          "bucket": "type-mismatch: Invalid table.set_position position: position.bad. Use one of the position.* constants such as position.top_right or position.bottom_left.",
+          "source": "table.set_position(id, \"position.bad\")"
+        }
+      ]
+    },
+    "type-mismatch: str.length source must be a string, got float": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0163__folknor-pine-tools__INV182-user-variable-qualifier.pine",
+          "version": "6",
+          "line": 25,
+          "column": 17,
+          "code": "type-mismatch",
+          "message": "str.length source must be a string, got float",
+          "bucket": "type-mismatch: str.length source must be a string, got float",
+          "source": "plot(str.length(c1) + str.length(c2) + str.length(c3) + str.length(i1) + str.length(s1) + str.length(s2) + str.length(r1) + str.length(p1))"
+        }
+      ]
+    },
+    "type-mismatch: strategy.exit requires a limit, stop, profit, loss, or trailing stop price": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0737__zelosleone-pinescript-vsc-server-rust__subtle_logic_error_suite.pine",
+          "version": "6",
+          "line": 22,
+          "column": 5,
+          "code": "type-mismatch",
+          "message": "strategy.exit requires a limit, stop, profit, loss, or trailing stop price",
+          "bucket": "type-mismatch: strategy.exit requires a limit, stop, profit, loss, or trailing stop price",
+          "source": "strategy.exit(\"L\", from_entry=\"L\")"
+        }
+      ]
+    },
+    "type-mismatch: ta.highest length must be a number, got string": {
+      "count": 1,
+      "corpora": {
+        "v6": 1
+      },
+      "codes": {
+        "type-mismatch": 1
+      },
+      "rows": [
+        {
+          "corpus": "v6",
+          "file": "0086__folknor-pine-tools__INV183-plain-param-expected-noun.pine",
+          "version": "6",
+          "line": 11,
+          "column": 23,
+          "code": "type-mismatch",
+          "message": "ta.highest length must be a number, got string",
+          "bucket": "type-mismatch: ta.highest length must be a number, got string",
+          "source": "plot(ta.highest(high, \"x\") + math.round(1.5, \"x\") + str.length(1.0) + str.length(str.match(1.0, \"a\")))"
+        }
+      ]
+    }
+  }
+}

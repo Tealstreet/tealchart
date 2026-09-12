@@ -1,0 +1,78 @@
+{
+  "supersededBy": "external-pine-corpus-v4.engine-delta-v4.md",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "schemaVersion": 1,
+  "corpus": "external-pine-corpus-v4",
+  "inputDir": "/tmp/pine-corpus-v4",
+  "reharvested": false,
+  "rerun": {
+    "completedRows": 649,
+    "timeoutRows": 1,
+    "timeoutLocalPath": "sources/0254__davidadff7-blip-CODE23__Aoi_alert_all.pine",
+    "timeoutStage": "execute",
+    "parserProbe": {
+      "status": "passed",
+      "programBodyEntries": 692,
+      "elapsedMs": 181
+    },
+    "rawSummary": {
+      "total": 649,
+      "parse": 618,
+      "semantic": 535,
+      "compile": 535,
+      "execute": 520,
+      "output": 501,
+      "validity": {
+        "supported": 512,
+        "tealscript-gap": 98,
+        "invalid-pine": 19,
+        "unsupported-by-design": 20
+      }
+    }
+  },
+  "baselineAudited": {
+    "total": 650,
+    "validity": {
+      "supported": 512,
+      "tealscript-gap": 53,
+      "invalid-pine": 55,
+      "unsupported-by-design": 19,
+      "corpus-hygiene": 11,
+      "corpus-input-gap": 0
+    },
+    "achievableDenominator": 565,
+    "funnel": {
+      "parse": 563,
+      "semantic": 532,
+      "compile": 532,
+      "execute": 516,
+      "output": 497
+    }
+  },
+  "normalizedAfter": {
+    "total": 650,
+    "validity": {
+      "supported": 516,
+      "tealscript-gap": 42,
+      "invalid-pine": 61,
+      "unsupported-by-design": 20,
+      "corpus-hygiene": 11,
+      "corpus-input-gap": 0
+    },
+    "achievableDenominator": 558,
+    "funnel": {
+      "parse": {"count": 558, "percent": 100.0},
+      "semantic": {"count": 535, "percent": 95.88},
+      "compile": {"count": 535, "percent": 95.88},
+      "execute": {"count": 519, "percent": 93.01},
+      "output": {"count": 501, "percent": 89.78}
+    }
+  },
+  "bucketAudit": {
+    "argument-count": {"rows": 5, "tealscriptGap": 3, "invalidPine": 2},
+    "unknown-argument": {"rows": 5, "tealscriptGap": 0, "invalidPine": 5},
+    "duplicate-argument": {"rows": 4, "tealscriptGap": 0, "invalidPine": 4},
+    "implicit-numeric-bool": {"rows": 3, "tealscriptGap": 0, "invalidPine": 3}
+  },
+  "engineChangedRows": ["0137", "0172", "0358", "0408", "0477"]
+}

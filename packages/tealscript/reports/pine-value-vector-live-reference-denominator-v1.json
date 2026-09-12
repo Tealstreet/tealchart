@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "supersededBy": "pine-value-vector-live-reference-denominator-v2.json",
+  "measurementCommit": "c130bcde33",
+  "basis": {
+    "valueVectorMemberMap": "packages/tealscript/reports/pine-value-vector-member-map-v30.json at 67abac4e78",
+    "liveReferenceIntegrity": "packages/tealscript/reports/pine-v6-reference-snapshot-integrity-v1.json at 30075c8727",
+    "method": "Use the committed 861-name snapshot denominator as the baseline, parse live callable names from liveSyntax in the live-reference integrity report, normalize generic constructor syntax to Pine call names, then add live-documented callable names absent from the committed snapshot. Parameter-only divergences are not new member names."
+  },
+  "snapshotCoverage": {
+    "denominator": 861,
+    "covered": 813,
+    "percent": 94.43
+  },
+  "liveReferenceCorrection": {
+    "liveDocumentsSnapshotLacksRows": 345,
+    "liveDocumentedMembersAbsentFromSnapshotRows": 297,
+    "liveParametersAbsentFromSnapshotRows": 48,
+    "liveCallableNames": 474,
+    "liveOnlyRawNames": 28,
+    "liveOnlyNamesAfterNormalization": 28,
+    "liveOnlyNamesAlreadyCoveredBySnapshotNames": 3,
+    "newLiveNamesBeyondSnapshot": 25,
+    "newLiveNamesTouchedByVectors": 0,
+    "newLiveNamesUncovered": 25,
+    "correctedDenominator": 886,
+    "correctedCovered": 813,
+    "correctedPercent": 91.76,
+    "namesAlreadyCoveredAfterNormalization": [
+      "array.new",
+      "map.new",
+      "matrix.new"
+    ],
+    "newUncoveredByNamespace": {
+      "footprint": 9,
+      "(global)": 1,
+      "math": 1,
+      "request": 3,
+      "runtime": 1,
+      "strategy": 2,
+      "volume_row": 8
+    },
+    "newUncoveredNames": [
+      "footprint.buy_volume",
+      "footprint.delta",
+      "footprint.get_row_by_price",
+      "footprint.poc",
+      "footprint.rows",
+      "footprint.sell_volume",
+      "footprint.total_volume",
+      "footprint.vah",
+      "footprint.val",
+      "library",
+      "math.random",
+      "request.footprint",
+      "request.quandl",
+      "request.seed",
+      "runtime.error",
+      "strategy.risk.max_cons_loss_days",
+      "strategy.risk.max_intraday_filled_orders",
+      "volume_row.buy_volume",
+      "volume_row.delta",
+      "volume_row.down_price",
+      "volume_row.has_buy_imbalance",
+      "volume_row.has_sell_imbalance",
+      "volume_row.sell_volume",
+      "volume_row.total_volume",
+      "volume_row.up_price"
+    ]
+  },
+  "interpretation": {
+    "honestCoverageFigure": "813/886 (91.76%) is the current answer to how much of the live-documented Pine member surface the vectors cover, using the committed snapshot plus the live callable-name correction.",
+    "artifactCoverageFigure": "813/861 (94.43%) remains useful only as coverage against the committed snapshot artifact.",
+    "limit": "The live-reference integrity report is callable-focused; constants and declarations still come from the committed snapshot until a fully refreshed live reference denominator replaces it."
+  }
+}

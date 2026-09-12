@@ -1,0 +1,1342 @@
+{
+  "generatedAt": "2026-09-11T14:53:48.321Z",
+  "commit": "933e277129f71c93f534701a0b6d89bf6974c73c",
+  "rows": [
+    {
+      "kind": "member-absent-from-manual",
+      "member": "box.get_bgcolor",
+      "accepted": "box.get_bgcolor",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "box.get_border_color",
+      "accepted": "box.get_border_color",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "box.get_text",
+      "accepted": "box.get_text",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "box.get_text_halign",
+      "accepted": "box.get_text_halign",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "box.get_text_valign",
+      "accepted": "box.get_text_valign",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "color.none",
+      "accepted": "color.none",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_color",
+      "accepted": "label.get_color",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_size",
+      "accepted": "label.get_size",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_style",
+      "accepted": "label.get_style",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_textcolor",
+      "accepted": "label.get_textcolor",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_tooltip",
+      "accepted": "label.get_tooltip",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_xloc",
+      "accepted": "label.get_xloc",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "label.get_yloc",
+      "accepted": "label.get_yloc",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "linefill.copy",
+      "accepted": "linefill.copy",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "linefill.get_color",
+      "accepted": "linefill.get_color",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "polyline.copy",
+      "accepted": "polyline.copy",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "strategy.percent_profitable",
+      "accepted": "strategy.percent_profitable",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "syminfo.exchange",
+      "accepted": "syminfo.exchange",
+      "verdict": "labelled-local-extension",
+      "evidence": "Implemented names that are useful compatibility aliases or local extensions, but are absent from the official v6 manual index and should not be counted as official v6 coverage."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "alert",
+      "accepted": "alert",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "alertcondition",
+      "accepted": "alertcondition",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "bool",
+      "accepted": "bool",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.copy",
+      "accepted": "box.copy",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.delete",
+      "accepted": "box.delete",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.get_bottom",
+      "accepted": "box.get_bottom",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.get_left",
+      "accepted": "box.get_left",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.get_right",
+      "accepted": "box.get_right",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.get_top",
+      "accepted": "box.get_top",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_bgcolor",
+      "accepted": "box.set_bgcolor",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_border_color",
+      "accepted": "box.set_border_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_border_style",
+      "accepted": "box.set_border_style",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_border_width",
+      "accepted": "box.set_border_width",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_bottom",
+      "accepted": "box.set_bottom",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_bottom_right_point",
+      "accepted": "box.set_bottom_right_point",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_extend",
+      "accepted": "box.set_extend",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_left",
+      "accepted": "box.set_left",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_lefttop",
+      "accepted": "box.set_lefttop",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_right",
+      "accepted": "box.set_right",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_rightbottom",
+      "accepted": "box.set_rightbottom",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text",
+      "accepted": "box.set_text",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_color",
+      "accepted": "box.set_text_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_font_family",
+      "accepted": "box.set_text_font_family",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_formatting",
+      "accepted": "box.set_text_formatting",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_halign",
+      "accepted": "box.set_text_halign",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_size",
+      "accepted": "box.set_text_size",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_valign",
+      "accepted": "box.set_text_valign",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_text_wrap",
+      "accepted": "box.set_text_wrap",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_top",
+      "accepted": "box.set_top",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_top_left_point",
+      "accepted": "box.set_top_left_point",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "box.set_xloc",
+      "accepted": "box.set_xloc",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "dayofmonth",
+      "accepted": "dayofmonth",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "dayofweek",
+      "accepted": "dayofweek",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "fixnan",
+      "accepted": "fixnan",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "float",
+      "accepted": "float",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "hour",
+      "accepted": "hour",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "indicator",
+      "accepted": "indicator",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "int",
+      "accepted": "int",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.copy",
+      "accepted": "label.copy",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.delete",
+      "accepted": "label.delete",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.get_text",
+      "accepted": "label.get_text",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.get_x",
+      "accepted": "label.get_x",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.get_y",
+      "accepted": "label.get_y",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_color",
+      "accepted": "label.set_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_point",
+      "accepted": "label.set_point",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_size",
+      "accepted": "label.set_size",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_style",
+      "accepted": "label.set_style",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_text",
+      "accepted": "label.set_text",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_text_font_family",
+      "accepted": "label.set_text_font_family",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_text_formatting",
+      "accepted": "label.set_text_formatting",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_textalign",
+      "accepted": "label.set_textalign",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_textcolor",
+      "accepted": "label.set_textcolor",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_tooltip",
+      "accepted": "label.set_tooltip",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_x",
+      "accepted": "label.set_x",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_xloc",
+      "accepted": "label.set_xloc",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_xy",
+      "accepted": "label.set_xy",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_y",
+      "accepted": "label.set_y",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "label.set_yloc",
+      "accepted": "label.set_yloc",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.copy",
+      "accepted": "line.copy",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.delete",
+      "accepted": "line.delete",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.get_price",
+      "accepted": "line.get_price",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.get_x1",
+      "accepted": "line.get_x1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.get_x2",
+      "accepted": "line.get_x2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.get_y1",
+      "accepted": "line.get_y1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.get_y2",
+      "accepted": "line.get_y2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_color",
+      "accepted": "line.set_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_extend",
+      "accepted": "line.set_extend",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_first_point",
+      "accepted": "line.set_first_point",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_second_point",
+      "accepted": "line.set_second_point",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_style",
+      "accepted": "line.set_style",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_width",
+      "accepted": "line.set_width",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_x1",
+      "accepted": "line.set_x1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_x2",
+      "accepted": "line.set_x2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_xloc",
+      "accepted": "line.set_xloc",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_xy1",
+      "accepted": "line.set_xy1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_xy2",
+      "accepted": "line.set_xy2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_y1",
+      "accepted": "line.set_y1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "line.set_y2",
+      "accepted": "line.set_y2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "linefill.delete",
+      "accepted": "linefill.delete",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "linefill.get_line1",
+      "accepted": "linefill.get_line1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "linefill.get_line2",
+      "accepted": "linefill.get_line2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "linefill.set_color",
+      "accepted": "linefill.set_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "log.error",
+      "accepted": "log.error",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "log.info",
+      "accepted": "log.info",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "log.warning",
+      "accepted": "log.warning",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "max_bars_back",
+      "accepted": "max_bars_back",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "minute",
+      "accepted": "minute",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "month",
+      "accepted": "month",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "na",
+      "accepted": "na",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "nz",
+      "accepted": "nz",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "polyline.delete",
+      "accepted": "polyline.delete",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "runtime.error",
+      "accepted": "runtime.error",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "second",
+      "accepted": "second",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "string",
+      "accepted": "string",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "syminfo.prefix",
+      "accepted": "syminfo.prefix",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "syminfo.ticker",
+      "accepted": "syminfo.ticker",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_bgcolor",
+      "accepted": "table.cell_set_bgcolor",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_height",
+      "accepted": "table.cell_set_height",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text",
+      "accepted": "table.cell_set_text",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text_color",
+      "accepted": "table.cell_set_text_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text_font_family",
+      "accepted": "table.cell_set_text_font_family",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text_formatting",
+      "accepted": "table.cell_set_text_formatting",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text_halign",
+      "accepted": "table.cell_set_text_halign",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text_size",
+      "accepted": "table.cell_set_text_size",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_text_valign",
+      "accepted": "table.cell_set_text_valign",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_tooltip",
+      "accepted": "table.cell_set_tooltip",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.cell_set_width",
+      "accepted": "table.cell_set_width",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.clear",
+      "accepted": "table.clear",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.delete",
+      "accepted": "table.delete",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.merge_cells",
+      "accepted": "table.merge_cells",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.set_bgcolor",
+      "accepted": "table.set_bgcolor",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.set_border_color",
+      "accepted": "table.set_border_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.set_border_width",
+      "accepted": "table.set_border_width",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.set_frame_color",
+      "accepted": "table.set_frame_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.set_frame_width",
+      "accepted": "table.set_frame_width",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "table.set_position",
+      "accepted": "table.set_position",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "time",
+      "accepted": "time",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "time_close",
+      "accepted": "time_close",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "timestamp",
+      "accepted": "timestamp",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "weekofyear",
+      "accepted": "weekofyear",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "callable-without-reference-signature",
+      "member": "year",
+      "accepted": "year",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The member is in the manual index, but has no committed reference signature snapshot to compare accepted parameters against."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "array.covariance",
+      "accepted": "id",
+      "canonical": "id1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'id' for 'id1', but the committed v6 reference signature documents 'id1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "color",
+      "accepted": "transparency",
+      "canonical": "transp",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'transparency' for 'transp', but the committed v6 reference signature documents 'transp' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "color.new",
+      "accepted": "transparency",
+      "canonical": "transp",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'transparency' for 'transp', but the committed v6 reference signature documents 'transp' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "color.rgb",
+      "accepted": "transparency",
+      "canonical": "transp",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'transparency' for 'transp', but the committed v6 reference signature documents 'transp' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "fill",
+      "accepted": "hline1",
+      "canonical": "plot1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'hline1' for 'plot1', but the committed v6 reference signature documents 'plot1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "fill",
+      "accepted": "hline2",
+      "canonical": "plot2",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'hline2' for 'plot2', but the committed v6 reference signature documents 'plot2' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "matrix.concat",
+      "accepted": "id",
+      "canonical": "id1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'id' for 'id1', but the committed v6 reference signature documents 'id1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "matrix.diff",
+      "accepted": "id",
+      "canonical": "id1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'id' for 'id1', but the committed v6 reference signature documents 'id1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "matrix.kron",
+      "accepted": "id",
+      "canonical": "id1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'id' for 'id1', but the committed v6 reference signature documents 'id1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "matrix.mult",
+      "accepted": "id",
+      "canonical": "id1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'id' for 'id1', but the committed v6 reference signature documents 'id1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "matrix.sum",
+      "accepted": "id",
+      "canonical": "id1",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'id' for 'id1', but the committed v6 reference signature documents 'id1' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.contains",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.contains",
+      "accepted": "substring",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'substring' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.contains",
+      "accepted": "target",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'target' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.endswith",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.endswith",
+      "accepted": "substring",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'substring' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.endswith",
+      "accepted": "target",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'target' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.length",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.lower",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.match",
+      "accepted": "pattern",
+      "canonical": "regex",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'pattern' for 'regex', but the committed v6 reference signature documents 'regex' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.match",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.pos",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.pos",
+      "accepted": "substring",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'substring' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.pos",
+      "accepted": "target",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'target' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.repeat",
+      "accepted": "count",
+      "canonical": "repeat",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'count' for 'repeat', but the committed v6 reference signature documents 'repeat' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.repeat",
+      "accepted": "repeat_count",
+      "canonical": "repeat",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'repeat_count' for 'repeat', but the committed v6 reference signature documents 'repeat' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.repeat",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.replace",
+      "accepted": "str",
+      "canonical": "target",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'str' for 'target', but the committed v6 reference signature documents 'target' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.replace",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.replace",
+      "accepted": "substring",
+      "canonical": "target",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'substring' for 'target', but the committed v6 reference signature documents 'target' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.replace_all",
+      "accepted": "str",
+      "canonical": "target",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'str' for 'target', but the committed v6 reference signature documents 'target' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.replace_all",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.replace_all",
+      "accepted": "substring",
+      "canonical": "target",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'substring' for 'target', but the committed v6 reference signature documents 'target' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.split",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.startswith",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.startswith",
+      "accepted": "substring",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'substring' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.startswith",
+      "accepted": "target",
+      "canonical": "str",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'target' for 'str', but the committed v6 reference signature documents 'str' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.substring",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.trim",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "str.upper",
+      "accepted": "string",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'string' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "extra-alias",
+      "member": "ta.mfi",
+      "accepted": "series",
+      "canonical": "source",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts named alias 'series' for 'source', but the committed v6 reference signature documents 'source' only."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "line.get_color",
+      "accepted": "line.get_color",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts this callable member, but it is absent from both the manual index and the labelled local-extension allowlist. Manual absence alone is not evidence that TradingView rejects it."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "line.get_extend",
+      "accepted": "line.get_extend",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts this callable member, but it is absent from both the manual index and the labelled local-extension allowlist. Manual absence alone is not evidence that TradingView rejects it."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "line.get_style",
+      "accepted": "line.get_style",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts this callable member, but it is absent from both the manual index and the labelled local-extension allowlist. Manual absence alone is not evidence that TradingView rejects it."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "line.get_width",
+      "accepted": "line.get_width",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts this callable member, but it is absent from both the manual index and the labelled local-extension allowlist. Manual absence alone is not evidence that TradingView rejects it."
+    },
+    {
+      "kind": "member-absent-from-manual",
+      "member": "str.tointeger",
+      "accepted": "str.tointeger",
+      "verdict": "needs-compile-evidence",
+      "evidence": "The checker accepts this callable member, but it is absent from both the manual index and the labelled local-extension allowlist. Manual absence alone is not evidence that TradingView rejects it."
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "generatedAt": "2026-09-11T12:25:23.886Z",
+  "commit": "6980895790ef13d3c6c6ff4ce5f1289f271623ce",
+  "rows": [
+    {
+      "member": "input.int",
+      "overload": "range",
+      "property": "positional metadata binds as tooltip/inline/group/confirm/display/active",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "input.int",
+      "overload": "options",
+      "property": "positional metadata binds after options",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "input.float",
+      "overload": "range",
+      "property": "positional metadata binds as tooltip/inline/group/confirm/display/active",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "input.float",
+      "overload": "options",
+      "property": "positional metadata binds after options",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "label.new",
+      "overload": "coordinate",
+      "property": "positional style/textcolor/size/textalign/tooltip bind to coordinate slots",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "label.new",
+      "overload": "chart-point",
+      "property": "positional xloc/style/textcolor/size bind to point slots",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "line.new",
+      "overload": "coordinate",
+      "property": "positional xloc/extend/color/style/width/force_overlay bind to coordinate slots",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "line.new",
+      "overload": "chart-point",
+      "property": "positional xloc/extend/color/style/width/force_overlay bind to point slots",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "box.new",
+      "overload": "coordinate",
+      "property": "positional xloc/bgcolor/text/text_color/text_halign/text_valign bind to coordinate slots",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "box.new",
+      "overload": "chart-point",
+      "property": "positional xloc/bgcolor/text/text_color/text_halign/text_valign bind to point slots",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; runtime-visible binding matched"
+    },
+    {
+      "member": "time",
+      "overload": "timezone",
+      "property": "third positional string is timezone; later numbers are bars_back/timeframe_bars_back",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "time",
+      "overload": "no-timezone",
+      "property": "third positional number is bars_back, not timezone",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "time_close",
+      "overload": "timezone",
+      "property": "third positional string is timezone; later numbers are bars_back/timeframe_bars_back",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "time_close",
+      "overload": "no-timezone",
+      "property": "third positional number is bars_back, not timezone",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "timestamp",
+      "overload": "dateString",
+      "property": "single string binds as dateString",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "timestamp",
+      "overload": "numeric",
+      "property": "first positional number binds as year",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "timestamp",
+      "overload": "timezone+numeric",
+      "property": "first positional string plus numeric date binds as timezone/year/month/day",
+      "status": "ok",
+      "evidence": "parse ok; semantic ok; compiled execution ok"
+    },
+    {
+      "member": "label.new",
+      "overload": "chart-point",
+      "property": "invalid positional size blames selected point-overload size slot",
+      "status": "ok",
+      "evidence": "selected-overload diagnostic matched: Invalid label.new size: giant"
+    },
+    {
+      "member": "line.new",
+      "overload": "chart-point",
+      "property": "invalid positional width blames selected point-overload width slot",
+      "status": "ok",
+      "evidence": "selected-overload diagnostic matched: line.new width must be a number, got string"
+    },
+    {
+      "member": "box.new",
+      "overload": "chart-point",
+      "property": "invalid positional text_halign blames selected point-overload text_halign slot",
+      "status": "ok",
+      "evidence": "selected-overload diagnostic matched: Invalid box.new text_halign: sideways"
+    },
+    {
+      "member": "time",
+      "overload": "no-timezone",
+      "property": "invalid fourth positional blames timeframe_bars_back after no-timezone selection",
+      "status": "ok",
+      "evidence": "selected-overload diagnostic matched: time timeframe_bars_back must be a number, got string"
+    },
+    {
+      "member": "timestamp",
+      "overload": "numeric",
+      "property": "invalid second positional blames month after numeric-overload selection",
+      "status": "ok",
+      "evidence": "selected-overload diagnostic matched: timestamp month must be a number, got string"
+    }
+  ]
+}

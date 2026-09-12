@@ -1,0 +1,109 @@
+{
+  "supersededBy": "pine-member-property-validation-filter-v6.json",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "schemaVersion": 1,
+  "basis": {
+    "propertyMap": "pine-member-property-map-v2",
+    "vectorCases": 725,
+    "passingVectorCases": 721,
+    "rule": "Explains why member coverage does not imply property-rule validation coverage. Current validation only applies scalar/tuple properties when the vector has one attributable target member and a series output."
+  },
+  "summary": {
+    "propertyRules": 993,
+    "scalarTupleEligibleRules": 409,
+    "payloadConstantShapeOrSideEffectRules": 584,
+    "vectorCoveredMembers": 811,
+    "propertyRulesOnVectorCoveredMembers": 944,
+    "scalarTupleRulesOnVectorCoveredMembers": 364,
+    "passingVectorCoveredMembers": 811,
+    "propertyRulesOnPassingVectorMembers": 944,
+    "scalarTupleRulesOnPassingVectorMembers": 364,
+    "scalarTupleRulesReachableByAnyPassingTarget": 364,
+    "scalarTupleRulesOnSingleTargetPassingCases": 97,
+    "scalarTupleRulesOnMultiTargetPassingCases": 269,
+    "scalarTupleRulesUnlockedByOutputAttributionSample": 113,
+    "scalarTupleRulesOnInvariantCases": 24,
+    "zeroOutputSingleTargetScalarRules": 0,
+    "vectorValidatedRules": 209,
+    "shippedStudyValidatedRules": 25,
+    "combinedKnownGoodRuleCoverage": 216,
+    "combinedKnownGoodRuleCoveragePercent": "21.75%"
+  },
+  "targetCounts": {
+    "zero": 332,
+    "one": 230,
+    "multi": 114,
+    "invariant": 45
+  },
+  "annotatedMultiTargetCases": [
+    {
+      "id": "matrix.predicate-distribution-values",
+      "outputs": 12,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "runtime.global-context-values",
+      "outputs": 10,
+      "scalarTupleRules": 14
+    },
+    {
+      "id": "runtime.input-expanded-default-values",
+      "outputs": 12,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "runtime.chart-context-values",
+      "outputs": 13,
+      "scalarTupleRules": 15
+    },
+    {
+      "id": "runtime.calendar-fields",
+      "outputs": 6,
+      "scalarTupleRules": 16
+    },
+    {
+      "id": "strategy.aggregate-performance-values",
+      "outputs": 10,
+      "scalarTupleRules": 10
+    },
+    {
+      "id": "strategy.aggregate-percent-contract-values",
+      "outputs": 7,
+      "scalarTupleRules": 8
+    },
+    {
+      "id": "strategy.closedtrades-timing-commission-values",
+      "outputs": 5,
+      "scalarTupleRules": 10
+    },
+    {
+      "id": "strategy.percent-commission-values",
+      "outputs": 6,
+      "scalarTupleRules": 8
+    },
+    {
+      "id": "strategy.trade-runup-drawdown-values",
+      "outputs": 9,
+      "scalarTupleRules": 17
+    }
+  ],
+  "propertyRuleKinds": {
+    "enum-constant": 240,
+    "void-side-effect": 147,
+    "collection-shape": 59,
+    "numeric-domain": 203,
+    "boolean-domain": 57,
+    "numeric-range": 32,
+    "string-domain": 112,
+    "nonnegative": 92,
+    "integer-domain": 21,
+    "handle-shape": 21,
+    "color-domain": 5,
+    "tuple-coherence": 4
+  },
+  "interpretation": {
+    "dominantFilter": "Most property rules are not scalar plot-series rules, and most scalar rules that do appear in vectors are in multi-target cases without output-to-member attribution.",
+    "cheapFixAvailable": false,
+    "costToRaiseCoverage": "A 10-case sample annotated 113 of the 269 stranded scalar/tuple rules. The work is mechanical when each plot directly corresponds to one member in source order, but needs judgment when guard variables, helper functions, or string wrappers contribute to an output. Completing the remaining multi-target cases is bounded annotation work, not a switch and not hundreds of new vectors."
+  }
+}

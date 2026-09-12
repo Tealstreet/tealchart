@@ -1,0 +1,20 @@
+# Generated value-vector coverage snapshots.
+#
+# `pine:value-vectors` writes a coverage artifact on every run. Adjacent
+# generations are near-identical -- a 2026-09 audit measured 0 of 931 cases
+# changed between consecutive versions -- so committing the series added
+# ~570MB of history for no reviewable signal, and it was stripped from the
+# branch before merge.
+#
+# Two snapshots stay TRACKED because scripts import them; gitignore does not
+# untrack existing files, so they are unaffected by the rules below:
+#   pine-value-vectors-coverage-v117.json
+#   pine-value-vectors-coverage-v174.json
+#
+# TRAP: if a future generation is genuinely needed as a committed input, it
+# will be silently ignored here -- the same failure that once kept a real
+# source file out of a build because root `.gitignore` carried a bare
+# `coverage/`. Stage it deliberately with `git add -f <path>` and say why in
+# the commit message.
+pine-value-vectors-coverage-v*.json
+pine-value-vectors-coverage-v*.md

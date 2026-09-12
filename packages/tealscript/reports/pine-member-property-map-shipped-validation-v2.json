@@ -1,0 +1,1179 @@
+{
+  "schemaVersion": 1,
+  "basis": {
+    "propertyMap": "pine-member-property-map-v3",
+    "propertyRules": 992,
+    "shippedSources": 29,
+    "bars": 12,
+    "sourceFiles": [
+      {
+        "localPath": "packages/tealchart/src/indicators/builtinIndicators.ts",
+        "surface": "tealchart_builtin_indicator"
+      },
+      {
+        "localPath": "apps/web/src/custom-chart-study-page-components/defaultChartStudy.ts",
+        "surface": "web_custom_study_page_default"
+      },
+      {
+        "localPath": "apps/web/src/atoms/tealscriptEditor.atoms.ts",
+        "surface": "web_in_chart_editor_default"
+      }
+    ],
+    "rule": "Applies executable scalar property kinds to shipped Pine plot outputs. A fire is a lead: either a live defect or an over-strict rule requiring adjudication."
+  },
+  "summary": {
+    "shippedSources": 29,
+    "executedSources": 29,
+    "failedSources": 0,
+    "evaluatedApplications": 91,
+    "uniqueAppliedRules": 25,
+    "combinedKnownGoodRuleCoverage": 884,
+    "combinedKnownGoodRuleCoveragePercentOfAllRules": "89.11%",
+    "vectorKnownGoodApplications": 1546,
+    "vectorKnownGoodRules": 879,
+    "ruleFiresOnShippedOutput": 0,
+    "violationPoints": 0,
+    "realDefects": 0,
+    "overStrictRules": 0
+  },
+  "executions": [
+    {
+      "sourceId": "sma",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.sma"
+      ],
+      "outputs": [
+        "SMA"
+      ]
+    },
+    {
+      "sourceId": "ema",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.orange",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.ema"
+      ],
+      "outputs": [
+        "EMA"
+      ]
+    },
+    {
+      "sourceId": "wma",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.purple",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.wma"
+      ],
+      "outputs": [
+        "WMA"
+      ]
+    },
+    {
+      "sourceId": "hma",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.teal",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.hma"
+      ],
+      "outputs": [
+        "HMA"
+      ]
+    },
+    {
+      "sourceId": "supertrend",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "color",
+        "color.green",
+        "color.red",
+        "float",
+        "indicator",
+        "input",
+        "input.float",
+        "input.int",
+        "int",
+        "plot",
+        "ta.supertrend"
+      ],
+      "outputs": [
+        "SuperTrend"
+      ]
+    },
+    {
+      "sourceId": "sma-cross",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.red",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.sma"
+      ],
+      "outputs": [
+        "Fast SMA",
+        "Slow SMA"
+      ]
+    },
+    {
+      "sourceId": "ema-ribbon",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.new",
+        "indicator",
+        "plot",
+        "ta.ema"
+      ],
+      "outputs": [
+        "EMA 8",
+        "EMA 13",
+        "EMA 21",
+        "EMA 34",
+        "EMA 55"
+      ]
+    },
+    {
+      "sourceId": "vwap",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "color",
+        "color.purple",
+        "indicator",
+        "plot",
+        "ta.vwap"
+      ],
+      "outputs": [
+        "VWAP"
+      ]
+    },
+    {
+      "sourceId": "ma-cross-signals",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.orange",
+        "color.red",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "location.abovebar",
+        "location.belowbar",
+        "plot",
+        "plotshape",
+        "shape.triangledown",
+        "shape.triangleup",
+        "size.small",
+        "ta.crossover",
+        "ta.crossunder",
+        "ta.ema"
+      ],
+      "outputs": [
+        "Fast MA",
+        "Slow MA",
+        "Buy",
+        "Sell"
+      ]
+    },
+    {
+      "sourceId": "bb-filled",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.new",
+        "color.orange",
+        "fill",
+        "float",
+        "indicator",
+        "input",
+        "input.float",
+        "input.int",
+        "int",
+        "plot",
+        "ta.sma",
+        "ta.stdev"
+      ],
+      "outputs": [
+        "Upper",
+        "Lower",
+        "Basis",
+        "Fill"
+      ]
+    },
+    {
+      "sourceId": "rsi",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.gray",
+        "color.green",
+        "color.purple",
+        "color.red",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.rsi"
+      ],
+      "outputs": [
+        "RSI",
+        "Overbought",
+        "Oversold",
+        "Middle"
+      ]
+    },
+    {
+      "sourceId": "macd",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.orange",
+        "color.red",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "plot.style_histogram",
+        "ta.macd"
+      ],
+      "outputs": [
+        "MACD",
+        "Signal",
+        "Histogram"
+      ]
+    },
+    {
+      "sourceId": "stochastic",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.orange",
+        "color.red",
+        "high",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "low",
+        "plot",
+        "ta.sma",
+        "ta.stoch"
+      ],
+      "outputs": [
+        "K",
+        "D",
+        "Overbought",
+        "Oversold"
+      ]
+    },
+    {
+      "sourceId": "momentum",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.gray",
+        "color.teal",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.mom"
+      ],
+      "outputs": [
+        "Momentum",
+        "Zero"
+      ]
+    },
+    {
+      "sourceId": "cci",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.gray",
+        "color.green",
+        "color.purple",
+        "color.red",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.cci"
+      ],
+      "outputs": [
+        "CCI",
+        "Overbought",
+        "Oversold",
+        "Zero"
+      ]
+    },
+    {
+      "sourceId": "adx",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "color",
+        "color.blue",
+        "color.gray",
+        "color.green",
+        "color.red",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.dmi"
+      ],
+      "outputs": [
+        "DI+",
+        "DI-",
+        "ADX",
+        "Trend Threshold"
+      ]
+    },
+    {
+      "sourceId": "roc",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.gray",
+        "color.teal",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.roc"
+      ],
+      "outputs": [
+        "ROC",
+        "Zero"
+      ]
+    },
+    {
+      "sourceId": "sar",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.green",
+        "color.red",
+        "float",
+        "indicator",
+        "input",
+        "input.float",
+        "plot",
+        "plot.style_circles",
+        "ta.sar"
+      ],
+      "outputs": [
+        "SAR"
+      ]
+    },
+    {
+      "sourceId": "rsi-signals",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.gray",
+        "color.green",
+        "color.purple",
+        "color.red",
+        "hline",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "location.bottom",
+        "location.top",
+        "plot",
+        "plotshape",
+        "shape.triangledown",
+        "shape.triangleup",
+        "size.tiny",
+        "ta.crossover",
+        "ta.crossunder",
+        "ta.rsi"
+      ],
+      "outputs": [
+        "RSI",
+        "Overbought",
+        "Oversold",
+        "Middle",
+        "OB Signal",
+        "OS Signal"
+      ]
+    },
+    {
+      "sourceId": "macd-signals",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.orange",
+        "color.red",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "location.bottom",
+        "location.top",
+        "plot",
+        "plot.style_histogram",
+        "plotshape",
+        "shape.triangledown",
+        "shape.triangleup",
+        "size.tiny",
+        "ta.crossover",
+        "ta.crossunder",
+        "ta.macd"
+      ],
+      "outputs": [
+        "MACD",
+        "Signal",
+        "Histogram",
+        "Bull Cross",
+        "Bear Cross"
+      ]
+    },
+    {
+      "sourceId": "bollinger-bands",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.red",
+        "float",
+        "indicator",
+        "input",
+        "input.float",
+        "input.int",
+        "int",
+        "plot",
+        "ta.sma",
+        "ta.stdev"
+      ],
+      "outputs": [
+        "Basis",
+        "Upper",
+        "Lower"
+      ]
+    },
+    {
+      "sourceId": "atr",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "color",
+        "color.orange",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "plot",
+        "ta.atr"
+      ],
+      "outputs": [
+        "ATR"
+      ]
+    },
+    {
+      "sourceId": "keltner-channels",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.red",
+        "float",
+        "indicator",
+        "input",
+        "input.float",
+        "input.int",
+        "int",
+        "plot",
+        "ta.atr",
+        "ta.ema"
+      ],
+      "outputs": [
+        "Basis",
+        "Upper",
+        "Lower"
+      ]
+    },
+    {
+      "sourceId": "donchian-channels",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "color",
+        "color.blue",
+        "color.green",
+        "color.red",
+        "high",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "low",
+        "plot",
+        "ta.highest",
+        "ta.lowest"
+      ],
+      "outputs": [
+        "Basis",
+        "Upper",
+        "Lower"
+      ]
+    },
+    {
+      "sourceId": "keltner-filled",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.new",
+        "color.orange",
+        "color.teal",
+        "fill",
+        "float",
+        "indicator",
+        "input",
+        "input.float",
+        "input.int",
+        "int",
+        "plot",
+        "ta.atr",
+        "ta.ema"
+      ],
+      "outputs": [
+        "Upper",
+        "Lower",
+        "Basis",
+        "Fill"
+      ]
+    },
+    {
+      "sourceId": "obv",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "color",
+        "color.teal",
+        "indicator",
+        "plot",
+        "ta.obv"
+      ],
+      "outputs": [
+        "OBV"
+      ]
+    },
+    {
+      "sourceId": "volume-sma",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.blue",
+        "color.green",
+        "color.red",
+        "indicator",
+        "input",
+        "input.int",
+        "int",
+        "open",
+        "plot",
+        "plot.style_histogram",
+        "ta.sma",
+        "volume"
+      ],
+      "outputs": [
+        "Volume",
+        "Volume MA"
+      ]
+    },
+    {
+      "sourceId": "defaultChartStudyCode",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "indicator",
+        "plot"
+      ],
+      "outputs": [
+        "Close"
+      ]
+    },
+    {
+      "sourceId": "DEFAULT_TEALSCRIPT_EDITOR_CODE",
+      "status": "passed",
+      "diagnostics": [],
+      "members": [
+        "close",
+        "color",
+        "color.teal",
+        "indicator",
+        "input",
+        "input.color",
+        "input.int",
+        "int",
+        "plot",
+        "ta.ema"
+      ],
+      "outputs": [
+        "EMA"
+      ]
+    }
+  ],
+  "applications": [
+    {
+      "sourceId": "sma",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sma",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sma",
+      "member": "ta.sma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ema",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ema",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ema",
+      "member": "ta.ema",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "wma",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "wma",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "wma",
+      "member": "ta.wma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "hma",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "hma",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "hma",
+      "member": "ta.hma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "supertrend",
+      "member": "input.float",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "supertrend",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sma-cross",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sma-cross",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sma-cross",
+      "member": "ta.sma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ema-ribbon",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ema-ribbon",
+      "member": "ta.ema",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "vwap",
+      "member": "ta.vwap",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ma-cross-signals",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ma-cross-signals",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "ma-cross-signals",
+      "member": "ta.ema",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bb-filled",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bb-filled",
+      "member": "input.float",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bb-filled",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bb-filled",
+      "member": "ta.sma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bb-filled",
+      "member": "ta.stdev",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "rsi",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "rsi",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "rsi",
+      "member": "ta.rsi",
+      "kind": "numeric-range"
+    },
+    {
+      "sourceId": "macd",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "macd",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "stochastic",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "stochastic",
+      "member": "high",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "stochastic",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "stochastic",
+      "member": "low",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "stochastic",
+      "member": "ta.sma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "stochastic",
+      "member": "ta.stoch",
+      "kind": "numeric-range"
+    },
+    {
+      "sourceId": "momentum",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "momentum",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "momentum",
+      "member": "ta.mom",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "cci",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "cci",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "cci",
+      "member": "ta.cci",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "adx",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "adx",
+      "member": "ta.dmi",
+      "kind": "numeric-range"
+    },
+    {
+      "sourceId": "roc",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "roc",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "roc",
+      "member": "ta.roc",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sar",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sar",
+      "member": "input.float",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "sar",
+      "member": "ta.sar",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "rsi-signals",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "rsi-signals",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "rsi-signals",
+      "member": "ta.rsi",
+      "kind": "numeric-range"
+    },
+    {
+      "sourceId": "macd-signals",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "macd-signals",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bollinger-bands",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bollinger-bands",
+      "member": "input.float",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bollinger-bands",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bollinger-bands",
+      "member": "ta.sma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "bollinger-bands",
+      "member": "ta.stdev",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "atr",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "atr",
+      "member": "ta.atr",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-channels",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-channels",
+      "member": "input.float",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-channels",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-channels",
+      "member": "ta.atr",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-channels",
+      "member": "ta.ema",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "donchian-channels",
+      "member": "high",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "donchian-channels",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "donchian-channels",
+      "member": "low",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "donchian-channels",
+      "member": "ta.highest",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "donchian-channels",
+      "member": "ta.lowest",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-filled",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-filled",
+      "member": "input.float",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-filled",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-filled",
+      "member": "ta.atr",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "keltner-filled",
+      "member": "ta.ema",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "obv",
+      "member": "ta.obv",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "volume-sma",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "volume-sma",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "volume-sma",
+      "member": "open",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "volume-sma",
+      "member": "ta.sma",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "volume-sma",
+      "member": "volume",
+      "kind": "nonnegative"
+    },
+    {
+      "sourceId": "defaultChartStudyCode",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "DEFAULT_TEALSCRIPT_EDITOR_CODE",
+      "member": "close",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "DEFAULT_TEALSCRIPT_EDITOR_CODE",
+      "member": "input.color",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "DEFAULT_TEALSCRIPT_EDITOR_CODE",
+      "member": "input.int",
+      "kind": "numeric-domain"
+    },
+    {
+      "sourceId": "DEFAULT_TEALSCRIPT_EDITOR_CODE",
+      "member": "ta.ema",
+      "kind": "numeric-domain"
+    }
+  ],
+  "violations": [],
+  "supersededBy": "pine-member-property-map-shipped-validation-v3.json",
+  "historicalMeasurementOnly": true
+}

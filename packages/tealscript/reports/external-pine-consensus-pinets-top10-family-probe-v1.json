@@ -1,0 +1,3569 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12",
+  "codeUnderTest": "490df475aa",
+  "pinets": "pinets@0.9.33",
+  "scope": "Top-ten row-gating families from external-pine-consensus-pinets-unprobed-family-queue-v1.md, using that report's named current-oracle examples for the checkpoint. This is not the full 800-case top-ten closure pass.",
+  "oracle": "The oracle is the value-vector expected output for each named case. PineTS is compared to expectedOutputs, not to TealScript output.",
+  "summary": {
+    "families": 10,
+    "cases": 15,
+    "promotedFamilies": 5,
+    "struckFamilies": 3,
+    "cannotRunOrPartialFamilies": 2,
+    "promotedRowsUpperBound": 2135,
+    "struckRowsUpperBound": 1650,
+    "cannotRunRowsUpperBound": 1302,
+    "distinctRowsTouchingPromotedFamilies": 764,
+    "distinctRowsStruckByWrongFamilies": 805,
+    "distinctRowsTouchingCannotRunOrPartialFamilies": 695,
+    "newlyFullyAllowlistedRows": 0,
+    "stillUnknownRowsAfterTopTenCheckpoint": 87
+  },
+  "families": [
+    {
+      "family": "member:plot",
+      "gatedPinetsSoleRows": 765,
+      "verdict": "proven-wrong",
+      "right": 0,
+      "wrong": 1,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "priority.visual-output-metadata-values",
+          "status": "wrong",
+          "mismatches": [
+            "plot[2][0] null != 1",
+            "plot[3][0] 1 != null",
+            "plot[4][0] 1 != null",
+            "plot[5][0] 0 != null"
+          ],
+          "plots": [
+            "Upper",
+            "Lower",
+            "FillDisplay",
+            "BackgroundOffsetTransp",
+            "BarOffset",
+            "ShapeEditableFormat",
+            "Close"
+          ],
+          "expectedOutputs": [
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              null,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ]
+          ],
+          "actualOutputs": [
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ]
+          ],
+          "rule": "TradingView v6 Visuals: fill display, bgcolor/barcolor offsets and legacy transparency, and plotshape editable/format/precision arguments are presentation metadata; they do not change the underlying output series values. The legacy transp argument uses the documented 0-100 transparency scale. https://www.tradingview.com/pine-script-docs/visuals/fills/ https://www.tradingview.com/pine-script-docs/visuals/backgrounds/ https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/ https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/"
+        }
+      ]
+    },
+    {
+      "family": "member:input",
+      "gatedPinetsSoleRows": 695,
+      "verdict": "cannot-run",
+      "right": 0,
+      "wrong": 0,
+      "cannotRun": 1,
+      "examples": [
+        {
+          "id": "priority.input-confirm-display-edge-values",
+          "status": "cannot-run",
+          "error": "ReferenceError: Choice is not defined\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:89:28)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)\n    at async main (/private/tmp/pinets-one-case.ts:33:19)"
+        }
+      ]
+    },
+    {
+      "family": "member:input.int",
+      "gatedPinetsSoleRows": 607,
+      "verdict": "partial-pinets-support",
+      "right": 1,
+      "wrong": 0,
+      "cannotRun": 1,
+      "examples": [
+        {
+          "id": "priority.input-declaration-qualifier-metadata-values",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0",
+            "#1",
+            "#2",
+            "#3",
+            "#4",
+            "#5",
+            "#6",
+            "#7"
+          ],
+          "expectedOutputs": [
+            [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25
+            ],
+            [
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20
+            ],
+            [
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40
+            ],
+            [
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60
+            ],
+            [
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25
+            ]
+          ],
+          "actualOutputs": [
+            [
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25,
+              1.25
+            ],
+            [
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20,
+              20
+            ],
+            [
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40,
+              40
+            ],
+            [
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60,
+              60
+            ],
+            [
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25,
+              25
+            ]
+          ],
+          "rule": "TradingView v6 Inputs and Type system: input-qualified declarations can be initialized from input.* calls; group, inline, tooltip, display, and active are input UI/display metadata and do not change the returned defval in headless script execution. https://www.tradingview.com/pine-script-docs/concepts/inputs/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+        },
+        {
+          "id": "priority.input-confirm-display-edge-values",
+          "status": "cannot-run",
+          "error": "ReferenceError: Choice is not defined\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:89:28)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)\n    at async main (/private/tmp/pinets-one-case.ts:33:19)"
+        }
+      ]
+    },
+    {
+      "family": "member:true",
+      "gatedPinetsSoleRows": 563,
+      "verdict": "promoted-proven-correct",
+      "right": 1,
+      "wrong": 0,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "property.single.true",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0"
+          ],
+          "expectedOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "actualOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "rule": "TradingView v6 Reference: true is the literal boolean true value. https://www.tradingview.com/pine-script-reference/v6/#var_true https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+        }
+      ]
+    },
+    {
+      "family": "member:na",
+      "gatedPinetsSoleRows": 551,
+      "verdict": "proven-wrong",
+      "right": 1,
+      "wrong": 1,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "array.new-default-na-values",
+          "status": "wrong",
+          "mismatches": [
+            "plot[1][0] 0 != 1"
+          ],
+          "plots": [
+            "#0",
+            "#1",
+            "#2"
+          ],
+          "expectedOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "actualOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "rule": "TradingView v6 Reference: typed array constructors accept an optional initial_value argument whose default is na, and array.get() returns the stored element. https://www.tradingview.com/pine-script-reference/v6/#fun_array.new_float https://www.tradingview.com/pine-script-reference/v6/#fun_array.new_int https://www.tradingview.com/pine-script-reference/v6/#fun_array.new_color https://www.tradingview.com/pine-script-reference/v6/#fun_array.get https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/operators/"
+        },
+        {
+          "id": "property.single.na",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0"
+          ],
+          "expectedOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "actualOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "rule": "TradingView v6 Reference: na(x) returns true when x is not available. https://www.tradingview.com/pine-script-reference/v6/#fun_na https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+        }
+      ]
+    },
+    {
+      "family": "member:false",
+      "gatedPinetsSoleRows": 447,
+      "verdict": "promoted-proven-correct",
+      "right": 1,
+      "wrong": 0,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "property.single.false",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0"
+          ],
+          "expectedOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "actualOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "rule": "TradingView v6 Reference: false is the literal boolean false value. https://www.tradingview.com/pine-script-reference/v6/#var_false https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+        }
+      ]
+    },
+    {
+      "family": "member:color.yellow",
+      "gatedPinetsSoleRows": 437,
+      "verdict": "promoted-proven-correct",
+      "right": 1,
+      "wrong": 0,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "property.single.color.yellow",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0"
+          ],
+          "expectedOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "actualOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "rule": "TradingView v6 Colors: color.yellow is one of the 17 predefined color constants with the documented RGB value (253, 216, 53). https://www.tradingview.com/pine-script-docs/visuals/colors/#constant-colors https://www.tradingview.com/pine-script-reference/v6/#var_color.yellow"
+        }
+      ]
+    },
+    {
+      "family": "member:input.source",
+      "gatedPinetsSoleRows": 362,
+      "verdict": "promoted-proven-correct",
+      "right": 1,
+      "wrong": 0,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "priority.input-context-metadata-values",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0",
+            "#1",
+            "#2",
+            "#3",
+            "#4"
+          ],
+          "expectedOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              3,
+              0,
+              4,
+              1,
+              -2,
+              2,
+              1,
+              -1,
+              3
+            ],
+            [
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "actualOutputs": [
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              -1,
+              1,
+              3,
+              0,
+              4,
+              1,
+              -2,
+              2,
+              1,
+              -1,
+              3
+            ],
+            [
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000,
+              1700000100000
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "rule": "TradingView v6 Inputs: input.timeframe/source/time/session/symbol return their configured value or source series; active, display, and confirm are input UI/display metadata and do not change the runtime value returned by the input call. https://www.tradingview.com/pine-script-docs/concepts/inputs/"
+        }
+      ]
+    },
+    {
+      "family": "member:nz",
+      "gatedPinetsSoleRows": 334,
+      "verdict": "proven-wrong",
+      "right": 1,
+      "wrong": 1,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "property.single.nz",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0"
+          ],
+          "expectedOutputs": [
+            [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ]
+          ],
+          "actualOutputs": [
+            [
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7,
+              7
+            ]
+          ],
+          "rule": "TradingView v6 Reference: nz(source, replacement) replaces na values with the supplied replacement. https://www.tradingview.com/pine-script-reference/v6/#fun_nz https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+        },
+        {
+          "id": "priority.math-workhorse-expression-values",
+          "status": "wrong",
+          "mismatches": [
+            "plot[2][0] null != 0"
+          ],
+          "plots": [
+            "#0",
+            "#1",
+            "#2"
+          ],
+          "expectedOutputs": [
+            [
+              2,
+              2,
+              2,
+              2,
+              3,
+              4,
+              3,
+              3,
+              4,
+              2,
+              2,
+              4
+            ],
+            [
+              0,
+              -2,
+              -2,
+              -2,
+              -3,
+              -4,
+              -3,
+              -3,
+              -4,
+              -1,
+              -2,
+              -4
+            ],
+            [
+              0,
+              -1.3,
+              0,
+              1.3,
+              -0.7,
+              2,
+              0,
+              -2,
+              0.7,
+              0,
+              -1.3,
+              1.3
+            ]
+          ],
+          "actualOutputs": [
+            [
+              2,
+              2,
+              2,
+              2,
+              3,
+              4,
+              3,
+              3,
+              4,
+              2,
+              2,
+              4
+            ],
+            [
+              0,
+              -2,
+              -2,
+              -2,
+              -3,
+              -4,
+              -3,
+              -3,
+              -4,
+              -1,
+              -2,
+              -4
+            ],
+            [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          ],
+          "rule": "TradingView v6 Reference: math.max()/math.min() return extrema across all supplied numeric arguments, math.round(number, precision) rounds to the requested decimal places, and nz(source, replacement) substitutes the replacement for na. https://www.tradingview.com/pine-script-reference/v6/#fun_math.max https://www.tradingview.com/pine-script-reference/v6/#fun_math.min https://www.tradingview.com/pine-script-reference/v6/#fun_math.round"
+        }
+      ]
+    },
+    {
+      "family": "member:color.new",
+      "gatedPinetsSoleRows": 326,
+      "verdict": "promoted-proven-correct",
+      "right": 4,
+      "wrong": 0,
+      "cannotRun": 0,
+      "examples": [
+        {
+          "id": "depth.color-new-series-transparency-values",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0",
+            "#1",
+            "#2",
+            "#3"
+          ],
+          "expectedOutputs": [
+            [
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12
+            ],
+            [
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34
+            ],
+            [
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56
+            ],
+            [
+              0,
+              50,
+              0,
+              50,
+              0,
+              50,
+              0,
+              50,
+              0,
+              50,
+              0,
+              50
+            ]
+          ],
+          "actualOutputs": [
+            [
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12,
+              12
+            ],
+            [
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34,
+              34
+            ],
+            [
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56,
+              56
+            ],
+            [
+              0,
+              50,
+              0,
+              50,
+              0,
+              50,
+              0,
+              50,
+              0,
+              50,
+              0,
+              50
+            ]
+          ],
+          "rule": "TradingView v6 Colors: color.new(color, transp) returns the same RGB color with the supplied transparency, and a series transparency argument can vary by bar. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new"
+        },
+        {
+          "id": "priority.color-fractional-transparency-values",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "new12",
+            "new12_4",
+            "new12_5",
+            "new12_6",
+            "new13",
+            "olive40",
+            "rgb12_5",
+            "gradient12_5"
+          ],
+          "expectedOutputs": [
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ]
+          ],
+          "actualOutputs": [
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ],
+            [
+              0,
+              -2,
+              0,
+              2,
+              -1,
+              3,
+              0,
+              -3,
+              1,
+              0,
+              -2,
+              2
+            ]
+          ],
+          "rule": "TradingView v6 Colors: transparency is 0 fully opaque and 100 fully transparent; color.new() and color.rgb() accept float transparency, and color.from_gradient() interpolates endpoint color channels. Expected #RRGGBBAA alpha for direct transparency is round(255 * (100 - transparency) / 100); gradient alpha is interpolated from endpoint color alpha bytes. The docs anchor color.new(color.olive, 40) as a valid transparency-setting form. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new https://www.tradingview.com/pine-script-reference/v6/#fun_color.rgb https://www.tradingview.com/pine-script-reference/v6/#fun_color.from_gradient"
+        },
+        {
+          "id": "priority.color-new-nested-transparency-values",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0",
+            "#1",
+            "#2",
+            "#3"
+          ],
+          "expectedOutputs": [
+            [
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242
+            ],
+            [
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54
+            ],
+            [
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69
+            ],
+            [
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75
+            ]
+          ],
+          "actualOutputs": [
+            [
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242,
+              242
+            ],
+            [
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54,
+              54
+            ],
+            [
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69,
+              69
+            ],
+            [
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75,
+              75
+            ]
+          ],
+          "rule": "TradingView v6 Colors: color.new(color, transp) returns the source RGB channels with the supplied transparency, replacing any existing transparency on the source color. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new"
+        },
+        {
+          "id": "priority.color-new-conditional-source-values",
+          "status": "right",
+          "mismatches": [],
+          "plots": [
+            "#0",
+            "#1",
+            "#2",
+            "#3"
+          ],
+          "expectedOutputs": [
+            [
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76
+            ],
+            [
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175
+            ],
+            [
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80
+            ],
+            [
+              0,
+              20,
+              40,
+              60,
+              0,
+              20,
+              40,
+              60,
+              0,
+              20,
+              40,
+              60
+            ]
+          ],
+          "actualOutputs": [
+            [
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76,
+              76
+            ],
+            [
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175,
+              175
+            ],
+            [
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80,
+              80
+            ],
+            [
+              0,
+              20,
+              40,
+              60,
+              0,
+              20,
+              40,
+              60,
+              0,
+              20,
+              40,
+              60
+            ]
+          ],
+          "rule": "TradingView v6 Colors: color.new() accepts a series color source and a series transparency, preserving the selected source RGB channels and applying the evaluated transparency. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new"
+        }
+      ]
+    }
+  ],
+  "caseResults": [
+    {
+      "id": "priority.visual-output-metadata-values",
+      "status": "wrong",
+      "mismatches": [
+        "plot[2][0] null != 1",
+        "plot[3][0] 1 != null",
+        "plot[4][0] 1 != null",
+        "plot[5][0] 0 != null"
+      ],
+      "plots": [
+        "Upper",
+        "Lower",
+        "FillDisplay",
+        "BackgroundOffsetTransp",
+        "BarOffset",
+        "ShapeEditableFormat",
+        "Close"
+      ],
+      "expectedOutputs": [
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          null,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ]
+      ],
+      "actualOutputs": [
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ]
+      ],
+      "rule": "TradingView v6 Visuals: fill display, bgcolor/barcolor offsets and legacy transparency, and plotshape editable/format/precision arguments are presentation metadata; they do not change the underlying output series values. The legacy transp argument uses the documented 0-100 transparency scale. https://www.tradingview.com/pine-script-docs/visuals/fills/ https://www.tradingview.com/pine-script-docs/visuals/backgrounds/ https://www.tradingview.com/pine-script-docs/visuals/bar-coloring/ https://www.tradingview.com/pine-script-docs/visuals/text-and-shapes/"
+    },
+    {
+      "id": "priority.input-confirm-display-edge-values",
+      "status": "cannot-run",
+      "error": "ReferenceError: Choice is not defined\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:89:28)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)\n    at async main (/private/tmp/pinets-one-case.ts:33:19)"
+    },
+    {
+      "id": "priority.input-declaration-qualifier-metadata-values",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0",
+        "#1",
+        "#2",
+        "#3",
+        "#4",
+        "#5",
+        "#6",
+        "#7"
+      ],
+      "expectedOutputs": [
+        [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25
+        ],
+        [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20
+        ],
+        [
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40
+        ],
+        [
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        [
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25
+        ]
+      ],
+      "actualOutputs": [
+        [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25,
+          1.25
+        ],
+        [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20
+        ],
+        [
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40,
+          40
+        ],
+        [
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        [
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25,
+          25
+        ]
+      ],
+      "rule": "TradingView v6 Inputs and Type system: input-qualified declarations can be initialized from input.* calls; group, inline, tooltip, display, and active are input UI/display metadata and do not change the returned defval in headless script execution. https://www.tradingview.com/pine-script-docs/concepts/inputs/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "property.single.true",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0"
+      ],
+      "expectedOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "actualOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "rule": "TradingView v6 Reference: true is the literal boolean true value. https://www.tradingview.com/pine-script-reference/v6/#var_true https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "array.new-default-na-values",
+      "status": "wrong",
+      "mismatches": [
+        "plot[1][0] 0 != 1"
+      ],
+      "plots": [
+        "#0",
+        "#1",
+        "#2"
+      ],
+      "expectedOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "actualOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "rule": "TradingView v6 Reference: typed array constructors accept an optional initial_value argument whose default is na, and array.get() returns the stored element. https://www.tradingview.com/pine-script-reference/v6/#fun_array.new_float https://www.tradingview.com/pine-script-reference/v6/#fun_array.new_int https://www.tradingview.com/pine-script-reference/v6/#fun_array.new_color https://www.tradingview.com/pine-script-reference/v6/#fun_array.get https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/operators/"
+    },
+    {
+      "id": "property.single.na",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0"
+      ],
+      "expectedOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "actualOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "rule": "TradingView v6 Reference: na(x) returns true when x is not available. https://www.tradingview.com/pine-script-reference/v6/#fun_na https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "property.single.false",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0"
+      ],
+      "expectedOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "actualOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "rule": "TradingView v6 Reference: false is the literal boolean false value. https://www.tradingview.com/pine-script-reference/v6/#var_false https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "property.single.color.yellow",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0"
+      ],
+      "expectedOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "actualOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "rule": "TradingView v6 Colors: color.yellow is one of the 17 predefined color constants with the documented RGB value (253, 216, 53). https://www.tradingview.com/pine-script-docs/visuals/colors/#constant-colors https://www.tradingview.com/pine-script-reference/v6/#var_color.yellow"
+    },
+    {
+      "id": "priority.input-context-metadata-values",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0",
+        "#1",
+        "#2",
+        "#3",
+        "#4"
+      ],
+      "expectedOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          -1,
+          1,
+          3,
+          0,
+          4,
+          1,
+          -2,
+          2,
+          1,
+          -1,
+          3
+        ],
+        [
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "actualOutputs": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          -1,
+          1,
+          3,
+          0,
+          4,
+          1,
+          -2,
+          2,
+          1,
+          -1,
+          3
+        ],
+        [
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000,
+          1700000100000
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "rule": "TradingView v6 Inputs: input.timeframe/source/time/session/symbol return their configured value or source series; active, display, and confirm are input UI/display metadata and do not change the runtime value returned by the input call. https://www.tradingview.com/pine-script-docs/concepts/inputs/"
+    },
+    {
+      "id": "property.single.nz",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0"
+      ],
+      "expectedOutputs": [
+        [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      ],
+      "actualOutputs": [
+        [
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7,
+          7
+        ]
+      ],
+      "rule": "TradingView v6 Reference: nz(source, replacement) replaces na values with the supplied replacement. https://www.tradingview.com/pine-script-reference/v6/#fun_nz https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "priority.math-workhorse-expression-values",
+      "status": "wrong",
+      "mismatches": [
+        "plot[2][0] null != 0"
+      ],
+      "plots": [
+        "#0",
+        "#1",
+        "#2"
+      ],
+      "expectedOutputs": [
+        [
+          2,
+          2,
+          2,
+          2,
+          3,
+          4,
+          3,
+          3,
+          4,
+          2,
+          2,
+          4
+        ],
+        [
+          0,
+          -2,
+          -2,
+          -2,
+          -3,
+          -4,
+          -3,
+          -3,
+          -4,
+          -1,
+          -2,
+          -4
+        ],
+        [
+          0,
+          -1.3,
+          0,
+          1.3,
+          -0.7,
+          2,
+          0,
+          -2,
+          0.7,
+          0,
+          -1.3,
+          1.3
+        ]
+      ],
+      "actualOutputs": [
+        [
+          2,
+          2,
+          2,
+          2,
+          3,
+          4,
+          3,
+          3,
+          4,
+          2,
+          2,
+          4
+        ],
+        [
+          0,
+          -2,
+          -2,
+          -2,
+          -3,
+          -4,
+          -3,
+          -3,
+          -4,
+          -1,
+          -2,
+          -4
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "rule": "TradingView v6 Reference: math.max()/math.min() return extrema across all supplied numeric arguments, math.round(number, precision) rounds to the requested decimal places, and nz(source, replacement) substitutes the replacement for na. https://www.tradingview.com/pine-script-reference/v6/#fun_math.max https://www.tradingview.com/pine-script-reference/v6/#fun_math.min https://www.tradingview.com/pine-script-reference/v6/#fun_math.round"
+    },
+    {
+      "id": "depth.color-new-series-transparency-values",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0",
+        "#1",
+        "#2",
+        "#3"
+      ],
+      "expectedOutputs": [
+        [
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12
+        ],
+        [
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34
+        ],
+        [
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56
+        ],
+        [
+          0,
+          50,
+          0,
+          50,
+          0,
+          50,
+          0,
+          50,
+          0,
+          50,
+          0,
+          50
+        ]
+      ],
+      "actualOutputs": [
+        [
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12
+        ],
+        [
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34,
+          34
+        ],
+        [
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56,
+          56
+        ],
+        [
+          0,
+          50,
+          0,
+          50,
+          0,
+          50,
+          0,
+          50,
+          0,
+          50,
+          0,
+          50
+        ]
+      ],
+      "rule": "TradingView v6 Colors: color.new(color, transp) returns the same RGB color with the supplied transparency, and a series transparency argument can vary by bar. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new"
+    },
+    {
+      "id": "priority.color-fractional-transparency-values",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "new12",
+        "new12_4",
+        "new12_5",
+        "new12_6",
+        "new13",
+        "olive40",
+        "rgb12_5",
+        "gradient12_5"
+      ],
+      "expectedOutputs": [
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ]
+      ],
+      "actualOutputs": [
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ],
+        [
+          0,
+          -2,
+          0,
+          2,
+          -1,
+          3,
+          0,
+          -3,
+          1,
+          0,
+          -2,
+          2
+        ]
+      ],
+      "rule": "TradingView v6 Colors: transparency is 0 fully opaque and 100 fully transparent; color.new() and color.rgb() accept float transparency, and color.from_gradient() interpolates endpoint color channels. Expected #RRGGBBAA alpha for direct transparency is round(255 * (100 - transparency) / 100); gradient alpha is interpolated from endpoint color alpha bytes. The docs anchor color.new(color.olive, 40) as a valid transparency-setting form. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new https://www.tradingview.com/pine-script-reference/v6/#fun_color.rgb https://www.tradingview.com/pine-script-reference/v6/#fun_color.from_gradient"
+    },
+    {
+      "id": "priority.color-new-nested-transparency-values",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0",
+        "#1",
+        "#2",
+        "#3"
+      ],
+      "expectedOutputs": [
+        [
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242
+        ],
+        [
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54
+        ],
+        [
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69
+        ],
+        [
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75
+        ]
+      ],
+      "actualOutputs": [
+        [
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242,
+          242
+        ],
+        [
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54,
+          54
+        ],
+        [
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69,
+          69
+        ],
+        [
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75
+        ]
+      ],
+      "rule": "TradingView v6 Colors: color.new(color, transp) returns the source RGB channels with the supplied transparency, replacing any existing transparency on the source color. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new"
+    },
+    {
+      "id": "priority.color-new-conditional-source-values",
+      "status": "right",
+      "mismatches": [],
+      "plots": [
+        "#0",
+        "#1",
+        "#2",
+        "#3"
+      ],
+      "expectedOutputs": [
+        [
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76
+        ],
+        [
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175
+        ],
+        [
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80
+        ],
+        [
+          0,
+          20,
+          40,
+          60,
+          0,
+          20,
+          40,
+          60,
+          0,
+          20,
+          40,
+          60
+        ]
+      ],
+      "actualOutputs": [
+        [
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76,
+          76
+        ],
+        [
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175,
+          175
+        ],
+        [
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80
+        ],
+        [
+          0,
+          20,
+          40,
+          60,
+          0,
+          20,
+          40,
+          60,
+          0,
+          20,
+          40,
+          60
+        ]
+      ],
+      "rule": "TradingView v6 Colors: color.new() accepts a series color source and a series transparency, preserving the selected source RGB channels and applying the evaluated transparency. https://www.tradingview.com/pine-script-docs/visuals/colors/ https://www.tradingview.com/pine-script-reference/v6/#fun_color.new"
+    }
+  ],
+  "rowImpact": {
+    "priorUnprobedPinetsSoleRows": 892,
+    "promotedFamilies": [
+      "member:color.new",
+      "member:color.yellow",
+      "member:false",
+      "member:input.source",
+      "member:true"
+    ],
+    "struckFamilies": [
+      "member:na",
+      "member:nz",
+      "member:plot"
+    ],
+    "cannotRunOrPartialFamilies": [
+      "member:input",
+      "member:input.int"
+    ],
+    "distinctRowsTouchingPromotedFamilies": 764,
+    "distinctRowsStruckByWrongFamilies": 805,
+    "distinctRowsTouchingCannotRunOrPartialFamilies": 695,
+    "newlyFullyAllowlistedRows": 0,
+    "stillUnknownRowsAfterTopTenCheckpoint": 87,
+    "samples": {
+      "struckRows": [
+        "v5 0001",
+        "v5 0003",
+        "v5 0004",
+        "v5 0005",
+        "v5 0006",
+        "v5 0007",
+        "v5 0009",
+        "v5 0011",
+        "v5 0012",
+        "v5 0013",
+        "v5 0014",
+        "v5 0017",
+        "v5 0018",
+        "v5 0019",
+        "v5 0020",
+        "v5 0021",
+        "v5 0022",
+        "v5 0024",
+        "v5 0026",
+        "v5 0030"
+      ],
+      "promotedTouchedRows": [
+        "v5 0001",
+        "v5 0003",
+        "v5 0004",
+        "v5 0005",
+        "v5 0006",
+        "v5 0007",
+        "v5 0009",
+        "v5 0011",
+        "v5 0012",
+        "v5 0013",
+        "v5 0014",
+        "v5 0017",
+        "v5 0018",
+        "v5 0019",
+        "v5 0020",
+        "v5 0021",
+        "v5 0022",
+        "v5 0024",
+        "v5 0026",
+        "v5 0030"
+      ],
+      "partialTouchedRows": [
+        "v5 0001",
+        "v5 0003",
+        "v5 0004",
+        "v5 0005",
+        "v5 0006",
+        "v5 0007",
+        "v5 0009",
+        "v5 0011",
+        "v5 0012",
+        "v5 0013",
+        "v5 0014",
+        "v5 0017",
+        "v5 0018",
+        "v5 0019",
+        "v5 0020",
+        "v5 0021",
+        "v5 0022",
+        "v5 0026",
+        "v5 0030",
+        "v5 0031"
+      ],
+      "newlyFullyAllowlistedRows": [],
+      "stillUnknownRows": [
+        "v5 0729",
+        "v5 0925",
+        "v5 0926",
+        "v5 0977",
+        "v6 0152",
+        "v6 0162",
+        "v6 0252",
+        "v6 0253",
+        "v6 0296",
+        "v6 0372",
+        "v6 0374",
+        "v6 0406",
+        "v6 0433",
+        "v6 0457",
+        "v6 0466",
+        "v6 0480",
+        "v6 0506",
+        "v6 0507",
+        "v6 0508",
+        "v6 0581"
+      ]
+    }
+  }
+}

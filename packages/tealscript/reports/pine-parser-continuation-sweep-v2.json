@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-12",
+  "codeUnderTest": {
+    "parserFix": "commit containing this report",
+    "runtimeRecoveryBase": "fd298c52db"
+  },
+  "derivation": {
+    "extends": "pine-parser-continuation-sweep-v1",
+    "originalCases": 37,
+    "addedCompletedOperandExpressionOperatorCases": 20,
+    "addedCases": [
+      {
+        "id": "expression.leading-plus-after-completed-conditional-operand",
+        "context": "leading binary + after a complete conditional operand",
+        "derivedFrom": [
+          "operators.arithmetic",
+          "operators.ternary",
+          "OperatorSpace",
+          "corpus rows 0497/0554/0924"
+        ],
+        "statusAfterFix": "ok"
+      },
+      {
+        "id": "expression.leading-minus-after-completed-conditional-operand",
+        "context": "leading binary - after a complete conditional operand",
+        "derivedFrom": [
+          "operators.arithmetic",
+          "operators.ternary",
+          "OperatorSpace",
+          "unary/binary sibling of +"
+        ],
+        "statusAfterFix": "ok"
+      }
+    ],
+    "addedCaseNote": "addedCases names the two fix-specific unary/binary additive probes; completedOperandOperatorSweep records the full 20-case grammar-derived sibling sweep.",
+    "completedOperandOperatorSweep": {
+      "versions": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "expressionOperators": [
+        "or",
+        "and",
+        "==",
+        "!=",
+        "<=",
+        ">=",
+        "<",
+        ">",
+        "|",
+        "^",
+        "&",
+        "<<",
+        ">>",
+        "+",
+        "-",
+        "*",
+        "/",
+        "%",
+        "?",
+        ":"
+      ],
+      "assignmentStatementOperators": [
+        ":=",
+        "+=",
+        "-=",
+        "*=",
+        "/=",
+        "%="
+      ],
+      "assignmentStatementOperatorVerdict": "not expression continuations after a completed operand; parsed by AssignmentOperator only after a left-hand target",
+      "isBlockIndentedOperatorRoutedOperators": [
+        "+",
+        "-"
+      ],
+      "misclassifiedAfterFix": 0,
+      "preFixCluster": {
+        "continuationOperators": [
+          "+",
+          "-"
+        ],
+        "triggeringCompletedOperandOperators": [
+          "<=",
+          ">="
+        ],
+        "property": "additive operators are both unary and binary and route through isBlockIndentedOperator; the completed conditional operand contained a comparison token with '=' that was mistaken for assignment evidence"
+      }
+    },
+    "unaryAndBinaryOperatorsChecked": [
+      "+",
+      "-"
+    ]
+  },
+  "summary": {
+    "cases": 57,
+    "byStatusAfterFix": {
+      "ok": 56,
+      "evidence-bound": 1
+    },
+    "parserOwnedFailuresAfterFix": 0,
+    "evidenceBoundOrOutOfScopeFailures": 1,
+    "fixedParserOwnedFailures": 1
+  },
+  "fixedCause": {
+    "id": "operator-led-continuation-after-completed-conditional",
+    "description": "isBlockIndentedOperator treated comparison operators containing '=' as assignment evidence, so leading + or - after completed conditional operands could parse as block-level unary expression statements.",
+    "fix": "Scan for top-level assignment operators only and ignore comparison operators inside conditional expressions."
+  },
+  "recoveryMeasurement": {
+    "runtimeCommit": "fd298c52db",
+    "rows": [
+      {
+        "id": "0497",
+        "declaredVersion": 6,
+        "postFixOutcome": "produced-output-compiled"
+      },
+      {
+        "id": "0554",
+        "declaredVersion": 6,
+        "postFixOutcome": "produced-output-compiled"
+      },
+      {
+        "id": "0924",
+        "declaredVersion": 5,
+        "postFixOutcome": "produced-output-compiled"
+      }
+    ],
+    "funnel": {
+      "parse": 3,
+      "semantic": 3,
+      "compile": 3,
+      "execute": 3,
+      "output": 3
+    }
+  }
+}

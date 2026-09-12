@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12T05:35:00.000Z",
+  "measuredCommitSha": "31a4d4eb61",
+  "inputs": {
+    "survivorTriageReport": "reports/external-pine-consensus-survivor-triage-v1.json",
+    "survivorTriageMeasuredCommitSha": "77182ce65e036932bda7c1699468e69983a6ad37",
+    "survivorTriageSha256": "a307b650c9985b8f806008ecf980d419d3b7b2cc322db472cee9704577c5948e",
+    "pinetsTop10FamilyProbeReport": "reports/external-pine-consensus-pinets-top10-family-probe-v1.json",
+    "pinetsTop10FamilyProbeCommitSha": "abbeda9f9d",
+    "pinetsTop10FamilyProbeSha256": "d8576dc748cfbda5e843b14c8ba1aaa7598347ba260761a312ef6bee896a88cc"
+  },
+  "strikeRule": {
+    "description": "Strike PineTS-sole candidate rows that touch a family PineTS failed against documented value-vector oracles in the top-ten family probe.",
+    "struckFamilies": [
+      "member:plot",
+      "member:na",
+      "member:nz"
+    ],
+    "reason": "Documented or hand-derived value vectors outrank a sole external implementation. PineTS failed the named probes for these families, so PineTS disagreement in rows touching them is evidence about PineTS, not TealScript."
+  },
+  "summary": {
+    "survivorsBeforeTop10Strike": 67,
+    "pinetsSoleSurvivorsBeforeTop10Strike": 65,
+    "pineAScriptSoleSurvivorsBeforeTop10Strike": 2,
+    "struckByTop10DocumentedFamilyProbe": 65,
+    "survivingAfterTop10Strike": 2,
+    "survivingAfterTop10StrikeProvenance": {
+      "pine-a-script-sole": 2
+    },
+    "survivingAfterTop10StrikeCauseClusters": {
+      "warmup-na-vs-finite": 2
+    },
+    "corroboratedExternalConsensusSurvivors": 0,
+    "newlyAllowlistedPinetsSoleRows": 0
+  },
+  "struckMemberOverlapCounts": {
+    "member:plot": 65,
+    "member:na": 40,
+    "member:nz": 21
+  },
+  "survivingRows": [
+    {
+      "key": "v7 0225",
+      "cause": "warmup-na-vs-finite",
+      "provenance": "pine-a-script-sole",
+      "differenceClass": "warmup-seed",
+      "firstDifference": "plot[0][0] 0 != null",
+      "outputFamily": "plot",
+      "previousDisposition": "survives-for-triage",
+      "reason": "PineTS top-ten strike only applies to PineTS-sole rows. This row is Pine-A-Script-sole warmup evidence and remains uncorroborated."
+    },
+    {
+      "key": "v7 0319",
+      "cause": "warmup-na-vs-finite",
+      "provenance": "pine-a-script-sole",
+      "differenceClass": "warmup-seed",
+      "firstDifference": "plot[0][0] null != 100000",
+      "outputFamily": "plot",
+      "previousDisposition": "survives-for-triage",
+      "reason": "PineTS top-ten strike only applies to PineTS-sole rows. This row is Pine-A-Script-sole warmup evidence and remains uncorroborated."
+    }
+  ],
+  "interpretation": {
+    "defectListPosture": "The automatic value candidate list now has no two-voter external-consensus rows and no PineTS-sole rows left for adoption. The only two survivors are uncorroborated Pine-A-Script-sole warmup rows.",
+    "pinetsPosture": "The positive trust map found zero fully allowlisted PineTS-sole rows. The top-ten probe then proved plot, na, and nz wrong against documented vectors and struck all 65 remaining PineTS-sole candidates.",
+    "nextAction": "Do not fix from this candidate list without a separate oracle. Candidate adoption now requires two-voter consensus, documentation/hand-derived vectors, TradingView trace, or a later positive trust probe that proves the relevant family."
+  }
+}

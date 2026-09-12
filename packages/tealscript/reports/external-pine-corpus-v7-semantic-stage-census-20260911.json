@@ -1,0 +1,3339 @@
+{
+  "measuredAt": "2026-09-11",
+  "codeUnderTest": "69c43143ac0f306f9236d7b16d29cff5c4b90991 + this report's parser/semantic changes",
+  "summary": {
+    "total": 456,
+    "parsePassed": 440,
+    "parseFailed": 16,
+    "semanticPassed": 338,
+    "semanticFailed": 102,
+    "declared": {
+      "5": 214,
+      "6": 242
+    },
+    "declarationKinds": {
+      "indicator": 318,
+      "library": 6,
+      "strategy": 132
+    },
+    "elapsedMs": 16279,
+    "cacheRoot": "/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-corpus/packages/tealscript/.cache/tealscript/pine-corpus-v7-20260911",
+    "sourcesDir": "/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-corpus/packages/tealscript/.cache/tealscript/pine-corpus-v7-20260911/sources"
+  },
+  "splitSummary": {
+    "semantic": {
+      "invalid-pine": 51,
+      "unclassified": 15,
+      "host-trace-or-unsupported": 36
+    }
+  },
+  "semanticBuckets": [
+    {
+      "key": "argument-count: matrix.sum() expects at least 2 arguments",
+      "count": 8
+    },
+    {
+      "key": "unknown-function: Unknown function: table.cell_set_text_wrap",
+      "count": 7
+    },
+    {
+      "key": "argument-count: request.footprint() expects at least 2 arguments",
+      "count": 4
+    },
+    {
+      "key": "unresolved-import: Import 'jdehorty/MLExtensions/2' as alias 'ml' was not supplied by the host library registry; provide Pine library source for jdehorty/MLExtensions version 2, or remove/change the import",
+      "count": 4
+    },
+    {
+      "key": "type-mismatch: na x cannot be a boolean because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).",
+      "count": 3
+    },
+    {
+      "key": "unresolved-import: Import 'redshad0ww/CoreMath/3' as alias 'math_lib' was not supplied by the host library registry; provide Pine library source for redshad0ww/CoreMath version 3, or remove/change the import",
+      "count": 3
+    },
+    {
+      "key": "argument-count: matrix.sum() expects at least 1 argument",
+      "count": 2
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: ma; first declared on line 118. Rename one declaration or remove the duplicate.",
+      "count": 2
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: ma; first declared on line 160. Rename one declaration or remove the duplicate.",
+      "count": 2
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: ma; first declared on line 164. Rename one declaration or remove the duplicate.",
+      "count": 2
+    },
+    {
+      "key": "type-mismatch: Cannot use string value as float matrix element",
+      "count": 2
+    },
+    {
+      "key": "type-mismatch: strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+      "count": 2
+    },
+    {
+      "key": "unknown-identifier: Unknown identifier: swept",
+      "count": 2
+    },
+    {
+      "key": "unresolved-import: Import 'boitoki/AwesomeColor/5' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 5, or remove/change the import",
+      "count": 2
+    },
+    {
+      "key": "unresolved-import: Import 'drebel/DRELib/1' as alias 'drelib' was not supplied by the host library registry; provide Pine library source for drebel/DRELib version 1, or remove/change the import",
+      "count": 2
+    },
+    {
+      "key": "unresolved-import: Import 'DskyzInvestments/DafeVisLib/1' as alias 'viz' was not supplied by the host library registry; provide Pine library source for DskyzInvestments/DafeVisLib version 1, or remove/change the import",
+      "count": 2
+    },
+    {
+      "key": "unresolved-import: Import 'TradersReality/Traders_Reality_Lib/2' as alias 'trLib' was not supplied by the host library registry; provide Pine library source for TradersReality/Traders_Reality_Lib version 2, or remove/change the import",
+      "count": 2
+    },
+    {
+      "key": "unresolved-import: Import 'ZenAndTheArtOfTrading/ZenLibrary/2' as alias 'l_zen' was not supplied by the host library registry; provide Pine library source for ZenAndTheArtOfTrading/ZenLibrary version 2, or remove/change the import",
+      "count": 2
+    },
+    {
+      "key": "unsupported-feature: strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+      "count": 2
+    },
+    {
+      "key": "unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+      "count": 2
+    },
+    {
+      "key": "argument-count: fill() expects at least 3 arguments",
+      "count": 1
+    },
+    {
+      "key": "argument-count: ticker.kagi() expects at least 3 arguments",
+      "count": 1
+    },
+    {
+      "key": "duplicate-argument: Argument 'title' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+      "count": 1
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: beta; first declared on line 636. Rename one declaration or remove the duplicate.",
+      "count": 1
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: buyVolume; first declared on line 115. Rename one declaration or remove the duplicate.",
+      "count": 1
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: eqty; first declared on line 418. Rename one declaration or remove the duplicate.",
+      "count": 1
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: et_h; first declared on line 27. Rename one declaration or remove the duplicate.",
+      "count": 1
+    },
+    {
+      "key": "duplicate-symbol: Duplicate declaration: ma; first declared on line 6. Rename one declaration or remove the duplicate.",
+      "count": 1
+    },
+    {
+      "key": "implicit-numeric-bool: Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+      "count": 1
+    },
+    {
+      "key": "invalid-na-comparison: Do not compare directly to na; use na(value) instead",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot assign float value to int variable elapsed. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot assign float value to int variable htfMins. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot assign float value to int variable left. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot assign float value to int variable matrix_int_sum. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot assign float value to int variable tf_mins. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot assign matrix<float> value to matrix<int> variable bad",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: Cannot use int value as string array element",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: hline price must be a number, got chart.point",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: hline price must be a number, got matrix<int>",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: strategy.exit trailing stop offset must be positive",
+      "count": 1
+    },
+    {
+      "key": "type-mismatch: time_close session must be a string, got int",
+      "count": 1
+    },
+    {
+      "key": "unknown-argument: Unknown argument 'step' for input()",
+      "count": 1
+    },
+    {
+      "key": "unknown-argument: Unknown argument 'text_wrap' for table.cell()",
+      "count": 1
+    },
+    {
+      "key": "unknown-argument: Unknown argument 'when' for strategy.close_all()",
+      "count": 1
+    },
+    {
+      "key": "unknown-function: Unknown function: math.cbrt",
+      "count": 1
+    },
+    {
+      "key": "unknown-function: Unknown function: strategy.opentrades.capital_held",
+      "count": 1
+    },
+    {
+      "key": "unknown-identifier: Unknown identifier: fastLength",
+      "count": 1
+    },
+    {
+      "key": "unknown-identifier: Unknown identifier: found",
+      "count": 1
+    },
+    {
+      "key": "unknown-identifier: Unknown identifier: isBullishImbalance",
+      "count": 1
+    },
+    {
+      "key": "unknown-identifier: Unknown identifier: wActifLvl",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'BlueprintResearch/lib_ephemeris/1' as alias 'eph' was not supplied by the host library registry; provide Pine library source for BlueprintResearch/lib_ephemeris version 1, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'dturkuler/lib_Indicators_DT/1' as alias 'ind' was not supplied by the host library registry; provide Pine library source for dturkuler/lib_Indicators_DT version 1, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'faiyaz7283/tools/15' as alias 'tools' was not supplied by the host library registry; provide Pine library source for faiyaz7283/tools version 15, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'HeWhoMustNotBeNamed/rzigzag/10' as alias 'zigzag' was not supplied by the host library registry; provide Pine library source for HeWhoMustNotBeNamed/rzigzag version 10, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'HeWhoMustNotBeNamed/ta/1' as alias 'eta' was not supplied by the host library registry; provide Pine library source for HeWhoMustNotBeNamed/ta version 1, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'n00btraders/Timezone/1' as alias 'tz' was not supplied by the host library registry; provide Pine library source for n00btraders/Timezone version 1, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'PineCoders/ConditionalAverages/2' as alias 'pc' was not supplied by the host library registry; provide Pine library source for PineCoders/ConditionalAverages version 2, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'RozaniGhani-RG/PriceTimeInteractive/2' as alias 'pti' was not supplied by the host library registry; provide Pine library source for RozaniGhani-RG/PriceTimeInteractive version 2, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'RVD-Projects/Drawing/4' as alias 'Drawing' was not supplied by the host library registry; provide Pine library source for RVD-Projects/Drawing version 4, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'sacredprofit/Toolbox/2' as alias 'Tools' was not supplied by the host library registry; provide Pine library source for sacredprofit/Toolbox version 2, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'vveerappa/MarketCalendar/2' as alias 'mktCalendar' was not supplied by the host library registry; provide Pine library source for vveerappa/MarketCalendar version 2, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'vveerappa/ProfilerData_Asia/4' as alias 'LibAsia' was not supplied by the host library registry; provide Pine library source for vveerappa/ProfilerData_Asia version 4, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'vveerappa/RangeSessionLib/20' as alias 'RSL' was not supplied by the host library registry; provide Pine library source for vveerappa/RangeSessionLib version 20, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unresolved-import: Import 'vveerappa/StatsLib/3' as alias 'Stats' was not supplied by the host library registry; provide Pine library source for vveerappa/StatsLib version 3, or remove/change the import",
+      "count": 1
+    },
+    {
+      "key": "unsupported-feature: strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+      "count": 1
+    }
+  ],
+  "rows": [
+    {
+      "localPath": "sources/0003__folknor-pine-tools__INV147-generic-overload-return.pine",
+      "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+      "sourceFilePath": "packages/core/test/fixtures/regression/INV147-generic-overload-return.pine",
+      "commitSha": "12ef0e01cbd00d1b444049b15170ef7eb3fa6cf9",
+      "sourceSha256": "e6a98fe9dc42cf43daf3184477c2518aebb38fdbe8654e460b8e735fc3492c75",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.abs",
+        "matrix.sum"
+      ],
+      "source": "sources/0003__folknor-pine-tools__INV147-generic-overload-return.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot assign matrix<float> value to matrix<int> variable bad",
+        "line": 20,
+        "column": 1
+      },
+      "sourceLine": "matrix<int> bad = matrix.mult(mf, mf)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Expected matrix<int> mismatch",
+        "verdict": "After matrix/vector return inference, only the fixture's TV-probed bad `matrix<int>` assignment remains."
+      }
+    },
+    {
+      "localPath": "sources/0009__helenananaa-pine-compat-runtime__builtin_array_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/builtin_array_call_result_reads.pine",
+      "commitSha": "9c60e67188bea9e9de7bbb52da618bfb029f815b",
+      "sourceSha256": "ac1ae3f0f889aa395ea2f699ca6febdcd5dd95e6fa7f6ce7d612eacf49c926d9",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.abs",
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0009__helenananaa-pine-compat-runtime__builtin_array_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "na x cannot be a boolean because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).",
+        "line": 323,
+        "column": 9
+      },
+      "sourceLine": "plot(na(none_includes) ? 1 : 0)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Pine v6 bool/numeric version mismatch",
+        "verdict": "Correct v6 refusal; v3-v5 compatibility does not apply to declared v6 source."
+      }
+    },
+    {
+      "localPath": "sources/0010__helenananaa-pine-compat-runtime__unsupported_builtin_array_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_builtin_array_call_result_reads.pine",
+      "commitSha": "9c60e67188bea9e9de7bbb52da618bfb029f815b",
+      "sourceSha256": "547bd2c4e6a2c15aee6305a1757ce3a806f77be6d34b2a264dc4b55faaea9ce1",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.abs"
+      ],
+      "source": "sources/0010__helenananaa-pine-compat-runtime__unsupported_builtin_array_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "fill() expects at least 3 arguments",
+        "line": 45,
+        "column": 29
+      },
+      "sourceLine": "    array.copy(values).fill(3)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "collection receiver method on unsupported call-result fixture",
+        "verdict": "Disputed with the corpus-lane invalid judgement; source fixture is explicitly unsupported, so do not accept without compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0027__regalouisei-collect-tradingview__session-barcandle-coloring.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/session-barcandle-coloring.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "a1840fd61c58e5e3a600a2e54ab428a5d27b7b125105ebab7c12f3aadfbd0aa0",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.every"
+      ],
+      "source": "sources/0027__regalouisei-collect-tradingview__session-barcandle-coloring.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'n00btraders/Timezone/1' as alias 'tz' was not supplied by the host library registry; provide Pine library source for n00btraders/Timezone version 1, or remove/change the import",
+        "line": 7,
+        "column": 1
+      },
+      "sourceLine": "import n00btraders/Timezone/1 as tz     // library to help with providing a timezone input in the indicator settings",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0031__helenananaa-pine-compat-runtime__builtin_namespace_array_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/builtin_namespace_array_call_result_reads.pine",
+      "commitSha": "9c60e67188bea9e9de7bbb52da618bfb029f815b",
+      "sourceSha256": "9926c8a2f4bc2c84295b47ef6acb3162b39fc3d87de319c86dfa41eeb5de35e1",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.every",
+        "array.percentile_nearest_rank",
+        "matrix.eigenvalues"
+      ],
+      "source": "sources/0031__helenananaa-pine-compat-runtime__builtin_namespace_array_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "na x cannot be a boolean because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).",
+        "line": 39,
+        "column": 9
+      },
+      "sourceLine": "plot(na(str.split(na, \",\").includes(\"missing\")) ? 1 : 0, \"split_na_includes\")",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Pine v6 bool/numeric version mismatch",
+        "verdict": "Correct v6 refusal; v3-v5 compatibility does not apply to declared v6 source."
+      }
+    },
+    {
+      "localPath": "sources/0045__vinay-veerappa-tvDownloadOHLC__DailyNYLevelsAnalytics.pine",
+      "sourceRepoUrl": "https://github.com/vinay-veerappa/tvDownloadOHLC",
+      "sourceFilePath": "scripts/indicators-pine/daily-ny-levels/DailyNYLevelsAnalytics.pine",
+      "commitSha": "6ace8619b65af6e8138bce77b448c90bd602ece2",
+      "sourceSha256": "66a3d73d8a1ffcf4ef632f484a9e4d5c71c2f22599cc2587a66cd6cfc1d88236",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0045__vinay-veerappa-tvDownloadOHLC__DailyNYLevelsAnalytics.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'vveerappa/RangeSessionLib/20' as alias 'RSL' was not supplied by the host library registry; provide Pine library source for vveerappa/RangeSessionLib version 20, or remove/change the import",
+        "line": 33,
+        "column": 1
+      },
+      "sourceLine": "import vveerappa/RangeSessionLib/20 as RSL",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0047__heyphat-piner__anchored-vwap-magnitized.pine",
+      "sourceRepoUrl": "https://github.com/heyphat/piner",
+      "sourceFilePath": "test/pinescripts/anchored-vwap-magnitized.pine",
+      "commitSha": "db6514474da2940f532655f36dfc20d118bf36b3",
+      "sourceSha256": "52e585e43aec23a979f64d699c1dd715bbf371f6a177900586ffa16538c6239f",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0047__heyphat-piner__anchored-vwap-magnitized.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot assign float value to int variable elapsed. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+        "line": 147,
+        "column": 9
+      },
+      "sourceLine": "        int elapsed = (time - t) / 1000",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Implicit float-to-int assignment",
+        "verdict": "Correct refusal; Pine requires explicit `int(...)` conversion."
+      }
+    },
+    {
+      "localPath": "sources/0051__itmakesyousick-Barbwire__2.0.0.pine",
+      "sourceRepoUrl": "https://github.com/itmakesyousick/Barbwire",
+      "sourceFilePath": "2.0.0.pine",
+      "commitSha": "53fe44e73f815f8b685dd666359cd3ad9bb77b7a",
+      "sourceSha256": "589a0c00aa911a38bc34c4d89ea946995e792322c762827eebaab1ba17eb58b0",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0051__itmakesyousick-Barbwire__2.0.0.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'boitoki/AwesomeColor/5' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 5, or remove/change the import",
+        "line": 7,
+        "column": 1
+      },
+      "sourceLine": "import boitoki/AwesomeColor/5 as ac",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0052__itmakesyousick-Barbwire__3.0.0.pine",
+      "sourceRepoUrl": "https://github.com/itmakesyousick/Barbwire",
+      "sourceFilePath": "3.0.0.pine",
+      "commitSha": "8baf2a46fa2b2f83721540065ba81daf3800c997",
+      "sourceSha256": "7be82e09d86d5eaa512c6e54899a97f7e242e6dd416d2a83d91ef64285e17d63",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0052__itmakesyousick-Barbwire__3.0.0.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'boitoki/AwesomeColor/5' as alias 'ac' was not supplied by the host library registry; provide Pine library source for boitoki/AwesomeColor version 5, or remove/change the import",
+        "line": 7,
+        "column": 1
+      },
+      "sourceLine": "import boitoki/AwesomeColor/5 as ac",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0054__DennisDyallo-PineScript__sr-algo1-volume-profile.pine",
+      "sourceRepoUrl": "https://github.com/DennisDyallo/PineScript",
+      "sourceFilePath": "support-resistance/sr-algo1-volume-profile.pine",
+      "commitSha": "f89c4d3c6368474d53015615c758b21a06a268d4",
+      "sourceSha256": "e0a340cdf7df00547f85cea3fa04401818f250f827605b944494a98b71080582",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0054__DennisDyallo-PineScript__sr-algo1-volume-profile.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'redshad0ww/CoreMath/3' as alias 'math_lib' was not supplied by the host library registry; provide Pine library source for redshad0ww/CoreMath version 3, or remove/change the import",
+        "line": 45,
+        "column": 1
+      },
+      "sourceLine": "import redshad0ww/CoreMath/3 as math_lib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0055__DennisDyallo-PineScript__sr-algo5-ensemble.pine",
+      "sourceRepoUrl": "https://github.com/DennisDyallo/PineScript",
+      "sourceFilePath": "support-resistance/sr-algo5-ensemble.pine",
+      "commitSha": "81fad8dfbe0df7ae6806be9ea2164a5099b7e903",
+      "sourceSha256": "37f1e45fae3dc51b5b6692ab67ed76a6d63790635bd327ff6b4103fafc372607",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0055__DennisDyallo-PineScript__sr-algo5-ensemble.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'redshad0ww/CoreMath/3' as alias 'math_lib' was not supplied by the host library registry; provide Pine library source for redshad0ww/CoreMath version 3, or remove/change the import",
+        "line": 44,
+        "column": 1
+      },
+      "sourceLine": "import redshad0ww/CoreMath/3 as math_lib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0056__DennisDyallo-PineScript__sr-algo5-ensemble-v2.pine",
+      "sourceRepoUrl": "https://github.com/DennisDyallo/PineScript",
+      "sourceFilePath": "support-resistance/sr-algo5-ensemble-v2.pine",
+      "commitSha": "5065c8b3682d7f900906c0577f0f4025331b1b57",
+      "sourceSha256": "a8f5debcc3834120a0ea8fb97b8af10829afa7e90a2f932cd4217e1b0749bc22",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank"
+      ],
+      "source": "sources/0056__DennisDyallo-PineScript__sr-algo5-ensemble-v2.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'redshad0ww/CoreMath/3' as alias 'math_lib' was not supplied by the host library registry; provide Pine library source for redshad0ww/CoreMath version 3, or remove/change the import",
+        "line": 83,
+        "column": 1
+      },
+      "sourceLine": "import redshad0ww/CoreMath/3 as math_lib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0058__regalouisei-collect-tradingview__portfolio-laboratory-kioseff-trading.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/portfolio-laboratory-kioseff-trading.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "5e4e556ac108a81a9d9d2f90a009b818b9ab4e3b0fc270213768f96ea22ed472",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.percentile_nearest_rank",
+        "request.quandl"
+      ],
+      "source": "sources/0058__regalouisei-collect-tradingview__portfolio-laboratory-kioseff-trading.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: beta; first declared on line 636. Rename one declaration or remove the duplicate.",
+        "line": 644,
+        "column": 1
+      },
+      "sourceLine": "beta                                          = str.tostring(beta(), format.mintick)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0088__helenananaa-pine-compat-runtime__unsupported_chart_point_return_qualifier.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_chart_point_return_qualifier.pine",
+      "commitSha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+      "sourceSha256": "57462de88af067baa011d3a53e071ce69522932daa387be9e74ee18572578e3d",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "chart.point.copy"
+      ],
+      "source": "sources/0088__helenananaa-pine-compat-runtime__unsupported_chart_point_return_qualifier.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "hline price must be a number, got chart.point",
+        "line": 10,
+        "column": 7
+      },
+      "sourceLine": "hline(new_point)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "hline nonnumeric price",
+        "verdict": "Correct refusal: hline price must be numeric."
+      }
+    },
+    {
+      "localPath": "sources/0103__folknor-pine-tools__coverage-footprint.pine",
+      "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+      "sourceFilePath": "packages/core/test/fixtures/regression/coverage-footprint.pine",
+      "commitSha": "ba6ec311f647faaf9aa20dfee4ceee82a675fc81",
+      "sourceSha256": "bd4a615aa84dc1d47a6a53772df3268e9db817805a39a11ef78e9bcb65b1d06d",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "footprint.buy_volume",
+        "footprint.delta",
+        "footprint.get_row_by_price",
+        "footprint.poc",
+        "footprint.rows",
+        "footprint.sell_volume",
+        "footprint.total_volume",
+        "footprint.vah",
+        "footprint.val",
+        "request.footprint",
+        "volume_row.buy_volume",
+        "volume_row.delta",
+        "volume_row.down_price",
+        "volume_row.has_buy_imbalance",
+        "volume_row.has_sell_imbalance",
+        "volume_row.sell_volume",
+        "volume_row.total_volume",
+        "volume_row.up_price"
+      ],
+      "source": "sources/0103__folknor-pine-tools__coverage-footprint.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "request.footprint() expects at least 2 arguments",
+        "line": 8,
+        "column": 24
+      },
+      "sourceLine": "fp = request.footprint(10)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "request.footprint missing va_percent",
+        "verdict": "Committed v6 signature requires ticks_per_row and va_percent; one-argument forms are invalid."
+      }
+    },
+    {
+      "localPath": "sources/0118__matiu2-trade-control-web-hook__candle-signals-v2.pine",
+      "sourceRepoUrl": "https://github.com/matiu2/trade-control-web-hook",
+      "sourceFilePath": "pine-scripts/candle-signals-v2.pine",
+      "commitSha": "cde807c5733b96f3772f09ce64939104cff2dd83",
+      "sourceSha256": "da2455fd785de1570a5ee57f40f2c0db0860a9be7fd1edbdf951529fccb9747c",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "label.style_cross"
+      ],
+      "source": "sources/0118__matiu2-trade-control-web-hook__candle-signals-v2.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot assign float value to int variable tf_mins. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+        "line": 197,
+        "column": 5
+      },
+      "sourceLine": "    int tf_mins = timeframe.in_seconds() / 60",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Implicit float-to-int assignment",
+        "verdict": "Correct refusal; Pine requires explicit `int(...)` conversion."
+      }
+    },
+    {
+      "localPath": "sources/0124__hasnocool-tradingview-pine-scripts__Hull-MA-TimeFrame-CrossOver.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "Hull MA TimeFrame CrossOver.pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "39982dfb731bce91206c02c57eec028b536a9d275effcf2cce8c0693afd13466",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 84,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 5781,
+        "transformedByteSize": 4369
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "label.style_cross"
+      ],
+      "source": "sources/0124__hasnocool-tradingview-pine-scripts__Hull-MA-TimeFrame-CrossOver.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-argument",
+        "message": "Unknown argument 'when' for strategy.close_all()",
+        "line": 63,
+        "column": 24
+      },
+      "sourceLine": "    strategy.close_all(when=(price > xATRTrailingStop and above) or (price < xATRTrailingStop and below), comment='ATR SL',alert_message='ATR SL') ",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Unknown strategy.close_all when argument",
+        "verdict": "Committed signature has comment/alert_message/immediately/disable_alert; `when` is invalid."
+      }
+    },
+    {
+      "localPath": "sources/0126__hasnocool-tradingview-pine-scripts__supertrend-with-multiple-filter-strategy.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "supertrend with multiple filter strategy.pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "a6f1884ba2225f768ec963c92c237f84d92063ae3c3a4698c43933900f4b3064",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 884,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 42262,
+        "transformedByteSize": 34121
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "label.style_cross"
+      ],
+      "source": "sources/0126__hasnocool-tradingview-pine-scripts__supertrend-with-multiple-filter-strategy.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-argument",
+        "message": "Argument 'title' for plot() was supplied multiple times. Pine parameters can be set only once; remove one of the values.",
+        "line": 512,
+        "column": 195
+      },
+      "sourceLine": "plot(series=strategy.position_size > 0 and use_percent_base_trailing_stop_exits ? longStopPricess : na, color=color.red, style=plot.style_linebr, linewidth=1, title=\"Long Trail Stop\", offset=1, title=\"Long Trail Stop\")",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Duplicate call argument",
+        "verdict": "Correct refusal; a Pine parameter can be bound once."
+      }
+    },
+    {
+      "localPath": "sources/0131__BrandonFreire-Prj_ML_VisualizacionDeDatosMedianteMotorDeCharting__03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "sourceRepoUrl": "https://github.com/BrandonFreire/Prj_ML_VisualizacionDeDatosMedianteMotorDeCharting",
+      "sourceFilePath": "snippets/03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "commitSha": "039da2eb614c0325695b948ccc3dd8c0d2cecfa4",
+      "sourceSha256": "925f9ce043a450ab3b4401ec3e2fc0b3ceec51435184b61893b392226a23360c",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "line.set_first_point",
+        "line.set_second_point"
+      ],
+      "source": "sources/0131__BrandonFreire-Prj_ML_VisualizacionDeDatosMedianteMotorDeCharting__03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 6. Rename one declaration or remove the duplicate.",
+        "line": 1530,
+        "column": 1
+      },
+      "sourceLine": "ma = ta.sma(ccisrc, ccilength)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0139__taichunmin-tradingview-pine__20230626-myo-omega-turtle-soup.pine",
+      "sourceRepoUrl": "https://github.com/taichunmin/tradingview-pine",
+      "sourceFilePath": "20230626-myo-omega-turtle-soup.pine",
+      "commitSha": "77f1a96b4d2a4621d1d0b77854477d851e09d91f",
+      "sourceSha256": "5a69346a2e80950e33a99b26d925b1d16a2e1b8ec54b65a477c83a52f69b268d",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "math.rphi"
+      ],
+      "source": "sources/0139__taichunmin-tradingview-pine__20230626-myo-omega-turtle-soup.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "strategy.exit trailing stop offset must be positive",
+        "line": 119,
+        "column": 122
+      },
+      "sourceLine": "        strategy.exit(\"Short Exit50%\", comment= \"Short Exit50%\" + str.tostring(low[0]), qty_percent = 50, trail_offset = -2, stop = sl_S)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Invalid strategy.exit trailing stop",
+        "verdict": "Correct refusal: trailing stops need positive/paired trail parameters."
+      }
+    },
+    {
+      "localPath": "sources/0140__helenananaa-pine-compat-runtime__math.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/math.pine",
+      "commitSha": "1fe28e59d9482a9b60cac986c91e2f1e2942c6ab",
+      "sourceSha256": "480fda7a828a9f43cd538643ee7d13e7719579b1a0acd09820ee6bfe0c4ee140",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "math.rphi"
+      ],
+      "source": "sources/0140__helenananaa-pine-compat-runtime__math.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: math.cbrt",
+        "line": 11,
+        "column": 14
+      },
+      "sourceLine": "cbrt_value = math.cbrt(close)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent math.cbrt",
+        "verdict": "Not in committed Pine v6 manual snapshot; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0154__helenananaa-pine-compat-runtime__unsupported_matrix_fixed_float_collection_return_qualifier.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_fixed_float_collection_return_qualifier.pine",
+      "commitSha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+      "sourceSha256": "7c01114e07e6567757389a5d76f9c9de319802ce967b40dda0735c2567b000ee",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvalues",
+        "matrix.eigenvectors",
+        "matrix.pinv"
+      ],
+      "source": "sources/0154__helenananaa-pine-compat-runtime__unsupported_matrix_fixed_float_collection_return_qualifier.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot use string value as float matrix element",
+        "line": 12,
+        "column": 40
+      },
+      "sourceLine": "matrix.fill(matrix.eigenvectors(ints), \"bad\")",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Collection element type mismatch",
+        "verdict": "Correct refusal: collection element writes must match element type."
+      }
+    },
+    {
+      "localPath": "sources/0155__helenananaa-pine-compat-runtime__matrix_int.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/matrix_int.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "4b7ae9c60c98ee215482e50e87f14dc5b8874a53b810b5a9ea05b4e65cdc88f7",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvalues",
+        "matrix.is_symmetric",
+        "matrix.sum"
+      ],
+      "source": "sources/0155__helenananaa-pine-compat-runtime__matrix_int.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 177,
+        "column": 17
+      },
+      "sourceLine": "plot(matrix.sum(int_stats), \"int_sum\")",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0156__helenananaa-pine-compat-runtime__supported_builtin_namespace_array_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/supported_builtin_namespace_array_call_result_reads.pine",
+      "commitSha": "9c60e67188bea9e9de7bbb52da618bfb029f815b",
+      "sourceSha256": "0c7ad9edbb3e8e8c8d6e52b8296c178b9ad512be3ddfb87a25ad0f4e257a4185",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvalues"
+      ],
+      "source": "sources/0156__helenananaa-pine-compat-runtime__supported_builtin_namespace_array_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot assign float value to int variable matrix_int_sum. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+        "line": 86,
+        "column": 1
+      },
+      "sourceLine": "int matrix_int_sum = matrix.col(int_matrix, 0).sum()",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Implicit float-to-int assignment",
+        "verdict": "Correct refusal; Pine requires explicit `int(...)` conversion."
+      }
+    },
+    {
+      "localPath": "sources/0157__helenananaa-pine-compat-runtime__unsupported_builtin_namespace_array_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_builtin_namespace_array_call_result_reads.pine",
+      "commitSha": "0adcb9e499fca0e1c488f2c806e3232354fa0eb2",
+      "sourceSha256": "311b81087b6bfb9e0c51142eb3179f3655e7d8e5aad881097bd9ea76e361e41b",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvalues"
+      ],
+      "source": "sources/0157__helenananaa-pine-compat-runtime__unsupported_builtin_namespace_array_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot use int value as string array element",
+        "line": 12,
+        "column": 28
+      },
+      "sourceLine": "str.split(\"a,b\", \",\").push(1)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Collection element type mismatch",
+        "verdict": "Correct refusal: collection element writes must match element type."
+      }
+    },
+    {
+      "localPath": "sources/0166__helenananaa-pine-compat-runtime__unsupported_builtin_namespace_matrix_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_builtin_namespace_matrix_call_result_reads.pine",
+      "commitSha": "ab3ccbea61b5a97b5686ff73409922766c9c11fa",
+      "sourceSha256": "85af674f80bc96dd251676375866f86f8d0ee7ccd1ff4ac6a01804b1eb792b2b",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvectors",
+        "matrix.pinv"
+      ],
+      "source": "sources/0166__helenananaa-pine-compat-runtime__unsupported_builtin_namespace_matrix_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot use string value as float matrix element",
+        "line": 67,
+        "column": 31
+      },
+      "sourceLine": "matrix.mult(left, right).fill(\"bad\")",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Collection element type mismatch",
+        "verdict": "Correct refusal: collection element writes must match element type."
+      }
+    },
+    {
+      "localPath": "sources/0167__helenananaa-pine-compat-runtime__builtin_namespace_matrix_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/builtin_namespace_matrix_call_result_reads.pine",
+      "commitSha": "ab3ccbea61b5a97b5686ff73409922766c9c11fa",
+      "sourceSha256": "fa8745262e80c378fc89ec6184c8c4e89d122f0682e5be18af71847f2f7771b2",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvectors",
+        "matrix.pinv"
+      ],
+      "source": "sources/0167__helenananaa-pine-compat-runtime__builtin_namespace_matrix_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 1 argument"
+      },
+      "sourceLine": "",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0168__helenananaa-pine-compat-runtime__supported_builtin_namespace_matrix_call_result_reads.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/supported_builtin_namespace_matrix_call_result_reads.pine",
+      "commitSha": "ab3ccbea61b5a97b5686ff73409922766c9c11fa",
+      "sourceSha256": "7f07ee0887c92d214bf18693236c16fd99b2a25fbe621ddebcdfaff69e3479a8",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.eigenvectors",
+        "matrix.pinv"
+      ],
+      "source": "sources/0168__helenananaa-pine-compat-runtime__supported_builtin_namespace_matrix_call_result_reads.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 1 argument"
+      },
+      "sourceLine": "",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0187__vinay-veerappa-tvDownloadOHLC__HitTracking.pine",
+      "sourceRepoUrl": "https://github.com/vinay-veerappa/tvDownloadOHLC",
+      "sourceFilePath": "scripts/indicators-pine/lib-pine/HitTracking.pine",
+      "commitSha": "06aad82e9d83d271101d66e32d1dbf3be2a8ef4f",
+      "sourceSha256": "2c29685ed095e6fcab0eff3d7652701e124411eb592b282dbcd680e78c13e571",
+      "declarationKind": "library",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.remove_col"
+      ],
+      "source": "sources/0187__vinay-veerappa-tvDownloadOHLC__HitTracking.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'vveerappa/StatsLib/3' as alias 'Stats' was not supplied by the host library registry; provide Pine library source for vveerappa/StatsLib version 3, or remove/change the import",
+        "line": 23,
+        "column": 1
+      },
+      "sourceLine": "import vveerappa/StatsLib/3 as Stats",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0188__vinay-veerappa-tvDownloadOHLC__ProfilerIndicator.pine",
+      "sourceRepoUrl": "https://github.com/vinay-veerappa/tvDownloadOHLC",
+      "sourceFilePath": "scripts/indicators-pine/profiler/ProfilerIndicator.pine",
+      "commitSha": "b029649ce2ef9fbf5ac5a356e7321a01dc261848",
+      "sourceSha256": "ad40659fce4224841ddc2a04009ac92f265d0aadd6dc85173b14398977362a32",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.remove_col"
+      ],
+      "source": "sources/0188__vinay-veerappa-tvDownloadOHLC__ProfilerIndicator.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'vveerappa/ProfilerData_Asia/4' as alias 'LibAsia' was not supplied by the host library registry; provide Pine library source for vveerappa/ProfilerData_Asia version 4, or remove/change the import",
+        "line": 20,
+        "column": 1
+      },
+      "sourceLine": "import vveerappa/ProfilerData_Asia/4 as LibAsia",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0195__helenananaa-pine-compat-runtime__matrix_bool.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/matrix_bool.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "60915f0447447b2f4f3031a6179c1d0ff815ce2e6751be833439ad557e58fba3",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.remove_col",
+        "matrix.swap_columns"
+      ],
+      "source": "sources/0195__helenananaa-pine-compat-runtime__matrix_bool.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "na x cannot be a boolean because Pine v6 does not allow boolean na values. This was valid in Pine v3-v5 but is not valid in Pine v6. Use bool(na) for an explicitly nullable bool, or test a value with na(...).",
+        "line": 9,
+        "column": 13
+      },
+      "sourceLine": "set_na = na(values.get(1, 0)) ? 1 : 0",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Pine v6 bool/numeric version mismatch",
+        "verdict": "Correct v6 refusal; v3-v5 compatibility does not apply to declared v6 source."
+      }
+    },
+    {
+      "localPath": "sources/0200__raybird-pine-trading-strategies__volume_profile_matrix_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/volume_profile_matrix_v6.pine",
+      "commitSha": "506d06cdc18eecd35245c04e60e5f11872651dc7",
+      "sourceSha256": "566a99929da2355952aeed546bbfd46f115528cbc07df7b3fad7649bbaf8b474",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum",
+        "request.footprint"
+      ],
+      "source": "sources/0200__raybird-pine-trading-strategies__volume_profile_matrix_v6.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "implicit-numeric-bool",
+        "message": "Numeric int expression cannot be used as a boolean in Pine v6. This was valid in Pine v3-v5 but is not valid in Pine v6. Compare it explicitly or wrap it in bool(...).",
+        "line": 29,
+        "column": 4
+      },
+      "sourceLine": "if ta.change(time(\"D\"))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Pine v6 bool/numeric version mismatch",
+        "verdict": "Correct v6 refusal; v3-v5 compatibility does not apply to declared v6 source."
+      }
+    },
+    {
+      "localPath": "sources/0201__folknor-pine-tools__INV056-overload-missing-required-arg.pine",
+      "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+      "sourceFilePath": "packages/core/test/fixtures/regression/INV056-overload-missing-required-arg.pine",
+      "commitSha": "8def6178f74b3c20561bc3396f1893607f3efcdd",
+      "sourceSha256": "04dd83b73909fa6148980f0471941a48cdab9f241be65a590abe29d1e0f8fd93",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0201__folknor-pine-tools__INV056-overload-missing-required-arg.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 11,
+        "column": 19
+      },
+      "sourceLine": "bad1 = matrix.sum(m)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0202__helenananaa-pine-compat-runtime__supported_matrix_sum.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/supported_matrix_sum.pine",
+      "commitSha": "16f6492487a82e3098750056b53ae8eb7cd58159",
+      "sourceSha256": "3ffbaa32d4c1f211f291721bde86cc3ab8f035b2e1c9e190d245444ef0c74d8b",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0202__helenananaa-pine-compat-runtime__supported_matrix_sum.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 5,
+        "column": 17
+      },
+      "sourceLine": "plot(matrix.sum(values))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0203__helenananaa-pine-compat-runtime__matrix_sum.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/matrix_sum.pine",
+      "commitSha": "16f6492487a82e3098750056b53ae8eb7cd58159",
+      "sourceSha256": "ab8457d002daa4a56e3e8e0bd0d6efc91be4548c75fde043c8f1c7722924d628",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0203__helenananaa-pine-compat-runtime__matrix_sum.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 8,
+        "column": 28
+      },
+      "sourceLine": "namespace_sum = matrix.sum(values)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0204__helenananaa-pine-compat-runtime__unsupported_matrix_bool_sum.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_bool_sum.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "3aaa6bdcf4c54fc7ce85b8342c99bb969c051aed1be101fef3065fddd798dd49",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0204__helenananaa-pine-compat-runtime__unsupported_matrix_bool_sum.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 5,
+        "column": 20
+      },
+      "sourceLine": "total = matrix.sum(values)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0205__helenananaa-pine-compat-runtime__unsupported_matrix_color_sum.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_color_sum.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "f0ed70d35f91f82e8347002853bf5ee0a0f04de5804e107a0dfa241910d87d0f",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0205__helenananaa-pine-compat-runtime__unsupported_matrix_color_sum.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 5,
+        "column": 17
+      },
+      "sourceLine": "plot(matrix.sum(values))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0206__helenananaa-pine-compat-runtime__unsupported_matrix_string_sum.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_string_sum.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "01d1d44dc42430ade224dab4f8e7bf43e6bcc6715b0fa2342270d92242955046",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0206__helenananaa-pine-compat-runtime__unsupported_matrix_string_sum.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 5,
+        "column": 20
+      },
+      "sourceLine": "total = matrix.sum(values)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0207__helenananaa-pine-compat-runtime__supported_matrix_aggregate_return_qualifier.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/supported_matrix_aggregate_return_qualifier.pine",
+      "commitSha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+      "sourceSha256": "9d903d3d405ca77c3df9254abaac111aa69cbf062fbe032ed81e7f5ddc2c9a0f",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0207__helenananaa-pine-compat-runtime__supported_matrix_aggregate_return_qualifier.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "matrix.sum() expects at least 2 arguments",
+        "line": 7,
+        "column": 17
+      },
+      "sourceLine": "plot(matrix.sum(int_values) + matrix.avg(int_values) + matrix.min(int_values) + matrix.max(int_values) + matrix.mode(int_values) + matrix.trace(int_values) + matrix.det(int_values))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "matrix.sum one-argument call",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0208__helenananaa-pine-compat-runtime__unsupported_matrix_aggregate_const_input_return_qualifier.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_aggregate_const_input_return_qualifier.pine",
+      "commitSha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+      "sourceSha256": "79f08261576f2865a4fee81febbab36f7fb72cf5e3a0760de274a056c84f7823",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "matrix.sum"
+      ],
+      "source": "sources/0208__helenananaa-pine-compat-runtime__unsupported_matrix_aggregate_const_input_return_qualifier.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "hline price must be a number, got matrix<int>",
+        "line": 7,
+        "column": 7
+      },
+      "sourceLine": "hline(matrix.sum(int_values))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "hline nonnumeric price",
+        "verdict": "Correct refusal: hline price must be numeric."
+      }
+    },
+    {
+      "localPath": "sources/0226__raybird-pine-trading-strategies__tn_footprint_imbalance_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/tn_footprint_imbalance_v6.pine",
+      "commitSha": "ccb4ae709ac325cf8302e34f8882a7469288eadb",
+      "sourceSha256": "ccee7b4b2622c9f7b9912c7892fb2da848cf7dfe466524a376f7ad8f9c18dc7e",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0226__raybird-pine-trading-strategies__tn_footprint_imbalance_v6.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-identifier",
+        "message": "Unknown identifier: isBullishImbalance",
+        "line": 66,
+        "column": 142
+      },
+      "sourceLine": "    label.set_text(info, str.format(\"TN Sovereign Metrics:\\nDelta: {0,number,#.##}\\nMode: {1}\\nImbalance Hit: {2}\", fbData.delta(), profile, isBullishImbalance ? \"BULL\" : isBearishImbalance ? \"BEAR\" : \"NONE\"))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Undefined source identifier",
+        "verdict": "Source references a name with no visible declaration."
+      }
+    },
+    {
+      "localPath": "sources/0227__raybird-pine-trading-strategies__stacked_imbalance_sovereign_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/stacked_imbalance_sovereign_v6.pine",
+      "commitSha": "95bc86dbbf9e159796ee428c49651cfdaeae83e4",
+      "sourceSha256": "7fb1be874470a39eb0032b18d93279fae4e81822733798fec86702fd37601315",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0227__raybird-pine-trading-strategies__stacked_imbalance_sovereign_v6.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "request.footprint() expects at least 2 arguments",
+        "line": 19,
+        "column": 24
+      },
+      "sourceLine": "fp = request.footprint(syminfo.tickerid)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "request.footprint missing va_percent",
+        "verdict": "Committed v6 signature requires ticks_per_row and va_percent; one-argument forms are invalid."
+      }
+    },
+    {
+      "localPath": "sources/0239__piecioshka-tradingview-pine-scripts__volume-delta-histogram.pine",
+      "sourceRepoUrl": "https://github.com/piecioshka/tradingview-pine-scripts",
+      "sourceFilePath": "indicators-premium/volume/volume-delta-histogram/volume-delta-histogram.pine",
+      "commitSha": "a05009372d2016a8a3a78c335495150e4e19927f",
+      "sourceSha256": "f6c9ae1dfc3e422ebf3c955e5d0564f6291ff6ff0f26cf7e86b5a1b325297d9f",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0239__piecioshka-tradingview-pine-scripts__volume-delta-histogram.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "request.footprint() expects at least 2 arguments",
+        "line": 37,
+        "column": 24
+      },
+      "sourceLine": "fp = request.footprint(1)        // ticks_per_row irrelevant for the delta total",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "request.footprint missing va_percent",
+        "verdict": "Committed v6 signature requires ticks_per_row and va_percent; one-argument forms are invalid."
+      }
+    },
+    {
+      "localPath": "sources/0243__ainell-owi-LePine__Siege-_structure-_engine_v6.pine",
+      "sourceRepoUrl": "https://github.com/ainell-owi/LePine",
+      "sourceFilePath": "Model Indicators/Dskyz[Dafe]_collective/Indicators/Siege _structure _engine_v6.pine",
+      "commitSha": "051410d541cf4f5f20050178670b7e3992b6f706",
+      "sourceSha256": "231f436a8e28f579d87e7a1d876cf8df65cf1bd8d616d6ef8582f5c1255d07d5",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0243__ainell-owi-LePine__Siege-_structure-_engine_v6.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-identifier",
+        "message": "Unknown identifier: found",
+        "line": 372,
+        "column": 40
+      },
+      "sourceLine": "                                if not found",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Nested local declaration visibility",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0244__ainell-owi-LePine__Trend_State_v6.pine",
+      "sourceRepoUrl": "https://github.com/ainell-owi/LePine",
+      "sourceFilePath": "Model Indicators/Dskyz[Dafe]_collective/Indicators/Trend_State_[DAFE]/Trend_State_v6.pine",
+      "commitSha": "5c8667271dbc56f27d3f9cfa53d71e8fbab90391",
+      "sourceSha256": "1fdde1eafd2fe4eb15341fb0f45aa965425b4b72fbfe675627f1c77cc56bf923",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0244__ainell-owi-LePine__Trend_State_v6.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'DskyzInvestments/DafeVisLib/1' as alias 'viz' was not supplied by the host library registry; provide Pine library source for DskyzInvestments/DafeVisLib version 1, or remove/change the import",
+        "line": 16,
+        "column": 1
+      },
+      "sourceLine": "import DskyzInvestments/DafeVisLib/1 as viz",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0245__ainell-owi-LePine__QUASIMODO_RANGE_ENGINE_-DAFE-_V6.pine",
+      "sourceRepoUrl": "https://github.com/ainell-owi/LePine",
+      "sourceFilePath": "Model Indicators/Dskyz[Dafe]_collective/Indicators/QUASIMODO_RANGE_ENGINE_[DAFE]_V6.pine",
+      "commitSha": "051410d541cf4f5f20050178670b7e3992b6f706",
+      "sourceSha256": "6df2adad22751bddc900bbd3fba74e589e072b08a291edab4209188cffb1ff93",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0245__ainell-owi-LePine__QUASIMODO_RANGE_ENGINE_-DAFE-_V6.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'DskyzInvestments/DafeVisLib/1' as alias 'viz' was not supplied by the host library registry; provide Pine library source for DskyzInvestments/DafeVisLib version 1, or remove/change the import",
+        "line": 50,
+        "column": 1
+      },
+      "sourceLine": "import DskyzInvestments/DafeVisLib/1 as viz",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0248__ferranbt-pinecone__request_data.pine",
+      "sourceRepoUrl": "https://github.com/ferranbt/pinecone",
+      "sourceFilePath": "tests/testdata/basics/request_data.pine",
+      "commitSha": "aa7c35fe80a11dcaa23a9af22103b13a292cf38f",
+      "sourceSha256": "fd8e32f9695ad67d40c8727e51d4f7b9127cf80841ab2568e03536c96df72bed",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint",
+        "request.quandl"
+      ],
+      "source": "sources/0248__ferranbt-pinecone__request_data.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "request.footprint() expects at least 2 arguments"
+      },
+      "sourceLine": "",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "request.footprint missing va_percent",
+        "verdict": "Committed v6 signature requires ticks_per_row and va_percent; one-argument forms are invalid."
+      }
+    },
+    {
+      "localPath": "sources/0249__folknor-pine-tools__coverage-misc-uncovered.pine",
+      "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+      "sourceFilePath": "packages/core/test/fixtures/regression/coverage-misc-uncovered.pine",
+      "commitSha": "ba6ec311f647faaf9aa20dfee4ceee82a675fc81",
+      "sourceSha256": "4185460d2686d4f526a1984219140719d6f026690a613d9f69e4c9913a308aa6",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.quandl"
+      ],
+      "source": "sources/0249__folknor-pine-tools__coverage-misc-uncovered.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "argument-count",
+        "message": "ticker.kagi() expects at least 3 arguments",
+        "line": 8,
+        "column": 18
+      },
+      "sourceLine": "tk = ticker.kagi(syminfo.tickerid, 3)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "ticker.kagi two-argument form",
+        "verdict": "Committed v6 signature requires symbol/style/param, while corpus lane called the harvested two-argument form a thin real gap; needs compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0255__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__path-of-the-planets.pine",
+      "sourceRepoUrl": "https://github.com/BlueprintResearch/Gann-and-Financial-Astrology-Indicators",
+      "sourceFilePath": "scripts/path of the planets.pine",
+      "commitSha": "1564a99a4f4155a4f28ea01e433c0b630471e03c",
+      "sourceSha256": "15a8e3081e9d54d68873dfcedda07d6ff257130ff794898fbb5eb819ecc2cb43",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "scale.left"
+      ],
+      "source": "sources/0255__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__path-of-the-planets.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'BlueprintResearch/lib_ephemeris/1' as alias 'eph' was not supplied by the host library registry; provide Pine library source for BlueprintResearch/lib_ephemeris version 1, or remove/change the import",
+        "line": 39,
+        "column": 1
+      },
+      "sourceLine": "import BlueprintResearch/lib_ephemeris/1 as eph",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0257__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__bradley-siderograph.pine",
+      "sourceRepoUrl": "https://github.com/BlueprintResearch/Gann-and-Financial-Astrology-Indicators",
+      "sourceFilePath": "scripts/bradley siderograph.pine",
+      "commitSha": "1564a99a4f4155a4f28ea01e433c0b630471e03c",
+      "sourceSha256": "1d333b46b9b9b18ba9b9ef64634d61c0bc8cfbfa30861d8fa484fa6fe8e01c85",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "scale.left"
+      ],
+      "source": "sources/0257__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__bradley-siderograph.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'faiyaz7283/tools/15' as alias 'tools' was not supplied by the host library registry; provide Pine library source for faiyaz7283/tools version 15, or remove/change the import",
+        "line": 43,
+        "column": 1
+      },
+      "sourceLine": "import faiyaz7283/tools/15 as tools",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0267__hasnocool-tradingview-pine-scripts__Indicators-Conditions-Test-Framework-DTU-.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "Indicators & Conditions Test Framework [DTU].pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "b4e8119439c01bf13db3cf5b989ad0828ab3ec5ad56d3a942470f6dc8073f328",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 1044,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 96640,
+        "transformedByteSize": 72575
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "scale.left"
+      ],
+      "source": "sources/0267__hasnocool-tradingview-pine-scripts__Indicators-Conditions-Test-Framework-DTU-.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'dturkuler/lib_Indicators_DT/1' as alias 'ind' was not supplied by the host library registry; provide Pine library source for dturkuler/lib_Indicators_DT version 1, or remove/change the import",
+        "line": 29,
+        "column": 1
+      },
+      "sourceLine": "import dturkuler/lib_Indicators_DT/1 as ind //CREDITS: library includes indicators, snippets from tradingview , @03.freeman (\"All MAs displayed\") public script.. Thanks to all!!!",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0282__ferranbt-pinecone__trade_accessors.pine",
+      "sourceRepoUrl": "https://github.com/ferranbt/pinecone",
+      "sourceFilePath": "tests/testdata/strategy/trade_accessors.pine",
+      "commitSha": "57c405d9cc7c1fa6d5ccca2e6253234074e3f740",
+      "sourceSha256": "e6799e5b1687a21ff862a7b3b4cc4657dd20ddb393346ec9415bbb4558995c26",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.closedtrades.first_index",
+        "strategy.opentrades.commission"
+      ],
+      "source": "sources/0282__ferranbt-pinecone__trade_accessors.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: strategy.opentrades.capital_held",
+        "line": 14,
+        "column": 161
+      },
+      "sourceLine": "    log.info(\"o:\" + str.tostring(strategy.opentrades.profit(0)) + \"|\" + str.tostring(math.round(strategy.opentrades.profit_percent(0), 4)) + \"|\" + str.tostring(strategy.opentrades.capital_held(0)))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "strategy.opentrades.capital_held called as function",
+        "verdict": "`strategy.opentrades.capital_held` is a variable in the committed reference, not a function call."
+      }
+    },
+    {
+      "localPath": "sources/0285__Studentcodee-Coursework-technical-analysis__bollinger_bands.pine",
+      "sourceRepoUrl": "https://github.com/Studentcodee/Coursework-technical-analysis",
+      "sourceFilePath": "strategies/bollinger_bands.pine",
+      "commitSha": "27c1b1a8816e9d0c43bceeb6a9a18eb75f608770",
+      "sourceSha256": "4fdf54138b51da350a816a31a278979670ac6b8e375d1f2dc6b08a715dd993cc",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all",
+        "strategy.direction.short"
+      ],
+      "source": "sources/0285__Studentcodee-Coursework-technical-analysis__bollinger_bands.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unsupported-feature",
+        "message": "strategy risk_free_rate=0 requires TradingView Sharpe/Sortino report trace parity before TealScript can simulate it",
+        "line": 10,
+        "column": 25
+      },
+      "sourceLine": "\t\t risk_free_rate=0,",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "strategy report metric trace boundary",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0286__AmanKumar87-tradingbot__t3.pine",
+      "sourceRepoUrl": "https://github.com/AmanKumar87/tradingbot",
+      "sourceFilePath": "t3.pine",
+      "commitSha": "020bcb1a898fb4c150322003e378b676a4c36b83",
+      "sourceSha256": "a12616fa9240dbfa776cf6f7456dd76aa3dea476e9093fab7e4b2bac19c9fe4d",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all"
+      ],
+      "source": "sources/0286__AmanKumar87-tradingbot__t3.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+        "line": 59,
+        "column": 89
+      },
+      "sourceLine": "strategy.exit(\"Long Exit\", from_entry=\"Long\", stop=long_sl, limit=long_tp, trail_points=atrValue * 0.5)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Invalid strategy.exit trailing stop",
+        "verdict": "Correct refusal: trailing stops need positive/paired trail parameters."
+      }
+    },
+    {
+      "localPath": "sources/0287__AmanKumar87-tradingbot__t2.pine",
+      "sourceRepoUrl": "https://github.com/AmanKumar87/tradingbot",
+      "sourceFilePath": "t2.pine",
+      "commitSha": "020bcb1a898fb4c150322003e378b676a4c36b83",
+      "sourceSha256": "c0d9b282775692737746e660d06fb19baf115fcd22cd6920368810d8a4a099bc",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all"
+      ],
+      "source": "sources/0287__AmanKumar87-tradingbot__t2.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "strategy.exit trailing stop requires trail_offset; add trail_offset when using trail_price or trail_points",
+        "line": 58,
+        "column": 89
+      },
+      "sourceLine": "strategy.exit(\"Long Exit\", from_entry=\"Long\", stop=long_sl, limit=long_tp, trail_points=atrValue * 0.5)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Invalid strategy.exit trailing stop",
+        "verdict": "Correct refusal: trailing stops need positive/paired trail parameters."
+      }
+    },
+    {
+      "localPath": "sources/0297__hasnocool-tradingview-pine-scripts__5min-MACD-scalp-by-Joel.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "5min MACD scalp by Joel.pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "755e7ace66aeeeac79b0614b062bbb5b40294736523d99c7aefcb20bd1a4cf01",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 229,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 19246,
+        "transformedByteSize": 15255
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all",
+        "strategy.direction.short"
+      ],
+      "source": "sources/0297__hasnocool-tradingview-pine-scripts__5min-MACD-scalp-by-Joel.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'ZenAndTheArtOfTrading/ZenLibrary/2' as alias 'l_zen' was not supplied by the host library registry; provide Pine library source for ZenAndTheArtOfTrading/ZenLibrary version 2, or remove/change the import",
+        "line": 3,
+        "column": 1
+      },
+      "sourceLine": "import ZenAndTheArtOfTrading/ZenLibrary/2 as l_zen",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0299__hasnocool-tradingview-pine-scripts__Band-Zigzag---TrendFollower-Strategy-Trendoscope-.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "Band-Zigzag - TrendFollower Strategy [Trendoscope].pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "62d3f460cbcce6324c66404671fd47b96d8debca34b077b912db31ac8862d0e4",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 285,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 17522,
+        "transformedByteSize": 10711
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all",
+        "strategy.direction.short"
+      ],
+      "source": "sources/0299__hasnocool-tradingview-pine-scripts__Band-Zigzag---TrendFollower-Strategy-Trendoscope-.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'HeWhoMustNotBeNamed/ta/1' as alias 'eta' was not supplied by the host library registry; provide Pine library source for HeWhoMustNotBeNamed/ta version 1, or remove/change the import",
+        "line": 16,
+        "column": 1
+      },
+      "sourceLine": "import HeWhoMustNotBeNamed/ta/1 as eta",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0300__hasnocool-tradingview-pine-scripts__5min-Williams-Fractals-scalping-3commas-.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "5min Williams Fractals scalping (3commas).pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "a785f4d15489d1a7c3bcc29b844424990b082eafb3278045c9fee26af4a20e8a",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 230,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 18009,
+        "transformedByteSize": 14416
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all",
+        "strategy.direction.short"
+      ],
+      "source": "sources/0300__hasnocool-tradingview-pine-scripts__5min-Williams-Fractals-scalping-3commas-.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'ZenAndTheArtOfTrading/ZenLibrary/2' as alias 'l_zen' was not supplied by the host library registry; provide Pine library source for ZenAndTheArtOfTrading/ZenLibrary version 2, or remove/change the import",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "import ZenAndTheArtOfTrading/ZenLibrary/2 as l_zen",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0305__zhuzp98-QuantTestFrame__Stg_TD_RSI_SMI.pine",
+      "sourceRepoUrl": "https://github.com/zhuzp98/QuantTestFrame",
+      "sourceFilePath": "PineScript/Stg_TD_RSI_SMI.pine",
+      "commitSha": "da055cf0ace5a6b279aea2ec8b8e5f2b033d44b8",
+      "sourceSha256": "8d74e27a4d21201228437f6a5911aef7828b4f4073a0630a74a2cee87c976aed",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.direction.all",
+        "strategy.direction.short"
+      ],
+      "source": "sources/0305__zhuzp98-QuantTestFrame__Stg_TD_RSI_SMI.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-identifier",
+        "message": "Unknown identifier: fastLength",
+        "line": 111,
+        "column": 51
+      },
+      "sourceLine": "[macdLine, signalLine, histLine] = ta.macd(close, fastLength, slowLength, signalLength)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Undefined source identifier",
+        "verdict": "Source references a name with no visible declaration."
+      }
+    },
+    {
+      "localPath": "sources/0310__rcook0-M15-Gold-BTC-GJ__strategy.pine",
+      "sourceRepoUrl": "https://github.com/rcook0/M15-Gold-BTC-GJ",
+      "sourceFilePath": "strategy.pine",
+      "commitSha": "5bbd95f07c8a970c321ba9f83d881ed11998fe03",
+      "sourceSha256": "e65554d25faa7e4a2fd0222d90b2c9cfc74e4c88c1a48c68f451f939e363e0d4",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "strategy.direction.short"
+      ],
+      "source": "sources/0310__rcook0-M15-Gold-BTC-GJ__strategy.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unsupported-feature",
+        "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+        "line": 7,
+        "column": 26
+      },
+      "sourceLine": "     calc_on_order_fills=true,",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "strategy calc_on_order_fills trace boundary",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0314__hasnocool-tradingview-pine-scripts__Wolfe-Strategy-Trendoscope-.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "Wolfe Strategy [Trendoscope].pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "fe7463a4f283e2f13bfa74724ebd0e21a704764e60a45c475f96d5ef6662c881",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 327,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 20580,
+        "transformedByteSize": 12294
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.direction.short"
+      ],
+      "source": "sources/0314__hasnocool-tradingview-pine-scripts__Wolfe-Strategy-Trendoscope-.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'HeWhoMustNotBeNamed/rzigzag/10' as alias 'zigzag' was not supplied by the host library registry; provide Pine library source for HeWhoMustNotBeNamed/rzigzag version 10, or remove/change the import",
+        "line": 8,
+        "column": 1
+      },
+      "sourceLine": "import HeWhoMustNotBeNamed/rzigzag/10 as zigzag",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0320__Izocel-PineScripts__TradeManager.pine",
+      "sourceRepoUrl": "https://github.com/Izocel/PineScripts",
+      "sourceFilePath": "Libs/TradeManager.pine",
+      "commitSha": "7c2740e68c4aad14dc149bc738755dc1dd5b488b",
+      "sourceSha256": "9aa44199cd50f0d48af5a4d081a52ef60ef97c5e1e309201caf6e7d232b32885",
+      "declarationKind": "library",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "strategy.oca.none"
+      ],
+      "source": "sources/0320__Izocel-PineScripts__TradeManager.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'RVD-Projects/Drawing/4' as alias 'Drawing' was not supplied by the host library registry; provide Pine library source for RVD-Projects/Drawing version 4, or remove/change the import",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "import RVD-Projects/Drawing/4",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0339__lyr-2000-lyr-2000.github.io__98-.pine",
+      "sourceRepoUrl": "https://github.com/lyr-2000/lyr-2000.github.io",
+      "sourceFilePath": "course/理财/投资/pinescript/unuse/胜率98网格交易.pine",
+      "commitSha": "5d817093e969285107c5db769b3195cdd1170973",
+      "sourceSha256": "25774b48784c6cc542b032d1895c42b86e8c64fef1b174f47f1c7fd403f483ad",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.opentrades.entry_comment"
+      ],
+      "source": "sources/0339__lyr-2000-lyr-2000.github.io__98-.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unsupported-feature",
+        "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+        "line": 15,
+        "column": 41
+      },
+      "sourceLine": "         , fill_orders_on_standard_ohlc=true",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "standard-OHLC host data boundary",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0342__hasnocool-tradingview-pine-scripts__Backtesting-System.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "-Backtesting System.pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "7cf6f641330bb9242743ee1ede4805663c39b6d21a1eec008ad5a85c290592f0",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 533,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 65536,
+        "transformedByteSize": 52152
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.risk.max_cons_loss_days"
+      ],
+      "source": "sources/0342__hasnocool-tradingview-pine-scripts__Backtesting-System.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: eqty; first declared on line 418. Rename one declaration or remove the duplicate.",
+        "line": 233,
+        "column": 1
+      },
+      "sourceLine": "eqty = switch QTYMethod",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0356__ainell-owi-LePine__custom-calendar.pine",
+      "sourceRepoUrl": "https://github.com/ainell-owi/LePine",
+      "sourceFilePath": "GH PINE REPOS/pinescript_agents_R/projects/custom-calendar.pine",
+      "commitSha": "7cc00c0884c33c0dd873f3b862514c6e07a5258b",
+      "sourceSha256": "7015fa4db8c7a92a2ded17772feebbc0cfbed82621f4bd566fcdea158bb8ceb2",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "text.format_none"
+      ],
+      "source": "sources/0356__ainell-owi-LePine__custom-calendar.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'sacredprofit/Toolbox/2' as alias 'Tools' was not supplied by the host library registry; provide Pine library source for sacredprofit/Toolbox version 2, or remove/change the import",
+        "line": 7,
+        "column": 1
+      },
+      "sourceLine": "import sacredprofit/Toolbox/2 as Tools",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0360__outraday-org-chartlang__72-table-formatting-consolidated.pine",
+      "sourceRepoUrl": "https://github.com/outraday-org/chartlang",
+      "sourceFilePath": "packages/pine-converter/fixtures/72-table-formatting-consolidated.pine",
+      "commitSha": "f89117dd3a1b91c62f751161d4486af029050fee",
+      "sourceSha256": "3e659450f9d7389fe9a850dbd38fae9dc55416470b20f60eb26ec6957b4ac22d",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0360__outraday-org-chartlang__72-table-formatting-consolidated.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-argument",
+        "message": "Unknown argument 'text_wrap' for table.cell()",
+        "line": 8,
+        "column": 37
+      },
+      "sourceLine": "    table.cell(panel, 0, 2, \"Note\", text_wrap=text.wrap_auto, text_formatting=text.format_bold)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0362__helenananaa-pine-compat-runtime__table_cell.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/table_cell.pine",
+      "commitSha": "be61d0135e39b1d0c71d6e39c43f4bf997ac7e8e",
+      "sourceSha256": "95b97a14f61657f7bdcccf8702574f7735514643865b5cf8b1b465adf5d336e2",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto",
+        "text.wrap_none"
+      ],
+      "source": "sources/0362__helenananaa-pine-compat-runtime__table_cell.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 54,
+        "column": 5
+      },
+      "sourceLine": "    table.cell_set_text_wrap(table_id, 1, 0, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0364__helenananaa-pine-compat-runtime__table_control_flow.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/table_control_flow.pine",
+      "commitSha": "be61d0135e39b1d0c71d6e39c43f4bf997ac7e8e",
+      "sourceSha256": "bf0aaf5ebf9c59fc4e000a24be7d1da0dd92d967f9d40489568ca980323284ed",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0364__helenananaa-pine-compat-runtime__table_control_flow.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 107,
+        "column": 9
+      },
+      "sourceLine": "        table.cell_set_text_wrap(independent_cell_text_wrap_table, 0, 0, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0369__regalouisei-collect-tradingview__xabcd-harmonic-pattern-custom-range-interactive.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/xabcd-harmonic-pattern-custom-range-interactive.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "d8d90168b902e4a2e9c90a59258fa93a85650a4e9b1d64fa073400e747c6c035",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0369__regalouisei-collect-tradingview__xabcd-harmonic-pattern-custom-range-interactive.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'RozaniGhani-RG/PriceTimeInteractive/2' as alias 'pti' was not supplied by the host library registry; provide Pine library source for RozaniGhani-RG/PriceTimeInteractive version 2, or remove/change the import",
+        "line": 8,
+        "column": 1
+      },
+      "sourceLine": "import RozaniGhani-RG/PriceTimeInteractive/2 as pti",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0371__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_missing_cell.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/regressions/table_cell_set_text_wrap_missing_cell.pine",
+      "commitSha": "02afc1cb9005e2ae55a9862faaf41524895cbb34",
+      "sourceSha256": "c0e4d77250fb2af0323be900eab7a4f85bf49ef485b2ff8300eded9b0d7bb0cd",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0371__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_missing_cell.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "table.cell_set_text_wrap(table_id, 0, 0, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0372__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_bounds.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/regressions/table_cell_set_text_wrap_coordinate_bounds.pine",
+      "commitSha": "02afc1cb9005e2ae55a9862faaf41524895cbb34",
+      "sourceSha256": "1ed72f5b349591e142bb32e17b7bffc7079078f3127c1f59a1d185863afccf2d",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0372__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_bounds.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "table.cell_set_text_wrap(table_id, 2, 0, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0373__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_negative.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/regressions/table_cell_set_text_wrap_coordinate_negative.pine",
+      "commitSha": "02afc1cb9005e2ae55a9862faaf41524895cbb34",
+      "sourceSha256": "3ae4efea52d8c9e404d6ed40128fb52954c70ed001b9346ae69b511366b64f04",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0373__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_negative.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "table.cell_set_text_wrap(table_id, -1, 0, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0374__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_row_bounds.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/regressions/table_cell_set_text_wrap_coordinate_row_bounds.pine",
+      "commitSha": "02afc1cb9005e2ae55a9862faaf41524895cbb34",
+      "sourceSha256": "3e06dba2f57a8f765c77c13d3c8a7501dfd6a7b09ca725bd26dc041b9f2ecc00",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0374__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_row_bounds.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "table.cell_set_text_wrap(table_id, 0, 1, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0375__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_row_negative.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/regressions/table_cell_set_text_wrap_coordinate_row_negative.pine",
+      "commitSha": "02afc1cb9005e2ae55a9862faaf41524895cbb34",
+      "sourceSha256": "054a529709833c20a5c86018da7c5b46e9f425c5f0cdad9770b5e629918d9385",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "text.wrap_auto"
+      ],
+      "source": "sources/0375__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_row_negative.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-function",
+        "message": "Unknown function: table.cell_set_text_wrap",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "table.cell_set_text_wrap(table_id, 0, -1, text.wrap_auto)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Nonexistent table text_wrap API",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence."
+      }
+    },
+    {
+      "localPath": "sources/0382__Allysson-Rodrigues-tradingview-indicator__ict_fvg_rsi_v1.2.12.pine",
+      "sourceRepoUrl": "https://github.com/Allysson-Rodrigues/tradingview-indicator",
+      "sourceFilePath": "src/ict_fvg_rsi_v1.2.12.pine",
+      "commitSha": "f5056737adc24a00bc074da08d81961f58d85266",
+      "sourceSha256": "5de34832cc133abaa24a930117cd5b29894c3d142662a50ed3151013804c16e5",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0382__Allysson-Rodrigues-tradingview-indicator__ict_fvg_rsi_v1.2.12.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot assign float value to int variable left. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+        "line": 980,
+        "column": 9
+      },
+      "sourceLine": "        left := bar_index + offset + (settings.width + settings.buffer) * (size - 1) / 2",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Implicit float-to-int assignment",
+        "verdict": "Correct refusal; Pine requires explicit `int(...)` conversion."
+      }
+    },
+    {
+      "localPath": "sources/0383__armin-harzli-TradingView-Indicators__volume-radar.pine",
+      "sourceRepoUrl": "https://github.com/armin-harzli/TradingView-Indicators",
+      "sourceFilePath": "volume-radar.pine",
+      "commitSha": "e27467cc9529cdaee3305cfea47ee6dc6697298e",
+      "sourceSha256": "7f9c85568eb336073f45618200b9c84581383502b06d8dec6a8713bffe14ec55",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0383__armin-harzli-TradingView-Indicators__volume-radar.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-identifier",
+        "message": "Unknown identifier: wActifLvl",
+        "line": 419,
+        "column": 27
+      },
+      "sourceLine": "        bool loud = rv >= wActifLvl",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Undefined source identifier",
+        "verdict": "Source references a name with no visible declaration."
+      }
+    },
+    {
+      "localPath": "sources/0384__erclm-tradingview-scripts__multi-vwap.pine",
+      "sourceRepoUrl": "https://github.com/erclm/tradingview-scripts",
+      "sourceFilePath": "multi-vwap.pine",
+      "commitSha": "6a01f49da4ad08802dc0f317ab5507bb3e8c42fc",
+      "sourceSha256": "6520ffd77ad111f2fde9616af8ca102e49c4359d61cd994525ebe4e4e5289e72",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0384__erclm-tradingview-scripts__multi-vwap.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'PineCoders/ConditionalAverages/2' as alias 'pc' was not supplied by the host library registry; provide Pine library source for PineCoders/ConditionalAverages version 2, or remove/change the import",
+        "line": 4,
+        "column": 1
+      },
+      "sourceLine": "import PineCoders/ConditionalAverages/2 as pc",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0385__holofoundry-trading-view-indicators__elite-sniper.pine",
+      "sourceRepoUrl": "https://github.com/holofoundry/trading-view-indicators",
+      "sourceFilePath": "pine/strategies/elite-sniper.pine",
+      "commitSha": "ce07c399ea342a059397b2bf0640b03c587c14fd",
+      "sourceSha256": "2ef94dca8abcdbf10ee6111d874f8b0b6f9a7378d704cccfb2946794fc5b60e7",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0385__holofoundry-trading-view-indicators__elite-sniper.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unsupported-feature",
+        "message": "strategy calc_on_order_fills=true requires TradingView fill-triggered re-entry trace parity before TealScript can simulate it",
+        "line": 13,
+        "column": 27
+      },
+      "sourceLine": "    calc_on_order_fills = true,",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "strategy calc_on_order_fills trace boundary",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0390__chaungoctruong-cntx-fintech-linux-control-plane__GsAlgo_v1.pine",
+      "sourceRepoUrl": "https://github.com/chaungoctruong/cntx-fintech-linux-control-plane",
+      "sourceFilePath": "bot-trading/gsalgovip/GsAlgo_v1.pine",
+      "commitSha": "aec4b08a96ab3b90191a72fa934279a05c4a27ca",
+      "sourceSha256": "3e7cd40d11164870d1edbe1cde3b8f71d7b9527bd78d425f8e6eae5b2090429c",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0390__chaungoctruong-cntx-fintech-linux-control-plane__GsAlgo_v1.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "Cannot assign float value to int variable htfMins. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float.",
+        "line": 244,
+        "column": 1
+      },
+      "sourceLine": "int htfMins = timeframe.in_seconds(higherTimeframe) / 60",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Implicit float-to-int assignment",
+        "verdict": "Correct refusal; Pine requires explicit `int(...)` conversion."
+      }
+    },
+    {
+      "localPath": "sources/0394__vinay-veerappa-tvDownloadOHLC__HTF_EMA_Analysis.pine",
+      "sourceRepoUrl": "https://github.com/vinay-veerappa/tvDownloadOHLC",
+      "sourceFilePath": "scripts/indicators-pine/htf_ema_analysis/HTF_EMA_Analysis.pine",
+      "commitSha": "06aad82e9d83d271101d66e32d1dbf3be2a8ef4f",
+      "sourceSha256": "62c928d86e2b7d3d71b97b2685a9a6e26059b4a6d615db29a814a00a9460bbe7",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0394__vinay-veerappa-tvDownloadOHLC__HTF_EMA_Analysis.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'vveerappa/MarketCalendar/2' as alias 'mktCalendar' was not supplied by the host library registry; provide Pine library source for vveerappa/MarketCalendar version 2, or remove/change the import",
+        "line": 8,
+        "column": 1
+      },
+      "sourceLine": "import vveerappa/MarketCalendar/2  as mktCalendar",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0398__pranay123-stack-Tradingview_Pinescript_Strategy__crypto_ict_liquidity_sweep_reversal_v1.pine",
+      "sourceRepoUrl": "https://github.com/pranay123-stack/Tradingview_Pinescript_Strategy",
+      "sourceFilePath": "crypto/Crypto ICT Liquidity Sweep Reversal Strategy v1/strategy/crypto_ict_liquidity_sweep_reversal_v1.pine",
+      "commitSha": "7082d3b50a71ab616cb60424f166f399153b0d1b",
+      "sourceSha256": "838420b6b5b177696735b56f514dd144cb53c657b987d62c91e24191d341f921",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0398__pranay123-stack-Tradingview_Pinescript_Strategy__crypto_ict_liquidity_sweep_reversal_v1.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unsupported-feature",
+        "message": "strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it",
+        "line": 46,
+        "column": 37
+      },
+      "sourceLine": "     fill_orders_on_standard_ohlc = true,",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "standard-OHLC host data boundary",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0409__hasnocool-tradingview-pine-scripts__Lorentzian-Classification-Strategy.pine",
+      "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+      "sourceFilePath": "Lorentzian Classification Strategy.pine",
+      "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2",
+      "sourceSha256": "257eb1dbfa8a844c6a6ced51e3a508c2468ce3c25509a801308e77788da12955",
+      "sourceTransform": {
+        "kind": "tradingview-copy-code-body",
+        "startLine": 946,
+        "removedTrailingExpandMarker": true,
+        "normalizedCopiedCodeSpaces": true,
+        "rawByteSize": 75409,
+        "transformedByteSize": 63268
+      },
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0409__hasnocool-tradingview-pine-scripts__Lorentzian-Classification-Strategy.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'jdehorty/MLExtensions/2' as alias 'ml' was not supplied by the host library registry; provide Pine library source for jdehorty/MLExtensions version 2, or remove/change the import",
+        "line": 3,
+        "column": 1
+      },
+      "sourceLine": "import jdehorty/MLExtensions/2 as ml",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0412__deepentropy-lightweight-charts-indicators__Traders-Reality-Main.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+      "sourceFilePath": "docs/official/indicators_community/Traders Reality Main.pine",
+      "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5",
+      "sourceSha256": "94fd80dde8bd10c5aaad2ff5c1b413b61f41e65f38bde9dbef6b490942b07bbc",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0412__deepentropy-lightweight-charts-indicators__Traders-Reality-Main.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'TradersReality/Traders_Reality_Lib/2' as alias 'trLib' was not supplied by the host library registry; provide Pine library source for TradersReality/Traders_Reality_Lib version 2, or remove/change the import",
+        "line": 23,
+        "column": 1
+      },
+      "sourceLine": "import TradersReality/Traders_Reality_Lib/2 as trLib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0413__deepentropy-lightweight-charts-indicators__Lorentzian-Classification-Strategy.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+      "sourceFilePath": "docs/official/indicators_community/Lorentzian Classification Strategy.pine",
+      "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5",
+      "sourceSha256": "7207af4ab0148dd3624ca84de2049d1cd068e5cc250a73f1a1aea87c4a9dbc5e",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0413__deepentropy-lightweight-charts-indicators__Lorentzian-Classification-Strategy.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'jdehorty/MLExtensions/2' as alias 'ml' was not supplied by the host library registry; provide Pine library source for jdehorty/MLExtensions version 2, or remove/change the import",
+        "line": 10,
+        "column": 1
+      },
+      "sourceLine": "import jdehorty/MLExtensions/2 as ml",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0416__astonmonnach-A.M-Nasdaq-STS-Research-Misc__STS_strategies.pine",
+      "sourceRepoUrl": "https://github.com/astonmonnach/A.M-Nasdaq-STS-Research-Misc",
+      "sourceFilePath": "sts-validation/STS_strategies.pine",
+      "commitSha": "098db8cd3e421487d36f165a7895b420c6421cba",
+      "sourceSha256": "e60cb3d20b842f4e2ad06e9e1f60b1dbb1a326b01eac4c5ae731b189a803b2e8",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0416__astonmonnach-A.M-Nasdaq-STS-Research-Misc__STS_strategies.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: et_h; first declared on line 27. Rename one declaration or remove the duplicate.",
+        "line": 51,
+        "column": 1
+      },
+      "sourceLine": "et_h = hour(time, \"America/New_York\")",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Duplicate global/source concatenation",
+        "verdict": "Correct refusal for same-scope duplicate or concatenated-script source."
+      }
+    },
+    {
+      "localPath": "sources/0418__g-moe-Trading-Indicators__hercules-rewrite.pine",
+      "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+      "sourceFilePath": "Tradingview/hercules-rewrite.pine",
+      "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6",
+      "sourceSha256": "9b86cf7034fbae955fa51bc66bec9f1f0406abb7597035e094c250771b704bac",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0418__g-moe-Trading-Indicators__hercules-rewrite.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 118. Rename one declaration or remove the duplicate.",
+        "line": 120,
+        "column": 1
+      },
+      "sourceLine": "ma = ma(ma_source, ma_length, ma_type)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0419__g-moe-Trading-Indicators__two-ma-strategy.pine",
+      "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+      "sourceFilePath": "Tradingview/two-ma-strategy.pine",
+      "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6",
+      "sourceSha256": "5d4bfc076e19391f2de9dfbbdc0e3bfcf67127ae73853de415ba9e5cf59bd1ea",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0419__g-moe-Trading-Indicators__two-ma-strategy.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 160. Rename one declaration or remove the duplicate.",
+        "line": 162,
+        "column": 1
+      },
+      "sourceLine": "ma = ma(ma_source, ma_length, ma_type)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0420__g-moe-Trading-Indicators__two-ma-indicator.pine",
+      "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+      "sourceFilePath": "Tradingview/two-ma-indicator.pine",
+      "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6",
+      "sourceSha256": "2dacb43bdd8ebbd5477408182286a565b862689e9938df62b6ed14fc304082e5",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0420__g-moe-Trading-Indicators__two-ma-indicator.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 160. Rename one declaration or remove the duplicate.",
+        "line": 162,
+        "column": 1
+      },
+      "sourceLine": "ma = ma(ma_source, ma_length, ma_type)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0422__g-moe-Trading-Indicators__hercules-strategy-rewrite.pine",
+      "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+      "sourceFilePath": "Tradingview/hercules-strategy-rewrite.pine",
+      "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6",
+      "sourceSha256": "56f63b592e389d64fa9b1ca7121c24b35ae849e5c62223dd6a7a5e683b3758df",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0422__g-moe-Trading-Indicators__hercules-strategy-rewrite.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 118. Rename one declaration or remove the duplicate.",
+        "line": 120,
+        "column": 1
+      },
+      "sourceLine": "ma = ma(ma_source, ma_length, ma_type)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0423__g-moe-Trading-Indicators__hercules-strategy-1-7.pine",
+      "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+      "sourceFilePath": "Tradingview/hercules-strategy-1-7.pine",
+      "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6",
+      "sourceSha256": "4e1772deb93d4ee34a5baf1428d0ac793dcb7d14f45c3cbdf2921e60f2105e61",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0423__g-moe-Trading-Indicators__hercules-strategy-1-7.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 164. Rename one declaration or remove the duplicate.",
+        "line": 166,
+        "column": 1
+      },
+      "sourceLine": "ma = ma(ma_source, ma_length, ma_type)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0424__g-moe-Trading-Indicators__hercules-indicator-1-7.pine",
+      "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+      "sourceFilePath": "Tradingview/hercules-indicator-1-7.pine",
+      "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6",
+      "sourceSha256": "ed916692d639e9b07e479bc0f46d009b8e95ac479f1703798b78d6fc1014037b",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0424__g-moe-Trading-Indicators__hercules-indicator-1-7.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: ma; first declared on line 164. Rename one declaration or remove the duplicate.",
+        "line": 166,
+        "column": 1
+      },
+      "sourceLine": "ma = ma(ma_source, ma_length, ma_type)",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0428__mikejuliano2-pine__mj-vwap-suite.pine",
+      "sourceRepoUrl": "https://github.com/mikejuliano2/pine",
+      "sourceFilePath": "code/mj-scripts/mj-vwap-suite.pine",
+      "commitSha": "5a5a047192b38ee38aa61b70656172fd16bdac53",
+      "sourceSha256": "cbedb2c50cf428eb62771a60dbf4f977be9ce6e661a79c1e32feedaedf17bcae",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0428__mikejuliano2-pine__mj-vwap-suite.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-argument",
+        "message": "Unknown argument 'step' for input()",
+        "line": 16,
+        "column": 73
+      },
+      "sourceLine": "stdevMult = input(1.0, title=\"B1\", group=groupShared, inline=inlineDev, step=0.1)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Legacy generic input step argument in v5",
+        "verdict": "Current version rules/tests accept this only for older legacy input forms; declared v5 should use typed input helpers."
+      }
+    },
+    {
+      "localPath": "sources/0434__drebel7-TradingView___Example_Lib.pine",
+      "sourceRepoUrl": "https://github.com/drebel7/TradingView",
+      "sourceFilePath": "src/libraries/_Example_Lib.pine",
+      "commitSha": "5929ff5e02f7ce5b8bfbe1c3536da2f7624f188b",
+      "sourceSha256": "8187fa611d7ff85a1f532efd4fc6661c766221b6d79a54b78eb51138b0c7862e",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0434__drebel7-TradingView___Example_Lib.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'drebel/DRELib/1' as alias 'drelib' was not supplied by the host library registry; provide Pine library source for drebel/DRELib version 1, or remove/change the import",
+        "line": 11,
+        "column": 1
+      },
+      "sourceLine": "import drebel/DRELib/1 as drelib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0435__HansUXdev-DataSciencePortfolio__PivotCandles.pine",
+      "sourceRepoUrl": "https://github.com/HansUXdev/DataSciencePortfolio",
+      "sourceFilePath": "QuantitativeFinance/Pinescript/PivotCandles.pine",
+      "commitSha": "ef0b86a0e721f41a727f208fa84465b9a1248995",
+      "sourceSha256": "41a231f89c514f2153e22c72bd72d819e17d4cac3cb9a2e83b43326351ead712",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0435__HansUXdev-DataSciencePortfolio__PivotCandles.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "invalid-na-comparison",
+        "message": "Do not compare directly to na; use na(value) instead",
+        "line": 974,
+        "column": 102
+      },
+      "sourceLine": "        color textColor = isCurrentWeek ? (weekColor == color.yellow ? color.black : color.white) : (weekColor != na ? weekColor : color.gray)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Direct na comparison",
+        "verdict": "Correct refusal; Pine uses `na(value)`."
+      }
+    },
+    {
+      "localPath": "sources/0440__regalouisei-collect-tradingview__periodic-activity-tracker-luxalgo.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/periodic-activity-tracker-luxalgo.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "dda1b32a625cb5af6ee45d8d8316f2868702b627c64c422cf03a94915f084d3c",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0440__regalouisei-collect-tradingview__periodic-activity-tracker-luxalgo.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "duplicate-symbol",
+        "message": "Duplicate declaration: buyVolume; first declared on line 115. Rename one declaration or remove the duplicate.",
+        "line": 244,
+        "column": 2
+      },
+      "sourceLine": "[buyVolume,sellVolume] = getLastValues()",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Function/value duplicate-name collision",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0441__alboogycOdR-dev-projects__institutional_crt_frameworkv9.pine",
+      "sourceRepoUrl": "https://github.com/alboogycOdR/dev-projects",
+      "sourceFilePath": "tradingview/Institutional CRT Framework/institutional_crt_frameworkv9.pine",
+      "commitSha": "ebb81a55067c4cec3440fe70113ef9c416fac7c5",
+      "sourceSha256": "5680ada2ba67c2b3f4d65efc71e4130cce9099778926319a157ca28b2457a531",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0441__alboogycOdR-dev-projects__institutional_crt_frameworkv9.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-identifier",
+        "message": "Unknown identifier: swept",
+        "line": 663,
+        "column": 5
+      },
+      "sourceLine": "    swept",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Comma-chain assignment plus break scoping",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0442__alboogycOdR-dev-projects__institutional_crt_frameworkv8.1.pine",
+      "sourceRepoUrl": "https://github.com/alboogycOdR/dev-projects",
+      "sourceFilePath": "tradingview/Institutional CRT Framework/institutional_crt_frameworkv8.1.pine",
+      "commitSha": "773565d51ee47aa97eeb5f9e606de4f83079765d",
+      "sourceSha256": "16b3f372cdd719f3e20982f64d53a1ac2a9941f455f0fc6f4655071da5cd9d28",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0442__alboogycOdR-dev-projects__institutional_crt_frameworkv8.1.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unknown-identifier",
+        "message": "Unknown identifier: swept",
+        "line": 660,
+        "column": 5
+      },
+      "sourceLine": "    swept",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Comma-chain assignment plus break scoping",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient."
+      }
+    },
+    {
+      "localPath": "sources/0443__drebel7-TradingView__MashineLearning-Lorentzian-Classification_by_jdehorty.pine",
+      "sourceRepoUrl": "https://github.com/drebel7/TradingView",
+      "sourceFilePath": "src/zzOthers/MashineLearning Lorentzian Classification_by_jdehorty.pine",
+      "commitSha": "5929ff5e02f7ce5b8bfbe1c3536da2f7624f188b",
+      "sourceSha256": "f6810e40759296e2cb7fc55a2741b54829742a0d1d7afc6421da6654b01d3495",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0443__drebel7-TradingView__MashineLearning-Lorentzian-Classification_by_jdehorty.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'jdehorty/MLExtensions/2' as alias 'ml' was not supplied by the host library registry; provide Pine library source for jdehorty/MLExtensions version 2, or remove/change the import",
+        "line": 10,
+        "column": 1
+      },
+      "sourceLine": "import jdehorty/MLExtensions/2 as ml",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0445__drebel7-TradingView__MashineLearning-Lorentzian-Classification_by_jdehorty_DRE.pine",
+      "sourceRepoUrl": "https://github.com/drebel7/TradingView",
+      "sourceFilePath": "src/zzOthers/MashineLearning Lorentzian Classification_by_jdehorty_DRE.pine",
+      "commitSha": "5929ff5e02f7ce5b8bfbe1c3536da2f7624f188b",
+      "sourceSha256": "4314c3557b1d90f53f7bb98d319191b9b517cf90315a63d301b5c313f3d6cbe7",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0445__drebel7-TradingView__MashineLearning-Lorentzian-Classification_by_jdehorty_DRE.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'drebel/DRELib/1' as alias 'drelib' was not supplied by the host library registry; provide Pine library source for drebel/DRELib version 1, or remove/change the import",
+        "line": 11,
+        "column": 1
+      },
+      "sourceLine": "import drebel/DRELib/1 as drelib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0449__helenananaa-pine-compat-runtime__time_components.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/runtime/time_components.pine",
+      "commitSha": "9a8173b42152a79ac7bb1a990a9cd33733454e95",
+      "sourceSha256": "9ddee8b09d2717400fd687fe363eb316a428e41dbcc8679871cc0d9543f0a7ae",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0449__helenananaa-pine-compat-runtime__time_components.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "type-mismatch",
+        "message": "time_close session must be a string, got int",
+        "line": 61,
+        "column": 33
+      },
+      "sourceLine": "previous_close = time_close(\"\", 1)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "time_close session argument type",
+        "verdict": "Second positional argument is session string, not bars_back; correct refusal."
+      }
+    },
+    {
+      "localPath": "sources/0454__deepentropy-oakscriptJS__Traders-Reality-Main.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/oakscriptJS",
+      "sourceFilePath": "docs/official/indicators_community/Traders Reality Main.pine",
+      "commitSha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+      "sourceSha256": "94fd80dde8bd10c5aaad2ff5c1b413b61f41e65f38bde9dbef6b490942b07bbc",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0454__deepentropy-oakscriptJS__Traders-Reality-Main.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'TradersReality/Traders_Reality_Lib/2' as alias 'trLib' was not supplied by the host library registry; provide Pine library source for TradersReality/Traders_Reality_Lib version 2, or remove/change the import",
+        "line": 23,
+        "column": 1
+      },
+      "sourceLine": "import TradersReality/Traders_Reality_Lib/2 as trLib",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    },
+    {
+      "localPath": "sources/0455__deepentropy-oakscriptJS__Lorentzian-Classification-Strategy.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/oakscriptJS",
+      "sourceFilePath": "docs/official/indicators_community/Lorentzian Classification Strategy.pine",
+      "commitSha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+      "sourceSha256": "7207af4ab0148dd3624ca84de2049d1cd068e5cc250a73f1a1aea87c4a9dbc5e",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "weekofyear"
+      ],
+      "source": "sources/0455__deepentropy-oakscriptJS__Lorentzian-Classification-Strategy.pine",
+      "stage": "semantic",
+      "diagnostic": {
+        "code": "unresolved-import",
+        "message": "Import 'jdehorty/MLExtensions/2' as alias 'ml' was not supplied by the host library registry; provide Pine library source for jdehorty/MLExtensions version 2, or remove/change the import",
+        "line": 10,
+        "column": 1
+      },
+      "sourceLine": "import jdehorty/MLExtensions/2 as ml",
+      "classification": {
+        "split": "host-trace-or-unsupported",
+        "bucket": "Unresolved third-party import",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap."
+      }
+    }
+  ],
+  "classifiedBuckets": {
+    "semantic": [
+      {
+        "bucket": "Unresolved third-party import",
+        "split": "host-trace-or-unsupported",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap.",
+        "rows": 31,
+        "examples": [
+          "sources/0027__regalouisei-collect-tradingview__session-barcandle-coloring.pine",
+          "sources/0045__vinay-veerappa-tvDownloadOHLC__DailyNYLevelsAnalytics.pine",
+          "sources/0051__itmakesyousick-Barbwire__2.0.0.pine",
+          "sources/0052__itmakesyousick-Barbwire__3.0.0.pine",
+          "sources/0054__DennisDyallo-PineScript__sr-algo1-volume-profile.pine",
+          "sources/0055__DennisDyallo-PineScript__sr-algo5-ensemble.pine"
+        ]
+      },
+      {
+        "bucket": "Function/value duplicate-name collision",
+        "split": "unclassified",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient.",
+        "rows": 10,
+        "examples": [
+          "sources/0058__regalouisei-collect-tradingview__portfolio-laboratory-kioseff-trading.pine",
+          "sources/0131__BrandonFreire-Prj_ML_VisualizacionDeDatosMedianteMotorDeCharting__03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+          "sources/0342__hasnocool-tradingview-pine-scripts__Backtesting-System.pine",
+          "sources/0418__g-moe-Trading-Indicators__hercules-rewrite.pine",
+          "sources/0419__g-moe-Trading-Indicators__two-ma-strategy.pine",
+          "sources/0420__g-moe-Trading-Indicators__two-ma-indicator.pine"
+        ]
+      },
+      {
+        "bucket": "matrix.sum one-argument call",
+        "split": "invalid-pine",
+        "verdict": "Committed v6 signature requires two matrix arguments; one-argument aggregate examples are not accepted without contrary compiler evidence.",
+        "rows": 10,
+        "examples": [
+          "sources/0155__helenananaa-pine-compat-runtime__matrix_int.pine",
+          "sources/0167__helenananaa-pine-compat-runtime__builtin_namespace_matrix_call_result_reads.pine",
+          "sources/0168__helenananaa-pine-compat-runtime__supported_builtin_namespace_matrix_call_result_reads.pine",
+          "sources/0201__folknor-pine-tools__INV056-overload-missing-required-arg.pine",
+          "sources/0202__helenananaa-pine-compat-runtime__supported_matrix_sum.pine",
+          "sources/0203__helenananaa-pine-compat-runtime__matrix_sum.pine"
+        ]
+      },
+      {
+        "bucket": "Nonexistent table text_wrap API",
+        "split": "invalid-pine",
+        "verdict": "Committed v6 reference includes box text wrapping, not table.cell text_wrap/table.cell_set_text_wrap; correct refusal absent compiler evidence.",
+        "rows": 8,
+        "examples": [
+          "sources/0360__outraday-org-chartlang__72-table-formatting-consolidated.pine",
+          "sources/0362__helenananaa-pine-compat-runtime__table_cell.pine",
+          "sources/0364__helenananaa-pine-compat-runtime__table_control_flow.pine",
+          "sources/0371__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_missing_cell.pine",
+          "sources/0372__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_bounds.pine",
+          "sources/0373__helenananaa-pine-compat-runtime__table_cell_set_text_wrap_coordinate_negative.pine"
+        ]
+      },
+      {
+        "bucket": "Implicit float-to-int assignment",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal; Pine requires explicit `int(...)` conversion.",
+        "rows": 5,
+        "examples": [
+          "sources/0047__heyphat-piner__anchored-vwap-magnitized.pine",
+          "sources/0118__matiu2-trade-control-web-hook__candle-signals-v2.pine",
+          "sources/0156__helenananaa-pine-compat-runtime__supported_builtin_namespace_array_call_result_reads.pine",
+          "sources/0382__Allysson-Rodrigues-tradingview-indicator__ict_fvg_rsi_v1.2.12.pine",
+          "sources/0390__chaungoctruong-cntx-fintech-linux-control-plane__GsAlgo_v1.pine"
+        ]
+      },
+      {
+        "bucket": "Pine v6 bool/numeric version mismatch",
+        "split": "invalid-pine",
+        "verdict": "Correct v6 refusal; v3-v5 compatibility does not apply to declared v6 source.",
+        "rows": 4,
+        "examples": [
+          "sources/0009__helenananaa-pine-compat-runtime__builtin_array_call_result_reads.pine",
+          "sources/0031__helenananaa-pine-compat-runtime__builtin_namespace_array_call_result_reads.pine",
+          "sources/0195__helenananaa-pine-compat-runtime__matrix_bool.pine",
+          "sources/0200__raybird-pine-trading-strategies__volume_profile_matrix_v6.pine"
+        ]
+      },
+      {
+        "bucket": "request.footprint missing va_percent",
+        "split": "invalid-pine",
+        "verdict": "Committed v6 signature requires ticks_per_row and va_percent; one-argument forms are invalid.",
+        "rows": 4,
+        "examples": [
+          "sources/0103__folknor-pine-tools__coverage-footprint.pine",
+          "sources/0227__raybird-pine-trading-strategies__stacked_imbalance_sovereign_v6.pine",
+          "sources/0239__piecioshka-tradingview-pine-scripts__volume-delta-histogram.pine",
+          "sources/0248__ferranbt-pinecone__request_data.pine"
+        ]
+      },
+      {
+        "bucket": "Collection element type mismatch",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal: collection element writes must match element type.",
+        "rows": 3,
+        "examples": [
+          "sources/0154__helenananaa-pine-compat-runtime__unsupported_matrix_fixed_float_collection_return_qualifier.pine",
+          "sources/0157__helenananaa-pine-compat-runtime__unsupported_builtin_namespace_array_call_result_reads.pine",
+          "sources/0166__helenananaa-pine-compat-runtime__unsupported_builtin_namespace_matrix_call_result_reads.pine"
+        ]
+      },
+      {
+        "bucket": "Invalid strategy.exit trailing stop",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal: trailing stops need positive/paired trail parameters.",
+        "rows": 3,
+        "examples": [
+          "sources/0139__taichunmin-tradingview-pine__20230626-myo-omega-turtle-soup.pine",
+          "sources/0286__AmanKumar87-tradingbot__t3.pine",
+          "sources/0287__AmanKumar87-tradingbot__t2.pine"
+        ]
+      },
+      {
+        "bucket": "Undefined source identifier",
+        "split": "invalid-pine",
+        "verdict": "Source references a name with no visible declaration.",
+        "rows": 3,
+        "examples": [
+          "sources/0226__raybird-pine-trading-strategies__tn_footprint_imbalance_v6.pine",
+          "sources/0305__zhuzp98-QuantTestFrame__Stg_TD_RSI_SMI.pine",
+          "sources/0383__armin-harzli-TradingView-Indicators__volume-radar.pine"
+        ]
+      },
+      {
+        "bucket": "Comma-chain assignment plus break scoping",
+        "split": "unclassified",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient.",
+        "rows": 2,
+        "examples": [
+          "sources/0441__alboogycOdR-dev-projects__institutional_crt_frameworkv9.pine",
+          "sources/0442__alboogycOdR-dev-projects__institutional_crt_frameworkv8.1.pine"
+        ]
+      },
+      {
+        "bucket": "hline nonnumeric price",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal: hline price must be numeric.",
+        "rows": 2,
+        "examples": [
+          "sources/0088__helenananaa-pine-compat-runtime__unsupported_chart_point_return_qualifier.pine",
+          "sources/0208__helenananaa-pine-compat-runtime__unsupported_matrix_aggregate_const_input_return_qualifier.pine"
+        ]
+      },
+      {
+        "bucket": "standard-OHLC host data boundary",
+        "split": "host-trace-or-unsupported",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap.",
+        "rows": 2,
+        "examples": [
+          "sources/0339__lyr-2000-lyr-2000.github.io__98-.pine",
+          "sources/0398__pranay123-stack-Tradingview_Pinescript_Strategy__crypto_ict_liquidity_sweep_reversal_v1.pine"
+        ]
+      },
+      {
+        "bucket": "strategy calc_on_order_fills trace boundary",
+        "split": "host-trace-or-unsupported",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap.",
+        "rows": 2,
+        "examples": [
+          "sources/0310__rcook0-M15-Gold-BTC-GJ__strategy.pine",
+          "sources/0385__holofoundry-trading-view-indicators__elite-sniper.pine"
+        ]
+      },
+      {
+        "bucket": "collection receiver method on unsupported call-result fixture",
+        "split": "unclassified",
+        "verdict": "Disputed with the corpus-lane invalid judgement; source fixture is explicitly unsupported, so do not accept without compiler evidence.",
+        "rows": 1,
+        "examples": [
+          "sources/0010__helenananaa-pine-compat-runtime__unsupported_builtin_array_call_result_reads.pine"
+        ]
+      },
+      {
+        "bucket": "Direct na comparison",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal; Pine uses `na(value)`.",
+        "rows": 1,
+        "examples": [
+          "sources/0435__HansUXdev-DataSciencePortfolio__PivotCandles.pine"
+        ]
+      },
+      {
+        "bucket": "Duplicate call argument",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal; a Pine parameter can be bound once.",
+        "rows": 1,
+        "examples": [
+          "sources/0126__hasnocool-tradingview-pine-scripts__supertrend-with-multiple-filter-strategy.pine"
+        ]
+      },
+      {
+        "bucket": "Duplicate global/source concatenation",
+        "split": "invalid-pine",
+        "verdict": "Correct refusal for same-scope duplicate or concatenated-script source.",
+        "rows": 1,
+        "examples": [
+          "sources/0416__astonmonnach-A.M-Nasdaq-STS-Research-Misc__STS_strategies.pine"
+        ]
+      },
+      {
+        "bucket": "Expected matrix<int> mismatch",
+        "split": "invalid-pine",
+        "verdict": "After matrix/vector return inference, only the fixture's TV-probed bad `matrix<int>` assignment remains.",
+        "rows": 1,
+        "examples": [
+          "sources/0003__folknor-pine-tools__INV147-generic-overload-return.pine"
+        ]
+      },
+      {
+        "bucket": "Legacy generic input step argument in v5",
+        "split": "invalid-pine",
+        "verdict": "Current version rules/tests accept this only for older legacy input forms; declared v5 should use typed input helpers.",
+        "rows": 1,
+        "examples": [
+          "sources/0428__mikejuliano2-pine__mj-vwap-suite.pine"
+        ]
+      },
+      {
+        "bucket": "Nested local declaration visibility",
+        "split": "unclassified",
+        "verdict": "Needs compiler evidence; source-only judgement is insufficient.",
+        "rows": 1,
+        "examples": [
+          "sources/0243__ainell-owi-LePine__Siege-_structure-_engine_v6.pine"
+        ]
+      },
+      {
+        "bucket": "Nonexistent math.cbrt",
+        "split": "invalid-pine",
+        "verdict": "Not in committed Pine v6 manual snapshot; correct refusal absent compiler evidence.",
+        "rows": 1,
+        "examples": [
+          "sources/0140__helenananaa-pine-compat-runtime__math.pine"
+        ]
+      },
+      {
+        "bucket": "strategy report metric trace boundary",
+        "split": "host-trace-or-unsupported",
+        "verdict": "Valid Pine shape may require host library/data or TradingView trace; not a semantic language acceptance gap.",
+        "rows": 1,
+        "examples": [
+          "sources/0285__Studentcodee-Coursework-technical-analysis__bollinger_bands.pine"
+        ]
+      },
+      {
+        "bucket": "strategy.opentrades.capital_held called as function",
+        "split": "invalid-pine",
+        "verdict": "`strategy.opentrades.capital_held` is a variable in the committed reference, not a function call.",
+        "rows": 1,
+        "examples": [
+          "sources/0282__ferranbt-pinecone__trade_accessors.pine"
+        ]
+      },
+      {
+        "bucket": "ticker.kagi two-argument form",
+        "split": "unclassified",
+        "verdict": "Committed v6 signature requires symbol/style/param, while corpus lane called the harvested two-argument form a thin real gap; needs compiler evidence.",
+        "rows": 1,
+        "examples": [
+          "sources/0249__folknor-pine-tools__coverage-misc-uncovered.pine"
+        ]
+      },
+      {
+        "bucket": "time_close session argument type",
+        "split": "invalid-pine",
+        "verdict": "Second positional argument is session string, not bars_back; correct refusal.",
+        "rows": 1,
+        "examples": [
+          "sources/0449__helenananaa-pine-compat-runtime__time_components.pine"
+        ]
+      },
+      {
+        "bucket": "Unknown strategy.close_all when argument",
+        "split": "invalid-pine",
+        "verdict": "Committed signature has comment/alert_message/immediately/disable_alert; `when` is invalid.",
+        "rows": 1,
+        "examples": [
+          "sources/0124__hasnocool-tradingview-pine-scripts__Hull-MA-TimeFrame-CrossOver.pine"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1953 @@
+{
+  "supersededBy": "pine-value-vectors-index-v1.md",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-05T04:11:42.877Z",
+  "sourceReport": "packages/tealscript/reports/external-pine-corpus-v4.report.json",
+  "importClassification": {
+    "unresolvedTotal": 26,
+    "officialTradingView": {
+      "count": 7,
+      "bucket": "tealscript-gap",
+      "queue": [
+        { "specifier": "TradingView/ta/12", "count": 3 },
+        { "specifier": "TradingView/ta/8", "count": 3 },
+        { "specifier": "TradingView/ta/1", "count": 1 }
+      ]
+    },
+    "userAuthored": {
+      "count": 19,
+      "bucket": "unsupported-by-design",
+      "excludedFromActionableDenominator": true
+    },
+    "headline": {
+      "supported": 508,
+      "tealscriptGap": 101,
+      "unsupportedByDesign": 19,
+      "invalidPine": 22,
+      "achievableDenominator": 609
+    }
+  },
+  "topSix": {
+    "unresolved-import": {
+      "stage": "semantic",
+      "count": 26,
+      "rows": [
+        {
+          "repo": "https://github.com/BlueprintResearch/Gann-and-Financial-Astrology-Indicators",
+          "path": "scripts/gann square of nine: planetary degrees.pine",
+          "sha": "1564a99a4f4155a4f28ea01e433c0b630471e03c",
+          "localPath": "sources/0037__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__gann-square-of-nine-planetary-degrees.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "70:1: unresolved-import: Import 'BlueprintResearch/lib_ephemeris/1' as alias 'eph' was not supplied by the host library registry; provide Pine library source for BlueprintResearch/lib_ephemeris version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/recursive-reversal-chart-patterns-trendoscope.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0079__regalouisei-collect-tradingview__recursive-reversal-chart-patterns-trendoscope.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "23:1: unresolved-import: Import 'Trendoscope/Drawing/2' as alias 'dr' was not supplied by the host library registry; provide Pine library source for Trendoscope/Drawing version 2, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/cybermediaboy/indicators",
+          "path": "m3f_te-research_v0.4.4.pine",
+          "sha": "f592ecde5cd5ceed5b2d6a18e09d082e3e151d99",
+          "localPath": "sources/0123__cybermediaboy-indicators__m3f_te-research_v0.4.4.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "16:1: unresolved-import: Import 'cybermediaboy/CyberCausalityLib/10' as alias 'CL' was not supplied by the host library registry; provide Pine library source for cybermediaboy/CyberCausalityLib version 10, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/uminomae/pjdhiro",
+          "path": "myPj/tradingview/pine/indicators/pjdhiro_sma3_bb_indicator_v6.pine",
+          "sha": "0383f24eff572b6a8c026c6f6a7f01be4d170c24",
+          "localPath": "sources/0143__uminomae-pjdhiro__pjdhiro_sma3_bb_indicator_v6.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "18:1: unresolved-import: Import 'uminomae/pjdhiro_ma_v6/2' as alias 'ma' was not supplied by the host library registry; provide Pine library source for uminomae/pjdhiro_ma_v6 version 2, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/Focal-QuantAI/QuantAI-Blog",
+          "path": "strategies/heikin_ashi_oscillator_trend_engine/AbVe_KnGK7Iuuhwb77Ul_code.pine",
+          "sha": "7c878f1e0c7afead0913944fdd0cc86b163d5259",
+          "localPath": "sources/0173__Focal-QuantAI-QuantAI-Blog__AbVe_KnGK7Iuuhwb77Ul_code.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "60:1: unresolved-import: Import 'SimpleCryptoLife/HighTimeframeSampling/4' as alias 'SCL_HTF' was not supplied by the host library registry; provide Pine library source for SimpleCryptoLife/HighTimeframeSampling version 4, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/trend_analysis/strategic-trend-filter.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0202__regalouisei-collect-tradingview__strategic-trend-filter.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_array_from_method_return_qualifier.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0217__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_from_method_return_qualifier.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/alighten-dev/Alighten",
+          "path": "TradingView/Indicators/AlightenCVDRegressionBiasV0002.pine",
+          "sha": "eadfefeac6a7da1513b3c39791a05f6599eb8cb0",
+          "localPath": "sources/0294__alighten-dev-Alighten__AlightenCVDRegressionBiasV0002.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/drebel7/TradingView",
+          "path": "src/indicators/DRE Non-Broken lows and highs.pine",
+          "sha": "5929ff5e02f7ce5b8bfbe1c3536da2f7624f188b",
+          "localPath": "sources/0296__drebel7-TradingView__DRE-Non-Broken-lows-and-highs.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "7:1: unresolved-import: Import 'drebel/DRELib/35' as alias 'drelib' was not supplied by the host library registry; provide Pine library source for drebel/DRELib version 35, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/alighten-dev/Alighten",
+          "path": "TradingView/Indicators/AlightenOrderflowPressureV0001.pine",
+          "sha": "eadfefeac6a7da1513b3c39791a05f6599eb8cb0",
+          "localPath": "sources/0300__alighten-dev-Alighten__AlightenOrderflowPressureV0001.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/trend_analysis/true-baseline-median-supertrend.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0324__regalouisei-collect-tradingview__true-baseline-median-supertrend.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/syntax/imports.pine",
+          "sha": "8c7cbbbde84ddc4d7856d18d9ca1b60cc65b1f97",
+          "localPath": "sources/0358__folknor-pine-tools__imports.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "10:1: unresolved-import: Official TradingView library 'TradingView/ta' version 1 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "investigations/INV143-transitive-library-imports/probes/q01-vardecl-anchor.pine",
+          "sha": "68907b82c9ecc57231bffedfdf12757118feada1",
+          "localPath": "sources/0388__folknor-pine-tools__q01-vardecl-anchor.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "3:1: unresolved-import: Import 'robbatt/lib_profile/44' as alias 'PF' was not supplied by the host library registry; provide Pine library source for robbatt/lib_profile version 44, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/turnupdigital/riskmanager",
+          "path": "Trend/CVD_Strategy_Export.pine",
+          "sha": "479ea44f7bb3e14c9a0c01e7d8a0e3bc4c38e1e5",
+          "localPath": "sources/0394__turnupdigital-riskmanager__CVD_Strategy_Export.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/volatility/true-baseline-median-supertrend.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0401__regalouisei-collect-tradingview__true-baseline-median-supertrend.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/jonathan-nascimento51/tradeCripto2025",
+          "path": "tests/map_utils_lib_test.pine",
+          "sha": "62ef61c811e78808b872ed7cf4c1356826d98c63",
+          "localPath": "sources/0424__jonathan-nascimento51-tradeCripto2025__map_utils_lib_test.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "3:1: unresolved-import: Import 'jonathanmoletta17/MapUtilsLib/1' as alias 'map' was not supplied by the host library registry; provide Pine library source for jonathanmoletta17/MapUtilsLib version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/import_user_method_matrix_call_result_reads.pine",
+          "sha": "ab3ccbea61b5a97b5686ff73409922766c9c11fa",
+          "localPath": "sources/0447__helenananaa-pine-compat-runtime__import_user_method_matrix_call_result_reads.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'left' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "investigations/INV126-item5-library-dataflow-probes/A-k4.pine",
+          "sha": "b5f8984922cfdc8f4268a96d401391f39ab29a48",
+          "localPath": "sources/0449__folknor-pine-tools__A-k4.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "3:1: unresolved-import: Import 'jason5480/series_collection/4' as alias 'col' was not supplied by the host library registry; provide Pine library source for jason5480/series_collection version 4, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/hirawatt/pineScripts",
+          "path": "indicator/iHotelIndex.pine",
+          "sha": "2df0c2f9ef72df6ac7af009c39778ba296647dc1",
+          "localPath": "sources/0478__hirawatt-pineScripts__iHotelIndex.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "6:1: unresolved-import: Import 'yesgoods/quant/1' as alias 'quant' was not supplied by the host library registry; provide Pine library source for yesgoods/quant version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_varip.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0583__helenananaa-pine-compat-runtime__unsupported_imported_udt_varip.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/import_udt_typed_udf_params.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0584__helenananaa-pine-compat-runtime__import_udt_typed_udf_params.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_array_push_local_target_method_mixed_identity.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0585__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_push_local_target_method_mixed_identity.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection",
+          "path": "Strategy/ESTIMATIONS_10M.PINE",
+          "sha": "b6b6f454c641d84690acd02d0323518357de2a66",
+          "localPath": "sources/0623__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ESTIMATIONS_10M.PINE",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "225:1: unresolved-import: Import 'jdehorty/KernelFunctions/2' as alias 'kernels' was not supplied by the host library registry; provide Pine library source for jdehorty/KernelFunctions version 2, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_community/Dynamic Supply and Demand Zones [AlgoAlpha].pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0629__deepentropy-oakscriptJS__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "6:1: unresolved-import: Import 'PineCoders/VisibleChart/4' as alias 'VisibleChart' was not supplied by the host library registry; provide Pine library source for PineCoders/VisibleChart version 4, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/oscillators/anova-macd.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0635__regalouisei-collect-tradingview__anova-macd.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "5:1: unresolved-import: Import 'Steversteves/SPTS_StatsPakLib/4' as alias 'spts' was not supplied by the host library registry; provide Pine library source for Steversteves/SPTS_StatsPakLib version 4, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/btcjon/pine",
+          "path": "archive/ttb_entry_main2.pine",
+          "sha": "43413c4657522fef2df09fb71cb4aeee3cef782e",
+          "localPath": "sources/0639__btcjon-pine__ttb_entry_main2.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "10:1: unresolved-import: Import 'DarkWaveAlgo/DarkWaveColorThemes/1' as alias 'ColorThemes' was not supplied by the host library registry; provide Pine library source for DarkWaveAlgo/DarkWaveColorThemes version 1, or remove/change the import"
+        }
+      ],
+      "representatives": [
+        {
+          "repo": "https://github.com/BlueprintResearch/Gann-and-Financial-Astrology-Indicators",
+          "path": "scripts/gann square of nine: planetary degrees.pine",
+          "sha": "1564a99a4f4155a4f28ea01e433c0b630471e03c",
+          "localPath": "sources/0037__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__gann-square-of-nine-planetary-degrees.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "70:1: unresolved-import: Import 'BlueprintResearch/lib_ephemeris/1' as alias 'eph' was not supplied by the host library registry; provide Pine library source for BlueprintResearch/lib_ephemeris version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/recursive-reversal-chart-patterns-trendoscope.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0079__regalouisei-collect-tradingview__recursive-reversal-chart-patterns-trendoscope.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "23:1: unresolved-import: Import 'Trendoscope/Drawing/2' as alias 'dr' was not supplied by the host library registry; provide Pine library source for Trendoscope/Drawing version 2, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/cybermediaboy/indicators",
+          "path": "m3f_te-research_v0.4.4.pine",
+          "sha": "f592ecde5cd5ceed5b2d6a18e09d082e3e151d99",
+          "localPath": "sources/0123__cybermediaboy-indicators__m3f_te-research_v0.4.4.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "16:1: unresolved-import: Import 'cybermediaboy/CyberCausalityLib/10' as alias 'CL' was not supplied by the host library registry; provide Pine library source for cybermediaboy/CyberCausalityLib version 10, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/uminomae/pjdhiro",
+          "path": "myPj/tradingview/pine/indicators/pjdhiro_sma3_bb_indicator_v6.pine",
+          "sha": "0383f24eff572b6a8c026c6f6a7f01be4d170c24",
+          "localPath": "sources/0143__uminomae-pjdhiro__pjdhiro_sma3_bb_indicator_v6.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "18:1: unresolved-import: Import 'uminomae/pjdhiro_ma_v6/2' as alias 'ma' was not supplied by the host library registry; provide Pine library source for uminomae/pjdhiro_ma_v6 version 2, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/Focal-QuantAI/QuantAI-Blog",
+          "path": "strategies/heikin_ashi_oscillator_trend_engine/AbVe_KnGK7Iuuhwb77Ul_code.pine",
+          "sha": "7c878f1e0c7afead0913944fdd0cc86b163d5259",
+          "localPath": "sources/0173__Focal-QuantAI-QuantAI-Blog__AbVe_KnGK7Iuuhwb77Ul_code.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "60:1: unresolved-import: Import 'SimpleCryptoLife/HighTimeframeSampling/4' as alias 'SCL_HTF' was not supplied by the host library registry; provide Pine library source for SimpleCryptoLife/HighTimeframeSampling version 4, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/trend_analysis/strategic-trend-filter.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0202__regalouisei-collect-tradingview__strategic-trend-filter.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_array_from_method_return_qualifier.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0217__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_from_method_return_qualifier.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/alighten-dev/Alighten",
+          "path": "TradingView/Indicators/AlightenCVDRegressionBiasV0002.pine",
+          "sha": "eadfefeac6a7da1513b3c39791a05f6599eb8cb0",
+          "localPath": "sources/0294__alighten-dev-Alighten__AlightenCVDRegressionBiasV0002.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        }
+      ]
+    },
+    "unexpected-token": {
+      "stage": "parse",
+      "count": 31,
+      "rows": [
+        {
+          "repo": "https://github.com/somat3k/Braga-Bielany-czycus",
+          "path": "pinnacle_strats/04_fib_gann/fib_gann.pine",
+          "sha": "a4306b8d9720e530582f207321a90cc2216bdca8",
+          "localPath": "sources/0075__somat3k-Braga-Bielany-czycus__fib_gann.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "417:42: Expected \"        \", \"    \\t\", \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"<\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"\\t    \", \"\\t\\t\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \";\" found."
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_standard/Performance.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0157__deepentropy-oakscriptJS__Performance.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "7:120: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/mushroom-men-Trading/clean-litter",
+          "path": "Indicators/indicators/premade indicators/oscillators/apo.pine",
+          "sha": "95f5f7d4bcb4e0e95cff86291bf343484842fbe6",
+          "localPath": "sources/0187__mushroom-men-Trading-clean-litter__apo.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "22:12: Expected \".\", \"/*\", \"[\", \"[]\", or [ \\t] but \"n\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/multitimeframe-fair-value-gap-fvg-zeiierman.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0208__regalouisei-collect-tradingview__multitimeframe-fair-value-gap-fvg-zeiierman.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "9:122: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_standard/Multi-Time Period Charts.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0224__deepentropy-oakscriptJS__Multi-Time-Period-Charts.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "5:120: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/levanelereal/pruebatrading",
+          "path": "Estructura_Mayor.pine",
+          "sha": "cccce361d393a61f2aeaea3cc0de9850a3e8a511",
+          "localPath": "sources/0329__levanelereal-pruebatrading__Estructura_Mayor.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "1404:54: Expected \".\", \"/*\", \"=\", \"[\", \"[]\", or [ \\t] but \"+\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/time-sales-tape-by-muqwishi.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0334__regalouisei-collect-tradingview__time-sales-tape-by-muqwishi.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "207:37: Expected \"%=\", \"*=\", \"+=\", \"-=\", \".\", \"/*\", \"/=\", \":=\", \"[\", or [ \\t] but \"(\" found."
+        },
+        {
+          "repo": "https://github.com/jonathan-nascimento51/tradeCripto2025",
+          "path": "combined_indicators.pine",
+          "sha": "a5fa58dae8affea1e2bdfdf8cf302d3dfd558873",
+          "localPath": "sources/0343__jonathan-nascimento51-tradeCripto2025__combined_indicators.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "106:2: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"false\", \"na\", \"not\", \"true\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"<\" found."
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV046-missing-closing-paren.pine",
+          "sha": "50298392b7bae453972851246a4e67e27677090e",
+          "localPath": "sources/0359__folknor-pine-tools__INV046-missing-closing-paren.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "10:1: Expected \")\", \",\", \"/*\", \"//\", [ \\t], or [\\n\\r] but \"p\" found."
+        },
+        {
+          "repo": "https://github.com/alighten-dev/Alighten",
+          "path": "TradingView/Indicators/AlightenLevelsMultiTimeframePatternEV0001.pine",
+          "sha": "7d0f0bcccaa786f5082f18fa37de4f09eb03ca4f",
+          "localPath": "sources/0383__alighten-dev-Alighten__AlightenLevelsMultiTimeframePatternEV0001.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "170:80: Expected \"        \", \"    \\t\", \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"<\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"\\t    \", \"\\t\\t\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \":\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/correlation-heatmap-tradingfinder-sessions-data-science-stats.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0414__regalouisei-collect-tradingview__correlation-heatmap-tradingfinder-sessions-data-science-stats.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "42:51: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"<\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \":\" found."
+        },
+        {
+          "repo": "https://github.com/jonathan-nascimento51/tradeCripto2025",
+          "path": "tests/style_lib_test.pine",
+          "sha": "e10ec3f87189371ad69d83eb242a122b511273fd",
+          "localPath": "sources/0423__jonathan-nascimento51-tradeCripto2025__style_lib_test.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "3:8: Expected \".\", \"/*\", \"[\", \"[]\", [ \\t], or [A-Za-z0-9_\\-] but \"\\\"\" found."
+        },
+        {
+          "repo": "https://github.com/jonathan-nascimento51/tradeCripto2025",
+          "path": "tests/bucketing_lib_test.pine",
+          "sha": "164362945454a4954c93de09d9eae965df3efd80",
+          "localPath": "sources/0425__jonathan-nascimento51-tradeCripto2025__bucketing_lib_test.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "3:8: Expected \".\", \"/*\", \"[\", \"[]\", [ \\t], or [A-Za-z0-9_\\-] but \"\\\"\" found."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/const_condition_qualifier_narrowing.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0445__helenananaa-pine-compat-runtime__const_condition_qualifier_narrowing.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "114:5: Expected \".\", \"/*\", \"[\", \"[]\", or [ \\t] but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/radityakhs/crypto-scanner",
+          "path": "HollowCat_Supreme_Indicator.pine",
+          "sha": "35919a179c067f9cfa110a07ba3a6bfff7e39382",
+          "localPath": "sources/0486__radityakhs-crypto-scanner__HollowCat_Supreme_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "418:46: Expected [0-9a-fA-F] but \" \" found."
+        },
+        {
+          "repo": "https://github.com/FlipWreck/test",
+          "path": "pattern_detector.pine",
+          "sha": "19a9c8a5f037db7a78dd7f4c241e7546e21f1167",
+          "localPath": "sources/0502__FlipWreck-test__pattern_detector.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "22:90: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"color\", \"const\", \"export\", \"false\", \"float\", \"for\", \"input\", \"int\", \"map\", \"matrix\", \"na\", \"not\", \"series\", \"simple\", \"string\", \"switch\", \"true\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"{\" found."
+        },
+        {
+          "repo": "https://github.com/bi-kash/Minddrift",
+          "path": "trendline/experiment.pine",
+          "sha": "9d9674d534a8c8d4a48a225bda9e1c966534853a",
+          "localPath": "sources/0504__bi-kash-Minddrift__experiment.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:15: Expected \")\", \",\", \"/*\", \"//\", \"=\", [ \\t], or [\\n\\r] but \"[\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/fundamentals-graphing-kioseff-trading.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0516__regalouisei-collect-tradingview__fundamentals-graphing-kioseff-trading.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "582:202: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"<\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \"=\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/excalibur-ehlers-autocorrelation-periodogram-modified.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0517__regalouisei-collect-tradingview__excalibur-ehlers-autocorrelation-periodogram-modified.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "86:17: Expected \"/*\", \"=\", \"in\", or [ \\t] but \"p\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/QVNBTiAtIDFEYXkgLSAxQk9MIC0gYWI1ODIxNDI.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0528__Leci37-tuisku_Web_selling__QVNBTiAtIDFEYXkgLSAxQk9MIC0gYWI1ODIxNDI.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/QUZSTSAtIDFNaW4gLSAxU1FVIC0gMjkyM2FlYWI.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0547__Leci37-tuisku_Web_selling__QUZSTSAtIDFNaW4gLSAxU1FVIC0gMjkyM2FlYWI.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/R1RMQiAtIDVNaW4gLSAyVFYwIC0gZjE4ZDlhNGQ.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0548__Leci37-tuisku_Web_selling__R1RMQiAtIDVNaW4gLSAyVFYwIC0gZjE4ZDlhNGQ.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/QUFQTCAtIDVNaW4gLSAxU1FVIC0gMDgxNmNhZWQ.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0549__Leci37-tuisku_Web_selling__QUFQTCAtIDVNaW4gLSAxU1FVIC0gMDgxNmNhZWQ.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/RERPRyAtIDFIb3VyIC0gMVNRVSAtIDM0NjkwZGZh.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0552__Leci37-tuisku_Web_selling__RERPRyAtIDFIb3VyIC0gMVNRVSAtIDM0NjkwZGZh.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        },
+        {
+          "repo": "https://github.com/toxictrader2024/NQ-Analyst",
+          "path": "tradingview/nq_confluence_v1.pine",
+          "sha": "592b4ffbabe8ae26d5153b376801fb84562de7e1",
+          "localPath": "sources/0557__toxictrader2024-NQ-Analyst__nq_confluence_v1.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "211:20: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"<\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"else\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \";\" found."
+        },
+        {
+          "repo": "https://github.com/cc4wang-ui/Auto-trade",
+          "path": "pattern_detector_v2_strategy.pine",
+          "sha": "4bc2fbe285c57fe9c73b6a2397a29722f3a5d542",
+          "localPath": "sources/0559__cc4wang-ui-Auto-trade__pattern_detector_v2_strategy.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "495:56: Expected \"%=\", \"*=\", \"+=\", \"-=\", \".\", \"/*\", \"/=\", \":=\", \"[\", or [ \\t] but \"(\" found."
+        },
+        {
+          "repo": "https://github.com/heyphat/piner",
+          "path": "test/pinescripts/breaker.pine",
+          "sha": "db6514474da2940f532655f36dfc20d118bf36b3",
+          "localPath": "sources/0564__heyphat-piner__breaker.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "123:2: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \",\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/VFNMQSAtIDFEYXkgLSAyU1YwIC0gMjE4NGQwZDk.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0616__Leci37-tuisku_Web_selling__VFNMQSAtIDFEYXkgLSAyU1YwIC0gMjE4NGQwZDk.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        },
+        {
+          "repo": "https://github.com/ignaciocruz65/LABORATORIO1",
+          "path": "TV/MACDRSI.pine",
+          "sha": "557db8e7107440453e19653a846eff02100d57d6",
+          "localPath": "sources/0633__ignaciocruz65-LABORATORIO1__MACDRSI.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "70:2: Expected [0-9a-fA-F] but \"#\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/flare.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0640__regalouisei-collect-tradingview__flare.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "6:13: Expected \"'\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/Leci37/tuisku_Web_selling",
+          "path": "d_result/pine_TW_hide/R01FIC0gMURheSAtIDJCVjAgLSBiZDI3NDMxNg.pine",
+          "sha": "974c0f0e29f9dbb11292dd2571636f4e8d082c2b",
+          "localPath": "sources/0650__Leci37-tuisku_Web_selling__R01FIC0gMURheSAtIDJCVjAgLSBiZDI3NDMxNg.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "61:6: Expected \"/*\", [ \\t], or [0-9] but \".\" found."
+        }
+      ],
+      "representatives": [
+        {
+          "repo": "https://github.com/somat3k/Braga-Bielany-czycus",
+          "path": "pinnacle_strats/04_fib_gann/fib_gann.pine",
+          "sha": "a4306b8d9720e530582f207321a90cc2216bdca8",
+          "localPath": "sources/0075__somat3k-Braga-Bielany-czycus__fib_gann.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "417:42: Expected \"        \", \"    \\t\", \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"<\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"\\t    \", \"\\t\\t\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \";\" found."
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_standard/Performance.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0157__deepentropy-oakscriptJS__Performance.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "7:120: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/mushroom-men-Trading/clean-litter",
+          "path": "Indicators/indicators/premade indicators/oscillators/apo.pine",
+          "sha": "95f5f7d4bcb4e0e95cff86291bf343484842fbe6",
+          "localPath": "sources/0187__mushroom-men-Trading-clean-litter__apo.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "22:12: Expected \".\", \"/*\", \"[\", \"[]\", or [ \\t] but \"n\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/multitimeframe-fair-value-gap-fvg-zeiierman.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0208__regalouisei-collect-tradingview__multitimeframe-fair-value-gap-fvg-zeiierman.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "9:122: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_standard/Multi-Time Period Charts.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0224__deepentropy-oakscriptJS__Multi-Time-Period-Charts.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "5:120: Expected \"\\\"\" or \"\\\\\" but \"\\n\" found."
+        },
+        {
+          "repo": "https://github.com/levanelereal/pruebatrading",
+          "path": "Estructura_Mayor.pine",
+          "sha": "cccce361d393a61f2aeaea3cc0de9850a3e8a511",
+          "localPath": "sources/0329__levanelereal-pruebatrading__Estructura_Mayor.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "1404:54: Expected \".\", \"/*\", \"=\", \"[\", \"[]\", or [ \\t] but \"+\" found."
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/time-sales-tape-by-muqwishi.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0334__regalouisei-collect-tradingview__time-sales-tape-by-muqwishi.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "207:37: Expected \"%=\", \"*=\", \"+=\", \"-=\", \".\", \"/*\", \"/=\", \":=\", \"[\", or [ \\t] but \"(\" found."
+        },
+        {
+          "repo": "https://github.com/jonathan-nascimento51/tradeCripto2025",
+          "path": "combined_indicators.pine",
+          "sha": "a5fa58dae8affea1e2bdfdf8cf302d3dfd558873",
+          "localPath": "sources/0343__jonathan-nascimento51-tradeCripto2025__combined_indicators.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "106:2: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"false\", \"na\", \"not\", \"true\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"<\" found."
+        }
+      ]
+    },
+    "type-mismatch": {
+      "stage": "semantic",
+      "count": 16,
+      "rows": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "investigations/INV087-collection-mutator-element-type/probes/coll_array_push_float.pine",
+          "sha": "47790c0105dd1769a67f9ef109166e7c2135b0cf",
+          "localPath": "sources/0072__folknor-pine-tools__coll_array_push_float.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "7:15: type-mismatch: Cannot use float value as int array element"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/collection-element-type.pine",
+          "sha": "47790c0105dd1769a67f9ef109166e7c2135b0cf",
+          "localPath": "sources/0087__folknor-pine-tools__collection-element-type.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "11:16: type-mismatch: Cannot use float value as int array element"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV123-paramless-control.pine",
+          "sha": "2e34e94d81b3ae2c0fe7f8d52819d9dde92ed48c",
+          "localPath": "sources/0150__folknor-pine-tools__INV123-paramless-control.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "7:9: type-mismatch: nz source cannot be a boolean"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/relative-crypto-dominance-polar-chart-luxalgo.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0172__regalouisei-collect-tradingview__relative-crypto-dominance-polar-chart-luxalgo.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "146:23: type-mismatch: Cannot use string value as udt array element"
+        },
+        {
+          "repo": "https://github.com/DeolinNaidoo/indic",
+          "path": "larper_main.pine",
+          "sha": "613deb667d353d2063d6858715eb3a71dddcd703",
+          "localPath": "sources/0326__DeolinNaidoo-indic__larper_main.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "673:1: type-mismatch: Cannot assign float value to int variable 'qDurMonth'"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/oscillators/composite-fear-greed-index.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0333__regalouisei-collect-tradingview__composite-fear-greed-index.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "119:29: type-mismatch: fill title must be a string, got int"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_map_put_key_type.pine",
+          "sha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+          "localPath": "sources/0364__helenananaa-pine-compat-runtime__unsupported_map_put_key_type.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "5:17: type-mismatch: Cannot use int value as string map key"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/oscillators/stock-screener.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0408__regalouisei-collect-tradingview__stock-screener.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "516:323: type-mismatch: vwap source must be a number, got bool"
+        },
+        {
+          "repo": "https://github.com/jerryinyang/Cerebr-Pinescript-Codebase",
+          "path": "Raids/CTF Raid Indicator.pine",
+          "sha": "402d06746b64d4e42dfae91d2f38e14786c358c9",
+          "localPath": "sources/0470__jerryinyang-Cerebr-Pinescript-Codebase__CTF-Raid-Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "284:25: type-mismatch: ta.valuewhen condition must be a boolean, got float"
+        },
+        {
+          "repo": "https://github.com/hylal/snd-ufo",
+          "path": "snd-ufo-indicator.pine",
+          "sha": "9d649e7164a5be925f5fab20aef81035a74c84a8",
+          "localPath": "sources/0477__hylal-snd-ufo__snd-ufo-indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "98:5: type-mismatch: Cannot assign float value to int variable bullLineX1"
+        },
+        {
+          "repo": "https://github.com/luillotrading/OliverVelez",
+          "path": "oliver_velez_indicator.pine",
+          "sha": "e0695fd702a07d41385e245dcf2409255b046c49",
+          "localPath": "sources/0481__luillotrading-OliverVelez__oliver_velez_indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "362:65: type-mismatch: Invalid plotshape style: shape.star"
+        },
+        {
+          "repo": "https://github.com/nishpa800/indicators",
+          "path": "squarify/versions/SQUARIFY_46_v2_2026-05-04.pine",
+          "sha": "a4303fb0995529f18cb50ff1eac8661ddea15eb1",
+          "localPath": "sources/0507__nishpa800-indicators__SQUARIFY_46_v2_2026-05-04.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "965:21: type-mismatch: nz source cannot be a boolean"
+        },
+        {
+          "repo": "https://github.com/TWODS-CAPITAL/Trading-View-Indicators",
+          "path": "Auto Drawings and Patterns/Auto-Pitchfork.pine",
+          "sha": "2439266905ef641014fd41ec533e516f86818be4",
+          "localPath": "sources/0588__TWODS-CAPITAL-Trading-View-Indicators__Auto-Pitchfork.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "86:26: type-mismatch: ta.valuewhen condition must be a boolean, got int"
+        },
+        {
+          "repo": "https://github.com/Hugs-4-Bugs/Trading-Indicator",
+          "path": "TriexDev-SuperBuySellTrend-TradingView-Trend-Indicator/TriexDev - SuperBuySellTrend.pine",
+          "sha": "1c5714041dd9d704d3ff158feade7aacae23b20f",
+          "localPath": "sources/0589__Hugs-4-Bugs-Trading-Indicator__TriexDev---SuperBuySellTrend.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "43:67: type-mismatch: plot linewidth must be a positive integer"
+        },
+        {
+          "repo": "https://github.com/mikejuliano2/pine",
+          "path": "code/reference/psy-levels.pine",
+          "sha": "504ac0e1ab71e354bad3ca36a0c4c1442a428d7b",
+          "localPath": "sources/0594__mikejuliano2-pine__psy-levels.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "158:34: type-mismatch: na x cannot be a boolean"
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_community/Order Blocks with signals.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0628__deepentropy-oakscriptJS__Order-Blocks-with-signals.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "8:1: type-mismatch: Cannot assign float value to int variable sens"
+        }
+      ],
+      "representatives": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "investigations/INV087-collection-mutator-element-type/probes/coll_array_push_float.pine",
+          "sha": "47790c0105dd1769a67f9ef109166e7c2135b0cf",
+          "localPath": "sources/0072__folknor-pine-tools__coll_array_push_float.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "7:15: type-mismatch: Cannot use float value as int array element"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/collection-element-type.pine",
+          "sha": "47790c0105dd1769a67f9ef109166e7c2135b0cf",
+          "localPath": "sources/0087__folknor-pine-tools__collection-element-type.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "11:16: type-mismatch: Cannot use float value as int array element"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV123-paramless-control.pine",
+          "sha": "2e34e94d81b3ae2c0fe7f8d52819d9dde92ed48c",
+          "localPath": "sources/0150__folknor-pine-tools__INV123-paramless-control.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "7:9: type-mismatch: nz source cannot be a boolean"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/relative-crypto-dominance-polar-chart-luxalgo.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0172__regalouisei-collect-tradingview__relative-crypto-dominance-polar-chart-luxalgo.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "146:23: type-mismatch: Cannot use string value as udt array element"
+        },
+        {
+          "repo": "https://github.com/DeolinNaidoo/indic",
+          "path": "larper_main.pine",
+          "sha": "613deb667d353d2063d6858715eb3a71dddcd703",
+          "localPath": "sources/0326__DeolinNaidoo-indic__larper_main.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "673:1: type-mismatch: Cannot assign float value to int variable 'qDurMonth'"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/oscillators/composite-fear-greed-index.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0333__regalouisei-collect-tradingview__composite-fear-greed-index.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "119:29: type-mismatch: fill title must be a string, got int"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_map_put_key_type.pine",
+          "sha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+          "localPath": "sources/0364__helenananaa-pine-compat-runtime__unsupported_map_put_key_type.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "5:17: type-mismatch: Cannot use int value as string map key"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/oscillators/stock-screener.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0408__regalouisei-collect-tradingview__stock-screener.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "516:323: type-mismatch: vwap source must be a number, got bool"
+        }
+      ]
+    },
+    "duplicate-symbol": {
+      "stage": "semantic",
+      "count": 8,
+      "rows": [
+        {
+          "repo": "https://github.com/LINE12138/TradingView",
+          "path": "combined_cci_indicator.pine",
+          "sha": "92c5be2667b717fe4110676dc56e67bbf4143d0b",
+          "localPath": "sources/0006__LINE12138-TradingView__combined_cci_indicator.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "7:1: duplicate-symbol: Duplicate declaration: ma"
+        },
+        {
+          "repo": "https://github.com/mushroom-men-Trading/clean-litter",
+          "path": "Indicators/indicators/premade indicators/volatility/jvolty.pine",
+          "sha": "95f5f7d4bcb4e0e95cff86291bf343484842fbe6",
+          "localPath": "sources/0105__mushroom-men-Trading-clean-litter__jvolty.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "48:1: duplicate-symbol: Duplicate declaration: jvolty"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_map_udf_method_return_templates.pine",
+          "sha": "35cdebbc3ce3c5a9114a9f5d28eba8cb01566ba7",
+          "localPath": "sources/0129__helenananaa-pine-compat-runtime__unsupported_map_udf_method_return_templates.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "7:8: duplicate-symbol: Duplicate declaration: badReturn"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV124-redeclared-uniongate-fp.pine",
+          "sha": "6acad711e221434176e641aa2e04c40afc9ef3f1",
+          "localPath": "sources/0176__folknor-pine-tools__INV124-redeclared-uniongate-fp.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "8:6: duplicate-symbol: Duplicate declaration: x"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV035-already-defined.pine",
+          "sha": "aa826ef3b13bf3821ff82df0adf74fe50feb0030",
+          "localPath": "sources/0214__folknor-pine-tools__INV035-already-defined.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "13:1: duplicate-symbol: Duplicate declaration: x"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/supported_user_type_array_udf_method_returns.pine",
+          "sha": "9c60e67188bea9e9de7bbb52da618bfb029f815b",
+          "localPath": "sources/0291__helenananaa-pine-compat-runtime__supported_user_type_array_udf_method_returns.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "99:8: duplicate-symbol: Duplicate declaration: first"
+        },
+        {
+          "repo": "https://github.com/CjHare/pinescript-v5-snippets",
+          "path": "src/indicator/adx.pine",
+          "sha": "9459f54f3841f074a9b00871996af96411a9f8ae",
+          "localPath": "sources/0474__CjHare-pinescript-v5-snippets__adx.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "33:2: duplicate-symbol: Duplicate declaration: adx"
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_community/Custom Pattern Detection.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0587__deepentropy-oakscriptJS__Custom-Pattern-Detection.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "105:1: duplicate-symbol: Duplicate declaration: t"
+        }
+      ],
+      "representatives": [
+        {
+          "repo": "https://github.com/LINE12138/TradingView",
+          "path": "combined_cci_indicator.pine",
+          "sha": "92c5be2667b717fe4110676dc56e67bbf4143d0b",
+          "localPath": "sources/0006__LINE12138-TradingView__combined_cci_indicator.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "7:1: duplicate-symbol: Duplicate declaration: ma"
+        },
+        {
+          "repo": "https://github.com/mushroom-men-Trading/clean-litter",
+          "path": "Indicators/indicators/premade indicators/volatility/jvolty.pine",
+          "sha": "95f5f7d4bcb4e0e95cff86291bf343484842fbe6",
+          "localPath": "sources/0105__mushroom-men-Trading-clean-litter__jvolty.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "48:1: duplicate-symbol: Duplicate declaration: jvolty"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_map_udf_method_return_templates.pine",
+          "sha": "35cdebbc3ce3c5a9114a9f5d28eba8cb01566ba7",
+          "localPath": "sources/0129__helenananaa-pine-compat-runtime__unsupported_map_udf_method_return_templates.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "7:8: duplicate-symbol: Duplicate declaration: badReturn"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV124-redeclared-uniongate-fp.pine",
+          "sha": "6acad711e221434176e641aa2e04c40afc9ef3f1",
+          "localPath": "sources/0176__folknor-pine-tools__INV124-redeclared-uniongate-fp.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "8:6: duplicate-symbol: Duplicate declaration: x"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV035-already-defined.pine",
+          "sha": "aa826ef3b13bf3821ff82df0adf74fe50feb0030",
+          "localPath": "sources/0214__folknor-pine-tools__INV035-already-defined.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "13:1: duplicate-symbol: Duplicate declaration: x"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/supported_user_type_array_udf_method_returns.pine",
+          "sha": "9c60e67188bea9e9de7bbb52da618bfb029f815b",
+          "localPath": "sources/0291__helenananaa-pine-compat-runtime__supported_user_type_array_udf_method_returns.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "99:8: duplicate-symbol: Duplicate declaration: first"
+        },
+        {
+          "repo": "https://github.com/CjHare/pinescript-v5-snippets",
+          "path": "src/indicator/adx.pine",
+          "sha": "9459f54f3841f074a9b00871996af96411a9f8ae",
+          "localPath": "sources/0474__CjHare-pinescript-v5-snippets__adx.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "33:2: duplicate-symbol: Duplicate declaration: adx"
+        },
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_community/Custom Pattern Detection.pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0587__deepentropy-oakscriptJS__Custom-Pattern-Detection.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "invalid-pine",
+          "diagnostic": "105:1: duplicate-symbol: Duplicate declaration: t"
+        }
+      ]
+    },
+    "global-output-declared-but-not-evaluated": {
+      "stage": "output",
+      "count": 8,
+      "rows": [
+        {
+          "repo": "https://github.com/easyspace-ai/pine-rs",
+          "path": "tests/scripts/series/debug_loop_i_values.pine",
+          "sha": "82a1323a9c05a35d6e60aa0dd90a7c49f237a446",
+          "localPath": "sources/0085__easyspace-ai-pine-rs__debug_loop_i_values.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/user_type_non_scalar_typed_na_history.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0128__helenananaa-pine-compat-runtime__user_type_non_scalar_typed_na_history.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/supported_for_in_empty_array_slice_result_negative_body_history.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0137__helenananaa-pine-compat-runtime__supported_for_in_empty_array_slice_result_negative_body_history.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/easyspace-ai/pine-rs",
+          "path": "tests/scripts/stdlib/array/array_core.pine",
+          "sha": "940ca37b8bc4f9861e34226c9abdc19c06b55831",
+          "localPath": "sources/0279__easyspace-ai-pine-rs__array_core.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/bsemaay-tech/mtc-command-center",
+          "path": "MTC_COMMAND_CENTER/01_MTC_PROJECT/parity_oracles/feature_adapters/pinets/producer_supertrend_v1.pine",
+          "sha": "d65b5a1dc947d0011408aff2cff1cdf9c785b359",
+          "localPath": "sources/0351__bsemaay-tech-mtc-command-center__producer_supertrend_v1.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/easyspace-ai/pine-rs",
+          "path": "tests/scripts/series/debug_loop_without_close.pine",
+          "sha": "82a1323a9c05a35d6e60aa0dd90a7c49f237a446",
+          "localPath": "sources/0429__easyspace-ai-pine-rs__debug_loop_without_close.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_matrix_add_row.pine",
+          "sha": "16f6492487a82e3098750056b53ae8eb7cd58159",
+          "localPath": "sources/0432__helenananaa-pine-compat-runtime__unsupported_matrix_add_row.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/nathanssantos/marketmind",
+          "path": "apps/backend/strategies/builtin/vwap-ema-cross.pine",
+          "sha": "61a72e9c98fdffb39cb712c6f53c97569a3f6722",
+          "localPath": "sources/0593__nathanssantos-marketmind__vwap-ema-cross.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        }
+      ],
+      "representatives": [
+        {
+          "repo": "https://github.com/easyspace-ai/pine-rs",
+          "path": "tests/scripts/series/debug_loop_i_values.pine",
+          "sha": "82a1323a9c05a35d6e60aa0dd90a7c49f237a446",
+          "localPath": "sources/0085__easyspace-ai-pine-rs__debug_loop_i_values.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/user_type_non_scalar_typed_na_history.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0128__helenananaa-pine-compat-runtime__user_type_non_scalar_typed_na_history.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/supported_for_in_empty_array_slice_result_negative_body_history.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0137__helenananaa-pine-compat-runtime__supported_for_in_empty_array_slice_result_negative_body_history.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/easyspace-ai/pine-rs",
+          "path": "tests/scripts/stdlib/array/array_core.pine",
+          "sha": "940ca37b8bc4f9861e34226c9abdc19c06b55831",
+          "localPath": "sources/0279__easyspace-ai-pine-rs__array_core.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/bsemaay-tech/mtc-command-center",
+          "path": "MTC_COMMAND_CENTER/01_MTC_PROJECT/parity_oracles/feature_adapters/pinets/producer_supertrend_v1.pine",
+          "sha": "d65b5a1dc947d0011408aff2cff1cdf9c785b359",
+          "localPath": "sources/0351__bsemaay-tech-mtc-command-center__producer_supertrend_v1.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/easyspace-ai/pine-rs",
+          "path": "tests/scripts/series/debug_loop_without_close.pine",
+          "sha": "82a1323a9c05a35d6e60aa0dd90a7c49f237a446",
+          "localPath": "sources/0429__easyspace-ai-pine-rs__debug_loop_without_close.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_matrix_add_row.pine",
+          "sha": "16f6492487a82e3098750056b53ae8eb7cd58159",
+          "localPath": "sources/0432__helenananaa-pine-compat-runtime__unsupported_matrix_add_row.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        },
+        {
+          "repo": "https://github.com/nathanssantos/marketmind",
+          "path": "apps/backend/strategies/builtin/vwap-ema-cross.pine",
+          "sha": "61a72e9c98fdffb39cb712c6f53c97569a3f6722",
+          "localPath": "sources/0593__nathanssantos-marketmind__vwap-ema-cross.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        }
+      ]
+    },
+    "unknown-identifier": {
+      "stage": "semantic",
+      "count": 8,
+      "rows": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV062-unresolved-call-args.pine",
+          "sha": "a35bac7ab74087723588464497631ab0a0d10d8c",
+          "localPath": "sources/0088__folknor-pine-tools__INV062-unresolved-call-args.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "12:13: unknown-identifier: Unknown identifier: missingArg"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV037-if-branch-scope.pine",
+          "sha": "a35bac7ab74087723588464497631ab0a0d10d8c",
+          "localPath": "sources/0149__folknor-pine-tools__INV037-if-branch-scope.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "17:8: unknown-identifier: Unknown identifier: branchOnly"
+        },
+        {
+          "repo": "https://github.com/nishpa800/indicators",
+          "path": "vob/versions/VOB_v11_MULTIPLES_HWcoincidence_2026-06-04.pine",
+          "sha": "0e08c6e02c2623dff7e0c7f002f887a81fd625fb",
+          "localPath": "sources/0336__nishpa800-indicators__VOB_v11_MULTIPLES_HWcoincidence_2026-06-04.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "1056:8: unknown-identifier: Unknown identifier: enabled"
+        },
+        {
+          "repo": "https://github.com/kwinkzap-bot/Mine",
+          "path": "Mine/Pine script/Combined Strike Selector & Intrinsic Levels.pine",
+          "sha": "46940112eaaafa99a21994f822ce2fd6e1c2f285",
+          "localPath": "sources/0341__kwinkzap-bot-Mine__Combined-Strike-Selector-Intrinsic-Levels.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "135:60: unknown-identifier: Unknown identifier: ce_l"
+        },
+        {
+          "repo": "https://github.com/Flopchamp/Custom-TradingView-Pine-Script-v5---Multi-Timeframe-Signal-Indicator---Strategy-Tester",
+          "path": "MTF_Signal_Indicator.pine",
+          "sha": "f34c3bb7c39f8c1813b761edea9bbca26bacdb42",
+          "localPath": "sources/0483__Flopchamp-Custom-TradingView-Pine-Script-v5---Multi-Timeframe-Signal-Indicator---Strategy-Tester__MTF_Signal_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "71:77: unknown-identifier: Unknown identifier: isNewDay"
+        },
+        {
+          "repo": "https://github.com/tarifamin/tempo-indicator",
+          "path": "ICT_Master_Indicator.pine",
+          "sha": "5b58c907866aa917160f0e895419ee8bdf9de28d",
+          "localPath": "sources/0485__tarifamin-tempo-indicator__ICT_Master_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "196:22: unknown-identifier: Unknown identifier: string"
+        },
+        {
+          "repo": "https://github.com/DMJ3691836/SNAP-HTF_LTF-Indicator-",
+          "path": "SNAP_HTF_LTF_Indicator.pine",
+          "sha": "83dd82413a2ee1a3c9f1658cf4ad0d50a014ef5c",
+          "localPath": "sources/0490__DMJ3691836-SNAP-HTF_LTF-Indicator__SNAP_HTF_LTF_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "50:32: unknown-identifier: Unknown identifier: weekly_wick_high"
+        },
+        {
+          "repo": "https://github.com/zhuzp98/QuantTestFrame",
+          "path": "PineScript/Z_template_strategy.pine",
+          "sha": "1ce362d84524f26118808e983691142780f3a978",
+          "localPath": "sources/0526__zhuzp98-QuantTestFrame__Z_template_strategy.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "76:4: unknown-identifier: Unknown identifier: enterLong"
+        }
+      ],
+      "representatives": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV062-unresolved-call-args.pine",
+          "sha": "a35bac7ab74087723588464497631ab0a0d10d8c",
+          "localPath": "sources/0088__folknor-pine-tools__INV062-unresolved-call-args.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "12:13: unknown-identifier: Unknown identifier: missingArg"
+        },
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/regression/INV037-if-branch-scope.pine",
+          "sha": "a35bac7ab74087723588464497631ab0a0d10d8c",
+          "localPath": "sources/0149__folknor-pine-tools__INV037-if-branch-scope.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "17:8: unknown-identifier: Unknown identifier: branchOnly"
+        },
+        {
+          "repo": "https://github.com/nishpa800/indicators",
+          "path": "vob/versions/VOB_v11_MULTIPLES_HWcoincidence_2026-06-04.pine",
+          "sha": "0e08c6e02c2623dff7e0c7f002f887a81fd625fb",
+          "localPath": "sources/0336__nishpa800-indicators__VOB_v11_MULTIPLES_HWcoincidence_2026-06-04.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "1056:8: unknown-identifier: Unknown identifier: enabled"
+        },
+        {
+          "repo": "https://github.com/kwinkzap-bot/Mine",
+          "path": "Mine/Pine script/Combined Strike Selector & Intrinsic Levels.pine",
+          "sha": "46940112eaaafa99a21994f822ce2fd6e1c2f285",
+          "localPath": "sources/0341__kwinkzap-bot-Mine__Combined-Strike-Selector-Intrinsic-Levels.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "135:60: unknown-identifier: Unknown identifier: ce_l"
+        },
+        {
+          "repo": "https://github.com/Flopchamp/Custom-TradingView-Pine-Script-v5---Multi-Timeframe-Signal-Indicator---Strategy-Tester",
+          "path": "MTF_Signal_Indicator.pine",
+          "sha": "f34c3bb7c39f8c1813b761edea9bbca26bacdb42",
+          "localPath": "sources/0483__Flopchamp-Custom-TradingView-Pine-Script-v5---Multi-Timeframe-Signal-Indicator---Strategy-Tester__MTF_Signal_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "71:77: unknown-identifier: Unknown identifier: isNewDay"
+        },
+        {
+          "repo": "https://github.com/tarifamin/tempo-indicator",
+          "path": "ICT_Master_Indicator.pine",
+          "sha": "5b58c907866aa917160f0e895419ee8bdf9de28d",
+          "localPath": "sources/0485__tarifamin-tempo-indicator__ICT_Master_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "196:22: unknown-identifier: Unknown identifier: string"
+        },
+        {
+          "repo": "https://github.com/DMJ3691836/SNAP-HTF_LTF-Indicator-",
+          "path": "SNAP_HTF_LTF_Indicator.pine",
+          "sha": "83dd82413a2ee1a3c9f1658cf4ad0d50a014ef5c",
+          "localPath": "sources/0490__DMJ3691836-SNAP-HTF_LTF-Indicator__SNAP_HTF_LTF_Indicator.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "50:32: unknown-identifier: Unknown identifier: weekly_wick_high"
+        },
+        {
+          "repo": "https://github.com/zhuzp98/QuantTestFrame",
+          "path": "PineScript/Z_template_strategy.pine",
+          "sha": "1ce362d84524f26118808e983691142780f3a978",
+          "localPath": "sources/0526__zhuzp98-QuantTestFrame__Z_template_strategy.pine",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "tealscript-gap",
+          "diagnostic": "76:4: unknown-identifier: Unknown identifier: enterLong"
+        }
+      ]
+    }
+  },
+  "imports": [
+    {
+      "specifier": "user/udt/1",
+      "alias": "lib",
+      "official": false,
+      "count": 4,
+      "rows": [
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_array_from_method_return_qualifier.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0217__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_from_method_return_qualifier.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_varip.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0583__helenananaa-pine-compat-runtime__unsupported_imported_udt_varip.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/import_udt_typed_udf_params.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0584__helenananaa-pine-compat-runtime__import_udt_typed_udf_params.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/sema/unsupported_imported_udt_array_push_local_target_method_mixed_identity.pine",
+          "sha": "0e4f409acbab5dad943d622b1c2d68324a5daf46",
+          "localPath": "sources/0585__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_push_local_target_method_mixed_identity.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'lib' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "TradingView/ta/12",
+      "alias": "unknown",
+      "official": true,
+      "count": 3,
+      "rows": [
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/trend_analysis/strategic-trend-filter.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0202__regalouisei-collect-tradingview__strategic-trend-filter.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/trend_analysis/true-baseline-median-supertrend.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0324__regalouisei-collect-tradingview__true-baseline-median-supertrend.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/volatility/true-baseline-median-supertrend.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0401__regalouisei-collect-tradingview__true-baseline-median-supertrend.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "8:1: unresolved-import: Official TradingView library 'TradingView/ta' version 12 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "TradingView/ta/8",
+      "alias": "unknown",
+      "official": true,
+      "count": 3,
+      "rows": [
+        {
+          "repo": "https://github.com/alighten-dev/Alighten",
+          "path": "TradingView/Indicators/AlightenCVDRegressionBiasV0002.pine",
+          "sha": "eadfefeac6a7da1513b3c39791a05f6599eb8cb0",
+          "localPath": "sources/0294__alighten-dev-Alighten__AlightenCVDRegressionBiasV0002.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/alighten-dev/Alighten",
+          "path": "TradingView/Indicators/AlightenOrderflowPressureV0001.pine",
+          "sha": "eadfefeac6a7da1513b3c39791a05f6599eb8cb0",
+          "localPath": "sources/0300__alighten-dev-Alighten__AlightenOrderflowPressureV0001.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        },
+        {
+          "repo": "https://github.com/turnupdigital/riskmanager",
+          "path": "Trend/CVD_Strategy_Export.pine",
+          "sha": "479ea44f7bb3e14c9a0c01e7d8a0e3bc4c38e1e5",
+          "localPath": "sources/0394__turnupdigital-riskmanager__CVD_Strategy_Export.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "4:1: unresolved-import: Official TradingView library 'TradingView/ta' version 8 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "BlueprintResearch/lib_ephemeris/1",
+      "alias": "eph",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/BlueprintResearch/Gann-and-Financial-Astrology-Indicators",
+          "path": "scripts/gann square of nine: planetary degrees.pine",
+          "sha": "1564a99a4f4155a4f28ea01e433c0b630471e03c",
+          "localPath": "sources/0037__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__gann-square-of-nine-planetary-degrees.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "70:1: unresolved-import: Import 'BlueprintResearch/lib_ephemeris/1' as alias 'eph' was not supplied by the host library registry; provide Pine library source for BlueprintResearch/lib_ephemeris version 1, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "cybermediaboy/CyberCausalityLib/10",
+      "alias": "CL",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/cybermediaboy/indicators",
+          "path": "m3f_te-research_v0.4.4.pine",
+          "sha": "f592ecde5cd5ceed5b2d6a18e09d082e3e151d99",
+          "localPath": "sources/0123__cybermediaboy-indicators__m3f_te-research_v0.4.4.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "16:1: unresolved-import: Import 'cybermediaboy/CyberCausalityLib/10' as alias 'CL' was not supplied by the host library registry; provide Pine library source for cybermediaboy/CyberCausalityLib version 10, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "DarkWaveAlgo/DarkWaveColorThemes/1",
+      "alias": "ColorThemes",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/btcjon/pine",
+          "path": "archive/ttb_entry_main2.pine",
+          "sha": "43413c4657522fef2df09fb71cb4aeee3cef782e",
+          "localPath": "sources/0639__btcjon-pine__ttb_entry_main2.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "10:1: unresolved-import: Import 'DarkWaveAlgo/DarkWaveColorThemes/1' as alias 'ColorThemes' was not supplied by the host library registry; provide Pine library source for DarkWaveAlgo/DarkWaveColorThemes version 1, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "drebel/DRELib/35",
+      "alias": "drelib",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/drebel7/TradingView",
+          "path": "src/indicators/DRE Non-Broken lows and highs.pine",
+          "sha": "5929ff5e02f7ce5b8bfbe1c3536da2f7624f188b",
+          "localPath": "sources/0296__drebel7-TradingView__DRE-Non-Broken-lows-and-highs.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "7:1: unresolved-import: Import 'drebel/DRELib/35' as alias 'drelib' was not supplied by the host library registry; provide Pine library source for drebel/DRELib version 35, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "jason5480/series_collection/4",
+      "alias": "col",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "investigations/INV126-item5-library-dataflow-probes/A-k4.pine",
+          "sha": "b5f8984922cfdc8f4268a96d401391f39ab29a48",
+          "localPath": "sources/0449__folknor-pine-tools__A-k4.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "3:1: unresolved-import: Import 'jason5480/series_collection/4' as alias 'col' was not supplied by the host library registry; provide Pine library source for jason5480/series_collection version 4, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "jdehorty/KernelFunctions/2",
+      "alias": "kernels",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection",
+          "path": "Strategy/ESTIMATIONS_10M.PINE",
+          "sha": "b6b6f454c641d84690acd02d0323518357de2a66",
+          "localPath": "sources/0623__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ESTIMATIONS_10M.PINE",
+          "version": 5,
+          "kind": "strategy",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "225:1: unresolved-import: Import 'jdehorty/KernelFunctions/2' as alias 'kernels' was not supplied by the host library registry; provide Pine library source for jdehorty/KernelFunctions version 2, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "jonathanmoletta17/MapUtilsLib/1",
+      "alias": "map",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/jonathan-nascimento51/tradeCripto2025",
+          "path": "tests/map_utils_lib_test.pine",
+          "sha": "62ef61c811e78808b872ed7cf4c1356826d98c63",
+          "localPath": "sources/0424__jonathan-nascimento51-tradeCripto2025__map_utils_lib_test.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "3:1: unresolved-import: Import 'jonathanmoletta17/MapUtilsLib/1' as alias 'map' was not supplied by the host library registry; provide Pine library source for jonathanmoletta17/MapUtilsLib version 1, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "PineCoders/VisibleChart/4",
+      "alias": "VisibleChart",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/deepentropy/oakscriptJS",
+          "path": "docs/official/indicators_community/Dynamic Supply and Demand Zones [AlgoAlpha].pine",
+          "sha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+          "localPath": "sources/0629__deepentropy-oakscriptJS__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "6:1: unresolved-import: Import 'PineCoders/VisibleChart/4' as alias 'VisibleChart' was not supplied by the host library registry; provide Pine library source for PineCoders/VisibleChart version 4, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "robbatt/lib_profile/44",
+      "alias": "PF",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "investigations/INV143-transitive-library-imports/probes/q01-vardecl-anchor.pine",
+          "sha": "68907b82c9ecc57231bffedfdf12757118feada1",
+          "localPath": "sources/0388__folknor-pine-tools__q01-vardecl-anchor.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "3:1: unresolved-import: Import 'robbatt/lib_profile/44' as alias 'PF' was not supplied by the host library registry; provide Pine library source for robbatt/lib_profile version 44, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "SimpleCryptoLife/HighTimeframeSampling/4",
+      "alias": "SCL_HTF",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/Focal-QuantAI/QuantAI-Blog",
+          "path": "strategies/heikin_ashi_oscillator_trend_engine/AbVe_KnGK7Iuuhwb77Ul_code.pine",
+          "sha": "7c878f1e0c7afead0913944fdd0cc86b163d5259",
+          "localPath": "sources/0173__Focal-QuantAI-QuantAI-Blog__AbVe_KnGK7Iuuhwb77Ul_code.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "60:1: unresolved-import: Import 'SimpleCryptoLife/HighTimeframeSampling/4' as alias 'SCL_HTF' was not supplied by the host library registry; provide Pine library source for SimpleCryptoLife/HighTimeframeSampling version 4, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "Steversteves/SPTS_StatsPakLib/4",
+      "alias": "spts",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/oscillators/anova-macd.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0635__regalouisei-collect-tradingview__anova-macd.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "5:1: unresolved-import: Import 'Steversteves/SPTS_StatsPakLib/4' as alias 'spts' was not supplied by the host library registry; provide Pine library source for Steversteves/SPTS_StatsPakLib version 4, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "TradingView/ta/1",
+      "alias": "ta_lib",
+      "official": true,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/folknor/pine-tools",
+          "path": "packages/core/test/fixtures/syntax/imports.pine",
+          "sha": "8c7cbbbde84ddc4d7856d18d9ca1b60cc65b1f97",
+          "localPath": "sources/0358__folknor-pine-tools__imports.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "tealscript-gap",
+          "diagnostic": "10:1: unresolved-import: Official TradingView library 'TradingView/ta' version 1 is not implemented by TealScript; implement that documented standard-library surface or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "Trendoscope/Drawing/2",
+      "alias": "dr",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/regalouisei/collect-tradingview",
+          "path": "pinescript/editors_picks/recursive-reversal-chart-patterns-trendoscope.pine",
+          "sha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+          "localPath": "sources/0079__regalouisei-collect-tradingview__recursive-reversal-chart-patterns-trendoscope.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "23:1: unresolved-import: Import 'Trendoscope/Drawing/2' as alias 'dr' was not supplied by the host library registry; provide Pine library source for Trendoscope/Drawing version 2, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "uminomae/pjdhiro_ma_v6/2",
+      "alias": "ma",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/uminomae/pjdhiro",
+          "path": "myPj/tradingview/pine/indicators/pjdhiro_sma3_bb_indicator_v6.pine",
+          "sha": "0383f24eff572b6a8c026c6f6a7f01be4d170c24",
+          "localPath": "sources/0143__uminomae-pjdhiro__pjdhiro_sma3_bb_indicator_v6.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "18:1: unresolved-import: Import 'uminomae/pjdhiro_ma_v6/2' as alias 'ma' was not supplied by the host library registry; provide Pine library source for uminomae/pjdhiro_ma_v6 version 2, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "user/udt/1",
+      "alias": "left",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/helenananaa/pine-compat-runtime",
+          "path": "tests/fixtures/runtime/import_user_method_matrix_call_result_reads.pine",
+          "sha": "ab3ccbea61b5a97b5686ff73409922766c9c11fa",
+          "localPath": "sources/0447__helenananaa-pine-compat-runtime__import_user_method_matrix_call_result_reads.pine",
+          "version": 6,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "2:1: unresolved-import: Import 'user/udt/1' as alias 'left' was not supplied by the host library registry; provide Pine library source for user/udt version 1, or remove/change the import"
+        }
+      ]
+    },
+    {
+      "specifier": "yesgoods/quant/1",
+      "alias": "quant",
+      "official": false,
+      "count": 1,
+      "rows": [
+        {
+          "repo": "https://github.com/hirawatt/pineScripts",
+          "path": "indicator/iHotelIndex.pine",
+          "sha": "2df0c2f9ef72df6ac7af009c39778ba296647dc1",
+          "localPath": "sources/0478__hirawatt-pineScripts__iHotelIndex.pine",
+          "version": 5,
+          "kind": "indicator",
+          "bucket": "unsupported-by-design",
+          "diagnostic": "6:1: unresolved-import: Import 'yesgoods/quant/1' as alias 'quant' was not supplied by the host library registry; provide Pine library source for yesgoods/quant version 1, or remove/change the import"
+        }
+      ]
+    }
+  ],
+  "minimalReproducers": {
+    "unresolved-import": "//@version=6\nindicator(\"import registry miss\")\nimport TradingView/ta/12 as tvta\nplot(tvta.rma2(close, 14))",
+    "unexpected-token": "//@version=6\nindicator(\"semicolon chain\")\nvar array<int> xs = array.new<int>()\nif barstate.islast\n    a = 1; b = 2\nplot(a)",
+    "type-mismatch": "//@version=6\nindicator(\"array element type\")\nvar int[] xs = array.new<int>()\narray.push(xs, 1.5)\nplot(array.size(xs))",
+    "duplicate-symbol": "//@version=6\nindicator(\"function and value share name\")\ncalc(float x) => x\ncalc = calc(close)\nplot(calc)",
+    "global-output-declared-but-not-evaluated": "//@version=6\nindicator(\"empty local-output loop\")\nvar float[] xs = array.new<float>()\nfor value in xs\n    plot(value)",
+    "unknown-identifier": "//@version=6\nindicator(\"self history initializer\")\nisNewDay = ta.change(dayofweek) != 0 or not isNewDay[1]\nplot(isNewDay ? 1 : 0)"
+  }
+}

@@ -1,0 +1,729 @@
+# Pine Value Vector Corpus Exposure V1
+
+## Basis
+
+- Measurement SHA: `bbcbf3d220`.
+- Scope: pinned v5 and v6 corpus cache sources, read-only.
+- Method: static source scan for the 50 trace/host-required members and the 32 unsettled TA missing-value policy members.
+- Exposure routes: `request.security`/request calls with `barmerge.gaps_on`, conditional or explicit `na`, collection reads, and derived warm-up series.
+- Limit: static analysis can under-resolve UDF/object-state dependencies; those are reported as `unknown`, not counted as safe.
+
+## Headline
+
+- Corpus scripts scanned: 2000.
+- Scripts touching trace/host-required or unsettled-NA members: 1135 (56.75%).
+- Scripts touching trace/host-required members: 488.
+- Scripts touching unsettled TA missing-value policies: 722.
+- Scripts touching both: 75.
+- Unsettled-policy scripts by worst source exposure: cannot-be-na=318, leading-warmup-only=169, interior-hole=66, unknown=169.
+- Scripts with confirmed interior-hole exposure: 66.
+- Scripts with unresolved static dependency exposure: 189.
+
+## Trace Or Host Required Members By Script Count
+
+- `runtime.error` - 395
+- `timenow` - 35
+- `barstate.islastconfirmedhistory` - 29
+- `library` - 26
+- `barstate.isnew` - 12
+- `strategy.risk.max_intraday_loss` - 11
+- `strategy.risk.max_drawdown` - 8
+- `earnings.estimate` - 2
+- `earnings.future_time` - 2
+- `math.random` - 2
+- `request.seed` - 2
+- `strategy.risk.max_intraday_filled_orders` - 2
+- `ask` - 1
+- `bid` - 1
+- `earnings.future_eps` - 1
+- `earnings.future_revenue` - 1
+- `session.isfirstbar` - 1
+- `session.islastbar` - 1
+
+## Unsettled TA Members By Script Count
+
+- `ta.crossover` - 352
+- `ta.crossunder` - 327
+- `ta.rsi` - 281
+- `ta.pivotlow` - 193
+- `ta.pivothigh` - 191
+- `ta.stoch` - 78
+- `ta.macd` - 77
+- `ta.dmi` - 68
+- `ta.vwap` - 65
+- `ta.cross` - 54
+- `ta.hma` - 50
+- `ta.supertrend` - 39
+- `ta.cum` - 35
+- `ta.bb` - 20
+- `ta.mfi` - 18
+- `ta.sar` - 11
+- `ta.alma` - 8
+- `ta.pivot_point_levels` - 7
+- `ta.cmo` - 5
+- `ta.swma` - 4
+- `ta.wpr` - 4
+- `ta.accdist` - 3
+- `ta.tsi` - 3
+- `ta.kc` - 2
+- `ta.adx` - 1
+- `ta.bbw` - 1
+- `ta.rci` - 1
+
+## Confirmed Interior-Hole Exposure
+
+- `v5/0487` `ta.crossover` via `microLastHigh` - interior-hole, microLastHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts archive/indicators/directional_probability_engine/directional_probability_engine_v3.pine)
+- `v5/0487` `ta.crossunder` via `microLastLow` - interior-hole, microLastLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts archive/indicators/directional_probability_engine/directional_probability_engine_v3.pine)
+- `v5/0501` `ta.crossover` via `microLastHigh` - interior-hole, microLastHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/composite/trade_permission_engine/trade_permission_engine_v1.pine)
+- `v5/0501` `ta.crossunder` via `microLastLow` - interior-hole, microLastLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/composite/trade_permission_engine/trade_permission_engine_v1.pine)
+- `v5/0512` `ta.crossover` via `score` - interior-hole, score <- rawScore <- s <- collection read can return or propagate missing data (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_advanced/market_structure_advanced.pine)
+- `v5/0512` `ta.crossover` via `signal` - interior-hole, signal <- score <- rawScore <- s <- collection read can return or propagate missing data (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_advanced/market_structure_advanced.pine)
+- `v5/0512` `ta.crossover` via `score` - interior-hole, score <- rawScore <- s <- collection read can return or propagate missing data (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_advanced/market_structure_advanced.pine)
+- `v5/0512` `ta.crossunder` via `score` - interior-hole, score <- rawScore <- s <- collection read can return or propagate missing data (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_advanced/market_structure_advanced.pine)
+- `v5/0512` `ta.crossunder` via `signal` - interior-hole, signal <- score <- rawScore <- s <- collection read can return or propagate missing data (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_advanced/market_structure_advanced.pine)
+- `v5/0512` `ta.crossunder` via `score` - interior-hole, score <- rawScore <- s <- collection read can return or propagate missing data (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_advanced/market_structure_advanced.pine)
+- `v5/0519` `ta.crossover` via `bosSwingHigh` - interior-hole, bosSwingHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine)
+- `v5/0519` `ta.crossover` via `bosSwingHigh` - interior-hole, bosSwingHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine)
+- `v5/0519` `ta.crossover` via `lastConfirmedSwingHigh * 1.005` - interior-hole, lastConfirmedSwingHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine)
+- `v5/0519` `ta.crossunder` via `bosSwingLow` - interior-hole, bosSwingLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine)
+- `v5/0519` `ta.crossunder` via `bosSwingLow` - interior-hole, bosSwingLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine)
+- `v5/0519` `ta.crossunder` via `lastConfirmedSwingLow * 0.995` - interior-hole, lastConfirmedSwingLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/market_structure/smc_structure_expectation/smc_structure_expectation.pine)
+- `v5/0532` `ta.cross` via `vwap` - interior-hole, vwap <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/anchored_vwap/anchored_vwap.pine)
+- `v5/0533` `ta.crossover` via `lower1` - interior-hole, lower1 <- midas <- cumV <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/midas_curves/midas_curves.pine)
+- `v5/0533` `ta.crossover` via `midas` - interior-hole, midas <- cumV <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/midas_curves/midas_curves.pine)
+- `v5/0533` `ta.crossunder` via `upper1` - interior-hole, upper1 <- midas <- cumV <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/midas_curves/midas_curves.pine)
+- `v5/0533` `ta.crossunder` via `midas` - interior-hole, midas <- cumV <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/midas_curves/midas_curves.pine)
+- `v5/0535` `ta.crossover` via `profile.nearestLVN` - interior-hole, nearestLVN <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossover` via `profile.valueAreaLow` - interior-hole, valueAreaLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `profile.nearestLVN` - interior-hole, nearestLVN <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `profile.valueAreaHigh` - interior-hole, valueAreaHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0544` `ta.crossover` via `smoothedTotal` - interior-hole, smoothedTotal <- totalScore <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/mtf_stochrsi_pair_score/mtf_stochrsi_pair_score.pine)
+- `v5/0544` `ta.crossunder` via `smoothedTotal` - interior-hole, smoothedTotal <- totalScore <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/mtf_stochrsi_pair_score/mtf_stochrsi_pair_score.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.stoch` via `_r` - interior-hole, _r <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0562` `ta.crossover` via `kvoRaw` - interior-hole, kvoRaw <- formulaMode <- vfTVDocs <- ratio <- cm <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossover` via `signalRaw` - interior-hole, signalRaw <- formulaMode <- vfTVDocs <- ratio <- cm <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossover` via `kvoRaw` - interior-hole, kvoRaw <- formulaMode <- vfTVDocs <- ratio <- cm <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossover` via `lastSwingHigh[1]` - interior-hole, lastSwingHigh <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossunder` via `kvoRaw` - interior-hole, kvoRaw <- formulaMode <- vfTVDocs <- ratio <- cm <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossunder` via `signalRaw` - interior-hole, signalRaw <- formulaMode <- vfTVDocs <- ratio <- cm <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossunder` via `kvoRaw` - interior-hole, kvoRaw <- formulaMode <- vfTVDocs <- ratio <- cm <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0562` `ta.crossunder` via `lastSwingLow[1]` - interior-hole, lastSwingLow <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/klinger_volume_force_map/klinger_volume_force_map_v1_0_0.pine)
+- `v5/0565` `ta.cross` via `poc_lvl_p` - interior-hole, poc_lvl_p <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/money_flow/volume_strata/volume_strata.pine)
+- `v5/0569` `ta.cross` via `aiAMA` - interior-hole, aiAMA <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/chandelier_flip_radar/chandelier_flip_radar.pine)
+- `v5/0574` `ta.crossover` via `TP1_lvl` - interior-hole, TP1_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossover` via `TP2_lvl` - interior-hole, TP2_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossover` via `TP3_lvl` - interior-hole, TP3_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossover` via `SL` - interior-hole, SL <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossunder` via `TP1_lvl` - interior-hole, TP1_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossunder` via `TP2_lvl` - interior-hole, TP2_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossunder` via `TP3_lvl` - interior-hole, TP3_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0574` `ta.crossunder` via `SL` - interior-hole, SL <- explicit na literal in source expression (https://github.com/casoon/pine-scripts indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine)
+- `v5/0605` `ta.cross` via `aiAMA` - interior-hole, aiAMA <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/chandelier_flip_radar/chandelier_flip_radar_strategy.pine)
+- `v5/0609` `ta.crossover` via `TP1_lvl` - interior-hole, TP1_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossover` via `TP2_lvl` - interior-hole, TP2_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossover` via `TP3_lvl` - interior-hole, TP3_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossover` via `SL` - interior-hole, SL <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossunder` via `TP1_lvl` - interior-hole, TP1_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossunder` via `TP2_lvl` - interior-hole, TP2_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossunder` via `TP3_lvl` - interior-hole, TP3_lvl <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0609` `ta.crossunder` via `SL` - interior-hole, SL <- explicit na literal in source expression (https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine)
+- `v5/0681` `ta.crossover` via `orHigh` - interior-hole, orHigh <- explicit na literal in source expression (https://github.com/gktrk0530/pine-script-indicators. orb_indicator.pine)
+- `v5/0681` `ta.crossunder` via `orLow` - interior-hole, orLow <- explicit na literal in source expression (https://github.com/gktrk0530/pine-script-indicators. orb_indicator.pine)
+- `v5/0753` `ta.crossover` via `long_1_high` - interior-hole, long_1_high <- explicit na literal in source expression (https://github.com/Opus-Aether-AI/pine-transpiler tests/corpus/community/arunkbhaskar/scanner_momentum_setup_-_rsi_directional_momentum.pine)
+- `v5/0753` `ta.crossunder` via `short_1_low` - interior-hole, short_1_low <- explicit na literal in source expression (https://github.com/Opus-Aether-AI/pine-transpiler tests/corpus/community/arunkbhaskar/scanner_momentum_setup_-_rsi_directional_momentum.pine)
+- `v5/0802` `ta.crossover` via `gEW.bx.get_top   ()` - interior-hole, gEW <- collection read can return or propagate missing data (https://github.com/YooooungLee/clever-meme Quant-code/strategy/艾略特波浪理论.pine)
+- `v5/0802` `ta.crossunder` via `gEW.bx.get_bottom()` - interior-hole, gEW <- collection read can return or propagate missing data (https://github.com/YooooungLee/clever-meme Quant-code/strategy/艾略特波浪理论.pine)
+- `v5/0805` `ta.crossover` via `short_break_price` - interior-hole, short_break_price <- explicit na literal in source expression (https://github.com/Opus-Aether-AI/pine-transpiler tests/corpus/community/arunkbhaskar/scanner_ict_mitigation_block_scanner.pine)
+- `v5/0805` `ta.crossover` via `zz_2` - interior-hole, zz_2 <- explicit na literal in source expression (https://github.com/Opus-Aether-AI/pine-transpiler tests/corpus/community/arunkbhaskar/scanner_ict_mitigation_block_scanner.pine)
+- `v5/0805` `ta.crossunder` via `zz_2` - interior-hole, zz_2 <- explicit na literal in source expression (https://github.com/Opus-Aether-AI/pine-transpiler tests/corpus/community/arunkbhaskar/scanner_ict_mitigation_block_scanner.pine)
+- `v5/0805` `ta.crossunder` via `long_break_price` - interior-hole, long_break_price <- explicit na literal in source expression (https://github.com/Opus-Aether-AI/pine-transpiler tests/corpus/community/arunkbhaskar/scanner_ict_mitigation_block_scanner.pine)
+- `v5/0811` `ta.bb` via `missing_source` - interior-hole, missing_source <- conditional branch yields na (https://github.com/helenananaa/pine-compat-runtime tests/fixtures/runtime/bb_edge_cases.pine)
+- `v5/0838` `ta.crossover` via `(1 + tp / 100) * last_open_longCondition1` - interior-hole, last_open_longCondition1 <- explicit na literal in source expression (https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/VP(MAPS)+OB+S&R+GGSHOT+HH BY LEO.pine)
+- `v5/0838` `ta.crossover` via `(1 + tp2 / 100) * last_open_longCondition2` - interior-hole, last_open_longCondition2 <- explicit na literal in source expression (https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/VP(MAPS)+OB+S&R+GGSHOT+HH BY LEO.pine)
+- `v5/0838` `ta.crossover` via `(1 + tp3 / 100) * last_open_longCondition3` - interior-hole, last_open_longCondition3 <- explicit na literal in source expression (https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/VP(MAPS)+OB+S&R+GGSHOT+HH BY LEO.pine)
+- `v5/0838` `ta.crossover` via `(1 + tp4 / 100) * last_open_longCondition4` - interior-hole, last_open_longCondition4 <- explicit na literal in source expression (https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/VP(MAPS)+OB+S&R+GGSHOT+HH BY LEO.pine)
+- `v5/0838` `ta.crossover` via `swingHighVal` - interior-hole, swingHighVal <- explicit na literal in source expression (https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/VP(MAPS)+OB+S&R+GGSHOT+HH BY LEO.pine)
+- `v5/0838` `ta.crossunder` via `longStopPrev` - interior-hole, longStopPrev <- longStop <- max <- vol <- collection read can return or propagate missing data (https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/VP(MAPS)+OB+S&R+GGSHOT+HH BY LEO.pine)
+
+## Unknown Static Exposure
+
+- `v5/0050` `ta.crossover` via `aroon_up` - unknown, aroon_up <- highest_pos <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/mihakralj/pinescript indicators/dynamics/aroon.pine)
+- `v5/0050` `ta.crossover` via `aroon_down` - unknown, aroon_down <- lowest_pos <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/mihakralj/pinescript indicators/dynamics/aroon.pine)
+- `v5/0050` `ta.crossunder` via `aroon_up` - unknown, aroon_up <- highest_pos <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/mihakralj/pinescript indicators/dynamics/aroon.pine)
+- `v5/0050` `ta.crossunder` via `aroon_down` - unknown, aroon_down <- lowest_pos <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/mihakralj/pinescript indicators/dynamics/aroon.pine)
+- `v5/0051` `ta.crossover` via `oscillator` - unknown, oscillator <- aroon_up <- highest_pos <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/mihakralj/pinescript indicators/dynamics/aroonosc.pine)
+- `v5/0051` `ta.crossunder` via `oscillator` - unknown, oscillator <- aroon_up <- highest_pos <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/mihakralj/pinescript indicators/dynamics/aroonosc.pine)
+- `v5/0421` `ta.crossover` via `cma` - unknown, cma <- cmaPrev <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/everget/tradingview-pinescript-indicators movings/corrected_moving_average.pine)
+- `v5/0421` `ta.crossunder` via `cma` - unknown, cma <- cmaPrev <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/everget/tradingview-pinescript-indicators movings/corrected_moving_average.pine)
+- `v5/0482` `ta.crossover` via `upper` - unknown, upper <- dynamicMult <- regimeBoost <- compression <- volScore <- atrLow <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/adaptive_fair_value_cloud/adaptive_fair_value_cloud.pine)
+- `v5/0482` `ta.crossunder` via `lower` - unknown, lower <- dynamicMult <- regimeBoost <- compression <- volScore <- atrLow <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/adaptive_fair_value_cloud/adaptive_fair_value_cloud.pine)
+- `v5/0491` `ta.crossover` via `k` - unknown, k <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/pattern_recognition/pattern_recognition.pine)
+- `v5/0491` `ta.crossover` via `d` - unknown, d <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/pattern_recognition/pattern_recognition.pine)
+- `v5/0491` `ta.crossunder` via `k` - unknown, k <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/pattern_recognition/pattern_recognition.pine)
+- `v5/0491` `ta.crossunder` via `d` - unknown, d <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/pattern_recognition/pattern_recognition.pine)
+- `v5/0492` `ta.cum` via `bodyAbs` - unknown, bodyAbs <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/relative_leg_efficiency_panel_chart/relative_leg_efficiency_panel_chart.pine)
+- `v5/0492` `ta.cum` via `bullBodyOK` - unknown, bullBodyOK <- bodyOK <- bodyAbs <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/relative_leg_efficiency_panel_chart/relative_leg_efficiency_panel_chart.pine)
+- `v5/0492` `ta.cum` via `bearBodyOK` - unknown, bearBodyOK <- bodyOK <- bodyAbs <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/relative_leg_efficiency_panel_chart/relative_leg_efficiency_panel_chart.pine)
+- `v5/0492` `ta.cum` via `bullCountOK` - unknown, bullCountOK <- bodyOK <- bodyAbs <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/relative_leg_efficiency_panel_chart/relative_leg_efficiency_panel_chart.pine)
+- `v5/0492` `ta.cum` via `bearCountOK` - unknown, bearCountOK <- bodyOK <- bodyAbs <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/relative_leg_efficiency_panel_chart/relative_leg_efficiency_panel_chart.pine)
+- `v5/0495` `ta.pivothigh` via `s` - unknown, s <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/wave_navigator/wave_navigator.pine)
+- `v5/0495` `ta.pivotlow` via `s` - unknown, s <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/indicators/wave_navigator/wave_navigator.pine)
+- `v5/0496` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_base_strategy.pine)
+- `v5/0497` `ta.crossover` via `_osLevel` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.crossunder` via `_obLevel` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.stoch` via `_r` - unknown, _r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.stoch` via `_r` - unknown, _r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.stoch` via `_r` - unknown, _r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.stoch` via `_r` - unknown, _r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.stoch` via `_r` - unknown, _r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0497` `ta.stoch` via `_r` - unknown, _r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine)
+- `v5/0498` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_v3_strategy.pine)
+- `v5/0499` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/composite/commodity_heat_reversal/commodity_heat_reversal.pine)
+- `v5/0500` `ta.stoch` via `rsi` - unknown, rsi <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/composite/signal_quality_engine/signal_quality_engine.pine)
+- `v5/0500` `ta.stoch` via `rsi` - unknown, rsi <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/composite/signal_quality_engine/signal_quality_engine.pine)
+- `v5/0500` `ta.stoch` via `rsi` - unknown, rsi <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/composite/signal_quality_engine/signal_quality_engine.pine)
+- `v5/0510` `ta.hma` via `source` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/market_motion_dna/market_motion_dna_v1.pine)
+- `v5/0513` `ta.crossover` via `activeTC` - unknown, activeTC <- pTC <- activeTf <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_pivot_map/market_structure_pivot_map.pine)
+- `v5/0513` `ta.crossunder` via `activeBC` - unknown, activeBC <- pBC <- activeTf <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/market_structure_pivot_map/market_structure_pivot_map.pine)
+- `v5/0529` `ta.pivothigh` via `f_pivotHighSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivothigh` via `f_pivotHighSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivothigh` via `f_pivotHighSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivothigh` via `f_pivotHighSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivothigh` via `f_pivotHighSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivothigh` via `f_pivotHighSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivotlow` via `f_pivotLowSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivotlow` via `f_pivotLowSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivotlow` via `f_pivotLowSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivotlow` via `f_pivotLowSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivotlow` via `f_pivotLowSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0529` `ta.pivotlow` via `f_pivotLowSource()` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/market_structure/zigzag_core/zigzag_core.pine)
+- `v5/0534` `ta.stoch` via `source` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine)
+- `v5/0534` `ta.stoch` via `source` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine)
+- `v5/0534` `ta.stoch` via `source` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine)
+- `v5/0535` `ta.crossover` via `sessionVwap` - unknown, sessionVwap <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossover` via `sessionVwap` - unknown, sessionVwap <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossover` via `anchoredHigh` - unknown, anchoredHigh <- updatedAnchors <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossover` via `sessionVwap` - unknown, sessionVwap <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossover` via `anchoredLow` - unknown, anchoredLow <- updatedAnchors <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `sessionVwap` - unknown, sessionVwap <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `sessionVwap` - unknown, sessionVwap <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `anchoredHigh` - unknown, anchoredHigh <- updatedAnchors <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `sessionVwap` - unknown, sessionVwap <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0535` `ta.crossunder` via `anchoredLow` - unknown, anchoredLow <- updatedAnchors <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine)
+- `v5/0537` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/elder_ray_pressure_engine/elder_ray_pressure_engine.pine)
+- `v5/0541` `ta.crossover` via `setupPressure` - unknown, setupPressure <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/market_pressure_scale/market_pressure_scale.pine)
+- `v5/0541` `ta.crossover` via `reversalLongScore` - unknown, reversalLongScore <- exhaustionScore <- impulsePressure <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/market_pressure_scale/market_pressure_scale.pine)
+- `v5/0541` `ta.crossover` via `reversalShortScore` - unknown, reversalShortScore <- exhaustionScore <- impulsePressure <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/market_pressure_scale/market_pressure_scale.pine)
+- `v5/0541` `ta.crossunder` via `setupPressure` - unknown, setupPressure <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/market_pressure_scale/market_pressure_scale.pine)
+- `v5/0541` `ta.crossunder` via `setupPressure` - unknown, setupPressure <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/market_pressure_scale/market_pressure_scale.pine)
+- `v5/0541` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/market_pressure_scale/market_pressure_scale.pine)
+- `v5/0544` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/mtf_stochrsi_pair_score/mtf_stochrsi_pair_score.pine)
+- `v5/0549` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/reversal_engine_score/reversal_engine_score_v1.pine)
+- `v5/0552` `ta.rsi` via `x` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/stoch_rsi_advanced/stoch_rsi_advanced.pine)
+- `v5/0552` `ta.stoch` via `r` - unknown, r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/stoch_rsi_advanced/stoch_rsi_advanced.pine)
+- `v5/0552` `ta.stoch` via `r` - unknown, r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/stoch_rsi_advanced/stoch_rsi_advanced.pine)
+- `v5/0552` `ta.stoch` via `r` - unknown, r <- source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/stoch_rsi_advanced/stoch_rsi_advanced.pine)
+- `v5/0554` `ta.crossover` via `_osLevel` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0554` `ta.crossunder` via `_obLevel` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend.pine)
+- `v5/0555` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend_v2.pine)
+- `v5/0556` `ta.hma` via `src` - unknown, source expression is computed through UDF/object state or unsupported static dependency shape (https://github.com/casoon/pine-scripts indicators/momentum/wavetrend/wavetrend_v3.pine)
+
+## Rows Touching Trace Or Host Required Members
+
+- `v5/0001` https://github.com/mihakralj/pinescript indicators/channels/aberr.pine @ `c4e91b962be0`
+- `v5/0002` https://github.com/mihakralj/pinescript indicators/channels/accbands.pine @ `c4e91b962be0`
+- `v5/0003` https://github.com/mihakralj/pinescript indicators/channels/apchannel.pine @ `c4e91b962be0`
+- `v5/0004` https://github.com/mihakralj/pinescript indicators/channels/apz.pine @ `c4e91b962be0`
+- `v5/0005` https://github.com/mihakralj/pinescript indicators/channels/atrbands.pine @ `c4e91b962be0`
+- `v5/0006` https://github.com/mihakralj/pinescript indicators/channels/bbands.pine @ `c4e91b962be0`
+- `v5/0007` https://github.com/mihakralj/pinescript indicators/channels/dchannel.pine @ `c4e91b962be0`
+- `v5/0008` https://github.com/mihakralj/pinescript indicators/channels/decaychannel.pine @ `c4e91b962be0`
+- `v5/0009` https://github.com/mihakralj/pinescript indicators/channels/fcb.pine @ `c4e91b962be0`
+- `v5/0011` https://github.com/mihakralj/pinescript indicators/channels/kchannel.pine @ `c4e91b962be0`
+- `v5/0012` https://github.com/mihakralj/pinescript indicators/channels/maenv.pine @ `c4e91b962be0`
+- `v5/0013` https://github.com/mihakralj/pinescript indicators/channels/mmchannel.pine @ `c4e91b962be0`
+- `v5/0014` https://github.com/mihakralj/pinescript indicators/channels/pchannel.pine @ `c4e91b962be0`
+- `v5/0015` https://github.com/mihakralj/pinescript indicators/channels/regchannel.pine @ `c4e91b962be0`
+- `v5/0016` https://github.com/mihakralj/pinescript indicators/channels/sdchannel.pine @ `c4e91b962be0`
+- `v5/0017` https://github.com/mihakralj/pinescript indicators/channels/starchannel.pine @ `c4e91b962be0`
+- `v5/0018` https://github.com/mihakralj/pinescript indicators/channels/stbands.pine @ `c4e91b962be0`
+- `v5/0020` https://github.com/mihakralj/pinescript indicators/channels/uchannel.pine @ `c4e91b962be0`
+- `v5/0022` https://github.com/mihakralj/pinescript indicators/channels/vwapsd.pine @ `c4e91b962be0`
+- `v5/0026` https://github.com/mihakralj/pinescript indicators/core/midpoint.pine @ `c4e91b962be0`
+- `v5/0030` https://github.com/mihakralj/pinescript indicators/cycles/ccor.pine @ `c4e91b962be0`
+- `v5/0031` https://github.com/mihakralj/pinescript indicators/cycles/ccyc.pine @ `c4e91b962be0`
+- `v5/0032` https://github.com/mihakralj/pinescript indicators/cycles/cg.pine @ `c4e91b962be0`
+- `v5/0033` https://github.com/mihakralj/pinescript indicators/cycles/dsp.pine @ `c4e91b962be0`
+- `v5/0034` https://github.com/mihakralj/pinescript indicators/cycles/eacp.pine @ `c4e91b962be0`
+- `v5/0035` https://github.com/mihakralj/pinescript indicators/cycles/ebsw.pine @ `c4e91b962be0`
+- `v5/0036` https://github.com/mihakralj/pinescript indicators/cycles/homod.pine @ `c4e91b962be0`
+- `v5/0037` https://github.com/mihakralj/pinescript indicators/cycles/ht_dcperiod.pine @ `c4e91b962be0`
+- `v5/0038` https://github.com/mihakralj/pinescript indicators/cycles/ht_dcphase.pine @ `c4e91b962be0`
+- `v5/0039` https://github.com/mihakralj/pinescript indicators/cycles/ht_phasor.pine @ `c4e91b962be0`
+- `v5/0040` https://github.com/mihakralj/pinescript indicators/cycles/ht_sine.pine @ `c4e91b962be0`
+- `v5/0043` https://github.com/mihakralj/pinescript indicators/cycles/sine.pine @ `c4e91b962be0`
+- `v5/0045` https://github.com/mihakralj/pinescript indicators/cycles/ssfdsp.pine @ `c4e91b962be0`
+- `v5/0046` https://github.com/mihakralj/pinescript indicators/dynamics/adx.pine @ `c4e91b962be0`
+- `v5/0047` https://github.com/mihakralj/pinescript indicators/dynamics/adxr.pine @ `c4e91b962be0`
+- `v5/0048` https://github.com/mihakralj/pinescript indicators/dynamics/alligator.pine @ `c4e91b962be0`
+- `v5/0049` https://github.com/mihakralj/pinescript indicators/dynamics/amat.pine @ `c4e91b962be0`
+- `v5/0050` https://github.com/mihakralj/pinescript indicators/dynamics/aroon.pine @ `c4e91b962be0`
+- `v5/0051` https://github.com/mihakralj/pinescript indicators/dynamics/aroonosc.pine @ `c4e91b962be0`
+- `v5/0052` https://github.com/mihakralj/pinescript indicators/dynamics/chop.pine @ `c4e91b962be0`
+- `v5/0053` https://github.com/mihakralj/pinescript indicators/dynamics/dmx.pine @ `c4e91b962be0`
+- `v5/0054` https://github.com/mihakralj/pinescript indicators/dynamics/dx.pine @ `c4e91b962be0`
+- `v5/0055` https://github.com/mihakralj/pinescript indicators/dynamics/ghla.pine @ `c4e91b962be0`
+- `v5/0056` https://github.com/mihakralj/pinescript indicators/dynamics/ht_trendmode.pine @ `c4e91b962be0`
+- `v5/0057` https://github.com/mihakralj/pinescript indicators/dynamics/ichimoku.pine @ `c4e91b962be0`
+- `v5/0058` https://github.com/mihakralj/pinescript indicators/dynamics/pfe.pine @ `c4e91b962be0`
+- `v5/0059` https://github.com/mihakralj/pinescript indicators/dynamics/qstick.pine @ `c4e91b962be0`
+- `v5/0060` https://github.com/mihakralj/pinescript indicators/dynamics/ravi.pine @ `c4e91b962be0`
+- `v5/0061` https://github.com/mihakralj/pinescript indicators/dynamics/super.pine @ `c4e91b962be0`
+- `v5/0062` https://github.com/mihakralj/pinescript indicators/dynamics/ttm.pine @ `c4e91b962be0`
+- `v5/0063` https://github.com/mihakralj/pinescript indicators/dynamics/ttmtrend.pine @ `c4e91b962be0`
+- `v5/0064` https://github.com/mihakralj/pinescript indicators/dynamics/vhf.pine @ `c4e91b962be0`
+- `v5/0065` https://github.com/mihakralj/pinescript indicators/dynamics/vortex.pine @ `c4e91b962be0`
+- `v5/0067` https://github.com/mihakralj/pinescript indicators/errors/huber.pine @ `c4e91b962be0`
+- `v5/0070` https://github.com/mihakralj/pinescript indicators/errors/mae.pine @ `c4e91b962be0`
+- `v5/0071` https://github.com/mihakralj/pinescript indicators/errors/mapd.pine @ `c4e91b962be0`
+- `v5/0072` https://github.com/mihakralj/pinescript indicators/errors/mape.pine @ `c4e91b962be0`
+- `v5/0073` https://github.com/mihakralj/pinescript indicators/errors/mase.pine @ `c4e91b962be0`
+- `v5/0076` https://github.com/mihakralj/pinescript indicators/errors/me.pine @ `c4e91b962be0`
+- `v5/0077` https://github.com/mihakralj/pinescript indicators/errors/mpe.pine @ `c4e91b962be0`
+- `v5/0079` https://github.com/mihakralj/pinescript indicators/errors/mse.pine @ `c4e91b962be0`
+- `v5/0080` https://github.com/mihakralj/pinescript indicators/errors/msle.pine @ `c4e91b962be0`
+- `v5/0083` https://github.com/mihakralj/pinescript indicators/errors/rae.pine @ `c4e91b962be0`
+- `v5/0084` https://github.com/mihakralj/pinescript indicators/errors/rmse.pine @ `c4e91b962be0`
+- `v5/0085` https://github.com/mihakralj/pinescript indicators/errors/rmsle.pine @ `c4e91b962be0`
+- `v5/0086` https://github.com/mihakralj/pinescript indicators/errors/rse.pine @ `c4e91b962be0`
+- `v5/0087` https://github.com/mihakralj/pinescript indicators/errors/rsquared.pine @ `c4e91b962be0`
+- `v5/0088` https://github.com/mihakralj/pinescript indicators/errors/smape.pine @ `c4e91b962be0`
+- `v5/0095` https://github.com/mihakralj/pinescript indicators/filters/baxterking.pine @ `c4e91b962be0`
+- `v5/0102` https://github.com/mihakralj/pinescript indicators/filters/cfitz.pine @ `c4e91b962be0`
+- `v5/0108` https://github.com/mihakralj/pinescript indicators/filters/hann.pine @ `c4e91b962be0`
+- `v5/0109` https://github.com/mihakralj/pinescript indicators/filters/hp.pine @ `c4e91b962be0`
+- `v5/0111` https://github.com/mihakralj/pinescript indicators/filters/kalman.pine @ `c4e91b962be0`
+- `v5/0112` https://github.com/mihakralj/pinescript indicators/filters/kf.pine @ `c4e91b962be0`
+- `v5/0114` https://github.com/mihakralj/pinescript indicators/filters/lms.pine @ `c4e91b962be0`
+- `v5/0117` https://github.com/mihakralj/pinescript indicators/filters/notch.pine @ `c4e91b962be0`
+- `v5/0118` https://github.com/mihakralj/pinescript indicators/filters/nw.pine @ `c4e91b962be0`
+- `v5/0119` https://github.com/mihakralj/pinescript indicators/filters/oneeuro.pine @ `c4e91b962be0`
+- `v5/0120` https://github.com/mihakralj/pinescript indicators/filters/rls.pine @ `c4e91b962be0`
+- `v5/0121` https://github.com/mihakralj/pinescript indicators/filters/rmed.pine @ `c4e91b962be0`
+- `v5/0124` https://github.com/mihakralj/pinescript indicators/filters/sgf.pine @ `c4e91b962be0`
+- `v5/0131` https://github.com/mihakralj/pinescript indicators/filters/wavelet.pine @ `c4e91b962be0`
+- `v5/0133` https://github.com/mihakralj/pinescript indicators/forecasts/afirma.pine @ `c4e91b962be0`
+- `v5/0136` https://github.com/mihakralj/pinescript indicators/momentum/bias.pine @ `c4e91b962be0`
+- `v5/0137` https://github.com/mihakralj/pinescript indicators/momentum/bop.pine @ `c4e91b962be0`
+- `v5/0138` https://github.com/mihakralj/pinescript indicators/momentum/cci.pine @ `c4e91b962be0`
+- `v5/0139` https://github.com/mihakralj/pinescript indicators/momentum/cfb.pine @ `c4e91b962be0`
+- `v5/0140` https://github.com/mihakralj/pinescript indicators/momentum/cmo.pine @ `c4e91b962be0`
+- `v5/0141` https://github.com/mihakralj/pinescript indicators/momentum/macd.pine @ `c4e91b962be0`
+- `v5/0142` https://github.com/mihakralj/pinescript indicators/momentum/mom.pine @ `c4e91b962be0`
+- `v5/0143` https://github.com/mihakralj/pinescript indicators/momentum/pmo.pine @ `c4e91b962be0`
+- `v5/0144` https://github.com/mihakralj/pinescript indicators/momentum/ppo.pine @ `c4e91b962be0`
+- `v5/0145` https://github.com/mihakralj/pinescript indicators/momentum/prs.pine @ `c4e91b962be0`
+- `v5/0146` https://github.com/mihakralj/pinescript indicators/momentum/roc.pine @ `c4e91b962be0`
+- `v5/0147` https://github.com/mihakralj/pinescript indicators/momentum/rocp.pine @ `c4e91b962be0`
+- `v5/0148` https://github.com/mihakralj/pinescript indicators/momentum/rocr.pine @ `c4e91b962be0`
+- `v5/0149` https://github.com/mihakralj/pinescript indicators/momentum/rsi.pine @ `c4e91b962be0`
+- `v5/0150` https://github.com/mihakralj/pinescript indicators/momentum/rsx.pine @ `c4e91b962be0`
+- `v5/0152` https://github.com/mihakralj/pinescript indicators/momentum/tsi.pine @ `c4e91b962be0`
+- `v5/0153` https://github.com/mihakralj/pinescript indicators/momentum/vel.pine @ `c4e91b962be0`
+- `v5/0154` https://github.com/mihakralj/pinescript indicators/numerics/accel.pine @ `c4e91b962be0`
+- `v5/0155` https://github.com/mihakralj/pinescript indicators/numerics/atan2.pine @ `c4e91b962be0`
+- `v5/0156` https://github.com/mihakralj/pinescript indicators/numerics/betadist.pine @ `c4e91b962be0`
+- `v5/0157` https://github.com/mihakralj/pinescript indicators/numerics/binomdist.pine @ `c4e91b962be0`
+- `v5/0158` https://github.com/mihakralj/pinescript indicators/numerics/change.pine @ `c4e91b962be0`
+- `v5/0159` https://github.com/mihakralj/pinescript indicators/numerics/cwt.pine @ `c4e91b962be0`
+- `v5/0160` https://github.com/mihakralj/pinescript indicators/numerics/dwt.pine @ `c4e91b962be0`
+- `v5/0161` https://github.com/mihakralj/pinescript indicators/numerics/exp.pine @ `c4e91b962be0`
+- `v5/0162` https://github.com/mihakralj/pinescript indicators/numerics/expdist.pine @ `c4e91b962be0`
+- `v5/0163` https://github.com/mihakralj/pinescript indicators/numerics/exptrans.pine @ `c4e91b962be0`
+- `v5/0164` https://github.com/mihakralj/pinescript indicators/numerics/fdist.pine @ `c4e91b962be0`
+- `v5/0165` https://github.com/mihakralj/pinescript indicators/numerics/fft.pine @ `c4e91b962be0`
+- `v5/0166` https://github.com/mihakralj/pinescript indicators/numerics/gammadist.pine @ `c4e91b962be0`
+- `v5/0167` https://github.com/mihakralj/pinescript indicators/numerics/highest.pine @ `c4e91b962be0`
+- `v5/0171` https://github.com/mihakralj/pinescript indicators/numerics/ifft.pine @ `c4e91b962be0`
+- `v5/0172` https://github.com/mihakralj/pinescript indicators/numerics/jerk.pine @ `c4e91b962be0`
+- `v5/0173` https://github.com/mihakralj/pinescript indicators/numerics/jolt.pine @ `c4e91b962be0`
+- `v5/0174` https://github.com/mihakralj/pinescript indicators/numerics/linear.pine @ `c4e91b962be0`
+- `v5/0175` https://github.com/mihakralj/pinescript indicators/numerics/lineartrans.pine @ `c4e91b962be0`
+- `v5/0176` https://github.com/mihakralj/pinescript indicators/numerics/log.pine @ `c4e91b962be0`
+- `v5/0177` https://github.com/mihakralj/pinescript indicators/numerics/lognormdist.pine @ `c4e91b962be0`
+- `v5/0178` https://github.com/mihakralj/pinescript indicators/numerics/logtrans.pine @ `c4e91b962be0`
+- `v5/0179` https://github.com/mihakralj/pinescript indicators/numerics/lowest.pine @ `c4e91b962be0`
+- `v5/0181` https://github.com/mihakralj/pinescript indicators/numerics/normdist.pine @ `c4e91b962be0`
+- `v5/0185` https://github.com/mihakralj/pinescript indicators/numerics/poissondist.pine @ `c4e91b962be0`
+- `v5/0188` https://github.com/mihakralj/pinescript indicators/numerics/slope.pine @ `c4e91b962be0`
+- `v5/0189` https://github.com/mihakralj/pinescript indicators/numerics/sqrt.pine @ `c4e91b962be0`
+- `v5/0190` https://github.com/mihakralj/pinescript indicators/numerics/sqrttrans.pine @ `c4e91b962be0`
+- `v5/0193` https://github.com/mihakralj/pinescript indicators/numerics/tdist.pine @ `c4e91b962be0`
+- `v5/0194` https://github.com/mihakralj/pinescript indicators/numerics/weibulldist.pine @ `c4e91b962be0`
+- `v5/0195` https://github.com/mihakralj/pinescript indicators/oscillators/ac.pine @ `c4e91b962be0`
+- `v5/0196` https://github.com/mihakralj/pinescript indicators/oscillators/ao.pine @ `c4e91b962be0`
+- `v5/0197` https://github.com/mihakralj/pinescript indicators/oscillators/apo.pine @ `c4e91b962be0`
+- `v5/0198` https://github.com/mihakralj/pinescript indicators/oscillators/bbb.pine @ `c4e91b962be0`
+- `v5/0199` https://github.com/mihakralj/pinescript indicators/oscillators/bbi.pine @ `c4e91b962be0`
+- `v5/0200` https://github.com/mihakralj/pinescript indicators/oscillators/bbs.pine @ `c4e91b962be0`
+- `v5/0201` https://github.com/mihakralj/pinescript indicators/oscillators/brar.pine @ `c4e91b962be0`
+- `v5/0202` https://github.com/mihakralj/pinescript indicators/oscillators/cfo.pine @ `c4e91b962be0`
+- `v5/0203` https://github.com/mihakralj/pinescript indicators/oscillators/coppock.pine @ `c4e91b962be0`
+- `v5/0204` https://github.com/mihakralj/pinescript indicators/oscillators/crsi.pine @ `c4e91b962be0`
+- `v5/0205` https://github.com/mihakralj/pinescript indicators/oscillators/cti.pine @ `c4e91b962be0`
+- `v5/0206` https://github.com/mihakralj/pinescript indicators/oscillators/deco.pine @ `c4e91b962be0`
+- `v5/0207` https://github.com/mihakralj/pinescript indicators/oscillators/dem.pine @ `c4e91b962be0`
+- `v5/0208` https://github.com/mihakralj/pinescript indicators/oscillators/dosc.pine @ `c4e91b962be0`
+- `v5/0209` https://github.com/mihakralj/pinescript indicators/oscillators/dpo.pine @ `c4e91b962be0`
+- `v5/0210` https://github.com/mihakralj/pinescript indicators/oscillators/dymoi.pine @ `c4e91b962be0`
+- `v5/0211` https://github.com/mihakralj/pinescript indicators/oscillators/er.pine @ `c4e91b962be0`
+- `v5/0212` https://github.com/mihakralj/pinescript indicators/oscillators/eri.pine @ `c4e91b962be0`
+- `v5/0213` https://github.com/mihakralj/pinescript indicators/oscillators/fi.pine @ `c4e91b962be0`
+- `v5/0214` https://github.com/mihakralj/pinescript indicators/oscillators/fisher.pine @ `c4e91b962be0`
+- `v5/0216` https://github.com/mihakralj/pinescript indicators/oscillators/gator.pine @ `c4e91b962be0`
+- `v5/0217` https://github.com/mihakralj/pinescript indicators/oscillators/imi.pine @ `c4e91b962be0`
+- `v5/0218` https://github.com/mihakralj/pinescript indicators/oscillators/inertia.pine @ `c4e91b962be0`
+- `v5/0219` https://github.com/mihakralj/pinescript indicators/oscillators/kdj.pine @ `c4e91b962be0`
+- `v5/0220` https://github.com/mihakralj/pinescript indicators/oscillators/kri.pine @ `c4e91b962be0`
+- `v5/0221` https://github.com/mihakralj/pinescript indicators/oscillators/kst.pine @ `c4e91b962be0`
+- `v5/0225` https://github.com/mihakralj/pinescript indicators/oscillators/pgo.pine @ `c4e91b962be0`
+- `v5/0226` https://github.com/mihakralj/pinescript indicators/oscillators/psl.pine @ `c4e91b962be0`
+- `v5/0227` https://github.com/mihakralj/pinescript indicators/oscillators/qqe.pine @ `c4e91b962be0`
+- `v5/0228` https://github.com/mihakralj/pinescript indicators/oscillators/reflex.pine @ `c4e91b962be0`
+- `v5/0229` https://github.com/mihakralj/pinescript indicators/oscillators/reverseema.pine @ `c4e91b962be0`
+- `v5/0230` https://github.com/mihakralj/pinescript indicators/oscillators/rvgi.pine @ `c4e91b962be0`
+- `v5/0231` https://github.com/mihakralj/pinescript indicators/oscillators/smi.pine @ `c4e91b962be0`
+- `v5/0232` https://github.com/mihakralj/pinescript indicators/oscillators/squeeze.pine @ `c4e91b962be0`
+- `v5/0233` https://github.com/mihakralj/pinescript indicators/oscillators/stc.pine @ `c4e91b962be0`
+- `v5/0234` https://github.com/mihakralj/pinescript indicators/oscillators/stoch.pine @ `c4e91b962be0`
+- `v5/0235` https://github.com/mihakralj/pinescript indicators/oscillators/stochf.pine @ `c4e91b962be0`
+- `v5/0236` https://github.com/mihakralj/pinescript indicators/oscillators/stochrsi.pine @ `c4e91b962be0`
+- `v5/0237` https://github.com/mihakralj/pinescript indicators/oscillators/td_seq.pine @ `c4e91b962be0`
+- `v5/0238` https://github.com/mihakralj/pinescript indicators/oscillators/trendflex.pine @ `c4e91b962be0`
+- `v5/0239` https://github.com/mihakralj/pinescript indicators/oscillators/trix.pine @ `c4e91b962be0`
+- `v5/0240` https://github.com/mihakralj/pinescript indicators/oscillators/ultosc.pine @ `c4e91b962be0`
+- `v5/0241` https://github.com/mihakralj/pinescript indicators/oscillators/willr.pine @ `c4e91b962be0`
+- `v5/0249` https://github.com/mihakralj/pinescript indicators/reversals/psar.pine @ `c4e91b962be0`
+- `v5/0250` https://github.com/mihakralj/pinescript indicators/reversals/swings.pine @ `c4e91b962be0`
+- `v5/0252` https://github.com/mihakralj/pinescript indicators/statistics/beta.pine @ `c4e91b962be0`
+- `v5/0254` https://github.com/mihakralj/pinescript indicators/statistics/cointegration.pine @ `c4e91b962be0`
+- `v5/0255` https://github.com/mihakralj/pinescript indicators/statistics/correlation.pine @ `c4e91b962be0`
+- `v5/0256` https://github.com/mihakralj/pinescript indicators/statistics/covariance.pine @ `c4e91b962be0`
+- `v5/0258` https://github.com/mihakralj/pinescript indicators/statistics/entropy.pine @ `c4e91b962be0`
+- `v5/0259` https://github.com/mihakralj/pinescript indicators/statistics/geomean.pine @ `c4e91b962be0`
+- `v5/0260` https://github.com/mihakralj/pinescript indicators/statistics/granger.pine @ `c4e91b962be0`
+- `v5/0261` https://github.com/mihakralj/pinescript indicators/statistics/harmean.pine @ `c4e91b962be0`
+- `v5/0262` https://github.com/mihakralj/pinescript indicators/statistics/hurst.pine @ `c4e91b962be0`
+- `v5/0263` https://github.com/mihakralj/pinescript indicators/statistics/iqr.pine @ `c4e91b962be0`
+- `v5/0266` https://github.com/mihakralj/pinescript indicators/statistics/kurtosis.pine @ `c4e91b962be0`
+- `v5/0268` https://github.com/mihakralj/pinescript indicators/statistics/meandev.pine @ `c4e91b962be0`
+- `v5/0269` https://github.com/mihakralj/pinescript indicators/statistics/median.pine @ `c4e91b962be0`
+- `v5/0270` https://github.com/mihakralj/pinescript indicators/statistics/mode.pine @ `c4e91b962be0`
+- `v5/0271` https://github.com/mihakralj/pinescript indicators/statistics/percentile.pine @ `c4e91b962be0`
+- `v5/0272` https://github.com/mihakralj/pinescript indicators/statistics/polyfit.pine @ `c4e91b962be0`
+- `v5/0273` https://github.com/mihakralj/pinescript indicators/statistics/quantile.pine @ `c4e91b962be0`
+- `v5/0274` https://github.com/mihakralj/pinescript indicators/statistics/skew.pine @ `c4e91b962be0`
+- `v5/0276` https://github.com/mihakralj/pinescript indicators/statistics/stddev.pine @ `c4e91b962be0`
+- `v5/0277` https://github.com/mihakralj/pinescript indicators/statistics/stderr.pine @ `c4e91b962be0`
+- `v5/0281` https://github.com/mihakralj/pinescript indicators/statistics/variance.pine @ `c4e91b962be0`
+- `v5/0282` https://github.com/mihakralj/pinescript indicators/statistics/wavg.pine @ `c4e91b962be0`
+- `v5/0284` https://github.com/mihakralj/pinescript indicators/statistics/zscore.pine @ `c4e91b962be0`
+- `v5/0285` https://github.com/mihakralj/pinescript indicators/statistics/ztest.pine @ `c4e91b962be0`
+- `v5/0286` https://github.com/mihakralj/pinescript indicators/trends_FIR/alma.pine @ `c4e91b962be0`
+- `v5/0287` https://github.com/mihakralj/pinescript indicators/trends_FIR/blma.pine @ `c4e91b962be0`
+- `v5/0288` https://github.com/mihakralj/pinescript indicators/trends_FIR/bwma.pine @ `c4e91b962be0`
+- `v5/0289` https://github.com/mihakralj/pinescript indicators/trends_FIR/conv.pine @ `c4e91b962be0`
+- `v5/0290` https://github.com/mihakralj/pinescript indicators/trends_FIR/crma.pine @ `c4e91b962be0`
+- `v5/0291` https://github.com/mihakralj/pinescript indicators/trends_FIR/dwma.pine @ `c4e91b962be0`
+- `v5/0292` https://github.com/mihakralj/pinescript indicators/trends_FIR/epma.pine @ `c4e91b962be0`
+- `v5/0293` https://github.com/mihakralj/pinescript indicators/trends_FIR/fwma.pine @ `c4e91b962be0`
+- `v5/0294` https://github.com/mihakralj/pinescript indicators/trends_FIR/gwma.pine @ `c4e91b962be0`
+- `v5/0295` https://github.com/mihakralj/pinescript indicators/trends_FIR/hamma.pine @ `c4e91b962be0`
+- `v5/0296` https://github.com/mihakralj/pinescript indicators/trends_FIR/hanma.pine @ `c4e91b962be0`
+- `v5/0297` https://github.com/mihakralj/pinescript indicators/trends_FIR/hend.pine @ `c4e91b962be0`
+- `v5/0298` https://github.com/mihakralj/pinescript indicators/trends_FIR/hma.pine @ `c4e91b962be0`
+- `v5/0299` https://github.com/mihakralj/pinescript indicators/trends_FIR/ilrs.pine @ `c4e91b962be0`
+- `v5/0300` https://github.com/mihakralj/pinescript indicators/trends_FIR/kaiser.pine @ `c4e91b962be0`
+- `v5/0301` https://github.com/mihakralj/pinescript indicators/trends_FIR/lanczos.pine @ `c4e91b962be0`
+- `v5/0302` https://github.com/mihakralj/pinescript indicators/trends_FIR/lsma.pine @ `c4e91b962be0`
+- `v5/0303` https://github.com/mihakralj/pinescript indicators/trends_FIR/nlma.pine @ `c4e91b962be0`
+- `v5/0304` https://github.com/mihakralj/pinescript indicators/trends_FIR/nyqma.pine @ `c4e91b962be0`
+- `v5/0305` https://github.com/mihakralj/pinescript indicators/trends_FIR/parzen.pine @ `c4e91b962be0`
+- `v5/0306` https://github.com/mihakralj/pinescript indicators/trends_FIR/pma.pine @ `c4e91b962be0`
+- `v5/0307` https://github.com/mihakralj/pinescript indicators/trends_FIR/pwma.pine @ `c4e91b962be0`
+- `v5/0308` https://github.com/mihakralj/pinescript indicators/trends_FIR/qrma.pine @ `c4e91b962be0`
+- `v5/0309` https://github.com/mihakralj/pinescript indicators/trends_FIR/rain.pine @ `c4e91b962be0`
+- `v5/0311` https://github.com/mihakralj/pinescript indicators/trends_FIR/sgma.pine @ `c4e91b962be0`
+- `v5/0312` https://github.com/mihakralj/pinescript indicators/trends_FIR/sinema.pine @ `c4e91b962be0`
+- `v5/0313` https://github.com/mihakralj/pinescript indicators/trends_FIR/sma.pine @ `c4e91b962be0`
+- `v5/0316` https://github.com/mihakralj/pinescript indicators/trends_FIR/trima.pine @ `c4e91b962be0`
+- `v5/0317` https://github.com/mihakralj/pinescript indicators/trends_FIR/tsf.pine @ `c4e91b962be0`
+- `v5/0319` https://github.com/mihakralj/pinescript indicators/trends_FIR/wma.pine @ `c4e91b962be0`
+- `v5/0320` https://github.com/mihakralj/pinescript indicators/trends_IIR/adxvma.pine @ `c4e91b962be0`
+- `v5/0321` https://github.com/mihakralj/pinescript indicators/trends_IIR/ahrens.pine @ `c4e91b962be0`
+- `v5/0322` https://github.com/mihakralj/pinescript indicators/trends_IIR/coral.pine @ `c4e91b962be0`
+- `v5/0323` https://github.com/mihakralj/pinescript indicators/trends_IIR/decycler.pine @ `c4e91b962be0`
+- `v5/0324` https://github.com/mihakralj/pinescript indicators/trends_IIR/dema.pine @ `c4e91b962be0`
+- `v5/0326` https://github.com/mihakralj/pinescript indicators/trends_IIR/ema.pine @ `c4e91b962be0`
+- `v5/0328` https://github.com/mihakralj/pinescript indicators/trends_IIR/gdema.pine @ `c4e91b962be0`
+- `v5/0330` https://github.com/mihakralj/pinescript indicators/trends_IIR/holt.pine @ `c4e91b962be0`
+- `v5/0334` https://github.com/mihakralj/pinescript indicators/trends_IIR/kama.pine @ `c4e91b962be0`
+- `v5/0335` https://github.com/mihakralj/pinescript indicators/trends_IIR/lema.pine @ `c4e91b962be0`
+- `v5/0336` https://github.com/mihakralj/pinescript indicators/trends_IIR/ltma.pine @ `c4e91b962be0`
+- `v5/0337` https://github.com/mihakralj/pinescript indicators/trends_IIR/mama.pine @ `c4e91b962be0`
+- `v5/0338` https://github.com/mihakralj/pinescript indicators/trends_IIR/mavp.pine @ `c4e91b962be0`
+- `v5/0339` https://github.com/mihakralj/pinescript indicators/trends_IIR/mcnma.pine @ `c4e91b962be0`
+- `v5/0340` https://github.com/mihakralj/pinescript indicators/trends_IIR/mgdi.pine @ `c4e91b962be0`
+- `v5/0341` https://github.com/mihakralj/pinescript indicators/trends_IIR/mma.pine @ `c4e91b962be0`
+- `v5/0342` https://github.com/mihakralj/pinescript indicators/trends_IIR/nma.pine @ `c4e91b962be0`
+- `v5/0343` https://github.com/mihakralj/pinescript indicators/trends_IIR/qema.pine @ `c4e91b962be0`
+- `v5/0344` https://github.com/mihakralj/pinescript indicators/trends_IIR/rema.pine @ `c4e91b962be0`
+- `v5/0345` https://github.com/mihakralj/pinescript indicators/trends_IIR/rgma.pine @ `c4e91b962be0`
+- `v5/0346` https://github.com/mihakralj/pinescript indicators/trends_IIR/rma.pine @ `c4e91b962be0`
+- `v5/0347` https://github.com/mihakralj/pinescript indicators/trends_IIR/t3.pine @ `c4e91b962be0`
+- `v5/0348` https://github.com/mihakralj/pinescript indicators/trends_IIR/tema.pine @ `c4e91b962be0`
+- `v5/0350` https://github.com/mihakralj/pinescript indicators/trends_IIR/vama.pine @ `c4e91b962be0`
+- `v5/0351` https://github.com/mihakralj/pinescript indicators/trends_IIR/vidya.pine @ `c4e91b962be0`
+- `v5/0352` https://github.com/mihakralj/pinescript indicators/trends_IIR/yzvama.pine @ `c4e91b962be0`
+- `v5/0353` https://github.com/mihakralj/pinescript indicators/trends_IIR/zldema.pine @ `c4e91b962be0`
+- `v5/0354` https://github.com/mihakralj/pinescript indicators/trends_IIR/zlema.pine @ `c4e91b962be0`
+- `v5/0355` https://github.com/mihakralj/pinescript indicators/trends_IIR/zltema.pine @ `c4e91b962be0`
+- `v5/0356` https://github.com/mihakralj/pinescript indicators/volatility/adr.pine @ `c4e91b962be0`
+- `v5/0357` https://github.com/mihakralj/pinescript indicators/volatility/atr.pine @ `c4e91b962be0`
+- `v5/0358` https://github.com/mihakralj/pinescript indicators/volatility/atrn.pine @ `c4e91b962be0`
+- `v5/0359` https://github.com/mihakralj/pinescript indicators/volatility/atrp.pine @ `c4e91b962be0`
+- `v5/0360` https://github.com/mihakralj/pinescript indicators/volatility/bbw.pine @ `c4e91b962be0`
+- `v5/0361` https://github.com/mihakralj/pinescript indicators/volatility/bbwn.pine @ `c4e91b962be0`
+- `v5/0362` https://github.com/mihakralj/pinescript indicators/volatility/bbwp.pine @ `c4e91b962be0`
+- `v5/0363` https://github.com/mihakralj/pinescript indicators/volatility/ccv.pine @ `c4e91b962be0`
+- `v5/0364` https://github.com/mihakralj/pinescript indicators/volatility/cv.pine @ `c4e91b962be0`
+- `v5/0365` https://github.com/mihakralj/pinescript indicators/volatility/cvi.pine @ `c4e91b962be0`
+- `v5/0366` https://github.com/mihakralj/pinescript indicators/volatility/etherm.pine @ `c4e91b962be0`
+- `v5/0367` https://github.com/mihakralj/pinescript indicators/volatility/ewma.pine @ `c4e91b962be0`
+- `v5/0368` https://github.com/mihakralj/pinescript indicators/volatility/gkv.pine @ `c4e91b962be0`
+- `v5/0369` https://github.com/mihakralj/pinescript indicators/volatility/hlv.pine @ `c4e91b962be0`
+- `v5/0370` https://github.com/mihakralj/pinescript indicators/volatility/hv.pine @ `c4e91b962be0`
+- `v5/0373` https://github.com/mihakralj/pinescript indicators/volatility/massi.pine @ `c4e91b962be0`
+- `v5/0374` https://github.com/mihakralj/pinescript indicators/volatility/natr.pine @ `c4e91b962be0`
+- `v5/0375` https://github.com/mihakralj/pinescript indicators/volatility/pv.pine @ `c4e91b962be0`
+- `v5/0376` https://github.com/mihakralj/pinescript indicators/volatility/rsv.pine @ `c4e91b962be0`
+- `v5/0377` https://github.com/mihakralj/pinescript indicators/volatility/rvi.pine @ `c4e91b962be0`
+- `v5/0379` https://github.com/mihakralj/pinescript indicators/volatility/ui.pine @ `c4e91b962be0`
+- `v5/0380` https://github.com/mihakralj/pinescript indicators/volatility/vov.pine @ `c4e91b962be0`
+- `v5/0381` https://github.com/mihakralj/pinescript indicators/volatility/vr.pine @ `c4e91b962be0`
+- `v5/0382` https://github.com/mihakralj/pinescript indicators/volatility/yzv.pine @ `c4e91b962be0`
+- `v5/0384` https://github.com/mihakralj/pinescript indicators/volume/adosc.pine @ `c4e91b962be0`
+- `v5/0386` https://github.com/mihakralj/pinescript indicators/volume/cmf.pine @ `c4e91b962be0`
+- `v5/0387` https://github.com/mihakralj/pinescript indicators/volume/efi.pine @ `c4e91b962be0`
+- `v5/0388` https://github.com/mihakralj/pinescript indicators/volume/eom.pine @ `c4e91b962be0`
+- `v5/0389` https://github.com/mihakralj/pinescript indicators/volume/evwma.pine @ `c4e91b962be0`
+- `v5/0392` https://github.com/mihakralj/pinescript indicators/volume/mfi.pine @ `c4e91b962be0`
+- `v5/0395` https://github.com/mihakralj/pinescript indicators/volume/pvd.pine @ `c4e91b962be0`
+- `v5/0397` https://github.com/mihakralj/pinescript indicators/volume/pvo.pine @ `c4e91b962be0`
+- `v5/0404` https://github.com/mihakralj/pinescript indicators/volume/vo.pine @ `c4e91b962be0`
+- `v5/0405` https://github.com/mihakralj/pinescript indicators/volume/vroc.pine @ `c4e91b962be0`
+- `v5/0406` https://github.com/mihakralj/pinescript indicators/volume/vwad.pine @ `c4e91b962be0`
+- `v5/0408` https://github.com/mihakralj/pinescript indicators/volume/vwma.pine @ `c4e91b962be0`
+- `v5/0456` https://github.com/everget/tradingview-pinescript-indicators research/litecoin_halving_utc_countdown.pine @ `60c93d3711d2`
+- `v5/0460` https://github.com/everget/tradingview-pinescript-indicators research/utc_clock.pine @ `60c93d3711d2`
+- `v5/0480` https://github.com/f13end/tradingview-custom-indicators indicators/Range Volume Change.pine @ `be0ba0d612cb`
+- `v5/0481` https://github.com/f13end/tradingview-custom-indicators indicators/Range Volume Change/Range Volume Change.pine @ `be0ba0d612cb`
+- `v5/0496` https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_base_strategy.pine @ `c0354de142e3`
+- `v5/0497` https://github.com/casoon/pine-scripts archive/strategies/wavetrend/wavetrend_strategy.pine @ `c0354de142e3`
+- `v5/0534` https://github.com/casoon/pine-scripts indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine @ `c0354de142e3`
+- `v5/0589` https://github.com/casoon/pine-scripts indicators/trend_strength/market_state_engine/market_state_engine.pine @ `c0354de142e3`
+- `v5/0601` https://github.com/casoon/pine-scripts libraries/RTAAdvanced.pine @ `c0354de142e3`
+- `v5/0602` https://github.com/casoon/pine-scripts libraries/RTALiquidity.pine @ `c0354de142e3`
+- `v5/0603` https://github.com/casoon/pine-scripts libraries/RTAMonitoring.pine @ `c0354de142e3`
+- `v5/0604` https://github.com/casoon/pine-scripts libraries/RTAStrategy.pine @ `c0354de142e3`
+- `v5/0605` https://github.com/casoon/pine-scripts strategies/chandelier_flip_radar/chandelier_flip_radar_strategy.pine @ `c0354de142e3`
+- `v5/0606` https://github.com/casoon/pine-scripts strategies/market_average_relationship_engine/market_average_relationship_engine_strategy.pine @ `c0354de142e3`
+- `v5/0607` https://github.com/casoon/pine-scripts strategies/oscillator_divergence_zones/oscillator_divergence_zones_strategy.pine @ `c0354de142e3`
+- `v5/0608` https://github.com/casoon/pine-scripts strategies/reversal_engine_score/reversal_engine_score_strategy.pine @ `c0354de142e3`
+- `v5/0609` https://github.com/casoon/pine-scripts strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine @ `c0354de142e3`
+- `v5/0611` https://github.com/casoon/pine-scripts strategies/wavetrend/wavetrend_v4_strategy.pine @ `c0354de142e3`
+- `v5/0618` https://github.com/knectardev/pine_scripts scripts/indicators/acrypto-weigthed-strategy-v149/archive/acrypto-weigthed-strategy-v149_v1.0.0.pine @ `187dc65e72f2`
+- `v5/0678` https://github.com/kevanoullio/tradingview-pine-scripts libraries/double_triple_ema.pine @ `1c9d49e7f157`
+- `v5/0679` https://github.com/kevanoullio/tradingview-pine-scripts libraries/ehlers_super_smoother.pine @ `1c9d49e7f157`
+- `v5/0708` https://github.com/mihakralj/QuanTAlib lib/errors/rae/rae.pine @ `031f1b5fe6ff`
+- `v5/0711` https://github.com/mihakralj/QuanTAlib lib/momentum/mom/mom.pine @ `031f1b5fe6ff`
+- `v5/0721` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_standard/Open Interest.pine @ `7765e3a9b4ac`
+- `v5/0725` https://github.com/mihakralj/QuanTAlib lib/statistics/cointegration/cointegration.pine @ `031f1b5fe6ff`
+- `v5/0734` https://github.com/mihakralj/QuanTAlib lib/dynamics/qstick/qstick.pine @ `031f1b5fe6ff`
+- `v5/0739` https://github.com/mihakralj/QuanTAlib lib/momentum/roc/roc.pine @ `031f1b5fe6ff`
+- `v5/0740` https://github.com/mihakralj/QuanTAlib lib/statistics/median/median.pine @ `031f1b5fe6ff`
+- `v5/0742` https://github.com/mihakralj/QuanTAlib lib/trends_FIR/sma/sma.pine @ `031f1b5fe6ff`
+- `v5/0744` https://github.com/mihakralj/QuanTAlib lib/trends_FIR/dwma/dwma.pine @ `031f1b5fe6ff`
+- `v5/0758` https://github.com/palitojendthen/pinescript indicator/adaptive_mfi.pine @ `1db4264f84a8`
+- `v5/0775` https://github.com/g-moe/Trading-Indicators Tradingview/horizontal-line-bands.pine @ `d7c3f5e9060f`
+- `v5/0788` https://github.com/g-moe/Trading-Indicators Tradingview/vwap-stripped-down.pine @ `d7c3f5e9060f`
+- `v5/0790` https://github.com/hasnocool/tradingview-pine-scripts Rainbow Oscillator [Strategy].pine @ `e031cab2819a`
+- `v5/0835` https://github.com/g-moe/Trading-Indicators Tradingview/psych-levels.pine @ `d7c3f5e9060f`
+- `v5/0840` https://github.com/iamc1oud/Tradingview-Scripts 2025-Setup/Smart Money Concept with Liquidity Swings.pine @ `b6563531a333`
+- `v5/0853` https://github.com/g-moe/Trading-Indicators Tradingview/hooplah-high-low-table.pine @ `d7c3f5e9060f`
+- `v5/0866` https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Strategy/ALGOX v13.pine @ `b6b6f454c641`
+- `v5/0870` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/QVBQU18xRGF5XzJDTTB0dWlza3UwNDA3ZjE2Mg.pine @ `b5b8edf74680`
+- `v5/0871` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/UUNPTV8xRGF5XzJDTTB0dWlza3VkYmEwMzFjZQ.pine @ `b5b8edf74680`
+- `v5/0873` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/QkFCQV8xSG91cl8yQkMwdHVpc2t1NzJmZDkzM2E.pine @ `b5b8edf74680`
+- `v5/0874` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/RE9DTl8zME1pbl8yQkMwdHVpc2t1MmNkNjUwMjg.pine @ `b5b8edf74680`
+- `v5/0875` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/UUNPTV8xSG91cl8yQ1MwdHVpc2t1NWZiNDJjMGQ.pine @ `b5b8edf74680`
+- `v5/0877` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/RE9UVVNEVF8xRGF5XzJDVDB0dWlza3ViZjI3ODRmZQ.pine @ `b5b8edf74680`
+- `v5/0883` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/TFlGVF8xRGF5XzFDMDB0dWlza3VmZWU2N2EyZg.pine @ `b5b8edf74680`
+- `v5/0954` https://github.com/anil-sn/EliteTrading pinecode/Referance/Smart-Money-Concepts.pine @ `e588a89bd155`
+- `v5/0959` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/TUVMSV8xSG91cl8yQ1YwdHVpc2t1YjllMzVjMGI.pine @ `b5b8edf74680`
+- `v5/0961` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/RkZJVl8zME1pbl8yQ1YwdHVpc2t1ZGZmODViYjI.pine @ `b5b8edf74680`
+- `v5/0963` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/TUVUQV8xRGF5XzJCQzB0dWlza3VjOTBiZjhhNw.pine @ `b5b8edf74680`
+- `v5/0965` https://github.com/Leci37/tuisku_Web_selling d_result/pine_TW_b/UElOU18xSG91cl8yQ1QwdHVpc2t1ZWVlNjIyNGM.pine @ `b5b8edf74680`
+- `v5/0977` https://github.com/helenananaa/pine-compat-runtime tests/fixtures/sema/unsupported_strategy_risk_max_intraday_loss_indicator.pine @ `a4001e666899`
+- `v5/0986` https://github.com/TWODS-CAPITAL/Trading-View-Indicators Technical-Indicators/Technical Indicators are Here🤩/ease-of-movement.pine @ `9e4d74678936`
+- `v5/0992` https://github.com/ali-rajabpour/ARPS-Pivots ARPS Pivots.pine @ `1850e5adb5ca`
+- `v5/0997` https://github.com/grantj-re3/LingoLog pine_script/Ideas/HashFunction.pine @ `af5dd3a961a1`
+- `v6/0005` https://github.com/mihakralj/QuanTAlib lib/filters/nw/nw.pine @ `031f1b5fe6ff`
+- `v6/0006` https://github.com/mihakralj/QuanTAlib lib/filters/hp/hp.pine @ `031f1b5fe6ff`
+- `v6/0017` https://github.com/mihakralj/QuanTAlib lib/momentum/rs/rs.pine @ `6f0a339c9b31`
+- `v6/0020` https://github.com/mihakralj/QuanTAlib lib/errors/rse/rse.pine @ `031f1b5fe6ff`
+- `v6/0023` https://github.com/mihakralj/QuanTAlib lib/errors/mse/mse.pine @ `031f1b5fe6ff`
+- `v6/0026` https://github.com/mihakralj/QuanTAlib lib/filters/lms/lms.pine @ `031f1b5fe6ff`
+- `v6/0027` https://github.com/mihakralj/QuanTAlib lib/filters/sgf/sgf.pine @ `031f1b5fe6ff`
+- `v6/0028` https://github.com/mihakralj/QuanTAlib lib/filters/rls/rls.pine @ `031f1b5fe6ff`
+- `v6/0031` https://github.com/mihakralj/QuanTAlib lib/cycles/ccor/ccor.pine @ `031f1b5fe6ff`
+- `v6/0032` https://github.com/mihakralj/QuanTAlib lib/momentum/cci/cci.pine @ `031f1b5fe6ff`
+- `v6/0033` https://github.com/mihakralj/QuanTAlib lib/momentum/vel/vel.pine @ `031f1b5fe6ff`
+- `v6/0034` https://github.com/mihakralj/QuanTAlib lib/numerics/cwt/cwt.pine @ `031f1b5fe6ff`
+- `v6/0038` https://github.com/mihakralj/QuanTAlib lib/dynamics/pfe/pfe.pine @ `031f1b5fe6ff`
+- `v6/0041` https://github.com/mihakralj/QuanTAlib lib/errors/msle/msle.pine @ `031f1b5fe6ff`
+- `v6/0044` https://github.com/mihakralj/QuanTAlib lib/momentum/cmo/cmo.pine @ `031f1b5fe6ff`
+- `v6/0046` https://github.com/mihakralj/QuanTAlib lib/momentum/pmo/pmo.pine @ `031f1b5fe6ff`
+- `v6/0047` https://github.com/mihakralj/QuanTAlib lib/errors/rmse/rmse.pine @ `031f1b5fe6ff`
+- `v6/0052` https://github.com/mihakralj/QuanTAlib lib/momentum/bop/bop.pine @ `031f1b5fe6ff`
+- `v6/0053` https://github.com/mihakralj/QuanTAlib lib/numerics/dwt/dwt.pine @ `031f1b5fe6ff`
+- `v6/0054` https://github.com/mihakralj/QuanTAlib lib/momentum/rsi/rsi.pine @ `031f1b5fe6ff`
+- `v6/0058` https://github.com/mihakralj/QuanTAlib lib/momentum/ppo/ppo.pine @ `031f1b5fe6ff`
+- `v6/0059` https://github.com/mihakralj/QuanTAlib lib/cycles/ccyc/ccyc.pine @ `031f1b5fe6ff`
+- `v6/0060` https://github.com/mihakralj/QuanTAlib lib/filters/hann/hann.pine @ `031f1b5fe6ff`
+- `v6/0061` https://github.com/mihakralj/QuanTAlib lib/reversals/sar/sar.pine @ `6f0a339c9b31`
+- `v6/0062` https://github.com/mihakralj/QuanTAlib lib/filters/rmed/rmed.pine @ `467a8c1cefd5`
+- `v6/0064` https://github.com/mihakralj/QuanTAlib lib/oscillators/er/er.pine @ `031f1b5fe6ff`
+- `v6/0065` https://github.com/mihakralj/QuanTAlib lib/oscillators/fi/fi.pine @ `031f1b5fe6ff`
+- `v6/0067` https://github.com/mihakralj/QuanTAlib lib/oscillators/ac/ac.pine @ `031f1b5fe6ff`
+- `v6/0068` https://github.com/mihakralj/QuanTAlib lib/oscillators/ao/ao.pine @ `031f1b5fe6ff`
+- `v6/0071` https://github.com/mihakralj/QuanTAlib lib/errors/smape/smape.pine @ `031f1b5fe6ff`
+- `v6/0073` https://github.com/mihakralj/QuanTAlib lib/cycles/homod/homod.pine @ `031f1b5fe6ff`
+- `v6/0077` https://github.com/danielbodnar/skills snippets/pinescript/chart-visualization.pine @ `214b16dddc5f`
+- `v6/0078` https://github.com/owenguobadia24s-collab/ovc-replay docs/programmes/lsiac-v0-1/mcac-v0-1/source-census/recovered/google-drive/OVC_TV_2H_CLOCK_CONFIRM_0001_R2_Full_Window_Native_Clock_C2_Census.pine @ `3ba03bd9383b`
+- `v6/0080` https://github.com/sspanogle/tcv-tv-indicators TCV_Regime_Engine_v0.0.2.pine @ `4c07f809637a`
+- `v6/0085` https://github.com/danielbodnar/skills snippets/pinescript/basic-usage.pine @ `214b16dddc5f`
+- `v6/0089` https://github.com/owenguobadia24s-collab/ovc-replay docs/programmes/lsiac-v0-1/mcac-v0-1/source-census/recovered/google-drive/OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine @ `3ba03bd9383b`
+- `v6/0092` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_standard/Chaikin Money Flow.pine @ `7765e3a9b4ac`
+- `v6/0102` https://github.com/mushroom-men-Trading/clean-litter Indicators/indicators/premade indicators/trends_FIR/dwma.pine @ `95f5f7d4bcb4`
+- `v6/0107` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_standard/Volume Oscillator.pine @ `7765e3a9b4ac`
+- `v6/0112` https://github.com/deepentropy/oakscriptJS docs/official/indicators_standard/Chaikin Money Flow.pine @ `d7bbd272e9ba`
+- `v6/0115` https://github.com/lebinhchieu/tradingview ema-vol.pine @ `6342e1b70b2c`
+- `v6/0119` https://github.com/mushroom-men-Trading/clean-litter Indicators/indicators/premade indicators/volume/eom.pine @ `95f5f7d4bcb4`
+- `v6/0123` https://github.com/mushroom-men-Trading/clean-litter Indicators/indicators/premade indicators/trends_IIR/rma.pine @ `95f5f7d4bcb4`
+- `v6/0131` https://github.com/ainell-owi/LePine Model Indicators/quantitative/indicators/cycles/cg.pine @ `5c8667271dbc`
+- `v6/0133` https://github.com/ainell-owi/LePine Model Indicators/quantitative/indicators/volume/vroc.pine @ `5c8667271dbc`
+- `v6/0134` https://github.com/ainell-owi/LePine Model Indicators/quantitative/indicators/momentum/rsi.pine @ `5c8667271dbc`
+- `v6/0135` https://github.com/ainell-owi/LePine Model Indicators/quantitative/indicators/momentum/roc.pine @ `5c8667271dbc`
+- `v6/0136` https://github.com/ainell-owi/LePine Model Indicators/quantitative/indicators/trends_IIR/t3.pine @ `5c8667271dbc`
+- `v6/0137` https://github.com/ainell-owi/LePine Model Indicators/quantitative/indicators/trends_FIR/nlma.pine @ `5c8667271dbc`
+- `v6/0145` https://github.com/TongIncomeWheel/AQE reference/Scoring_v1_8_Overlay.pine @ `9e8d99e64954`
+- `v6/0190` https://github.com/hasnocool/tradingview-pine-scripts 5MSM VISHNU.pine @ `e031cab2819a`
+- `v6/0214` https://github.com/kevinhhl/Pinescript-Projects Scripts/3 Bar Gap.pine @ `3e7704afea36`
+- `v6/0229` https://github.com/koji-mizumoto/Pine-Script-Trial kaneda/20250128_/trendLine.pine @ `70cfc69aabcf`
+- `v6/0243` https://github.com/middlechild0/gamechanger mt5/indicators/pine/ict_ts.pine @ `440115cc4c88`
+- `v6/0271` https://github.com/kingmalitha/SRI-Indicator-Ft.-MSB final.pine @ `15480f99f752`
+- `v6/0288` https://github.com/klevler/tradingview_indicators indicators/MarketSmith/MarketSmith.pine @ `becc3ef2addd`
+- `v6/0289` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_community/RSI (Kernel Optimized) _ Flux Charts.pine @ `7765e3a9b4ac`
+- `v6/0297` https://github.com/middlechild0/gamechanger mt5/indicators/pine/advanced_smc.pine @ `440115cc4c88`
+- `v6/0302` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/oscillator-workbench-chart-lucf.pine @ `5847fd3b4754`
+- `v6/0303` https://github.com/Hugs-4-Bugs/Trading-Indicator Trading-View-Indicators/Technical-Indicators/Technical Indicators are Here🤩/chaikin-oscillator.pine @ `1c5714041dd9`
+- `v6/0312` https://github.com/alboogycOdR/dev-projects tradingview/_pinescripts_/US30 WED LEVELS - TIKTOK/archive/0729DST_ALERTS_TEST.pine @ `cc151b4d0532`
+- `v6/0357` https://github.com/webcrack4/pine-script-combine v5组合/V5_14+16+21+27+34+35+36.pine @ `c950c638dc8a`
+- `v6/0358` https://github.com/alboogycOdR/dev-projects tradingview/PROJECT 714/archive/original.pine @ `b154b86a79b2`
+- `v6/0361` https://github.com/venkatanelson/GVN_MASTER_AI gvn_master_simplified.pine @ `d46c5c6ccaea`
+- `v6/0364` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/RSI (Kernel Optimized) _ Flux Charts.pine @ `d7bbd272e9ba`
+- `v6/0366` https://github.com/7b809/logic-gems indicators/ema/or-levels-ema-cross-v7.pine @ `bbf69999af3e`
+- `v6/0368` https://github.com/SenkuSupreme/TradingView-MT4-MT5-Indicators-Strategies-Collection Indicators/OS ALGO V22- SuperTrend .pine @ `568d113dc782`
+- `v6/0403` https://github.com/zhuzp98/QuantTestFrame PineScript/Ind_ex_TD_EMA.pine @ `b5615a6c0e4c`
+- `v6/0408` https://github.com/g-moe/Trading-Indicators Tradingview/price-action-candles-macd-signals.pine @ `d7c3f5e9060f`
+- `v6/0410` https://github.com/AubakirovArman/SaltanatbotV2 pine/4-fundamentals-graphing.pine @ `6b1872bf0bd0`
+- `v6/0415` https://github.com/skywalker0803r/Sentinel-System SmartMoneyConcepts/SmartMoneyConcepts.pine @ `18e7967132f8`
+- `v6/0421` https://github.com/alboogycOdR/dev-projects tradingview/PROJECT_APEX_714++/apx3/gemini2/apx3.2.gem.pine @ `5e550ce82ca9`
+- `v6/0423` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/monte-carlo-polyline-traceback-kioseff-trading.pine @ `5847fd3b4754`
+- `v6/0426` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/probability-cones.pine @ `5847fd3b4754`
+- `v6/0430` https://github.com/turnupdigital/riskmanager BuySellIndicators/BUYSELLSIGNALS/LuxAlgo.pine @ `f69a5838ea1f`
+- `v6/0431` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/tasc-202407-gaps-and-extreme-closes.pine @ `5847fd3b4754`
+- `v6/0437` https://github.com/helenananaa/pine-compat-runtime tests/fixtures/sema/unsupported_request_math_calls.pine @ `35f105c2b296`
+- `v6/0455` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/Session Sweeps [LuxAlgo].pine @ `d7bbd272e9ba`
+- `v6/0461` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_community/Realtime Footprint.pine @ `7765e3a9b4ac`
+- `v6/0465` https://github.com/tc3oliver/tradingview-indicators session-highs-and-lows-indicator/main.v1.pine @ `5646195d2e08`
+- `v6/0477` https://github.com/7b809/logic-gems indicators/ema/or-levels-ema-cross.pine @ `47371c76c47d`
+- `v6/0478` https://github.com/kotipasa/tradingview-scripts tradewar_spy_options.pine @ `3b7320350e93`
+- `v6/0483` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/technical-ratings.pine @ `5847fd3b4754`
+- `v6/0487` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/fourier-extrapolator-of-price-w-projection-forecast-loxx.pine @ `5847fd3b4754`
+- `v6/0490` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/mxwll-price-action-suite-mxwll.pine @ `5847fd3b4754`
+- `v6/0491` https://github.com/alboogycOdR/dev-projects tradingview/_pinescripts_/US30 WED LEVELS - TIKTOK/WED & MIDNIGHT DST System v0.8.pine @ `cc151b4d0532`
+- `v6/0496` https://github.com/alboogycOdR/dev-projects tradingview/WEDNESDAY_LEVELS/US30 WED LEVELS - TIKTOK/archive/v0.7.0 0801DST_ALERTS V0.7.0.pine @ `b154b86a79b2`
+- `v6/0526` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_community/Volume Footprint [LuxAlgo].pine @ `7765e3a9b4ac`
+- `v6/0529` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_community/ICT Concepts [LuxAlgo].pine @ `7765e3a9b4ac`
+- `v6/0556` https://github.com/g-moe/Trading-Indicators Tradingview/supply-demand-zones-linear-regression-v3.pine @ `d7c3f5e9060f`
+- `v6/0562` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/Realtime Footprint.pine @ `d7bbd272e9ba`
+- `v6/0571` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_community/Fibonacci Extension _ Retracement _ Pivot Points by DGT.pine @ `7765e3a9b4ac`
+- `v6/0572` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/Fibonacci Extension _ Retracement _ Pivot Points by DGT.pine @ `d7bbd272e9ba`
+- `v6/0592` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/Volume Footprint [LuxAlgo].pine @ `d7bbd272e9ba`
+- `v6/0602` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/ICT Concepts [LuxAlgo].pine @ `d7bbd272e9ba`
+- `v6/0617` https://github.com/caizongxun/bb-channel-ai-predictor pine_script/bb_predictor_final.pine @ `887398cd7460`
+- `v6/0635` https://github.com/LongVu5228/Swing-Long-System Scripts/pinescript-indicators.pine @ `380ca96aba2b`
+- `v6/0636` https://github.com/eddiebelaval/openclaw-tradingview pinescript/popular/strategy-pack-by-cryptokazancev.pine @ `22db21575d57`
+- `v6/0645` https://github.com/regalouisei/collect-tradingview pinescript/popular/strategy-pack-by-cryptokazancev.pine @ `22db21575d57`
+- `v6/0647` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_community/Price Action - Support & Resistance by DGT.pine @ `7765e3a9b4ac`
+- `v6/0650` https://github.com/regalouisei/collect-tradingview pinescript/editors_picks/volume-analysis-heatmap-and-volume-profile.pine @ `5847fd3b4754`
+- `v6/0652` https://github.com/deepentropy/oakscriptJS docs/official/indicators_community/Price Action - Support & Resistance by DGT.pine @ `d7bbd272e9ba`
+- `v6/0655` https://github.com/Hugs-4-Bugs/Trading-Indicator Trading-view-Scripts/intraday-trading.pine @ `1c5714041dd9`
+- `v6/0689` https://github.com/deepentropy/lightweight-charts-indicators docs/official/indicators_standard/BarUpDn Strategy.pine @ `7765e3a9b4ac`
+- `v6/0739` https://github.com/penguin72487/tradebot Taker/HullTaker.pine @ `52d3442ae748`
+- `v6/0742` https://github.com/penguin72487/tradebot Taker/HullTakerQ.pine @ `a54595c6fc09`
+- `v6/0744` https://github.com/ArtBreguez/tradingview_backtest long_nasdaq.pine @ `9eb6b2b7d03f`
+- `v6/0745` https://github.com/Hugs-4-Bugs/Trading-Indicator pinescript/strategies/Simple Strategy.pine @ `1c5714041dd9`
+- `v6/0747` https://github.com/penguin72487/tradebot Taker/Hullpenguin.pine @ `4790a01fa383`
+- `v6/0761` https://github.com/SynergOps/AlgoTrading DeMark/pivots-demark.pine @ `fe5f34c8cd58`
+- `v6/0773` https://github.com/atanasvasilevjourney/trading-engine pine/strategy_template.pine @ `4c15e5df1776`
+- `v6/0778` https://github.com/deepentropy/oakscriptJS docs/official/indicators_standard/BarUpDn Strategy.pine @ `d7bbd272e9ba`
+- `v6/0826` https://github.com/keyse/scriptyard src/strategies/mnq_orb_v7_lean.pine @ `7a95fc827b4f`
+- `v6/0828` https://github.com/penguin72487/tradebot Taker/OCCsimple.pine @ `6bad02f735a7`
+- `v6/0838` https://github.com/jjbb013/OKX Pine Script/TRUMP-15m-大振幅反转开仓策略-v1.pine @ `bc5012775f2b`
+- `v6/0866` https://github.com/SebaGutierrezF/news_trader_rest_api news_trader.pine @ `819dab91e0ad`
+- `v6/0869` https://github.com/shubhamtaywade82/algo_trading_api tradingview_strategies/SupertrendVWAP.pine @ `27db78f3a940`
+- `v6/0882` https://github.com/pineforge-4pass/pineforge-corpus validation/composite-bracket-cap-range-pending-stop-01/strategy.pine @ `ef6ce58ab26f`
+- `v6/0924` https://github.com/pineforge-4pass/pineforge-codegen-oss tests/gate-corpus/ok/validation__cap-risk-gates-allow-max-intraday-01.pine @ `2c085a62fce7`
+- `v6/0966` https://github.com/eddoonn/Wickless-candle Wickless_Reversal_Strategy_v1_0.pine @ `35a6c9d36395`
+- `v6/0981` https://github.com/deepentropy/lightweight-charts-indicators docs/official/libraries/PineCoders/getSeries-v2.pine @ `7765e3a9b4ac`
+- `v6/0982` https://github.com/deepentropy/lightweight-charts-indicators docs/official/libraries/TradingView/RelativeValue-v3.pine @ `7765e3a9b4ac`
+- `v6/0983` https://github.com/deepentropy/lightweight-charts-indicators docs/official/libraries/TradingView/TechnicalRating-v3.pine @ `7765e3a9b4ac`
+- `v6/0984` https://github.com/deepentropy/lightweight-charts-indicators docs/official/libraries/TradingView/ZigZag-v8.pine @ `7765e3a9b4ac`
+- `v6/0985` https://github.com/deepentropy/lightweight-charts-indicators docs/official/libraries/TradingView/ta-v10.pine @ `7765e3a9b4ac`
+- `v6/0986` https://github.com/heyphat/piner examples/pine-libs/alice/bands/1.pine @ `6f9004d7fd94`
+- `v6/0987` https://github.com/heyphat/piner examples/pine-libs/alice/mathx/1.pine @ `6f9004d7fd94`
+- `v6/0988` https://github.com/deepentropy/lightweight-charts-indicators docs/official/libraries/TradingView/ValueAtTime-v2.pine @ `7765e3a9b4ac`
+- `v6/0989` https://github.com/iamrichardD/tradingview libraries/risk-management/position-sizing.pine @ `c8bb7631d9d3`
+- `v6/0990` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/RiskMetrics-v3.pine @ `4fc920c067bd`
+- `v6/0991` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/RelativeValue-v4.pine @ `4fc920c067bd`
+- `v6/0992` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/TechnicalRating-v3.pine @ `4fc920c067bd`
+- `v6/0993` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/ta-v12.pine @ `4fc920c067bd`
+- `v6/0994` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/ZigZag-v9.pine @ `4fc920c067bd`
+- `v6/0995` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/LibraryCOT-v5.pine @ `4fc920c067bd`
+- `v6/0996` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/Strategy-v5.pine @ `4fc920c067bd`
+- `v6/0997` https://github.com/jonathan-nascimento51/TradingViewFibo BiasUtils_library.pine @ `cc51a9669a0e`
+- `v6/0998` https://github.com/jonathan-nascimento51/TradingViewFibo FiboUtils_library.pine @ `6626daec704d`
+- `v6/0999` https://github.com/deepentropy/oakscriptJS docs/official/libraries/TradingView/Request-v3.pine @ `4fc920c067bd`
+- `v6/1000` https://github.com/jonathan-nascimento51/tradeCripto2025 libraries/style_lib.pine @ `69fda60d8379`
+

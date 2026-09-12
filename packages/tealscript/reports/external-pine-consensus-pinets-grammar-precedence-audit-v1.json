@@ -1,0 +1,3371 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12T04:53:44.529Z",
+  "codeUnderTest": "5e247d592f2a0f097898694f4d9fd87501c23052",
+  "pinets": {
+    "package": "pinets",
+    "version": "0.9.33",
+    "install": "/tmp/pinets-audit-1789188575"
+  },
+  "summary": {
+    "languageValueVectors": {
+      "right": 55,
+      "wrong": 17,
+      "cannot-run": 12
+    },
+    "grammarSnippets": {
+      "runs": 68,
+      "cannot-run": 17
+    },
+    "precedenceProbes": {
+      "right": 2,
+      "wrong": 0,
+      "cannotRun": 0
+    },
+    "contaminatedSurvivingValueCandidates": 52,
+    "contaminatedPinetsSoleCanonRows": 446,
+    "contaminatedPinetsSoleDifferingRows": 319,
+    "verdict": "unsafe-as-blanket-sole-canon"
+  },
+  "languageResults": [
+    {
+      "id": "language.local-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.expression-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 0"
+      ],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.dynamic-history-offset",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.global-history-offset-boundaries",
+      "status": "wrong",
+      "mismatches": [
+        "plot[2][1] null != 11",
+        "plot[5][1] null != 11"
+      ],
+      "rule": "TradingView v6 Operators: the history operator reads the value of a series on previous bars; unavailable history returns na. Numeric history offsets select bar counts, with fractional offsets truncated toward zero before selecting history and negative offsets unavailable. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/concepts/chart-information/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.dynamic-history-max-bars-back-na",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Operators and max_bars_back: max_bars_back declares required history depth, and a dynamic history offset evaluating to na produces unavailable history as na rather than JavaScript undefined. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-reference/v6/#fun_max_bars_back https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.function-result-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 1"
+      ],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.function-result-history-call-sites",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 1",
+        "plot[1][1] null != 1"
+      ],
+      "rule": "TradingView v6 Operators: [] applies after a function call. TradingView v6 UDFs: each written function call has independent history. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.nested-expression-history-offset2",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][2] null != 0"
+      ],
+      "rule": "TradingView v6 Operators: [] applies after an expression, and the offset selects the expression value on a previous bar. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.tuple-destructured-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: tuple declarations assign each returned item to a variable. Operators: [] on each variable reads its previous series value. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.if-expression-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Conditional structures: if can return a value assigned to a variable. Operators: [] reads that variable series on prior bars. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.switch-expression-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Conditional structures: switch can return a value assigned to a variable. Operators: [] reads that variable series on prior bars. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.for-loop-history-sum",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: for loop bodies execute sequentially and can update outer variables. Operators: missing history values are na, so arithmetic using them yields na. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.for-loop-break-history-search",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: break exits a loop immediately. Operators: close[i] reads prior bar values, with unavailable history as na. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.for-loop-continue-history-sum",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: continue skips the rest of the current loop iteration. Operators: [] reads history, and nz() replaces na with zero. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.while-loop-history-sum",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: while loop bodies execute until the condition is false and can update outer variables. Missing history values used in arithmetic yield na. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.while-loop-break-history-search",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: while loops execute until their condition is false, and break exits immediately. Operators: [] reads prior bar values, with unavailable history as na. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.nested-var-call-sites",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: var initializes once on first execution of its block. UDF docs: each written call has independent local scope/history. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udf-var-loop-call-sites",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 UDFs: each written call has independent local scope/history. Variable declarations: var persists after first initialization. Loops/history apply inside that per-call scope. https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.sparse-udf-call-site-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 UDFs: every written function call establishes an independent call site, and function-local series history is created through successive calls to that function. Operators: [] reads the previous value in that call-site series, so bars where the call is skipped do not add a function-history slot. https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udt-history-field-read",
+      "status": "cannot-run",
+      "error": "ReferenceError: pair is not defined\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:20:25)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)\n    at async main (/private/tmp/pinets-audit-language.ts:67:17)",
+      "rule": "TradingView v6 migration rules disallow history directly on UDT fields and require referencing object history first, e.g. (myUDT[10]).fieldName. https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udt-method-resolution",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Methods: methods are specialized functions associated with a receiver type and can be called with receiver.method(args). https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udt-field-var-persistence",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Objects are values with fields; var initializes the variable once and preserves its value across bars. Field reassignment updates the persistent object variable. https://www.tradingview.com/pine-script-docs/language/objects/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.method-result-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 0"
+      ],
+      "rule": "TradingView v6 Operators: [] applies after a function call. Methods are functions with receiver-call syntax, so method-call results form a series that can be history-referenced. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.method-local-var-call-sites",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Methods are functions with receiver-call syntax, and UDF local history/state is independent for each written call. Variable declarations: var persists after first initialization. https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udt-method-result-field-history",
+      "status": "cannot-run",
+      "error": "TypeError: Cannot read properties of undefined (reading 'value')\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:26:62)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)\n    at async main (/private/tmp/pinets-audit-language.ts:67:17)",
+      "rule": "TradingView v6 Methods are functions with receiver-call syntax. UDT history rules require referencing object history before field access, and Operators: [] can apply to a method call returning the object series. https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.bool-history-missing-is-false",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Type system: bool expressions cannot be na; history that has no available bool value returns false. https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/"
+    },
+    {
+      "id": "language.if-bool-no-branch-is-false",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Type system: if expressions returning bool return false when no local block executes. https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/"
+    },
+    {
+      "id": "language.if-number-no-branch-is-na",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Conditional structures: if expressions without an executed local block return na unless the result is bool, where v6 uses false. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/"
+    },
+    {
+      "id": "language.float-accepts-int-expression",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Type system: int values can be automatically cast to float values, but not the reverse. https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/"
+    },
+    {
+      "id": "language.for-loop-return-expression",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][2] null != 0"
+      ],
+      "rule": "TradingView v6 Loops: loops can return a value; the return value is the last evaluated expression in the final iteration. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.while-loop-return-expression",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: while loops can return a value; the return value is the last evaluated expression before the condition becomes false. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.switch-local-var-result",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Conditional structures: switch local blocks can contain statements and return the final expression as the branch result. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udf-var-first-execution-per-branch",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: var variables in local blocks initialize the first time their declaration executes, then preserve that value. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.var-initializes-once",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-var-initializes-per-call-site",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-param-shadows-builtin",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-param-history-call-sites",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-local-shadows-outer",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-local-history-call-sites",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-local-shadow-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.udf-varip-call-sites",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.conditional-var-first-execution",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 language documentation: variable declarations, execution model, functions, operators, type-system and time-series semantics define the hand-derived expectation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/built-ins/"
+    },
+    {
+      "id": "language.block-local-var-name-scope",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: each local block establishes a distinct scope; `var` initializes once on the first execution of its own declaration and then persists in that scoped variable, not in an outer variable with the same name. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/execution-model/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.root-if-local-shadows-builtin-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 10"
+      ],
+      "rule": "TradingView v6 Conditional structures: if local blocks can declare local variables and return their final expression. Variable declarations and scoping make the local `n` the identifier in that block. Operators: [] reads that local series history, not a same-named built-in fallback. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.nested-if-local-shadows-builtin-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 20"
+      ],
+      "rule": "TradingView v6 Conditional structures can nest local if blocks whose final expression returns a value. Variable declarations are scoped to their local block, so the nested local `n[1]` reads that local series history rather than a built-in fallback. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.if-branch-local-shadows-builtin-current",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][0] null != 0"
+      ],
+      "rule": "TradingView v6 Conditional structures: each branch local block can return its final expression. A variable declared in one branch is scoped to that branch and shadows outer or built-in names only there; the other branch resolves its own expression independently. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.conditional-local-shadows-builtin-current",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][3] null != 42"
+      ],
+      "rule": "TradingView v6 Conditional structures can return `na` when no numeric branch value is produced. Inside the executed branch, a local declaration shadows built-in names and its final expression returns the local value. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.block-local-var-shadows-builtin-current",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][3] null != 2"
+      ],
+      "rule": "TradingView v6 Variable declarations: `var` initializes once on first execution of its own declaration and persists in that declaration scope. A block-local `var n` is distinct from an outer `var n` or built-in fallback with the same name. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.reassigned-local-history",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: `=` declares a variable and `:=` reassigns it; Operators: [] reads the variable series value from prior bars. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.ternary-expression-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 0"
+      ],
+      "rule": "TradingView v6 Operators: the history operator can apply to an expression and selects that expression value from a previous bar. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.array-method-result-history",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 0"
+      ],
+      "rule": "TradingView v6 Methods: namespace functions can use method-call syntax with the receiver as first argument; Operators: [] applies after a function/method call result. https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udf-returned-udt-field-history",
+      "status": "cannot-run",
+      "error": "TypeError: Cannot read properties of undefined (reading 'value')\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:22:56)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)\n    at async main (/private/tmp/pinets-audit-language.ts:67:17)",
+      "rule": "TradingView v6 UDT history rules require referencing object history before field access; Operators: [] can apply to a function call returning the object series. https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.enum-display-string-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Enums: enum members can include optional string titles used in dropdown menus; enum identity remains the member, not the title string. https://www.tradingview.com/pine-script-docs/language/enums/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.switch-arm-arrow-continuation-values",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 5: Expected OPERATOR but got NEWLINE at 5:14\n    at getPineTSFromSource (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/transpiler/index.ts:81:23)\n    at transpile (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/transpiler/index.ts:97:56)\n    at Ut.prepare (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/Indicator/Indicator.class.ts:111:20)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:484:30)",
+      "rule": "TradingView v5/v6 Conditional structures: switch arms can return values from local blocks, and Pine line wrapping permits continuation indentation before the arm expression. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.switch-arm-tuple-local-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations and Conditional structures: tuple declarations assign multiple returned values, and switch arms can contain local blocks whose final expression is the arm value. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.block-boundary-unary-return-values",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][1] null != 1"
+      ],
+      "rule": "TradingView v6 User-defined functions and Operators: a multiline UDF returns the result of its final statement, and a leading `-` on its own line is unary negation of that expression, not a continuation of the previous variable initializer. https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/faq/functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.block-boundary-for-body-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops and Line wrapping: indentation defines the loop local block; the dedented statement after the `for` block executes once after the loop, not once per iteration. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/script-structure/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.block-boundary-switch-nested-if-values",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][3] null != 7"
+      ],
+      "rule": "TradingView v6 Conditional structures: switch arms can return local-block results, and an if expression nested in a selected arm supplies that arm value without absorbing the following default arm. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.drawing-receiver-method-named-values",
+      "status": "wrong",
+      "mismatches": [
+        "plot[0][11] null != 3"
+      ],
+      "rule": "TradingView v6 Methods: namespace functions can use method-call syntax with the receiver as first argument, so label.set_y(id, y) and id.set_y(y=...) bind the same y parameter. https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.multi-declaration-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: a comma-separated declaration statement declares each variable from its own initializer. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.call-continuation-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Script structure: wrapped function-call arguments belong to the call, and Conditional structures: ternaries select one of the two branch expressions. https://www.tradingview.com/pine-script-docs/language/script-structure/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.switch-parenthesized-discriminant-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Conditional structures: switch can compare value arms against a discriminant expression; Operators: parentheses group the discriminant expression without changing its value. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.assignment-minus-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: `-=` reassigns a variable to its current value minus the right-hand expression, and indentation keeps the reassignment inside the selected local block. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/script-structure/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.expression-continuation-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Script structure: a wrapped expression continuation remains part of the same initializer; Operators: multiplication binds before addition and parentheses group subexpressions. https://www.tradingview.com/pine-script-docs/language/script-structure/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.for-in-value-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: `for value in collection` iterates each collection element in order and the loop body can update outer variables. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.bitwise-operator-values",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected character '&' at 3:20\n    at getPineTSFromSource (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/transpiler/index.ts:81:23)\n    at transpile (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/transpiler/index.ts:97:56)\n    at Ut.prepare (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/Indicator/Indicator.class.ts:111:20)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:484:30)",
+      "rule": "TradingView v6 Operators: bitwise `&` and `|` operate on integer operands; parentheses group the mask before the inclusive-or. https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udt-field-shape-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Objects and Collections: UDT fields preserve their declared value shape, including nested UDT fields and collection-typed fields, and field access reads the stored member. https://www.tradingview.com/pine-script-docs/language/objects/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.block-default-parameter-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 User-defined functions: block-body functions return the final statement value, and default parameter values are used only when a call omits that argument. https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.tuple-continuation-equals-values",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: tuple declarations assign multiple returned values, and Pine permits wrapped statements using continuation indentation. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.or-short-circuit-skips-error",
+      "status": "cannot-run",
+      "error": "PineRuntimeError: Index 0 is out of bounds, array size is 0.\n    at U._get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/methods/get.ts:13:19)\n    at U.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/PineArrayObject.ts:211:21)\n    at Bo.Bo.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/array.index.ts:41:60)\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:13:24)",
+      "rule": "TradingView v6 migration rules: `and` and `or` evaluate lazily, so the right side is not evaluated when the left side determines the result. https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.and-short-circuit-skips-error",
+      "status": "cannot-run",
+      "error": "PineRuntimeError: Index 0 is out of bounds, array size is 0.\n    at U._get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/methods/get.ts:13:19)\n    at U.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/PineArrayObject.ts:211:21)\n    at Bo.Bo.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/array.index.ts:41:60)\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:13:24)",
+      "rule": "TradingView v6 migration rules: `and` and `or` evaluate lazily, so the right side is not evaluated when the left side determines the result. https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.if-branch-skips-error",
+      "status": "cannot-run",
+      "error": "PineRuntimeError: Index 0 is out of bounds, array size is 0.\n    at U._get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/methods/get.ts:13:19)\n    at U.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/PineArrayObject.ts:211:21)\n    at Bo.Bo.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/array.index.ts:41:60)\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:13:24)",
+      "rule": "TradingView v6 Conditional structures: an `if` structure evaluates and returns the local block whose condition is true; unselected branches are not the returned value. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.switch-branch-skips-error",
+      "status": "cannot-run",
+      "error": "PineRuntimeError: Index 0 is out of bounds, array size is 0.\n    at U._get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/methods/get.ts:13:19)\n    at U.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/PineArrayObject.ts:211:21)\n    at Bo.Bo.get (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/array.index.ts:41:60)\n    at eval (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:14:26)",
+      "rule": "TradingView v6 Conditional structures: switch evaluates and returns the selected branch expression or local-block result. https://www.tradingview.com/pine-script-docs/language/conditional-structures/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.reverse-for-loop-sum",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops: a `for` loop with a start value greater than the end value counts downward; history values unavailable on early bars are `na`. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.tuple-discard-keeps-position",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Variable declarations: `_` can be used as a tuple discard identifier without shifting the remaining tuple positions. https://www.tradingview.com/pine-script-docs/language/variable-declarations/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udf-default-parameter-source",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 User-defined functions: parameters can declare default values used when the call omits that argument. https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.method-param-shadows-builtin",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Methods are functions with receiver-call syntax; UDF parameter names are local to the function body and can shadow outer names. https://www.tradingview.com/pine-script-docs/language/methods/ https://www.tradingview.com/pine-script-docs/language/user-defined-functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.library-local-state-call-sites",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'import' at 2:7\n    at getPineTSFromSource (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/transpiler/index.ts:81:23)\n    at transpile (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/transpiler/index.ts:97:56)\n    at Ut.prepare (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/Indicator/Indicator.class.ts:111:20)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:484:30)",
+      "rule": "TradingView v6 Libraries: imported library functions execute as normal functions, and written calls keep independent histories/state. TradingView/ta highestSince() stores state since its condition last became true. https://www.tradingview.com/pine-script-docs/concepts/libraries/ https://www.tradingview.com/script/BICzyhq0-ta/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.strategy-declaration-value-inputs",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Strategies: strategy() declaration properties initialize the broker emulator state, and strategy.initial_capital/strategy.equity expose that state as series values. https://www.tradingview.com/pine-script-docs/concepts/strategies/ https://www.tradingview.com/pine-script-reference/v6/ https://www.tradingview.com/pine-script-docs/faq/strategies/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.collection-history-containers",
+      "status": "cannot-run",
+      "error": "TypeError: i.size is not a function\n    at Bo.Bo.size (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/array.index.ts:74:61)\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:38:24)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)",
+      "rule": "TradingView v6 Collections and Operators: collection variables are series values, so the history operator can reference a prior collection instance before calling its methods. https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/matrices/ https://www.tradingview.com/pine-script-docs/language/maps/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.collection-history-offset-boundaries",
+      "status": "cannot-run",
+      "error": "TypeError: i.size is not a function\n    at Bo.Bo.size (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/namespaces/array/array.index.ts:74:61)\n    at _r (eval at Ly (/private/tmp/pinets-audit-1789188575/node_modules/pinets/dist/pinets.min.cjs:125:848), <anonymous>:38:24)\n    at Gi._executeIterations (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:1199:34)\n    at Gi._runComplete (/private/tmp/pinets-audit-1789188575/node_modules/pinets/src/PineTS.class.ts:502:24)",
+      "rule": "TradingView v6 Collections and Operators: collection variables are series values, so history offsets select a prior collection instance before methods read it. Unavailable collection history returns na, fractional offsets truncate toward zero, and negative offsets are unavailable. https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/matrices/ https://www.tradingview.com/pine-script-docs/language/maps/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.collection-mutation-ordering-loops",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Loops execute statements in order, and collection mutation functions update the referenced collection immediately for later statements in the same iteration and later iterations. https://www.tradingview.com/pine-script-docs/language/loops/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/maps/ https://www.tradingview.com/pine-script-docs/language/matrices/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.udt-collection-copy-identity",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Objects and Collections: UDT objects are reference types, collections store object references, and copy() creates a distinct object whose fields do not follow later mutations on the original. https://www.tradingview.com/pine-script-docs/language/objects/ https://www.tradingview.com/pine-script-docs/language/arrays/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/ https://www.tradingview.com/pine-script-docs/language/type-system/"
+    },
+    {
+      "id": "language.qualifier-helper-chain",
+      "status": "right",
+      "mismatches": [],
+      "rule": "TradingView v6 Type system: stronger qualifiers can satisfy weaker requirements only when allowed by the signature; helper chains returning a simple int must still satisfy TA length parameters that require simple int lengths. https://www.tradingview.com/pine-script-docs/language/type-system/ https://www.tradingview.com/pine-script-reference/v6/ https://www.tradingview.com/pine-script-docs/faq/functions/ https://www.tradingview.com/pine-script-docs/language/built-ins/ https://www.tradingview.com/pine-script-docs/language/operators/ https://www.tradingview.com/pine-script-docs/language/time-series/"
+    }
+  ],
+  "grammarResults": [
+    {
+      "id": "declarations.version-indicator",
+      "category": "declarations",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "declarations.strategy",
+      "category": "declarations",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "declarations.strategy-risk-options",
+      "category": "declarations",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "declarations.library-export-function",
+      "category": "declarations",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 3:7"
+    },
+    {
+      "id": "imports.explicit-alias",
+      "category": "imports",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'import' at 3:7"
+    },
+    {
+      "id": "imports.explicit-alias-call",
+      "category": "imports",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'import' at 3:7"
+    },
+    {
+      "id": "imports.implicit-alias",
+      "category": "imports",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'import' at 3:7"
+    },
+    {
+      "id": "variables.untyped-declaration",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.typed-declaration",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.var",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.varip",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.reassignment",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.compound-assignments",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.assignment-minus-block",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.multi-declaration",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "variables.multi-declaration-untyped",
+      "category": "variables",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.primitive-annotations",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "[object Object]"
+      ]
+    },
+    {
+      "id": "types.qualifier-annotations",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.qualifier-annotations-references",
+      "category": "types",
+      "status": "cannot-run",
+      "error": "ReferenceError: series is not defined"
+    },
+    {
+      "id": "types.casts",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.na-typed-initializer",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.na-typed-initializer-reference",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.array-template",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.array-shorthand",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.matrix-template",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.map-template",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.udt-collection-field",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.nested-udt-field",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "types.object-provider-annotations",
+      "category": "types",
+      "status": "cannot-run",
+      "error": "TypeError: request.footprint is not a function"
+    },
+    {
+      "id": "operators.arithmetic",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.bitwise",
+      "category": "operators",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected character '&' at 3:20"
+    },
+    {
+      "id": "operators.comparison",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.logical",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.conditional",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.nested-conditional",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.history-reference",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.history-reference-expression",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.member-access",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.method-call",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "operators.drawing-receiver-method-call",
+      "category": "operators",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.if-statement",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.else-if",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.else-if-expression",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.if-expression",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.switch-expression",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.switch-discriminant-parenthesized",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.switch-condition-form",
+      "category": "conditionals",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "conditionals.once",
+      "category": "conditionals",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token INDENT '' at 5:5"
+    },
+    {
+      "id": "loops.for-to",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.for-to-by",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.for-in-value",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.for-in-value-break",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.for-in-index-value",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.while",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.while-break",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.break",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "loops.continue",
+      "category": "loops",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "functions.expression-body",
+      "category": "functions-methods",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "functions.block-body",
+      "category": "functions-methods",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "functions.block-body-default-parameter",
+      "category": "functions-methods",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "functions.block-body-nested-tail",
+      "category": "functions-methods",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "functions.exported",
+      "category": "functions-methods",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 3:7"
+    },
+    {
+      "id": "methods.declaration",
+      "category": "functions-methods",
+      "status": "cannot-run",
+      "error": "TypeError: close.param is not a function"
+    },
+    {
+      "id": "methods.overload",
+      "category": "functions-methods",
+      "status": "cannot-run",
+      "error": "ReferenceError: overload is not defined"
+    },
+    {
+      "id": "methods.exported",
+      "category": "functions-methods",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 3:7"
+    },
+    {
+      "id": "objects.udt-field-defaults",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "objects.field-assignment",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "objects.field-assignment-nested",
+      "category": "types",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "objects.exported-udt",
+      "category": "types",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 3:7"
+    },
+    {
+      "id": "enums.declaration",
+      "category": "enums",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "enums.exported",
+      "category": "enums",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 3:7"
+    },
+    {
+      "id": "tuples.declaration",
+      "category": "tuples",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "tuples.discard-underscore",
+      "category": "tuples",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "tuples.reassignment",
+      "category": "tuples",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "arrays.array-literal",
+      "category": "arrays-matrices-maps",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "arrays.array-literal-nested",
+      "category": "arrays-matrices-maps",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "arrays.generic-new-call",
+      "category": "arrays-matrices-maps",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "formatting.call-continuation",
+      "category": "formatting",
+      "status": "runs",
+      "plots": [
+        "Close"
+      ]
+    },
+    {
+      "id": "formatting.call-continuation-nested",
+      "category": "formatting",
+      "status": "runs",
+      "plots": [
+        "Selected"
+      ]
+    },
+    {
+      "id": "formatting.expression-continuation",
+      "category": "formatting",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "formatting.expression-continuation-nested",
+      "category": "formatting",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "formatting.method-chain-continuation",
+      "category": "formatting",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token INDENT '' at 5:5"
+    },
+    {
+      "id": "formatting.inline-comment",
+      "category": "formatting",
+      "status": "runs",
+      "plots": [
+        "#0"
+      ]
+    },
+    {
+      "id": "formatting.doc-annotations",
+      "category": "formatting",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 7:7"
+    },
+    {
+      "id": "formatting.doc-annotations-function-extra",
+      "category": "formatting",
+      "status": "cannot-run",
+      "error": "Error: Failed to transpile Pine Script version 6: Unexpected token KEYWORD 'export' at 8:7"
+    }
+  ],
+  "precedenceProbes": [
+    {
+      "id": "precedence.eq-rel-bool",
+      "status": "right",
+      "expected": "[1,1,1,1]",
+      "note": "`a == b > c` evaluated as `a == (b > c)` for bool/numeric relational grouping."
+    },
+    {
+      "id": "precedence.logic-chain",
+      "status": "right",
+      "expected": "[1,1,1,1]",
+      "note": "`or`, `and`, equality, relational, additive and multiplicative precedence agreed with documented grouping."
+    }
+  ],
+  "contamination": {
+    "survivorTotal": 119,
+    "pinetsSoleCanonTotal": 1338,
+    "pinetsSoleDifferingTotal": 716,
+    "survivors": [
+      {
+        "id": "history-on-expression-or-call-result",
+        "why": "PineTS wrong on expression/function/method/array result history vectors.",
+        "count": 1,
+        "examples": [
+          {
+            "key": "v6 0795",
+            "cause": "later-na-vs-finite",
+            "provenance": "pine-a-script-sole",
+            "firstDifference": "plot[0][46] null != 0.41694356534135074"
+          }
+        ],
+        "allKeys": [
+          "v6 0795"
+        ]
+      },
+      {
+        "id": "block-valued-loop-expression",
+        "why": "PineTS wrong on for-loop return expression vector.",
+        "count": 2,
+        "examples": [
+          {
+            "key": "v7 0007",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 101.26 != null"
+          },
+          {
+            "key": "v7 0152",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 101.26 != null"
+          }
+        ],
+        "allKeys": [
+          "v7 0007",
+          "v7 0152"
+        ]
+      },
+      {
+        "id": "builtin-name-shadowing",
+        "why": "PineTS wrong on local values shadowing builtins such as close/high with current/history reads.",
+        "count": 30,
+        "examples": [
+          {
+            "key": "v5 0386",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 0.0625 != 0"
+          },
+          {
+            "key": "v5 0387",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 8159.4711958299 != 0"
+          },
+          {
+            "key": "v5 0388",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 0.0011777475 != 0"
+          },
+          {
+            "key": "v5 0390",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 45.6875 != 0.004464285714285615"
+          },
+          {
+            "key": "v5 0391",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 6.807520609199855 != 0"
+          },
+          {
+            "key": "v5 0392",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][17] 92.0158249304 != 0"
+          },
+          {
+            "key": "v5 0395",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] -2.8666916129 != 0"
+          },
+          {
+            "key": "v5 0398",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 1 != 2"
+          },
+          {
+            "key": "v5 0400",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 10234 != 0"
+          },
+          {
+            "key": "v5 0402",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 818.72 != 0"
+          },
+          {
+            "key": "v5 0404",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][5] 2.0733950310921694 != 0"
+          },
+          {
+            "key": "v5 0405",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][12] 3105 != null"
+          },
+          {
+            "key": "v5 0406",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 639.625 != 0"
+          },
+          {
+            "key": "v5 0409",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 20241.9260795368 != 0"
+          },
+          {
+            "key": "v6 0001",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][5] 2.0733950310921694 != 0"
+          },
+          {
+            "key": "v6 0002",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 818.72 != 0"
+          },
+          {
+            "key": "v6 0007",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 8159.4711958299 != 0"
+          },
+          {
+            "key": "v6 0008",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 6.807520609199855 != 0"
+          },
+          {
+            "key": "v6 0009",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 0.0625 != 0"
+          },
+          {
+            "key": "v6 0010",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] -2.8666916129 != 0"
+          }
+        ],
+        "allKeys": [
+          "v5 0386",
+          "v5 0387",
+          "v5 0388",
+          "v5 0390",
+          "v5 0391",
+          "v5 0392",
+          "v5 0395",
+          "v5 0398",
+          "v5 0400",
+          "v5 0402",
+          "v5 0404",
+          "v5 0405",
+          "v5 0406",
+          "v5 0409",
+          "v6 0001",
+          "v6 0002",
+          "v6 0007",
+          "v6 0008",
+          "v6 0009",
+          "v6 0010",
+          "v6 0011",
+          "v6 0014",
+          "v6 0015",
+          "v6 0018",
+          "v6 0019",
+          "v6 0022",
+          "v6 0051",
+          "v6 0056",
+          "v6 0119",
+          "v6 0133"
+        ]
+      },
+      {
+        "id": "drawing-receiver-method-value",
+        "why": "PineTS wrong on drawing receiver method named-argument value vector.",
+        "count": 19,
+        "examples": [
+          {
+            "key": "v5 0134",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][126] 96.7464766741 != null"
+          },
+          {
+            "key": "v5 0492",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[4][43] 100 != 87.98436563983076"
+          },
+          {
+            "key": "v5 0541",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][99] 40.622223085 != null"
+          },
+          {
+            "key": "v5 0548",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[1][14] null != 100"
+          },
+          {
+            "key": "v5 0590",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][14] 0 != -20"
+          },
+          {
+            "key": "v5 0595",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][34] null != 21.658970857706326"
+          },
+          {
+            "key": "v5 0917",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][89] -4.967764633680499 != -0.645593631710458"
+          },
+          {
+            "key": "v5 0968",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][199] 142.9018688289 != 112.46391767816598"
+          },
+          {
+            "key": "v5 0970",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][199] 142.9018688289 != 112.46391767816598"
+          },
+          {
+            "key": "v6 0246",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][30] null != 114.02580407367421"
+          },
+          {
+            "key": "v6 0435",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pine-a-script-sole",
+            "firstDifference": "plot[0][0] 0 != 2"
+          },
+          {
+            "key": "v6 0666",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 0 != null"
+          },
+          {
+            "key": "v6 0669",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pine-a-script-sole",
+            "firstDifference": "plot[0][0] 0 != 2"
+          },
+          {
+            "key": "v6 0850",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[1][99] 124.5858202456 != null"
+          },
+          {
+            "key": "v6 0979",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[5][20] 130.5190184976 != null"
+          },
+          {
+            "key": "v7 0053",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][20] null != 82.02616834606701"
+          },
+          {
+            "key": "v7 0077",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pine-a-script-sole",
+            "firstDifference": "plot[0][0] 0 != 22"
+          },
+          {
+            "key": "v7 0087",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 600.6400000000001 != 1704067200600.64"
+          },
+          {
+            "key": "v7 0113",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pine-a-script-sole",
+            "firstDifference": "plot[0][0] null != 0"
+          }
+        ],
+        "allKeys": [
+          "v5 0134",
+          "v5 0492",
+          "v5 0541",
+          "v5 0548",
+          "v5 0590",
+          "v5 0595",
+          "v5 0917",
+          "v5 0968",
+          "v5 0970",
+          "v6 0246",
+          "v6 0435",
+          "v6 0666",
+          "v6 0669",
+          "v6 0850",
+          "v6 0979",
+          "v7 0053",
+          "v7 0077",
+          "v7 0087",
+          "v7 0113"
+        ]
+      }
+    ],
+    "pinetsSoleCanon": [
+      {
+        "id": "history-on-expression-or-call-result",
+        "why": "PineTS wrong on expression/function/method/array result history vectors.",
+        "count": 70,
+        "examples": [
+          {
+            "key": "v5 0485",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0486",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0487",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0499",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0501",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0504",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[15][39] 1 != null"
+          },
+          {
+            "key": "v5 0589",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0599",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[8][0] null != 0"
+          },
+          {
+            "key": "v5 0687",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0690",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[2][0] null != 101.26"
+          },
+          {
+            "key": "v5 0749",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0777",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[11][0] null != 1"
+          },
+          {
+            "key": "v5 0794",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[4][157] null != 132.86151045317746"
+          },
+          {
+            "key": "v5 0795",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0858",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0893",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0941",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0953",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[1][0] null != 101.26"
+          },
+          {
+            "key": "v5 0995",
+            "cause": "output-call-count-shape-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot count 1 != 2"
+          },
+          {
+            "key": "v5 0998",
+            "provenance": "pinets-sole"
+          }
+        ],
+        "allKeys": [
+          "v5 0485",
+          "v5 0486",
+          "v5 0487",
+          "v5 0499",
+          "v5 0501",
+          "v5 0504",
+          "v5 0589",
+          "v5 0599",
+          "v5 0687",
+          "v5 0690",
+          "v5 0749",
+          "v5 0777",
+          "v5 0794",
+          "v5 0795",
+          "v5 0858",
+          "v5 0893",
+          "v5 0941",
+          "v5 0953",
+          "v5 0995",
+          "v5 0998",
+          "v6 0145",
+          "v6 0200",
+          "v6 0203",
+          "v6 0233",
+          "v6 0234",
+          "v6 0235",
+          "v6 0236",
+          "v6 0247",
+          "v6 0291",
+          "v6 0333",
+          "v6 0337",
+          "v6 0345",
+          "v6 0362",
+          "v6 0405",
+          "v6 0501",
+          "v6 0556",
+          "v6 0558",
+          "v6 0566",
+          "v6 0633",
+          "v6 0641",
+          "v6 0725",
+          "v6 0743",
+          "v6 0755",
+          "v6 0766",
+          "v6 0771",
+          "v6 0775",
+          "v6 0781",
+          "v6 0786",
+          "v6 0787",
+          "v6 0788",
+          "v6 0800",
+          "v6 0806",
+          "v6 0810",
+          "v6 0830",
+          "v6 0833",
+          "v6 0843",
+          "v6 0860",
+          "v6 0861",
+          "v6 0870",
+          "v6 0893",
+          "v6 0894",
+          "v6 0909",
+          "v6 0915",
+          "v6 0945",
+          "v6 0950",
+          "v6 0964",
+          "v7 0120",
+          "v7 0343",
+          "v7 0368",
+          "v7 0417"
+        ]
+      },
+      {
+        "id": "block-valued-loop-expression",
+        "why": "PineTS wrong on for-loop return expression vector.",
+        "count": 9,
+        "examples": [
+          {
+            "key": "v5 0819",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0945",
+            "cause": "tealscript-runtime-table-cell-bounds-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: Table cell coordinates out of bounds: column 1, row NaN. This table has columns 0-2 and rows 0-25."
+          },
+          {
+            "key": "v6 0310",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v6 0353",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v6 0378",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v7 0005",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v7 0007",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 101.26 != null"
+          },
+          {
+            "key": "v7 0150",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v7 0152",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 101.26 != null"
+          }
+        ],
+        "allKeys": [
+          "v5 0819",
+          "v5 0945",
+          "v6 0310",
+          "v6 0353",
+          "v6 0378",
+          "v7 0005",
+          "v7 0007",
+          "v7 0150",
+          "v7 0152"
+        ]
+      },
+      {
+        "id": "builtin-name-shadowing",
+        "why": "PineTS wrong on local values shadowing builtins such as close/high with current/history reads.",
+        "count": 57,
+        "examples": [
+          {
+            "key": "v5 0002",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v5 0008",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[2][0] null != 1"
+          },
+          {
+            "key": "v5 0015",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v5 0016",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v5 0135",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0219",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0377",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0383",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0386",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 0.0625 != 0"
+          },
+          {
+            "key": "v5 0387",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 8159.4711958299 != 0"
+          },
+          {
+            "key": "v5 0388",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 0.0011777475 != 0"
+          },
+          {
+            "key": "v5 0390",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 45.6875 != 0.004464285714285615"
+          },
+          {
+            "key": "v5 0391",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 6.807520609199855 != 0"
+          },
+          {
+            "key": "v5 0392",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][17] 92.0158249304 != 0"
+          },
+          {
+            "key": "v5 0393",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0394",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0395",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] -2.8666916129 != 0"
+          },
+          {
+            "key": "v5 0396",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0398",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 1 != 2"
+          },
+          {
+            "key": "v5 0400",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 10234 != 0"
+          }
+        ],
+        "allKeys": [
+          "v5 0002",
+          "v5 0008",
+          "v5 0015",
+          "v5 0016",
+          "v5 0135",
+          "v5 0219",
+          "v5 0377",
+          "v5 0383",
+          "v5 0386",
+          "v5 0387",
+          "v5 0388",
+          "v5 0390",
+          "v5 0391",
+          "v5 0392",
+          "v5 0393",
+          "v5 0394",
+          "v5 0395",
+          "v5 0396",
+          "v5 0398",
+          "v5 0400",
+          "v5 0402",
+          "v5 0403",
+          "v5 0404",
+          "v5 0405",
+          "v5 0406",
+          "v5 0409",
+          "v5 0572",
+          "v5 0589",
+          "v5 0606",
+          "v5 0710",
+          "v5 0789",
+          "v6 0001",
+          "v6 0002",
+          "v6 0003",
+          "v6 0004",
+          "v6 0007",
+          "v6 0008",
+          "v6 0009",
+          "v6 0010",
+          "v6 0011",
+          "v6 0012",
+          "v6 0014",
+          "v6 0015",
+          "v6 0016",
+          "v6 0018",
+          "v6 0019",
+          "v6 0022",
+          "v6 0024",
+          "v6 0051",
+          "v6 0056",
+          "v6 0119",
+          "v6 0133",
+          "v6 0835",
+          "v7 0110",
+          "v7 0419",
+          "v7 0420",
+          "v7 0421"
+        ]
+      },
+      {
+        "id": "switch-arm-nested-if-block-value",
+        "why": "PineTS wrong on switch arm whose value is a nested if local block.",
+        "count": 9,
+        "examples": [
+          {
+            "key": "v5 0055",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0067",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 0"
+          },
+          {
+            "key": "v5 0535",
+            "cause": "tealscript-semantic-series-to-simple-parameter-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot pass series value to simple parameter 'windowLength' for function calculateProfile; use an input/simple value or declare a compatible parameter"
+          },
+          {
+            "key": "v5 0845",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v6 0154",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v6 0271",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v6 0454",
+            "cause": "tealscript-host-request-security-lower-tf-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security_lower_tf requires a request datafeed"
+          },
+          {
+            "key": "v7 0321",
+            "cause": "output-call-count-shape-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot count 36 != 37"
+          },
+          {
+            "key": "v7 0368",
+            "provenance": "pinets-sole"
+          }
+        ],
+        "allKeys": [
+          "v5 0055",
+          "v5 0067",
+          "v5 0535",
+          "v5 0845",
+          "v6 0154",
+          "v6 0271",
+          "v6 0454",
+          "v7 0321",
+          "v7 0368"
+        ]
+      },
+      {
+        "id": "drawing-receiver-method-value",
+        "why": "PineTS wrong on drawing receiver method named-argument value vector.",
+        "count": 355,
+        "examples": [
+          {
+            "key": "v5 0134",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][126] 96.7464766741 != null"
+          },
+          {
+            "key": "v5 0486",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0487",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0488",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0492",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[4][43] 100 != 87.98436563983076"
+          },
+          {
+            "key": "v5 0494",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0500",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 101.26"
+          },
+          {
+            "key": "v5 0501",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0504",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[15][39] 1 != null"
+          },
+          {
+            "key": "v5 0505",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0509",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0512",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 0"
+          },
+          {
+            "key": "v5 0516",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0518",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][46] 1 != null"
+          },
+          {
+            "key": "v5 0519",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[7][0] 1 != null"
+          },
+          {
+            "key": "v5 0521",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 101.26"
+          },
+          {
+            "key": "v5 0523",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0524",
+            "provenance": "pinets-sole"
+          },
+          {
+            "key": "v5 0533",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[5][0] null != 1"
+          },
+          {
+            "key": "v5 0535",
+            "cause": "tealscript-semantic-series-to-simple-parameter-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot pass series value to simple parameter 'windowLength' for function calculateProfile; use an input/simple value or declare a compatible parameter"
+          }
+        ],
+        "allKeys": [
+          "v5 0134",
+          "v5 0486",
+          "v5 0487",
+          "v5 0488",
+          "v5 0492",
+          "v5 0494",
+          "v5 0500",
+          "v5 0501",
+          "v5 0504",
+          "v5 0505",
+          "v5 0509",
+          "v5 0512",
+          "v5 0516",
+          "v5 0518",
+          "v5 0519",
+          "v5 0521",
+          "v5 0523",
+          "v5 0524",
+          "v5 0533",
+          "v5 0535",
+          "v5 0538",
+          "v5 0540",
+          "v5 0541",
+          "v5 0545",
+          "v5 0546",
+          "v5 0548",
+          "v5 0553",
+          "v5 0555",
+          "v5 0562",
+          "v5 0564",
+          "v5 0566",
+          "v5 0567",
+          "v5 0568",
+          "v5 0569",
+          "v5 0570",
+          "v5 0572",
+          "v5 0573",
+          "v5 0574",
+          "v5 0575",
+          "v5 0576",
+          "v5 0577",
+          "v5 0578",
+          "v5 0579",
+          "v5 0583",
+          "v5 0584",
+          "v5 0589",
+          "v5 0590",
+          "v5 0595",
+          "v5 0599",
+          "v5 0605",
+          "v5 0606",
+          "v5 0607",
+          "v5 0608",
+          "v5 0609",
+          "v5 0617",
+          "v5 0620",
+          "v5 0621",
+          "v5 0626",
+          "v5 0627",
+          "v5 0727",
+          "v5 0731",
+          "v5 0737",
+          "v5 0749",
+          "v5 0767",
+          "v5 0775",
+          "v5 0777",
+          "v5 0789",
+          "v5 0792",
+          "v5 0797",
+          "v5 0799",
+          "v5 0800",
+          "v5 0802",
+          "v5 0826",
+          "v5 0832",
+          "v5 0835",
+          "v5 0842",
+          "v5 0845",
+          "v5 0853",
+          "v5 0856",
+          "v5 0858",
+          "v5 0859",
+          "v5 0860",
+          "v5 0861",
+          "v5 0862",
+          "v5 0863",
+          "v5 0864",
+          "v5 0867",
+          "v5 0868",
+          "v5 0869",
+          "v5 0870",
+          "v5 0871",
+          "v5 0872",
+          "v5 0873",
+          "v5 0874",
+          "v5 0875",
+          "v5 0877",
+          "v5 0878",
+          "v5 0879",
+          "v5 0881",
+          "v5 0882",
+          "v5 0883",
+          "v5 0884",
+          "v5 0885",
+          "v5 0886",
+          "v5 0887",
+          "v5 0888",
+          "v5 0889",
+          "v5 0890",
+          "v5 0891",
+          "v5 0892",
+          "v5 0893",
+          "v5 0896",
+          "v5 0898",
+          "v5 0908",
+          "v5 0912",
+          "v5 0913",
+          "v5 0914",
+          "v5 0915",
+          "v5 0917",
+          "v5 0918",
+          "v5 0929",
+          "v5 0935",
+          "v5 0937",
+          "v5 0938",
+          "v5 0940",
+          "v5 0941",
+          "v5 0950",
+          "v5 0952",
+          "v5 0953",
+          "v5 0954",
+          "v5 0956",
+          "v5 0957",
+          "v5 0958",
+          "v5 0959",
+          "v5 0960",
+          "v5 0961",
+          "v5 0962",
+          "v5 0963",
+          "v5 0964",
+          "v5 0965",
+          "v5 0966",
+          "v5 0967",
+          "v5 0968",
+          "v5 0969",
+          "v5 0970",
+          "v5 0971",
+          "v5 0972",
+          "v5 0973",
+          "v5 0974",
+          "v5 0975",
+          "v5 0976",
+          "v5 0979",
+          "v5 0984",
+          "v5 0985",
+          "v5 0987",
+          "v5 0989",
+          "v5 0996",
+          "v5 0998",
+          "v6 0077",
+          "v6 0083",
+          "v6 0088",
+          "v6 0090",
+          "v6 0103",
+          "v6 0106",
+          "v6 0113",
+          "v6 0118",
+          "v6 0130",
+          "v6 0139",
+          "v6 0145",
+          "v6 0149",
+          "v6 0151",
+          "v6 0154",
+          "v6 0159",
+          "v6 0160",
+          "v6 0200",
+          "v6 0202",
+          "v6 0203",
+          "v6 0216",
+          "v6 0217",
+          "v6 0225",
+          "v6 0234",
+          "v6 0235",
+          "v6 0236",
+          "v6 0242",
+          "v6 0245",
+          "v6 0246",
+          "v6 0248",
+          "v6 0249",
+          "v6 0255",
+          "v6 0266",
+          "v6 0269",
+          "v6 0271",
+          "v6 0274",
+          "v6 0279",
+          "v6 0282",
+          "v6 0286",
+          "v6 0289",
+          "v6 0294",
+          "v6 0322",
+          "v6 0324",
+          "v6 0328",
+          "v6 0333",
+          "v6 0337",
+          "v6 0339",
+          "v6 0349",
+          "v6 0350",
+          "v6 0352",
+          "v6 0353",
+          "v6 0354",
+          "v6 0358",
+          "v6 0359",
+          "v6 0361",
+          "v6 0364",
+          "v6 0366",
+          "v6 0369",
+          "v6 0387",
+          "v6 0388",
+          "v6 0404",
+          "v6 0405",
+          "v6 0407",
+          "v6 0413",
+          "v6 0415",
+          "v6 0425",
+          "v6 0427",
+          "v6 0454",
+          "v6 0455",
+          "v6 0456",
+          "v6 0462",
+          "v6 0473",
+          "v6 0475",
+          "v6 0477",
+          "v6 0487",
+          "v6 0497",
+          "v6 0505",
+          "v6 0538",
+          "v6 0541",
+          "v6 0548",
+          "v6 0553",
+          "v6 0554",
+          "v6 0556",
+          "v6 0558",
+          "v6 0566",
+          "v6 0571",
+          "v6 0572",
+          "v6 0575",
+          "v6 0576",
+          "v6 0587",
+          "v6 0594",
+          "v6 0606",
+          "v6 0607",
+          "v6 0618",
+          "v6 0619",
+          "v6 0623",
+          "v6 0631",
+          "v6 0633",
+          "v6 0634",
+          "v6 0638",
+          "v6 0639",
+          "v6 0641",
+          "v6 0643",
+          "v6 0644",
+          "v6 0647",
+          "v6 0652",
+          "v6 0654",
+          "v6 0655",
+          "v6 0659",
+          "v6 0662",
+          "v6 0665",
+          "v6 0666",
+          "v6 0700",
+          "v6 0722",
+          "v6 0727",
+          "v6 0735",
+          "v6 0744",
+          "v6 0766",
+          "v6 0775",
+          "v6 0787",
+          "v6 0788",
+          "v6 0813",
+          "v6 0818",
+          "v6 0829",
+          "v6 0830",
+          "v6 0835",
+          "v6 0838",
+          "v6 0850",
+          "v6 0861",
+          "v6 0875",
+          "v6 0886",
+          "v6 0887",
+          "v6 0893",
+          "v6 0895",
+          "v6 0897",
+          "v6 0899",
+          "v6 0916",
+          "v6 0940",
+          "v6 0941",
+          "v6 0944",
+          "v6 0945",
+          "v6 0949",
+          "v6 0953",
+          "v6 0964",
+          "v6 0971",
+          "v6 0976",
+          "v6 0979",
+          "v7 0039",
+          "v7 0040",
+          "v7 0042",
+          "v7 0047",
+          "v7 0053",
+          "v7 0073",
+          "v7 0083",
+          "v7 0087",
+          "v7 0097",
+          "v7 0108",
+          "v7 0117",
+          "v7 0118",
+          "v7 0119",
+          "v7 0120",
+          "v7 0122",
+          "v7 0125",
+          "v7 0128",
+          "v7 0135",
+          "v7 0136",
+          "v7 0270",
+          "v7 0310",
+          "v7 0343",
+          "v7 0353",
+          "v7 0367",
+          "v7 0368",
+          "v7 0378",
+          "v7 0381",
+          "v7 0385",
+          "v7 0388",
+          "v7 0389",
+          "v7 0392",
+          "v7 0395",
+          "v7 0397",
+          "v7 0398",
+          "v7 0411",
+          "v7 0414",
+          "v7 0418",
+          "v7 0419",
+          "v7 0420",
+          "v7 0421",
+          "v7 0422",
+          "v7 0423",
+          "v7 0424",
+          "v7 0425",
+          "v7 0432",
+          "v7 0433",
+          "v7 0436",
+          "v7 0439",
+          "v7 0440",
+          "v7 0453",
+          "v7-size-recovery 0022"
+        ]
+      }
+    ],
+    "pinetsSoleDiffering": [
+      {
+        "id": "history-on-expression-or-call-result",
+        "why": "PineTS wrong on expression/function/method/array result history vectors.",
+        "count": 58,
+        "examples": [
+          {
+            "key": "v5 0485",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0486",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0487",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0499",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0501",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0504",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[15][39] 1 != null"
+          },
+          {
+            "key": "v5 0589",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0599",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[8][0] null != 0"
+          },
+          {
+            "key": "v5 0690",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[2][0] null != 101.26"
+          },
+          {
+            "key": "v5 0777",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[11][0] null != 1"
+          },
+          {
+            "key": "v5 0794",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[4][157] null != 132.86151045317746"
+          },
+          {
+            "key": "v5 0858",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0953",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[1][0] null != 101.26"
+          },
+          {
+            "key": "v5 0995",
+            "cause": "output-call-count-shape-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot count 1 != 2"
+          },
+          {
+            "key": "v6 0145",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v6 0200",
+            "cause": "tealscript-host-request-security-lower-tf-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security_lower_tf requires a request datafeed"
+          },
+          {
+            "key": "v6 0203",
+            "cause": "tealscript-host-request-security-lower-tf-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security_lower_tf requires a request datafeed"
+          },
+          {
+            "key": "v6 0233",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 101.26"
+          },
+          {
+            "key": "v6 0234",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v6 0235",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[4][19] 140.5054638613 != null"
+          }
+        ],
+        "allKeys": [
+          "v5 0485",
+          "v5 0486",
+          "v5 0487",
+          "v5 0499",
+          "v5 0501",
+          "v5 0504",
+          "v5 0589",
+          "v5 0599",
+          "v5 0690",
+          "v5 0777",
+          "v5 0794",
+          "v5 0858",
+          "v5 0953",
+          "v5 0995",
+          "v6 0145",
+          "v6 0200",
+          "v6 0203",
+          "v6 0233",
+          "v6 0234",
+          "v6 0235",
+          "v6 0236",
+          "v6 0247",
+          "v6 0291",
+          "v6 0337",
+          "v6 0345",
+          "v6 0362",
+          "v6 0501",
+          "v6 0556",
+          "v6 0558",
+          "v6 0566",
+          "v6 0633",
+          "v6 0641",
+          "v6 0725",
+          "v6 0743",
+          "v6 0755",
+          "v6 0766",
+          "v6 0771",
+          "v6 0775",
+          "v6 0781",
+          "v6 0786",
+          "v6 0787",
+          "v6 0788",
+          "v6 0800",
+          "v6 0806",
+          "v6 0810",
+          "v6 0830",
+          "v6 0833",
+          "v6 0843",
+          "v6 0860",
+          "v6 0861",
+          "v6 0870",
+          "v6 0893",
+          "v6 0894",
+          "v6 0909",
+          "v6 0915",
+          "v6 0945",
+          "v6 0964",
+          "v7 0343"
+        ]
+      },
+      {
+        "id": "block-valued-loop-expression",
+        "why": "PineTS wrong on for-loop return expression vector.",
+        "count": 3,
+        "examples": [
+          {
+            "key": "v5 0945",
+            "cause": "tealscript-runtime-table-cell-bounds-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: Table cell coordinates out of bounds: column 1, row NaN. This table has columns 0-2 and rows 0-25."
+          },
+          {
+            "key": "v7 0007",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 101.26 != null"
+          },
+          {
+            "key": "v7 0152",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 101.26 != null"
+          }
+        ],
+        "allKeys": [
+          "v5 0945",
+          "v7 0007",
+          "v7 0152"
+        ]
+      },
+      {
+        "id": "builtin-name-shadowing",
+        "why": "PineTS wrong on local values shadowing builtins such as close/high with current/history reads.",
+        "count": 41,
+        "examples": [
+          {
+            "key": "v5 0002",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v5 0008",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[2][0] null != 1"
+          },
+          {
+            "key": "v5 0015",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v5 0016",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v5 0386",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 0.0625 != 0"
+          },
+          {
+            "key": "v5 0387",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 8159.4711958299 != 0"
+          },
+          {
+            "key": "v5 0388",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 0.0011777475 != 0"
+          },
+          {
+            "key": "v5 0390",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 45.6875 != 0.004464285714285615"
+          },
+          {
+            "key": "v5 0391",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 6.807520609199855 != 0"
+          },
+          {
+            "key": "v5 0392",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][17] 92.0158249304 != 0"
+          },
+          {
+            "key": "v5 0395",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] -2.8666916129 != 0"
+          },
+          {
+            "key": "v5 0398",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 1 != 2"
+          },
+          {
+            "key": "v5 0400",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 10234 != 0"
+          },
+          {
+            "key": "v5 0402",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 818.72 != 0"
+          },
+          {
+            "key": "v5 0404",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][5] 2.0733950310921694 != 0"
+          },
+          {
+            "key": "v5 0405",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][12] 3105 != null"
+          },
+          {
+            "key": "v5 0406",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] 639.625 != 0"
+          },
+          {
+            "key": "v5 0409",
+            "cause": "warmup-finite-seed-value",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][1] 20241.9260795368 != 0"
+          },
+          {
+            "key": "v5 0572",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][19] null != 1"
+          },
+          {
+            "key": "v5 0589",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          }
+        ],
+        "allKeys": [
+          "v5 0002",
+          "v5 0008",
+          "v5 0015",
+          "v5 0016",
+          "v5 0386",
+          "v5 0387",
+          "v5 0388",
+          "v5 0390",
+          "v5 0391",
+          "v5 0392",
+          "v5 0395",
+          "v5 0398",
+          "v5 0400",
+          "v5 0402",
+          "v5 0404",
+          "v5 0405",
+          "v5 0406",
+          "v5 0409",
+          "v5 0572",
+          "v5 0589",
+          "v5 0606",
+          "v5 0789",
+          "v6 0001",
+          "v6 0002",
+          "v6 0007",
+          "v6 0008",
+          "v6 0009",
+          "v6 0010",
+          "v6 0011",
+          "v6 0014",
+          "v6 0015",
+          "v6 0018",
+          "v6 0019",
+          "v6 0022",
+          "v6 0051",
+          "v6 0056",
+          "v6 0119",
+          "v6 0133",
+          "v6 0835",
+          "v7 0419",
+          "v7 0420"
+        ]
+      },
+      {
+        "id": "switch-arm-nested-if-block-value",
+        "why": "PineTS wrong on switch arm whose value is a nested if local block.",
+        "count": 7,
+        "examples": [
+          {
+            "key": "v5 0067",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 0"
+          },
+          {
+            "key": "v5 0535",
+            "cause": "tealscript-semantic-series-to-simple-parameter-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot pass series value to simple parameter 'windowLength' for function calculateProfile; use an input/simple value or declare a compatible parameter"
+          },
+          {
+            "key": "v5 0845",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 1"
+          },
+          {
+            "key": "v6 0154",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v6 0271",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v6 0454",
+            "cause": "tealscript-host-request-security-lower-tf-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security_lower_tf requires a request datafeed"
+          },
+          {
+            "key": "v7 0321",
+            "cause": "output-call-count-shape-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot count 36 != 37"
+          }
+        ],
+        "allKeys": [
+          "v5 0067",
+          "v5 0535",
+          "v5 0845",
+          "v6 0154",
+          "v6 0271",
+          "v6 0454",
+          "v7 0321"
+        ]
+      },
+      {
+        "id": "drawing-receiver-method-value",
+        "why": "PineTS wrong on drawing receiver method named-argument value vector.",
+        "count": 253,
+        "examples": [
+          {
+            "key": "v5 0134",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][126] 96.7464766741 != null"
+          },
+          {
+            "key": "v5 0486",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0487",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0492",
+            "cause": "finite-value-mismatch",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[4][43] 100 != 87.98436563983076"
+          },
+          {
+            "key": "v5 0494",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0500",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 101.26"
+          },
+          {
+            "key": "v5 0501",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable microPivotLen. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0504",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[15][39] 1 != null"
+          },
+          {
+            "key": "v5 0512",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 0"
+          },
+          {
+            "key": "v5 0518",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][46] 1 != null"
+          },
+          {
+            "key": "v5 0519",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[7][0] 1 != null"
+          },
+          {
+            "key": "v5 0521",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 101.26"
+          },
+          {
+            "key": "v5 0533",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[5][0] null != 1"
+          },
+          {
+            "key": "v5 0535",
+            "cause": "tealscript-semantic-series-to-simple-parameter-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot pass series value to simple parameter 'windowLength' for function calculateProfile; use an input/simple value or declare a compatible parameter"
+          },
+          {
+            "key": "v5 0538",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][0] null != 101.26"
+          },
+          {
+            "key": "v5 0540",
+            "cause": "tealscript-host-request-security-datafeed",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:execute: request.security requires a request datafeed"
+          },
+          {
+            "key": "v5 0541",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[0][99] 40.622223085 != null"
+          },
+          {
+            "key": "v5 0545",
+            "cause": "tealscript-semantic-float-to-int-assignment-refusal",
+            "provenance": "pinets-sole",
+            "firstDifference": "tealscript failed: tealscript:semantic: Cannot assign float value to int variable cx. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+          },
+          {
+            "key": "v5 0548",
+            "cause": "later-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[1][14] null != 100"
+          },
+          {
+            "key": "v5 0553",
+            "cause": "warmup-na-vs-finite",
+            "provenance": "pinets-sole",
+            "firstDifference": "plot[3][0] null != 0"
+          }
+        ],
+        "allKeys": [
+          "v5 0134",
+          "v5 0486",
+          "v5 0487",
+          "v5 0492",
+          "v5 0494",
+          "v5 0500",
+          "v5 0501",
+          "v5 0504",
+          "v5 0512",
+          "v5 0518",
+          "v5 0519",
+          "v5 0521",
+          "v5 0533",
+          "v5 0535",
+          "v5 0538",
+          "v5 0540",
+          "v5 0541",
+          "v5 0545",
+          "v5 0548",
+          "v5 0553",
+          "v5 0555",
+          "v5 0562",
+          "v5 0566",
+          "v5 0567",
+          "v5 0568",
+          "v5 0569",
+          "v5 0570",
+          "v5 0572",
+          "v5 0573",
+          "v5 0574",
+          "v5 0575",
+          "v5 0576",
+          "v5 0577",
+          "v5 0578",
+          "v5 0579",
+          "v5 0584",
+          "v5 0589",
+          "v5 0590",
+          "v5 0595",
+          "v5 0599",
+          "v5 0605",
+          "v5 0606",
+          "v5 0608",
+          "v5 0609",
+          "v5 0617",
+          "v5 0620",
+          "v5 0621",
+          "v5 0626",
+          "v5 0627",
+          "v5 0727",
+          "v5 0731",
+          "v5 0737",
+          "v5 0767",
+          "v5 0775",
+          "v5 0777",
+          "v5 0789",
+          "v5 0797",
+          "v5 0799",
+          "v5 0832",
+          "v5 0842",
+          "v5 0845",
+          "v5 0856",
+          "v5 0858",
+          "v5 0859",
+          "v5 0860",
+          "v5 0863",
+          "v5 0867",
+          "v5 0868",
+          "v5 0869",
+          "v5 0872",
+          "v5 0873",
+          "v5 0874",
+          "v5 0875",
+          "v5 0877",
+          "v5 0878",
+          "v5 0879",
+          "v5 0884",
+          "v5 0885",
+          "v5 0886",
+          "v5 0887",
+          "v5 0888",
+          "v5 0889",
+          "v5 0890",
+          "v5 0891",
+          "v5 0892",
+          "v5 0896",
+          "v5 0912",
+          "v5 0913",
+          "v5 0914",
+          "v5 0915",
+          "v5 0917",
+          "v5 0918",
+          "v5 0935",
+          "v5 0937",
+          "v5 0938",
+          "v5 0940",
+          "v5 0950",
+          "v5 0952",
+          "v5 0953",
+          "v5 0957",
+          "v5 0958",
+          "v5 0962",
+          "v5 0963",
+          "v5 0964",
+          "v5 0965",
+          "v5 0966",
+          "v5 0967",
+          "v5 0968",
+          "v5 0969",
+          "v5 0970",
+          "v5 0971",
+          "v5 0972",
+          "v5 0973",
+          "v5 0974",
+          "v5 0979",
+          "v5 0984",
+          "v5 0985",
+          "v5 0987",
+          "v5 0996",
+          "v6 0077",
+          "v6 0083",
+          "v6 0090",
+          "v6 0103",
+          "v6 0106",
+          "v6 0130",
+          "v6 0139",
+          "v6 0145",
+          "v6 0149",
+          "v6 0151",
+          "v6 0154",
+          "v6 0159",
+          "v6 0160",
+          "v6 0200",
+          "v6 0203",
+          "v6 0216",
+          "v6 0217",
+          "v6 0225",
+          "v6 0234",
+          "v6 0235",
+          "v6 0236",
+          "v6 0242",
+          "v6 0245",
+          "v6 0246",
+          "v6 0248",
+          "v6 0249",
+          "v6 0266",
+          "v6 0269",
+          "v6 0271",
+          "v6 0274",
+          "v6 0282",
+          "v6 0286",
+          "v6 0289",
+          "v6 0322",
+          "v6 0328",
+          "v6 0337",
+          "v6 0339",
+          "v6 0349",
+          "v6 0350",
+          "v6 0352",
+          "v6 0354",
+          "v6 0359",
+          "v6 0361",
+          "v6 0364",
+          "v6 0366",
+          "v6 0369",
+          "v6 0387",
+          "v6 0388",
+          "v6 0407",
+          "v6 0413",
+          "v6 0425",
+          "v6 0454",
+          "v6 0456",
+          "v6 0477",
+          "v6 0497",
+          "v6 0541",
+          "v6 0548",
+          "v6 0553",
+          "v6 0556",
+          "v6 0558",
+          "v6 0566",
+          "v6 0575",
+          "v6 0594",
+          "v6 0606",
+          "v6 0607",
+          "v6 0619",
+          "v6 0631",
+          "v6 0633",
+          "v6 0638",
+          "v6 0639",
+          "v6 0641",
+          "v6 0643",
+          "v6 0644",
+          "v6 0655",
+          "v6 0662",
+          "v6 0666",
+          "v6 0700",
+          "v6 0727",
+          "v6 0744",
+          "v6 0766",
+          "v6 0775",
+          "v6 0787",
+          "v6 0788",
+          "v6 0818",
+          "v6 0830",
+          "v6 0835",
+          "v6 0850",
+          "v6 0861",
+          "v6 0887",
+          "v6 0893",
+          "v6 0897",
+          "v6 0899",
+          "v6 0940",
+          "v6 0945",
+          "v6 0949",
+          "v6 0953",
+          "v6 0964",
+          "v6 0979",
+          "v7 0039",
+          "v7 0042",
+          "v7 0047",
+          "v7 0053",
+          "v7 0073",
+          "v7 0083",
+          "v7 0087",
+          "v7 0097",
+          "v7 0117",
+          "v7 0118",
+          "v7 0119",
+          "v7 0122",
+          "v7 0310",
+          "v7 0343",
+          "v7 0353",
+          "v7 0367",
+          "v7 0381",
+          "v7 0385",
+          "v7 0388",
+          "v7 0389",
+          "v7 0392",
+          "v7 0397",
+          "v7 0398",
+          "v7 0414",
+          "v7 0418",
+          "v7 0419",
+          "v7 0420",
+          "v7 0422",
+          "v7 0423",
+          "v7 0424",
+          "v7 0425",
+          "v7 0432",
+          "v7 0433",
+          "v7 0436",
+          "v7 0440",
+          "v7-size-recovery 0022"
+        ]
+      }
+    ]
+  }
+}

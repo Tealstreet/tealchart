@@ -1,0 +1,4101 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11T14:12:47.581Z",
+  "measuredCommit": "be88f5dc1c",
+  "basis": {
+    "grammarInventory": "PINE_V6_GRAMMAR_CONSTRUCTS from src/compat/pineV6GrammarReference.ts",
+    "committedGrammarSnippets": 85,
+    "corpusScripts": 2506,
+    "parsedScripts": 2469,
+    "parseFailedScripts": 37,
+    "method": "Each construct row is detected against all v5, v6, v7, and v7 size-recovered pinned sources. AST-backed rows are counted only when the local parser produces an AST; source-backed formatting/import rows also count in parse-failed files. Grammar depth is the number of committed grammar coverage snippets that trigger the same detector.",
+    "caveats": [
+      "This measures language-form exposure, not semantic/value correctness.",
+      "The taxonomy includes manual-inventory rows plus authoring-pattern refinements that the manual snippets collapse together, such as collection receiver calls versus namespace calls.",
+      "Recursive-call detection is syntactic and direct only: it counts a UDF body calling the same name, not mutual recursion or runtime recursion depth.",
+      "Formatting rows are source-pattern detections and can include benign false positives; they are kept separate with basis=source."
+    ]
+  },
+  "headline": {
+    "constructRows": 76,
+    "corpusExercisedConstructRows": 71,
+    "highUseConstructRowsAt100Scripts": 47,
+    "highUseThinGrammarRowsAt100Scripts": 0,
+    "corpusExercisedButNoGrammarSnippetRows": 0,
+    "corpusUnreachedRows": 5,
+    "conclusion": "The heavily used corpus constructs are also backed by multiple grammar snippets; construct depth is healthier than member depth."
+  },
+  "byCategory": {
+    "exercised": {
+      "types": 14,
+      "operators": 11,
+      "variables": 10,
+      "loops": 7,
+      "conditionals": 6,
+      "functions-methods": 5,
+      "formatting": 4,
+      "declarations": 3,
+      "enums": 3,
+      "imports": 3,
+      "tuples": 3,
+      "arrays-matrices-maps": 2
+    },
+    "highUseThin": {},
+    "unbacked": {}
+  },
+  "corpusStats": [
+    {
+      "corpus": "v5",
+      "scripts": 1000,
+      "parsed": 990,
+      "parseFailed": 10
+    },
+    {
+      "corpus": "v6",
+      "scripts": 1000,
+      "parsed": 989,
+      "parseFailed": 11
+    },
+    {
+      "corpus": "v7",
+      "scripts": 456,
+      "parsed": 440,
+      "parseFailed": 16
+    },
+    {
+      "corpus": "v7-size-recovery",
+      "scripts": 50,
+      "parsed": 50,
+      "parseFailed": 0
+    }
+  ],
+  "rows": [
+    {
+      "id": "variables.multi-declaration",
+      "category": "variables",
+      "name": "comma-separated declarations",
+      "basis": "source",
+      "corpusScriptCount": 1903,
+      "corpusHitCount": 45350,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 15751,
+      "sampleGrammarSnippets": [
+        "formatting.call-continuation-nested",
+        "variables.multi-declaration",
+        "variables.multi-declaration-untyped"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.logical",
+      "category": "operators",
+      "name": "logical operator",
+      "basis": "ast",
+      "corpusScriptCount": 1684,
+      "corpusHitCount": 95664,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 8,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 12800,
+      "sampleGrammarSnippets": [
+        "operators.comparison",
+        "operators.logical"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.history-reference",
+      "category": "operators",
+      "name": "history/index operator []",
+      "basis": "ast",
+      "corpusScriptCount": 1428,
+      "corpusHitCount": 23966,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 4,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 6467.5,
+      "sampleGrammarSnippets": [
+        "operators.drawing-receiver-method-call",
+        "operators.history-reference",
+        "operators.history-reference-expression"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0009__mihakralj-pinescript__fcb.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/fcb.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0010__mihakralj-pinescript__jbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/jbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0015__mihakralj-pinescript__regchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/regchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.na-typed-initializer",
+      "category": "types",
+      "name": "typed na initializer",
+      "basis": "ast",
+      "corpusScriptCount": 928,
+      "corpusHitCount": 9831,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 5379.5,
+      "sampleGrammarSnippets": [
+        "types.na-typed-initializer",
+        "types.na-typed-initializer-reference"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0011__mihakralj-pinescript__kchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/kchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0017__mihakralj-pinescript__starchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/starchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "variables.reassignment",
+      "category": "variables",
+      "name": "reassignment operator :=",
+      "basis": "ast",
+      "corpusScriptCount": 1560,
+      "corpusHitCount": 55945,
+      "grammarSnippetCount": 7,
+      "grammarHitCount": 11,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 5308.77,
+      "sampleGrammarSnippets": [
+        "conditionals.else-if",
+        "conditionals.if-statement",
+        "conditionals.once",
+        "objects.field-assignment",
+        "objects.field-assignment-nested",
+        "types.na-typed-initializer-reference",
+        "variables.reassignment"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "variables.var",
+      "category": "variables",
+      "name": "var declaration mode",
+      "basis": "ast",
+      "corpusScriptCount": 1507,
+      "corpusHitCount": 23230,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 6,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 4374,
+      "sampleGrammarSnippets": [
+        "conditionals.once",
+        "operators.drawing-receiver-method-call",
+        "variables.var"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0007__mihakralj-pinescript__dchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/dchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.conditional",
+      "category": "operators",
+      "name": "ternary conditional operator",
+      "basis": "ast",
+      "corpusScriptCount": 1700,
+      "corpusHitCount": 52926,
+      "grammarSnippetCount": 12,
+      "grammarHitCount": 14,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 3922.1,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal-nested",
+        "conditionals.switch-discriminant-parenthesized",
+        "conditionals.switch-expression",
+        "enums.declaration",
+        "formatting.call-continuation-nested",
+        "operators.comparison",
+        "operators.conditional",
+        "operators.logical"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "conditionals.if-statement",
+      "category": "conditionals",
+      "name": "if statement",
+      "basis": "ast",
+      "corpusScriptCount": 1810,
+      "corpusHitCount": 50768,
+      "grammarSnippetCount": 14,
+      "grammarHitCount": 16,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 3302.29,
+      "sampleGrammarSnippets": [
+        "conditionals.else-if",
+        "conditionals.else-if-expression",
+        "conditionals.if-expression",
+        "conditionals.if-statement",
+        "declarations.strategy-risk-options",
+        "functions.block-body-nested-tail",
+        "loops.break",
+        "loops.continue"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "conditionals.else-if",
+      "category": "conditionals",
+      "name": "else-if chain",
+      "basis": "ast",
+      "corpusScriptCount": 620,
+      "corpusHitCount": 5970,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 3295,
+      "sampleGrammarSnippets": [
+        "conditionals.else-if",
+        "conditionals.else-if-expression"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0042__mihakralj-pinescript__phasor.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/cycles/phasor.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0055__mihakralj-pinescript__ghla.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/dynamics/ghla.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0102__mihakralj-pinescript__cfitz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/filters/cfitz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0123__mihakralj-pinescript__sak.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/filters/sak.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "arrays.array-literal",
+      "category": "arrays-matrices-maps",
+      "name": "array literal expression",
+      "basis": "ast",
+      "corpusScriptCount": 885,
+      "corpusHitCount": 4896,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2890.5,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.member-access",
+      "category": "operators",
+      "name": "member access operator",
+      "basis": "ast",
+      "corpusScriptCount": 2442,
+      "corpusHitCount": 325629,
+      "grammarSnippetCount": 37,
+      "grammarHitCount": 117,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2849.15,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested",
+        "arrays.generic-new-call",
+        "declarations.strategy",
+        "declarations.strategy-risk-options",
+        "enums.declaration",
+        "enums.exported",
+        "formatting.call-continuation-nested"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.comparison",
+      "category": "operators",
+      "name": "comparison operator",
+      "basis": "ast",
+      "corpusScriptCount": 2052,
+      "corpusHitCount": 97319,
+      "grammarSnippetCount": 25,
+      "grammarHitCount": 37,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2712.32,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal-nested",
+        "conditionals.else-if",
+        "conditionals.else-if-expression",
+        "conditionals.if-expression",
+        "conditionals.if-statement",
+        "conditionals.switch-condition-form",
+        "conditionals.switch-discriminant-parenthesized",
+        "conditionals.switch-expression"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "functions.block-body",
+      "category": "functions-methods",
+      "name": "function with block body",
+      "basis": "ast",
+      "corpusScriptCount": 1427,
+      "corpusHitCount": 8520,
+      "grammarSnippetCount": 4,
+      "grammarHitCount": 4,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2486.75,
+      "sampleGrammarSnippets": [
+        "formatting.doc-annotations-function-extra",
+        "functions.block-body",
+        "functions.block-body-default-parameter",
+        "functions.block-body-nested-tail"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "objects.field-assignment",
+      "category": "types",
+      "name": "UDT field assignment",
+      "basis": "ast",
+      "corpusScriptCount": 161,
+      "corpusHitCount": 7044,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2428.5,
+      "sampleGrammarSnippets": [
+        "objects.field-assignment",
+        "objects.field-assignment-nested"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0491__casoon-pine-scripts__pattern_recognition.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/pattern_recognition/pattern_recognition.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0494__casoon-pine-scripts__smart_money_dashboard.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/smart_money_dashboard/smart_money_dashboard.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "operators.arithmetic",
+      "category": "operators",
+      "name": "arithmetic binary operator",
+      "basis": "ast",
+      "corpusScriptCount": 2020,
+      "corpusHitCount": 122416,
+      "grammarSnippetCount": 29,
+      "grammarHitCount": 55,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2295.4,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal-nested",
+        "declarations.library-export-function",
+        "formatting.doc-annotations",
+        "formatting.doc-annotations-function-extra",
+        "formatting.expression-continuation",
+        "formatting.expression-continuation-nested",
+        "functions.block-body",
+        "functions.block-body-default-parameter"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "variables.untyped-declaration",
+      "category": "variables",
+      "name": "untyped variable declaration",
+      "basis": "ast",
+      "corpusScriptCount": 2288,
+      "corpusHitCount": 110706,
+      "grammarSnippetCount": 44,
+      "grammarHitCount": 54,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2102.11,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested",
+        "arrays.generic-new-call",
+        "conditionals.else-if",
+        "conditionals.else-if-expression",
+        "conditionals.if-expression",
+        "conditionals.if-statement",
+        "conditionals.once"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.collection-namespace-call",
+      "category": "operators",
+      "name": "array/map/matrix namespace call",
+      "basis": "ast",
+      "corpusScriptCount": 931,
+      "corpusHitCount": 37862,
+      "grammarSnippetCount": 13,
+      "grammarHitCount": 19,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 2064.35,
+      "sampleGrammarSnippets": [
+        "arrays.generic-new-call",
+        "formatting.method-chain-continuation",
+        "loops.for-in-index-value",
+        "loops.for-in-value",
+        "loops.for-in-value-break",
+        "operators.method-call",
+        "types.array-shorthand",
+        "types.array-template"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0007__mihakralj-pinescript__dchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/dchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "formatting.call-continuation",
+      "category": "formatting",
+      "name": "multi-line call continuation",
+      "basis": "source",
+      "corpusScriptCount": 276,
+      "corpusHitCount": 3041,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1658.5,
+      "sampleGrammarSnippets": [
+        "formatting.call-continuation",
+        "formatting.call-continuation-nested"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0156__mihakralj-pinescript__betadist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/betadist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0157__mihakralj-pinescript__binomdist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/binomdist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0164__mihakralj-pinescript__fdist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/fdist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0166__mihakralj-pinescript__gammadist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/gammadist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0185__mihakralj-pinescript__poissondist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/poissondist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.primitive-annotation",
+      "category": "types",
+      "name": "primitive type annotation",
+      "basis": "ast",
+      "corpusScriptCount": 1606,
+      "corpusHitCount": 71592,
+      "grammarSnippetCount": 24,
+      "grammarHitCount": 46,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1623.26,
+      "sampleGrammarSnippets": [
+        "declarations.library-export-function",
+        "formatting.doc-annotations",
+        "formatting.doc-annotations-function-extra",
+        "functions.block-body",
+        "functions.block-body-default-parameter",
+        "functions.block-body-nested-tail",
+        "functions.exported",
+        "functions.expression-body"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "variables.typed-declaration",
+      "category": "variables",
+      "name": "typed variable declaration",
+      "basis": "ast",
+      "corpusScriptCount": 1618,
+      "corpusHitCount": 64666,
+      "grammarSnippetCount": 23,
+      "grammarHitCount": 45,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1507.37,
+      "sampleGrammarSnippets": [
+        "enums.declaration",
+        "formatting.doc-annotations",
+        "formatting.doc-annotations-function-extra",
+        "objects.field-assignment",
+        "objects.field-assignment-nested",
+        "objects.udt-field-defaults",
+        "operators.drawing-receiver-method-call",
+        "types.array-shorthand"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "loops.for-to",
+      "category": "loops",
+      "name": "numeric for loop",
+      "basis": "ast",
+      "corpusScriptCount": 624,
+      "corpusHitCount": 3670,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1431.33,
+      "sampleGrammarSnippets": [
+        "loops.break",
+        "loops.continue",
+        "loops.for-to"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0015__mihakralj-pinescript__regchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/regchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0016__mihakralj-pinescript__sdchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/sdchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0019__mihakralj-pinescript__ubands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/ubands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "arrays.generic-new-call",
+      "category": "arrays-matrices-maps",
+      "name": "generic collection constructor call",
+      "basis": "source",
+      "corpusScriptCount": 368,
+      "corpusHitCount": 3520,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1296,
+      "sampleGrammarSnippets": [
+        "arrays.generic-new-call",
+        "types.map-template",
+        "types.matrix-template"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0270__mihakralj-pinescript__mode.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/statistics/mode.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0353__mihakralj-pinescript__zldema.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/trends_IIR/zldema.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0354__mihakralj-pinescript__zlema.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/trends_IIR/zlema.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0355__mihakralj-pinescript__zltema.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/trends_IIR/zltema.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "tuples.declaration",
+      "category": "tuples",
+      "name": "tuple declaration",
+      "basis": "ast",
+      "corpusScriptCount": 650,
+      "corpusHitCount": 2711,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1120.33,
+      "sampleGrammarSnippets": [
+        "tuples.declaration",
+        "tuples.discard-underscore",
+        "tuples.reassignment"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.array-shorthand",
+      "category": "types",
+      "name": "T[] array shorthand annotation",
+      "basis": "ast",
+      "corpusScriptCount": 558,
+      "corpusHitCount": 4834,
+      "grammarSnippetCount": 5,
+      "grammarHitCount": 5,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1078.4,
+      "sampleGrammarSnippets": [
+        "types.array-shorthand",
+        "types.array-template",
+        "types.object-provider-annotations",
+        "types.qualifier-annotations-references",
+        "types.udt-collection-field"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0007__mihakralj-pinescript__dchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/dchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "formatting.inline-comment",
+      "category": "formatting",
+      "name": "line comment",
+      "basis": "source",
+      "corpusScriptCount": 2506,
+      "corpusHitCount": 104937,
+      "grammarSnippetCount": 85,
+      "grammarHitCount": 102,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1058.28,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested",
+        "arrays.generic-new-call",
+        "conditionals.else-if",
+        "conditionals.else-if-expression",
+        "conditionals.if-expression",
+        "conditionals.if-statement",
+        "conditionals.once"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.array-template",
+      "category": "types",
+      "name": "array<T> type annotation",
+      "basis": "source",
+      "corpusScriptCount": 390,
+      "corpusHitCount": 3457,
+      "grammarSnippetCount": 4,
+      "grammarHitCount": 4,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 961.75,
+      "sampleGrammarSnippets": [
+        "types.array-template",
+        "types.object-provider-annotations",
+        "types.qualifier-annotations-references",
+        "types.udt-collection-field"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0017__mihakralj-pinescript__starchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/starchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "operators.collection-receiver-method-call",
+      "category": "operators",
+      "name": "collection receiver method call",
+      "basis": "ast",
+      "corpusScriptCount": 365,
+      "corpusHitCount": 15768,
+      "grammarSnippetCount": 13,
+      "grammarHitCount": 19,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 857.97,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested",
+        "arrays.generic-new-call",
+        "formatting.method-chain-continuation",
+        "objects.exported-udt",
+        "objects.field-assignment",
+        "objects.field-assignment-nested",
+        "objects.udt-field-defaults"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0491__casoon-pine-scripts__pattern_recognition.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/pattern_recognition/pattern_recognition.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0494__casoon-pine-scripts__smart_money_dashboard.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/smart_money_dashboard/smart_money_dashboard.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "operators.receiver-method-call",
+      "category": "operators",
+      "name": "receiver method call syntax",
+      "basis": "ast",
+      "corpusScriptCount": 969,
+      "corpusHitCount": 24935,
+      "grammarSnippetCount": 18,
+      "grammarHitCount": 33,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 809.44,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested",
+        "arrays.generic-new-call",
+        "formatting.method-chain-continuation",
+        "imports.explicit-alias-call",
+        "methods.declaration",
+        "methods.overload",
+        "objects.exported-udt"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "conditionals.switch-discriminant",
+      "category": "conditionals",
+      "name": "switch with discriminant",
+      "basis": "ast",
+      "corpusScriptCount": 351,
+      "corpusHitCount": 991,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 671,
+      "sampleGrammarSnippets": [
+        "conditionals.switch-discriminant-parenthesized",
+        "conditionals.switch-expression"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0021__mihakralj-pinescript__vwapbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/vwapbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0022__mihakralj-pinescript__vwapsd.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/vwapsd.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0105__mihakralj-pinescript__edcf.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/filters/edcf.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0401__mihakralj-pinescript__twap.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/volume/twap.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "declarations.strategy",
+      "category": "declarations",
+      "name": "strategy declaration",
+      "basis": "ast",
+      "corpusScriptCount": 570,
+      "corpusHitCount": 578,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 574,
+      "sampleGrammarSnippets": [
+        "declarations.strategy",
+        "declarations.strategy-risk-options"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/strategies/wavetrend/wavetrend_base_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0497__casoon-pine-scripts__wavetrend_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/strategies/wavetrend/wavetrend_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/strategies/wavetrend/wavetrend_v3_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/chandelier_flip_radar/chandelier_flip_radar_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/market_average_relationship_engine/market_average_relationship_engine_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "types.qualifier-annotation",
+      "category": "types",
+      "name": "const/input/simple/series qualifier",
+      "basis": "ast",
+      "corpusScriptCount": 662,
+      "corpusHitCount": 3876,
+      "grammarSnippetCount": 5,
+      "grammarHitCount": 9,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 563.07,
+      "sampleGrammarSnippets": [
+        "functions.block-body-default-parameter",
+        "functions.block-body-nested-tail",
+        "operators.history-reference-expression",
+        "types.qualifier-annotations",
+        "types.qualifier-annotations-references"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "variables.assignment-plus",
+      "category": "variables",
+      "name": "compound assignment +=",
+      "basis": "ast",
+      "corpusScriptCount": 705,
+      "corpusHitCount": 6334,
+      "grammarSnippetCount": 11,
+      "grammarHitCount": 13,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 551.32,
+      "sampleGrammarSnippets": [
+        "loops.break",
+        "loops.continue",
+        "loops.for-in-index-value",
+        "loops.for-in-value",
+        "loops.for-in-value-break",
+        "loops.for-to",
+        "loops.for-to-by",
+        "loops.while"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0017__mihakralj-pinescript__starchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/starchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.udt-collection-field",
+      "category": "types",
+      "name": "UDT field containing array/matrix/map",
+      "basis": "ast",
+      "corpusScriptCount": 78,
+      "corpusHitCount": 443,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 521,
+      "sampleGrammarSnippets": [
+        "types.udt-collection-field"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/broadening_wedge_scanner_pro/broadening_wedge_scanner_pro.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0525__casoon-pine-scripts__triangle_compression_scanner_pro.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/triangle_compression_scanner_pro/triangle_compression_scanner_pro.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "operators.drawing-receiver-method-call",
+      "category": "operators",
+      "name": "drawing receiver method call",
+      "basis": "ast",
+      "corpusScriptCount": 121,
+      "corpusHitCount": 2596,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 6,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 473,
+      "sampleGrammarSnippets": [
+        "operators.drawing-receiver-method-call",
+        "types.na-typed-initializer-reference",
+        "types.qualifier-annotations-references"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0533__casoon-pine-scripts__midas_curves.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/mean_reversion/midas_curves/midas_curves.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/momentum/mtf_wavetrend_opportunity_hunter/mtf_wavetrend_opportunity_hunter.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/momentum/oscillator_divergence_zones/oscillator_divergence_zones.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "formatting.doc-annotations",
+      "category": "formatting",
+      "name": "Pine doc annotation comments",
+      "basis": "source",
+      "corpusScriptCount": 510,
+      "corpusHitCount": 2668,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 15,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 432.87,
+      "sampleGrammarSnippets": [
+        "formatting.doc-annotations",
+        "formatting.doc-annotations-function-extra"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "variables.assignment-minus",
+      "category": "variables",
+      "name": "compound assignment -=",
+      "basis": "ast",
+      "corpusScriptCount": 193,
+      "corpusHitCount": 561,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 377,
+      "sampleGrammarSnippets": [
+        "variables.assignment-minus-block",
+        "variables.compound-assignments"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0006__mihakralj-pinescript__bbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/bbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0017__mihakralj-pinescript__starchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/starchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.udt-annotation",
+      "category": "types",
+      "name": "UDT type annotation",
+      "basis": "ast",
+      "corpusScriptCount": 671,
+      "corpusHitCount": 6837,
+      "grammarSnippetCount": 10,
+      "grammarHitCount": 23,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 364.36,
+      "sampleGrammarSnippets": [
+        "enums.declaration",
+        "objects.field-assignment",
+        "objects.field-assignment-nested",
+        "objects.udt-field-defaults",
+        "operators.drawing-receiver-method-call",
+        "types.na-typed-initializer-reference",
+        "types.nested-udt-field",
+        "types.object-provider-annotations"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0452__everget-tradingview-pinescript-indicators__chart_type_identifier.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "research/chart_type_identifier.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0454__everget-tradingview-pinescript-indicators__heikin_ashi_chart_identifier.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "research/heikin_ashi_chart_identifier.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0455__everget-tradingview-pinescript-indicators__kagi_chart_identifier.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "research/kagi_chart_identifier.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "research/litecoin_halving_utc_countdown.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        }
+      ]
+    },
+    {
+      "id": "formatting.expression-continuation",
+      "category": "formatting",
+      "name": "multi-line expression continuation",
+      "basis": "source",
+      "corpusScriptCount": 127,
+      "corpusHitCount": 1201,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 4,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 363.75,
+      "sampleGrammarSnippets": [
+        "formatting.expression-continuation",
+        "formatting.expression-continuation-nested"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0041__mihakralj-pinescript__lunar.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/cycles/lunar.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0044__mihakralj-pinescript__solar.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/cycles/solar.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0193__mihakralj-pinescript__tdist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/tdist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0308__mihakralj-pinescript__qrma.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/trends_FIR/qrma.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0420__everget-tradingview-pinescript-indicators__butterworth_filter.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "movings/butterworth_filter.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        }
+      ]
+    },
+    {
+      "id": "loops.while",
+      "category": "loops",
+      "name": "while loop",
+      "basis": "ast",
+      "corpusScriptCount": 144,
+      "corpusHitCount": 530,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 337,
+      "sampleGrammarSnippets": [
+        "loops.while",
+        "loops.while-break"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0007__mihakralj-pinescript__dchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/dchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0009__mihakralj-pinescript__fcb.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/fcb.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0013__mihakralj-pinescript__mmchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/mmchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0014__mihakralj-pinescript__pchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/pchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0165__mihakralj-pinescript__fft.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/fft.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "functions.default-parameter",
+      "category": "functions-methods",
+      "name": "function parameter default",
+      "basis": "ast",
+      "corpusScriptCount": 193,
+      "corpusHitCount": 474,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 333.5,
+      "sampleGrammarSnippets": [
+        "functions.block-body-default-parameter",
+        "functions.expression-body"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0008__mihakralj-pinescript__decaychannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/decaychannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0012__mihakralj-pinescript__maenv.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/maenv.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0015__mihakralj-pinescript__regchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/regchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0016__mihakralj-pinescript__sdchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/sdchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "types.matrix-template",
+      "category": "types",
+      "name": "matrix<T> type annotation",
+      "basis": "source",
+      "corpusScriptCount": 32,
+      "corpusHitCount": 275,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 307,
+      "sampleGrammarSnippets": [
+        "types.matrix-template"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0160__heyphat-piner__regression-trend.pine",
+          "sourceRepoUrl": "https://github.com/heyphat/piner",
+          "sourceFilePath": "test/pinescripts/regression-trend.pine",
+          "commitSha": "db6514474da2940f532655f36dfc20d118bf36b3"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine",
+          "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+          "sourceFilePath": "tests/fixtures/sema/supported_matrix_new_string.pine",
+          "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0423__regalouisei-collect-tradingview__monte-carlo-polyline-traceback-kioseff-trading.pine",
+          "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+          "sourceFilePath": "pinescript/editors_picks/monte-carlo-polyline-traceback-kioseff-trading.pine",
+          "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0453__deepentropy-lightweight-charts-indicators__R_R-Trading-System-Framework.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/R_R Trading System Framework.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        }
+      ]
+    },
+    {
+      "id": "variables.assignment-multiply",
+      "category": "variables",
+      "name": "compound assignment *=",
+      "basis": "ast",
+      "corpusScriptCount": 90,
+      "corpusHitCount": 175,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 265,
+      "sampleGrammarSnippets": [
+        "variables.compound-assignments"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0033__mihakralj-pinescript__dsp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/cycles/dsp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0034__mihakralj-pinescript__eacp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/cycles/eacp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0036__mihakralj-pinescript__homod.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/cycles/homod.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0047__mihakralj-pinescript__adxr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/dynamics/adxr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "conditionals.switch-condition-form",
+      "category": "conditionals",
+      "name": "switch without discriminant",
+      "basis": "ast",
+      "corpusScriptCount": 65,
+      "corpusHitCount": 184,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 249,
+      "sampleGrammarSnippets": [
+        "conditionals.switch-condition-form"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0528__casoon-pine-scripts__wyckoff_schematics.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/wyckoff_schematics/wyckoff_schematics.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Multi-Time Period Charts.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0777__hasnocool-tradingview-pine-scripts__Ranged-Volume-DCA-Strategy---R3c0nTrader.pine",
+          "sourceRepoUrl": "https://github.com/hasnocool/tradingview-pine-scripts",
+          "sourceFilePath": "Ranged Volume DCA Strategy - R3c0nTrader.pine",
+          "commitSha": "e031cab2819a7d56fb8bb9d000252f51439986e2"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0819__helenananaa-pine-compat-runtime__dynamic_history_series_max_bars_back_for_in_result_miss.pine",
+          "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+          "sourceFilePath": "tests/fixtures/profile/dynamic_history_series_max_bars_back_for_in_result_miss.pine",
+          "commitSha": "02afc1cb9005e2ae55a9862faaf41524895cbb34"
+        }
+      ]
+    },
+    {
+      "id": "loops.break",
+      "category": "loops",
+      "name": "break statement",
+      "basis": "ast",
+      "corpusScriptCount": 186,
+      "corpusHitCount": 558,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 248,
+      "sampleGrammarSnippets": [
+        "loops.break",
+        "loops.for-in-value-break",
+        "loops.while-break"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0009__mihakralj-pinescript__fcb.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/fcb.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0014__mihakralj-pinescript__pchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/pchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0102__mihakralj-pinescript__cfitz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/filters/cfitz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0156__mihakralj-pinescript__betadist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/betadist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0164__mihakralj-pinescript__fdist.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/fdist.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "loops.for-to-by",
+      "category": "loops",
+      "name": "numeric for loop with by step",
+      "basis": "ast",
+      "corpusScriptCount": 59,
+      "corpusHitCount": 175,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 234,
+      "sampleGrammarSnippets": [
+        "loops.for-to-by"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0165__mihakralj-pinescript__fft.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/fft.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0435__everget-tradingview-pinescript-indicators__quick_moving_average.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "movings/quick_moving_average.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0531__casoon-pine-scripts__zigzag_patterns_framework.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/zigzag_patterns_framework/zigzag_patterns_framework.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0743__deepentropy-lightweight-charts-indicators__Support-Resistance-Channels.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/Support Resistance Channels.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine",
+          "sourceRepoUrl": "https://github.com/Opus-Aether-AI/pine-transpiler",
+          "sourceFilePath": "tests/corpus/community/arunkbhaskar/scanner_momentum_setup_-_rsi_directional_momentum.pine",
+          "commitSha": "6506237f3a34c8082851e8f8d7da69062f0f4f3b"
+        }
+      ]
+    },
+    {
+      "id": "types.map-template",
+      "category": "types",
+      "name": "map<K,V> type annotation",
+      "basis": "source",
+      "corpusScriptCount": 31,
+      "corpusHitCount": 176,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 207,
+      "sampleGrammarSnippets": [
+        "types.map-template"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0593__casoon-pine-scripts__regime_detector.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/trend_strength/regime_detector/regime_detector.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0603__casoon-pine-scripts__RTAMonitoring.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAMonitoring.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine",
+          "sourceRepoUrl": "https://github.com/owenguobadia24s-collab/ovc-replay",
+          "sourceFilePath": "docs/programmes/lsiac-v0-1/mcac-v0-1/source-census/recovered/google-drive/OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine",
+          "commitSha": "3ba03bd9383b46edebfba28ebca1bff1e6c2ef8f"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0147__abhinaynatraj-TradingHub__quarter_theory_stats.pine",
+          "sourceRepoUrl": "https://github.com/abhinaynatraj/TradingHub",
+          "sourceFilePath": "Analysis/pine/quarter_theory_stats.pine",
+          "commitSha": "901c662d0b374ef2fde0a138a46e27b394b6c9b0"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0164__helenananaa-pine-compat-runtime__map_typed_declarations.pine",
+          "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+          "sourceFilePath": "tests/fixtures/runtime/map_typed_declarations.pine",
+          "commitSha": "0e4f409acbab5dad943d622b1c2d68324a5daf46"
+        }
+      ]
+    },
+    {
+      "id": "loops.for-in-value",
+      "category": "loops",
+      "name": "for...in value loop",
+      "basis": "ast",
+      "corpusScriptCount": 105,
+      "corpusHitCount": 306,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 205.5,
+      "sampleGrammarSnippets": [
+        "loops.for-in-value",
+        "loops.for-in-value-break"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0270__mihakralj-pinescript__mode.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/statistics/mode.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0494__casoon-pine-scripts__smart_money_dashboard.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/smart_money_dashboard/smart_money_dashboard.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0502__casoon-pine-scripts__auto_trendlines.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/auto_trendlines/auto_trendlines.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0506__casoon-pine-scripts__edge_atlas.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/edge_atlas/edge_atlas.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0509__casoon-pine-scripts__liquidity_hunter.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/liquidity_hunter/liquidity_hunter.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "methods.declaration",
+      "category": "functions-methods",
+      "name": "method declaration",
+      "basis": "ast",
+      "corpusScriptCount": 104,
+      "corpusHitCount": 502,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 202,
+      "sampleGrammarSnippets": [
+        "methods.declaration",
+        "methods.exported",
+        "methods.overload"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Multi-Time Period Charts.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0760__supertonka-tradingview-ict-indicator__orderblock_indicator.pine",
+          "sourceRepoUrl": "https://github.com/supertonka/tradingview-ict-indicator",
+          "sourceFilePath": "orderblock_indicator.pine",
+          "commitSha": "a65385012d39d44e53e0c27ee2f7f02aa2802a34"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0780__deepentropy-lightweight-charts-indicators__Custom-Pattern-Detection.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/Custom Pattern Detection.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        }
+      ]
+    },
+    {
+      "id": "tuples.discard-underscore",
+      "category": "tuples",
+      "name": "tuple underscore discard",
+      "basis": "ast",
+      "corpusScriptCount": 74,
+      "corpusHitCount": 256,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 2,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 202,
+      "sampleGrammarSnippets": [
+        "tuples.discard-underscore"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/mean_reversion/oscillator_cycle_statistics/oscillator_cycle_statistics.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/mean_reversion/vwap_cross_visuals/vwap_cross_visuals.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/momentum/mtf_wavetrend_opportunity_hunter/mtf_wavetrend_opportunity_hunter.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "variables.varip",
+      "category": "variables",
+      "name": "varip declaration mode",
+      "basis": "ast",
+      "corpusScriptCount": 28,
+      "corpusHitCount": 168,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 196,
+      "sampleGrammarSnippets": [
+        "variables.varip"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine",
+          "sourceRepoUrl": "https://github.com/f13end/tradingview-custom-indicators",
+          "sourceFilePath": "indicators/Range Volume Change.pine",
+          "commitSha": "be0ba0d612cb7cdcb2b458093a13e70d4fdf6f3b"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine",
+          "sourceRepoUrl": "https://github.com/f13end/tradingview-custom-indicators",
+          "sourceFilePath": "indicators/Range Volume Change/Range Volume Change.pine",
+          "commitSha": "be0ba0d612cb7cdcb2b458093a13e70d4fdf6f3b"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/strategies/wavetrend/wavetrend_base_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/vein_reversal_labeler/vein_reversal_labeler_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/wavetrend/wavetrend_v4_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "imports.explicit-alias",
+      "category": "imports",
+      "name": "import with explicit alias",
+      "basis": "source",
+      "corpusScriptCount": 118,
+      "corpusHitCount": 216,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 167,
+      "sampleGrammarSnippets": [
+        "imports.explicit-alias",
+        "imports.explicit-alias-call"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/mtf_trend_alignment/mtf_trend_alignment.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Performance.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/SuperTrend + Relative Volume (Kernel Optimized).pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0768__TraderOracle-TradingView__Total-Recall.pine",
+          "sourceRepoUrl": "https://github.com/TraderOracle/TradingView",
+          "sourceFilePath": "Total Recall.pine",
+          "commitSha": "08b33c19614e00361b6a2fa775f6d0038a205726"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0771__msongkiet-TDV_share__ZigZag_EMA.pine",
+          "sourceRepoUrl": "https://github.com/msongkiet/TDV_share",
+          "sourceFilePath": "ZigZag_EMA.pine",
+          "commitSha": "7eac7fabc4fc75ef13ca2d81036504032eb460ea"
+        }
+      ]
+    },
+    {
+      "id": "loops.continue",
+      "category": "loops",
+      "name": "continue statement",
+      "basis": "ast",
+      "corpusScriptCount": 38,
+      "corpusHitCount": 117,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 155,
+      "sampleGrammarSnippets": [
+        "loops.continue"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0180__mihakralj-pinescript__normalize.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/normalize.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0262__mihakralj-pinescript__hurst.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/statistics/hurst.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0502__casoon-pine-scripts__auto_trendlines.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/auto_trendlines/auto_trendlines.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0583__casoon-pine-scripts__vein_structure_zones.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/trend_direction/vein/vein_structure_zones.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "types.nested-udt-field",
+      "category": "types",
+      "name": "UDT field typed as another UDT",
+      "basis": "ast",
+      "corpusScriptCount": 37,
+      "corpusHitCount": 116,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 153,
+      "sampleGrammarSnippets": [
+        "types.nested-udt-field"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/broadening_wedge_scanner_pro/broadening_wedge_scanner_pro.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0525__casoon-pine-scripts__triangle_compression_scanner_pro.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/triangle_compression_scanner_pro/triangle_compression_scanner_pro.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0527__casoon-pine-scripts__wolfe_wave_scanner_pro.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/wolfe_wave_scanner_pro/wolfe_wave_scanner_pro.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0528__casoon-pine-scripts__wyckoff_schematics.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/wyckoff_schematics/wyckoff_schematics.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "objects.field-default",
+      "category": "types",
+      "name": "UDT field default",
+      "basis": "ast",
+      "corpusScriptCount": 73,
+      "corpusHitCount": 755,
+      "grammarSnippetCount": 5,
+      "grammarHitCount": 6,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 140.43,
+      "sampleGrammarSnippets": [
+        "formatting.doc-annotations",
+        "objects.exported-udt",
+        "objects.field-assignment",
+        "objects.field-assignment-nested",
+        "objects.udt-field-defaults"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0569__casoon-pine-scripts__chandelier_flip_radar.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/trend_direction/chandelier_flip_radar/chandelier_flip_radar.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0574__casoon-pine-scripts__smooth_trend_radar.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/trend_direction/smooth_trend_radar/smooth_trend_radar.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/chandelier_flip_radar/chandelier_flip_radar_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/smooth_trend_radar/smooth_trend_radar_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "objects.udt-declaration",
+      "category": "types",
+      "name": "UDT declaration",
+      "basis": "ast",
+      "corpusScriptCount": 222,
+      "corpusHitCount": 848,
+      "grammarSnippetCount": 7,
+      "grammarHitCount": 8,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 137.71,
+      "sampleGrammarSnippets": [
+        "formatting.doc-annotations",
+        "objects.exported-udt",
+        "objects.field-assignment",
+        "objects.field-assignment-nested",
+        "objects.udt-field-defaults",
+        "types.nested-udt-field",
+        "types.udt-collection-field"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0134__mihakralj-pinescript__mlp.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/forecasts/mlp.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0491__casoon-pine-scripts__pattern_recognition.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/pattern_recognition/pattern_recognition.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0494__casoon-pine-scripts__smart_money_dashboard.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/smart_money_dashboard/smart_money_dashboard.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0495__casoon-pine-scripts__wave_navigator.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/wave_navigator/wave_navigator.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "loops.for-in-index-value",
+      "category": "loops",
+      "name": "for...in index/value loop",
+      "basis": "ast",
+      "corpusScriptCount": 39,
+      "corpusHitCount": 87,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 126,
+      "sampleGrammarSnippets": [
+        "loops.for-in-index-value"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Performance.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0728__gorx1-TradingView__Quantile-BasedAdaptiveDetection.pine",
+          "sourceRepoUrl": "https://github.com/gorx1/TradingView",
+          "sourceFilePath": "Quantile-BasedAdaptiveDetection.pine",
+          "commitSha": "a6c559c3dd3f7730813b0716dfe1b50247057b6a"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0767__TraderOracle-TradingView__Tidal-Wave.pine",
+          "sourceRepoUrl": "https://github.com/TraderOracle/TradingView",
+          "sourceFilePath": "Tidal Wave.pine",
+          "commitSha": "08b33c19614e00361b6a2fa775f6d0038a205726"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine",
+          "sourceRepoUrl": "https://github.com/iamc1oud/Tradingview-Scripts",
+          "sourceFilePath": "2025-Setup/Smart Money Concept with Liquidity Swings.pine",
+          "commitSha": "b6563531a333bcfa8b52e497caed79be511c554d"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0954__anil-sn-EliteTrading__Smart-Money-Concepts.pine",
+          "sourceRepoUrl": "https://github.com/anil-sn/EliteTrading",
+          "sourceFilePath": "pinecode/Referance/Smart-Money-Concepts.pine",
+          "commitSha": "e588a89bd155117acb345268caac5ad693e64267"
+        }
+      ]
+    },
+    {
+      "id": "imports.declaration",
+      "category": "imports",
+      "name": "import declaration",
+      "basis": "ast",
+      "corpusScriptCount": 124,
+      "corpusHitCount": 233,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 119,
+      "sampleGrammarSnippets": [
+        "imports.explicit-alias",
+        "imports.explicit-alias-call",
+        "imports.implicit-alias"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/mtf_trend_alignment/mtf_trend_alignment.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Performance.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/SuperTrend + Relative Volume (Kernel Optimized).pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0768__TraderOracle-TradingView__Total-Recall.pine",
+          "sourceRepoUrl": "https://github.com/TraderOracle/TradingView",
+          "sourceFilePath": "Total Recall.pine",
+          "commitSha": "08b33c19614e00361b6a2fa775f6d0038a205726"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0771__msongkiet-TDV_share__ZigZag_EMA.pine",
+          "sourceRepoUrl": "https://github.com/msongkiet/TDV_share",
+          "sourceFilePath": "ZigZag_EMA.pine",
+          "commitSha": "7eac7fabc4fc75ef13ca2d81036504032eb460ea"
+        }
+      ]
+    },
+    {
+      "id": "conditionals.if-expression",
+      "category": "conditionals",
+      "name": "if expression initializer/RHS",
+      "basis": "source",
+      "corpusScriptCount": 64,
+      "corpusHitCount": 150,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 107,
+      "sampleGrammarSnippets": [
+        "conditionals.else-if-expression",
+        "conditionals.if-expression"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0541__casoon-pine-scripts__market_pressure_scale.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/momentum/market_pressure_scale/market_pressure_scale.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0547__casoon-pine-scripts__oscillator_topology.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/momentum/oscillator_topology/oscillator_topology.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0564__casoon-pine-scripts__money_flow_delta_profile.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/money_flow/money_flow_delta_profile/money_flow_delta_profile.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/trend_direction/market_average_relationship_engine/market_average_relationship_engine.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "strategies/market_average_relationship_engine/market_average_relationship_engine_strategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "functions.expression-body",
+      "category": "functions-methods",
+      "name": "function with expression body",
+      "basis": "ast",
+      "corpusScriptCount": 207,
+      "corpusHitCount": 777,
+      "grammarSnippetCount": 10,
+      "grammarHitCount": 12,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 85.45,
+      "sampleGrammarSnippets": [
+        "declarations.library-export-function",
+        "enums.exported",
+        "formatting.doc-annotations",
+        "functions.exported",
+        "functions.expression-body",
+        "methods.declaration",
+        "methods.exported",
+        "methods.overload"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine",
+          "sourceRepoUrl": "https://github.com/everget/tradingview-pinescript-indicators",
+          "sourceFilePath": "volume/volume_accumulation.pine",
+          "commitSha": "60c93d3711d222b8f2db96160defe568429348e0"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/candle_pressure_response_jma/candle_pressure_response_jma.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0489__casoon-pine-scripts__flow_bias.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/flow_bias/flow_bias.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/relative_leg_efficiency_panel_chart/relative_leg_efficiency_panel_chart.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/composite/trade_permission_engine/trade_permission_engine_v1.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        }
+      ]
+    },
+    {
+      "id": "functions.exported",
+      "category": "functions-methods",
+      "name": "exported function/method",
+      "basis": "ast",
+      "corpusScriptCount": 28,
+      "corpusHitCount": 481,
+      "grammarSnippetCount": 7,
+      "grammarHitCount": 8,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 64.13,
+      "sampleGrammarSnippets": [
+        "declarations.library-export-function",
+        "enums.exported",
+        "formatting.doc-annotations",
+        "formatting.doc-annotations-function-extra",
+        "functions.exported",
+        "methods.exported",
+        "objects.exported-udt"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0602__casoon-pine-scripts__RTALiquidity.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTALiquidity.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0603__casoon-pine-scripts__RTAMonitoring.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAMonitoring.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0604__casoon-pine-scripts__RTAStrategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAStrategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0678__kevanoullio-tradingview-pine-scripts__double_triple_ema.pine",
+          "sourceRepoUrl": "https://github.com/kevanoullio/tradingview-pine-scripts",
+          "sourceFilePath": "libraries/double_triple_ema.pine",
+          "commitSha": "1c9d49e7f157221e9335c0a1e9cd12e3eed41b30"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0679__kevanoullio-tradingview-pine-scripts__ehlers_super_smoother.pine",
+          "sourceRepoUrl": "https://github.com/kevanoullio/tradingview-pine-scripts",
+          "sourceFilePath": "libraries/ehlers_super_smoother.pine",
+          "commitSha": "1c9d49e7f157221e9335c0a1e9cd12e3eed41b30"
+        }
+      ]
+    },
+    {
+      "id": "declarations.indicator",
+      "category": "declarations",
+      "name": "indicator/study declaration",
+      "basis": "ast",
+      "corpusScriptCount": 1873,
+      "corpusHitCount": 1874,
+      "grammarSnippetCount": 76,
+      "grammarHitCount": 76,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 49.3,
+      "sampleGrammarSnippets": [
+        "arrays.array-literal",
+        "arrays.array-literal-nested",
+        "arrays.generic-new-call",
+        "conditionals.else-if",
+        "conditionals.else-if-expression",
+        "conditionals.if-expression",
+        "conditionals.if-statement",
+        "conditionals.once"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0001__mihakralj-pinescript__aberr.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/aberr.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0002__mihakralj-pinescript__accbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/accbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0003__mihakralj-pinescript__apchannel.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apchannel.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0004__mihakralj-pinescript__apz.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/apz.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0005__mihakralj-pinescript__atrbands.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/channels/atrbands.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "objects.exported-udt",
+      "category": "types",
+      "name": "exported UDT declaration",
+      "basis": "ast",
+      "corpusScriptCount": 11,
+      "corpusHitCount": 76,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 43.5,
+      "sampleGrammarSnippets": [
+        "formatting.doc-annotations",
+        "objects.exported-udt"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0602__casoon-pine-scripts__RTALiquidity.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTALiquidity.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0603__casoon-pine-scripts__RTAMonitoring.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAMonitoring.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0604__casoon-pine-scripts__RTAStrategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAStrategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0984__deepentropy-lightweight-charts-indicators__ZigZag-v8.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/libraries/TradingView/ZigZag-v8.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0986__heyphat-piner__1.pine",
+          "sourceRepoUrl": "https://github.com/heyphat/piner",
+          "sourceFilePath": "examples/pine-libs/alice/bands/1.pine",
+          "commitSha": "6f9004d7fd94df375516a0e6b5ea704897dccf52"
+        }
+      ]
+    },
+    {
+      "id": "variables.assignment-divide",
+      "category": "variables",
+      "name": "compound assignment /=",
+      "basis": "ast",
+      "corpusScriptCount": 12,
+      "corpusHitCount": 21,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 33,
+      "sampleGrammarSnippets": [
+        "variables.compound-assignments"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0228__mihakralj-pinescript__reflex.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/oscillators/reflex.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0783__deepentropy-lightweight-charts-indicators__Order-Blocks-with-signals.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/Order Blocks with signals.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0997__grantj-re3-LingoLog__HashFunction.pine",
+          "sourceRepoUrl": "https://github.com/grantj-re3/LingoLog",
+          "sourceFilePath": "pine_script/Ideas/HashFunction.pine",
+          "commitSha": "af5dd3a961a1123e7ff1bca4848107f5e5c34547"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0357__webcrack4-pine-script-combine__V5_14-16-21-27-34-35-36.pine",
+          "sourceRepoUrl": "https://github.com/webcrack4/pine-script-combine",
+          "sourceFilePath": "v5组合/V5_14+16+21+27+34+35+36.pine",
+          "commitSha": "c950c638dc8a20bb590a34f3362b1e4dc75f1090"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0487__regalouisei-collect-tradingview__fourier-extrapolator-of-price-w-projection-forecast-loxx.pine",
+          "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+          "sourceFilePath": "pinescript/editors_picks/fourier-extrapolator-of-price-w-projection-forecast-loxx.pine",
+          "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae"
+        }
+      ]
+    },
+    {
+      "id": "imports.implicit-alias",
+      "category": "imports",
+      "name": "import with implicit alias",
+      "basis": "source",
+      "corpusScriptCount": 11,
+      "corpusHitCount": 13,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 24,
+      "sampleGrammarSnippets": [
+        "imports.implicit-alias"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0784__deepentropy-lightweight-charts-indicators__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_community/Dynamic Supply and Demand Zones [AlgoAlpha].pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0994__g-moe-Trading-Indicators__text-motion-marquee-demo.pine",
+          "sourceRepoUrl": "https://github.com/g-moe/Trading-Indicators",
+          "sourceFilePath": "Tradingview/text-motion-marquee-demo.pine",
+          "commitSha": "d7c3f5e9060fa7e461f4946713cc7a30f154a1e6"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0207__cetio-indicators__wolf.pine",
+          "sourceRepoUrl": "https://github.com/cetio/indicators",
+          "sourceFilePath": "wolf.pine",
+          "commitSha": "bade3123678f0df08c9eb4e16c0b54417721476f"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0208__cetio-indicators__vptl.pine",
+          "sourceRepoUrl": "https://github.com/cetio/indicators",
+          "sourceFilePath": "vptl.pine",
+          "commitSha": "9a4a0445661001ce863dddae3b2fe395c871f77a"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0213__cetio-indicators__wolfv2.pine",
+          "sourceRepoUrl": "https://github.com/cetio/indicators",
+          "sourceFilePath": "wolfv2.pine",
+          "commitSha": "9a4a0445661001ce863dddae3b2fe395c871f77a"
+        }
+      ]
+    },
+    {
+      "id": "enums.declaration",
+      "category": "enums",
+      "name": "enum declaration",
+      "basis": "ast",
+      "corpusScriptCount": 22,
+      "corpusHitCount": 47,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 3,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 23,
+      "sampleGrammarSnippets": [
+        "enums.declaration",
+        "enums.exported",
+        "formatting.doc-annotations"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0493__casoon-pine-scripts__rj_wave.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "archive/indicators/rj_wave/rj_wave.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "indicators/market_structure/modern_wyckoff_state_machine_visual/modern_wyckoff_state_machine_visual.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Multi-Time Period Charts.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0433__ferranbt-pinecone__enum_with_values.pine",
+          "sourceRepoUrl": "https://github.com/ferranbt/pinecone",
+          "sourceFilePath": "tests/testdata/types/enum_with_values.pine",
+          "commitSha": "94a8d81a2cf2937940b1179a38b623c8ebb0da7e"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0478__kotipasa-tradingview-scripts__tradewar_spy_options.pine",
+          "sourceRepoUrl": "https://github.com/kotipasa/tradingview-scripts",
+          "sourceFilePath": "tradewar_spy_options.pine",
+          "commitSha": "3b7320350e9304cf2259dd4b5eb76885db7d9c73"
+        }
+      ]
+    },
+    {
+      "id": "enums.title",
+      "category": "enums",
+      "name": "enum value title",
+      "basis": "ast",
+      "corpusScriptCount": 12,
+      "corpusHitCount": 77,
+      "grammarSnippetCount": 3,
+      "grammarHitCount": 5,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 19.4,
+      "sampleGrammarSnippets": [
+        "enums.declaration",
+        "enums.exported",
+        "formatting.doc-annotations"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine",
+          "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+          "sourceFilePath": "docs/official/indicators_standard/Multi-Time Period Charts.pine",
+          "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0433__ferranbt-pinecone__enum_with_values.pine",
+          "sourceRepoUrl": "https://github.com/ferranbt/pinecone",
+          "sourceFilePath": "tests/testdata/types/enum_with_values.pine",
+          "commitSha": "94a8d81a2cf2937940b1179a38b623c8ebb0da7e"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0489__turnupdigital-riskmanager__SimpleMarketMetrics.pine",
+          "sourceRepoUrl": "https://github.com/turnupdigital/riskmanager",
+          "sourceFilePath": "BuySellIndicators/BUYSELLSIGNALS/SimpleMarketMetrics.pine",
+          "commitSha": "f69a5838ea1f67197a66b2ebb58aed117bdce8b7"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0650__regalouisei-collect-tradingview__volume-analysis-heatmap-and-volume-profile.pine",
+          "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+          "sourceFilePath": "pinescript/editors_picks/volume-analysis-heatmap-and-volume-profile.pine",
+          "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0903__raybird-pine-trading-strategies__adaptive_vol_regime_sovereign_v6.pine",
+          "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+          "sourceFilePath": "strategies/adaptive_vol_regime_sovereign_v6.pine",
+          "commitSha": "1883e3658eedf03ebeb80ce7653c483bc0919368"
+        }
+      ]
+    },
+    {
+      "id": "declarations.library",
+      "category": "declarations",
+      "name": "library declaration",
+      "basis": "ast",
+      "corpusScriptCount": 28,
+      "corpusHitCount": 28,
+      "grammarSnippetCount": 7,
+      "grammarHitCount": 7,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 8,
+      "sampleGrammarSnippets": [
+        "declarations.library-export-function",
+        "enums.exported",
+        "formatting.doc-annotations",
+        "formatting.doc-annotations-function-extra",
+        "functions.exported",
+        "methods.exported",
+        "objects.exported-udt"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0602__casoon-pine-scripts__RTALiquidity.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTALiquidity.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0603__casoon-pine-scripts__RTAMonitoring.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAMonitoring.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0604__casoon-pine-scripts__RTAStrategy.pine",
+          "sourceRepoUrl": "https://github.com/casoon/pine-scripts",
+          "sourceFilePath": "libraries/RTAStrategy.pine",
+          "commitSha": "c0354de142e352b76a81622b273db032ea32a449"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0678__kevanoullio-tradingview-pine-scripts__double_triple_ema.pine",
+          "sourceRepoUrl": "https://github.com/kevanoullio/tradingview-pine-scripts",
+          "sourceFilePath": "libraries/double_triple_ema.pine",
+          "commitSha": "1c9d49e7f157221e9335c0a1e9cd12e3eed41b30"
+        },
+        {
+          "corpus": "v5",
+          "localPath": "sources/0679__kevanoullio-tradingview-pine-scripts__ehlers_super_smoother.pine",
+          "sourceRepoUrl": "https://github.com/kevanoullio/tradingview-pine-scripts",
+          "sourceFilePath": "libraries/ehlers_super_smoother.pine",
+          "commitSha": "1c9d49e7f157221e9335c0a1e9cd12e3eed41b30"
+        }
+      ]
+    },
+    {
+      "id": "tuples.reassignment",
+      "category": "tuples",
+      "name": "tuple reassignment",
+      "basis": "ast",
+      "corpusScriptCount": 2,
+      "corpusHitCount": 4,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 6,
+      "sampleGrammarSnippets": [
+        "tuples.reassignment"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v7",
+          "localPath": "sources/0209__majixai-majixai.github.io__jinx.pine",
+          "sourceRepoUrl": "https://github.com/majixai/majixai.github.io",
+          "sourceFilePath": "tradingview_integration/pine_script/jinx.pine",
+          "commitSha": "599a6555bf939a2ee4f24ef2a241ed6f0c909906"
+        },
+        {
+          "corpus": "v7",
+          "localPath": "sources/0210__majixai-majixai.github.io__differentiated_conic_projection_engine.pine",
+          "sourceRepoUrl": "https://github.com/majixai/majixai.github.io",
+          "sourceFilePath": "tradingview_integration/pine_script/differentiated_conic_projection_engine.pine",
+          "commitSha": "f16c242afac879590aa3e365f7a3bdc93e1f4c6b"
+        }
+      ]
+    },
+    {
+      "id": "conditionals.once",
+      "category": "conditionals",
+      "name": "once block",
+      "basis": "ast",
+      "corpusScriptCount": 2,
+      "corpusHitCount": 3,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 5,
+      "sampleGrammarSnippets": [
+        "conditionals.once"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v6",
+          "localPath": "sources/0079__folknor-pine-tools__p10-nested-in-if-and-loop.pine",
+          "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+          "sourceFilePath": "investigations/INV177-once-conditional-structure/probes/p10-nested-in-if-and-loop.pine",
+          "commitSha": "dfa6c6d66a24979632568fe3fcbccfe05e5f04ba"
+        },
+        {
+          "corpus": "v6",
+          "localPath": "sources/0084__folknor-pine-tools__p01-basic.pine",
+          "sourceRepoUrl": "https://github.com/folknor/pine-tools",
+          "sourceFilePath": "investigations/INV177-once-conditional-structure/probes/p01-basic.pine",
+          "commitSha": "dfa6c6d66a24979632568fe3fcbccfe05e5f04ba"
+        }
+      ]
+    },
+    {
+      "id": "operators.bitwise",
+      "category": "operators",
+      "name": "bitwise operator",
+      "basis": "ast",
+      "corpusScriptCount": 1,
+      "corpusHitCount": 4,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 2,
+      "thinGrammar": true,
+      "highUseThinGrammar": false,
+      "depthGapScore": 3,
+      "sampleGrammarSnippets": [
+        "operators.bitwise"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v5",
+          "localPath": "sources/0165__mihakralj-pinescript__fft.pine",
+          "sourceRepoUrl": "https://github.com/mihakralj/pinescript",
+          "sourceFilePath": "indicators/numerics/fft.pine",
+          "commitSha": "c4e91b962be09733d8fc76caa5191e9e586c5cee"
+        }
+      ]
+    },
+    {
+      "id": "enums.exported",
+      "category": "enums",
+      "name": "exported enum declaration",
+      "basis": "ast",
+      "corpusScriptCount": 1,
+      "corpusHitCount": 1,
+      "grammarSnippetCount": 2,
+      "grammarHitCount": 2,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 1,
+      "sampleGrammarSnippets": [
+        "enums.exported",
+        "formatting.doc-annotations"
+      ],
+      "sampleCorpusHits": [
+        {
+          "corpus": "v6",
+          "localPath": "sources/0986__heyphat-piner__1.pine",
+          "sourceRepoUrl": "https://github.com/heyphat/piner",
+          "sourceFilePath": "examples/pine-libs/alice/bands/1.pine",
+          "commitSha": "6f9004d7fd94df375516a0e6b5ea704897dccf52"
+        }
+      ]
+    },
+    {
+      "id": "formatting.method-chain-continuation",
+      "category": "formatting",
+      "name": "multi-line method-chain continuation",
+      "basis": "source",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [
+        "formatting.method-chain-continuation"
+      ],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "formatting.triple-quoted-string",
+      "category": "formatting",
+      "name": "triple-quoted string literal",
+      "basis": "source",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 0,
+      "grammarHitCount": 0,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "functions.recursive-call",
+      "category": "functions-methods",
+      "name": "direct recursive UDF call",
+      "basis": "ast",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 0,
+      "grammarHitCount": 0,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "methods.overload",
+      "category": "functions-methods",
+      "name": "overload method/function declaration",
+      "basis": "ast",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [
+        "methods.overload"
+      ],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "variables.assignment-modulo",
+      "category": "variables",
+      "name": "compound assignment %=",
+      "basis": "ast",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [
+        "variables.compound-assignments"
+      ],
+      "sampleCorpusHits": []
+    }
+  ],
+  "highUseThinRows": [],
+  "unbackedRows": [],
+  "unreachedRows": [
+    {
+      "id": "formatting.method-chain-continuation",
+      "category": "formatting",
+      "name": "multi-line method-chain continuation",
+      "basis": "source",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [
+        "formatting.method-chain-continuation"
+      ],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "formatting.triple-quoted-string",
+      "category": "formatting",
+      "name": "triple-quoted string literal",
+      "basis": "source",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 0,
+      "grammarHitCount": 0,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "functions.recursive-call",
+      "category": "functions-methods",
+      "name": "direct recursive UDF call",
+      "basis": "ast",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 0,
+      "grammarHitCount": 0,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "methods.overload",
+      "category": "functions-methods",
+      "name": "overload method/function declaration",
+      "basis": "ast",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [
+        "methods.overload"
+      ],
+      "sampleCorpusHits": []
+    },
+    {
+      "id": "variables.assignment-modulo",
+      "category": "variables",
+      "name": "compound assignment %=",
+      "basis": "ast",
+      "corpusScriptCount": 0,
+      "corpusHitCount": 0,
+      "grammarSnippetCount": 1,
+      "grammarHitCount": 1,
+      "thinGrammar": false,
+      "highUseThinGrammar": false,
+      "depthGapScore": 0,
+      "sampleGrammarSnippets": [
+        "variables.compound-assignments"
+      ],
+      "sampleCorpusHits": []
+    }
+  ]
+}

@@ -1,0 +1,1733 @@
+{
+  "supersededBy": "pine-value-vector-depth-v12.json",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "schemaVersion": 1,
+  "basis": {
+    "coveredCallableMembers": 325,
+    "vectorCases": 404,
+    "note": "Overload coverage is strict when a call uniquely selects that overload; lenient coverage means at least one call is compatible with it. Optional argument coverage is by member:param slot, reached by positional or named use."
+  },
+  "headline": {
+    "overloadRows": 10,
+    "overloadRowsCoveredLenient": 10,
+    "overloadRowsCoveredLenientPercent": "100.00%",
+    "overloadRowsCoveredStrict": 10,
+    "overloadRowsCoveredStrictPercent": "100.00%",
+    "optionalArgumentSlots": 463,
+    "optionalArgumentSlotsCovered": 237,
+    "optionalArgumentSlotsCoveredPercent": "51.19%",
+    "optionalArgumentSlotsUntouched": 226
+  },
+  "byNamespace": {
+    "optionalSlots": {
+      "array": 34,
+      "barcolor": 5,
+      "bgcolor": 7,
+      "box": 15,
+      "chart": 1,
+      "color": 2,
+      "fill": 5,
+      "hline": 6,
+      "input": 108,
+      "label": 12,
+      "line": 6,
+      "linefill": 1,
+      "math": 1,
+      "matrix": 18,
+      "plot": 15,
+      "plotarrow": 12,
+      "plotbar": 6,
+      "plotcandle": 8,
+      "plotchar": 14,
+      "plotshape": 14,
+      "polyline": 8,
+      "request": 29,
+      "str": 7,
+      "strategy": 78,
+      "ta": 21,
+      "table": 18,
+      "ticker": 10,
+      "timeframe": 2
+    },
+    "untouchedOptionalSlots": {
+      "array": 9,
+      "barcolor": 1,
+      "bgcolor": 2,
+      "box": 9,
+      "color": 1,
+      "fill": 1,
+      "hline": 1,
+      "input": 84,
+      "label": 7,
+      "line": 2,
+      "matrix": 1,
+      "plotarrow": 7,
+      "plotbar": 4,
+      "plotcandle": 4,
+      "plotchar": 8,
+      "plotshape": 4,
+      "request": 10,
+      "strategy": 59,
+      "ta": 5,
+      "table": 3,
+      "ticker": 3,
+      "timeframe": 1
+    },
+    "overloadRows": {
+      "box": 2,
+      "input": 4,
+      "label": 2,
+      "line": 2
+    },
+    "untouchedStrictOverloadRows": {}
+  },
+  "untouchedOptionalSlots": [
+    {
+      "member": "array.new",
+      "param": "size",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.new",
+      "param": "initial_value",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.new_box",
+      "param": "initial_value",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.new_label",
+      "param": "initial_value",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.new_line",
+      "param": "initial_value",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.new_linefill",
+      "param": "initial_value",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.new_table",
+      "param": "initial_value",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.sort",
+      "param": "sort_field",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "array.sort_indices",
+      "param": "sort_field",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "barcolor",
+      "param": "offset",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "bgcolor",
+      "param": "offset",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "bgcolor",
+      "param": "transp",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "xloc",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "bgcolor",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "text",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "text_color",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "text_halign",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "text_valign",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "text_font_family",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "box.new",
+      "param": "text_formatting",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "color",
+      "param": "transp",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "fill",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "hline",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input",
+      "param": "title",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.bool",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.bool",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.bool",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.bool",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.bool",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.bool",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.color",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.color",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.color",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.color",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.color",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.color",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.enum",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.enum",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.enum",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.enum",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.enum",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.enum",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.float",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.float",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.float",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.float",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.float",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.float",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.int",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.int",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.int",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.int",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.int",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.int",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.price",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.price",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.price",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.price",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.price",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.price",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.session",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.session",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.session",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.session",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.session",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.session",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.source",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.source",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.source",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.source",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.source",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.source",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.string",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.string",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.string",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.string",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.string",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.string",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.symbol",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.symbol",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.symbol",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.symbol",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.symbol",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.symbol",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.text_area",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.text_area",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.text_area",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.text_area",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.text_area",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.text_area",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.time",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.time",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.time",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.time",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.time",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.time",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.timeframe",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.timeframe",
+      "param": "inline",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.timeframe",
+      "param": "group",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.timeframe",
+      "param": "confirm",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.timeframe",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "input.timeframe",
+      "param": "active",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "xloc",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "style",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "textcolor",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "textalign",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "tooltip",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "label.new",
+      "param": "text_formatting",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "line.new",
+      "param": "xloc",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "line.new",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "matrix.sort",
+      "param": "sort_field",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "offset",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "editable",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "show_last",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "format",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "precision",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotarrow",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotbar",
+      "param": "editable",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotbar",
+      "param": "show_last",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotbar",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotbar",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotcandle",
+      "param": "editable",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotcandle",
+      "param": "show_last",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotcandle",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotcandle",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "offset",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "editable",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "size",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "show_last",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "format",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "precision",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotchar",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotshape",
+      "param": "editable",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotshape",
+      "param": "display",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotshape",
+      "param": "format",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "plotshape",
+      "param": "precision",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.dividends",
+      "param": "lookahead",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.earnings",
+      "param": "lookahead",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.economic",
+      "param": "gaps",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.financial",
+      "param": "gaps",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.security",
+      "param": "currency",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.security",
+      "param": "calc_bars_count",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.security_lower_tf",
+      "param": "currency",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.security_lower_tf",
+      "param": "calc_bars_count",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.splits",
+      "param": "gaps",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "request.splits",
+      "param": "lookahead",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "shorttitle",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "format",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "precision",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "scale",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "calc_on_every_tick",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "max_bars_back",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "backtest_fill_limits_assumption",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "slippage",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "close_entries_rule",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "margin_long",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "margin_short",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "explicit_plot_zorder",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "max_lines_count",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "max_labels_count",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "max_boxes_count",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "risk_free_rate",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "use_bar_magnifier",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "fill_orders_on_standard_ohlc",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "max_polylines_count",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "dynamic_requests",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy",
+      "param": "behind_chart",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close",
+      "param": "alert_message",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close",
+      "param": "immediately",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close",
+      "param": "disable_alert",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close_all",
+      "param": "comment",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close_all",
+      "param": "alert_message",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close_all",
+      "param": "immediately",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.close_all",
+      "param": "disable_alert",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.entry",
+      "param": "stop",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.entry",
+      "param": "oca_name",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.entry",
+      "param": "oca_type",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.entry",
+      "param": "alert_message",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.entry",
+      "param": "disable_alert",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "qty",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "qty_percent",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "profit",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "loss",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "stop",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "trail_price",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "trail_points",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "trail_offset",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "oca_name",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "comment",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "comment_profit",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "comment_loss",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "comment_trailing",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "alert_message",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "alert_profit",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "alert_loss",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "alert_trailing",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.exit",
+      "param": "disable_alert",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "limit",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "stop",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "oca_name",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "oca_type",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "comment",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "alert_message",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "strategy.order",
+      "param": "disable_alert",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ta.max",
+      "param": "source2",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ta.min",
+      "param": "source2",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ta.pivot_point_levels",
+      "param": "developing",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ta.vwap",
+      "param": "anchor",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ta.vwap",
+      "param": "stdev_mult",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "table.cell",
+      "param": "text_font_family",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "table.cell",
+      "param": "text_formatting",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "table.new",
+      "param": "force_overlay",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ticker.modify",
+      "param": "adjustment",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ticker.modify",
+      "param": "backadjustment",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "ticker.modify",
+      "param": "settlement_as_close",
+      "covered": false,
+      "cases": []
+    },
+    {
+      "member": "timeframe.in_seconds",
+      "param": "timeframe",
+      "covered": false,
+      "cases": []
+    }
+  ],
+  "overloadRows": [
+    {
+      "member": "box.new",
+      "overloadIndex": 0,
+      "params": [
+        "left",
+        "top",
+        "right",
+        "bottom",
+        "border_color",
+        "border_width",
+        "border_style",
+        "extend",
+        "xloc",
+        "bgcolor",
+        "text",
+        "text_size",
+        "text_color",
+        "text_halign",
+        "text_valign",
+        "text_wrap",
+        "text_font_family",
+        "force_overlay",
+        "text_formatting"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "visual.secondary-constant-metadata-values",
+        "drawing.box-getters",
+        "drawing.box-mutation-copy-values",
+        "drawing.delete-all-values",
+        "drawing.delete-all-values",
+        "drawing.box-style-text-values",
+        "drawing.named-coordinate-overload-values"
+      ]
+    },
+    {
+      "member": "box.new",
+      "overloadIndex": 1,
+      "params": [
+        "top_left",
+        "bottom_right",
+        "border_color",
+        "border_width",
+        "border_style",
+        "extend",
+        "xloc",
+        "bgcolor",
+        "text",
+        "text_size",
+        "text_color",
+        "text_halign",
+        "text_valign",
+        "text_wrap",
+        "text_font_family",
+        "force_overlay",
+        "text_formatting"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "visual.secondary-constant-metadata-values",
+        "drawing.box-getters",
+        "drawing.box-mutation-copy-values",
+        "drawing.delete-all-values",
+        "drawing.delete-all-values",
+        "drawing.box-style-text-values",
+        "drawing.box-point-style-values",
+        "drawing.named-point-overload-values"
+      ]
+    },
+    {
+      "member": "input.float",
+      "overloadIndex": 0,
+      "params": [
+        "defval",
+        "title",
+        "minval",
+        "maxval",
+        "step",
+        "tooltip",
+        "inline",
+        "group",
+        "confirm",
+        "display",
+        "active"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "runtime.input-default-values",
+        "runtime.input-range-overload-values"
+      ]
+    },
+    {
+      "member": "input.float",
+      "overloadIndex": 1,
+      "params": [
+        "defval",
+        "title",
+        "options",
+        "tooltip",
+        "inline",
+        "group",
+        "confirm",
+        "display",
+        "active"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "runtime.input-default-values",
+        "runtime.input-options-overload-values"
+      ]
+    },
+    {
+      "member": "input.int",
+      "overloadIndex": 0,
+      "params": [
+        "defval",
+        "title",
+        "minval",
+        "maxval",
+        "step",
+        "tooltip",
+        "inline",
+        "group",
+        "confirm",
+        "display",
+        "active"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "runtime.input-default-values",
+        "runtime.input-range-overload-values"
+      ]
+    },
+    {
+      "member": "input.int",
+      "overloadIndex": 1,
+      "params": [
+        "defval",
+        "title",
+        "options",
+        "tooltip",
+        "inline",
+        "group",
+        "confirm",
+        "display",
+        "active"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "runtime.input-default-values",
+        "runtime.input-options-overload-values"
+      ]
+    },
+    {
+      "member": "label.new",
+      "overloadIndex": 0,
+      "params": [
+        "x",
+        "y",
+        "text",
+        "xloc",
+        "yloc",
+        "color",
+        "style",
+        "textcolor",
+        "size",
+        "textalign",
+        "tooltip",
+        "text_font_family",
+        "force_overlay",
+        "text_formatting"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "visual.secondary-constant-metadata-values",
+        "runtime.host-constant-identity-values",
+        "drawing.label-getters",
+        "drawing.label-mutation-copy-values",
+        "drawing.label-style-metadata-values",
+        "drawing.delete-all-values",
+        "drawing.delete-all-values",
+        "drawing.named-coordinate-overload-values",
+        "drawing.label-text-style-values"
+      ]
+    },
+    {
+      "member": "label.new",
+      "overloadIndex": 1,
+      "params": [
+        "point",
+        "text",
+        "xloc",
+        "yloc",
+        "color",
+        "style",
+        "textcolor",
+        "size",
+        "textalign",
+        "tooltip",
+        "text_font_family",
+        "force_overlay",
+        "text_formatting"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "visual.secondary-constant-metadata-values",
+        "runtime.host-constant-identity-values",
+        "drawing.label-getters",
+        "drawing.label-mutation-copy-values",
+        "drawing.label-style-metadata-values",
+        "drawing.delete-all-values",
+        "drawing.delete-all-values",
+        "drawing.named-point-overload-values",
+        "drawing.label-text-style-values"
+      ]
+    },
+    {
+      "member": "line.new",
+      "overloadIndex": 0,
+      "params": [
+        "x1",
+        "y1",
+        "x2",
+        "y2",
+        "xloc",
+        "extend",
+        "color",
+        "style",
+        "width",
+        "force_overlay"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "visual.secondary-constant-metadata-values",
+        "runtime.host-constant-identity-values",
+        "drawing.line-getters",
+        "drawing.line-mutation-copy-values",
+        "drawing.line-style-payload-values",
+        "drawing.line-style-getter-values",
+        "drawing.linefill-getters",
+        "drawing.linefill-getters",
+        "drawing.linefill-color-copy-values",
+        "drawing.linefill-color-copy-values",
+        "drawing.delete-all-values",
+        "drawing.delete-all-values",
+        "drawing.named-coordinate-overload-values"
+      ]
+    },
+    {
+      "member": "line.new",
+      "overloadIndex": 1,
+      "params": [
+        "first_point",
+        "second_point",
+        "xloc",
+        "extend",
+        "color",
+        "style",
+        "width",
+        "force_overlay"
+      ],
+      "lenientCovered": true,
+      "strictCovered": true,
+      "cases": [
+        "visual.secondary-constant-metadata-values",
+        "runtime.host-constant-identity-values",
+        "drawing.line-getters",
+        "drawing.line-mutation-copy-values",
+        "drawing.line-style-payload-values",
+        "drawing.line-style-getter-values",
+        "drawing.linefill-getters",
+        "drawing.linefill-getters",
+        "drawing.linefill-color-copy-values",
+        "drawing.linefill-color-copy-values",
+        "drawing.delete-all-values",
+        "drawing.delete-all-values",
+        "drawing.line-point-style-values",
+        "drawing.named-point-overload-values"
+      ]
+    }
+  ]
+}

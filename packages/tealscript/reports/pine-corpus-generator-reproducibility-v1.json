@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11T13:00:47Z",
+  "auditedHead": "28221b0a7c",
+  "headline": {
+    "generatorsAudited": 17,
+    "repoCleanReducers": 5,
+    "localCacheDependent": 10,
+    "acquisitionOrReplayScripts": 2,
+    "conclusion": "The headline corpus synthesis reports are reproducible from committed inputs. Source-scanning and rerun/property generators depend on local pinned corpus caches, but committed v5/v6/v7/recovery manifests are sufficient reconstruction manifests for sampled rows. Those scripts now fail on missing or mismatched denominators instead of silently measuring a partial cache."
+  },
+  "manifestReconstruction": {
+    "report": "pine-corpus-manifest-reconstruction-check-v1.json",
+    "manifestRows": 2506,
+    "requiredFieldsPresentRows": 2506,
+    "sampledRows": 160,
+    "matchedRows": 160,
+    "fetchFailedRows": 0,
+    "hashMismatchRows": 0,
+    "sampledAttritionRate": "0.00%",
+    "conclusion": "The source caches are local artifacts, but the committed manifests contain repo/path/commit/hash pointers for every row. A deterministic 40-row-per-corpus sample still refetched from raw GitHub and matched manifest hashes byte-for-byte after the documented normalization."
+  },
+  "hardenedInThisAudit": [
+    "report-pine-corpus-member-map.ts: local package cache defaults, v5/v6 source-file count assertions, current measuredCommit",
+    "report-pine-corpus-optional-argument-usage.ts: local package cache defaults, 1000/1000/456/50 manifest assertions, current measuredCommit",
+    "report-pine-corpus-vector-depth-gap.ts: local package cache defaults and 1000/1000/456/50 manifest assertions",
+    "report-pine-corpus-construct-depth.ts: local package cache defaults and 1000/1000/456/50 manifest assertions",
+    "report-pine-corpus-saturation.ts: v7/recovery manifest assertions and current measuredCommit",
+    "report-external-pine-corpus-v6-current-gap-pool.ts: removed sibling-worktree pinned-source path from report output",
+    "report-external-pine-corpus-v7-size-recovery.ts: v7/recovery manifest/run assertions and current measuredCommit",
+    "report-external-pine-corpus-output-asymmetry-reslice.ts: source-summary contract for the reference-free output audit",
+    "report-pine-corpus-priority-queue.ts: component-report input contract assertions",
+    "report-pine-corpus-invalid-clusters.ts: v5/v6 section assertions and 32/54/63 invalid-row assertions",
+    "report-external-pine-corpus-v7-rejection-audit.ts: refuses live GitHub search refetch unless PINE_V7_REJECTION_AUDIT_REFETCH=1 is set"
+  ],
+  "generators": [
+    {
+      "script": "report-external-pine-corpus-current-error-rerun.ts",
+      "status": "repo-clean reducer",
+      "inputs": [
+        "reports/external-pine-corpus-v5.daily-rerun-a75ebd88d7.json",
+        "reports/external-pine-corpus-v5.daily-rerun-7c08371da1.json",
+        "reports/external-pine-corpus-v6.daily-rerun-a75ebd88d7.json",
+        "reports/external-pine-corpus-v6.daily-rerun-7c08371da1.json",
+        "reports/external-pine-corpus-v7.daily-rerun-7c08371da1.json",
+        ".cache/tealscript/pine-corpus-v7-20260911/fixture-profiles-current-2e05553bda/external-pine-corpus-v7-daily-standard.json"
+      ],
+      "caveat": "The v7 baseline input is a local cache artifact, so this is repo-clean for v5/v6 but cache-dependent for the v7 baseline."
+    },
+    {
+      "script": "audit-external-pine-corpus-output-properties.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        "reports/external-pine-corpus-v5.daily-rerun-7c08371da1.json",
+        "reports/external-pine-corpus-v6.daily-rerun-7c08371da1.json",
+        "reports/external-pine-corpus-v7.daily-rerun-7c08371da1.json",
+        "source directories named by each report inputDir"
+      ],
+      "guard": "Asserts expected produced-output counts 855/777/304 before auditing."
+    },
+    {
+      "script": "audit-external-pine-corpus-member-properties.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        "reports/external-pine-corpus-v5.daily-rerun-7c08371da1.json",
+        "reports/external-pine-corpus-v6.daily-rerun-7c08371da1.json",
+        "reports/external-pine-corpus-v7.daily-rerun-7c08371da1.json",
+        "reports/pine-member-property-map-v2.json",
+        "property validation reports",
+        "source directories named by each report inputDir"
+      ],
+      "guard": "Asserts expected produced-output counts 855/777/304 and preserves validated finding versus unvalidated lead labels."
+    },
+    {
+      "script": "report-external-pine-corpus-output-asymmetry-reslice.ts",
+      "status": "repo-clean reducer",
+      "inputs": [
+        "reports/external-pine-corpus-output-reference-free-v2.json"
+      ],
+      "guard": "Asserts source report summary: 1936 audited rows, 2142 findings, 1230 all-NaN fields, 912 constant-finite fields."
+    },
+    {
+      "script": "report-external-pine-corpus-v6-current-gap-pool.ts",
+      "status": "repo-clean reducer",
+      "inputs": [
+        "reports/external-pine-corpus-v6.daily-rerun-a75ebd88d7.json",
+        "reports/external-pine-corpus-v6.fixture-profile-delta-v3-runs/external-pine-corpus-v6-daily-standard.json"
+      ],
+      "guard": "Throws for missing top-cause parser rows; report output names the local pinned-source cache path but does not read it."
+    },
+    {
+      "script": "report-external-pine-corpus-v7-current-gap-pool.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v7-20260911/fixture-profiles-current-2e05553bda/external-pine-corpus-v7-daily-standard.json"
+      ],
+      "guard": "Asserts 108 current gap-pool rows and exact classification coverage."
+    },
+    {
+      "script": "report-external-pine-corpus-v7-current-rerun.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v7-20260911/fixture-profiles-current-2e05553bda/external-pine-corpus-v7-daily-standard.json",
+        "reports/external-pine-corpus-v7.daily-rerun-306e72ba5f.json"
+      ],
+      "guard": "Throws if expected gain/drop attribution rows are not present."
+    },
+    {
+      "script": "report-external-pine-corpus-v7-size-recovery.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v7-20260911",
+        ".cache/tealscript/pine-corpus-v7-size-recovery-20260911",
+        "reports/external-pine-corpus-v7-size-recovery.daily-rerun-3c2c00ac84.json",
+        "reports/external-pine-corpus-v7-size-recovery.manifest.json"
+      ],
+      "guard": "Asserts 456 accepted v7 manifest rows, 50 recovered manifest rows, and 50 recovered daily-run rows."
+    },
+    {
+      "script": "report-pine-corpus-member-map.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v5-20260910",
+        ".cache/tealscript/pine-corpus-v6-20260911",
+        "reports/pine-value-vector-member-map-v1.json"
+      ],
+      "guard": "Asserts exactly 1000 v5 and 1000 v6 pinned .pine files; PINE_CORPUS_V5/PINE_CORPUS_V6 may override roots intentionally."
+    },
+    {
+      "script": "report-pine-corpus-saturation.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        "reports/pine-corpus-member-map-v1.json",
+        "reports/pine-value-vector-member-map-v29.json",
+        ".cache/tealscript/pine-corpus-v7-20260911",
+        ".cache/tealscript/pine-corpus-v7-size-recovery-20260911"
+      ],
+      "guard": "Asserts 456 v7 manifest rows and 50 recovered manifest rows before scanning."
+    },
+    {
+      "script": "report-pine-corpus-optional-argument-usage.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v5-20260910",
+        ".cache/tealscript/pine-corpus-v6-20260911",
+        ".cache/tealscript/pine-corpus-v7-20260911",
+        ".cache/tealscript/pine-corpus-v7-size-recovery-20260911",
+        "reports/pine-value-vector-depth-v12.json"
+      ],
+      "guard": "Asserts 1000/1000/456/50 manifest rows before scanning source."
+    },
+    {
+      "script": "report-pine-corpus-vector-depth-gap.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v5-20260910",
+        ".cache/tealscript/pine-corpus-v6-20260911",
+        ".cache/tealscript/pine-corpus-v7-20260911",
+        ".cache/tealscript/pine-corpus-v7-size-recovery-20260911",
+        "reports/pine-value-vector-member-map-v29.json",
+        "reports/pine-value-vector-assertion-quality-v8.json"
+      ],
+      "guard": "Asserts 1000/1000/456/50 manifest rows before scanning source."
+    },
+    {
+      "script": "report-pine-corpus-construct-depth.ts",
+      "status": "local-cache dependent",
+      "inputs": [
+        ".cache/tealscript/pine-corpus-v5-20260910",
+        ".cache/tealscript/pine-corpus-v6-20260911",
+        ".cache/tealscript/pine-corpus-v7-20260911",
+        ".cache/tealscript/pine-corpus-v7-size-recovery-20260911",
+        "PINE_V6_GRAMMAR_CONSTRUCTS"
+      ],
+      "guard": "Asserts 1000/1000/456/50 manifest rows before scanning source."
+    },
+    {
+      "script": "report-pine-corpus-priority-queue.ts",
+      "status": "repo-clean reducer",
+      "inputs": [
+        "reports/pine-corpus-vector-depth-gap-v1.json",
+        "reports/pine-corpus-optional-argument-usage-v1.json",
+        "reports/pine-corpus-construct-depth-v1.json"
+      ],
+      "guard": "Asserts component headline contracts: 96/49 member rows, 75/197 slot rows, and 20 construct rows."
+    },
+    {
+      "script": "report-pine-corpus-invalid-clusters.ts",
+      "status": "repo-clean reducer",
+      "inputs": [
+        "reports/external-pine-corpus-v5.dispatch-routing-audit-v1.md",
+        "reports/external-pine-corpus-v6.current-gap-pool-a75ebd88d7-v1.md",
+        "reports/external-pine-corpus-v7.current-gap-pool-bbcbf3d220-v1.json",
+        "corpus manifests"
+      ],
+      "guard": "Asserts v5/v6 section presence and 32/54/63 invalid-Pine rows."
+    },
+    {
+      "script": "report-external-pine-corpus-v7-rejection-audit.ts",
+      "status": "acquisition/replay script",
+      "inputs": [
+        ".cache/tealscript/v7-rejection-audit-search-pages",
+        "v7 harvest manifest and prior corpus reports"
+      ],
+      "guard": "Refuses missing cached search pages by default; PINE_V7_REJECTION_AUDIT_REFETCH=1 is required for an intentional new network measurement."
+    },
+    {
+      "script": "recover-external-pine-corpus-v7-size-rejections.ts",
+      "status": "acquisition script",
+      "inputs": [
+        "reports/external-pine-corpus-v7.rejection-audit-v1.json",
+        "network/raw source fetches"
+      ],
+      "guard": "Fetch/recovery script for producing the local recovered cache and committed recovery manifest; not a pure reducer."
+    }
+  ]
+}

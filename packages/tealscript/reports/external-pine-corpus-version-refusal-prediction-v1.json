@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "measurementCommit": "8528648ef3",
+  "baselineReports": {
+    "v5": "reports/external-pine-corpus-v5.daily-rerun-8db55d66ae.json",
+    "v6": "reports/external-pine-corpus-v6.daily-rerun-8db55d66ae.json",
+    "v7": "reports/external-pine-corpus-v7.daily-rerun-8db55d66ae.json"
+  },
+  "baselineMeasurementCommits": {
+    "v5": "8db55d66aeb6503072350ffe31f31ff4b33745c2",
+    "v6": "8db55d66aeb6503072350ffe31f31ff4b33745c2",
+    "v7": "8db55d66aeb6503072350ffe31f31ff4b33745c2"
+  },
+  "summaries": [
+    {
+      "rule": "v5-generic-input-type-integer",
+      "sourceRows": 0,
+      "producingRows": 0,
+      "predictedOutputDropLow": 0,
+      "predictedOutputDropHigh": 0,
+      "notes": "Static source match under the declared Pine version; predicted drop counts only currently producing rows."
+    },
+    {
+      "rule": "v5-global-sma",
+      "sourceRows": 0,
+      "producingRows": 0,
+      "predictedOutputDropLow": 0,
+      "predictedOutputDropHigh": 0,
+      "notes": "Rows with a local sma() definition are reported as shadowed candidates and excluded from the predicted drop range."
+    },
+    {
+      "rule": "v4-untyped-na",
+      "sourceRows": 0,
+      "producingRows": 0,
+      "predictedOutputDropLow": 0,
+      "predictedOutputDropHigh": 0,
+      "notes": "Static source match under the declared Pine version; predicted drop counts only currently producing rows."
+    },
+    {
+      "rule": "v3-bool-number-arithmetic",
+      "sourceRows": 0,
+      "producingRows": 0,
+      "predictedOutputDropLow": 0,
+      "predictedOutputDropHigh": 0,
+      "notes": "Static source match under the declared Pine version; predicted drop counts only currently producing rows."
+    }
+  ],
+  "matches": {
+    "v5-generic-input-type-integer": [],
+    "v5-global-sma": [],
+    "v4-untyped-na": [],
+    "v3-bool-number-arithmetic": []
+  }
+}

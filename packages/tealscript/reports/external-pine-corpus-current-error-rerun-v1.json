@@ -1,0 +1,917 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11T09:32:34.594Z",
+  "measurementCommit": "7c08371da19c918e42e591c4f461f3183e2a0d58",
+  "headline": {
+    "previousSilentNoErrorRows": 66,
+    "previouslySilentNoErrorNowSevenErrors": 0,
+    "previouslySilentNoErrorNowTaLength": 2,
+    "producedOutputDropsToSevenErrors": 9,
+    "producedOutputDropsToTaLength": 43,
+    "producedOutputGains": 27,
+    "rawOutputDelta": -25,
+    "achievableOutputDelta": -25
+  },
+  "sevenErrorPatterns": [
+    "Index 'from' should be less than index 'to'",
+    "Map cannot contain more than 50000 key-value pairs",
+    "Too many table cells: maximum is 10000",
+    "Table cell coordinates out of bounds",
+    "Table merged cell range overlaps existing merged cells",
+    "Matrix-vector multiplication requires matrix columns to match array size",
+    "Too many plot outputs: maximum is 64"
+  ],
+  "taLengthPattern": "TA length must be a positive integer|ta\\.change length must be a positive integer",
+  "comparisons": [
+    {
+      "corpus": "v5",
+      "previousSha": "a75ebd88d7",
+      "currentSha": "7c08371da1",
+      "previousReport": "reports/external-pine-corpus-v5.daily-rerun-a75ebd88d7.json",
+      "currentReport": "reports/external-pine-corpus-v5.daily-rerun-7c08371da1.json",
+      "previous": {
+        "rawOutput": 872,
+        "rawTotal": 1000,
+        "achievableOutput": 872,
+        "achievableDenominator": 923,
+        "outcomes": {
+          "failed": 114,
+          "no-output-compiled": 14,
+          "produced-output-compiled": 872
+        },
+        "outputSilence": {
+          "correct-silence": 3,
+          "tealscript-gap": 1,
+          "undecided": 10
+        }
+      },
+      "current": {
+        "rawOutput": 855,
+        "rawTotal": 1000,
+        "achievableOutput": 855,
+        "achievableDenominator": 925,
+        "outcomes": {
+          "failed": 132,
+          "no-output-compiled": 13,
+          "produced-output-compiled": 855
+        },
+        "outputSilence": {
+          "correct-silence": 3,
+          "tealscript-gap": 1,
+          "undecided": 9
+        }
+      },
+      "deltas": {
+        "rawOutput": -17,
+        "achievableOutput": -17,
+        "achievableDenominator": 2
+      },
+      "previousSilentNoErrorRows": 14,
+      "previouslySilentNoErrorNowSevenErrors": [],
+      "previouslySilentNoErrorNowTaLength": [
+        {
+          "row": "sources/0987__deepentropy-lightweight-charts-indicators__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": "output",
+          "previousOutcome": "no-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputDropsToSevenErrors": [
+        {
+          "row": "sources/0945__haydarkadioglu-tradingview-indicators__trend_strength.pine",
+          "cause": "table-coordinates",
+          "diagnostic": "Table cell coordinates out of bounds: column 1, row NaN",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputDropsToTaLength": [
+        {
+          "row": "sources/0450__everget-tradingview-pinescript-indicators__stochastic.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0676__SammyEnigma-pine-scripts__vol-bbw-rsi-15m.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0698__dcaoyuan-vibetrader__kdj.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0750__mphinance-mphinance__ghost_flow.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0755__hasnocool-tradingview-pine-scripts__kaya-indicator.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0761__benso87-Private-Pine-Scripts__BB-Swing-indicator.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0809__helenananaa-pine-compat-runtime__stoch.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0811__helenananaa-pine-compat-runtime__bb_edge_cases.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0812__helenananaa-pine-compat-runtime__unsupported_ta_macd_fastlen.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0852__benso87-Private-Pine-Scripts__Stoch-crossovers.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0867__Leci37-tuisku_Web_selling__WklfMUhvdXJfMk1TMHR1aXNrdTNjYTFjMjNj.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0872__Leci37-tuisku_Web_selling__TklPXzFIb3VyXzJTVDB0dWlza3U0NWJjOTVmMw.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0875__Leci37-tuisku_Web_selling__UUNPTV8xSG91cl8yQ1MwdHVpc2t1NWZiNDJjMGQ.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0884__Leci37-tuisku_Web_selling__U09MVVNEVF8xRGF5XzFTMDB0dWlza3VjODcyNGM0ZQ.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0935__deepentropy-lightweight-charts-indicators__CDC-ActionZone-V3-2020.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0937__Leci37-tuisku_Web_selling__VV8xTWluXzJNUzB0dWlza3VhMTUzNWNjZQ.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0940__deepentropy-oakscriptJS__CDC-ActionZone-V3-2020.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0957__Leci37-tuisku_Web_selling__R09PR18xRGF5XzJTVjB0dWlza3U0ZmUyMmFhOQ.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0966__Leci37-tuisku_Web_selling__RVRIVVNEVF8xSG91cl8yTVMwdHVpc2t1NDg2ODBhYWI.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputGains": [
+        {
+          "row": "sources/0828__deepentropy-lightweight-charts-indicators__Support-Resistance-Classification-VR-LuxAlgo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0910__deepentropy-oakscriptJS__Support-Resistance-Classification-VR-LuxAlgo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0924__g-moe-Trading-Indicators__tbm-wick-test.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0989__SynergOps-AlgoTrading__atr-bands.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "parse",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        }
+      ]
+    },
+    {
+      "corpus": "v6",
+      "previousSha": "a75ebd88d7",
+      "currentSha": "7c08371da1",
+      "previousReport": "reports/external-pine-corpus-v6.daily-rerun-a75ebd88d7.json",
+      "currentReport": "reports/external-pine-corpus-v6.daily-rerun-7c08371da1.json",
+      "previous": {
+        "rawOutput": 796,
+        "rawTotal": 1000,
+        "achievableOutput": 796,
+        "achievableDenominator": 930,
+        "outcomes": {
+          "failed": 156,
+          "no-output-compiled": 48,
+          "produced-output-compiled": 796
+        },
+        "outputSilence": {
+          "correct-silence": 7,
+          "tealscript-gap": 6,
+          "undecided": 35
+        }
+      },
+      "current": {
+        "rawOutput": 777,
+        "rawTotal": 1000,
+        "achievableOutput": 777,
+        "achievableDenominator": 935,
+        "outcomes": {
+          "failed": 174,
+          "no-output-compiled": 49,
+          "produced-output-compiled": 777
+        },
+        "outputSilence": {
+          "correct-silence": 7,
+          "tealscript-gap": 6,
+          "undecided": 36
+        }
+      },
+      "deltas": {
+        "rawOutput": -19,
+        "achievableOutput": -19,
+        "achievableDenominator": 5
+      },
+      "previousSilentNoErrorRows": 47,
+      "previouslySilentNoErrorNowSevenErrors": [],
+      "previouslySilentNoErrorNowTaLength": [
+        {
+          "row": "sources/0339__deepentropy-oakscriptJS__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": "output",
+          "previousOutcome": "no-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputDropsToSevenErrors": [
+        {
+          "row": "sources/0317__helenananaa-pine-compat-runtime__table_cell_set_text_color_coordinate_bounds.pine",
+          "cause": "table-coordinates",
+          "diagnostic": "Table cell coordinates out of bounds: column 2, row 0",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0382__helenananaa-pine-compat-runtime__user_methods.pine",
+          "cause": "plot-output-limit",
+          "diagnostic": "Too many plot outputs: maximum is 64",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0441__helenananaa-pine-compat-runtime__ticker.pine",
+          "cause": "plot-output-limit",
+          "diagnostic": "Too many plot outputs: maximum is 64",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0444__helenananaa-pine-compat-runtime__table_cell_set_text_coordinate_row_bounds.pine",
+          "cause": "table-coordinates",
+          "diagnostic": "Table cell coordinates out of bounds: column 0, row 1",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0513__helenananaa-pine-compat-runtime__table_merge_coordinate_bounds.pine",
+          "cause": "table-coordinates",
+          "diagnostic": "Table cell coordinates out of bounds: column 2, row 0",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0681__helenananaa-pine-compat-runtime__table_cell_set_text_size_coordinate_row_bounds.pine",
+          "cause": "table-coordinates",
+          "diagnostic": "Table cell coordinates out of bounds: column 0, row 1",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputDropsToTaLength": [
+        {
+          "row": "sources/0120__rubbermetal-Pine__Quad-Rotation-40-4.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0184__benso87-Private-Pine-Scripts__KC-Combo.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0236__aeiioaeiio-XAUUSD_TradingView_Pine__XAUUSD_Strategy_V4_7_1_AutoEntry_SmartTPSL_Fixed.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0238__akash-yellgetti-api.web__algo-trade-indian-commodity.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0246__aboutblank007-alpha-os__Dual-SuperTrend.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0271__kingmalitha-SRI-Indicator-Ft.-MSB__final.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0318__helenananaa-pine-compat-runtime__unsupported_ta_percentile_linear_interpolation_length.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0412__benso87-Private-Pine-Scripts__Intermediate-Stoch.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0608__Ronterox-BoxBot__stochastic.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0651__AkashSasikumar47-pine-strategy-indicators-v6__Hull-Moving-Average.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0668__helenananaa-pine-compat-runtime__change_edge_cases.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "ta.change length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0693__TradersPost-pinescript-agents__momentum.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0711__tarasprystavskyj-top__Breakout-AVAAI-BITGET.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0723__blumax20-OptionsTradingStrategy__debit_spread_strategy.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0733__PapaPablano-Crypto-Test-FIle__EnhancedStrategy.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0776__deepentropy-lightweight-charts-indicators__Stochastic-Slow-Strategy.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0859__deepentropy-oakscriptJS__Stochastic-Slow-Strategy.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputGains": [
+        {
+          "row": "sources/0129__woodstock-tokyo-pinescription-demo__example2.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0208__cetio-indicators__vptl.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0320__deepentropy-lightweight-charts-indicators__MA-Sabres-LuxAlgo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0385__deepentropy-oakscriptJS__MA-Sabres-LuxAlgo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0486__alboogycOdR-dev-projects__institutional_crt_frameworkv8.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0595__deepentropy-lightweight-charts-indicators__Three-Drive-Pattern-Detector-LuxAlgo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        }
+      ]
+    },
+    {
+      "corpus": "v7",
+      "previousSha": "bbcbf3d220",
+      "currentSha": "7c08371da1",
+      "previousReport": ".cache/tealscript/pine-corpus-v7-20260911/fixture-profiles-current-2e05553bda/external-pine-corpus-v7-daily-standard.json",
+      "currentReport": "reports/external-pine-corpus-v7.daily-rerun-7c08371da1.json",
+      "previous": {
+        "rawOutput": 293,
+        "rawTotal": 456,
+        "achievableOutput": 293,
+        "achievableDenominator": 401,
+        "outcomes": {
+          "failed": 156,
+          "no-output-compiled": 7,
+          "produced-output-compiled": 293
+        },
+        "outputSilence": {
+          "correct-silence": 4,
+          "tealscript-gap": 1,
+          "undecided": 2
+        }
+      },
+      "current": {
+        "rawOutput": 304,
+        "rawTotal": 456,
+        "achievableOutput": 304,
+        "achievableDenominator": 400,
+        "outcomes": {
+          "failed": 145,
+          "no-output-compiled": 7,
+          "produced-output-compiled": 304
+        },
+        "outputSilence": {
+          "correct-silence": 4,
+          "tealscript-gap": 1,
+          "undecided": 2
+        }
+      },
+      "deltas": {
+        "rawOutput": 11,
+        "achievableOutput": 11,
+        "achievableDenominator": -1
+      },
+      "previousSilentNoErrorRows": 5,
+      "previouslySilentNoErrorNowSevenErrors": [],
+      "previouslySilentNoErrorNowTaLength": [],
+      "producedOutputDropsToSevenErrors": [
+        {
+          "row": "sources/0252__regalouisei-collect-tradingview__short-volume-stamper.pine",
+          "cause": "table-cell-limit",
+          "diagnostic": "Too many table cells: maximum is 10000",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0367__himeshramjee-chaiwala-invest__two-thirty-100pip-scalp.pine",
+          "cause": "table-cell-limit",
+          "diagnostic": "Too many table cells: maximum is 10000",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputDropsToTaLength": [
+        {
+          "row": "sources/0254__deepentropy-lightweight-charts-indicators__Global-Liquidity-Index.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0260__deepentropy-oakscriptJS__Global-Liquidity-Index.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0290__hasnocool-tradingview-pine-scripts__Position-Investing-by-SirSeff.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        },
+        {
+          "row": "sources/0380__etnt-stocks__15M.pine",
+          "cause": "ta-invalid-length",
+          "diagnostic": "TA length must be a positive integer",
+          "previousStage": null,
+          "previousOutcome": "produced-output-compiled",
+          "currentStage": "execute",
+          "currentOutcome": "failed"
+        }
+      ],
+      "producedOutputGains": [
+        {
+          "row": "sources/0100__TommyPang-TradingBot__pillar7_catalysts.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0101__DarthBuddha-TradingView__MoneyFlow.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "parse",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0102__DarthBuddha-TradingView__BuddhaMoneyFlow.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "parse",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0115__agejevasv-tradingview__marketprofile.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "parse",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0116__s4mn0v-pinescript__market-profile.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "parse",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0141__pineforge-4pass-pineforge-corpus__strategy.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0142__MeridianAlgo-Pine-A-Script__Singular_Spectrum_Decomposition_LuxAlgo.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0143__pineforge-4pass-pineforge-benchmarks-assets__strategy.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0144__regalouisei-collect-tradingview__rolling-ssa-oscillator-luxalgo.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0145__pineforge-4pass-pineforge-codegen-oss__validation__matrix-eigen-rank-deficient-cov-01.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0146__helenananaa-pine-compat-runtime__matrix_eigenvalues.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0160__helenananaa-pine-compat-runtime__matrix_eigenvectors.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "execute",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0243__ainell-owi-LePine__Siege-_structure-_engine_v6.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0411__deepentropy-lightweight-charts-indicators__TradingView-Alerts-Expo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0441__alboogycOdR-dev-projects__institutional_crt_frameworkv9.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0442__alboogycOdR-dev-projects__institutional_crt_frameworkv8.1.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        },
+        {
+          "row": "sources/0453__deepentropy-oakscriptJS__TradingView-Alerts-Expo-.pine",
+          "cause": "now-produces-output",
+          "diagnostic": "",
+          "previousStage": "semantic",
+          "previousOutcome": "failed",
+          "currentStage": null,
+          "currentOutcome": "produced-output-compiled"
+        }
+      ]
+    }
+  ]
+}

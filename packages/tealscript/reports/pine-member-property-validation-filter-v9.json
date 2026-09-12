@@ -1,0 +1,808 @@
+{
+  "schemaVersion": 1,
+  "supersededBy": "pine-member-property-validation-filter-v10.json",
+  "supersededNote": "Historical measurement only.",
+  "basis": {
+    "propertyMap": "pine-member-property-map-v2",
+    "vectorCases": 817,
+    "passingVectorCases": 814,
+    "rule": "Explains why member coverage does not imply property-rule validation coverage. Current validation applies scalar/tuple properties, explicit enum/string scalar proxy checks, and attributed array/matrix/map collection rules when the vector has one attributable output."
+  },
+  "summary": {
+    "propertyRules": 993,
+    "scalarProxyTupleCollectionEligibleRules": 838,
+    "payloadShapeOrSideEffectRules": 155,
+    "vectorCoveredMembers": 813,
+    "propertyRulesOnVectorCoveredMembers": 946,
+    "scalarProxyTupleCollectionRulesOnVectorCoveredMembers": 793,
+    "passingVectorCoveredMembers": 813,
+    "propertyRulesOnPassingVectorMembers": 946,
+    "scalarProxyTupleCollectionRulesOnPassingVectorMembers": 793,
+    "scalarProxyTupleCollectionRulesReachableByAnyPassingTarget": 793,
+    "scalarProxyTupleCollectionRulesOnSingleTargetPassingCases": 117,
+    "scalarProxyTupleCollectionRulesOnMultiTargetPassingCases": 682,
+    "scalarProxyTupleCollectionRulesUnlockedByOutputAttribution": 498,
+    "scalarProxyTupleCollectionRulesUnlockedByConstructedSingleTargetCases": 73,
+    "scalarProxyTupleCollectionRulesStillStrandedBehindJudgment": 82,
+    "scalarProxyTupleCollectionRulesOnInvariantCases": 24,
+    "zeroOutputSingleTargetScalarRules": 0,
+    "vectorValidatedRules": 770,
+    "shippedStudyValidatedRules": 25,
+    "combinedKnownGoodRuleCoverage": 775,
+    "combinedKnownGoodRuleCoveragePercent": "78.05%"
+  },
+  "targetCounts": {
+    "zero": 403,
+    "one": 235,
+    "multi": 131,
+    "invariant": 45
+  },
+  "annotatedMultiTargetCases": [
+    {
+      "id": "array.mutation-accessors",
+      "outputs": 1,
+      "scalarTupleRules": 9
+    },
+    {
+      "id": "array.receiver-result-chain-values",
+      "outputs": 4,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "array.statistics",
+      "outputs": 7,
+      "scalarTupleRules": 7
+    },
+    {
+      "id": "array.nth-extrema-values",
+      "outputs": 2,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "array.search-sort-values",
+      "outputs": 7,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "array.slice-reverse-join-values",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "array.advanced-search-fill-values",
+      "outputs": 9,
+      "scalarTupleRules": 5
+    },
+    {
+      "id": "array.bool-and-constructor-values",
+      "outputs": 5,
+      "scalarTupleRules": 9
+    },
+    {
+      "id": "array.distribution-values",
+      "outputs": 7,
+      "scalarTupleRules": 7
+    },
+    {
+      "id": "array.unbiased-distribution-values",
+      "outputs": 3,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "matrix.basic-aggregates",
+      "outputs": 9,
+      "scalarTupleRules": 9
+    },
+    {
+      "id": "matrix.fill-sort-values",
+      "outputs": 5,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "matrix.range-fill-sort-column-values",
+      "outputs": 6,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "matrix.shape-mutation-values",
+      "outputs": 10,
+      "scalarTupleRules": 23
+    },
+    {
+      "id": "matrix.algebra-values",
+      "outputs": 11,
+      "scalarTupleRules": 11
+    },
+    {
+      "id": "matrix.mixed-kron-values",
+      "outputs": 4,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "matrix.complex-eigen-shape-values",
+      "outputs": 3,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "matrix.predicate-distribution-values",
+      "outputs": 12,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "visual.constant-identity-values",
+      "outputs": 23,
+      "scalarTupleRules": 8
+    },
+    {
+      "id": "visual.shape-position-constant-values",
+      "outputs": 17,
+      "scalarTupleRules": 17
+    },
+    {
+      "id": "runtime.color-math-array-values",
+      "outputs": 9,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "runtime.global-context-values",
+      "outputs": 10,
+      "scalarTupleRules": 14
+    },
+    {
+      "id": "visual.secondary-constant-metadata-values",
+      "outputs": 9,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "runtime.host-constant-identity-values",
+      "outputs": 17,
+      "scalarTupleRules": 21
+    },
+    {
+      "id": "drawing.line-getters",
+      "outputs": 5,
+      "scalarTupleRules": 5
+    },
+    {
+      "id": "drawing.line-mutation-copy-values",
+      "outputs": 8,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "drawing.line-style-getter-values",
+      "outputs": 6,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "drawing.box-getters",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "drawing.box-mutation-copy-values",
+      "outputs": 8,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "drawing.label-getters",
+      "outputs": 3,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "drawing.label-mutation-copy-values",
+      "outputs": 6,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "drawing.label-style-metadata-values",
+      "outputs": 13,
+      "scalarTupleRules": 8
+    },
+    {
+      "id": "drawing.linefill-getters",
+      "outputs": 2,
+      "scalarTupleRules": 0
+    },
+    {
+      "id": "drawing.linefill-color-copy-values",
+      "outputs": 10,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "drawing.box-style-text-values",
+      "outputs": 9,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "drawing.chart-point-values",
+      "outputs": 4,
+      "scalarTupleRules": 0
+    },
+    {
+      "id": "drawing.chart-point-constructor-values",
+      "outputs": 11,
+      "scalarTupleRules": 0
+    },
+    {
+      "id": "drawing.label-style-constant-values",
+      "outputs": 21,
+      "scalarTupleRules": 21
+    },
+    {
+      "id": "runtime.barstate-historical-flags",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "runtime.input-default-values",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "runtime.input-expanded-default-values",
+      "outputs": 12,
+      "scalarTupleRules": 17
+    },
+    {
+      "id": "runtime.currency-constants-values",
+      "outputs": 56,
+      "scalarTupleRules": 112
+    },
+    {
+      "id": "runtime.syminfo-values",
+      "outputs": 5,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "runtime.syminfo-metadata-values",
+      "outputs": 12,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "runtime.syminfo-provider-metadata-values",
+      "outputs": 16,
+      "scalarTupleRules": 16
+    },
+    {
+      "id": "runtime.chart-context-values",
+      "outputs": 13,
+      "scalarTupleRules": 15
+    },
+    {
+      "id": "runtime.timeframe-values",
+      "outputs": 5,
+      "scalarTupleRules": 7
+    },
+    {
+      "id": "runtime.timeframe-conversion-change-values",
+      "outputs": 12,
+      "scalarTupleRules": 13
+    },
+    {
+      "id": "runtime.calendar-fields",
+      "outputs": 6,
+      "scalarTupleRules": 16
+    },
+    {
+      "id": "runtime.timestamp-and-time-values",
+      "outputs": 3,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "runtime.session-state-values",
+      "outputs": 5,
+      "scalarTupleRules": 5
+    },
+    {
+      "id": "strategy.market-slippage-commission-ledger-values",
+      "outputs": 11,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "strategy.percent-of-equity-quantity-ledger-values",
+      "outputs": 7,
+      "scalarTupleRules": 7
+    },
+    {
+      "id": "strategy.partial-exit-average-price-values",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "strategy.cash-per-order-commission-ledger-values",
+      "outputs": 5,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "strategy.percent-commission-ledger-values",
+      "outputs": 5,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "strategy.fixed-quantity-ledger-values",
+      "outputs": 5,
+      "scalarTupleRules": 5
+    },
+    {
+      "id": "strategy.cash-amount-quantity-ledger-values",
+      "outputs": 6,
+      "scalarTupleRules": 6
+    },
+    {
+      "id": "strategy.close-entries-rule-fifo-values",
+      "outputs": 6,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "strategy.close-entries-rule-any-values",
+      "outputs": 6,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "strategy.pyramiding-closeout-ledger-values",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "strategy.oca-cancel-pending-order-values",
+      "outputs": 2,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "strategy.oca-reduce-pending-order-values",
+      "outputs": 2,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "strategy.oca-none-pending-order-values",
+      "outputs": 2,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "strategy.process-orders-on-close-fill-timing-values",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "strategy.next-tick-market-fill-timing-values",
+      "outputs": 4,
+      "scalarTupleRules": 4
+    },
+    {
+      "id": "strategy.aggregate-performance-values",
+      "outputs": 10,
+      "scalarTupleRules": 10
+    },
+    {
+      "id": "strategy.aggregate-percent-contract-values",
+      "outputs": 7,
+      "scalarTupleRules": 8
+    },
+    {
+      "id": "strategy.closedtrades-timing-commission-values",
+      "outputs": 5,
+      "scalarTupleRules": 10
+    },
+    {
+      "id": "strategy.percent-commission-values",
+      "outputs": 6,
+      "scalarTupleRules": 12
+    },
+    {
+      "id": "strategy.risk-max-drawdown-cash-values",
+      "outputs": 3,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "strategy.risk-max-intraday-loss-cash-values",
+      "outputs": 3,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "strategy.trade-runup-drawdown-values",
+      "outputs": 9,
+      "scalarTupleRules": 17
+    },
+    {
+      "id": "request.security-barmerge-modes",
+      "outputs": 4,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "request.security-lower-tf-lookahead",
+      "outputs": 2,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "request.currency-rate-points",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "request.corporate-actions-points",
+      "outputs": 6,
+      "scalarTupleRules": 3
+    },
+    {
+      "id": "request.financial-economic-points",
+      "outputs": 2,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "request.point-gaps-options",
+      "outputs": 2,
+      "scalarTupleRules": 2
+    }
+  ],
+  "constructedSingleTargetCases": [
+    {
+      "id": "property.single.alert.freq_all",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.alert.freq_once_per_bar",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.alert.freq_once_per_bar_close",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.barmerge.gaps_off",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.barmerge.gaps_on",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.barmerge.lookahead_off",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.barmerge.lookahead_on",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.bar_index",
+      "outputs": 1,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "property.single.array.first",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.array.last",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.array.from",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.array.new_bool",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.array.new_float",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.array.new_int",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.bool",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.false",
+      "outputs": 1,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "property.single.true",
+      "outputs": 1,
+      "scalarTupleRules": 2
+    },
+    {
+      "id": "property.single.map.clear",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.contains",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.copy",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.get",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.keys",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.new",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.put",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.put_all",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.remove",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.size",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.map.values",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.matrix.new",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.dividends.gross",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.dividends.net",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.earnings.actual",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.earnings.standardized",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.extend.both",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.extend.left",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.extend.none",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.extend.right",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.font.family_default",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.font.family_monospace",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.format.inherit",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.format.price",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.location.abovebar",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.location.belowbar",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.order.ascending",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.position.bottom_left",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.position.middle_center",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.position.top_right",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.scale.left",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.session.extended",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.shape.triangleup",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.size.auto",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.size.huge",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.size.large",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.size.normal",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.size.small",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.size.tiny",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.splits.denominator",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.splits.numerator",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.align_bottom",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.align_left",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.align_right",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.align_top",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.format_bold",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.wrap_auto",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.text.wrap_none",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.xloc.bar_index",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.xloc.bar_time",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.yloc.abovebar",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.yloc.belowbar",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    },
+    {
+      "id": "property.single.yloc.price",
+      "outputs": 1,
+      "scalarTupleRules": 1
+    }
+  ],
+  "propertyRuleKinds": {
+    "enum-constant": 240,
+    "void-side-effect": 147,
+    "collection-shape": 59,
+    "numeric-domain": 203,
+    "boolean-domain": 57,
+    "numeric-range": 32,
+    "string-domain": 112,
+    "nonnegative": 92,
+    "integer-domain": 21,
+    "handle-shape": 21,
+    "color-domain": 5,
+    "tuple-coherence": 4
+  },
+  "interpretation": {
+    "dominantFilter": "Most remaining unvalidated rules require judgment or payload-specific traversal; scalar/proxy and mechanical collection rules now validate when an output owns them.",
+    "cheapFixAvailable": false,
+    "costToRaiseCoverage": "A small constructed single-target sample showed the remaining judgment bucket can be reduced without annotating ambiguous existing cases. The method is slower per rule than mechanical attribution but avoids misattributing a multi-output case."
+  }
+}

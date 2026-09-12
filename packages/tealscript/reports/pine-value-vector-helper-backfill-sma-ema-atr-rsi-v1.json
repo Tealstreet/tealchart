@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12T07:06:02.906Z",
+  "measuredCommitSha": "2628bdbd1a",
+  "measuredWorkingTreeDirty": true,
+  "inputs": {
+    "rmaCheckpoint": "pine-value-vector-helper-backfill-rma-v1.json @ 2628bdbd1a"
+  },
+  "summary": {
+    "rowsBackfilled": 19,
+    "rowsByHelper": {
+      "sma": 6,
+      "ema": 5,
+      "atr": 4,
+      "rsi": 4
+    },
+    "disagreementsFound": 0,
+    "proofFailures": 0,
+    "runningRowsBackfilled": 33,
+    "runningDisagreementsFound": 0,
+    "remainingBroadCitationRows": 59,
+    "gateCaughtProoflessMergedVectors": 4,
+    "gateCatchesByLane": {
+      "runtime/operator": 1,
+      "runtime/versioned-operator": 1,
+      "semantic/argument-type": 1,
+      "semantic/qualifier": 1
+    }
+  },
+  "rows": [
+    {
+      "id": "ta.sma",
+      "helper": "sma",
+      "member": "ta.sma",
+      "firstNonNullBar": 2,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.sma.middle-na",
+      "helper": "sma",
+      "member": "ta.sma",
+      "firstNonNullBar": 2,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.sma.multi-middle-na",
+      "helper": "sma",
+      "member": "ta.sma",
+      "firstNonNullBar": 3,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "ta.sma.nested-expression-source-order-values",
+      "helper": "sma",
+      "member": "ta.sma",
+      "firstNonNullBar": 2,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "language.block-boundary-unary-return-values",
+      "helper": "sma",
+      "member": "ta.sma",
+      "firstNonNullBar": 1,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "udf.ta.call-sites",
+      "helper": "sma",
+      "member": "ta.sma",
+      "firstNonNullBar": 2,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "ta.ema",
+      "helper": "ema",
+      "member": "ta.ema",
+      "firstNonNullBar": 0,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.ema.long",
+      "helper": "ema",
+      "member": "ta.ema",
+      "firstNonNullBar": 0,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.ema.long-middle-na",
+      "helper": "ema",
+      "member": "ta.ema",
+      "firstNonNullBar": 0,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.ema.middle-na",
+      "helper": "ema",
+      "member": "ta.ema",
+      "firstNonNullBar": 0,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.ema.multi-middle-na",
+      "helper": "ema",
+      "member": "ta.ema",
+      "firstNonNullBar": 0,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "ta.atr",
+      "helper": "atr",
+      "member": "ta.atr",
+      "firstNonNullBar": 2,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.atr.middle-na",
+      "helper": "atr",
+      "member": "ta.atr",
+      "firstNonNullBar": 2,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.atr.multi-middle-na",
+      "helper": "atr",
+      "member": "ta.atr",
+      "firstNonNullBar": 3,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.atr.overlong",
+      "helper": "atr",
+      "member": "ta.atr",
+      "firstNonNullBar": null,
+      "proofMutations": [
+        "truncate-first-output"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "ta.rsi",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "firstNonNullBar": 3,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.rsi.flat",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "firstNonNullBar": 3,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.rsi.multi-middle-na",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "firstNonNullBar": 4,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    },
+    {
+      "id": "hostile.rsi.signed",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "firstNonNullBar": 3,
+      "proofMutations": [
+        "flip-first-non-null-value"
+      ],
+      "compiledMatches": true,
+      "publicPathMatches": true
+    }
+  ],
+  "proofFailures": [],
+  "gateCatches": [
+    {
+      "id": "semantic.array-percentile-string-percentage-rejection",
+      "lane": "semantic/argument-type",
+      "sourceCommit": "14ac4a40cf",
+      "sourceSubject": "fix: reject string array percentile percentage"
+    },
+    {
+      "id": "semantic.builtin-argument-qualifier-rejection",
+      "lane": "semantic/qualifier",
+      "sourceCommit": "2d9aa7168e",
+      "sourceSubject": "fix: enforce builtin argument qualifiers"
+    },
+    {
+      "id": "language.negative-modulo-floor-quotient",
+      "lane": "runtime/operator",
+      "sourceCommit": "8a1fb60dac",
+      "sourceSubject": "fix: use pine modulo semantics for negatives"
+    },
+    {
+      "id": "language.v5-comparison-na-result-is-na",
+      "lane": "runtime/versioned-operator",
+      "sourceCommit": "58cff557c0",
+      "sourceSubject": "fix: preserve v5 na comparison results"
+    }
+  ]
+}

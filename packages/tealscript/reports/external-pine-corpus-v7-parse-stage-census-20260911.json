@@ -1,0 +1,701 @@
+{
+  "measuredAt": "2026-09-11",
+  "codeUnderTest": "69c43143ac0f306f9236d7b16d29cff5c4b90991 + this report's parser changes",
+  "summary": {
+    "total": 456,
+    "parsePassed": 440,
+    "parseFailed": 16,
+    "semanticPassed": 338,
+    "semanticFailed": 102,
+    "declared": {
+      "5": 214,
+      "6": 242
+    },
+    "declarationKinds": {
+      "indicator": 318,
+      "library": 6,
+      "strategy": 132
+    },
+    "elapsedMs": 16279,
+    "cacheRoot": "/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-corpus/packages/tealscript/.cache/tealscript/pine-corpus-v7-20260911",
+    "sourcesDir": "/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-corpus/packages/tealscript/.cache/tealscript/pine-corpus-v7-20260911/sources"
+  },
+  "splitSummary": {
+    "parse": {
+      "corpus-artifact": 6,
+      "invalid-pine": 5,
+      "unclassified": 5
+    }
+  },
+  "parseBuckets": [
+    {
+      "key": "parse-error: Expected \"(\", \".\", \"/*\", \"=>\", \"[\", or [ \\t] but \"\\n\" found.",
+      "count": 3
+    },
+    {
+      "key": "parse-error: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"false\", \"na\", \"not\", \"true\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"a\" found.",
+      "count": 3
+    },
+    {
+      "key": "parse-error: Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"0\" found.",
+      "count": 2
+    },
+    {
+      "key": "parse-error: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \",\" found.",
+      "count": 2
+    },
+    {
+      "key": "parse-error: Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \"=\" found.",
+      "count": 2
+    },
+    {
+      "key": "parse-error: Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"1\" found.",
+      "count": 1
+    },
+    {
+      "key": "parse-error: Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"3\" found.",
+      "count": 1
+    },
+    {
+      "key": "parse-error: Expected [0-9] but \".\" found.",
+      "count": 1
+    },
+    {
+      "key": "parse-error: Pine Script uses indentation to delimit blocks; JavaScript-style braces are not valid Pine syntax.",
+      "count": 1
+    }
+  ],
+  "rows": [
+    {
+      "localPath": "sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+      "sourceRepoUrl": "https://github.com/Matt2005git/PineScriptV5",
+      "sourceFilePath": "themes/syntaxCheck.pine",
+      "commitSha": "0766730269197e82614b97889c4bfbdf3e3be0f2",
+      "sourceSha256": "492e0ae5b8ca51835dad67931d9413d1a0f824d78772e546f0663ac43f5d9248",
+      "declarationKind": "library",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.abs",
+        "array.every",
+        "array.percentile_nearest_rank",
+        "box.set_text_font_family",
+        "box.set_text_wrap",
+        "chart.point.copy",
+        "dividends.future_amount",
+        "dividends.future_ex_date",
+        "dividends.future_pay_date",
+        "earnings.future_period_end_time",
+        "label.set_text_font_family",
+        "label.style_cross",
+        "line.set_first_point",
+        "line.set_second_point",
+        "math.rphi",
+        "matrix.eigenvalues",
+        "matrix.eigenvectors",
+        "matrix.is_identity",
+        "matrix.is_square",
+        "matrix.is_symmetric",
+        "matrix.median",
+        "matrix.pinv",
+        "matrix.remove_col",
+        "matrix.sum",
+        "matrix.swap_columns",
+        "request.quandl",
+        "scale.left",
+        "strategy.closedtrades.entry_comment",
+        "strategy.closedtrades.max_drawdown_percent",
+        "strategy.closedtrades.max_runup_percent",
+        "strategy.direction.all",
+        "strategy.direction.short",
+        "strategy.margin_liquidation_price",
+        "strategy.oca.none",
+        "strategy.opentrades.commission",
+        "strategy.opentrades.entry_comment",
+        "strategy.opentrades.max_drawdown_percent",
+        "strategy.opentrades.max_runup_percent",
+        "strategy.risk.max_cons_loss_days",
+        "syminfo.minmove",
+        "syminfo.recommendations_buy",
+        "syminfo.recommendations_buy_strong",
+        "syminfo.recommendations_date",
+        "syminfo.recommendations_hold",
+        "syminfo.recommendations_sell",
+        "syminfo.recommendations_sell_strong",
+        "syminfo.recommendations_total",
+        "text.wrap_auto",
+        "text.wrap_none",
+        "weekofyear"
+      ],
+      "source": "sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"false\", \"na\", \"not\", \"true\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"a\" found.",
+        "line": 208,
+        "column": 1
+      },
+      "sourceLine": "and",
+      "classification": {
+        "split": "corpus-artifact",
+        "bucket": "Non-source/token/template artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder."
+      }
+    },
+    {
+      "localPath": "sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+      "sourceRepoUrl": "https://github.com/tradesdontlie/pine-script-v6-extension",
+      "sourceFilePath": "themes/syntaxCheck.pine",
+      "commitSha": "0766730269197e82614b97889c4bfbdf3e3be0f2",
+      "sourceSha256": "492e0ae5b8ca51835dad67931d9413d1a0f824d78772e546f0663ac43f5d9248",
+      "declarationKind": "library",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.abs",
+        "array.every",
+        "array.percentile_nearest_rank",
+        "box.set_text_font_family",
+        "box.set_text_wrap",
+        "chart.point.copy",
+        "dividends.future_amount",
+        "dividends.future_ex_date",
+        "dividends.future_pay_date",
+        "earnings.future_period_end_time",
+        "label.set_text_font_family",
+        "label.style_cross",
+        "line.set_first_point",
+        "line.set_second_point",
+        "math.rphi",
+        "matrix.eigenvalues",
+        "matrix.eigenvectors",
+        "matrix.is_identity",
+        "matrix.is_square",
+        "matrix.is_symmetric",
+        "matrix.median",
+        "matrix.pinv",
+        "matrix.remove_col",
+        "matrix.sum",
+        "matrix.swap_columns",
+        "request.quandl",
+        "scale.left",
+        "strategy.closedtrades.entry_comment",
+        "strategy.closedtrades.max_drawdown_percent",
+        "strategy.closedtrades.max_runup_percent",
+        "strategy.direction.all",
+        "strategy.direction.short",
+        "strategy.margin_liquidation_price",
+        "strategy.oca.none",
+        "strategy.opentrades.commission",
+        "strategy.opentrades.entry_comment",
+        "strategy.opentrades.max_drawdown_percent",
+        "strategy.opentrades.max_runup_percent",
+        "strategy.risk.max_cons_loss_days",
+        "syminfo.minmove",
+        "syminfo.recommendations_buy",
+        "syminfo.recommendations_buy_strong",
+        "syminfo.recommendations_date",
+        "syminfo.recommendations_hold",
+        "syminfo.recommendations_sell",
+        "syminfo.recommendations_sell_strong",
+        "syminfo.recommendations_total",
+        "text.wrap_auto",
+        "text.wrap_none",
+        "weekofyear"
+      ],
+      "source": "sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"false\", \"na\", \"not\", \"true\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"a\" found.",
+        "line": 208,
+        "column": 1
+      },
+      "sourceLine": "and",
+      "classification": {
+        "split": "corpus-artifact",
+        "bucket": "Non-source/token/template artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder."
+      }
+    },
+    {
+      "localPath": "sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+      "sourceRepoUrl": "https://github.com/kaigouthro/Pine-Script-VS-Code",
+      "sourceFilePath": "themes/syntaxCheck.pine",
+      "commitSha": "0b33e824f736524f4925db957f1c5bdac1877f2e",
+      "sourceSha256": "492e0ae5b8ca51835dad67931d9413d1a0f824d78772e546f0663ac43f5d9248",
+      "declarationKind": "library",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.abs",
+        "array.every",
+        "array.percentile_nearest_rank",
+        "box.set_text_font_family",
+        "box.set_text_wrap",
+        "chart.point.copy",
+        "dividends.future_amount",
+        "dividends.future_ex_date",
+        "dividends.future_pay_date",
+        "earnings.future_period_end_time",
+        "label.set_text_font_family",
+        "label.style_cross",
+        "line.set_first_point",
+        "line.set_second_point",
+        "math.rphi",
+        "matrix.eigenvalues",
+        "matrix.eigenvectors",
+        "matrix.is_identity",
+        "matrix.is_square",
+        "matrix.is_symmetric",
+        "matrix.median",
+        "matrix.pinv",
+        "matrix.remove_col",
+        "matrix.sum",
+        "matrix.swap_columns",
+        "request.quandl",
+        "scale.left",
+        "strategy.closedtrades.entry_comment",
+        "strategy.closedtrades.max_drawdown_percent",
+        "strategy.closedtrades.max_runup_percent",
+        "strategy.direction.all",
+        "strategy.direction.short",
+        "strategy.margin_liquidation_price",
+        "strategy.oca.none",
+        "strategy.opentrades.commission",
+        "strategy.opentrades.entry_comment",
+        "strategy.opentrades.max_drawdown_percent",
+        "strategy.opentrades.max_runup_percent",
+        "strategy.risk.max_cons_loss_days",
+        "syminfo.minmove",
+        "syminfo.recommendations_buy",
+        "syminfo.recommendations_buy_strong",
+        "syminfo.recommendations_date",
+        "syminfo.recommendations_hold",
+        "syminfo.recommendations_sell",
+        "syminfo.recommendations_sell_strong",
+        "syminfo.recommendations_total",
+        "text.wrap_auto",
+        "text.wrap_none",
+        "weekofyear"
+      ],
+      "source": "sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"false\", \"na\", \"not\", \"true\", [ \\t], [+\\-], [0-9], or [\\n\\r] but \"a\" found.",
+        "line": 208,
+        "column": 1
+      },
+      "sourceLine": "and",
+      "classification": {
+        "split": "corpus-artifact",
+        "bucket": "Non-source/token/template artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder."
+      }
+    },
+    {
+      "localPath": "sources/0033__tibicrypto-chibao__bot-screener-okk-mod.pine",
+      "sourceRepoUrl": "https://github.com/tibicrypto/chibao",
+      "sourceFilePath": "bot screener okk mod.pine",
+      "commitSha": "cd2d03342d122877d854b745ff75436691339870",
+      "sourceSha256": "f5b41e64139ca1d7b904fbadc8d7eeb808ab674e8871d5675a06f860f824be46",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "array.every"
+      ],
+      "source": "sources/0033__tibicrypto-chibao__bot-screener-okk-mod.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \"=\" found.",
+        "line": 422,
+        "column": 263
+      },
+      "sourceLine": "    [globals.get(\"coinbuy\" + str.tostring(i)), globals.get(\"coinsell\" + str.tostring(i)), globals.get(\"atrBuy\" + str.tostring(i)), globals.get(\"atrSell\" + str.tostring(i)), globals.get(\"buytarget\" + str.tostring(i)), globals.get(\"selltarget\" + str.tostring(i))] = alarmTetikle(globals.get(\"sembol\" + str.tostring(i)), globals.get(\"sembol\" + str.tostring(i) + \"_tg1\"), globals.get(\"sembol\" + str.tostring(i) + \"_tg2\"), globals.get(\"sembol\" + str.tostring(i) + \"_tg3\"))",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Invalid tuple assignment target",
+        "verdict": "Tuple assignment targets must be assignable Pine targets, not `globals.get(...)` calls."
+      }
+    },
+    {
+      "localPath": "sources/0078__btcjon-pine__TTB_SnD_MTF.pine",
+      "sourceRepoUrl": "https://github.com/btcjon/pine",
+      "sourceFilePath": "archive/TTB_SnD_MTF.pine",
+      "commitSha": "43413c4657522fef2df09fb71cb4aeee3cef782e",
+      "sourceSha256": "82f1b234f11414bb3f856032e680fb8adb5f8eb4f9debe7079622e39b8313ba7",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "box.set_text_font_family"
+      ],
+      "source": "sources/0078__btcjon-pine__TTB_SnD_MTF.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"(\", \".\", \"/*\", \"=>\", \"[\", or [ \\t] but \"\\n\" found.",
+        "line": 119,
+        "column": 69
+      },
+      "sourceLine": "            timeframe.isminutes and  timeframe.multiplier % 60 != 0 ",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Switch arm condition line-wrapped before `=>`",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid."
+      }
+    },
+    {
+      "localPath": "sources/0079__btcjon-pine__TTB_MTF_SnD.pine",
+      "sourceRepoUrl": "https://github.com/btcjon/pine",
+      "sourceFilePath": "archive/TTB_MTF_SnD.pine",
+      "commitSha": "43413c4657522fef2df09fb71cb4aeee3cef782e",
+      "sourceSha256": "9023588b0c007cd6bc32f0b3723911dacfd92e6be5d1da6adcb3ccc6a4a2480d",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "box.set_text_font_family"
+      ],
+      "source": "sources/0079__btcjon-pine__TTB_MTF_SnD.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"(\", \".\", \"/*\", \"=>\", \"[\", or [ \\t] but \"\\n\" found.",
+        "line": 119,
+        "column": 69
+      },
+      "sourceLine": "            timeframe.isminutes and  timeframe.multiplier % 60 != 0 ",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Switch arm condition line-wrapped before `=>`",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid."
+      }
+    },
+    {
+      "localPath": "sources/0080__btcjon-pine__TTB_MTF_SnD_strat.pine",
+      "sourceRepoUrl": "https://github.com/btcjon/pine",
+      "sourceFilePath": "archive/TTB_MTF_SnD_strat.pine",
+      "commitSha": "43413c4657522fef2df09fb71cb4aeee3cef782e",
+      "sourceSha256": "dbc4607e3e2aae11b32aec54583351ad9f6b65fac8750fce21e463d8d68bd125",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "box.set_text_font_family"
+      ],
+      "source": "sources/0080__btcjon-pine__TTB_MTF_SnD_strat.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"(\", \".\", \"/*\", \"=>\", \"[\", or [ \\t] but \"\\n\" found.",
+        "line": 115,
+        "column": 69
+      },
+      "sourceLine": "            timeframe.isminutes and  timeframe.multiplier % 60 != 0 ",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Switch arm condition line-wrapped before `=>`",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid."
+      }
+    },
+    {
+      "localPath": "sources/0123__regalouisei-collect-tradingview__scatter-plot.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/scatter-plot.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "73cf162f10486d0226a0a79b4e9e4edd9b24ecf66d3aea0fabf3f9a734282924",
+      "declarationKind": "indicator",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "label.style_cross"
+      ],
+      "source": "sources/0123__regalouisei-collect-tradingview__scatter-plot.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \",\" found.",
+        "line": 12,
+        "column": 2
+      },
+      "sourceLine": " , INV=color(na)",
+      "classification": {
+        "split": "corpus-artifact",
+        "bucket": "Non-source/token/template artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder."
+      }
+    },
+    {
+      "localPath": "sources/0181__regalouisei-collect-tradingview__intrabar-analyzer-kioseff-trading.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/intrabar-analyzer-kioseff-trading.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "5db25414bf31b5db57f02815c547be41cf9c634a5a63420d27a13ca9323896ad",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "matrix.median"
+      ],
+      "source": "sources/0181__regalouisei-collect-tradingview__intrabar-analyzer-kioseff-trading.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \",\" found.",
+        "line": 7,
+        "column": 32
+      },
+      "sourceLine": "import PineCoders/Time/3 as pct, import kaigouthro/hsvColor/15 as kai, import kaigouthro/EchoMorphicAverage/1 as wema, import TradingView/TechnicalRating/1 as rating",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Comma-separated import declarations",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid."
+      }
+    },
+    {
+      "localPath": "sources/0229__raybird-pine-trading-strategies__of_imbalance_matrix_map_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/of_imbalance_matrix_map_v6.pine",
+      "commitSha": "ab4a18f5caf33d07a4ddceabe47903411839dc3f",
+      "sourceSha256": "7c3c75a6c9381009199602f4c9822fdd420fbbf092f0c0f1e9be923fe972b948",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0229__raybird-pine-trading-strategies__of_imbalance_matrix_map_v6.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"3\" found.",
+        "line": 10,
+        "column": 16
+      },
+      "sourceLine": "    Scalp    = 3.0 // 300% 失衡",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Numeric enum field assignment",
+        "verdict": "Pine enum field assignments are titles, not numeric enum values; numeric RHS is invalid by declared v6."
+      }
+    },
+    {
+      "localPath": "sources/0231__raybird-pine-trading-strategies__multi_agent_of_ensemble_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/multi_agent_of_ensemble_v6.pine",
+      "commitSha": "e83730ee88e055e195bbd0f4b5b6106a963870dc",
+      "sourceSha256": "87c52aba997f92d50c19840548204fbc1c09c6e4d34480a1df724564bba0aee1",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0231__raybird-pine-trading-strategies__multi_agent_of_ensemble_v6.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"0\" found.",
+        "line": 10,
+        "column": 17
+      },
+      "sourceLine": "    Sovereign = 0.5 // 高主權門檻 (需強共識)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Numeric enum field assignment",
+        "verdict": "Pine enum field assignments are titles, not numeric enum values; numeric RHS is invalid by declared v6."
+      }
+    },
+    {
+      "localPath": "sources/0233__raybird-pine-trading-strategies__footprint_liquidity_sweep_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/footprint_liquidity_sweep_v6.pine",
+      "commitSha": "e6038861fe0fdc2ec3cf578459f868e9de62764b",
+      "sourceSha256": "ce63f6e82843d7d75e001e3a1b350a70025b5eb3ad8ea933a242e6026c504c6d",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0233__raybird-pine-trading-strategies__footprint_liquidity_sweep_v6.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"1\" found.",
+        "line": 11,
+        "column": 18
+      },
+      "sourceLine": "    Aggressive = 10  // 短回溯 (快速響應)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Numeric enum field assignment",
+        "verdict": "Pine enum field assignments are titles, not numeric enum values; numeric RHS is invalid by declared v6."
+      }
+    },
+    {
+      "localPath": "sources/0234__raybird-pine-trading-strategies__footprint_entropy_sovereign_v6.pine",
+      "sourceRepoUrl": "https://github.com/raybird/pine-trading-strategies",
+      "sourceFilePath": "strategies/footprint_entropy_sovereign_v6.pine",
+      "commitSha": "7b50cc3e84c4cdc7b13d3c50a23859320f942fbd",
+      "sourceSha256": "483d33e310037cd6db7af4dfe224ae3c84e34fb81927dea76b18e7df2a240980",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "request.footprint"
+      ],
+      "source": "sources/0234__raybird-pine-trading-strategies__footprint_entropy_sovereign_v6.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"'\", \"/*\", \"\\\"\", \"\\\"\\\"\\\"\", or [ \\t] but \"0\" found.",
+        "line": 11,
+        "column": 17
+      },
+      "sourceLine": "    Sovereign = 0.7 // 強制有序 (低熵)",
+      "classification": {
+        "split": "invalid-pine",
+        "bucket": "Numeric enum field assignment",
+        "verdict": "Pine enum field assignments are titles, not numeric enum values; numeric RHS is invalid by declared v6."
+      }
+    },
+    {
+      "localPath": "sources/0253__regalouisei-collect-tradingview__everything-bitcoin-kioseff-trading.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/everything-bitcoin-kioseff-trading.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "1d48701610485b0d836c1311b27a30942b8e78fc8f387417b09f9cc5eacae3c3",
+      "declarationKind": "indicator",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "request.quandl"
+      ],
+      "source": "sources/0253__regalouisei-collect-tradingview__everything-bitcoin-kioseff-trading.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected \"#\", \"'\", \"(\", \".\", \"/*\", \"//\", \"[\", \"\\\"\", \"\\\"\\\"\\\"\", \"array\", \"bool\", \"break\", \"color\", \"const\", \"continue\", \"enum\", \"export\", \"false\", \"float\", \"for\", \"if\", \"import\", \"indicator\", \"input\", \"int\", \"library\", \"map\", \"matrix\", \"method\", \"na\", \"not\", \"once\", \"overload\", \"series\", \"simple\", \"strategy\", \"string\", \"study\", \"switch\", \"true\", \"type\", \"var\", \"varip\", \"while\", [ \\t], [+\\-], [0-9], [\\n\\r], or end of input but \"=\" found.",
+        "line": 244,
+        "column": 3
+      },
+      "sourceLine": "  = normalizedData()",
+      "classification": {
+        "split": "unclassified",
+        "bucket": "Tuple declaration `=` after blank continuation line",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid."
+      }
+    },
+    {
+      "localPath": "sources/0340__MoDarK-MK-PineScript-Skill__strategy_template.pine",
+      "sourceRepoUrl": "https://github.com/MoDarK-MK/PineScript-Skill",
+      "sourceFilePath": "assets/templates/strategy_template.pine",
+      "commitSha": "d54c85f3357d2c076abc987af16cef9a04f9d07d",
+      "sourceSha256": "5072246ba84f0f34d29e676eba5d800e88e476254fc207f18b36cdcbd766b6b5",
+      "declarationKind": "strategy",
+      "declaredVersion": 6,
+      "matchedUntouchedMembers": [
+        "strategy.risk.max_cons_loss_days"
+      ],
+      "source": "sources/0340__MoDarK-MK-PineScript-Skill__strategy_template.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Pine Script uses indentation to delimit blocks; JavaScript-style braces are not valid Pine syntax.",
+        "line": 5,
+        "column": 60
+      },
+      "sourceLine": "strategy(\"{{TITLE}}\", shorttitle=\"{{SHORTTITLE}}\", overlay={{OVERLAY}},",
+      "classification": {
+        "split": "corpus-artifact",
+        "bucket": "Non-source/token/template artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder."
+      }
+    },
+    {
+      "localPath": "sources/0344__samkomo-nashipai__strategy_template.pine",
+      "sourceRepoUrl": "https://github.com/samkomo/nashipai",
+      "sourceFilePath": "tradingview/strategies/strategy_template.pine",
+      "commitSha": "67f1fb90bd117087e41baa52da28166b529a5c77",
+      "sourceSha256": "5e082839be6fd8ad08c2436cca7121225e43990d07c166078e0b592db395b7c9",
+      "declarationKind": "strategy",
+      "declaredVersion": 5,
+      "matchedUntouchedMembers": [
+        "strategy.risk.max_cons_loss_days"
+      ],
+      "source": "sources/0344__samkomo-nashipai__strategy_template.pine",
+      "stage": "parse",
+      "diagnostic": {
+        "code": "parse-error",
+        "message": "Expected [0-9] but \".\" found.",
+        "line": 151,
+        "column": 18
+      },
+      "sourceLine": "longCondition = ...",
+      "classification": {
+        "split": "corpus-artifact",
+        "bucket": "Non-source/token/template artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder."
+      }
+    }
+  ],
+  "classifiedBuckets": {
+    "parse": [
+      {
+        "bucket": "Non-source/token/template artifact",
+        "split": "corpus-artifact",
+        "verdict": "Not Pine source as cached: token list, detached/preamble source, mustache template, or ellipsis placeholder.",
+        "rows": 6,
+        "examples": [
+          "sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+          "sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+          "sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+          "sources/0123__regalouisei-collect-tradingview__scatter-plot.pine",
+          "sources/0340__MoDarK-MK-PineScript-Skill__strategy_template.pine",
+          "sources/0344__samkomo-nashipai__strategy_template.pine"
+        ]
+      },
+      {
+        "bucket": "Numeric enum field assignment",
+        "split": "invalid-pine",
+        "verdict": "Pine enum field assignments are titles, not numeric enum values; numeric RHS is invalid by declared v6.",
+        "rows": 4,
+        "examples": [
+          "sources/0229__raybird-pine-trading-strategies__of_imbalance_matrix_map_v6.pine",
+          "sources/0231__raybird-pine-trading-strategies__multi_agent_of_ensemble_v6.pine",
+          "sources/0233__raybird-pine-trading-strategies__footprint_liquidity_sweep_v6.pine",
+          "sources/0234__raybird-pine-trading-strategies__footprint_entropy_sovereign_v6.pine"
+        ]
+      },
+      {
+        "bucket": "Switch arm condition line-wrapped before `=>`",
+        "split": "unclassified",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid.",
+        "rows": 3,
+        "examples": [
+          "sources/0078__btcjon-pine__TTB_SnD_MTF.pine",
+          "sources/0079__btcjon-pine__TTB_MTF_SnD.pine",
+          "sources/0080__btcjon-pine__TTB_MTF_SnD_strat.pine"
+        ]
+      },
+      {
+        "bucket": "Comma-separated import declarations",
+        "split": "unclassified",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid.",
+        "rows": 1,
+        "examples": [
+          "sources/0181__regalouisei-collect-tradingview__intrabar-analyzer-kioseff-trading.pine"
+        ]
+      },
+      {
+        "bucket": "Invalid tuple assignment target",
+        "split": "invalid-pine",
+        "verdict": "Tuple assignment targets must be assignable Pine targets, not `globals.get(...)` calls.",
+        "rows": 1,
+        "examples": [
+          "sources/0033__tibicrypto-chibao__bot-screener-okk-mod.pine"
+        ]
+      },
+      {
+        "bucket": "Tuple declaration `=` after blank continuation line",
+        "split": "unclassified",
+        "verdict": "Needs TradingView/compiler evidence before changing grammar or declaring invalid.",
+        "rows": 1,
+        "examples": [
+          "sources/0253__regalouisei-collect-tradingview__everything-bitcoin-kioseff-trading.pine"
+        ]
+      }
+    ]
+  }
+}

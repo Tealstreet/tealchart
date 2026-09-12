@@ -1,0 +1,1174 @@
+# Pine Corpus Member Map V1
+
+Date: 2026-09-11
+
+## Basis
+
+- Official denominator: 861 names from `pine-value-vector-member-map-v1.json`.
+- Value-vector covered members: 582.
+- V5 corpus: `/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-parity/packages/tealscript/.cache/tealscript/pine-corpus-v5-20260910` (1000 source files).
+- V6 corpus: `/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-parity/packages/tealscript/.cache/tealscript/pine-corpus-v6-20260911` (1000 source files).
+- Method: explicit official member references in source text after stripping `//` comments and double-quoted strings.
+- Limit: this is structural source coverage only. It does not prove the member is reached at runtime, value-asserted, or semantically bound through every method-receiver form.
+
+## Headline
+
+- Exercised by either corpus: 658/861 (76.42%).
+- Exercised only by value vectors: 128.
+- Exercised by nothing: 75/861 (8.71%).
+- Exercised by both corpus and vectors: 454.
+- Exercised only by corpus: 204.
+- Exercised by either corpus or vectors: 786/861 (91.29%).
+
+## Namespace Counts
+
+| Namespace | Official | Corpus-exercised | Vector-only | Exercised by nothing |
+| --- | ---: | ---: | ---: | ---: |
+| `(global)` | 59 | 58 | 0 | 1 |
+| `adjustment` | 3 | 3 | 0 | 0 |
+| `alert` | 3 | 3 | 0 | 0 |
+| `array` | 55 | 50 | 2 | 3 |
+| `backadjustment` | 3 | 3 | 0 | 0 |
+| `barmerge` | 4 | 4 | 0 | 0 |
+| `barstate` | 7 | 7 | 0 | 0 |
+| `box` | 30 | 26 | 0 | 4 |
+| `chart` | 16 | 10 | 5 | 1 |
+| `color` | 24 | 24 | 0 | 0 |
+| `currency` | 56 | 3 | 53 | 0 |
+| `dayofweek` | 7 | 7 | 0 | 0 |
+| `display` | 7 | 6 | 0 | 1 |
+| `dividends` | 5 | 1 | 1 | 3 |
+| `earnings` | 7 | 6 | 0 | 1 |
+| `extend` | 4 | 4 | 0 | 0 |
+| `font` | 2 | 2 | 0 | 0 |
+| `footprint` | 9 | 0 | 0 | 9 |
+| `format` | 5 | 5 | 0 | 0 |
+| `hline` | 3 | 3 | 0 | 0 |
+| `input` | 13 | 13 | 0 | 0 |
+| `label` | 43 | 39 | 1 | 3 |
+| `line` | 28 | 26 | 0 | 2 |
+| `linefill` | 6 | 5 | 1 | 0 |
+| `location` | 5 | 5 | 0 | 0 |
+| `log` | 3 | 3 | 0 | 0 |
+| `map` | 11 | 8 | 3 | 0 |
+| `math` | 29 | 27 | 1 | 1 |
+| `matrix` | 49 | 37 | 2 | 10 |
+| `order` | 2 | 2 | 0 | 0 |
+| `plot` | 14 | 13 | 0 | 1 |
+| `polyline` | 3 | 3 | 0 | 0 |
+| `position` | 9 | 9 | 0 | 0 |
+| `request` | 11 | 7 | 2 | 2 |
+| `runtime` | 1 | 1 | 0 | 0 |
+| `scale` | 3 | 2 | 0 | 1 |
+| `session` | 9 | 7 | 2 | 0 |
+| `settlement_as_close` | 3 | 3 | 0 | 0 |
+| `shape` | 12 | 12 | 0 | 0 |
+| `size` | 6 | 6 | 0 | 0 |
+| `splits` | 2 | 1 | 1 | 0 |
+| `str` | 18 | 18 | 0 | 0 |
+| `strategy` | 96 | 56 | 27 | 13 |
+| `syminfo` | 40 | 14 | 18 | 8 |
+| `ta` | 67 | 65 | 2 | 0 |
+| `table` | 23 | 16 | 7 | 0 |
+| `text` | 10 | 7 | 0 | 3 |
+| `ticker` | 9 | 9 | 0 | 0 |
+| `timeframe` | 14 | 14 | 0 | 0 |
+| `volume_row` | 8 | 0 | 0 | 8 |
+| `xloc` | 2 | 2 | 0 | 0 |
+| `yloc` | 3 | 3 | 0 | 0 |
+
+## V7 Harvest Targets
+
+Largest/most useful namespaces among members exercised by nothing:
+
+| Namespace | Untouched members |
+| --- | ---: |
+| `strategy` | 13 |
+| `matrix` | 10 |
+| `footprint` | 9 |
+| `syminfo` | 8 |
+| `volume_row` | 8 |
+| `box` | 4 |
+| `array` | 3 |
+| `dividends` | 3 |
+| `label` | 3 |
+| `text` | 3 |
+| `line` | 2 |
+| `request` | 2 |
+
+## Exercised Only By Value Vectors
+
+- `array.lastindexof`
+- `array.mode`
+- `chart.is_kagi`
+- `chart.is_linebreak`
+- `chart.is_pnf`
+- `chart.is_range`
+- `chart.is_renko`
+- `currency.AED`
+- `currency.ARS`
+- `currency.AUD`
+- `currency.BDT`
+- `currency.BHD`
+- `currency.BRL`
+- `currency.BTC`
+- `currency.CAD`
+- `currency.CLP`
+- `currency.CNY`
+- `currency.COP`
+- `currency.CZK`
+- `currency.DKK`
+- `currency.EGP`
+- `currency.ETH`
+- `currency.EUR`
+- `currency.GBP`
+- `currency.HKD`
+- `currency.HUF`
+- `currency.IDR`
+- `currency.ILS`
+- `currency.INR`
+- `currency.ISK`
+- `currency.JPY`
+- `currency.KES`
+- `currency.KRW`
+- `currency.KWD`
+- `currency.LKR`
+- `currency.MAD`
+- `currency.MXN`
+- `currency.MYR`
+- `currency.NGN`
+- `currency.NOK`
+- `currency.NONE`
+- `currency.NZD`
+- `currency.PEN`
+- `currency.PHP`
+- `currency.PKR`
+- `currency.PLN`
+- `currency.QAR`
+- `currency.RON`
+- `currency.RSD`
+- `currency.RUB`
+- `currency.SAR`
+- `currency.SEK`
+- `currency.SGD`
+- `currency.THB`
+- `currency.TND`
+- `currency.TRY`
+- `currency.TWD`
+- `currency.VES`
+- `currency.VND`
+- `currency.ZAR`
+- `dividends.net`
+- `label.set_point`
+- `linefill.get_line2`
+- `map.copy`
+- `map.put_all`
+- `map.values`
+- `math.toradians`
+- `matrix.avg`
+- `matrix.trace`
+- `request.currency_rate`
+- `request.economic`
+- `session.islastbar_regular`
+- `session.ispostmarket`
+- `splits.numerator`
+- `strategy.account_currency`
+- `strategy.avg_losing_trade`
+- `strategy.avg_losing_trade_percent`
+- `strategy.avg_trade`
+- `strategy.avg_trade_percent`
+- `strategy.avg_winning_trade`
+- `strategy.avg_winning_trade_percent`
+- `strategy.closedtrades.commission`
+- `strategy.closedtrades.profit_percent`
+- `strategy.convert_to_account`
+- `strategy.convert_to_symbol`
+- `strategy.default_entry_qty`
+- `strategy.eventrades`
+- `strategy.grossloss_percent`
+- `strategy.grossprofit_percent`
+- `strategy.max_contracts_held_all`
+- `strategy.max_contracts_held_long`
+- `strategy.max_contracts_held_short`
+- `strategy.max_drawdown_percent`
+- `strategy.max_runup_percent`
+- `strategy.netprofit_percent`
+- `strategy.openprofit_percent`
+- `strategy.opentrades.capital_held`
+- `strategy.opentrades.max_drawdown`
+- `strategy.opentrades.max_runup`
+- `strategy.opentrades.profit_percent`
+- `strategy.position_entry_name`
+- `syminfo.country`
+- `syminfo.current_contract`
+- `syminfo.employees`
+- `syminfo.expiration_date`
+- `syminfo.isin`
+- `syminfo.main_tickerid`
+- `syminfo.pricescale`
+- `syminfo.sector`
+- `syminfo.shareholders`
+- `syminfo.shares_outstanding_float`
+- `syminfo.shares_outstanding_total`
+- `syminfo.target_price_average`
+- `syminfo.target_price_date`
+- `syminfo.target_price_estimates`
+- `syminfo.target_price_high`
+- `syminfo.target_price_low`
+- `syminfo.target_price_median`
+- `syminfo.volumetype`
+- `ta.kcw`
+- `ta.mode`
+- `table.all`
+- `table.cell_set_bgcolor`
+- `table.cell_set_text_font_family`
+- `table.cell_set_text_formatting`
+- `table.cell_set_text_valign`
+- `table.cell_set_tooltip`
+- `table.cell_set_width`
+
+## Exercised By Nothing
+
+- `array.abs`
+- `array.every`
+- `array.percentile_nearest_rank`
+- `box.set_text_font_family`
+- `box.set_text_formatting`
+- `box.set_text_wrap`
+- `box.set_xloc`
+- `chart.point.copy`
+- `display.pine_screener`
+- `dividends.future_amount`
+- `dividends.future_ex_date`
+- `dividends.future_pay_date`
+- `earnings.future_period_end_time`
+- `footprint.buy_volume`
+- `footprint.delta`
+- `footprint.get_row_by_price`
+- `footprint.poc`
+- `footprint.rows`
+- `footprint.sell_volume`
+- `footprint.total_volume`
+- `footprint.vah`
+- `footprint.val`
+- `label.set_text_font_family`
+- `label.set_text_formatting`
+- `label.style_cross`
+- `line.set_first_point`
+- `line.set_second_point`
+- `math.rphi`
+- `matrix.eigenvalues`
+- `matrix.eigenvectors`
+- `matrix.is_identity`
+- `matrix.is_square`
+- `matrix.is_symmetric`
+- `matrix.median`
+- `matrix.pinv`
+- `matrix.remove_col`
+- `matrix.sum`
+- `matrix.swap_columns`
+- `plot.linestyle_solid`
+- `request.footprint`
+- `request.quandl`
+- `scale.left`
+- `strategy.closedtrades.entry_comment`
+- `strategy.closedtrades.first_index`
+- `strategy.closedtrades.max_drawdown_percent`
+- `strategy.closedtrades.max_runup_percent`
+- `strategy.direction.all`
+- `strategy.direction.short`
+- `strategy.margin_liquidation_price`
+- `strategy.oca.none`
+- `strategy.opentrades.commission`
+- `strategy.opentrades.entry_comment`
+- `strategy.opentrades.max_drawdown_percent`
+- `strategy.opentrades.max_runup_percent`
+- `strategy.risk.max_cons_loss_days`
+- `syminfo.minmove`
+- `syminfo.recommendations_buy`
+- `syminfo.recommendations_buy_strong`
+- `syminfo.recommendations_date`
+- `syminfo.recommendations_hold`
+- `syminfo.recommendations_sell`
+- `syminfo.recommendations_sell_strong`
+- `syminfo.recommendations_total`
+- `text.format_none`
+- `text.wrap_auto`
+- `text.wrap_none`
+- `volume_row.buy_volume`
+- `volume_row.delta`
+- `volume_row.down_price`
+- `volume_row.has_buy_imbalance`
+- `volume_row.has_sell_imbalance`
+- `volume_row.sell_volume`
+- `volume_row.total_volume`
+- `volume_row.up_price`
+- `weekofyear`
+
+## Corpus-Only Members
+
+- `adjustment.dividends`
+- `adjustment.none`
+- `adjustment.splits`
+- `array.binary_search`
+- `array.binary_search_leftmost`
+- `array.binary_search_rightmost`
+- `array.concat`
+- `array.covariance`
+- `array.fill`
+- `array.new_bool`
+- `array.new_box`
+- `array.new_color`
+- `array.new_label`
+- `array.new_line`
+- `array.new_linefill`
+- `array.new_string`
+- `array.new_table`
+- `array.percentile_linear_interpolation`
+- `array.percentrank`
+- `array.some`
+- `array.standardize`
+- `array.stdev`
+- `array.variance`
+- `ask`
+- `backadjustment.inherit`
+- `backadjustment.off`
+- `backadjustment.on`
+- `barstate.ishistory`
+- `barstate.islastconfirmedhistory`
+- `barstate.isnew`
+- `bid`
+- `box.set_border_style`
+- `box.set_border_width`
+- `box.set_bottom_right_point`
+- `box.set_extend`
+- `box.set_text_color`
+- `box.set_text_size`
+- `box.set_top_left_point`
+- `chart.point.from_time`
+- `chart.point.new`
+- `chart.point.now`
+- `color.from_gradient`
+- `color.new`
+- `dayofmonth`
+- `dayofweek.friday`
+- `dayofweek.saturday`
+- `dayofweek.sunday`
+- `dayofweek.thursday`
+- `dayofweek.wednesday`
+- `display.none`
+- `display.pane`
+- `display.price_scale`
+- `display.status_line`
+- `earnings.estimate`
+- `earnings.future_eps`
+- `earnings.future_revenue`
+- `earnings.future_time`
+- `extend.both`
+- `extend.left`
+- `extend.none`
+- `fixnan`
+- `font.family_default`
+- `format.inherit`
+- `format.mintick`
+- `format.percent`
+- `format.volume`
+- `hl2`
+- `hlc3`
+- `hlcc4`
+- `hline.style_dotted`
+- `hline.style_solid`
+- `label.set_textalign`
+- `label.style_arrowdown`
+- `label.style_arrowup`
+- `label.style_circle`
+- `label.style_diamond`
+- `label.style_flag`
+- `label.style_label_center`
+- `label.style_label_down`
+- `label.style_label_left`
+- `label.style_label_lower_left`
+- `label.style_label_lower_right`
+- `label.style_label_right`
+- `label.style_label_upper_left`
+- `label.style_label_upper_right`
+- `label.style_none`
+- `label.style_square`
+- `label.style_text_outline`
+- `label.style_triangledown`
+- `label.style_triangleup`
+- `label.style_xcross`
+- `last_bar_index`
+- `last_bar_time`
+- `library`
+- `line.set_xloc`
+- `line.style_arrow_both`
+- `line.style_arrow_left`
+- `line.style_arrow_right`
+- `line.style_solid`
+- `location.absolute`
+- `location.bottom`
+- `location.top`
+- `math.random`
+- `math.round_to_mintick`
+- `math.tanh`
+- `matrix.add_col`
+- `matrix.add_row`
+- `matrix.col`
+- `matrix.concat`
+- `matrix.copy`
+- `matrix.diff`
+- `matrix.inv`
+- `matrix.is_antidiagonal`
+- `matrix.is_antisymmetric`
+- `matrix.is_binary`
+- `matrix.is_diagonal`
+- `matrix.is_stochastic`
+- `matrix.is_triangular`
+- `matrix.is_zero`
+- `matrix.kron`
+- `matrix.mode`
+- `matrix.mult`
+- `matrix.pow`
+- `matrix.rank`
+- `matrix.remove_row`
+- `matrix.reshape`
+- `matrix.reverse`
+- `matrix.row`
+- `matrix.submatrix`
+- `matrix.swap_rows`
+- `matrix.transpose`
+- `max_bars_back`
+- `ohlc4`
+- `order.descending`
+- `plot.linestyle_dashed`
+- `plot.linestyle_dotted`
+- `plot.style_area`
+- `plot.style_areabr`
+- `plot.style_circles`
+- `plot.style_columns`
+- `plot.style_cross`
+- `plot.style_histogram`
+- `plot.style_line`
+- `plot.style_linebr`
+- `plot.style_stepline_diamond`
+- `plot.style_steplinebr`
+- `position.bottom_center`
+- `position.bottom_right`
+- `position.middle_left`
+- `position.middle_right`
+- `position.top_center`
+- `position.top_left`
+- `request.seed`
+- `runtime.error`
+- `scale.none`
+- `scale.right`
+- `session.isfirstbar`
+- `session.islastbar`
+- `session.regular`
+- `settlement_as_close.inherit`
+- `settlement_as_close.off`
+- `settlement_as_close.on`
+- `shape.arrowdown`
+- `shape.arrowup`
+- `shape.circle`
+- `shape.cross`
+- `shape.diamond`
+- `shape.flag`
+- `shape.labeldown`
+- `shape.labelup`
+- `shape.square`
+- `shape.triangledown`
+- `shape.xcross`
+- `size.auto`
+- `size.huge`
+- `size.normal`
+- `size.tiny`
+- `strategy.closedtrades.entry_id`
+- `strategy.closedtrades.exit_comment`
+- `strategy.closedtrades.exit_id`
+- `strategy.commission.cash_per_contract`
+- `strategy.commission.percent`
+- `strategy.oca.cancel`
+- `strategy.oca.reduce`
+- `strategy.openprofit`
+- `strategy.opentrades.entry_id`
+- `strategy.risk.max_drawdown`
+- `strategy.risk.max_intraday_filled_orders`
+- `strategy.risk.max_intraday_loss`
+- `text.align_center`
+- `text.format_italic`
+- `ticker.heikinashi`
+- `ticker.inherit`
+- `ticker.kagi`
+- `ticker.linebreak`
+- `ticker.new`
+- `ticker.pointfigure`
+- `ticker.renko`
+- `time_close`
+- `time_tradingday`
+- `timenow`
+- `xloc.bar_time`
+- `yloc.abovebar`
+- `yloc.belowbar`
+
+## Corpus Member Hit Map
+
+- `adjustment.dividends`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `adjustment.none`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `adjustment.splits`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `alert`: 183 hits across v5+v6; samples: v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine, v5:sources/0515__casoon-pine-scripts__market_tradability_engine_v2.pine
+- `alert.freq_all`: 1 hits across v6; samples: v6:sources/0826__keyse-scriptyard__mnq_orb_v7_lean.pine
+- `alert.freq_once_per_bar`: 43 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0607__casoon-pine-scripts__oscillator_divergence_zones_strategy.pine, v5:sources/0783__deepentropy-lightweight-charts-indicators__Order-Blocks-with-signals.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine
+- `alert.freq_once_per_bar_close`: 126 hits across v5+v6; samples: v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine, v5:sources/0515__casoon-pine-scripts__market_tradability_engine_v2.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine
+- `alertcondition`: 375 hits across v5+v6; samples: v5:sources/0050__mihakralj-pinescript__aroon.pine, v5:sources/0051__mihakralj-pinescript__aroonosc.pine, v5:sources/0415__everget-tradingview-pinescript-indicators__adaptive_laguerre_filter.pine, v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine, v5:sources/0424__everget-tradingview-pinescript-indicators__fibonacci_weighted_moving_average.pine
+- `array.avg`: 23 hits across v5+v6; samples: v5:sources/0264__mihakralj-pinescript__jb.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine
+- `array.binary_search`: 1 hits across v6; samples: v6:sources/0514__helenananaa-pine-compat-runtime__unsupported_array_binary_search_label.pine
+- `array.binary_search_leftmost`: 3 hits across v5+v6; samples: v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v6:sources/0289__deepentropy-lightweight-charts-indicators__RSI-Kernel-Optimized-_-Flux-Charts.pine, v6:sources/0364__deepentropy-oakscriptJS__RSI-Kernel-Optimized-_-Flux-Charts.pine
+- `array.binary_search_rightmost`: 6 hits across v5+v6; samples: v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v6:sources/0289__deepentropy-lightweight-charts-indicators__RSI-Kernel-Optimized-_-Flux-Charts.pine, v6:sources/0364__deepentropy-oakscriptJS__RSI-Kernel-Optimized-_-Flux-Charts.pine, v6:sources/0381__helenananaa-pine-compat-runtime__unsupported_array_binary_search_rightmost_label.pine, v6:sources/0519__helenananaa-pine-compat-runtime__unsupported_array_binary_search_rightmost_line.pine
+- `array.clear`: 61 hits across v5+v6; samples: v5:sources/0014__mihakralj-pinescript__pchannel.pine, v5:sources/0107__mihakralj-pinescript__gauss.pine, v5:sources/0115__mihakralj-pinescript__loess.pine, v5:sources/0124__mihakralj-pinescript__sgf.pine, v5:sources/0132__mihakralj-pinescript__wiener.pine
+- `array.concat`: 7 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine, v6:sources/0436__helenananaa-pine-compat-runtime__unsupported_array_concat_map.pine, v6:sources/0454__g-moe-Trading-Indicators__testing-ltf-htf.pine, v6:sources/0507__ferranbt-pinecone__array_methods.pine
+- `array.copy`: 20 hits across v5+v6; samples: v5:sources/0094__mihakralj-pinescript__alaguerre.pine, v5:sources/0107__mihakralj-pinescript__gauss.pine, v5:sources/0289__mihakralj-pinescript__conv.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine
+- `array.covariance`: 1 hits across v6; samples: v6:sources/0379__helenananaa-pine-compat-runtime__unsupported_array_covariance_chart_point.pine
+- `array.fill`: 9 hits across v5+v6; samples: v5:sources/0234__mihakralj-pinescript__stoch.pine, v5:sources/0345__mihakralj-pinescript__rgma.pine, v5:sources/0355__mihakralj-pinescript__zltema.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0743__deepentropy-lightweight-charts-indicators__Support-Resistance-Channels.pine
+- `array.first`: 3 hits across v5+v6; samples: v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine, v5:sources/0835__g-moe-Trading-Indicators__psych-levels.pine, v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `array.from`: 117 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0156__mihakralj-pinescript__betadist.pine, v5:sources/0157__mihakralj-pinescript__binomdist.pine, v5:sources/0164__mihakralj-pinescript__fdist.pine, v5:sources/0166__mihakralj-pinescript__gammadist.pine
+- `array.get`: 468 hits across v5+v6; samples: v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0008__mihakralj-pinescript__decaychannel.pine
+- `array.includes`: 16 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0832__zhuzp98-QuantTestFrame__Z_ind_MetaDiv.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine
+- `array.indexof`: 23 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0834__RA1NCS-TradeEase__TradeEase.pine
+- `array.insert`: 5 hits across v5+v6; samples: v5:sources/0784__deepentropy-lightweight-charts-indicators__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine, v5:sources/0949__g-moe-Trading-Indicators__xact-technical-analysis.pine, v6:sources/0469__g-moe-Trading-Indicators__csw-technical-analysis-beta.pine, v6:sources/0510__helenananaa-pine-compat-runtime__array_insert_remove.pine, v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `array.join`: 16 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v5:sources/0980__mkdir700-tradewise__double-star-indicator.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine, v6:sources/0335__itmakesyousick-HTF-Candles-Pivots__Next.pine
+- `array.last`: 7 hits across v5+v6; samples: v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine, v5:sources/0835__g-moe-Trading-Indicators__psych-levels.pine, v6:sources/0173__helenananaa-pine-compat-runtime__supported_imported_udt_array_element_method_return_qualifier.pine
+- `array.max`: 35 hits across v5+v6; samples: v5:sources/0094__mihakralj-pinescript__alaguerre.pine, v5:sources/0231__mihakralj-pinescript__smi.pine, v5:sources/0236__mihakralj-pinescript__stochrsi.pine, v5:sources/0241__mihakralj-pinescript__willr.pine, v5:sources/0262__mihakralj-pinescript__hurst.pine
+- `array.median`: 2 hits across v6; samples: v6:sources/0160__heyphat-piner__regression-trend.pine, v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `array.min`: 18 hits across v5+v6; samples: v5:sources/0094__mihakralj-pinescript__alaguerre.pine, v5:sources/0231__mihakralj-pinescript__smi.pine, v5:sources/0236__mihakralj-pinescript__stochrsi.pine, v5:sources/0241__mihakralj-pinescript__willr.pine, v5:sources/0262__mihakralj-pinescript__hurst.pine
+- `array.new`: 173 hits across v5+v6; samples: v5:sources/0353__mihakralj-pinescript__zldema.pine, v5:sources/0354__mihakralj-pinescript__zlema.pine, v5:sources/0355__mihakralj-pinescript__zltema.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine
+- `array.new_bool`: 24 hits across v5+v6; samples: v5:sources/0191__mihakralj-pinescript__standardize.pine, v5:sources/0385__mihakralj-pinescript__aobv.pine, v5:sources/0502__casoon-pine-scripts__auto_trendlines.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine
+- `array.new_box`: 52 hits across v5+v6; samples: v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0509__casoon-pine-scripts__liquidity_hunter.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0511__casoon-pine-scripts__market_scenario_projector.pine, v5:sources/0513__casoon-pine-scripts__market_structure_pivot_map.pine
+- `array.new_color`: 9 hits across v5+v6; samples: v5:sources/0832__zhuzp98-QuantTestFrame__Z_ind_MetaDiv.pine, v5:sources/0864__hasnocool-tradingview-pine-scripts__Linear-Regression-Channel-Breakout-Strategy.pine, v5:sources/0902__helenananaa-pine-compat-runtime__array_methods.pine, v5:sources/0932__helenananaa-pine-compat-runtime__unsupported_array_binary_search_rightmost_color_method.pine, v6:sources/0184__benso87-Private-Pine-Scripts__KC-Combo.pine
+- `array.new_float`: 348 hits across v5+v6; samples: v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0008__mihakralj-pinescript__decaychannel.pine
+- `array.new_int`: 104 hits across v5+v6; samples: v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0013__mihakralj-pinescript__mmchannel.pine, v5:sources/0014__mihakralj-pinescript__pchannel.pine, v5:sources/0139__mihakralj-pinescript__cfb.pine
+- `array.new_label`: 53 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0507__casoon-pine-scripts__elliott_wave_radar.pine
+- `array.new_line`: 65 hits across v5+v6; samples: v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0507__casoon-pine-scripts__elliott_wave_radar.pine, v5:sources/0509__casoon-pine-scripts__liquidity_hunter.pine
+- `array.new_linefill`: 9 hits across v5+v6; samples: v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0903__helenananaa-pine-compat-runtime__unsupported_array_some_linefill.pine, v6:sources/0314__helenananaa-pine-compat-runtime__unsupported_array_standardize_linefill_method.pine, v6:sources/0357__webcrack4-pine-script-combine__V5_14-16-21-27-34-35-36.pine
+- `array.new_string`: 35 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0507__casoon-pine-scripts__elliott_wave_radar.pine, v5:sources/0513__casoon-pine-scripts__market_structure_pivot_map.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine
+- `array.new_table`: 2 hits across v6; samples: v6:sources/0380__helenananaa-pine-compat-runtime__unsupported_array_covariance_table_method.pine, v6:sources/0518__helenananaa-pine-compat-runtime__unsupported_array_standardize_table_method.pine
+- `array.percentile_linear_interpolation`: 1 hits across v6; samples: v6:sources/0445__helenananaa-pine-compat-runtime__unsupported_array_percentile_linear_interpolation_percentage.pine
+- `array.percentrank`: 1 hits across v6; samples: v6:sources/0220__tamaJESUS-ML__tvt-vol-box.pine
+- `array.pop`: 57 hits across v5+v6; samples: v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0013__mihakralj-pinescript__mmchannel.pine, v5:sources/0014__mihakralj-pinescript__pchannel.pine, v5:sources/0053__mihakralj-pinescript__dmx.pine
+- `array.push`: 231 hits across v5+v6; samples: v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0013__mihakralj-pinescript__mmchannel.pine, v5:sources/0014__mihakralj-pinescript__pchannel.pine, v5:sources/0094__mihakralj-pinescript__alaguerre.pine
+- `array.range`: 1 hits across v6; samples: v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `array.remove`: 44 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0509__casoon-pine-scripts__liquidity_hunter.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine
+- `array.reverse`: 3 hits across v5+v6; samples: v5:sources/0424__everget-tradingview-pinescript-indicators__fibonacci_weighted_moving_average.pine, v6:sources/0487__regalouisei-collect-tradingview__fourier-extrapolator-of-price-w-projection-forecast-loxx.pine, v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `array.set`: 303 hits across v5+v6; samples: v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0008__mihakralj-pinescript__decaychannel.pine
+- `array.shift`: 127 hits across v5+v6; samples: v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0013__mihakralj-pinescript__mmchannel.pine, v5:sources/0014__mihakralj-pinescript__pchannel.pine, v5:sources/0094__mihakralj-pinescript__alaguerre.pine
+- `array.size`: 253 hits across v5+v6; samples: v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0013__mihakralj-pinescript__mmchannel.pine, v5:sources/0014__mihakralj-pinescript__pchannel.pine, v5:sources/0094__mihakralj-pinescript__alaguerre.pine
+- `array.slice`: 1 hits across v6; samples: v6:sources/0585__helenananaa-pine-compat-runtime__unsupported_array_slice_matrix.pine
+- `array.some`: 2 hits across v5+v6; samples: v5:sources/0903__helenananaa-pine-compat-runtime__unsupported_array_some_linefill.pine, v6:sources/0259__helenananaa-pine-compat-runtime__unsupported_array_some_chart_point.pine
+- `array.sort`: 28 hits across v5+v6; samples: v5:sources/0094__mihakralj-pinescript__alaguerre.pine, v5:sources/0121__mihakralj-pinescript__rmed.pine, v5:sources/0263__mihakralj-pinescript__iqr.pine, v5:sources/0269__mihakralj-pinescript__median.pine, v5:sources/0271__mihakralj-pinescript__percentile.pine
+- `array.sort_indices`: 5 hits across v5+v6; samples: v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0728__gorx1-TradingView__Quantile-BasedAdaptiveDetection.pine, v5:sources/0815__helenananaa-pine-compat-runtime__unsupported_array_sort_indices_order.pine, v5:sources/0816__helenananaa-pine-compat-runtime__unsupported_array_sort_indices_bool_namespace.pine, v6:sources/0684__helenananaa-pine-compat-runtime__unsupported_imported_udt_array_sort_indices_unknown_field.pine
+- `array.standardize`: 1 hits across v5; samples: v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine
+- `array.stdev`: 4 hits across v5+v6; samples: v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v6:sources/0996__deepentropy-oakscriptJS__Strategy-v5.pine
+- `array.sum`: 33 hits across v5+v6; samples: v5:sources/0132__mihakralj-pinescript__wiener.pine, v5:sources/0236__mihakralj-pinescript__stochrsi.pine, v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0583__casoon-pine-scripts__vein_structure_zones.pine, v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine
+- `array.unshift`: 40 hits across v5+v6; samples: v5:sources/0053__mihakralj-pinescript__dmx.pine, v5:sources/0139__mihakralj-pinescript__cfb.pine, v5:sources/0150__mihakralj-pinescript__rsx.pine, v5:sources/0153__mihakralj-pinescript__vel.pine, v5:sources/0333__mihakralj-pinescript__jma.pine
+- `array.variance`: 3 hits across v6; samples: v6:sources/0439__helenananaa-pine-compat-runtime__unsupported_array_variance_linefill.pine, v6:sources/0598__wanjo-tech-kk__mVoltThermo.pine, v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `ask`: 1 hits across v6; samples: v6:sources/0993__deepentropy-oakscriptJS__ta-v12.pine
+- `backadjustment.inherit`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `backadjustment.off`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `backadjustment.on`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `bar_index`: 797 hits across v5+v6; samples: v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0008__mihakralj-pinescript__decaychannel.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0013__mihakralj-pinescript__mmchannel.pine
+- `barcolor`: 123 hits across v5+v6; samples: v5:sources/0411__everget-tradingview-pinescript-indicators__moving_average_channel.pine, v5:sources/0412__everget-tradingview-pinescript-indicators__vortex_bands.pine, v5:sources/0424__everget-tradingview-pinescript-indicators__fibonacci_weighted_moving_average.pine, v5:sources/0428__everget-tradingview-pinescript-indicators__henderson_weighted_moving_average.pine, v5:sources/0431__everget-tradingview-pinescript-indicators__inverse_distance_weighted_moving_average.pine
+- `barmerge.gaps_off`: 72 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0469__everget-tradingview-pinescript-indicators__us_treasury_yields.pine, v5:sources/0489__casoon-pine-scripts__flow_bias.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0513__casoon-pine-scripts__market_structure_pivot_map.pine
+- `barmerge.gaps_on`: 16 hits across v6; samples: v6:sources/0145__TongIncomeWheel-AQE__Scoring_v1_8_Overlay.pine, v6:sources/0156__radiarkazemi-qt-price-elite__Orca-Structure-v3.1.pine, v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0258__helenananaa-pine-compat-runtime__unsupported_request_merge_options.pine, v6:sources/0271__kingmalitha-SRI-Indicator-Ft.-MSB__final.pine
+- `barmerge.lookahead_off`: 112 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0254__mihakralj-pinescript__cointegration.pine, v5:sources/0255__mihakralj-pinescript__correlation.pine, v5:sources/0256__mihakralj-pinescript__covariance.pine, v5:sources/0260__mihakralj-pinescript__granger.pine
+- `barmerge.lookahead_on`: 94 hits across v5+v6; samples: v5:sources/0243__mihakralj-pinescript__pivot.pine, v5:sources/0244__mihakralj-pinescript__pivotcam.pine, v5:sources/0245__mihakralj-pinescript__pivotdem.pine, v5:sources/0246__mihakralj-pinescript__pivotext.pine, v5:sources/0247__mihakralj-pinescript__pivotfib.pine
+- `barstate.isconfirmed`: 228 hits across v5+v6; samples: v5:sources/0415__everget-tradingview-pinescript-indicators__adaptive_laguerre_filter.pine, v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine
+- `barstate.isfirst`: 74 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0297__mihakralj-pinescript__hend.pine, v5:sources/0300__mihakralj-pinescript__kaiser.pine, v5:sources/0301__mihakralj-pinescript__lanczos.pine, v5:sources/0303__mihakralj-pinescript__nlma.pine
+- `barstate.ishistory`: 7 hits across v5+v6; samples: v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v6:sources/0223__DemasJ2k-Strategies-Indicators__flowrex_tradingview_indicator.pine, v6:sources/0285__webcrack4-pine-script-combine__33VPLuxAlgo.pine, v6:sources/0417__Moustaphasow01-TV_Automation__volume_profile.pine
+- `barstate.islast`: 423 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine
+- `barstate.islastconfirmedhistory`: 29 hits across v5+v6; samples: v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0721__deepentropy-lightweight-charts-indicators__Open-Interest.pine, v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine, v5:sources/0835__g-moe-Trading-Indicators__psych-levels.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine
+- `barstate.isnew`: 12 hits across v5+v6; samples: v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v6:sources/0085__danielbodnar-skills__basic-usage.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0426__regalouisei-collect-tradingview__probability-cones.pine
+- `barstate.isrealtime`: 30 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0695__oguzhandilber-PineScripts__hash_ribbon.pine, v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine
+- `bgcolor`: 567 hits across v5+v6; samples: v5:sources/0051__mihakralj-pinescript__aroonosc.pine, v5:sources/0059__mihakralj-pinescript__qstick.pine, v5:sources/0200__mihakralj-pinescript__bbs.pine, v5:sources/0225__mihakralj-pinescript__pgo.pine, v5:sources/0399__mihakralj-pinescript__pvt.pine
+- `bid`: 1 hits across v6; samples: v6:sources/0993__deepentropy-oakscriptJS__ta-v12.pine
+- `bool`: 953 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine
+- `box`: 156 hits across v5+v6; samples: v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine
+- `box.all`: 3 hits across v5+v6; samples: v5:sources/0760__supertonka-tradingview-ict-indicator__orderblock_indicator.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine
+- `box.copy`: 1 hits across v6; samples: v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `box.delete`: 74 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0509__casoon-pine-scripts__liquidity_hunter.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine
+- `box.get_bottom`: 21 hits across v5+v6; samples: v5:sources/0783__deepentropy-lightweight-charts-indicators__Order-Blocks-with-signals.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0949__g-moe-Trading-Indicators__xact-technical-analysis.pine
+- `box.get_left`: 5 hits across v5+v6; samples: v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0529__deepentropy-lightweight-charts-indicators__ICT-Concepts-LuxAlgo-.pine, v6:sources/0602__deepentropy-oakscriptJS__ICT-Concepts-LuxAlgo-.pine, v6:sources/0875__jati143-arch-Dashboard__VOB_Strategy.pine
+- `box.get_right`: 5 hits across v5+v6; samples: v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine, v6:sources/0529__deepentropy-lightweight-charts-indicators__ICT-Concepts-LuxAlgo-.pine, v6:sources/0602__deepentropy-oakscriptJS__ICT-Concepts-LuxAlgo-.pine
+- `box.get_top`: 21 hits across v5+v6; samples: v5:sources/0783__deepentropy-lightweight-charts-indicators__Order-Blocks-with-signals.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0949__g-moe-Trading-Indicators__xact-technical-analysis.pine
+- `box.new`: 152 hits across v5+v6; samples: v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine
+- `box.set_bgcolor`: 29 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine
+- `box.set_border_color`: 22 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine
+- `box.set_border_style`: 3 hits across v6; samples: v6:sources/0529__deepentropy-lightweight-charts-indicators__ICT-Concepts-LuxAlgo-.pine, v6:sources/0560__shevateshubham-tradingbot__smc_connector.pine, v6:sources/0602__deepentropy-oakscriptJS__ICT-Concepts-LuxAlgo-.pine
+- `box.set_border_width`: 3 hits across v5+v6; samples: v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0589__casoon-pine-scripts__market_state_engine.pine, v6:sources/0486__alboogycOdR-dev-projects__institutional_crt_frameworkv8.pine
+- `box.set_bottom`: 22 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine
+- `box.set_bottom_right_point`: 1 hits across v6; samples: v6:sources/0255__helenananaa-pine-compat-runtime__box_point_mutation.pine
+- `box.set_extend`: 8 hits across v5+v6; samples: v5:sources/0834__RA1NCS-TradeEase__TradeEase.pine, v6:sources/0156__radiarkazemi-qt-price-elite__Orca-Structure-v3.1.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0407__Mensi01-SMC__SMCindicator.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine
+- `box.set_left`: 4 hits across v5+v6; samples: v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0597__casoon-pine-scripts__compression_fractal_release.pine, v6:sources/0335__itmakesyousick-HTF-Candles-Pivots__Next.pine, v6:sources/0397__itmakesyousick-HTF-Candles-Pivots__v14.0.pine
+- `box.set_lefttop`: 12 hits across v5+v6; samples: v5:sources/0834__RA1NCS-TradeEase__TradeEase.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0151__wesso80-marketscannerpros__MSP_Auto_Fib_Tool_v3.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0407__Mensi01-SMC__SMCindicator.pine
+- `box.set_right`: 43 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine
+- `box.set_rightbottom`: 14 hits across v5+v6; samples: v5:sources/0834__RA1NCS-TradeEase__TradeEase.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0151__wesso80-marketscannerpros__MSP_Auto_Fib_Tool_v3.pine, v6:sources/0234__TamTH-Dev-trading-view-scripts__MasterAlgo.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `box.set_text`: 3 hits across v6; samples: v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0479__regalouisei-collect-tradingview__sector-rotation.pine, v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `box.set_text_color`: 1 hits across v6; samples: v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `box.set_text_halign`: 2 hits across v6; samples: v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `box.set_text_size`: 1 hits across v6; samples: v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `box.set_text_valign`: 1 hits across v6; samples: v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `box.set_top`: 26 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine
+- `box.set_top_left_point`: 1 hits across v6; samples: v6:sources/0255__helenananaa-pine-compat-runtime__box_point_mutation.pine
+- `chart.bg_color`: 23 hits across v5+v6; samples: v5:sources/0763__hasnocool-tradingview-pine-scripts__HyperTrend-LuxAlgo-.pine, v5:sources/0784__deepentropy-lightweight-charts-indicators__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0908__deepentropy-oakscriptJS__TTrades-Daily-Bias-TFO-.pine
+- `chart.fg_color`: 45 hits across v5+v6; samples: v5:sources/0575__casoon-pine-scripts__vein_accumulation_phase.pine, v5:sources/0576__casoon-pine-scripts__vein_execution.pine, v5:sources/0577__casoon-pine-scripts__vein_feature_exporter.pine, v5:sources/0580__casoon-pine-scripts__vein_reversal_score.pine, v5:sources/0582__casoon-pine-scripts__vein_spread_context.pine
+- `chart.is_heikinashi`: 1 hits across v6; samples: v6:sources/0489__turnupdigital-riskmanager__SimpleMarketMetrics.pine
+- `chart.is_standard`: 1 hits across v6; samples: v6:sources/0650__regalouisei-collect-tradingview__volume-analysis-heatmap-and-volume-profile.pine
+- `chart.left_visible_bar_time`: 13 hits across v5+v6; samples: v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0828__deepentropy-lightweight-charts-indicators__Support-Resistance-Classification-VR-LuxAlgo-.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0910__deepentropy-oakscriptJS__Support-Resistance-Classification-VR-LuxAlgo-.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `chart.point.from_index`: 23 hits across v5+v6; samples: v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0704__ttopias-tradinview-indicators__vwap-indicator.pine, v5:sources/0712__deepentropy-lightweight-charts-indicators__Volume-Profile-Pivot-Levels-ChartPrime-.pine
+- `chart.point.from_time`: 4 hits across v5+v6; samples: v5:sources/0780__deepentropy-lightweight-charts-indicators__Custom-Pattern-Detection.pine, v6:sources/0094__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__price-and-longitude-angles.pine, v6:sources/0255__helenananaa-pine-compat-runtime__box_point_mutation.pine, v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE
+- `chart.point.new`: 8 hits across v5+v6; samples: v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine, v5:sources/0954__anil-sn-EliteTrading__Smart-Money-Concepts.pine, v6:sources/0299__alboogycOdR-dev-projects__0729DST.pine, v6:sources/0358__alboogycOdR-dev-projects__original.pine, v6:sources/0415__skywalker0803r-Sentinel-System__SmartMoneyConcepts.pine
+- `chart.point.now`: 3 hits across v5+v6; samples: v5:sources/0817__helenananaa-pine-compat-runtime__unsupported_array_binary_search_chart_point_method.pine, v6:sources/0255__helenananaa-pine-compat-runtime__box_point_mutation.pine, v6:sources/0994__deepentropy-oakscriptJS__ZigZag-v9.pine
+- `chart.right_visible_bar_time`: 9 hits across v5+v6; samples: v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0828__deepentropy-lightweight-charts-indicators__Support-Resistance-Classification-VR-LuxAlgo-.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0910__deepentropy-oakscriptJS__Support-Resistance-Classification-VR-LuxAlgo-.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `close`: 1759 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `color`: 1710 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `color.aqua`: 149 hits across v5+v6; samples: v5:sources/0201__mihakralj-pinescript__brar.pine, v5:sources/0221__mihakralj-pinescript__kst.pine, v5:sources/0227__mihakralj-pinescript__qqe.pine, v5:sources/0230__mihakralj-pinescript__rvgi.pine, v5:sources/0237__mihakralj-pinescript__td_seq.pine
+- `color.b`: 14 hits across v5+v6; samples: v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0760__supertonka-tradingview-ict-indicator__orderblock_indicator.pine, v5:sources/0926__ferranbt-pinecone__transparency.pine, v5:sources/0999__g-moe-Trading-Indicators__xact-internals.pine
+- `color.black`: 236 hits across v5+v6; samples: v5:sources/0447__everget-tradingview-pinescript-indicators__derivative_oscillator.pine, v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0460__everget-tradingview-pinescript-indicators__utc_clock.pine, v5:sources/0467__everget-tradingview-pinescript-indicators__roi_return_on_investment.pine, v5:sources/0470__everget-tradingview-pinescript-indicators__ytd_year_to_date_percent_return.pine
+- `color.blue`: 543 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine
+- `color.from_gradient`: 76 hits across v5+v6; samples: v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0511__casoon-pine-scripts__market_scenario_projector.pine, v5:sources/0512__casoon-pine-scripts__market_structure_advanced.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine
+- `color.fuchsia`: 67 hits across v5+v6; samples: v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0537__casoon-pine-scripts__elder_ray_pressure_engine.pine, v5:sources/0571__casoon-pine-scripts__ma_regime_bands.pine, v5:sources/0694__oguzhandilber-PineScripts__Vortex-Trend-Tracker.pine
+- `color.g`: 14 hits across v5+v6; samples: v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0760__supertonka-tradingview-ict-indicator__orderblock_indicator.pine, v5:sources/0926__ferranbt-pinecone__transparency.pine, v5:sources/0999__g-moe-Trading-Indicators__xact-internals.pine
+- `color.gray`: 574 hits across v5+v6; samples: v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0031__mihakralj-pinescript__ccyc.pine, v5:sources/0032__mihakralj-pinescript__cg.pine, v5:sources/0033__mihakralj-pinescript__dsp.pine
+- `color.green`: 704 hits across v5+v6; samples: v5:sources/0015__mihakralj-pinescript__regchannel.pine, v5:sources/0016__mihakralj-pinescript__sdchannel.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0024__mihakralj-pinescript__ha.pine, v5:sources/0028__mihakralj-pinescript__typprice.pine
+- `color.lime`: 219 hits across v5+v6; samples: v5:sources/0219__mihakralj-pinescript__kdj.pine, v5:sources/0232__mihakralj-pinescript__squeeze.pine, v5:sources/0411__everget-tradingview-pinescript-indicators__moving_average_channel.pine, v5:sources/0412__everget-tradingview-pinescript-indicators__vortex_bands.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine
+- `color.maroon`: 65 hits across v5+v6; samples: v5:sources/0232__mihakralj-pinescript__squeeze.pine, v5:sources/0412__everget-tradingview-pinescript-indicators__vortex_bands.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine
+- `color.navy`: 40 hits across v5+v6; samples: v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0800__Leci37-tuisku_Web_selling__VFdMT181TWluXzFBRFh0dWlza3VmNmQ4YmJhYw.pine, v5:sources/0832__zhuzp98-QuantTestFrame__Z_ind_MetaDiv.pine, v5:sources/0848__unicorpuss-NormalizedIndicators_pine__commodities_rsps.pine, v5:sources/0856__VVASILEVSS-LOCAL_AI_ENGINE__LOCAL_AI_ENGINE_AD_Context_v20_9.pine
+- `color.new`: 951 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `color.olive`: 8 hits across v5+v6; samples: v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0499__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__RR-DANGOV-v3.3.pine, v6:sources/0655__Hugs-4-Bugs-Trading-Indicator__intraday-trading.pine
+- `color.orange`: 375 hits across v5+v6; samples: v5:sources/0025__mihakralj-pinescript__medprice.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0094__mihakralj-pinescript__alaguerre.pine, v5:sources/0120__mihakralj-pinescript__rls.pine, v5:sources/0181__mihakralj-pinescript__normdist.pine
+- `color.purple`: 171 hits across v5+v6; samples: v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0027__mihakralj-pinescript__midprice.pine, v5:sources/0057__mihakralj-pinescript__ichimoku.pine, v5:sources/0446__everget-tradingview-pinescript-indicators__asymmetrical_rsi.pine, v5:sources/0448__everget-tradingview-pinescript-indicators__mfi_money_flow_index.pine
+- `color.r`: 14 hits across v5+v6; samples: v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0760__supertonka-tradingview-ict-indicator__orderblock_indicator.pine, v5:sources/0926__ferranbt-pinecone__transparency.pine, v5:sources/0999__g-moe-Trading-Indicators__xact-internals.pine
+- `color.red`: 923 hits across v5+v6; samples: v5:sources/0015__mihakralj-pinescript__regchannel.pine, v5:sources/0016__mihakralj-pinescript__sdchannel.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0024__mihakralj-pinescript__ha.pine, v5:sources/0029__mihakralj-pinescript__wclprice.pine
+- `color.rgb`: 142 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0511__casoon-pine-scripts__market_scenario_projector.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine
+- `color.silver`: 48 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine
+- `color.t`: 3 hits across v5+v6; samples: v5:sources/0926__ferranbt-pinecone__transparency.pine, v6:sources/0160__heyphat-piner__regression-trend.pine, v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE
+- `color.teal`: 125 hits across v5+v6; samples: v5:sources/0102__mihakralj-pinescript__cfitz.pine, v5:sources/0181__mihakralj-pinescript__normdist.pine, v5:sources/0264__mihakralj-pinescript__jb.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine
+- `color.white`: 627 hits across v5+v6; samples: v5:sources/0041__mihakralj-pinescript__lunar.pine, v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v5:sources/0446__everget-tradingview-pinescript-indicators__asymmetrical_rsi.pine
+- `color.yellow`: 709 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `currency.CHF`: 1 hits across v6; samples: v6:sources/0481__fiji-solutions-pinescript__09.-Company-Financials.pine
+- `currency.USD`: 77 hits across v5+v6; samples: v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0659__SammyEnigma-pine-scripts__BBW-RSI-60-Strategy.pine, v5:sources/0661__SammyEnigma-pine-scripts__bb-rsi-15m-3.pine, v5:sources/0662__SammyEnigma-pine-scripts__bb-rsi-1m-3.pine, v5:sources/0663__SammyEnigma-pine-scripts__bb-rsi-1m-4.pine
+- `currency.USDT`: 3 hits across v6; samples: v6:sources/0708__s4mn0v-pinescript__crossoveremas.pine, v6:sources/0838__jjbb013-OKX__TRUMP-15m---v1.pine, v6:sources/0847__Finnlayy-Neo_Fabel__BTCUSDT_P_15m_LuxAlgo_Confluence_Strategy_v1.pine
+- `dayofmonth`: 46 hits across v5+v6; samples: v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine, v5:sources/0724__deepentropy-lightweight-charts-indicators__Relative-Strength-of-a-stock.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0762__MinorLeopard-Indicator__Indicator-FalseRemovals-.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine
+- `dayofweek`: 45 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0854__gabriel330407-gabriel330407__wave_bot_alerts.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v5:sources/0987__deepentropy-lightweight-charts-indicators__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine
+- `dayofweek.friday`: 13 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v5:sources/0854__gabriel330407-gabriel330407__wave_bot_alerts.pine, v5:sources/0987__deepentropy-lightweight-charts-indicators__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine, v6:sources/0339__deepentropy-oakscriptJS__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine
+- `dayofweek.monday`: 7 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v6:sources/0404__mitchell-917-tradingview-pinescript-lab__date-time-filters.pine, v6:sources/0529__deepentropy-lightweight-charts-indicators__ICT-Concepts-LuxAlgo-.pine, v6:sources/0555__azam2050-market-data-engine__mirsad9.pine, v6:sources/0602__deepentropy-oakscriptJS__ICT-Concepts-LuxAlgo-.pine
+- `dayofweek.saturday`: 7 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v6:sources/0404__mitchell-917-tradingview-pinescript-lab__date-time-filters.pine, v6:sources/0405__Pbaaroma-pbatrades-forex-bot__smc_15min_v4.pine, v6:sources/0570__GreyssonEnterprises-trading-setups__indicator.pine
+- `dayofweek.sunday`: 9 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine, v6:sources/0404__mitchell-917-tradingview-pinescript-lab__date-time-filters.pine, v6:sources/0405__Pbaaroma-pbatrades-forex-bot__smc_15min_v4.pine
+- `dayofweek.thursday`: 3 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v6:sources/0404__mitchell-917-tradingview-pinescript-lab__date-time-filters.pine, v6:sources/0767__agentiayoung-agent-trader-framework__range_breakout.pine
+- `dayofweek.tuesday`: 4 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v6:sources/0404__mitchell-917-tradingview-pinescript-lab__date-time-filters.pine, v6:sources/0767__agentiayoung-agent-trader-framework__range_breakout.pine, v6:sources/0835__vinay-veerappa-tvDownloadOHLC__ORB_V7_Strategy.pine
+- `dayofweek.wednesday`: 4 hits across v5+v6; samples: v5:sources/0414__everget-tradingview-pinescript-indicators__weekdays_gaps.pine, v6:sources/0404__mitchell-917-tradingview-pinescript-lab__date-time-filters.pine, v6:sources/0767__agentiayoung-agent-trader-framework__range_breakout.pine, v6:sources/0835__vinay-veerappa-tvDownloadOHLC__ORB_V7_Strategy.pine
+- `display.all`: 47 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0512__casoon-pine-scripts__market_structure_advanced.pine, v5:sources/0536__casoon-pine-scripts__cci_advanced.pine, v5:sources/0539__casoon-pine-scripts__fisher_transform_advanced.pine
+- `display.data_window`: 72 hits across v5+v6; samples: v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine
+- `display.none`: 147 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine, v5:sources/0472__everget-tradingview-pinescript-indicators__nrtr_nick_rypock_trailing_reverse.pine, v5:sources/0473__everget-tradingview-pinescript-indicators__parabolic_sar.pine, v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine
+- `display.pane`: 26 hits across v5+v6; samples: v5:sources/0424__everget-tradingview-pinescript-indicators__fibonacci_weighted_moving_average.pine, v5:sources/0428__everget-tradingview-pinescript-indicators__henderson_weighted_moving_average.pine, v5:sources/0431__everget-tradingview-pinescript-indicators__inverse_distance_weighted_moving_average.pine, v5:sources/0435__everget-tradingview-pinescript-indicators__quick_moving_average.pine, v5:sources/0439__everget-tradingview-pinescript-indicators__sharp_modified_moving_average.pine
+- `display.price_scale`: 3 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0479__regalouisei-collect-tradingview__sector-rotation.pine
+- `display.status_line`: 13 hits across v5+v6; samples: v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine
+- `dividends.gross`: 3 hits across v6; samples: v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0869__shubhamtaywade82-algo_trading_api__SupertrendVWAP.pine
+- `earnings.actual`: 5 hits across v6; samples: v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0635__LongVu5228-Swing-Long-System__pinescript-indicators.pine, v6:sources/0869__shubhamtaywade82-algo_trading_api__SupertrendVWAP.pine
+- `earnings.estimate`: 2 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0635__LongVu5228-Swing-Long-System__pinescript-indicators.pine
+- `earnings.future_eps`: 1 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine
+- `earnings.future_revenue`: 1 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine
+- `earnings.future_time`: 2 hits across v6; samples: v6:sources/0145__TongIncomeWheel-AQE__Scoring_v1_8_Overlay.pine, v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine
+- `earnings.standardized`: 2 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0635__LongVu5228-Swing-Long-System__pinescript-indicators.pine
+- `extend.both`: 36 hits across v5+v6; samples: v5:sources/0743__deepentropy-lightweight-charts-indicators__Support-Resistance-Channels.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine, v5:sources/0835__g-moe-Trading-Indicators__psych-levels.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine
+- `extend.left`: 9 hits across v5+v6; samples: v5:sources/0828__deepentropy-lightweight-charts-indicators__Support-Resistance-Classification-VR-LuxAlgo-.pine, v5:sources/0910__deepentropy-oakscriptJS__Support-Resistance-Classification-VR-LuxAlgo-.pine, v6:sources/0130__jonathan-nascimento51-tradeCripto2025__auto_fib_extension_example.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0357__webcrack4-pine-script-combine__V5_14-16-21-27-34-35-36.pine
+- `extend.none`: 62 hits across v5+v6; samples: v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine
+- `extend.right`: 75 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0507__casoon-pine-scripts__elliott_wave_radar.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine
+- `false`: 1229 hits across v5+v6; samples: v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0031__mihakralj-pinescript__ccyc.pine
+- `fill`: 294 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `fixnan`: 27 hits across v5+v6; samples: v5:sources/0446__everget-tradingview-pinescript-indicators__asymmetrical_rsi.pine, v5:sources/0449__everget-tradingview-pinescript-indicators__stc_schaff_trend_cycle.pine, v5:sources/0795__hasnocool-tradingview-pine-scripts__Rob-Booker---ADX-Breakout-updated-to-pinescript-V5.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0198__TraderOracle-TradingView__VodkaShot.pine
+- `float`: 1482 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `font.family_default`: 1 hits across v5; samples: v5:sources/0994__g-moe-Trading-Indicators__text-motion-marquee-demo.pine
+- `font.family_monospace`: 6 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0994__g-moe-Trading-Indicators__text-motion-marquee-demo.pine, v6:sources/0239__btcjon-pine__TTB_Signals.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine, v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE
+- `format.inherit`: 7 hits across v5; samples: v5:sources/0659__SammyEnigma-pine-scripts__BBW-RSI-60-Strategy.pine, v5:sources/0661__SammyEnigma-pine-scripts__bb-rsi-15m-3.pine, v5:sources/0662__SammyEnigma-pine-scripts__bb-rsi-1m-3.pine, v5:sources/0663__SammyEnigma-pine-scripts__bb-rsi-1m-4.pine, v5:sources/0674__SammyEnigma-pine-scripts__rsi-bb-1min-v0.pine
+- `format.mintick`: 114 hits across v5+v6; samples: v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0489__casoon-pine-scripts__flow_bias.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine
+- `format.percent`: 30 hits across v5+v6; samples: v5:sources/0066__mihakralj-pinescript__dirty.pine, v5:sources/0069__mihakralj-pinescript__maape.pine, v5:sources/0075__mihakralj-pinescript__mdape.pine, v5:sources/0091__mihakralj-pinescript__wmape.pine, v5:sources/0158__mihakralj-pinescript__change.pine
+- `format.price`: 39 hits across v5+v6; samples: v5:sources/0379__mihakralj-pinescript__ui.pine, v5:sources/0380__mihakralj-pinescript__vov.pine, v5:sources/0381__mihakralj-pinescript__vr.pine, v5:sources/0469__everget-tradingview-pinescript-indicators__us_treasury_yields.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine
+- `format.volume`: 28 hits across v5+v6; samples: v5:sources/0478__everget-tradingview-pinescript-indicators__price_volume_trend.pine, v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine, v5:sources/0664__SammyEnigma-pine-scripts__bb-rsi.pine, v5:sources/0712__deepentropy-lightweight-charts-indicators__Volume-Profile-Pivot-Levels-ChartPrime-.pine, v5:sources/0721__deepentropy-lightweight-charts-indicators__Open-Interest.pine
+- `high`: 966 hits across v5+v6; samples: v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine
+- `hl2`: 71 hits across v5+v6; samples: v5:sources/0031__mihakralj-pinescript__ccyc.pine, v5:sources/0105__mihakralj-pinescript__edcf.pine, v5:sources/0168__mihakralj-pinescript__hl2.pine, v5:sources/0214__mihakralj-pinescript__fisher.pine, v5:sources/0215__mihakralj-pinescript__fisher04.pine
+- `hlc3`: 133 hits across v5+v6; samples: v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0033__mihakralj-pinescript__dsp.pine, v5:sources/0036__mihakralj-pinescript__homod.pine, v5:sources/0037__mihakralj-pinescript__ht_dcperiod.pine
+- `hlcc4`: 5 hits across v5+v6; samples: v5:sources/0139__mihakralj-pinescript__cfb.pine, v5:sources/0170__mihakralj-pinescript__hlcc4.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine, v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine, v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE
+- `hline`: 343 hits across v5+v6; samples: v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0031__mihakralj-pinescript__ccyc.pine, v5:sources/0032__mihakralj-pinescript__cg.pine, v5:sources/0033__mihakralj-pinescript__dsp.pine, v5:sources/0035__mihakralj-pinescript__ebsw.pine
+- `hline.style_dashed`: 147 hits across v5+v6; samples: v5:sources/0032__mihakralj-pinescript__cg.pine, v5:sources/0035__mihakralj-pinescript__ebsw.pine, v5:sources/0037__mihakralj-pinescript__ht_dcperiod.pine, v5:sources/0038__mihakralj-pinescript__ht_dcphase.pine, v5:sources/0043__mihakralj-pinescript__sine.pine
+- `hline.style_dotted`: 175 hits across v5+v6; samples: v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0031__mihakralj-pinescript__ccyc.pine, v5:sources/0052__mihakralj-pinescript__chop.pine, v5:sources/0058__mihakralj-pinescript__pfe.pine, v5:sources/0060__mihakralj-pinescript__ravi.pine
+- `hline.style_solid`: 35 hits across v5+v6; samples: v5:sources/0033__mihakralj-pinescript__dsp.pine, v5:sources/0038__mihakralj-pinescript__ht_dcphase.pine, v5:sources/0039__mihakralj-pinescript__ht_phasor.pine, v5:sources/0040__mihakralj-pinescript__ht_sine.pine, v5:sources/0045__mihakralj-pinescript__ssfdsp.pine
+- `hour`: 81 hits across v5+v6; samples: v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0616__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.4.pine, v5:sources/0617__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.6.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine
+- `indicator`: 1465 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `input`: 1649 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `input.bool`: 733 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0009__mihakralj-pinescript__fcb.pine, v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0042__mihakralj-pinescript__phasor.pine
+- `input.color`: 286 hits across v5+v6; samples: v5:sources/0242__mihakralj-pinescript__fractals.pine, v5:sources/0243__mihakralj-pinescript__pivot.pine, v5:sources/0244__mihakralj-pinescript__pivotcam.pine, v5:sources/0245__mihakralj-pinescript__pivotdem.pine, v5:sources/0246__mihakralj-pinescript__pivotext.pine
+- `input.enum`: 2 hits across v5+v6; samples: v5:sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine, v6:sources/0650__regalouisei-collect-tradingview__volume-analysis-heatmap-and-volume-profile.pine
+- `input.float`: 794 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine
+- `input.int`: 1374 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `input.price`: 7 hits across v5+v6; samples: v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0983__deepentropy-lightweight-charts-indicators__Support-Resistance-Interactive.pine, v6:sources/0088__tc3oliver-tradingview-indicators__scale-binding-poc.pine, v6:sources/0118__trendtrooper-trendtrooper-site__Risk_Architect.pine, v6:sources/0245__regalouisei-collect-tradingview__interactive-atr-stop-loss-tanhef.pine
+- `input.session`: 75 hits across v5+v6; samples: v5:sources/0475__everget-tradingview-pinescript-indicators__session_input_parser.pine, v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine, v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine
+- `input.source`: 525 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine
+- `input.string`: 490 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0059__mihakralj-pinescript__qstick.pine, v5:sources/0105__mihakralj-pinescript__edcf.pine
+- `input.symbol`: 100 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0252__mihakralj-pinescript__beta.pine, v5:sources/0254__mihakralj-pinescript__cointegration.pine, v5:sources/0255__mihakralj-pinescript__correlation.pine, v5:sources/0256__mihakralj-pinescript__covariance.pine
+- `input.text_area`: 8 hits across v5+v6; samples: v5:sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine
+- `input.time`: 116 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0518__casoon-pine-scripts__reversal_type_classifier_v1.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine, v5:sources/0532__casoon-pine-scripts__anchored_vwap.pine
+- `input.timeframe`: 184 hits across v5+v6; samples: v5:sources/0243__mihakralj-pinescript__pivot.pine, v5:sources/0244__mihakralj-pinescript__pivotcam.pine, v5:sources/0245__mihakralj-pinescript__pivotdem.pine, v5:sources/0246__mihakralj-pinescript__pivotext.pine, v5:sources/0247__mihakralj-pinescript__pivotfib.pine
+- `int`: 1488 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `label`: 488 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0452__everget-tradingview-pinescript-indicators__chart_type_identifier.pine, v5:sources/0454__everget-tradingview-pinescript-indicators__heikin_ashi_chart_identifier.pine, v5:sources/0455__everget-tradingview-pinescript-indicators__kagi_chart_identifier.pine, v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine
+- `label.all`: 6 hits across v6; samples: v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine, v6:sources/0435__helenananaa-pine-compat-runtime__label_limit_eviction.pine, v6:sources/0461__deepentropy-lightweight-charts-indicators__Realtime-Footprint.pine, v6:sources/0478__kotipasa-tradingview-scripts__tradewar_spy_options.pine
+- `label.copy`: 1 hits across v6; samples: v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `label.delete`: 173 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine
+- `label.get_text`: 1 hits across v6; samples: v6:sources/0473__quant5-lab-runner__support_resistance_pivot_levels.pine
+- `label.get_x`: 6 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0246__aboutblank007-alpha-os__Dual-SuperTrend.pine, v6:sources/0461__deepentropy-lightweight-charts-indicators__Realtime-Footprint.pine, v6:sources/0562__deepentropy-oakscriptJS__Realtime-Footprint.pine, v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE
+- `label.get_y`: 3 hits across v6; samples: v6:sources/0463__theduffman-PineScript__market-sessions.pine, v6:sources/0655__Hugs-4-Bugs-Trading-Indicator__intraday-trading.pine, v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `label.new`: 479 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0452__everget-tradingview-pinescript-indicators__chart_type_identifier.pine, v5:sources/0454__everget-tradingview-pinescript-indicators__heikin_ashi_chart_identifier.pine, v5:sources/0455__everget-tradingview-pinescript-indicators__kagi_chart_identifier.pine, v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine
+- `label.set_color`: 29 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine
+- `label.set_size`: 4 hits across v5+v6; samples: v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v6:sources/0149__appuo-in-ChartIQ__nifty_pro_decision_map_v2_indicator.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine, v6:sources/0486__alboogycOdR-dev-projects__institutional_crt_frameworkv8.pine
+- `label.set_style`: 10 hits across v5+v6; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine
+- `label.set_text`: 62 hits across v5+v6; samples: v5:sources/0452__everget-tradingview-pinescript-indicators__chart_type_identifier.pine, v5:sources/0454__everget-tradingview-pinescript-indicators__heikin_ashi_chart_identifier.pine, v5:sources/0455__everget-tradingview-pinescript-indicators__kagi_chart_identifier.pine, v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0457__everget-tradingview-pinescript-indicators__point_and_figure_pnf_chart_identifier.pine
+- `label.set_textalign`: 1 hits across v6; samples: v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `label.set_textcolor`: 20 hits across v5+v6; samples: v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v6:sources/0149__appuo-in-ChartIQ__nifty_pro_decision_map_v2_indicator.pine
+- `label.set_tooltip`: 17 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0522__casoon-pine-scripts__support_resistance_zones.pine
+- `label.set_x`: 28 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine
+- `label.set_xloc`: 1 hits across v6; samples: v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `label.set_xy`: 46 hits across v5+v6; samples: v5:sources/0452__everget-tradingview-pinescript-indicators__chart_type_identifier.pine, v5:sources/0454__everget-tradingview-pinescript-indicators__heikin_ashi_chart_identifier.pine, v5:sources/0455__everget-tradingview-pinescript-indicators__kagi_chart_identifier.pine, v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0457__everget-tradingview-pinescript-indicators__point_and_figure_pnf_chart_identifier.pine
+- `label.set_y`: 18 hits across v5+v6; samples: v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine
+- `label.set_yloc`: 1 hits across v5; samples: v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine
+- `label.style_arrowdown`: 5 hits across v5+v6; samples: v5:sources/0573__casoon-pine-scripts__modern_trend_regime.pine, v6:sources/0114__piecioshka-tradingview-pine-scripts__macd.pine, v6:sources/0554__sucgangrichard-SMSTRUCTUREVERSIONS__SMS-V3.pine, v6:sources/0604__TraderOracle-TradingView__TO-Method-v2.0.pine, v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `label.style_arrowup`: 5 hits across v5+v6; samples: v5:sources/0573__casoon-pine-scripts__modern_trend_regime.pine, v6:sources/0114__piecioshka-tradingview-pine-scripts__macd.pine, v6:sources/0554__sucgangrichard-SMSTRUCTUREVERSIONS__SMS-V3.pine, v6:sources/0604__TraderOracle-TradingView__TO-Method-v2.0.pine, v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `label.style_circle`: 23 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0570__casoon-pine-scripts__ma_cascade_engine.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine
+- `label.style_diamond`: 12 hits across v5+v6; samples: v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0780__deepentropy-lightweight-charts-indicators__Custom-Pattern-Detection.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0114__piecioshka-tradingview-pine-scripts__macd.pine, v6:sources/0299__alboogycOdR-dev-projects__0729DST.pine
+- `label.style_flag`: 1 hits across v5; samples: v5:sources/0762__MinorLeopard-Indicator__Indicator-FalseRemovals-.pine
+- `label.style_label_center`: 20 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine, v5:sources/0595__casoon-pine-scripts__trend_persistence_score.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine
+- `label.style_label_down`: 334 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0457__everget-tradingview-pinescript-indicators__point_and_figure_pnf_chart_identifier.pine, v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine
+- `label.style_label_left`: 150 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0475__everget-tradingview-pinescript-indicators__session_input_parser.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine
+- `label.style_label_lower_left`: 16 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0569__casoon-pine-scripts__chandelier_flip_radar.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine
+- `label.style_label_lower_right`: 9 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0864__hasnocool-tradingview-pine-scripts__Linear-Regression-Channel-Breakout-Strategy.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine, v6:sources/0294__grantj-re3-LingoLog__DynInputSelect.pine
+- `label.style_label_right`: 39 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0784__deepentropy-lightweight-charts-indicators__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine
+- `label.style_label_up`: 247 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine
+- `label.style_label_upper_left`: 14 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0569__casoon-pine-scripts__chandelier_flip_radar.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine
+- `label.style_label_upper_right`: 7 hits across v5+v6; samples: v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0864__hasnocool-tradingview-pine-scripts__Linear-Regression-Channel-Breakout-Strategy.pine, v6:sources/0226__BeSmMo-pinescriptindicators__unit_testing_framework.pine, v6:sources/0453__deepentropy-lightweight-charts-indicators__R_R-Trading-System-Framework.pine
+- `label.style_none`: 46 hits across v5+v6; samples: v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0460__everget-tradingview-pinescript-indicators__utc_clock.pine, v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0481__f13end-tradingview-custom-indicators__Range-Volume-Change.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine
+- `label.style_square`: 5 hits across v6; samples: v6:sources/0299__alboogycOdR-dev-projects__0729DST.pine, v6:sources/0312__alboogycOdR-dev-projects__0729DST_ALERTS_TEST.pine, v6:sources/0491__alboogycOdR-dev-projects__WED-MIDNIGHT-DST-System-v0.8.pine, v6:sources/0496__alboogycOdR-dev-projects__v0.7.0-0801DST_ALERTS-V0.7.0.pine, v6:sources/0569__alboogycOdR-dev-projects__0729DST.pine
+- `label.style_text_outline`: 1 hits across v5; samples: v5:sources/0762__MinorLeopard-Indicator__Indicator-FalseRemovals-.pine
+- `label.style_triangledown`: 20 hits across v5+v6; samples: v5:sources/0573__casoon-pine-scripts__modern_trend_regime.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0856__VVASILEVSS-LOCAL_AI_ENGINE__LOCAL_AI_ENGINE_AD_Context_v20_9.pine
+- `label.style_triangleup`: 22 hits across v5+v6; samples: v5:sources/0573__casoon-pine-scripts__modern_trend_regime.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0856__VVASILEVSS-LOCAL_AI_ENGINE__LOCAL_AI_ENGINE_AD_Context_v20_9.pine
+- `label.style_xcross`: 2 hits across v5+v6; samples: v5:sources/0802__YooooungLee-clever-meme__.pine, v6:sources/0604__TraderOracle-TradingView__TO-Method-v2.0.pine
+- `last_bar_index`: 41 hits across v5+v6; samples: v5:sources/0522__casoon-pine-scripts__support_resistance_zones.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0543__casoon-pine-scripts__momentum_profile.pine, v5:sources/0564__casoon-pine-scripts__money_flow_delta_profile.pine, v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine
+- `last_bar_time`: 9 hits across v5+v6; samples: v5:sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine, v5:sources/0954__anil-sn-EliteTrading__Smart-Money-Concepts.pine, v6:sources/0358__alboogycOdR-dev-projects__original.pine, v6:sources/0367__regalouisei-collect-tradingview__3d-engine-overlay.pine
+- `library`: 26 hits across v5+v6; samples: v5:sources/0601__casoon-pine-scripts__RTAAdvanced.pine, v5:sources/0602__casoon-pine-scripts__RTALiquidity.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0678__kevanoullio-tradingview-pine-scripts__double_triple_ema.pine
+- `line`: 293 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine
+- `line.all`: 4 hits across v5+v6; samples: v5:sources/0760__supertonka-tradingview-ict-indicator__orderblock_indicator.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine, v6:sources/0669__helenananaa-pine-compat-runtime__line_limit_eviction.pine
+- `line.copy`: 2 hits across v5+v6; samples: v5:sources/0789__g-moe-Trading-Indicators__supply-demand-zones-heikin-ashi.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `line.delete`: 145 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine
+- `line.get_price`: 6 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0949__g-moe-Trading-Indicators__xact-technical-analysis.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0469__g-moe-Trading-Indicators__csw-technical-analysis-beta.pine, v6:sources/0576__regalouisei-collect-tradingview__auto-fib-speed-resistance-fans-by-dgt.pine
+- `line.get_x1`: 18 hits across v5+v6; samples: v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine, v5:sources/0789__g-moe-Trading-Indicators__supply-demand-zones-heikin-ashi.pine, v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0103__bikky983-a__myindicator.pine
+- `line.get_x2`: 10 hits across v5+v6; samples: v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0103__bikky983-a__myindicator.pine, v6:sources/0130__jonathan-nascimento51-tradeCripto2025__auto_fib_extension_example.pine, v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine
+- `line.get_y1`: 18 hits across v5+v6; samples: v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0767__TraderOracle-TradingView__Tidal-Wave.pine, v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0103__bikky983-a__myindicator.pine
+- `line.get_y2`: 12 hits across v5+v6; samples: v5:sources/0789__g-moe-Trading-Indicators__supply-demand-zones-heikin-ashi.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine, v6:sources/0103__bikky983-a__myindicator.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0333__TamTH-Dev-trading-view-scripts__Volumatic.pine
+- `line.new`: 267 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine
+- `line.set_color`: 41 hits across v5+v6; samples: v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine
+- `line.set_extend`: 14 hits across v5+v6; samples: v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0525__casoon-pine-scripts__triangle_compression_scanner_pro.pine, v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine, v5:sources/0789__g-moe-Trading-Indicators__supply-demand-zones-heikin-ashi.pine, v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine
+- `line.set_style`: 14 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine
+- `line.set_width`: 16 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine
+- `line.set_x1`: 7 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0949__g-moe-Trading-Indicators__xact-technical-analysis.pine, v6:sources/0335__itmakesyousick-HTF-Candles-Pivots__Next.pine, v6:sources/0397__itmakesyousick-HTF-Candles-Pivots__v14.0.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine
+- `line.set_x2`: 35 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine
+- `line.set_xloc`: 1 hits across v6; samples: v6:sources/0270__g-moe-Trading-Indicators__csw-sentiment-line.pine
+- `line.set_xy1`: 39 hits across v5+v6; samples: v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine, v5:sources/0527__casoon-pine-scripts__wolfe_wave_scanner_pro.pine
+- `line.set_xy2`: 42 hits across v5+v6; samples: v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine, v5:sources/0508__casoon-pine-scripts__fib_reaction_memory.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine
+- `line.set_y1`: 16 hits across v5+v6; samples: v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine
+- `line.set_y2`: 20 hits across v5+v6; samples: v5:sources/0520__casoon-pine-scripts__sr_zones_mtf_v2.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine
+- `line.style_arrow_both`: 3 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0473__quant5-lab-runner__support_resistance_pivot_levels.pine
+- `line.style_arrow_left`: 4 hits across v5+v6; samples: v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0473__quant5-lab-runner__support_resistance_pivot_levels.pine, v6:sources/0650__regalouisei-collect-tradingview__volume-analysis-heatmap-and-volume-profile.pine
+- `line.style_arrow_right`: 5 hits across v5+v6; samples: v5:sources/0511__casoon-pine-scripts__market_scenario_projector.pine, v5:sources/0673__SammyEnigma-pine-scripts__pivot-popints.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0473__quant5-lab-runner__support_resistance_pivot_levels.pine
+- `line.style_dashed`: 158 hits across v5+v6; samples: v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine
+- `line.style_dotted`: 129 hits across v5+v6; samples: v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine
+- `line.style_solid`: 128 hits across v5+v6; samples: v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0502__casoon-pine-scripts__auto_trendlines.pine, v5:sources/0503__casoon-pine-scripts__broadening_wedge_scanner_pro.pine
+- `linefill`: 29 hits across v5+v6; samples: v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0802__YooooungLee-clever-meme__.pine, v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine
+- `linefill.all`: 1 hits across v5; samples: v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine
+- `linefill.delete`: 15 hits across v5+v6; samples: v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v5:sources/0851__nishpa800-indicators__vob_asym_t3_x6_mutex_lines_claude_v10.pine
+- `linefill.get_line1`: 2 hits across v5+v6; samples: v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine, v6:sources/0666__helenananaa-pine-compat-runtime__linefill_cast.pine
+- `linefill.new`: 29 hits across v5+v6; samples: v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0802__YooooungLee-clever-meme__.pine, v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine
+- `linefill.set_color`: 2 hits across v5+v6; samples: v5:sources/0929__helenananaa-pine-compat-runtime__linefill_set_color.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `location.abovebar`: 367 hits across v5+v6; samples: v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine
+- `location.absolute`: 113 hits across v5+v6; samples: v5:sources/0041__mihakralj-pinescript__lunar.pine, v5:sources/0044__mihakralj-pinescript__solar.pine, v5:sources/0242__mihakralj-pinescript__fractals.pine, v5:sources/0251__mihakralj-pinescript__ttmscalper.pine, v5:sources/0448__everget-tradingview-pinescript-indicators__mfi_money_flow_index.pine
+- `location.belowbar`: 370 hits across v5+v6; samples: v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine
+- `location.bottom`: 70 hits across v5+v6; samples: v5:sources/0200__mihakralj-pinescript__bbs.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine, v5:sources/0489__casoon-pine-scripts__flow_bias.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0523__casoon-pine-scripts__swing_conviction_radar.pine
+- `location.top`: 70 hits across v5+v6; samples: v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine, v5:sources/0489__casoon-pine-scripts__flow_bias.pine, v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0523__casoon-pine-scripts__swing_conviction_radar.pine
+- `log.error`: 66 hits across v5+v6; samples: v5:sources/0797__Leci37-tuisku_Web_selling__WFJQVVNEVF8zME1pbl8yQlQwdHVpc2t1NWQxMTM1YTI.pine, v5:sources/0799__Leci37-tuisku_Web_selling__TFlGVF8xSG91cl8xQk9MdHVpc2t1MjA4ZGZjNWI.pine, v5:sources/0800__Leci37-tuisku_Web_selling__VFdMT181TWluXzFBRFh0dWlza3VmNmQ4YmJhYw.pine, v5:sources/0860__Leci37-tuisku_Web_selling__VFdMT18xRGF5XzJCVjB0dWlza3U5YTlmNTgyYg.pine, v5:sources/0861__Leci37-tuisku_Web_selling__QUJOQl8xSG91cl8xU1FVdHVpc2t1MTY5YzhiNDY.pine
+- `log.info`: 135 hits across v5+v6; samples: v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine
+- `log.warning`: 3 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v6:sources/0490__regalouisei-collect-tradingview__mxwll-price-action-suite-mxwll.pine, v6:sources/0908__raybird-pine-trading-strategies__tn_fakeout_sovereign_v6.pine
+- `low`: 923 hits across v5+v6; samples: v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0007__mihakralj-pinescript__dchannel.pine
+- `map.clear`: 1 hits across v6; samples: v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine
+- `map.contains`: 7 hits across v5+v6; samples: v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine, v6:sources/0147__abhinaynatraj-TradingHub__quarter_theory_stats.pine
+- `map.get`: 7 hits across v5+v6; samples: v5:sources/0270__mihakralj-pinescript__mode.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine
+- `map.keys`: 1 hits across v5; samples: v5:sources/0270__mihakralj-pinescript__mode.pine
+- `map.new`: 18 hits across v5+v6; samples: v5:sources/0270__mihakralj-pinescript__mode.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine
+- `map.put`: 8 hits across v5+v6; samples: v5:sources/0270__mihakralj-pinescript__mode.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine
+- `map.remove`: 1 hits across v6; samples: v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `map.size`: 1 hits across v5; samples: v5:sources/0270__mihakralj-pinescript__mode.pine
+- `math.abs`: 585 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0010__mihakralj-pinescript__jbands.pine, v5:sources/0011__mihakralj-pinescript__kchannel.pine
+- `math.acos`: 1 hits across v6; samples: v6:sources/0487__regalouisei-collect-tradingview__fourier-extrapolator-of-price-w-projection-forecast-loxx.pine
+- `math.asin`: 9 hits across v5+v6; samples: v5:sources/0035__mihakralj-pinescript__ebsw.pine, v5:sources/0043__mihakralj-pinescript__sine.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine, v5:sources/0679__kevanoullio-tradingview-pine-scripts__ehlers_super_smoother.pine, v5:sources/0757__palitojendthen-pinescript__adaptive_rsi.pine
+- `math.atan`: 23 hits across v5+v6; samples: v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0036__mihakralj-pinescript__homod.pine, v5:sources/0037__mihakralj-pinescript__ht_dcperiod.pine, v5:sources/0038__mihakralj-pinescript__ht_dcphase.pine, v5:sources/0039__mihakralj-pinescript__ht_phasor.pine
+- `math.avg`: 95 hits across v5+v6; samples: v5:sources/0007__mihakralj-pinescript__dchannel.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine
+- `math.ceil`: 45 hits across v5+v6; samples: v5:sources/0107__mihakralj-pinescript__gauss.pine, v5:sources/0139__mihakralj-pinescript__cfb.pine, v5:sources/0263__mihakralj-pinescript__iqr.pine, v5:sources/0271__mihakralj-pinescript__percentile.pine, v5:sources/0273__mihakralj-pinescript__quantile.pine
+- `math.cos`: 86 hits across v5+v6; samples: v5:sources/0019__mihakralj-pinescript__ubands.pine, v5:sources/0020__mihakralj-pinescript__uchannel.pine, v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0035__mihakralj-pinescript__ebsw.pine
+- `math.e`: 3 hits across v5+v6; samples: v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v6:sources/0289__deepentropy-lightweight-charts-indicators__RSI-Kernel-Optimized-_-Flux-Charts.pine, v6:sources/0364__deepentropy-oakscriptJS__RSI-Kernel-Optimized-_-Flux-Charts.pine
+- `math.exp`: 115 hits across v5+v6; samples: v5:sources/0008__mihakralj-pinescript__decaychannel.pine, v5:sources/0019__mihakralj-pinescript__ubands.pine, v5:sources/0020__mihakralj-pinescript__uchannel.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0035__mihakralj-pinescript__ebsw.pine
+- `math.floor`: 136 hits across v5+v6; samples: v5:sources/0107__mihakralj-pinescript__gauss.pine, v5:sources/0133__mihakralj-pinescript__afirma.pine, v5:sources/0209__mihakralj-pinescript__dpo.pine, v5:sources/0258__mihakralj-pinescript__entropy.pine, v5:sources/0262__mihakralj-pinescript__hurst.pine
+- `math.log`: 96 hits across v5+v6; samples: v5:sources/0008__mihakralj-pinescript__decaychannel.pine, v5:sources/0010__mihakralj-pinescript__jbands.pine, v5:sources/0053__mihakralj-pinescript__dmx.pine, v5:sources/0068__mihakralj-pinescript__logcosh.pine, v5:sources/0080__mihakralj-pinescript__msle.pine
+- `math.log10`: 19 hits across v5+v6; samples: v5:sources/0052__mihakralj-pinescript__chop.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine
+- `math.max`: 750 hits across v5+v6; samples: v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine, v5:sources/0008__mihakralj-pinescript__decaychannel.pine, v5:sources/0010__mihakralj-pinescript__jbands.pine
+- `math.min`: 614 hits across v5+v6; samples: v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0008__mihakralj-pinescript__decaychannel.pine, v5:sources/0010__mihakralj-pinescript__jbands.pine, v5:sources/0020__mihakralj-pinescript__uchannel.pine, v5:sources/0024__mihakralj-pinescript__ha.pine
+- `math.phi`: 2 hits across v5+v6; samples: v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine, v6:sources/0663__ferranbt-pinecone__array_reductions.pine
+- `math.pi`: 111 hits across v5+v6; samples: v5:sources/0019__mihakralj-pinescript__ubands.pine, v5:sources/0020__mihakralj-pinescript__uchannel.pine, v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0036__mihakralj-pinescript__homod.pine
+- `math.pow`: 158 hits across v5+v6; samples: v5:sources/0010__mihakralj-pinescript__jbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0031__mihakralj-pinescript__ccyc.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0035__mihakralj-pinescript__ebsw.pine
+- `math.random`: 2 hits across v6; samples: v6:sources/0423__regalouisei-collect-tradingview__monte-carlo-polyline-traceback-kioseff-trading.pine, v6:sources/0437__helenananaa-pine-compat-runtime__unsupported_request_math_calls.pine
+- `math.round`: 236 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0033__mihakralj-pinescript__dsp.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0045__mihakralj-pinescript__ssfdsp.pine, v5:sources/0159__mihakralj-pinescript__cwt.pine
+- `math.round_to_mintick`: 58 hits across v5+v6; samples: v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0780__deepentropy-lightweight-charts-indicators__Custom-Pattern-Detection.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0835__g-moe-Trading-Indicators__psych-levels.pine
+- `math.sign`: 45 hits across v5+v6; samples: v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0131__mihakralj-pinescript__wavelet.pine, v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0331__mihakralj-pinescript__htit.pine
+- `math.sin`: 41 hits across v5+v6; samples: v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0034__mihakralj-pinescript__eacp.pine, v5:sources/0035__mihakralj-pinescript__ebsw.pine, v5:sources/0040__mihakralj-pinescript__ht_sine.pine, v5:sources/0041__mihakralj-pinescript__lunar.pine
+- `math.sqrt`: 195 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine, v5:sources/0010__mihakralj-pinescript__jbands.pine, v5:sources/0015__mihakralj-pinescript__regchannel.pine
+- `math.sum`: 119 hits across v5+v6; samples: v5:sources/0334__mihakralj-pinescript__kama.pine, v5:sources/0373__mihakralj-pinescript__massi.pine, v5:sources/0379__mihakralj-pinescript__ui.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine
+- `math.tan`: 6 hits across v5+v6; samples: v5:sources/0103__mihakralj-pinescript__cheby1.pine, v5:sources/0104__mihakralj-pinescript__cheby2.pine, v5:sources/0106__mihakralj-pinescript__elliptic.pine, v5:sources/0117__mihakralj-pinescript__notch.pine, v6:sources/0128__mushroom-men-Trading-clean-litter__elliptic.pine
+- `math.tanh`: 1 hits across v5; samples: v5:sources/0598__casoon-pine-scripts__time_to_react_volatility_time.pine
+- `math.todegrees`: 3 hits across v5+v6; samples: v5:sources/0030__mihakralj-pinescript__ccor.pine, v5:sources/0601__casoon-pine-scripts__RTAAdvanced.pine, v6:sources/0031__mihakralj-QuanTAlib__ccor.pine
+- `matrix.add_col`: 2 hits across v5; samples: v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine
+- `matrix.add_row`: 6 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine, v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.col`: 2 hits across v6; samples: v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine, v6:sources/0508__ferranbt-pinecone__matrix_sort_concat.pine
+- `matrix.columns`: 4 hits across v5; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.concat`: 1 hits across v6; samples: v6:sources/0508__ferranbt-pinecone__matrix_sort_concat.pine
+- `matrix.copy`: 3 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v6:sources/0166__helenananaa-pine-compat-runtime__matrix_call_result_kron_cell_limit.pine, v6:sources/0168__helenananaa-pine-compat-runtime__matrix_call_result_pow_negative_power.pine
+- `matrix.det`: 1 hits across v5; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.diff`: 1 hits across v5; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.elements_count`: 1 hits across v6; samples: v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.fill`: 1 hits across v6; samples: v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.get`: 11 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine
+- `matrix.inv`: 2 hits across v5+v6; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v6:sources/0160__heyphat-piner__regression-trend.pine
+- `matrix.is_antidiagonal`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.is_antisymmetric`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.is_binary`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.is_diagonal`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.is_stochastic`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.is_triangular`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.is_zero`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.kron`: 1 hits across v5; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.max`: 2 hits across v5; samples: v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine
+- `matrix.min`: 2 hits across v5; samples: v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine
+- `matrix.mode`: 1 hits across v6; samples: v6:sources/0372__ferranbt-pinecone__matrix_predicates.pine
+- `matrix.mult`: 3 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v6:sources/0160__heyphat-piner__regression-trend.pine
+- `matrix.new`: 25 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine
+- `matrix.pow`: 1 hits across v5; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.rank`: 1 hits across v5; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.remove_row`: 3 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.reshape`: 1 hits across v5; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine
+- `matrix.reverse`: 1 hits across v6; samples: v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.row`: 2 hits across v5+v6; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v6:sources/0508__ferranbt-pinecone__matrix_sort_concat.pine
+- `matrix.rows`: 6 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.set`: 8 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v6:sources/0160__heyphat-piner__regression-trend.pine, v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.sort`: 1 hits across v6; samples: v6:sources/0508__ferranbt-pinecone__matrix_sort_concat.pine
+- `matrix.submatrix`: 2 hits across v5+v6; samples: v5:sources/0925__ferranbt-pinecone__matrix_la.pine, v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.swap_rows`: 1 hits across v6; samples: v6:sources/0165__helenananaa-pine-compat-runtime__supported_matrix_new_string.pine
+- `matrix.transpose`: 1 hits across v6; samples: v6:sources/0874__pineforge-4pass-pineforge-corpus__strategy.pine
+- `max_bars_back`: 219 hits across v5+v6; samples: v5:sources/0102__mihakralj-pinescript__cfitz.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine
+- `minute`: 63 hits across v5+v6; samples: v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine, v5:sources/0616__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.4.pine, v5:sources/0617__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.6.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine
+- `month`: 50 hits across v5+v6; samples: v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0724__deepentropy-lightweight-charts-indicators__Relative-Strength-of-a-stock.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine
+- `na`: 1331 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine, v5:sources/0006__mihakralj-pinescript__bbands.pine
+- `nz`: 723 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `ohlc4`: 37 hits across v5+v6; samples: v5:sources/0105__mihakralj-pinescript__edcf.pine, v5:sources/0184__mihakralj-pinescript__ohlc4.pine, v5:sources/0401__mihakralj-pinescript__twap.pine, v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine
+- `open`: 487 hits across v5+v6; samples: v5:sources/0023__mihakralj-pinescript__avgprice.pine, v5:sources/0024__mihakralj-pinescript__ha.pine, v5:sources/0059__mihakralj-pinescript__qstick.pine, v5:sources/0068__mihakralj-pinescript__logcosh.pine, v5:sources/0069__mihakralj-pinescript__maape.pine
+- `order.ascending`: 18 hits across v5+v6; samples: v5:sources/0094__mihakralj-pinescript__alaguerre.pine, v5:sources/0280__mihakralj-pinescript__trim.pine, v5:sources/0283__mihakralj-pinescript__wins.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0502__casoon-pine-scripts__auto_trendlines.pine
+- `order.descending`: 7 hits across v5+v6; samples: v5:sources/0502__casoon-pine-scripts__auto_trendlines.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine, v5:sources/0728__gorx1-TradingView__Quantile-BasedAdaptiveDetection.pine, v6:sources/0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine, v6:sources/0485__itmakesyousick-Currency-Strength-Chart__v33.0.pine
+- `plot`: 1585 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `plot.linestyle_dashed`: 1 hits across v6; samples: v6:sources/0708__s4mn0v-pinescript__crossoveremas.pine
+- `plot.linestyle_dotted`: 1 hits across v6; samples: v6:sources/0114__piecioshka-tradingview-pine-scripts__macd.pine
+- `plot.style_area`: 37 hits across v5+v6; samples: v5:sources/0067__mihakralj-pinescript__huber.pine, v5:sources/0070__mihakralj-pinescript__mae.pine, v5:sources/0071__mihakralj-pinescript__mapd.pine, v5:sources/0072__mihakralj-pinescript__mape.pine, v5:sources/0073__mihakralj-pinescript__mase.pine
+- `plot.style_areabr`: 5 hits across v5; samples: v5:sources/0666__SammyEnigma-pine-scripts__greeffer-bb-strategy-0.pine, v5:sources/0667__SammyEnigma-pine-scripts__greeffer-bb-strategy-1.pine, v5:sources/0668__SammyEnigma-pine-scripts__greeffer-bb-strategy-2.pine, v5:sources/0669__SammyEnigma-pine-scripts__greeffer-bb-strategy-3.pine, v5:sources/0671__SammyEnigma-pine-scripts__greeffer-bb-strategy.pine
+- `plot.style_circles`: 89 hits across v5+v6; samples: v5:sources/0232__mihakralj-pinescript__squeeze.pine, v5:sources/0365__mihakralj-pinescript__cvi.pine, v5:sources/0467__everget-tradingview-pinescript-indicators__roi_return_on_investment.pine, v5:sources/0469__everget-tradingview-pinescript-indicators__us_treasury_yields.pine, v5:sources/0470__everget-tradingview-pinescript-indicators__ytd_year_to_date_percent_return.pine
+- `plot.style_columns`: 95 hits across v5+v6; samples: v5:sources/0049__mihakralj-pinescript__amat.pine, v5:sources/0141__mihakralj-pinescript__macd.pine, v5:sources/0447__everget-tradingview-pinescript-indicators__derivative_oscillator.pine, v5:sources/0448__everget-tradingview-pinescript-indicators__mfi_money_flow_index.pine, v5:sources/0450__everget-tradingview-pinescript-indicators__stochastic.pine
+- `plot.style_cross`: 40 hits across v5+v6; samples: v5:sources/0579__casoon-pine-scripts__vein_reversal_labeler.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0697__dcaoyuan-vibetrader__sar.pine, v5:sources/0793__TraderOracle-TradingView__The-Defibrillator.pine, v5:sources/0837__nicknameniko21-pines__VolatilitySignals.pine
+- `plot.style_histogram`: 43 hits across v5+v6; samples: v5:sources/0042__mihakralj-pinescript__phasor.pine, v5:sources/0144__mihakralj-pinescript__ppo.pine, v5:sources/0216__mihakralj-pinescript__gator.pine, v5:sources/0232__mihakralj-pinescript__squeeze.pine, v5:sources/0237__mihakralj-pinescript__td_seq.pine
+- `plot.style_line`: 106 hits across v5+v6; samples: v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine
+- `plot.style_linebr`: 170 hits across v5+v6; samples: v5:sources/0249__mihakralj-pinescript__psar.pine, v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine, v5:sources/0472__everget-tradingview-pinescript-indicators__nrtr_nick_rypock_trailing_reverse.pine, v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine
+- `plot.style_stepline`: 49 hits across v5+v6; samples: v5:sources/0056__mihakralj-pinescript__ht_trendmode.pine, v5:sources/0243__mihakralj-pinescript__pivot.pine, v5:sources/0244__mihakralj-pinescript__pivotcam.pine, v5:sources/0245__mihakralj-pinescript__pivotdem.pine, v5:sources/0246__mihakralj-pinescript__pivotext.pine
+- `plot.style_stepline_diamond`: 4 hits across v6; samples: v6:sources/0077__danielbodnar-skills__chart-visualization.pine, v6:sources/0180__msongkiet-TDV_share__PE_PBV_EPS.pine, v6:sources/0995__deepentropy-oakscriptJS__LibraryCOT-v5.pine, v6:sources/0999__deepentropy-oakscriptJS__Request-v3.pine
+- `plot.style_steplinebr`: 7 hits across v5+v6; samples: v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0728__gorx1-TradingView__Quantile-BasedAdaptiveDetection.pine, v5:sources/0924__g-moe-Trading-Indicators__tbm-wick-test.pine, v6:sources/0239__btcjon-pine__TTB_Signals.pine, v6:sources/0492__lyr-2000-lyr-2000.github.io__.pine
+- `plotarrow`: 3 hits across v6; samples: v6:sources/0289__deepentropy-lightweight-charts-indicators__RSI-Kernel-Optimized-_-Flux-Charts.pine, v6:sources/0364__deepentropy-oakscriptJS__RSI-Kernel-Optimized-_-Flux-Charts.pine, v6:sources/0678__helenananaa-pine-compat-runtime__unsupported_output_series_show_last_params.pine
+- `plotbar`: 1 hits across v6; samples: v6:sources/0678__helenananaa-pine-compat-runtime__unsupported_output_series_show_last_params.pine
+- `plotcandle`: 36 hits across v5+v6; samples: v5:sources/0024__mihakralj-pinescript__ha.pine, v5:sources/0413__everget-tradingview-pinescript-indicators__range_candles.pine, v5:sources/0424__everget-tradingview-pinescript-indicators__fibonacci_weighted_moving_average.pine, v5:sources/0428__everget-tradingview-pinescript-indicators__henderson_weighted_moving_average.pine, v5:sources/0431__everget-tradingview-pinescript-indicators__inverse_distance_weighted_moving_average.pine
+- `plotchar`: 42 hits across v5+v6; samples: v5:sources/0041__mihakralj-pinescript__lunar.pine, v5:sources/0044__mihakralj-pinescript__solar.pine, v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0766__TraderOracle-TradingView__ShockWave.pine
+- `plotshape`: 488 hits across v5+v6; samples: v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0200__mihakralj-pinescript__bbs.pine
+- `polyline.all`: 1 hits across v6; samples: v6:sources/0434__helenananaa-pine-compat-runtime__polyline_cast.pine
+- `polyline.delete`: 8 hits across v5+v6; samples: v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0704__ttopias-tradinview-indicators__vwap-indicator.pine, v6:sources/0094__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__price-and-longitude-angles.pine
+- `polyline.new`: 18 hits across v5+v6; samples: v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0704__ttopias-tradinview-indicators__vwap-indicator.pine, v5:sources/0712__deepentropy-lightweight-charts-indicators__Volume-Profile-Pivot-Levels-ChartPrime-.pine
+- `position.bottom_center`: 25 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine, v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v5:sources/0857__regalouisei-collect-tradingview__adx-trend-strength-with-dashboard.pine
+- `position.bottom_left`: 71 hits across v5+v6; samples: v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine
+- `position.bottom_right`: 95 hits across v5+v6; samples: v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine
+- `position.middle_center`: 19 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine, v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v5:sources/0857__regalouisei-collect-tradingview__adx-trend-strength-with-dashboard.pine
+- `position.middle_left`: 23 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine, v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v5:sources/0857__regalouisei-collect-tradingview__adx-trend-strength-with-dashboard.pine
+- `position.middle_right`: 38 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine
+- `position.top_center`: 25 hits across v5+v6; samples: v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0773__suyons-tradingview-indicators__02-rsi-signal.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine
+- `position.top_left`: 63 hits across v5+v6; samples: v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine, v5:sources/0507__casoon-pine-scripts__elliott_wave_radar.pine
+- `position.top_right`: 280 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine, v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine
+- `request.dividends`: 4 hits across v5+v6; samples: v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0869__shubhamtaywade82-algo_trading_api__SupertrendVWAP.pine
+- `request.earnings`: 6 hits across v5+v6; samples: v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0635__LongVu5228-Swing-Long-System__pinescript-indicators.pine
+- `request.financial`: 9 hits across v5+v6; samples: v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v5:sources/0830__jawauntb-trading-scripts__pe-peg-over-time.pine, v5:sources/1000__jfernandogg-pinescript_ind_estrat__value_investing_scanner.pine, v6:sources/0180__msongkiet-TDV_share__PE_PBV_EPS.pine, v6:sources/0280__g-moe-Trading-Indicators__heikin-ashi-macd-signals.pine
+- `request.security`: 366 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0243__mihakralj-pinescript__pivot.pine, v5:sources/0244__mihakralj-pinescript__pivotcam.pine, v5:sources/0245__mihakralj-pinescript__pivotdem.pine, v5:sources/0246__mihakralj-pinescript__pivotext.pine
+- `request.security_lower_tf`: 34 hits across v5+v6; samples: v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0564__casoon-pine-scripts__money_flow_delta_profile.pine, v5:sources/0775__g-moe-Trading-Indicators__horizontal-line-bands.pine
+- `request.seed`: 2 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0617__caizongxun-bb-channel-ai-predictor__bb_predictor_final.pine
+- `request.splits`: 3 hits across v6; samples: v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0869__shubhamtaywade82-algo_trading_api__SupertrendVWAP.pine
+- `runtime.error`: 395 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `scale.none`: 1 hits across v6; samples: v6:sources/0270__g-moe-Trading-Indicators__csw-sentiment-line.pine
+- `scale.right`: 18 hits across v5+v6; samples: v5:sources/0659__SammyEnigma-pine-scripts__BBW-RSI-60-Strategy.pine, v5:sources/0661__SammyEnigma-pine-scripts__bb-rsi-15m-3.pine, v5:sources/0662__SammyEnigma-pine-scripts__bb-rsi-1m-3.pine, v5:sources/0663__SammyEnigma-pine-scripts__bb-rsi-1m-4.pine, v5:sources/0664__SammyEnigma-pine-scripts__bb-rsi.pine
+- `second`: 12 hits across v5+v6; samples: v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0556__casoon-pine-scripts__wavetrend_v3.pine, v5:sources/0810__helenananaa-pine-compat-runtime__linefill_all.pine
+- `session.extended`: 5 hits across v5+v6; samples: v5:sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine, v6:sources/0121__folknor-pine-tools__probe-b-untyped-param-ternary.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine, v6:sources/0833__jeffgat-trading-engine__v5_atr_gaps.pine, v6:sources/0893__jeffgat-trading-engine__v6_multiple_entries.pine
+- `session.isfirstbar`: 1 hits across v5; samples: v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine
+- `session.isfirstbar_regular`: 4 hits across v5+v6; samples: v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0555__azam2050-market-data-engine__mirsad9.pine, v6:sources/0915__Jmoney1214-Market-Insight-Engine__morning_scan_strategy.pine, v6:sources/0981__deepentropy-lightweight-charts-indicators__getSeries-v2.pine
+- `session.islastbar`: 1 hits across v6; samples: v6:sources/0996__deepentropy-oakscriptJS__Strategy-v5.pine
+- `session.ismarket`: 8 hits across v5+v6; samples: v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0271__kingmalitha-SRI-Indicator-Ft.-MSB__final.pine, v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine, v6:sources/0604__TraderOracle-TradingView__TO-Method-v2.0.pine
+- `session.ispremarket`: 7 hits across v5+v6; samples: v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0271__kingmalitha-SRI-Indicator-Ft.-MSB__final.pine, v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine, v6:sources/0604__TraderOracle-TradingView__TO-Method-v2.0.pine, v6:sources/0915__Jmoney1214-Market-Insight-Engine__morning_scan_strategy.pine
+- `session.regular`: 6 hits across v5+v6; samples: v5:sources/0791__g-moe-Trading-Indicators__bankai-es-trend.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine, v6:sources/0545__g-moe-Trading-Indicators__atr-levels-call-put.pine, v6:sources/0560__shevateshubham-tradingbot__smc_connector.pine, v6:sources/0566__voidrlm-TradingView-Indicators__CompleteBundle.pine
+- `settlement_as_close.inherit`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `settlement_as_close.off`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `settlement_as_close.on`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `shape.arrowdown`: 24 hits across v5+v6; samples: v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v5:sources/0843__jpsm83-pineScript__tiago.pine
+- `shape.arrowup`: 23 hits across v5+v6; samples: v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v5:sources/0736__deepentropy-lightweight-charts-indicators__SuperTrend-Relative-Volume-Kernel-Optimized-.pine, v5:sources/0843__jpsm83-pineScript__tiago.pine
+- `shape.circle`: 126 hits across v5+v6; samples: v5:sources/0200__mihakralj-pinescript__bbs.pine, v5:sources/0448__everget-tradingview-pinescript-indicators__mfi_money_flow_index.pine, v5:sources/0449__everget-tradingview-pinescript-indicators__stc_schaff_trend_cycle.pine, v5:sources/0450__everget-tradingview-pinescript-indicators__stochastic.pine, v5:sources/0451__everget-tradingview-pinescript-indicators__tsi_true_strength_index.pine
+- `shape.cross`: 13 hits across v5+v6; samples: v5:sources/0569__casoon-pine-scripts__chandelier_flip_radar.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0768__TraderOracle-TradingView__Total-Recall.pine, v5:sources/0851__nishpa800-indicators__vob_asym_t3_x6_mutex_lines_claude_v10.pine, v5:sources/0881__Leci37-tuisku_Web_selling__QUZSTV8zME1pbl8yTU0wdHVpc2t1MWFlYjg0MjE.pine
+- `shape.diamond`: 59 hits across v5+v6; samples: v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine
+- `shape.flag`: 14 hits across v5+v6; samples: v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0532__casoon-pine-scripts__anchored_vwap.pine, v5:sources/0804__nishpa800-indicators__heavy_weapons_nra_gzi_fvg_matrix_combos_2_bodies_not_1_nrafr_shorttitle_rvol_nrafr_x2.pine, v5:sources/0839__g-moe-Trading-Indicators__tmt-overlay.pine, v5:sources/0851__nishpa800-indicators__vob_asym_t3_x6_mutex_lines_claude_v10.pine
+- `shape.labeldown`: 148 hits across v5+v6; samples: v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine, v5:sources/0472__everget-tradingview-pinescript-indicators__nrtr_nick_rypock_trailing_reverse.pine
+- `shape.labelup`: 159 hits across v5+v6; samples: v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0461__everget-tradingview-pinescript-indicators__bullish_bearish_candle_series_distribution.pine, v5:sources/0462__everget-tradingview-pinescript-indicators__close_to_close_percent_change_distribution.pine
+- `shape.square`: 29 hits across v5+v6; samples: v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine, v5:sources/0515__casoon-pine-scripts__market_tradability_engine_v2.pine
+- `shape.triangledown`: 284 hits across v5+v6; samples: v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0242__mihakralj-pinescript__fractals.pine, v5:sources/0251__mihakralj-pinescript__ttmscalper.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine
+- `shape.triangleup`: 297 hits across v5+v6; samples: v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0242__mihakralj-pinescript__fractals.pine, v5:sources/0251__mihakralj-pinescript__ttmscalper.pine, v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine
+- `shape.xcross`: 43 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine
+- `size.auto`: 38 hits across v5+v6; samples: v5:sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine
+- `size.huge`: 46 hits across v5+v6; samples: v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0460__everget-tradingview-pinescript-indicators__utc_clock.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine
+- `size.large`: 163 hits across v5+v6; samples: v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0484__casoon-pine-scripts__candle_pressure_response_jma.pine, v5:sources/0489__casoon-pine-scripts__flow_bias.pine, v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine
+- `size.normal`: 240 hits across v5+v6; samples: v5:sources/0452__everget-tradingview-pinescript-indicators__chart_type_identifier.pine, v5:sources/0453__everget-tradingview-pinescript-indicators__fancy_shapes.pine, v5:sources/0454__everget-tradingview-pinescript-indicators__heikin_ashi_chart_identifier.pine, v5:sources/0455__everget-tradingview-pinescript-indicators__kagi_chart_identifier.pine, v5:sources/0457__everget-tradingview-pinescript-indicators__point_and_figure_pnf_chart_identifier.pine
+- `size.small`: 469 hits across v5+v6; samples: v5:sources/0041__mihakralj-pinescript__lunar.pine, v5:sources/0044__mihakralj-pinescript__solar.pine, v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0061__mihakralj-pinescript__super.pine, v5:sources/0242__mihakralj-pinescript__fractals.pine
+- `size.tiny`: 424 hits across v5+v6; samples: v5:sources/0062__mihakralj-pinescript__ttm.pine, v5:sources/0063__mihakralj-pinescript__ttmtrend.pine, v5:sources/0200__mihakralj-pinescript__bbs.pine, v5:sources/0448__everget-tradingview-pinescript-indicators__mfi_money_flow_index.pine, v5:sources/0449__everget-tradingview-pinescript-indicators__stc_schaff_trend_cycle.pine
+- `splits.denominator`: 3 hits across v6; samples: v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0869__shubhamtaywade82-algo_trading_api__SupertrendVWAP.pine
+- `str.contains`: 40 hits across v5+v6; samples: v5:sources/0522__casoon-pine-scripts__support_resistance_zones.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0577__casoon-pine-scripts__vein_feature_exporter.pine, v5:sources/0582__casoon-pine-scripts__vein_spread_context.pine
+- `str.endswith`: 2 hits across v6; samples: v6:sources/0429__nishpa800-indicators__KC_COMBO_SR_v5.3.pine, v6:sources/0988__deepentropy-lightweight-charts-indicators__ValueAtTime-v2.pine
+- `str.format`: 88 hits across v5+v6; samples: v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine
+- `str.format_time`: 17 hits across v5+v6; samples: v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0780__deepentropy-lightweight-charts-indicators__Custom-Pattern-Detection.pine
+- `str.length`: 38 hits across v5+v6; samples: v5:sources/0475__everget-tradingview-pinescript-indicators__session_input_parser.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0580__casoon-pine-scripts__vein_reversal_score.pine, v5:sources/0584__casoon-pine-scripts__vein_trend.pine
+- `str.lower`: 11 hits across v5+v6; samples: v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v6:sources/0323__deepentropy-lightweight-charts-indicators__Liquidity-Pools-LuxAlgo-.pine, v6:sources/0335__itmakesyousick-HTF-Candles-Pivots__Next.pine, v6:sources/0391__deepentropy-oakscriptJS__Liquidity-Pools-LuxAlgo-.pine
+- `str.match`: 4 hits across v5+v6; samples: v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0086__folknor-pine-tools__INV183-plain-param-expected-noun.pine, v6:sources/0104__helenananaa-pine-compat-runtime__unsupported_str_match_promoted_string_simple_return_qualifier.pine, v6:sources/0253__ferranbt-pinecone__str_new.pine
+- `str.pos`: 5 hits across v5+v6; samples: v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v6:sources/0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine, v6:sources/0455__deepentropy-oakscriptJS__Session-Sweeps-LuxAlgo-.pine, v6:sources/0490__regalouisei-collect-tradingview__mxwll-price-action-suite-mxwll.pine
+- `str.repeat`: 13 hits across v5+v6; samples: v5:sources/0536__casoon-pine-scripts__cci_advanced.pine, v5:sources/0539__casoon-pine-scripts__fisher_transform_advanced.pine, v5:sources/0550__casoon-pine-scripts__roc_advanced.pine, v5:sources/0551__casoon-pine-scripts__rsi_advanced.pine, v5:sources/0552__casoon-pine-scripts__stoch_rsi_advanced.pine
+- `str.replace`: 7 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0802__YooooungLee-clever-meme__.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0931__helenananaa-pine-compat-runtime__str_replace_result_limit.pine, v6:sources/0245__regalouisei-collect-tradingview__interactive-atr-stop-loss-tanhef.pine
+- `str.replace_all`: 7 hits across v5+v6; samples: v5:sources/0475__everget-tradingview-pinescript-indicators__session_input_parser.pine, v5:sources/0522__casoon-pine-scripts__support_resistance_zones.pine, v5:sources/0567__casoon-pine-scripts__relative_strength_line.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v6:sources/0295__alboogycOdR-dev-projects__CRT-Bias-Scanner-v4.pine
+- `str.split`: 16 hits across v5+v6; samples: v5:sources/0475__everget-tradingview-pinescript-indicators__session_input_parser.pine, v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine
+- `str.startswith`: 4 hits across v5+v6; samples: v5:sources/0532__casoon-pine-scripts__anchored_vwap.pine, v6:sources/0485__itmakesyousick-Currency-Strength-Chart__v33.0.pine, v6:sources/0642__itmakesyousick-Currency-Strength-Chart__v39.0.pine, v6:sources/0829__chriswoojinlee-indicator-suite__Capitulation_Retest.pine
+- `str.substring`: 15 hits across v5+v6; samples: v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v5:sources/0851__nishpa800-indicators__vob_asym_t3_x6_mutex_lines_claude_v10.pine, v6:sources/0094__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__price-and-longitude-angles.pine
+- `str.tonumber`: 25 hits across v5+v6; samples: v5:sources/0513__casoon-pine-scripts__market_structure_pivot_map.pine, v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v5:sources/0803__nishpa800-indicators__KC_COMBO_v2.pine, v5:sources/0835__g-moe-Trading-Indicators__psych-levels.pine
+- `str.tostring`: 584 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0259__mihakralj-pinescript__geomean.pine, v5:sources/0261__mihakralj-pinescript__harmean.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0480__f13end-tradingview-custom-indicators__Range-Volume-Change.pine
+- `str.trim`: 8 hits across v5+v6; samples: v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0792__TraderOracle-TradingView__TraderSmarts.pine, v6:sources/0253__ferranbt-pinecone__str_new.pine, v6:sources/0478__kotipasa-tradingview-scripts__tradewar_spy_options.pine
+- `str.upper`: 11 hits across v5+v6; samples: v5:sources/0582__casoon-pine-scripts__vein_spread_context.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine, v6:sources/0362__patelmanav294-eng-Profit-Hunter__trend-anchor-signals.pine, v6:sources/0427__regalouisei-collect-tradingview__eduvest-qqe-grade-system-sabc-signal-classification.pine
+- `strategy`: 464 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0556__casoon-pine-scripts__wavetrend_v3.pine
+- `strategy.cancel`: 74 hits across v5+v6; samples: v5:sources/0664__SammyEnigma-pine-scripts__bb-rsi.pine, v5:sources/0797__Leci37-tuisku_Web_selling__WFJQVVNEVF8zME1pbl8yQlQwdHVpc2t1NWQxMTM1YTI.pine, v5:sources/0799__Leci37-tuisku_Web_selling__TFlGVF8xSG91cl8xQk9MdHVpc2t1MjA4ZGZjNWI.pine, v5:sources/0800__Leci37-tuisku_Web_selling__VFdMT181TWluXzFBRFh0dWlza3VmNmQ4YmJhYw.pine, v5:sources/0860__Leci37-tuisku_Web_selling__VFdMT18xRGF5XzJCVjB0dWlza3U5YTlmNTgyYg.pine
+- `strategy.cancel_all`: 8 hits across v6; samples: v6:sources/0499__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__RR-DANGOV-v3.3.pine, v6:sources/0829__chriswoojinlee-indicator-suite__Capitulation_Retest.pine, v6:sources/0834__vinay-veerappa-tvDownloadOHLC__NoonCurve_Strategy.pine, v6:sources/0835__vinay-veerappa-tvDownloadOHLC__ORB_V7_Strategy.pine, v6:sources/0895__glenr4-TradingScripts__Singapore-Open-FVG-Strategy.pine
+- `strategy.cash`: 10 hits across v5+v6; samples: v5:sources/0674__SammyEnigma-pine-scripts__rsi-bb-1min-v0.pine, v5:sources/0777__hasnocool-tradingview-pine-scripts__Ranged-Volume-DCA-Strategy---R3c0nTrader.pine, v5:sources/0795__hasnocool-tradingview-pine-scripts__Rob-Booker---ADX-Breakout-updated-to-pinescript-V5.pine, v5:sources/0855__hasnocool-tradingview-pine-scripts__I11L-Long-Put-Call-Ratio-Inversion.pine, v5:sources/0977__helenananaa-pine-compat-runtime__unsupported_strategy_risk_max_intraday_loss_indicator.pine
+- `strategy.close`: 248 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.close_all`: 118 hits across v5+v6; samples: v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0639__knectardev-pine_scripts__es-professional-fade-strategy.pine, v5:sources/0642__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.4_exec-gap.pine, v5:sources/0643__knectardev-pine_scripts__es-professional-fade-strategy-v2.5.7-FIXED.pine, v5:sources/0644__knectardev-pine_scripts__es-professional-fade-strategy.pine
+- `strategy.closedtrades`: 42 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine
+- `strategy.closedtrades.entry_bar_index`: 4 hits across v5; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine
+- `strategy.closedtrades.entry_id`: 2 hits across v5+v6; samples: v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v6:sources/0829__chriswoojinlee-indicator-suite__Capitulation_Retest.pine
+- `strategy.closedtrades.entry_price`: 6 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0608__casoon-pine-scripts__reversal_engine_score_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine
+- `strategy.closedtrades.entry_time`: 4 hits across v5+v6; samples: v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0499__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__RR-DANGOV-v3.3.pine, v6:sources/0996__deepentropy-oakscriptJS__Strategy-v5.pine
+- `strategy.closedtrades.exit_bar_index`: 10 hits across v5; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine
+- `strategy.closedtrades.exit_comment`: 4 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine, v6:sources/0893__jeffgat-trading-engine__v6_multiple_entries.pine
+- `strategy.closedtrades.exit_id`: 2 hits across v5; samples: v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0608__casoon-pine-scripts__reversal_engine_score_strategy.pine
+- `strategy.closedtrades.exit_price`: 7 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0608__casoon-pine-scripts__reversal_engine_score_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine
+- `strategy.closedtrades.exit_time`: 4 hits across v5+v6; samples: v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0830__supanut-ss-ATS__pure_structure_vsa.pine, v6:sources/0996__deepentropy-oakscriptJS__Strategy-v5.pine
+- `strategy.closedtrades.max_drawdown`: 3 hits across v5; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine
+- `strategy.closedtrades.max_runup`: 3 hits across v5; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine
+- `strategy.closedtrades.profit`: 13 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0608__casoon-pine-scripts__reversal_engine_score_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine
+- `strategy.closedtrades.size`: 5 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0608__casoon-pine-scripts__reversal_engine_score_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine, v6:sources/0830__supanut-ss-ATS__pure_structure_vsa.pine
+- `strategy.commission.cash_per_contract`: 29 hits across v5+v6; samples: v5:sources/0639__knectardev-pine_scripts__es-professional-fade-strategy.pine, v5:sources/0640__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.0.pine, v5:sources/0641__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.1.pine, v5:sources/0642__knectardev-pine_scripts__es-professional-fade-strategy_v2.5.4_exec-gap.pine, v5:sources/0643__knectardev-pine_scripts__es-professional-fade-strategy-v2.5.7-FIXED.pine
+- `strategy.commission.cash_per_order`: 1 hits across v6; samples: v6:sources/0966__eddoonn-Wickless-candle__Wickless_Reversal_Strategy_v1_0.pine
+- `strategy.commission.percent`: 217 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine
+- `strategy.direction.long`: 1 hits across v6; samples: v6:sources/0924__pineforge-4pass-pineforge-codegen-oss__validation__cap-risk-gates-allow-max-intraday-01.pine
+- `strategy.entry`: 439 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.equity`: 95 hits across v5+v6; samples: v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0666__SammyEnigma-pine-scripts__greeffer-bb-strategy-0.pine, v5:sources/0667__SammyEnigma-pine-scripts__greeffer-bb-strategy-1.pine, v5:sources/0668__SammyEnigma-pine-scripts__greeffer-bb-strategy-2.pine, v5:sources/0669__SammyEnigma-pine-scripts__greeffer-bb-strategy-3.pine
+- `strategy.exit`: 287 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.fixed`: 134 hits across v6; samples: v6:sources/0695__TradersPost-pinescript-agents__traderspost-replay.pine, v6:sources/0702__pineforge-4pass-pineforge-engine__strategy_htf.pine, v6:sources/0707__WaleA-Dev-wale-pinescript-engine__newstrat.pine, v6:sources/0722__Young666YHF-xauusd_backtest__breakout_grid.pine, v6:sources/0725__trustdan-trend-following-backtesting-strategies__Ed-Seykota.pine
+- `strategy.grossloss`: 11 hits across v5+v6; samples: v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0715__iamrichardD-tradingview__strategy.pine, v6:sources/0820__eltonaguiar-findtorontoevents_antigravity.ca-archive-2026-05-23__simpleton_v001_claude.pine
+- `strategy.grossprofit`: 11 hits across v5+v6; samples: v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0715__iamrichardD-tradingview__strategy.pine, v6:sources/0820__eltonaguiar-findtorontoevents_antigravity.ca-archive-2026-05-23__simpleton_v001_claude.pine
+- `strategy.initial_capital`: 11 hits across v5+v6; samples: v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0820__eltonaguiar-findtorontoevents_antigravity.ca-archive-2026-05-23__simpleton_v001_claude.pine, v6:sources/0844__tim7en-buffetABC__tiered_mean_reversion.pine, v6:sources/0850__shubhamtaywade82-algo_trading_api__ML-Adaptive-ST-ATR-Strategy.pine
+- `strategy.long`: 439 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.losstrades`: 18 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v5:sources/0607__casoon-pine-scripts__oscillator_divergence_zones_strategy.pine
+- `strategy.max_drawdown`: 7 hits across v5+v6; samples: v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0820__eltonaguiar-findtorontoevents_antigravity.ca-archive-2026-05-23__simpleton_v001_claude.pine, v6:sources/0845__raybird-pine-trading-strategies__TnSovereignScalpingProV6.pine, v6:sources/0883__raybird-pine-trading-strategies__TnSovereignGapFillOpeningRangeV6.pine
+- `strategy.max_runup`: 2 hits across v5+v6; samples: v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine
+- `strategy.netprofit`: 22 hits across v5+v6; samples: v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine
+- `strategy.oca.cancel`: 2 hits across v5+v6; samples: v5:sources/0664__SammyEnigma-pine-scripts__bb-rsi.pine, v6:sources/0901__Studentcodee-Coursework-technical-analysis__adaptive_strategy.pine
+- `strategy.oca.reduce`: 11 hits across v5+v6; samples: v5:sources/0659__SammyEnigma-pine-scripts__BBW-RSI-60-Strategy.pine, v5:sources/0660__SammyEnigma-pine-scripts__BBW-RSI-60-Study.pine, v5:sources/0661__SammyEnigma-pine-scripts__bb-rsi-15m-3.pine, v5:sources/0662__SammyEnigma-pine-scripts__bb-rsi-1m-3.pine, v5:sources/0663__SammyEnigma-pine-scripts__bb-rsi-1m-4.pine
+- `strategy.openprofit`: 5 hits across v5+v6; samples: v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine, v6:sources/0746__iamrichardD-tradingview__strategy-v1.pine, v6:sources/0974__artemgiant-markt_bot__whitebit_spot_strategy.pine
+- `strategy.opentrades`: 30 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v5:sources/0777__hasnocool-tradingview-pine-scripts__Ranged-Volume-DCA-Strategy---R3c0nTrader.pine
+- `strategy.opentrades.entry_bar_index`: 10 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0610__casoon-pine-scripts__vein_reversal_labeler_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine, v5:sources/0618__knectardev-pine_scripts__acrypto-weigthed-strategy-v149_v1.0.0.pine, v6:sources/0499__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__RR-DANGOV-v3.3.pine
+- `strategy.opentrades.entry_id`: 3 hits across v5+v6; samples: v5:sources/0921__kankinku-AutoResearchFinance_v2__cand-b061508a.pine, v6:sources/0829__chriswoojinlee-indicator-suite__Capitulation_Retest.pine, v6:sources/0978__ttopias-tradinview-indicators__vwap-rsi-scalp.pine
+- `strategy.opentrades.entry_price`: 12 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine, v5:sources/0921__kankinku-AutoResearchFinance_v2__cand-b061508a.pine, v5:sources/0955__hasnocool-tradingview-pine-scripts__BankNifty-5min-Supertrend-Based-Strategy.pine, v6:sources/0722__Young666YHF-xauusd_backtest__breakout_grid.pine
+- `strategy.opentrades.entry_time`: 1 hits across v6; samples: v6:sources/0996__deepentropy-oakscriptJS__Strategy-v5.pine
+- `strategy.opentrades.profit`: 1 hits across v6; samples: v6:sources/0996__deepentropy-oakscriptJS__Strategy-v5.pine
+- `strategy.opentrades.size`: 3 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0611__casoon-pine-scripts__wavetrend_v4_strategy.pine, v6:sources/0722__Young666YHF-xauusd_backtest__breakout_grid.pine
+- `strategy.order`: 12 hits across v5+v6; samples: v5:sources/0659__SammyEnigma-pine-scripts__BBW-RSI-60-Strategy.pine, v5:sources/0660__SammyEnigma-pine-scripts__BBW-RSI-60-Study.pine, v5:sources/0661__SammyEnigma-pine-scripts__bb-rsi-15m-3.pine, v5:sources/0663__SammyEnigma-pine-scripts__bb-rsi-1m-4.pine, v5:sources/0676__SammyEnigma-pine-scripts__vol-bbw-rsi-15m.pine
+- `strategy.percent_of_equity`: 143 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine
+- `strategy.position_avg_price`: 165 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.position_size`: 327 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.risk.allow_entry_in`: 1 hits across v6; samples: v6:sources/0924__pineforge-4pass-pineforge-codegen-oss__validation__cap-risk-gates-allow-max-intraday-01.pine
+- `strategy.risk.max_drawdown`: 8 hits across v5; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v5:sources/0607__casoon-pine-scripts__oscillator_divergence_zones_strategy.pine
+- `strategy.risk.max_intraday_filled_orders`: 2 hits across v6; samples: v6:sources/0882__pineforge-4pass-pineforge-corpus__strategy.pine, v6:sources/0924__pineforge-4pass-pineforge-codegen-oss__validation__cap-risk-gates-allow-max-intraday-01.pine
+- `strategy.risk.max_intraday_loss`: 11 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v5:sources/0607__casoon-pine-scripts__oscillator_divergence_zones_strategy.pine
+- `strategy.risk.max_position_size`: 1 hits across v6; samples: v6:sources/0924__pineforge-4pass-pineforge-codegen-oss__validation__cap-risk-gates-allow-max-intraday-01.pine
+- `strategy.short`: 304 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0604__casoon-pine-scripts__RTAStrategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine
+- `strategy.wintrades`: 27 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0605__casoon-pine-scripts__chandelier_flip_radar_strategy.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v5:sources/0607__casoon-pine-scripts__oscillator_divergence_zones_strategy.pine
+- `string`: 633 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0059__mihakralj-pinescript__qstick.pine, v5:sources/0105__mihakralj-pinescript__edcf.pine
+- `syminfo.basecurrency`: 6 hits across v5+v6; samples: v5:sources/0827__deepentropy-lightweight-charts-indicators__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine, v5:sources/0909__deepentropy-oakscriptJS__Open-Interest-Suite-Aggregated---By-Leviathan.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine, v6:sources/0745__Hugs-4-Bugs-Trading-Indicator__Simple-Strategy.pine
+- `syminfo.currency`: 7 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0935__deepentropy-lightweight-charts-indicators__CDC-ActionZone-V3-2020.pine, v5:sources/0940__deepentropy-oakscriptJS__CDC-ActionZone-V3-2020.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine, v6:sources/0463__theduffman-PineScript__market-sessions.pine
+- `syminfo.description`: 4 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v6:sources/0245__regalouisei-collect-tradingview__interactive-atr-stop-loss-tanhef.pine, v6:sources/0246__aboutblank007-alpha-os__Dual-SuperTrend.pine, v6:sources/0988__deepentropy-lightweight-charts-indicators__ValueAtTime-v2.pine
+- `syminfo.industry`: 1 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine
+- `syminfo.mincontract`: 1 hits across v6; samples: v6:sources/0830__supanut-ss-ATS__pure_structure_vsa.pine
+- `syminfo.mintick`: 232 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine
+- `syminfo.pointvalue`: 11 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0838__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__VP-MAPS-OB-S-R-GGSHOT-HH-BY-LEO.pine, v6:sources/0769__agentiayoung-agent-trader-framework__quanloki_qqe.pine, v6:sources/0833__jeffgat-trading-engine__v5_atr_gaps.pine, v6:sources/0835__vinay-veerappa-tvDownloadOHLC__ORB_V7_Strategy.pine
+- `syminfo.prefix`: 22 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0463__everget-tradingview-pinescript-indicators__dividends_per_share_dps_yearly.pine, v5:sources/0464__everget-tradingview-pinescript-indicators__earnings_per_share_eps_yearly.pine, v5:sources/0721__deepentropy-lightweight-charts-indicators__Open-Interest.pine, v5:sources/0791__g-moe-Trading-Indicators__bankai-es-trend.pine
+- `syminfo.root`: 2 hits across v5+v6; samples: v5:sources/0582__casoon-pine-scripts__vein_spread_context.pine, v6:sources/0155__vinay-veerappa-tvDownloadOHLC__expected_volatility_ladder.pine
+- `syminfo.session`: 5 hits across v5+v6; samples: v5:sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v6:sources/0121__folknor-pine-tools__probe-b-untyped-param-ternary.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `syminfo.ticker`: 86 hits across v5+v6; samples: v5:sources/0463__everget-tradingview-pinescript-indicators__dividends_per_share_dps_yearly.pine, v5:sources/0464__everget-tradingview-pinescript-indicators__earnings_per_share_eps_yearly.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0511__casoon-pine-scripts__market_scenario_projector.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine
+- `syminfo.tickerid`: 280 hits across v5+v6; samples: v5:sources/0198__mihakralj-pinescript__bbb.pine, v5:sources/0243__mihakralj-pinescript__pivot.pine, v5:sources/0244__mihakralj-pinescript__pivotcam.pine, v5:sources/0245__mihakralj-pinescript__pivotdem.pine, v5:sources/0246__mihakralj-pinescript__pivotext.pine
+- `syminfo.timezone`: 21 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0778__hasnocool-tradingview-pine-scripts__Ichimoku-Cloud-with-ADX-By-Coinrule-.pine
+- `syminfo.type`: 16 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0750__mphinance-mphinance__ghost_flow.pine, v5:sources/0829__regalouisei-collect-tradingview__modern-portfolio-management-indicator.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v5:sources/0987__deepentropy-lightweight-charts-indicators__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine
+- `ta.accdist`: 3 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine, v6:sources/0303__Hugs-4-Bugs-Trading-Indicator__chaikin-oscillator.pine, v6:sources/0341__jpsm83-pineScript__idEmasSameDirectMtf.pine
+- `ta.alma`: 8 hits across v5+v6; samples: v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine, v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine, v6:sources/0525__capissimo-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine, v6:sources/0610__shaashish1-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine
+- `ta.atr`: 483 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine, v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine
+- `ta.barssince`: 76 hits across v5+v6; samples: v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine, v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine
+- `ta.bb`: 20 hits across v5+v6; samples: v5:sources/0518__casoon-pine-scripts__reversal_type_classifier_v1.pine, v5:sources/0626__knectardev-pine_scripts__reversal_v1.0.0.pine, v5:sources/0627__knectardev-pine_scripts__reversal_v1.0.1.pine, v5:sources/0656__knectardev-pine_scripts__momentum-breakout-strategy.pine, v5:sources/0696__dcaoyuan-vibetrader__bb.pine
+- `ta.bbw`: 1 hits across v5; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine
+- `ta.cci`: 21 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0536__casoon-pine-scripts__cci_advanced.pine, v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine
+- `ta.change`: 180 hits across v5+v6; samples: v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0349__mihakralj-pinescript__trama.pine, v5:sources/0401__mihakralj-pinescript__twap.pine, v5:sources/0407__mihakralj-pinescript__vwap.pine
+- `ta.cmo`: 5 hits across v5+v6; samples: v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine
+- `ta.cog`: 2 hits across v5+v6; samples: v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine, v6:sources/0430__turnupdigital-riskmanager__LuxAlgo.pine
+- `ta.correlation`: 17 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine, v5:sources/0562__casoon-pine-scripts__klinger_volume_force_map_v1_0_0.pine, v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine, v5:sources/0588__casoon-pine-scripts__market_memory_decay_oscillator.pine
+- `ta.cross`: 54 hits across v5+v6; samples: v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine, v5:sources/0515__casoon-pine-scripts__market_tradability_engine_v2.pine, v5:sources/0532__casoon-pine-scripts__anchored_vwap.pine, v5:sources/0565__casoon-pine-scripts__volume_strata.pine, v5:sources/0569__casoon-pine-scripts__chandelier_flip_radar.pine
+- `ta.crossover`: 352 hits across v5+v6; samples: v5:sources/0050__mihakralj-pinescript__aroon.pine, v5:sources/0051__mihakralj-pinescript__aroonosc.pine, v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine
+- `ta.crossunder`: 327 hits across v5+v6; samples: v5:sources/0050__mihakralj-pinescript__aroon.pine, v5:sources/0051__mihakralj-pinescript__aroonosc.pine, v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine
+- `ta.cum`: 35 hits across v5+v6; samples: v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0590__casoon-pine-scripts__markov_state_engine.pine, v5:sources/0759__iamhuraira-trading-view-script__FVG_with_IFVG_Indicator.pine, v5:sources/0768__TraderOracle-TradingView__Total-Recall.pine
+- `ta.dev`: 3 hits across v5+v6; samples: v5:sources/0791__g-moe-Trading-Indicators__bankai-es-trend.pine, v5:sources/0853__g-moe-Trading-Indicators__hooplah-high-low-table.pine, v6:sources/0181__TraderOracle-TradingView__RSI-Cloud.pine
+- `ta.dmi`: 68 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine, v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine
+- `ta.ema`: 518 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0067__mihakralj-pinescript__huber.pine, v5:sources/0070__mihakralj-pinescript__mae.pine, v5:sources/0071__mihakralj-pinescript__mapd.pine, v5:sources/0072__mihakralj-pinescript__mape.pine
+- `ta.falling`: 13 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0580__casoon-pine-scripts__vein_reversal_score.pine, v5:sources/0584__casoon-pine-scripts__vein_trend.pine, v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine
+- `ta.highest`: 405 hits across v5+v6; samples: v5:sources/0026__mihakralj-pinescript__midpoint.pine, v5:sources/0027__mihakralj-pinescript__midprice.pine, v5:sources/0214__mihakralj-pinescript__fisher.pine, v5:sources/0215__mihakralj-pinescript__fisher04.pine, v5:sources/0233__mihakralj-pinescript__stc.pine
+- `ta.highestbars`: 22 hits across v5+v6; samples: v5:sources/0050__mihakralj-pinescript__aroon.pine, v5:sources/0051__mihakralj-pinescript__aroonosc.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine, v5:sources/0791__g-moe-Trading-Indicators__bankai-es-trend.pine
+- `ta.hma`: 50 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine, v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine
+- `ta.iii`: 2 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine
+- `ta.kc`: 2 hits across v6; samples: v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE, v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine
+- `ta.linreg`: 30 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0568__casoon-pine-scripts__adaptive_arithmetic_candles.pine, v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine
+- `ta.lowest`: 377 hits across v5+v6; samples: v5:sources/0026__mihakralj-pinescript__midpoint.pine, v5:sources/0027__mihakralj-pinescript__midprice.pine, v5:sources/0214__mihakralj-pinescript__fisher.pine, v5:sources/0215__mihakralj-pinescript__fisher04.pine, v5:sources/0233__mihakralj-pinescript__stc.pine
+- `ta.lowestbars`: 22 hits across v5+v6; samples: v5:sources/0050__mihakralj-pinescript__aroon.pine, v5:sources/0051__mihakralj-pinescript__aroonosc.pine, v5:sources/0493__casoon-pine-scripts__rj_wave.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine, v5:sources/0791__g-moe-Trading-Indicators__bankai-es-trend.pine
+- `ta.macd`: 77 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0577__casoon-pine-scripts__vein_feature_exporter.pine, v5:sources/0580__casoon-pine-scripts__vein_reversal_score.pine, v5:sources/0584__casoon-pine-scripts__vein_trend.pine, v5:sources/0622__knectardev-pine_scripts__macd-histogram-divergence.pine
+- `ta.max`: 4 hits across v6; samples: v6:sources/0187__jawauntb-trading-scripts__seasonality-gauge.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine, v6:sources/0371__ferranbt-pinecone__max.pine, v6:sources/0981__deepentropy-lightweight-charts-indicators__getSeries-v2.pine
+- `ta.median`: 5 hits across v5+v6; samples: v5:sources/0074__mihakralj-pinescript__mdae.pine, v5:sources/0075__mihakralj-pinescript__mdape.pine, v5:sources/0951__ArcFosterSystems-trading-indicator-stack__jma_adaptive_trailing_stop_ehlers_v3.pine, v6:sources/0267__kevinhhl-Pinescript-Projects__Trend-Finder-with-COV.pine, v6:sources/0426__regalouisei-collect-tradingview__probability-cones.pine
+- `ta.mfi`: 18 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine, v5:sources/0538__casoon-pine-scripts__exhaustion_scanner.pine, v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine
+- `ta.min`: 1 hits across v6; samples: v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine
+- `ta.mom`: 6 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0778__hasnocool-tradingview-pine-scripts__Ichimoku-Cloud-with-ADX-By-Coinrule-.pine, v5:sources/0832__zhuzp98-QuantTestFrame__Z_ind_MetaDiv.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine, v6:sources/0983__deepentropy-lightweight-charts-indicators__TechnicalRating-v3.pine
+- `ta.nvi`: 1 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine
+- `ta.obv`: 10 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0832__zhuzp98-QuantTestFrame__Z_ind_MetaDiv.pine, v6:sources/0083__developertugrul-treadingview-pine-editor__momentum-suite.pine, v6:sources/0085__danielbodnar-skills__basic-usage.pine, v6:sources/0145__TongIncomeWheel-AQE__Scoring_v1_8_Overlay.pine
+- `ta.percentile_linear_interpolation`: 6 hits across v5+v6; samples: v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0707__deepentropy-lightweight-charts-indicators__Volumatic-Support_Resistance-Levels-BigBeluga-.pine, v5:sources/0738__deepentropy-lightweight-charts-indicators__Moving-Average-Shift-ChartPrime-.pine, v6:sources/0318__helenananaa-pine-compat-runtime__unsupported_ta_percentile_linear_interpolation_length.pine
+- `ta.percentile_nearest_rank`: 6 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine, v5:sources/0594__casoon-pine-scripts__regime_transition_engine.pine, v5:sources/0607__casoon-pine-scripts__oscillator_divergence_zones_strategy.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine
+- `ta.percentrank`: 32 hits across v5+v6; samples: v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine, v5:sources/0515__casoon-pine-scripts__market_tradability_engine_v2.pine
+- `ta.pivot_point_levels`: 7 hits across v5+v6; samples: v5:sources/0828__deepentropy-lightweight-charts-indicators__Support-Resistance-Classification-VR-LuxAlgo-.pine, v5:sources/0910__deepentropy-oakscriptJS__Support-Resistance-Classification-VR-LuxAlgo-.pine, v5:sources/0992__ali-rajabpour-ARPS-Pivots__ARPS-Pivots.pine, v6:sources/0171__helenananaa-pine-compat-runtime__unsupported_for_in_ta_pivot_point_levels_result_negative_history.pine, v6:sources/0636__eddiebelaval-openclaw-tradingview__strategy-pack-by-cryptokazancev.pine
+- `ta.pivothigh`: 191 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine
+- `ta.pivotlow`: 193 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine
+- `ta.pvi`: 1 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine
+- `ta.pvt`: 1 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine
+- `ta.range`: 1 hits across v6; samples: v6:sources/0194__gorx1-TradingView__quick_scan_for_drift.pine
+- `ta.rci`: 1 hits across v5; samples: v5:sources/0705__deepentropy-lightweight-charts-indicators__Rank-Correlation-Index.pine
+- `ta.rising`: 15 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine
+- `ta.rma`: 111 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0375__mihakralj-pinescript__pv.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine
+- `ta.roc`: 22 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0589__casoon-pine-scripts__market_state_engine.pine, v5:sources/0848__unicorpuss-NormalizedIndicators_pine__commodities_rsps.pine, v5:sources/0941__capissimo-Pinescript-Laboratory__096-ML-kNN-based-Strategy--s-.pine, v5:sources/0995__g-moe-Trading-Indicators__farid-makram-custom-levels.pine
+- `ta.rsi`: 281 hits across v5+v6; samples: v5:sources/0134__mihakralj-pinescript__mlp.pine, v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine
+- `ta.sar`: 11 hits across v5+v6; samples: v5:sources/0473__everget-tradingview-pinescript-indicators__parabolic_sar.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0697__dcaoyuan-vibetrader__sar.pine, v6:sources/0331__nathanssantos-marketmind__parabolic-sar-crypto.pine, v6:sources/0566__voidrlm-TradingView-Indicators__CompleteBundle.pine
+- `ta.sma`: 593 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0055__mihakralj-pinescript__ghla.pine, v5:sources/0068__mihakralj-pinescript__logcosh.pine, v5:sources/0069__mihakralj-pinescript__maape.pine, v5:sources/0078__mihakralj-pinescript__mrae.pine
+- `ta.stdev`: 176 hits across v5+v6; samples: v5:sources/0097__mihakralj-pinescript__bilateral.pine, v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine
+- `ta.stoch`: 78 hits across v5+v6; samples: v5:sources/0489__casoon-pine-scripts__flow_bias.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine
+- `ta.supertrend`: 39 hits across v5+v6; samples: v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine, v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0581__casoon-pine-scripts__vein_reversal_zones.pine, v5:sources/0700__dcaoyuan-vibetrader__cmf.pine, v5:sources/0727__dcaoyuan-vibetrader__supertrend_pivots.pine
+- `ta.swma`: 4 hits across v6; samples: v6:sources/0525__capissimo-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine, v6:sources/0610__shaashish1-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine, v6:sources/0611__Dimmiditutto-Pinescript-laboratory__020-Pair-Trading-Cointegration.pine, v6:sources/0612__TWODS-CAPITAL-Trading-View-Indicators__relative-vigor-index.pine
+- `ta.tr`: 75 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0516__casoon-pine-scripts__modern_wyckoff_state_machine_visual.pine, v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine
+- `ta.tsi`: 3 hits across v6; samples: v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine, v6:sources/0566__voidrlm-TradingView-Indicators__CompleteBundle.pine, v6:sources/0613__TWODS-CAPITAL-Trading-View-Indicators__SMI-Ergodic-Indicator.pine
+- `ta.valuewhen`: 59 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0518__casoon-pine-scripts__reversal_type_classifier_v1.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine, v5:sources/0537__casoon-pine-scripts__elder_ray_pressure_engine.pine
+- `ta.variance`: 7 hits across v5+v6; samples: v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine, v5:sources/0591__casoon-pine-scripts__predictability_regime_index.pine, v5:sources/0594__casoon-pine-scripts__regime_transition_engine.pine, v6:sources/0237__elijahbrown9-AscendAi__garch_gauge.pine, v6:sources/0238__akash-yellgetti-api.web__algo-trade-indian-commodity.pine
+- `ta.vwap`: 65 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0522__casoon-pine-scripts__support_resistance_zones.pine, v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0612__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.0.pine
+- `ta.vwma`: 52 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0537__casoon-pine-scripts__elder_ray_pressure_engine.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine, v5:sources/0589__casoon-pine-scripts__market_state_engine.pine, v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine
+- `ta.wad`: 1 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine
+- `ta.wma`: 113 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0439__everget-tradingview-pinescript-indicators__sharp_modified_moving_average.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine
+- `ta.wpr`: 4 hits across v5+v6; samples: v5:sources/0548__casoon-pine-scripts__pivot_momentum_structure.pine, v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine, v6:sources/0983__deepentropy-lightweight-charts-indicators__TechnicalRating-v3.pine, v6:sources/0992__deepentropy-oakscriptJS__TechnicalRating-v3.pine
+- `ta.wvad`: 1 hits across v6; samples: v6:sources/0162__ferranbt-pinecone__accumulators.pine
+- `table`: 342 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine, v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine
+- `table.cell`: 325 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine, v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine
+- `table.cell_set_height`: 2 hits across v6; samples: v6:sources/0615__sogutemir-PineScriptTradingViewIndicators__table.pine, v6:sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine
+- `table.cell_set_text`: 3 hits across v5+v6; samples: v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0444__helenananaa-pine-compat-runtime__table_cell_set_text_coordinate_row_bounds.pine
+- `table.cell_set_text_color`: 1 hits across v6; samples: v6:sources/0317__helenananaa-pine-compat-runtime__table_cell_set_text_color_coordinate_bounds.pine
+- `table.cell_set_text_halign`: 1 hits across v6; samples: v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine
+- `table.cell_set_text_size`: 3 hits across v6; samples: v6:sources/0615__sogutemir-PineScriptTradingViewIndicators__table.pine, v6:sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine, v6:sources/0681__helenananaa-pine-compat-runtime__table_cell_set_text_size_coordinate_row_bounds.pine
+- `table.clear`: 31 hits across v5+v6; samples: v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0514__casoon-pine-scripts__market_tradability_engine.pine, v5:sources/0515__casoon-pine-scripts__market_tradability_engine_v2.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine
+- `table.delete`: 8 hits across v5+v6; samples: v5:sources/0530__casoon-pine-scripts__zigzag_fibo_pullback_map.pine, v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine, v5:sources/0593__casoon-pine-scripts__regime_detector.pine, v6:sources/0151__wesso80-marketscannerpros__MSP_Auto_Fib_Tool_v3.pine, v6:sources/0361__venkatanelson-GVN_MASTER_AI__gvn_master_simplified.pine
+- `table.merge_cells`: 36 hits across v5+v6; samples: v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0544__casoon-pine-scripts__mtf_stochrsi_pair_score.pine
+- `table.new`: 342 hits across v5+v6; samples: v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine, v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine, v5:sources/0488__casoon-pine-scripts__fib_retracement_quality.pine, v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0491__casoon-pine-scripts__pattern_recognition.pine
+- `table.set_bgcolor`: 3 hits across v5+v6; samples: v5:sources/0573__casoon-pine-scripts__modern_trend_regime.pine, v6:sources/0665__helenananaa-pine-compat-runtime__table_delete.pine, v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `table.set_border_color`: 5 hits across v5+v6; samples: v5:sources/0989__SynergOps-AlgoTrading__atr-bands.pine, v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0615__sogutemir-PineScriptTradingViewIndicators__table.pine, v6:sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine, v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `table.set_border_width`: 3 hits across v5+v6; samples: v5:sources/0989__SynergOps-AlgoTrading__atr-bands.pine, v6:sources/0615__sogutemir-PineScriptTradingViewIndicators__table.pine, v6:sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine
+- `table.set_frame_color`: 5 hits across v5+v6; samples: v5:sources/0989__SynergOps-AlgoTrading__atr-bands.pine, v6:sources/0288__klevler-tradingview_indicators__MarketSmith.pine, v6:sources/0615__sogutemir-PineScriptTradingViewIndicators__table.pine, v6:sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine, v6:sources/0846__Borisder1-skalpel__SMC_Agent_v6.pine
+- `table.set_frame_width`: 3 hits across v5+v6; samples: v5:sources/0989__SynergOps-AlgoTrading__atr-bands.pine, v6:sources/0615__sogutemir-PineScriptTradingViewIndicators__table.pine, v6:sources/0619__sogutemir-PineScriptTradingViewIndicators__BBSRExtremeWithTableV2.pine
+- `table.set_position`: 1 hits across v5; samples: v5:sources/0979__helenananaa-pine-compat-runtime__unsupported_table_set_position_values.pine
+- `text.align_bottom`: 6 hits across v6; samples: v6:sources/0230__TamTH-Dev-trading-view-scripts__EzAlgo.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0357__webcrack4-pine-script-combine__V5_14-16-21-27-34-35-36.pine, v6:sources/0455__deepentropy-oakscriptJS__Session-Sweeps-LuxAlgo-.pine, v6:sources/0529__deepentropy-lightweight-charts-indicators__ICT-Concepts-LuxAlgo-.pine
+- `text.align_center`: 51 hits across v5+v6; samples: v5:sources/0490__casoon-pine-scripts__mtf_trend_alignment.pine, v5:sources/0494__casoon-pine-scripts__smart_money_dashboard.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine
+- `text.align_left`: 95 hits across v5+v6; samples: v5:sources/0459__everget-tradingview-pinescript-indicators__symbol_info_helper.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0475__everget-tradingview-pinescript-indicators__session_input_parser.pine, v5:sources/0476__everget-tradingview-pinescript-indicators__unit_testing_framework.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine
+- `text.align_right`: 51 hits across v5+v6; samples: v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0554__casoon-pine-scripts__wavetrend.pine, v5:sources/0555__casoon-pine-scripts__wavetrend_v2.pine
+- `text.align_top`: 8 hits across v5+v6; samples: v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0784__deepentropy-lightweight-charts-indicators__Dynamic-Supply-and-Demand-Zones-AlgoAlpha-.pine, v6:sources/0220__tamaJESUS-ML__tvt-vol-box.pine, v6:sources/0297__middlechild0-gamechanger__advanced_smc.pine, v6:sources/0344__g-moe-Trading-Indicators__consecutive-candle-levels-v2.pine
+- `text.format_bold`: 3 hits across v6; samples: v6:sources/0094__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__price-and-longitude-angles.pine, v6:sources/0745__Hugs-4-Bugs-Trading-Indicator__Simple-Strategy.pine, v6:sources/0835__vinay-veerappa-tvDownloadOHLC__ORB_V7_Strategy.pine
+- `text.format_italic`: 1 hits across v6; samples: v6:sources/0094__BlueprintResearch-Gann-and-Financial-Astrology-Indicators__price-and-longitude-angles.pine
+- `ticker.heikinashi`: 18 hits across v5+v6; samples: v5:sources/0612__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.0.pine, v5:sources/0613__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.1.pine, v5:sources/0614__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.2.pine, v5:sources/0615__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.3.pine, v5:sources/0616__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.4.pine
+- `ticker.inherit`: 3 hits across v5+v6; samples: v5:sources/0720__deepentropy-lightweight-charts-indicators__Performance.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine, v6:sources/0988__deepentropy-lightweight-charts-indicators__ValueAtTime-v2.pine
+- `ticker.kagi`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `ticker.linebreak`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `ticker.modify`: 3 hits across v5+v6; samples: v5:sources/0753__Opus-Aether-AI-pine-transpiler__scanner_momentum_setup_-_rsi_directional_momentum.pine, v5:sources/0805__Opus-Aether-AI-pine-transpiler__scanner_ict_mitigation_block_scanner.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `ticker.new`: 9 hits across v5+v6; samples: v5:sources/0791__g-moe-Trading-Indicators__bankai-es-trend.pine, v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine, v6:sources/0489__turnupdigital-riskmanager__SimpleMarketMetrics.pine, v6:sources/0499__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__RR-DANGOV-v3.3.pine
+- `ticker.pointfigure`: 1 hits across v6; samples: v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `ticker.renko`: 3 hits across v5+v6; samples: v5:sources/0726__suyons-tradingview-indicators__02-atr-renko.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine
+- `ticker.standard`: 3 hits across v5+v6; samples: v5:sources/0721__deepentropy-lightweight-charts-indicators__Open-Interest.pine, v6:sources/0441__helenananaa-pine-compat-runtime__ticker.pine, v6:sources/0999__deepentropy-oakscriptJS__Request-v3.pine
+- `time`: 402 hits across v5+v6; samples: v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0041__mihakralj-pinescript__lunar.pine, v5:sources/0044__mihakralj-pinescript__solar.pine, v5:sources/0401__mihakralj-pinescript__twap.pine
+- `time_close`: 22 hits across v5+v6; samples: v5:sources/0600__casoon-pine-scripts__cci_export.pine, v5:sources/0987__deepentropy-lightweight-charts-indicators__ICT-Algorithmic-Macro-Tracker-Open-Source-by-toodegrees.pine, v5:sources/0992__ali-rajabpour-ARPS-Pivots__ARPS-Pivots.pine, v6:sources/0078__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R2_Full_Window_Native_Clock_C2_Census.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine
+- `time_tradingday`: 1 hits across v6; samples: v6:sources/0496__alboogycOdR-dev-projects__v0.7.0-0801DST_ALERTS-V0.7.0.pine
+- `timeframe.change`: 38 hits across v5+v6; samples: v5:sources/0506__casoon-pine-scripts__edge_atlas.pine, v5:sources/0728__gorx1-TradingView__Quantile-BasedAdaptiveDetection.pine, v5:sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine, v5:sources/0762__MinorLeopard-Indicator__Indicator-FalseRemovals-.pine, v5:sources/0826__deepentropy-lightweight-charts-indicators__TTrades-Daily-Bias-TFO-.pine
+- `timeframe.from_seconds`: 3 hits across v5+v6; samples: v5:sources/0564__casoon-pine-scripts__money_flow_delta_profile.pine, v5:sources/0592__casoon-pine-scripts__regime_classifier.pine, v6:sources/0357__webcrack4-pine-script-combine__V5_14-16-21-27-34-35-36.pine
+- `timeframe.in_seconds`: 91 hits across v5+v6; samples: v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine, v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine, v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine
+- `timeframe.isdaily`: 29 hits across v5+v6; samples: v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine
+- `timeframe.isdwm`: 9 hits across v6; samples: v6:sources/0115__lebinhchieu-tradingview__ema-vol.pine, v6:sources/0190__hasnocool-tradingview-pine-scripts__5MSM-VISHNU.pine, v6:sources/0403__zhuzp98-QuantTestFrame__Ind_ex_TD_EMA.pine, v6:sources/0410__AubakirovArman-SaltanatbotV2__4-fundamentals-graphing.pine, v6:sources/0790__exequiel381-TradingIndicators__IndicadorMariano.pine
+- `timeframe.isintraday`: 43 hits across v5+v6; samples: v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine, v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0704__ttopias-tradinview-indicators__vwap-indicator.pine, v5:sources/0721__deepentropy-lightweight-charts-indicators__Open-Interest.pine
+- `timeframe.isminutes`: 14 hits across v5+v6; samples: v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0078__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R2_Full_Window_Native_Clock_C2_Census.pine, v6:sources/0080__sspanogle-tcv-tv-indicators__TCV_Regime_Engine_v0.0.2.pine, v6:sources/0089__owenguobadia24s-collab-ovc-replay__OVC_TV_2H_CLOCK_CONFIRM_0001_R4_R16_Constraint_Source_Transport.pine
+- `timeframe.ismonthly`: 17 hits across v5+v6; samples: v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v5:sources/0954__anil-sn-EliteTrading__Smart-Money-Concepts.pine
+- `timeframe.isseconds`: 8 hits across v5+v6; samples: v5:sources/0732__deepentropy-lightweight-charts-indicators__Multi-Time-Period-Charts.pine, v5:sources/0866__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__ALGOX-v13.pine, v6:sources/0080__sspanogle-tcv-tv-indicators__TCV_Regime_Engine_v0.0.2.pine, v6:sources/0368__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__OS-ALGO-V22--SuperTrend-.pine, v6:sources/0430__turnupdigital-riskmanager__LuxAlgo.pine
+- `timeframe.isticks`: 1 hits across v6; samples: v6:sources/0993__deepentropy-oakscriptJS__ta-v12.pine
+- `timeframe.isweekly`: 25 hits across v5+v6; samples: v5:sources/0519__casoon-pine-scripts__smc_structure_expectation.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0574__casoon-pine-scripts__smooth_trend_radar.pine, v5:sources/0609__casoon-pine-scripts__smooth_trend_radar_strategy.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine
+- `timeframe.main_period`: 2 hits across v6; samples: v6:sources/0985__deepentropy-lightweight-charts-indicators__ta-v10.pine, v6:sources/0993__deepentropy-oakscriptJS__ta-v12.pine
+- `timeframe.multiplier`: 60 hits across v5+v6; samples: v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine, v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine, v5:sources/0528__casoon-pine-scripts__wyckoff_schematics.pine, v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine, v5:sources/0639__knectardev-pine_scripts__es-professional-fade-strategy.pine
+- `timeframe.period`: 317 hits across v5+v6; samples: v5:sources/0145__mihakralj-pinescript__prs.pine, v5:sources/0198__mihakralj-pinescript__bbb.pine, v5:sources/0252__mihakralj-pinescript__beta.pine, v5:sources/0254__mihakralj-pinescript__cointegration.pine, v5:sources/0255__mihakralj-pinescript__correlation.pine
+- `timenow`: 35 hits across v5+v6; samples: v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0460__everget-tradingview-pinescript-indicators__utc_clock.pine, v5:sources/0603__casoon-pine-scripts__RTAMonitoring.pine, v5:sources/0840__iamc1oud-Tradingview-Scripts__Smart-Money-Concept-with-Liquidity-Swings.pine, v6:sources/0077__danielbodnar-skills__chart-visualization.pine
+- `timestamp`: 152 hits across v5+v6; samples: v5:sources/0456__everget-tradingview-pinescript-indicators__litecoin_halving_utc_countdown.pine, v5:sources/0467__everget-tradingview-pinescript-indicators__roi_return_on_investment.pine, v5:sources/0468__everget-tradingview-pinescript-indicators__ticker_performance_by_us_president.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine
+- `true`: 1511 hits across v5+v6; samples: v5:sources/0001__mihakralj-pinescript__aberr.pine, v5:sources/0002__mihakralj-pinescript__accbands.pine, v5:sources/0003__mihakralj-pinescript__apchannel.pine, v5:sources/0004__mihakralj-pinescript__apz.pine, v5:sources/0005__mihakralj-pinescript__atrbands.pine
+- `volume`: 444 hits across v5+v6; samples: v5:sources/0021__mihakralj-pinescript__vwapbands.pine, v5:sources/0022__mihakralj-pinescript__vwapsd.pine, v5:sources/0092__mihakralj-pinescript__wrmse.pine, v5:sources/0213__mihakralj-pinescript__fi.pine, v5:sources/0223__mihakralj-pinescript__marketfi.pine
+- `xloc.bar_index`: 107 hits across v5+v6; samples: v5:sources/0492__casoon-pine-scripts__relative_leg_efficiency_panel_chart.pine, v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine
+- `xloc.bar_time`: 90 hits across v5+v6; samples: v5:sources/0465__everget-tradingview-pinescript-indicators__gaps_percent_size_distribution.pine, v5:sources/0466__everget-tradingview-pinescript-indicators__linear_regression_all_data.pine, v5:sources/0529__casoon-pine-scripts__zigzag_core.pine, v5:sources/0581__casoon-pine-scripts__vein_reversal_zones.pine, v5:sources/0759__iamhuraira-trading-view-script__FVG_with_IFVG_Indicator.pine
+- `year`: 57 hits across v5+v6; samples: v5:sources/0463__everget-tradingview-pinescript-indicators__dividends_per_share_dps_yearly.pine, v5:sources/0464__everget-tradingview-pinescript-indicators__earnings_per_share_eps_yearly.pine, v5:sources/0467__everget-tradingview-pinescript-indicators__roi_return_on_investment.pine, v5:sources/0470__everget-tradingview-pinescript-indicators__ytd_year_to_date_percent_return.pine, v5:sources/0479__everget-tradingview-pinescript-indicators__volume_accumulation.pine
+- `yloc.abovebar`: 46 hits across v5+v6; samples: v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine
+- `yloc.belowbar`: 42 hits across v5+v6; samples: v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine, v5:sources/0504__casoon-pine-scripts__candle_story_engine.pine, v5:sources/0533__casoon-pine-scripts__midas_curves.pine, v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine, v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine
+- `yloc.price`: 86 hits across v5+v6; samples: v5:sources/0495__casoon-pine-scripts__wave_navigator.pine, v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine, v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine, v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine, v5:sources/0506__casoon-pine-scripts__edge_atlas.pine

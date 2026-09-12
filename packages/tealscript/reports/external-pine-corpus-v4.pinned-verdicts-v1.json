@@ -1,0 +1,18 @@
+{
+  "supersededBy": "pine-value-vectors-index-v1.md",
+  "supersededNote": "Historical measurement only; use the superseding report for current figures.",
+  "rows": {
+    "sources/0279__easyspace-ai-pine-rs__array_core.pine": {
+      "bucket": "invalid-pine",
+      "reason": "array.push() mutates the array and returns void; assigning it to an array is invalid Pine."
+    },
+    "sources/0393__folknor-pine-tools__p08-array-history-not-element.pine": {
+      "bucket": "invalid-pine",
+      "reason": "c[1] is history access on the prior array instance, not element access; assigning it to float is invalid Pine."
+    },
+    "sources/0468__James-Idiens-levels-futures__indicator.pine": {
+      "bucket": "invalid-pine",
+      "reason": "str.split() returns array<string>; [1] is history access on that array series, not string element access."
+    }
+  }
+}

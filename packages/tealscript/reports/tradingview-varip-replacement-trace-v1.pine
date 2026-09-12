@@ -1,0 +1,77 @@
+//@version=6
+indicator("TealScript Varip Replacement Trace V1", overlay = false, max_bars_back = 500)
+
+// Acquisition:
+// 1. Open a 1-minute live chart on a liquid symbol during market hours.
+// 2. Paste this script, add it to the chart, and open Pine Logs.
+// 3. Wait until at least two TS_TRACE_V1 lines share the same time value.
+// 4. Keep recording through the next bar transition, then copy the TS_TRACE_V1 lines.
+
+trace_session = input.string("session_001", "Trace session")
+chart_session = input.string("regular_or_extended", "Chart session")
+timezone_label = input.string("exchange", "Timezone")
+
+var int var_scalar = 0
+varip int varip_scalar = 0
+var array<int> var_updates = array.new<int>()
+varip array<int> varip_updates = array.new<int>()
+
+if barstate.isnew
+    var_scalar := 1
+    varip_scalar := 1
+    array.clear(var_updates)
+    array.clear(varip_updates)
+    array.push(var_updates, 1)
+    array.push(varip_updates, 1)
+else
+    var_scalar += 1
+    varip_scalar += 1
+    array.push(var_updates, var_scalar)
+    array.push(varip_updates, varip_scalar)
+
+bool_to_int(value) =>
+    value ? 1 : 0
+
+num_to_string(value) =>
+    na(value) ? "na" : str.tostring(value)
+
+emit_trace() =>
+    "TS_TRACE_V1" +
+      " schema=1" +
+      " kind=varip" +
+      " declaredVersion=6" +
+      " traceSession=" + trace_session +
+      " script=tradingview-varip-replacement-trace-v1" +
+      " symbol=" + syminfo.tickerid +
+      " timeframe=" + timeframe.period +
+      " chartSession=" + chart_session +
+      " timezone=" + timezone_label +
+      " updateSeq=" + str.tostring(varip_scalar - 1) +
+      " barIndex=" + str.tostring(bar_index) +
+      " time=" + str.tostring(time) +
+      " timeClose=" + str.tostring(time_close) +
+      " timenow=" + str.tostring(timenow) +
+      " open=" + num_to_string(open) +
+      " high=" + num_to_string(high) +
+      " low=" + num_to_string(low) +
+      " close=" + num_to_string(close) +
+      " volume=" + num_to_string(volume) +
+      " isnew=" + str.tostring(bool_to_int(barstate.isnew)) +
+      " isrealtime=" + str.tostring(bool_to_int(barstate.isrealtime)) +
+      " isconfirmed=" + str.tostring(bool_to_int(barstate.isconfirmed)) +
+      " islast=" + str.tostring(bool_to_int(barstate.islast)) +
+      " islastconfirmedhistory=" + str.tostring(bool_to_int(barstate.islastconfirmedhistory)) +
+      " varScalar=" + str.tostring(var_scalar) +
+      " varipScalar=" + str.tostring(varip_scalar) +
+      " varArraySize=" + str.tostring(array.size(var_updates)) +
+      " varipArraySize=" + str.tostring(array.size(varip_updates))
+
+if barstate.islast or barstate.islastconfirmedhistory
+    log.info(emit_trace())
+
+plot(var_scalar, "ts_trace__var_scalar")
+plot(varip_scalar, "ts_trace__varip_scalar")
+plot(array.size(var_updates), "ts_trace__var_array_size")
+plot(array.size(varip_updates), "ts_trace__varip_array_size")
+plot(time, "ts_trace__time")
+plot(timenow, "ts_trace__timenow")

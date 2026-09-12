@@ -1,0 +1,3204 @@
+{
+  "schemaVersion": 14,
+  "generatedAt": "2026-09-11T11:36:04.010Z",
+  "inputDir": "/Users/samuelsteady/cs/tealstreet-next/.aimux/worktrees/tealscript-corpus/packages/tealscript/.cache/tealscript/pine-corpus-v7-size-recovery-20260911",
+  "bars": {
+    "count": 1600,
+    "firstTime": 1546332300000,
+    "lastTime": 1739806200000
+  },
+  "summary": {
+    "total": 50,
+    "repositories": 13,
+    "declarationKinds": {
+      "indicator": 43,
+      "strategy": 7
+    },
+    "versionMix": {
+      "5": 14,
+      "6": 36
+    },
+    "funnel": {
+      "parse": {
+        "count": 50,
+        "percent": 100
+      },
+      "semantic": {
+        "count": 35,
+        "percent": 70
+      },
+      "compile": {
+        "count": 34,
+        "percent": 68
+      },
+      "execute": {
+        "count": 34,
+        "percent": 68
+      },
+      "output": {
+        "count": 27,
+        "percent": 54
+      }
+    },
+    "achievableCeiling": {
+      "denominator": 39,
+      "excludedInvalidPine": 6,
+      "excludedCorpusHygiene": 0,
+      "excludedCorpusInputGap": 0,
+      "excludedUnsupportedByDesign": 5,
+      "funnel": {
+        "parse": {
+          "count": 39,
+          "percent": 100
+        },
+        "semantic": {
+          "count": 35,
+          "percent": 89.74
+        },
+        "compile": {
+          "count": 34,
+          "percent": 87.18
+        },
+        "execute": {
+          "count": 34,
+          "percent": 87.18
+        },
+        "output": {
+          "count": 27,
+          "percent": 69.23
+        }
+      }
+    },
+    "validity": {
+      "invalid-pine": 6,
+      "supported": 32,
+      "tealscript-gap": 7,
+      "unsupported-by-design": 5
+    },
+    "outputSilence": {
+      "correct-silence": 5,
+      "tealscript-gap": 2
+    },
+    "outputParity": {
+      "not-run": 50
+    },
+    "outputParityDifferenceKinds": {},
+    "strategyLedgerParity": {
+      "strategies": 7,
+      "executableStrategies": 0,
+      "activeStrategies": 0,
+      "matched": 0,
+      "compiledLedger": {
+        "not-run": 7
+      },
+      "currentlyPassingRowsWithLedgerMismatch": 0,
+      "differenceKinds": {}
+    },
+    "compiledBarErrors": {
+      "scripts": 2,
+      "totalErrors": 3200,
+      "firstCauses": [
+        {
+          "message": "Cannot read properties of undefined (reading 'reduce')",
+          "count": 1,
+          "representativeScript": "sources/undersized/0042__helenananaa-pine-compat-runtime__unsupported_matrix_pinv.pine",
+          "firstBarIndex": 0
+        },
+        {
+          "message": "matrix.values is not iterable",
+          "count": 1,
+          "representativeScript": "sources/undersized/0040__helenananaa-pine-compat-runtime__unsupported_matrix_median.pine",
+          "firstBarIndex": 0
+        }
+      ]
+    },
+    "swallowedErrors": {
+      "scripts": 2,
+      "totalErrors": 3200,
+      "firstCauses": [
+        {
+          "site": "compiled-bar",
+          "message": "Cannot read properties of undefined (reading 'reduce')",
+          "count": 1,
+          "representativeScript": "sources/undersized/0042__helenananaa-pine-compat-runtime__unsupported_matrix_pinv.pine",
+          "firstBarIndex": 0
+        },
+        {
+          "site": "compiled-bar",
+          "message": "matrix.values is not iterable",
+          "count": 1,
+          "representativeScript": "sources/undersized/0040__helenananaa-pine-compat-runtime__unsupported_matrix_median.pine",
+          "firstBarIndex": 0
+        }
+      ]
+    },
+    "executionModes": {
+      "compiled": 34,
+      "not-run": 16
+    },
+    "outcomes": {
+      "failed": 16,
+      "no-output-compiled": 7,
+      "produced-output-compiled": 27
+    },
+    "failureCauses": [
+      {
+        "stage": "semantic",
+        "cause": "duplicate-symbol",
+        "count": 5,
+        "representativeDiagnostic": "1484:2: duplicate-symbol: Duplicate declaration: adx; first declared on line 1478. Rename one declaration or remove the duplicate."
+      },
+      {
+        "stage": "output",
+        "cause": "source-declares-no-chart-output",
+        "count": 5,
+        "representativeDiagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      },
+      {
+        "stage": "semantic",
+        "cause": "unresolved-import",
+        "count": 5,
+        "representativeDiagnostic": "4:1: unresolved-import: Import 'Trendoscope/utils/1' as alias 'ut' was not supplied by the host library registry; provide Pine library source for Trendoscope/utils version 1, or remove/change the import"
+      },
+      {
+        "stage": "output",
+        "cause": "global-output-declared-but-not-evaluated",
+        "count": 2,
+        "representativeDiagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+      },
+      {
+        "stage": "semantic",
+        "cause": "type-mismatch",
+        "count": 2,
+        "representativeDiagnostic": "35:1: type-mismatch: Cannot assign float value to int variable _tf. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+      },
+      {
+        "stage": "semantic",
+        "cause": "argument-count",
+        "count": 1,
+        "representativeDiagnostic": "4:20: argument-count: matrix.sum() expects at least 2 arguments"
+      },
+      {
+        "stage": "compile",
+        "cause": "Compilation error: Duplicate parameter name not allowed in this context",
+        "count": 1,
+        "representativeDiagnostic": "Compilation error: Duplicate parameter name not allowed in this context"
+      },
+      {
+        "stage": "semantic",
+        "cause": "qualifier-mismatch",
+        "count": 1,
+        "representativeDiagnostic": "1196:29: qualifier-mismatch: Cannot pass series value to simple parameter 'len' for function f_knn_pivots; use an input/simple value or declare a compatible parameter"
+      },
+      {
+        "stage": "semantic",
+        "cause": "unsupported-feature",
+        "count": 1,
+        "representativeDiagnostic": "70:41: unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": "0001:https://github.com/Adeoluwa12/stock-be:ig.pine",
+      "localPath": "sources/oversized/0001__Adeoluwa12-stock-be__ig.pine",
+      "sourceRepoUrl": "https://github.com/Adeoluwa12/stock-be",
+      "sourceFilePath": "ig.pine",
+      "commitSha": "8a67c586490beac145b042e0164e762386192052",
+      "sourceSha256": "0d5354247315e594a57cc4cd5e5c0f5ab7e681bd136a75b34f76c9aa7ecea854",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 254424,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "4:1: unresolved-import: Import 'Trendoscope/utils/1' as alias 'ut' was not supplied by the host library registry; provide Pine library source for Trendoscope/utils version 1, or remove/change the import"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import Trendoscope/utils/1 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
+      }
+    },
+    {
+      "id": "0002:https://github.com/ameer1996112/liquidity-supply-and-demand:scripts/pinescript/strategies/SND_Strategey_refactor.pine",
+      "localPath": "sources/oversized/0002__ameer1996112-liquidity-supply-and-demand__SND_Strategey_refactor.pine",
+      "sourceRepoUrl": "https://github.com/ameer1996112/liquidity-supply-and-demand",
+      "sourceFilePath": "scripts/pinescript/strategies/SND_Strategey_refactor.pine",
+      "commitSha": "9e8214b91de6d0694cc837ddfc75ea06e4034e40",
+      "sourceSha256": "009d8dc30e1ab0eb301f7d41f7a98b3b7cfccd195efa9afabfee948a1b49976f",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "strategy",
+      "byteSize": 261203,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "10:1: unresolved-import: Import 'ameer_1996112/SND_Utils/24' as alias 'Utils' was not supplied by the host library registry; provide Pine library source for ameer_1996112/SND_Utils version 24, or remove/change the import"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import ameer_1996112/SND_Utils/24 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
+      }
+    },
+    {
+      "id": "0003:https://github.com/ameer1996112/liquidity-supply-and-demand:scripts/pinescript/strategies/SND_Strategy.pine",
+      "localPath": "sources/oversized/0003__ameer1996112-liquidity-supply-and-demand__SND_Strategy.pine",
+      "sourceRepoUrl": "https://github.com/ameer1996112/liquidity-supply-and-demand",
+      "sourceFilePath": "scripts/pinescript/strategies/SND_Strategy.pine",
+      "commitSha": "924a142f1faff32faeba2b75406bb750272aa57b",
+      "sourceSha256": "59986795828c196c5990e48db4e0a20ab4fef2dd4b0729ee87dab765e908eaf9",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "strategy",
+      "byteSize": 265990,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "29:1: unresolved-import: Import 'ameer_1996112/SND_Utils/25' as alias 'Utils' was not supplied by the host library registry; provide Pine library source for ameer_1996112/SND_Utils version 25, or remove/change the import"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import ameer_1996112/SND_Utils/25 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
+      }
+    },
+    {
+      "id": "0004:https://github.com/deepentropy/lightweight-charts-indicators:docs/official/indicators_community/DIY Custom Strategy Builder  [ZP] - v1.pine",
+      "localPath": "sources/oversized/0004__deepentropy-lightweight-charts-indicators__DIY-Custom-Strategy-Builder-ZP---v1.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/lightweight-charts-indicators",
+      "sourceFilePath": "docs/official/indicators_community/DIY Custom Strategy Builder  [ZP] - v1.pine",
+      "commitSha": "7765e3a9b4ac847fe756abdf28f1dc14f7b8fad5",
+      "sourceSha256": "3347a003ff07170458b5f331f7a292aca6bd259a5e1be1449cc6d99ceb9f93a4",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 216935,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "1484:2: duplicate-symbol: Duplicate declaration: adx; first declared on line 1478. Rename one declaration or remove the duplicate."
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "invalid-pine",
+        "reason": "TradingView rejects duplicate declarations in the same scope."
+      }
+    },
+    {
+      "id": "0005:https://github.com/deepentropy/oakscriptJS:docs/official/indicators_community/DIY Custom Strategy Builder  [ZP] - v1.pine",
+      "localPath": "sources/oversized/0005__deepentropy-oakscriptJS__DIY-Custom-Strategy-Builder-ZP---v1.pine",
+      "sourceRepoUrl": "https://github.com/deepentropy/oakscriptJS",
+      "sourceFilePath": "docs/official/indicators_community/DIY Custom Strategy Builder  [ZP] - v1.pine",
+      "commitSha": "d7bbd272e9ba6e12bb304a4c6d83d67f57afd2a0",
+      "sourceSha256": "3347a003ff07170458b5f331f7a292aca6bd259a5e1be1449cc6d99ceb9f93a4",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 216935,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "1484:2: duplicate-symbol: Duplicate declaration: adx; first declared on line 1478. Rename one declaration or remove the duplicate."
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "invalid-pine",
+        "reason": "TradingView rejects duplicate declarations in the same scope."
+      }
+    },
+    {
+      "id": "0006:https://github.com/DrinkBoooz/PyTrade:pine scripts/pine-overlay-strategy-april-1.pine",
+      "localPath": "sources/oversized/0006__DrinkBoooz-PyTrade__pine-overlay-strategy-april-1.pine",
+      "sourceRepoUrl": "https://github.com/DrinkBoooz/PyTrade",
+      "sourceFilePath": "pine scripts/pine-overlay-strategy-april-1.pine",
+      "commitSha": "4ac662d6981ed3932206efd5ad98da319b0caf30",
+      "sourceSha256": "d1b1a3d6c7269155a4744bfd85aaf9a68fa74b699031538dc3c0ac92b6a768ac",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "strategy",
+      "byteSize": 258928,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "1196:29: qualifier-mismatch: Cannot pass series value to simple parameter 'len' for function f_knn_pivots; use an input/simple value or declare a compatible parameter"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "Semantic failure is not proven invalid Pine: qualifier-mismatch."
+      }
+    },
+    {
+      "id": "0007:https://github.com/Harry-GNS/Proyecto-Grupo-HM-DE-ml:c/03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "localPath": "sources/oversized/0007__Harry-GNS-Proyecto-Grupo-HM-DE-ml__03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "sourceRepoUrl": "https://github.com/Harry-GNS/Proyecto-Grupo-HM-DE-ml",
+      "sourceFilePath": "c/03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "commitSha": "cb60eb7a09af805a429074e11217054ccef21f2f",
+      "sourceSha256": "86666b1d29f30c6fdefb3d4f63eeb05e4b48b93f628bcc8d5dda998155e9dba9",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 209826,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "1662:1: duplicate-symbol: Duplicate declaration: ma; first declared on line 7. Rename one declaration or remove the duplicate."
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "invalid-pine",
+        "reason": "TradingView rejects duplicate declarations in the same scope."
+      }
+    },
+    {
+      "id": "0008:https://github.com/Harry-GNS/Proyecto-Machine-Learning:Data/Codigos Fuente indicadores/03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "localPath": "sources/oversized/0008__Harry-GNS-Proyecto-Machine-Learning__03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "sourceRepoUrl": "https://github.com/Harry-GNS/Proyecto-Machine-Learning",
+      "sourceFilePath": "Data/Codigos Fuente indicadores/03_DIY_Custom_Strategy_Builder_ZP_v1.pine",
+      "commitSha": "b735e98b0672c3451962a08c0df0a3c94bdff3fd",
+      "sourceSha256": "86666b1d29f30c6fdefb3d4f63eeb05e4b48b93f628bcc8d5dda998155e9dba9",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 209826,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "1662:1: duplicate-symbol: Duplicate declaration: ma; first declared on line 7. Rename one declaration or remove the duplicate."
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "invalid-pine",
+        "reason": "TradingView rejects duplicate declarations in the same scope."
+      }
+    },
+    {
+      "id": "0009:https://github.com/MeridianAlgo/Pine-A-Script:examples/Smart_Trader_Episode_03_by_Ata_Sabanci_Candles_and_Tradelines.pine",
+      "localPath": "sources/oversized/0009__MeridianAlgo-Pine-A-Script__Smart_Trader_Episode_03_by_Ata_Sabanci_Candles_and_Tradelines.pine",
+      "sourceRepoUrl": "https://github.com/MeridianAlgo/Pine-A-Script",
+      "sourceFilePath": "examples/Smart_Trader_Episode_03_by_Ata_Sabanci_Candles_and_Tradelines.pine",
+      "commitSha": "57e79c1209c23612ea78be3c3a9f3b5044b10e3c",
+      "sourceSha256": "a98ee78950c69235d3f84f0dc4ba64eae29432f19ab027d448b1e443a40b22f1",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 180744,
+      "firstFailedStage": "compile",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [
+        "Compilation error: Duplicate parameter name not allowed in this context"
+      ],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "failed",
+          "diagnostic": "Compilation error: Duplicate parameter name not allowed in this context"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "Pipeline failed at compile."
+      }
+    },
+    {
+      "id": "0010:https://github.com/natebking/345-strategies:pine/TheStratSuite_v2.2.2-split.pine",
+      "localPath": "sources/oversized/0010__natebking-345-strategies__TheStratSuite_v2.2.2-split.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v2.2.2-split.pine",
+      "commitSha": "00ee152613ccd417cf22ea4660acb88e25567dd1",
+      "sourceSha256": "dcf762926f36149a79caa6b95cf053fb5e95ef66dc4c122efc0a12116425a049",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 189875,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 0,
+        "drawings": 25,
+        "alerts": 15,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0011:https://github.com/natebking/345-strategies:pine/TheStratSuite_v2.2.4-split.pine",
+      "localPath": "sources/oversized/0011__natebking-345-strategies__TheStratSuite_v2.2.4-split.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v2.2.4-split.pine",
+      "commitSha": "00ee152613ccd417cf22ea4660acb88e25567dd1",
+      "sourceSha256": "4d478dda686bd1b0daaa4ff2de02ddb8fbff641fbbb2ee828e418cd95c8ab374",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 190324,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 0,
+        "drawings": 25,
+        "alerts": 15,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0012:https://github.com/natebking/345-strategies:pine/TheStratSuite_v2.2.6-split.pine",
+      "localPath": "sources/oversized/0012__natebking-345-strategies__TheStratSuite_v2.2.6-split.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v2.2.6-split.pine",
+      "commitSha": "f0871ab743d0f91f87d84e57ab4257ea7781f3c0",
+      "sourceSha256": "d8853f5fc8a6b96c3ec822f610fa68f5d733657d7f12979a2e21f0e9b49db1ee",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 191313,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 0,
+        "drawings": 25,
+        "alerts": 15,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0013:https://github.com/natebking/345-strategies:pine/TheStratSuite_v2.2.7-split.pine",
+      "localPath": "sources/oversized/0013__natebking-345-strategies__TheStratSuite_v2.2.7-split.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v2.2.7-split.pine",
+      "commitSha": "2333560f7141ce83e431bcff26434d3e473381d1",
+      "sourceSha256": "2b81d838510d72e2fac8a05de9898daf45f8f9b7c3f2ca33668968ec96d92686",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 192122,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 0,
+        "drawings": 25,
+        "alerts": 15,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0014:https://github.com/natebking/345-strategies:pine/TheStratSuite_v3.0.0.pine",
+      "localPath": "sources/oversized/0014__natebking-345-strategies__TheStratSuite_v3.0.0.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v3.0.0.pine",
+      "commitSha": "a82c7810ee132d45d13609bc718f1b37f4e6fe59",
+      "sourceSha256": "191bc0357fa9d5bb97f68f5488c39679d2002237bba2ea1450421a14bef2b105",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 203942,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 25,
+        "alerts": 15,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0015:https://github.com/natebking/345-strategies:pine/TheStratSuite_v3.0.1.pine",
+      "localPath": "sources/oversized/0015__natebking-345-strategies__TheStratSuite_v3.0.1.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v3.0.1.pine",
+      "commitSha": "c67c93b3a304d5ce5291f70268b0007ad442e4d4",
+      "sourceSha256": "ec45b75d79ef58115d0b114d0ba3898973f5a5b62c22810c80578c21ada1ac5a",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 205141,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 25,
+        "alerts": 15,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0016:https://github.com/natebking/345-strategies:pine/TheStratSuite_v3.1.0.pine",
+      "localPath": "sources/oversized/0016__natebking-345-strategies__TheStratSuite_v3.1.0.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v3.1.0.pine",
+      "commitSha": "5879103632ec1adf61eca4bc4c11335eb076ea80",
+      "sourceSha256": "73256e36924c6d17e3efc9bdec6e41138baa4d93cfe0f27c5d55d9d97dee21ce",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 207999,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "42:1: unresolved-import: Import 'SpinTrades/TheStratGrammar/1' as alias 'sg' was not supplied by the host library registry; provide Pine library source for SpinTrades/TheStratGrammar version 1, or remove/change the import"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import SpinTrades/TheStratGrammar/1 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
+      }
+    },
+    {
+      "id": "0017:https://github.com/natebking/345-strategies:pine/TheStratSuite_v3.1.1.pine",
+      "localPath": "sources/oversized/0017__natebking-345-strategies__TheStratSuite_v3.1.1.pine",
+      "sourceRepoUrl": "https://github.com/natebking/345-strategies",
+      "sourceFilePath": "pine/TheStratSuite_v3.1.1.pine",
+      "commitSha": "5879103632ec1adf61eca4bc4c11335eb076ea80",
+      "sourceSha256": "490efd2b6cdc61c979ffe8d58f33c636db353c3edd7a9e6118a7e4080e36e20c",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 212297,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "42:1: unresolved-import: Import 'SpinTrades/TheStratGrammar/1' as alias 'sg' was not supplied by the host library registry; provide Pine library source for SpinTrades/TheStratGrammar version 1, or remove/change the import"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "unsupported-by-design",
+        "reason": "Third-party TradingView import SpinTrades/TheStratGrammar/1 is permanently unsupported: Pine library source is not network-resolvable outside TradingView closed runtime, so there is no fetcher or resolver for TealScript to build."
+      }
+    },
+    {
+      "id": "0018:https://github.com/regalouisei/collect-tradingview:pinescript/editors_picks/rks-notepad-pine-script-v5.pine",
+      "localPath": "sources/oversized/0018__regalouisei-collect-tradingview__rks-notepad-pine-script-v5.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/rks-notepad-pine-script-v5.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "1e7957d4939b0ad77eab529ee424be91cb4cded2a5af0664020f54684556559d",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 280276,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0019:https://github.com/regalouisei/collect-tradingview:pinescript/editors_picks/smart-trader-concentric-candles-aristotelian-cycloids.pine",
+      "localPath": "sources/oversized/0019__regalouisei-collect-tradingview__smart-trader-concentric-candles-aristotelian-cycloids.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/smart-trader-concentric-candles-aristotelian-cycloids.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "2bfbfe514ce13b4158315d60c0330ca791d5d68ffa1dd80a476073742eea905a",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 193655,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 0,
+        "drawings": 22,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0020:https://github.com/regalouisei/collect-tradingview:pinescript/editors_picks/template-trailing-strategy-backtester.pine",
+      "localPath": "sources/oversized/0020__regalouisei-collect-tradingview__template-trailing-strategy-backtester.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/editors_picks/template-trailing-strategy-backtester.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "fb4d7fc3d5e6669d4bd4e3d91021f68ad59de2e987a63025700790a19f258096",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "strategy",
+      "byteSize": 284782,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "70:41: unsupported-feature: strategy fill_orders_on_standard_ohlc=true requires host-supplied standard OHLC bars for non-standard charts before TealScript can simulate it"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "Semantic failure is not proven invalid Pine: unsupported-feature."
+      }
+    },
+    {
+      "id": "0021:https://github.com/regalouisei/collect-tradingview:pinescript/oscillators/adx-forecast-colorful-diflip.pine",
+      "localPath": "sources/oversized/0021__regalouisei-collect-tradingview__adx-forecast-colorful-diflip.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/oscillators/adx-forecast-colorful-diflip.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "5bb00656b8af8da1013274784b3b09117f476a5e292c253b98d5470d7e1370d9",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 248748,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 18,
+        "drawings": 3700,
+        "alerts": 3,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0022:https://github.com/regalouisei/collect-tradingview:pinescript/oscillators/rsi-forecast-colorful-diflip.pine",
+      "localPath": "sources/oversized/0022__regalouisei-collect-tradingview__rsi-forecast-colorful-diflip.pine",
+      "sourceRepoUrl": "https://github.com/regalouisei/collect-tradingview",
+      "sourceFilePath": "pinescript/oscillators/rsi-forecast-colorful-diflip.pine",
+      "commitSha": "5847fd3b47540ddd107be02b8c658409d35660ae",
+      "sourceSha256": "9d6f5eb17bfba1a2975892db924ff1b67385a9aae7fd19e83e15d6a66562d4df",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 199136,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 23,
+        "drawings": 3700,
+        "alerts": 2,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0023:https://github.com/Rono40230/NativeTrading:docs/reference/smc_indicateur_v12.pine",
+      "localPath": "sources/oversized/0023__Rono40230-NativeTrading__smc_indicateur_v12.pine",
+      "sourceRepoUrl": "https://github.com/Rono40230/NativeTrading",
+      "sourceFilePath": "docs/reference/smc_indicateur_v12.pine",
+      "commitSha": "4f50a704e9e37dd87f06d71a5f5e5032b56d2be3",
+      "sourceSha256": "0ef6a26f18a9b5cafefd8c5b0b7d013b2d08dded5e17882ad1a8e81983cb6e7a",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 240987,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "35:1: type-mismatch: Cannot assign float value to int variable _tf. Pine does not round floats into ints automatically; use int(...) to convert explicitly or declare it as float."
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "invalid-pine",
+        "reason": "Pine does not implicitly cast float expressions to int variables; scripts must use int() or another explicit integer expression."
+      }
+    },
+    {
+      "id": "0024:https://github.com/shubhamtaywade82/algo_trading_api:tradingview_strategies/DIY_CUSTOMER_STRATEGY_BUILDER.pine",
+      "localPath": "sources/oversized/0024__shubhamtaywade82-algo_trading_api__DIY_CUSTOMER_STRATEGY_BUILDER.pine",
+      "sourceRepoUrl": "https://github.com/shubhamtaywade82/algo_trading_api",
+      "sourceFilePath": "tradingview_strategies/DIY_CUSTOMER_STRATEGY_BUILDER.pine",
+      "commitSha": "27db78f3a9403710991741faf3b651cef537a760",
+      "sourceSha256": "149e57ead0ae1e78a68d632005f487df333081d7ecedd1c79eaf82b0f064a122",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 191222,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "1484:2: duplicate-symbol: Duplicate declaration: adx; first declared on line 1478. Rename one declaration or remove the duplicate."
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "invalid-pine",
+        "reason": "TradingView rejects duplicate declarations in the same scope."
+      }
+    },
+    {
+      "id": "0025:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_array_every_box.pine",
+      "localPath": "sources/undersized/0025__helenananaa-pine-compat-runtime__unsupported_array_every_box.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_array_every_box.pine",
+      "commitSha": "4eea8e7974897593b51793b9cb581fbf48f5bea2",
+      "sourceSha256": "1592704b638663431f617b8dedc7634c9c01f849ee97b2ceb52b3372ca945ef2",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 113,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0026:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_array_every_color.pine",
+      "localPath": "sources/undersized/0026__helenananaa-pine-compat-runtime__unsupported_array_every_color.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_array_every_color.pine",
+      "commitSha": "3e4941a4991862b2e27c67a41699a03f65b8823d",
+      "sourceSha256": "4450cb3d663dbfd6658ceaaed76a7487dd886e24562a3dbb878fa275318e8f54",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 117,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0027:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_array_every_label.pine",
+      "localPath": "sources/undersized/0027__helenananaa-pine-compat-runtime__unsupported_array_every_label.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_array_every_label.pine",
+      "commitSha": "8908e0c09347f5a7269f72ecbb493594e20cbac5",
+      "sourceSha256": "1b73443691a358563cce0df92e2af20130ddded9257168dedf984562d7c7c230",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 117,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0028:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_array_every_line.pine",
+      "localPath": "sources/undersized/0028__helenananaa-pine-compat-runtime__unsupported_array_every_line.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_array_every_line.pine",
+      "commitSha": "1a585a3b96bff973e120165320ebf1194f42f644",
+      "sourceSha256": "87c260c8929b6186154c25cdac7e136108e70311bc6afc62f15c2f1c9348d489",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 115,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0029:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_array_every_string.pine",
+      "localPath": "sources/undersized/0029__helenananaa-pine-compat-runtime__unsupported_array_every_string.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_array_every_string.pine",
+      "commitSha": "41e83d5245b49f459168d4459d6d3795017aba19",
+      "sourceSha256": "25086000af2f34583b5afd5d097f6f3e156354fecd7ba6eb3c4ac7d5ff5ee6b0",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 119,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0030:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_array_every_table.pine",
+      "localPath": "sources/undersized/0030__helenananaa-pine-compat-runtime__unsupported_array_every_table.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_array_every_table.pine",
+      "commitSha": "f583d797c9213799b47d68c2842fd4eb97d0687a",
+      "sourceSha256": "2e0b6826adf2af132f13c31b74322e1bb5c669a734bd2ca969b8c249488be6af",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 117,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0031:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_eigenvalues_method_receiver.pine",
+      "localPath": "sources/undersized/0031__helenananaa-pine-compat-runtime__unsupported_matrix_eigenvalues_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_eigenvalues_method_receiver.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "c250a8e8a22d6f7edcf38c1617ae8a27c86716e35e8249c743c44f4d2f9e79b8",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 114,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0032:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_eigenvalues.pine",
+      "localPath": "sources/undersized/0032__helenananaa-pine-compat-runtime__unsupported_matrix_eigenvalues.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_eigenvalues.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "38043065596e21a5f5f035224921aa6a2687332fe797505803fc3f8812fd78a2",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 101,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0033:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_eigenvectors_method_receiver.pine",
+      "localPath": "sources/undersized/0033__helenananaa-pine-compat-runtime__unsupported_matrix_eigenvectors_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_eigenvectors_method_receiver.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "6b56c8528722ef311e3714803db525e4d8d633c694992eee863c9f69cb6ffd87",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 116,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0034:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_eigenvectors.pine",
+      "localPath": "sources/undersized/0034__helenananaa-pine-compat-runtime__unsupported_matrix_eigenvectors.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_eigenvectors.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "51cc751c8791be9eb0f2f16f26ea29b222a53731bbb75951317f22f72f3d6b7e",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 103,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0035:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_is_identity.pine",
+      "localPath": "sources/undersized/0035__helenananaa-pine-compat-runtime__unsupported_matrix_is_identity.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_is_identity.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "5f94af94ec89f1afbc66d2286034bde03322a06b224b8117790af30a0440646a",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 107,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0036:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_is_square_method_receiver.pine",
+      "localPath": "sources/undersized/0036__helenananaa-pine-compat-runtime__unsupported_matrix_is_square_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_is_square_method_receiver.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "d6bc8b64ea833526f291251e5f28ea4e53c9c5789b9f6ee070d5e32103c77df9",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 114,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0037:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_is_square.pine",
+      "localPath": "sources/undersized/0037__helenananaa-pine-compat-runtime__unsupported_matrix_is_square.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_is_square.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "94391009dddf67c00c528cce55a22c08c453e96cda609940c095bbc240f955e9",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 101,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0038:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_is_symmetric.pine",
+      "localPath": "sources/undersized/0038__helenananaa-pine-compat-runtime__unsupported_matrix_is_symmetric.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_is_symmetric.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "7ae22ec679b4a8c99364c5b197a7c5792bd2b47bd7fb786e60d8b02cb4991f0f",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 110,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0039:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_median_method_receiver.pine",
+      "localPath": "sources/undersized/0039__helenananaa-pine-compat-runtime__unsupported_matrix_median_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_median_method_receiver.pine",
+      "commitSha": "869a89e6b88aa4d91edfd0511c91fbf326b6e8c2",
+      "sourceSha256": "2206d0ac0835492efd1896a2de72f1e2a7e45c9538ddb740bf50fc6fca9aebb5",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 90,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0040:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_median.pine",
+      "localPath": "sources/undersized/0040__helenananaa-pine-compat-runtime__unsupported_matrix_median.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_median.pine",
+      "commitSha": "869a89e6b88aa4d91edfd0511c91fbf326b6e8c2",
+      "sourceSha256": "4b31080a5dbe3a3569e85797cb1ff628c63ed966107df6e36adead62cd242712",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 105,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "compiledBarErrors": {
+        "count": 1600,
+        "firstBarIndex": 0,
+        "firstMessage": "matrix.values is not iterable"
+      },
+      "swallowedErrors": [
+        {
+          "site": "compiled-bar",
+          "count": 1600,
+          "firstBarIndex": 0,
+          "firstMessage": "matrix.values is not iterable"
+        }
+      ],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "tealscript-gap",
+        "cause": "global-output-declared-but-not-evaluated",
+        "reason": "The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series.",
+        "sourceCalls": [
+          {
+            "kind": "plot",
+            "line": 5,
+            "column": 1,
+            "scope": "global"
+          }
+        ],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+      }
+    },
+    {
+      "id": "0041:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_pinv_method_receiver.pine",
+      "localPath": "sources/undersized/0041__helenananaa-pine-compat-runtime__unsupported_matrix_pinv_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_pinv_method_receiver.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "f49ebe53b0d84ff87b75d05391f2b19535a674164bbbb33540ac2999129fa8e8",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 100,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0042:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_pinv.pine",
+      "localPath": "sources/undersized/0042__helenananaa-pine-compat-runtime__unsupported_matrix_pinv.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_pinv.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "00cb44c5658d2c64fe022cfe8558f89447f71dc0b0c4512b3d79e58c15378aa8",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 87,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "compiledBarErrors": {
+        "count": 1600,
+        "firstBarIndex": 0,
+        "firstMessage": "Cannot read properties of undefined (reading 'reduce')"
+      },
+      "swallowedErrors": [
+        {
+          "site": "compiled-bar",
+          "count": 1600,
+          "firstBarIndex": 0,
+          "firstMessage": "Cannot read properties of undefined (reading 'reduce')"
+        }
+      ],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "tealscript-gap",
+        "cause": "global-output-declared-but-not-evaluated",
+        "reason": "The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series.",
+        "sourceCalls": [
+          {
+            "kind": "plot",
+            "line": 5,
+            "column": 1,
+            "scope": "global"
+          }
+        ],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:global-output-declared-but-not-evaluated: The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "The source contains global visible-output calls, but neither execution path produced output on the default or extended synthetic series."
+      }
+    },
+    {
+      "id": "0043:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_sum_method_receiver.pine",
+      "localPath": "sources/undersized/0043__helenananaa-pine-compat-runtime__unsupported_matrix_sum_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_sum_method_receiver.pine",
+      "commitSha": "16f6492487a82e3098750056b53ae8eb7cd58159",
+      "sourceSha256": "907d44dbdd32c0c14209e028f7fb0a20f54dc2abe2c31a59ca8a952091478891",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 98,
+      "firstFailedStage": null,
+      "outcome": "produced-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": true,
+        "plots": 1,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "passed"
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "Pipeline reached visible output."
+      }
+    },
+    {
+      "id": "0044:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_sum.pine",
+      "localPath": "sources/undersized/0044__helenananaa-pine-compat-runtime__unsupported_matrix_sum.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_sum.pine",
+      "commitSha": "16f6492487a82e3098750056b53ae8eb7cd58159",
+      "sourceSha256": "2e487f9dfa134948bcc396a7acb79cc0afb31b21ec70f26797201227a7b0c7f3",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 85,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "4:20: argument-count: matrix.sum() expects at least 2 arguments"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "Semantic failure is not proven invalid Pine: argument-count."
+      }
+    },
+    {
+      "id": "0045:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_swap_columns_method_receiver.pine",
+      "localPath": "sources/undersized/0045__helenananaa-pine-compat-runtime__unsupported_matrix_swap_columns_method_receiver.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_swap_columns_method_receiver.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "e2ffd3483ef576a66f6950bc722e9a5d7a70c6ac4637e48f12690381bad6b529",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 113,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "correct-silence",
+        "cause": "source-declares-no-chart-output",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected.",
+        "sourceCalls": [],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      }
+    },
+    {
+      "id": "0046:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_matrix_swap_columns.pine",
+      "localPath": "sources/undersized/0046__helenananaa-pine-compat-runtime__unsupported_matrix_swap_columns.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_matrix_swap_columns.pine",
+      "commitSha": "62192b7f37bdd9be34d5b2af5768e943d7e55a9c",
+      "sourceSha256": "a404fa4c9082d6d33fbdd834223a9cd15fcaff00d797e29941abc5360da3d881",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 6,
+      "declarationKind": "indicator",
+      "byteSize": 89,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "correct-silence",
+        "cause": "source-declares-no-chart-output",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected.",
+        "sourceCalls": [],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      }
+    },
+    {
+      "id": "0047:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_fraction.pine",
+      "localPath": "sources/undersized/0047__helenananaa-pine-compat-runtime__unsupported_strategy_risk_max_cons_loss_days_fraction.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_fraction.pine",
+      "commitSha": "a4001e66689943898f5f81b355a22f19fb94f912",
+      "sourceSha256": "1acb3e52e68eba261550807670fc94394dc1bee63e51d2fe02d4c2a08e1b2bf2",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "strategy",
+      "byteSize": 117,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "correct-silence",
+        "cause": "source-declares-no-chart-output",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected.",
+        "sourceCalls": [],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      }
+    },
+    {
+      "id": "0048:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_indicator.pine",
+      "localPath": "sources/undersized/0048__helenananaa-pine-compat-runtime__unsupported_strategy_risk_max_cons_loss_days_indicator.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_indicator.pine",
+      "commitSha": "a4001e66689943898f5f81b355a22f19fb94f912",
+      "sourceSha256": "76bf6bebd2cf19fcdb3de726cad0b37e52ed76370dfea5fa0df1a13f20d572f4",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "indicator",
+      "byteSize": 117,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "correct-silence",
+        "cause": "source-declares-no-chart-output",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected.",
+        "sourceCalls": [],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      }
+    },
+    {
+      "id": "0049:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_series.pine",
+      "localPath": "sources/undersized/0049__helenananaa-pine-compat-runtime__unsupported_strategy_risk_max_cons_loss_days_series.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_series.pine",
+      "commitSha": "a4001e66689943898f5f81b355a22f19fb94f912",
+      "sourceSha256": "44a2c05770505e038e4878f6555e942d16abae591925e13aacfec19dc8702c8f",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "strategy",
+      "byteSize": 117,
+      "firstFailedStage": "output",
+      "outcome": "no-output-compiled",
+      "executionMode": "compiled",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "outputSilence": {
+        "bucket": "correct-silence",
+        "cause": "source-declares-no-chart-output",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected.",
+        "sourceCalls": [],
+        "sameBarsProbeOutput": {
+          "produced": false,
+          "plots": 0,
+          "rawPlots": 0,
+          "suppressedPlots": 0,
+          "drawings": 0,
+          "alerts": 0,
+          "logs": 0,
+          "errors": 0
+        },
+        "probeBars": {
+          "count": 2880,
+          "firstTime": 1546332300000,
+          "lastTime": 1894635000000,
+          "compiledOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeOutput": {
+            "produced": false,
+            "plots": 0,
+            "rawPlots": 0,
+            "suppressedPlots": 0,
+            "drawings": 0,
+            "alerts": 0,
+            "logs": 0,
+            "errors": 0
+          },
+          "probeStrategy": {
+            "orders": 0,
+            "fills": 0,
+            "openTrades": 0,
+            "closedTrades": 0,
+            "positionSize": 0
+          }
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "passed"
+        },
+        "compile": {
+          "status": "passed"
+        },
+        "execute": {
+          "status": "passed"
+        },
+        "output": {
+          "status": "failed",
+          "diagnostic": "output-silence:source-declares-no-chart-output: The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+        }
+      },
+      "validity": {
+        "bucket": "supported",
+        "reason": "The source has no plot, drawing, alert, or strategy order calls; empty output is expected."
+      }
+    },
+    {
+      "id": "0050:https://github.com/helenananaa/pine-compat-runtime:tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_zero.pine",
+      "localPath": "sources/undersized/0050__helenananaa-pine-compat-runtime__unsupported_strategy_risk_max_cons_loss_days_zero.pine",
+      "sourceRepoUrl": "https://github.com/helenananaa/pine-compat-runtime",
+      "sourceFilePath": "tests/fixtures/sema/unsupported_strategy_risk_max_cons_loss_days_zero.pine",
+      "commitSha": "a4001e66689943898f5f81b355a22f19fb94f912",
+      "sourceSha256": "e698f36b4ffd45526d69a7f9e3ecbc38ccea380e78472dd9e1c1266a0116161e",
+      "sourceHasElidedMarker": false,
+      "declaredVersion": 5,
+      "declarationKind": "strategy",
+      "byteSize": 111,
+      "firstFailedStage": "semantic",
+      "outcome": "failed",
+      "executionMode": "not-run",
+      "fallbackReasons": [],
+      "output": {
+        "produced": false,
+        "plots": 0,
+        "drawings": 0,
+        "alerts": 0,
+        "logs": 0
+      },
+      "outputParity": {
+        "status": "not-run"
+      },
+      "strategyLedgerParity": {
+        "compiledLedger": {
+          "status": "not-run"
+        }
+      },
+      "stages": {
+        "parse": {
+          "status": "passed"
+        },
+        "semantic": {
+          "status": "failed",
+          "diagnostic": "3:34: type-mismatch: strategy.risk.max_cons_loss_days count must be a positive number"
+        },
+        "compile": {
+          "status": "not-run"
+        },
+        "execute": {
+          "status": "not-run"
+        },
+        "output": {
+          "status": "not-run"
+        }
+      },
+      "validity": {
+        "bucket": "tealscript-gap",
+        "reason": "Semantic failure is not proven invalid Pine: type-mismatch."
+      }
+    }
+  ]
+}

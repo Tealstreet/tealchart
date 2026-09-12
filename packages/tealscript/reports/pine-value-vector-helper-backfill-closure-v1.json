@@ -1,0 +1,2222 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-12T07:13:38.641Z",
+  "measuredCommitSha": "cbecb6b000",
+  "measuredWorkingTreeDirty": true,
+  "inputs": {
+    "priorityQueue": "pine-value-vector-helper-backfill-priority-v1.json @ 962a27e8b4"
+  },
+  "summary": {
+    "status": "measured-and-deprioritized",
+    "originalQueueRows": 92,
+    "completedRows": 33,
+    "remainingRows": 59,
+    "disagreementsFound": 0,
+    "completedByHelper": {
+      "rma": 8,
+      "sma": 6,
+      "ema": 5,
+      "atr": 4,
+      "highest": 4,
+      "rsi": 4,
+      "lowest": 2
+    },
+    "remainingByHelper": {
+      "stdev": 4,
+      "dmi": 3,
+      "keltner": 3,
+      "linreg": 3,
+      "median": 3,
+      "supertrend": 3,
+      "variance": 3,
+      "alma": 2,
+      "bollingerBands": 2,
+      "bollingerWidth": 2,
+      "cci": 2,
+      "cmo": 2,
+      "cog": 2,
+      "keltnerWidth": 2,
+      "macd": 2,
+      "stochastic": 2,
+      "swma": 2,
+      "williamsR": 2,
+      "wma": 2,
+      "accdist": 1,
+      "anchoredVwapBands": 1,
+      "dema": 1,
+      "hma": 1,
+      "kst": 1,
+      "mfi": 1,
+      "mfiFromSource": 1,
+      "obvWithSourceVolume": 1,
+      "stdevUnbiased": 1,
+      "tema": 1,
+      "tsi": 1,
+      "varianceUnbiased": 1,
+      "wvad": 1
+    },
+    "remainingTopTen": [
+      "ta.mfi",
+      "ta.dema",
+      "ta.tema",
+      "hostile.stdev.flat",
+      "hostile.stdev.middle-na",
+      "hostile.stdev.multi-middle-na",
+      "ta.stdev",
+      "ta.stdev.unbiased",
+      "hostile.wma.middle-na",
+      "ta.wma"
+    ],
+    "detectionMethodsByObservedYield": [
+      "external-differential",
+      "red-first-enforcement",
+      "systematic-rederivation"
+    ],
+    "redFirstCaughtRows": [
+      {
+        "id": "semantic.array-percentile-string-percentage-rejection",
+        "sourceCommit": "14ac4a40cf",
+        "lane": "semantic argument-type"
+      },
+      {
+        "id": "semantic.builtin-argument-qualifier-rejection",
+        "sourceCommit": "2d9aa7168e",
+        "lane": "semantic qualifier"
+      },
+      {
+        "id": "language.negative-modulo-floor-quotient",
+        "sourceCommit": "8a1fb60dac",
+        "lane": "runtime operator"
+      },
+      {
+        "id": "language.v5-comparison-na-result-is-na",
+        "sourceCommit": "58cff557c0",
+        "lane": "runtime versioned-operator"
+      }
+    ]
+  },
+  "completedRows": [
+    {
+      "rank": 1,
+      "id": "hostile.sma.middle-na",
+      "helper": "sma",
+      "member": "ta.sma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 733,
+      "corpusCallSiteCount": 2297,
+      "corpusReferenceCount": 2317,
+      "vectorCaseCount": 12,
+      "priorityScore": 1007332320.17,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0055__mihakralj-pinescript__ghla.pine",
+        "v5:sources/0068__mihakralj-pinescript__logcosh.pine",
+        "v5:sources/0069__mihakralj-pinescript__maape.pine",
+        "v5:sources/0078__mihakralj-pinescript__mrae.pine"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "hostile.sma.multi-middle-na",
+      "helper": "sma",
+      "member": "ta.sma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 733,
+      "corpusCallSiteCount": 2297,
+      "corpusReferenceCount": 2317,
+      "vectorCaseCount": 12,
+      "priorityScore": 1007332320.17,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0055__mihakralj-pinescript__ghla.pine",
+        "v5:sources/0068__mihakralj-pinescript__logcosh.pine",
+        "v5:sources/0069__mihakralj-pinescript__maape.pine",
+        "v5:sources/0078__mihakralj-pinescript__mrae.pine"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "language.block-boundary-unary-return-values",
+      "helper": "sma",
+      "member": "ta.sma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 733,
+      "corpusCallSiteCount": 2297,
+      "corpusReferenceCount": 2317,
+      "vectorCaseCount": 12,
+      "priorityScore": 1007332320.17,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0055__mihakralj-pinescript__ghla.pine",
+        "v5:sources/0068__mihakralj-pinescript__logcosh.pine",
+        "v5:sources/0069__mihakralj-pinescript__maape.pine",
+        "v5:sources/0078__mihakralj-pinescript__mrae.pine"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "ta.sma",
+      "helper": "sma",
+      "member": "ta.sma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 733,
+      "corpusCallSiteCount": 2297,
+      "corpusReferenceCount": 2317,
+      "vectorCaseCount": 12,
+      "priorityScore": 1007332320.17,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0055__mihakralj-pinescript__ghla.pine",
+        "v5:sources/0068__mihakralj-pinescript__logcosh.pine",
+        "v5:sources/0069__mihakralj-pinescript__maape.pine",
+        "v5:sources/0078__mihakralj-pinescript__mrae.pine"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "ta.sma.nested-expression-source-order-values",
+      "helper": "sma",
+      "member": "ta.sma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 733,
+      "corpusCallSiteCount": 2297,
+      "corpusReferenceCount": 2317,
+      "vectorCaseCount": 12,
+      "priorityScore": 1007332320.17,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0055__mihakralj-pinescript__ghla.pine",
+        "v5:sources/0068__mihakralj-pinescript__logcosh.pine",
+        "v5:sources/0069__mihakralj-pinescript__maape.pine",
+        "v5:sources/0078__mihakralj-pinescript__mrae.pine"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "udf.ta.call-sites",
+      "helper": "sma",
+      "member": "ta.sma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 733,
+      "corpusCallSiteCount": 2297,
+      "corpusReferenceCount": 2317,
+      "vectorCaseCount": 12,
+      "priorityScore": 1007332320.17,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0055__mihakralj-pinescript__ghla.pine",
+        "v5:sources/0068__mihakralj-pinescript__logcosh.pine",
+        "v5:sources/0069__mihakralj-pinescript__maape.pine",
+        "v5:sources/0078__mihakralj-pinescript__mrae.pine"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "hostile.ema.long",
+      "helper": "ema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 1006402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "hostile.ema.long-middle-na",
+      "helper": "ema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 1006402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "hostile.ema.middle-na",
+      "helper": "ema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 1006402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "hostile.ema.multi-middle-na",
+      "helper": "ema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 1006402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "ta.ema",
+      "helper": "ema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 1006402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "hostile.atr.middle-na",
+      "helper": "atr",
+      "member": "ta.atr",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 594,
+      "corpusCallSiteCount": 991,
+      "corpusReferenceCount": 1014,
+      "vectorCaseCount": 8,
+      "priorityScore": 1005941001.14,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine",
+        "v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine"
+      ]
+    },
+    {
+      "rank": 13,
+      "id": "hostile.atr.multi-middle-na",
+      "helper": "atr",
+      "member": "ta.atr",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 594,
+      "corpusCallSiteCount": 991,
+      "corpusReferenceCount": 1014,
+      "vectorCaseCount": 8,
+      "priorityScore": 1005941001.14,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine",
+        "v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine"
+      ]
+    },
+    {
+      "rank": 14,
+      "id": "hostile.atr.overlong",
+      "helper": "atr",
+      "member": "ta.atr",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 594,
+      "corpusCallSiteCount": 991,
+      "corpusReferenceCount": 1014,
+      "vectorCaseCount": 8,
+      "priorityScore": 1005941001.14,
+      "reasons": [
+        "all-null-series",
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine",
+        "v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine"
+      ]
+    },
+    {
+      "rank": 15,
+      "id": "ta.atr",
+      "helper": "atr",
+      "member": "ta.atr",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 594,
+      "corpusCallSiteCount": 991,
+      "corpusReferenceCount": 1014,
+      "vectorCaseCount": 8,
+      "priorityScore": 1005941001.14,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0471__everget-tradingview-pinescript-indicators__chandelier_exit.pine",
+        "v5:sources/0474__everget-tradingview-pinescript-indicators__supertrend.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine"
+      ]
+    },
+    {
+      "rank": 16,
+      "id": "hostile.highest.middle-na",
+      "helper": "highest",
+      "member": "ta.highest",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/window behavior changed in this branch, including 37a40e99ef and 8e5c5064a1.",
+      "corpusScriptCount": 488,
+      "corpusCallSiteCount": 1095,
+      "corpusReferenceCount": 1104,
+      "vectorCaseCount": 11,
+      "priorityScore": 1004881106.04,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0026__mihakralj-pinescript__midpoint.pine",
+        "v5:sources/0027__mihakralj-pinescript__midprice.pine",
+        "v5:sources/0214__mihakralj-pinescript__fisher.pine",
+        "v5:sources/0215__mihakralj-pinescript__fisher04.pine",
+        "v5:sources/0233__mihakralj-pinescript__stc.pine"
+      ]
+    },
+    {
+      "rank": 17,
+      "id": "hostile.highest.multi-middle-na",
+      "helper": "highest",
+      "member": "ta.highest",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/window behavior changed in this branch, including 37a40e99ef and 8e5c5064a1.",
+      "corpusScriptCount": 488,
+      "corpusCallSiteCount": 1095,
+      "corpusReferenceCount": 1104,
+      "vectorCaseCount": 11,
+      "priorityScore": 1004881106.04,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0026__mihakralj-pinescript__midpoint.pine",
+        "v5:sources/0027__mihakralj-pinescript__midprice.pine",
+        "v5:sources/0214__mihakralj-pinescript__fisher.pine",
+        "v5:sources/0215__mihakralj-pinescript__fisher04.pine",
+        "v5:sources/0233__mihakralj-pinescript__stc.pine"
+      ]
+    },
+    {
+      "rank": 18,
+      "id": "language.qualifier-helper-chain",
+      "helper": "highest",
+      "member": "ta.highest",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/window behavior changed in this branch, including 37a40e99ef and 8e5c5064a1.",
+      "corpusScriptCount": 488,
+      "corpusCallSiteCount": 1095,
+      "corpusReferenceCount": 1104,
+      "vectorCaseCount": 11,
+      "priorityScore": 1004881106.04,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0026__mihakralj-pinescript__midpoint.pine",
+        "v5:sources/0027__mihakralj-pinescript__midprice.pine",
+        "v5:sources/0214__mihakralj-pinescript__fisher.pine",
+        "v5:sources/0215__mihakralj-pinescript__fisher04.pine",
+        "v5:sources/0233__mihakralj-pinescript__stc.pine"
+      ]
+    },
+    {
+      "rank": 19,
+      "id": "ta.highest",
+      "helper": "highest",
+      "member": "ta.highest",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/window behavior changed in this branch, including 37a40e99ef and 8e5c5064a1.",
+      "corpusScriptCount": 488,
+      "corpusCallSiteCount": 1095,
+      "corpusReferenceCount": 1104,
+      "vectorCaseCount": 11,
+      "priorityScore": 1004881106.04,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0026__mihakralj-pinescript__midpoint.pine",
+        "v5:sources/0027__mihakralj-pinescript__midprice.pine",
+        "v5:sources/0214__mihakralj-pinescript__fisher.pine",
+        "v5:sources/0215__mihakralj-pinescript__fisher04.pine",
+        "v5:sources/0233__mihakralj-pinescript__stc.pine"
+      ]
+    },
+    {
+      "rank": 20,
+      "id": "hostile.lowest.middle-na",
+      "helper": "lowest",
+      "member": "ta.lowest",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/window behavior changed in this branch, including 37a40e99ef and 8e5c5064a1.",
+      "corpusScriptCount": 451,
+      "corpusCallSiteCount": 972,
+      "corpusReferenceCount": 980,
+      "vectorCaseCount": 9,
+      "priorityScore": 1004510981.8,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0026__mihakralj-pinescript__midpoint.pine",
+        "v5:sources/0027__mihakralj-pinescript__midprice.pine",
+        "v5:sources/0214__mihakralj-pinescript__fisher.pine",
+        "v5:sources/0215__mihakralj-pinescript__fisher04.pine",
+        "v5:sources/0233__mihakralj-pinescript__stc.pine"
+      ]
+    },
+    {
+      "rank": 21,
+      "id": "ta.lowest",
+      "helper": "lowest",
+      "member": "ta.lowest",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/window behavior changed in this branch, including 37a40e99ef and 8e5c5064a1.",
+      "corpusScriptCount": 451,
+      "corpusCallSiteCount": 972,
+      "corpusReferenceCount": 980,
+      "vectorCaseCount": 9,
+      "priorityScore": 1004510981.8,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0026__mihakralj-pinescript__midpoint.pine",
+        "v5:sources/0027__mihakralj-pinescript__midprice.pine",
+        "v5:sources/0214__mihakralj-pinescript__fisher.pine",
+        "v5:sources/0215__mihakralj-pinescript__fisher04.pine",
+        "v5:sources/0233__mihakralj-pinescript__stc.pine"
+      ]
+    },
+    {
+      "rank": 22,
+      "id": "hostile.rma.long",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 23,
+      "id": "hostile.rma.long-middle-na",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 24,
+      "id": "hostile.rma.middle-na",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 25,
+      "id": "hostile.rma.multi-middle-na",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 26,
+      "id": "hostile.rma.overlong",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "all-null-series",
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 27,
+      "id": "hostile.rma.synthetic.multi-middle-na",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 28,
+      "id": "ta.rma",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 29,
+      "id": "ta.smma",
+      "helper": "rma",
+      "member": "ta.rma",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA rolling/warmup/invalid-length behavior changed in this branch, including 37a40e99ef and 67e6023355.",
+      "corpusScriptCount": 156,
+      "corpusCallSiteCount": 564,
+      "corpusReferenceCount": 570,
+      "vectorCaseCount": 11,
+      "priorityScore": 1001560569.7,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0375__mihakralj-pinescript__pv.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine"
+      ]
+    },
+    {
+      "rank": 33,
+      "id": "hostile.rsi.flat",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 332,
+      "corpusCallSiteCount": 458,
+      "corpusReferenceCount": 466,
+      "vectorCaseCount": 12,
+      "priorityScore": 3320462.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine"
+      ]
+    },
+    {
+      "rank": 34,
+      "id": "hostile.rsi.multi-middle-na",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 332,
+      "corpusCallSiteCount": 458,
+      "corpusReferenceCount": 466,
+      "vectorCaseCount": 12,
+      "priorityScore": 3320462.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine"
+      ]
+    },
+    {
+      "rank": 35,
+      "id": "hostile.rsi.signed",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 332,
+      "corpusCallSiteCount": 458,
+      "corpusReferenceCount": 466,
+      "vectorCaseCount": 12,
+      "priorityScore": 3320462.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine"
+      ]
+    },
+    {
+      "rank": 36,
+      "id": "ta.rsi",
+      "helper": "rsi",
+      "member": "ta.rsi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 332,
+      "corpusCallSiteCount": 458,
+      "corpusReferenceCount": 466,
+      "vectorCaseCount": 12,
+      "priorityScore": 3320462.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine"
+      ]
+    }
+  ],
+  "remainingRows": [
+    {
+      "rank": 30,
+      "id": "ta.mfi",
+      "helper": "mfi",
+      "member": "ta.mfi",
+      "runtimeChangedFamily": true,
+      "runtimeChangeEvidence": "TA MFI runtime/value behavior changed at cec092f9e3 and earlier MFI parity work; hostile middle-na behavior remains trace-qualified.",
+      "corpusScriptCount": 28,
+      "corpusCallSiteCount": 25,
+      "corpusReferenceCount": 31,
+      "vectorCaseCount": 11,
+      "priorityScore": 1000280025.31,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+        "v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+        "v5:sources/0538__casoon-pine-scripts__exhaustion_scanner.pine",
+        "v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine"
+      ]
+    },
+    {
+      "rank": 31,
+      "id": "ta.dema",
+      "helper": "dema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 6402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 32,
+      "id": "ta.tema",
+      "helper": "tema",
+      "member": "ta.ema",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 640,
+      "corpusCallSiteCount": 2533,
+      "corpusReferenceCount": 2592,
+      "vectorCaseCount": 9,
+      "priorityScore": 6402558.92,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0067__mihakralj-pinescript__huber.pine",
+        "v5:sources/0070__mihakralj-pinescript__mae.pine",
+        "v5:sources/0071__mihakralj-pinescript__mapd.pine",
+        "v5:sources/0072__mihakralj-pinescript__mape.pine"
+      ]
+    },
+    {
+      "rank": 37,
+      "id": "hostile.stdev.flat",
+      "helper": "stdev",
+      "member": "ta.stdev",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 235,
+      "corpusCallSiteCount": 422,
+      "corpusReferenceCount": 428,
+      "vectorCaseCount": 9,
+      "priorityScore": 2350426.28,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0097__mihakralj-pinescript__bilateral.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine"
+      ]
+    },
+    {
+      "rank": 38,
+      "id": "hostile.stdev.middle-na",
+      "helper": "stdev",
+      "member": "ta.stdev",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 235,
+      "corpusCallSiteCount": 422,
+      "corpusReferenceCount": 428,
+      "vectorCaseCount": 9,
+      "priorityScore": 2350426.28,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0097__mihakralj-pinescript__bilateral.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine"
+      ]
+    },
+    {
+      "rank": 39,
+      "id": "hostile.stdev.multi-middle-na",
+      "helper": "stdev",
+      "member": "ta.stdev",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 235,
+      "corpusCallSiteCount": 422,
+      "corpusReferenceCount": 428,
+      "vectorCaseCount": 9,
+      "priorityScore": 2350426.28,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0097__mihakralj-pinescript__bilateral.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine"
+      ]
+    },
+    {
+      "rank": 40,
+      "id": "ta.stdev",
+      "helper": "stdev",
+      "member": "ta.stdev",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 235,
+      "corpusCallSiteCount": 422,
+      "corpusReferenceCount": 428,
+      "vectorCaseCount": 9,
+      "priorityScore": 2350426.28,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0097__mihakralj-pinescript__bilateral.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine"
+      ]
+    },
+    {
+      "rank": 41,
+      "id": "ta.stdev.unbiased",
+      "helper": "stdevUnbiased",
+      "member": "ta.stdev",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 235,
+      "corpusCallSiteCount": 422,
+      "corpusReferenceCount": 428,
+      "vectorCaseCount": 9,
+      "priorityScore": 2350426.28,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0097__mihakralj-pinescript__bilateral.pine",
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine"
+      ]
+    },
+    {
+      "rank": 42,
+      "id": "hostile.wma.middle-na",
+      "helper": "wma",
+      "member": "ta.wma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 163,
+      "corpusCallSiteCount": 440,
+      "corpusReferenceCount": 458,
+      "vectorCaseCount": 6,
+      "priorityScore": 1630444.58,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0439__everget-tradingview-pinescript-indicators__sharp_modified_moving_average.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine"
+      ]
+    },
+    {
+      "rank": 43,
+      "id": "ta.wma",
+      "helper": "wma",
+      "member": "ta.wma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 163,
+      "corpusCallSiteCount": 440,
+      "corpusReferenceCount": 458,
+      "vectorCaseCount": 6,
+      "priorityScore": 1630444.58,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0001__mihakralj-pinescript__aberr.pine",
+        "v5:sources/0439__everget-tradingview-pinescript-indicators__sharp_modified_moving_average.pine",
+        "v5:sources/0483__casoon-pine-scripts__adaptive_supertrend.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine"
+      ]
+    },
+    {
+      "rank": 44,
+      "id": "hostile.stoch.zero-range",
+      "helper": "stochastic",
+      "member": "ta.stoch",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 101,
+      "corpusCallSiteCount": 136,
+      "corpusReferenceCount": 140,
+      "vectorCaseCount": 10,
+      "priorityScore": 1010137.4,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0489__casoon-pine-scripts__flow_bias.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine",
+        "v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine"
+      ]
+    },
+    {
+      "rank": 45,
+      "id": "ta.stoch",
+      "helper": "stochastic",
+      "member": "ta.stoch",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 101,
+      "corpusCallSiteCount": 136,
+      "corpusReferenceCount": 140,
+      "vectorCaseCount": 10,
+      "priorityScore": 1010137.4,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0489__casoon-pine-scripts__flow_bias.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0497__casoon-pine-scripts__wavetrend_strategy.pine",
+        "v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine"
+      ]
+    },
+    {
+      "rank": 46,
+      "id": "priority.ta-vwap-stdev-mult-values",
+      "helper": "anchoredVwapBands",
+      "member": "ta.vwap",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 97,
+      "corpusCallSiteCount": 110,
+      "corpusReferenceCount": 158,
+      "vectorCaseCount": 3,
+      "priorityScore": 970111.58,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0506__casoon-pine-scripts__edge_atlas.pine",
+        "v5:sources/0522__casoon-pine-scripts__support_resistance_zones.pine",
+        "v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine",
+        "v5:sources/0612__knectardev-pine_scripts__4x4-futures-ghost-matrix_v1.0.0.pine"
+      ]
+    },
+    {
+      "rank": 47,
+      "id": "hostile.macd.middle-na",
+      "helper": "macd",
+      "member": "ta.macd",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 91,
+      "corpusCallSiteCount": 105,
+      "corpusReferenceCount": 106,
+      "vectorCaseCount": 3,
+      "priorityScore": 910106.06,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0577__casoon-pine-scripts__vein_feature_exporter.pine",
+        "v5:sources/0580__casoon-pine-scripts__vein_reversal_score.pine",
+        "v5:sources/0584__casoon-pine-scripts__vein_trend.pine",
+        "v5:sources/0622__knectardev-pine_scripts__macd-histogram-divergence.pine"
+      ]
+    },
+    {
+      "rank": 48,
+      "id": "ta.macd",
+      "helper": "macd",
+      "member": "ta.macd",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 91,
+      "corpusCallSiteCount": 105,
+      "corpusReferenceCount": 106,
+      "vectorCaseCount": 3,
+      "priorityScore": 910106.06,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0577__casoon-pine-scripts__vein_feature_exporter.pine",
+        "v5:sources/0580__casoon-pine-scripts__vein_reversal_score.pine",
+        "v5:sources/0584__casoon-pine-scripts__vein_trend.pine",
+        "v5:sources/0622__knectardev-pine_scripts__macd-histogram-divergence.pine"
+      ]
+    },
+    {
+      "rank": 49,
+      "id": "hostile.dmi.multi-middle-na",
+      "helper": "dmi",
+      "member": "ta.dmi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 89,
+      "corpusCallSiteCount": 87,
+      "corpusReferenceCount": 91,
+      "vectorCaseCount": 14,
+      "priorityScore": 890087.91,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+        "v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine",
+        "v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine"
+      ]
+    },
+    {
+      "rank": 50,
+      "id": "ta.adx",
+      "helper": "dmi",
+      "member": "ta.dmi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 89,
+      "corpusCallSiteCount": 87,
+      "corpusReferenceCount": 91,
+      "vectorCaseCount": 14,
+      "priorityScore": 890087.91,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+        "v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine",
+        "v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine"
+      ]
+    },
+    {
+      "rank": 51,
+      "id": "ta.dmi",
+      "helper": "dmi",
+      "member": "ta.dmi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 89,
+      "corpusCallSiteCount": 87,
+      "corpusReferenceCount": 91,
+      "vectorCaseCount": 14,
+      "priorityScore": 890087.91,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+        "v5:sources/0500__casoon-pine-scripts__signal_quality_engine.pine",
+        "v5:sources/0505__casoon-pine-scripts__coilforge_zones_v1.pine"
+      ]
+    },
+    {
+      "rank": 52,
+      "id": "ta.hma",
+      "helper": "hma",
+      "member": "ta.hma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 81,
+      "corpusCallSiteCount": 154,
+      "corpusReferenceCount": 159,
+      "vectorCaseCount": 5,
+      "priorityScore": 810155.59,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v5:sources/0496__casoon-pine-scripts__wavetrend_base_strategy.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+        "v5:sources/0499__casoon-pine-scripts__commodity_heat_reversal.pine",
+        "v5:sources/0510__casoon-pine-scripts__market_motion_dna_v1.pine"
+      ]
+    },
+    {
+      "rank": 53,
+      "id": "hostile.supertrend.middle-na",
+      "helper": "supertrend",
+      "member": "ta.supertrend",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 56,
+      "corpusCallSiteCount": 63,
+      "corpusReferenceCount": 66,
+      "vectorCaseCount": 8,
+      "priorityScore": 560063.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine",
+        "v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine",
+        "v5:sources/0581__casoon-pine-scripts__vein_reversal_zones.pine",
+        "v5:sources/0700__dcaoyuan-vibetrader__cmf.pine",
+        "v5:sources/0727__dcaoyuan-vibetrader__supertrend_pivots.pine"
+      ]
+    },
+    {
+      "rank": 54,
+      "id": "hostile.supertrend.zero-range",
+      "helper": "supertrend",
+      "member": "ta.supertrend",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 56,
+      "corpusCallSiteCount": 63,
+      "corpusReferenceCount": 66,
+      "vectorCaseCount": 8,
+      "priorityScore": 560063.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine",
+        "v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine",
+        "v5:sources/0581__casoon-pine-scripts__vein_reversal_zones.pine",
+        "v5:sources/0700__dcaoyuan-vibetrader__cmf.pine",
+        "v5:sources/0727__dcaoyuan-vibetrader__supertrend_pivots.pine"
+      ]
+    },
+    {
+      "rank": 55,
+      "id": "ta.supertrend",
+      "helper": "supertrend",
+      "member": "ta.supertrend",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 56,
+      "corpusCallSiteCount": 63,
+      "corpusReferenceCount": 66,
+      "vectorCaseCount": 8,
+      "priorityScore": 560063.66,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0526__casoon-pine-scripts__tweezer_kangaroo_zones.pine",
+        "v5:sources/0535__casoon-pine-scripts__vwap_cross_visuals.pine",
+        "v5:sources/0581__casoon-pine-scripts__vein_reversal_zones.pine",
+        "v5:sources/0700__dcaoyuan-vibetrader__cmf.pine",
+        "v5:sources/0727__dcaoyuan-vibetrader__supertrend_pivots.pine"
+      ]
+    },
+    {
+      "rank": 56,
+      "id": "hostile.linreg.flat",
+      "helper": "linreg",
+      "member": "ta.linreg",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 50,
+      "corpusCallSiteCount": 102,
+      "corpusReferenceCount": 122,
+      "vectorCaseCount": 7,
+      "priorityScore": 500103.22,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine",
+        "v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine",
+        "v5:sources/0568__casoon-pine-scripts__adaptive_arithmetic_candles.pine",
+        "v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine"
+      ]
+    },
+    {
+      "rank": 57,
+      "id": "hostile.linreg.middle-na",
+      "helper": "linreg",
+      "member": "ta.linreg",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 50,
+      "corpusCallSiteCount": 102,
+      "corpusReferenceCount": 122,
+      "vectorCaseCount": 7,
+      "priorityScore": 500103.22,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine",
+        "v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine",
+        "v5:sources/0568__casoon-pine-scripts__adaptive_arithmetic_candles.pine",
+        "v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine"
+      ]
+    },
+    {
+      "rank": 58,
+      "id": "ta.linreg",
+      "helper": "linreg",
+      "member": "ta.linreg",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 50,
+      "corpusCallSiteCount": 102,
+      "corpusReferenceCount": 122,
+      "vectorCaseCount": 7,
+      "priorityScore": 500103.22,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0482__casoon-pine-scripts__adaptive_fair_value_cloud.pine",
+        "v5:sources/0524__casoon-pine-scripts__trading_range_state_machine.pine",
+        "v5:sources/0545__casoon-pine-scripts__mtf_wavetrend_opportunity_hunter.pine",
+        "v5:sources/0568__casoon-pine-scripts__adaptive_arithmetic_candles.pine",
+        "v5:sources/0587__casoon-pine-scripts__bayesian_trend_factor.pine"
+      ]
+    },
+    {
+      "rank": 59,
+      "id": "ta.kst",
+      "helper": "kst",
+      "member": "ta.roc",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 34,
+      "corpusCallSiteCount": 96,
+      "corpusReferenceCount": 100,
+      "vectorCaseCount": 6,
+      "priorityScore": 340097,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0589__casoon-pine-scripts__market_state_engine.pine",
+        "v5:sources/0848__unicorpuss-NormalizedIndicators_pine__commodities_rsps.pine",
+        "v5:sources/0941__capissimo-Pinescript-Laboratory__096-ML-kNN-based-Strategy--s-.pine",
+        "v5:sources/0995__g-moe-Trading-Indicators__farid-makram-custom-levels.pine"
+      ]
+    },
+    {
+      "rank": 60,
+      "id": "hostile.cci.flat",
+      "helper": "cci",
+      "member": "ta.cci",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 31,
+      "corpusCallSiteCount": 33,
+      "corpusReferenceCount": 38,
+      "vectorCaseCount": 6,
+      "priorityScore": 310033.38,
+      "reasons": [
+        "all-null-series",
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+        "v5:sources/0536__casoon-pine-scripts__cci_advanced.pine",
+        "v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine",
+        "v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine"
+      ]
+    },
+    {
+      "rank": 61,
+      "id": "ta.cci",
+      "helper": "cci",
+      "member": "ta.cci",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 31,
+      "corpusCallSiteCount": 33,
+      "corpusReferenceCount": 38,
+      "vectorCaseCount": 6,
+      "priorityScore": 310033.38,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+        "v5:sources/0536__casoon-pine-scripts__cci_advanced.pine",
+        "v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine",
+        "v5:sources/0546__casoon-pine-scripts__oscillator_divergence_zones.pine"
+      ]
+    },
+    {
+      "rank": 62,
+      "id": "hostile.bb.middle-na",
+      "helper": "bollingerBands",
+      "member": "ta.bb",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 31,
+      "corpusCallSiteCount": 33,
+      "corpusReferenceCount": 37,
+      "vectorCaseCount": 7,
+      "priorityScore": 310033.37,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0518__casoon-pine-scripts__reversal_type_classifier_v1.pine",
+        "v5:sources/0626__knectardev-pine_scripts__reversal_v1.0.0.pine",
+        "v5:sources/0627__knectardev-pine_scripts__reversal_v1.0.1.pine",
+        "v5:sources/0656__knectardev-pine_scripts__momentum-breakout-strategy.pine",
+        "v5:sources/0696__dcaoyuan-vibetrader__bb.pine"
+      ]
+    },
+    {
+      "rank": 63,
+      "id": "ta.bb",
+      "helper": "bollingerBands",
+      "member": "ta.bb",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 31,
+      "corpusCallSiteCount": 33,
+      "corpusReferenceCount": 37,
+      "vectorCaseCount": 7,
+      "priorityScore": 310033.37,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0518__casoon-pine-scripts__reversal_type_classifier_v1.pine",
+        "v5:sources/0626__knectardev-pine_scripts__reversal_v1.0.0.pine",
+        "v5:sources/0627__knectardev-pine_scripts__reversal_v1.0.1.pine",
+        "v5:sources/0656__knectardev-pine_scripts__momentum-breakout-strategy.pine",
+        "v5:sources/0696__dcaoyuan-vibetrader__bb.pine"
+      ]
+    },
+    {
+      "rank": 64,
+      "id": "ta.mfi.clean-typical-price-values",
+      "helper": "mfiFromSource",
+      "member": "ta.mfi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 28,
+      "corpusCallSiteCount": 25,
+      "corpusReferenceCount": 31,
+      "vectorCaseCount": 11,
+      "priorityScore": 280025.31,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0498__casoon-pine-scripts__wavetrend_v3_strategy.pine",
+        "v5:sources/0534__casoon-pine-scripts__oscillator_cycle_statistics.pine",
+        "v5:sources/0538__casoon-pine-scripts__exhaustion_scanner.pine",
+        "v5:sources/0540__casoon-pine-scripts__market_exhaustion.pine"
+      ]
+    },
+    {
+      "rank": 65,
+      "id": "ta.alma",
+      "helper": "alma",
+      "member": "ta.alma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 20,
+      "corpusCallSiteCount": 35,
+      "corpusReferenceCount": 41,
+      "vectorCaseCount": 7,
+      "priorityScore": 200035.41,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine",
+        "v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine",
+        "v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine",
+        "v6:sources/0525__capissimo-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0610__shaashish1-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine"
+      ]
+    },
+    {
+      "rank": 66,
+      "id": "ta.alma.explicit-floor",
+      "helper": "alma",
+      "member": "ta.alma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 20,
+      "corpusCallSiteCount": 35,
+      "corpusReferenceCount": 41,
+      "vectorCaseCount": 7,
+      "priorityScore": 200035.41,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0572__casoon-pine-scripts__market_average_relationship_engine.pine",
+        "v5:sources/0606__casoon-pine-scripts__market_average_relationship_engine_strategy.pine",
+        "v6:sources/0327__TraderOracle-TradingView__TO-Method-1.4.pine",
+        "v6:sources/0525__capissimo-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0610__shaashish1-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine"
+      ]
+    },
+    {
+      "rank": 67,
+      "id": "hostile.swma.middle-na",
+      "helper": "swma",
+      "member": "ta.swma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 18,
+      "corpusCallSiteCount": 17,
+      "corpusReferenceCount": 21,
+      "vectorCaseCount": 3,
+      "priorityScore": 180017.21,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0525__capissimo-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0610__shaashish1-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0611__Dimmiditutto-Pinescript-laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0612__TWODS-CAPITAL-Trading-View-Indicators__relative-vigor-index.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 68,
+      "id": "ta.swma",
+      "helper": "swma",
+      "member": "ta.swma",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 18,
+      "corpusCallSiteCount": 17,
+      "corpusReferenceCount": 21,
+      "vectorCaseCount": 3,
+      "priorityScore": 180017.21,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0525__capissimo-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0610__shaashish1-Pinescript-Laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0611__Dimmiditutto-Pinescript-laboratory__020-Pair-Trading-Cointegration.pine",
+        "v6:sources/0612__TWODS-CAPITAL-Trading-View-Indicators__relative-vigor-index.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 69,
+      "id": "hostile.variance.flat",
+      "helper": "variance",
+      "member": "ta.variance",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 17,
+      "corpusCallSiteCount": 17,
+      "corpusReferenceCount": 20,
+      "vectorCaseCount": 8,
+      "priorityScore": 170017.2,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine",
+        "v5:sources/0591__casoon-pine-scripts__predictability_regime_index.pine",
+        "v5:sources/0594__casoon-pine-scripts__regime_transition_engine.pine",
+        "v6:sources/0237__elijahbrown9-AscendAi__garch_gauge.pine",
+        "v6:sources/0238__akash-yellgetti-api.web__algo-trade-indian-commodity.pine"
+      ]
+    },
+    {
+      "rank": 70,
+      "id": "hostile.variance.middle-na",
+      "helper": "variance",
+      "member": "ta.variance",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 17,
+      "corpusCallSiteCount": 17,
+      "corpusReferenceCount": 20,
+      "vectorCaseCount": 8,
+      "priorityScore": 170017.2,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine",
+        "v5:sources/0591__casoon-pine-scripts__predictability_regime_index.pine",
+        "v5:sources/0594__casoon-pine-scripts__regime_transition_engine.pine",
+        "v6:sources/0237__elijahbrown9-AscendAi__garch_gauge.pine",
+        "v6:sources/0238__akash-yellgetti-api.web__algo-trade-indian-commodity.pine"
+      ]
+    },
+    {
+      "rank": 71,
+      "id": "ta.variance",
+      "helper": "variance",
+      "member": "ta.variance",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 17,
+      "corpusCallSiteCount": 17,
+      "corpusReferenceCount": 20,
+      "vectorCaseCount": 8,
+      "priorityScore": 170017.2,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine",
+        "v5:sources/0591__casoon-pine-scripts__predictability_regime_index.pine",
+        "v5:sources/0594__casoon-pine-scripts__regime_transition_engine.pine",
+        "v6:sources/0237__elijahbrown9-AscendAi__garch_gauge.pine",
+        "v6:sources/0238__akash-yellgetti-api.web__algo-trade-indian-commodity.pine"
+      ]
+    },
+    {
+      "rank": 72,
+      "id": "ta.variance.unbiased",
+      "helper": "varianceUnbiased",
+      "member": "ta.variance",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 17,
+      "corpusCallSiteCount": 17,
+      "corpusReferenceCount": 20,
+      "vectorCaseCount": 8,
+      "priorityScore": 170017.2,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0421__everget-tradingview-pinescript-indicators__corrected_moving_average.pine",
+        "v5:sources/0591__casoon-pine-scripts__predictability_regime_index.pine",
+        "v5:sources/0594__casoon-pine-scripts__regime_transition_engine.pine",
+        "v6:sources/0237__elijahbrown9-AscendAi__garch_gauge.pine",
+        "v6:sources/0238__akash-yellgetti-api.web__algo-trade-indian-commodity.pine"
+      ]
+    },
+    {
+      "rank": 73,
+      "id": "ta.obv.source-volume",
+      "helper": "obvWithSourceVolume",
+      "member": "ta.obv",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 15,
+      "corpusCallSiteCount": 0,
+      "corpusReferenceCount": 18,
+      "vectorCaseCount": 5,
+      "priorityScore": 150000.18,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0495__casoon-pine-scripts__wave_navigator.pine",
+        "v5:sources/0832__zhuzp98-QuantTestFrame__Z_ind_MetaDiv.pine",
+        "v6:sources/0083__developertugrul-treadingview-pine-editor__momentum-suite.pine",
+        "v6:sources/0085__danielbodnar-skills__basic-usage.pine",
+        "v6:sources/0145__TongIncomeWheel-AQE__Scoring_v1_8_Overlay.pine"
+      ]
+    },
+    {
+      "rank": 74,
+      "id": "hostile.wpr.zero-range",
+      "helper": "williamsR",
+      "member": "ta.wpr",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 10,
+      "corpusCallSiteCount": 6,
+      "corpusReferenceCount": 10,
+      "vectorCaseCount": 10,
+      "priorityScore": 100006.1,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0548__casoon-pine-scripts__pivot_momentum_structure.pine",
+        "v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine",
+        "v6:sources/0983__deepentropy-lightweight-charts-indicators__TechnicalRating-v3.pine",
+        "v6:sources/0992__deepentropy-oakscriptJS__TechnicalRating-v3.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 75,
+      "id": "ta.wpr",
+      "helper": "williamsR",
+      "member": "ta.wpr",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 10,
+      "corpusCallSiteCount": 6,
+      "corpusReferenceCount": 10,
+      "vectorCaseCount": 10,
+      "priorityScore": 100006.1,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0548__casoon-pine-scripts__pivot_momentum_structure.pine",
+        "v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine",
+        "v6:sources/0983__deepentropy-lightweight-charts-indicators__TechnicalRating-v3.pine",
+        "v6:sources/0992__deepentropy-oakscriptJS__TechnicalRating-v3.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 76,
+      "id": "hostile.median.flat",
+      "helper": "median",
+      "member": "ta.median",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 6,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 7,
+      "priorityScore": 90006.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0074__mihakralj-pinescript__mdae.pine",
+        "v5:sources/0075__mihakralj-pinescript__mdape.pine",
+        "v5:sources/0951__ArcFosterSystems-trading-indicator-stack__jma_adaptive_trailing_stop_ehlers_v3.pine",
+        "v6:sources/0267__kevinhhl-Pinescript-Projects__Trend-Finder-with-COV.pine",
+        "v6:sources/0426__regalouisei-collect-tradingview__probability-cones.pine"
+      ]
+    },
+    {
+      "rank": 77,
+      "id": "hostile.median.middle-na",
+      "helper": "median",
+      "member": "ta.median",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 6,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 7,
+      "priorityScore": 90006.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0074__mihakralj-pinescript__mdae.pine",
+        "v5:sources/0075__mihakralj-pinescript__mdape.pine",
+        "v5:sources/0951__ArcFosterSystems-trading-indicator-stack__jma_adaptive_trailing_stop_ehlers_v3.pine",
+        "v6:sources/0267__kevinhhl-Pinescript-Projects__Trend-Finder-with-COV.pine",
+        "v6:sources/0426__regalouisei-collect-tradingview__probability-cones.pine"
+      ]
+    },
+    {
+      "rank": 78,
+      "id": "ta.median",
+      "helper": "median",
+      "member": "ta.median",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 6,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 7,
+      "priorityScore": 90006.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0074__mihakralj-pinescript__mdae.pine",
+        "v5:sources/0075__mihakralj-pinescript__mdape.pine",
+        "v5:sources/0951__ArcFosterSystems-trading-indicator-stack__jma_adaptive_trailing_stop_ehlers_v3.pine",
+        "v6:sources/0267__kevinhhl-Pinescript-Projects__Trend-Finder-with-COV.pine",
+        "v6:sources/0426__regalouisei-collect-tradingview__probability-cones.pine"
+      ]
+    },
+    {
+      "rank": 79,
+      "id": "hostile.cmo.middle-na",
+      "helper": "cmo",
+      "member": "ta.cmo",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 5,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 10,
+      "priorityScore": 90005.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine",
+        "v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine"
+      ]
+    },
+    {
+      "rank": 80,
+      "id": "ta.cmo",
+      "helper": "cmo",
+      "member": "ta.cmo",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 5,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 10,
+      "priorityScore": 90005.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0485__casoon-pine-scripts__directional_probability_engine_v1.pine",
+        "v5:sources/0486__casoon-pine-scripts__directional_probability_engine_v2.pine",
+        "v5:sources/0487__casoon-pine-scripts__directional_probability_engine_v3.pine",
+        "v5:sources/0501__casoon-pine-scripts__trade_permission_engine_v1.pine",
+        "v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine"
+      ]
+    },
+    {
+      "rank": 81,
+      "id": "hostile.bbw.flat",
+      "helper": "bollingerWidth",
+      "member": "ta.bbw",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 4,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 7,
+      "priorityScore": 90004.09,
+      "reasons": [
+        "all-null-series",
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+        "v7:sources/0028__regalouisei-collect-tradingview__multi-condition-stock-screener-alert-system.pine"
+      ]
+    },
+    {
+      "rank": 82,
+      "id": "ta.bbw",
+      "helper": "bollingerWidth",
+      "member": "ta.bbw",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 9,
+      "corpusCallSiteCount": 4,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 7,
+      "priorityScore": 90004.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0134__mihakralj-pinescript__mlp.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+        "v7:sources/0028__regalouisei-collect-tradingview__multi-condition-stock-screener-alert-system.pine"
+      ]
+    },
+    {
+      "rank": 83,
+      "id": "hostile.kc.middle-na",
+      "helper": "keltner",
+      "member": "ta.kc",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 9,
+      "corpusReferenceCount": 12,
+      "vectorCaseCount": 8,
+      "priorityScore": 60009.12,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE",
+        "v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 84,
+      "id": "ta.kc",
+      "helper": "keltner",
+      "member": "ta.kc",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 9,
+      "corpusReferenceCount": 12,
+      "vectorCaseCount": 8,
+      "priorityScore": 60009.12,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE",
+        "v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 85,
+      "id": "ta.kc.high-low-range",
+      "helper": "keltner",
+      "member": "ta.kc",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 9,
+      "corpusReferenceCount": 12,
+      "vectorCaseCount": 8,
+      "priorityScore": 60009.12,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0622__SenkuSupreme-TradingView-MT4-MT5-Indicators-Strategies-Collection__PIEKI_ALGO.PINE",
+        "v6:sources/0849__Kelly-ux-The-Ultimate-Trading-Strategy-001__Msnr_1.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 86,
+      "id": "hostile.cog.flat",
+      "helper": "cog",
+      "member": "ta.cog",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 5,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 6,
+      "priorityScore": 60005.09,
+      "reasons": [
+        "all-null-series",
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine",
+        "v6:sources/0430__turnupdigital-riskmanager__LuxAlgo.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 87,
+      "id": "ta.cog",
+      "helper": "cog",
+      "member": "ta.cog",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 5,
+      "corpusReferenceCount": 9,
+      "vectorCaseCount": 6,
+      "priorityScore": 60005.09,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v5:sources/0865__hasnocool-tradingview-pine-scripts__John-F.-Ehlers-Center-Of-Gravity-Balanced-by-DM-.pine",
+        "v6:sources/0430__turnupdigital-riskmanager__LuxAlgo.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 88,
+      "id": "ta.tsi",
+      "helper": "tsi",
+      "member": "ta.tsi",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 3,
+      "corpusReferenceCount": 6,
+      "vectorCaseCount": 13,
+      "priorityScore": 60003.06,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0302__regalouisei-collect-tradingview__oscillator-workbench-chart-lucf.pine",
+        "v6:sources/0566__voidrlm-TradingView-Indicators__CompleteBundle.pine",
+        "v6:sources/0613__TWODS-CAPITAL-Trading-View-Indicators__SMI-Ergodic-Indicator.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 89,
+      "id": "ta.accdist",
+      "helper": "accdist",
+      "member": "ta.accdist",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 6,
+      "corpusCallSiteCount": 0,
+      "corpusReferenceCount": 7,
+      "vectorCaseCount": 1,
+      "priorityScore": 60000.07,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0162__ferranbt-pinecone__accumulators.pine",
+        "v6:sources/0303__Hugs-4-Bugs-Trading-Indicator__chaikin-oscillator.pine",
+        "v6:sources/0341__jpsm83-pineScript__idEmasSameDirectMtf.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine"
+      ]
+    },
+    {
+      "rank": 90,
+      "id": "ta.kcw",
+      "helper": "keltnerWidth",
+      "member": "ta.kcw",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 5,
+      "corpusCallSiteCount": 1,
+      "corpusReferenceCount": 5,
+      "vectorCaseCount": 7,
+      "priorityScore": 50001.05,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+        "v7:sources/0181__regalouisei-collect-tradingview__intrabar-analyzer-kioseff-trading.pine",
+        "v7:sources/0249__folknor-pine-tools__coverage-misc-uncovered.pine"
+      ]
+    },
+    {
+      "rank": 91,
+      "id": "ta.kcw.high-low-range",
+      "helper": "keltnerWidth",
+      "member": "ta.kcw",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 5,
+      "corpusCallSiteCount": 1,
+      "corpusReferenceCount": 5,
+      "vectorCaseCount": 7,
+      "priorityScore": 50001.05,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine",
+        "v7:sources/0181__regalouisei-collect-tradingview__intrabar-analyzer-kioseff-trading.pine",
+        "v7:sources/0249__folknor-pine-tools__coverage-misc-uncovered.pine"
+      ]
+    },
+    {
+      "rank": 92,
+      "id": "hostile.wvad.zero-range",
+      "helper": "wvad",
+      "member": "ta.wvad",
+      "runtimeChangedFamily": false,
+      "runtimeChangeEvidence": "No helper-specific runtime-change evidence recorded by this audit; still a second implementation rather than a red-first oracle.",
+      "corpusScriptCount": 4,
+      "corpusCallSiteCount": 0,
+      "corpusReferenceCount": 4,
+      "vectorCaseCount": 5,
+      "priorityScore": 40000.04,
+      "reasons": [
+        "complex-local-helper"
+      ],
+      "sampleCorpusHits": [
+        "v6:sources/0162__ferranbt-pinecone__accumulators.pine",
+        "v7:sources/0024__Matt2005git-PineScriptV5__syntaxCheck.pine",
+        "v7:sources/0025__tradesdontlie-pine-script-v6-extension__syntaxCheck.pine",
+        "v7:sources/0026__kaigouthro-Pine-Script-VS-Code__syntaxCheck.pine"
+      ]
+    }
+  ]
+}
