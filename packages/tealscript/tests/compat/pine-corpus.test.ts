@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 
+import { generatePineCompatibilityDashboardArtifacts } from '../../scripts/generate-pine-compatibility-dashboard.ts';
 import {
   createPineCompatibilityCoverageIndex,
   createPineParseSemanticStageOutcomes,
@@ -1001,19 +1001,10 @@ plot(signals.fast(close, 2), title="Fast")
     expect(formatPineCompatibilityCoverageJson(index)).toContain(`"total": ${EXPECTED_CHECKPOINT_TOTAL}`);
   });
 
-  it('generates deterministic dashboard artifacts for CI', () => {
+  it('generates deterministic dashboard artifacts for CI', async () => {
     const outDir = mkdtempSync(join(tmpdir(), 'pine-compat-dashboard-'));
     try {
-      execFileSync('yarn', [
-        'tsx',
-        resolve(__dirname, '..', '..', 'scripts', 'generate-pine-compatibility-dashboard.ts'),
-        '--outDir',
-        outDir,
-      ], {
-        cwd: resolve(__dirname, '..', '..'),
-        encoding: 'utf8',
-        stdio: 'pipe',
-      });
+      await generatePineCompatibilityDashboardArtifacts(outDir);
 
       expect(readFileSync(join(outDir, 'pine-compatibility-corpus.json'), 'utf8')).toContain(
         `"passed": ${EXPECTED_CHECKPOINT_PASSED}`,
