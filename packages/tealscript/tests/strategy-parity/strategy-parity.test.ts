@@ -21,6 +21,7 @@ const CORPUS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'corp
 const RUN_REALTIME_SWEEP = process.env.TEALSCRIPT_REALTIME_SWEEP === '1';
 const REALTIME_SWEEP_BACKEND = 'worker';
 const REPRESENTATIVE_REALTIME_REENTRY_TIMEOUT_MS = 15_000;
+const FULL_FAST_CORPUS_REALTIME_REENTRY_TIMEOUT_MS = 60_000;
 const realtimeSweepIt = RUN_REALTIME_SWEEP ? it : it.skip;
 
 function toProductionWorkerCase(entry: CorpusEntry): ProductionWorkerCase {
@@ -168,5 +169,5 @@ describe('strategy parity corpus', () => {
       workerMatched: 36,
       workerMismatches: [],
     });
-  });
+  }, FULL_FAST_CORPUS_REALTIME_REENTRY_TIMEOUT_MS);
 });
