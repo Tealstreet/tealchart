@@ -83,7 +83,7 @@
     "@shopify/react-native-skia": "2.10.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.5",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^22.15.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.7",
