@@ -306,7 +306,7 @@ export class TealchartWidget implements ITealchartWebWidget {
   private _customTealscriptIndicators: BuiltinIndicator[];
   // Auto-save timer ID
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
-  // Throttled crosshair emission (50ms matches TradingView's throttle in useWidgetStateManagement)
+  // Throttled crosshair emission (50ms matches the chart session's crosshair throttle)
   private _lastCrossHairEmit = 0;
   private _crossHairEmitThrottleMs = 50;
 
@@ -1163,7 +1163,7 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._isReady = true;
 
     // Emit initial interval to external listeners if not controlled
-    // This allows the parent (useWidgetStateManagement) to sync its state
+    // This allows the host's chart session to sync its state
     if (!this._intervalWasProvided) {
       this._chartApi.emitCurrentInterval();
     }
