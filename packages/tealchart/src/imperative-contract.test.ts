@@ -492,6 +492,16 @@ describe('imperative chart API contract', () => {
     expect(handleBlock).toContain('extends ITealchartWidget');
   });
 
+  it('hides the native legend and its tap targets together', () => {
+    const source = readSource('SkiaTealchart.tsx');
+
+    // The web host hides TradingView's legend with the `legend_widget` feature;
+    // native takes a prop. Unmounting the overlay alone would leave its last
+    // reported action targets swallowing taps where the legend used to be.
+    expect(source).toContain('{frame && !hideLegend && (\n        <NativeChartLegendOverlay');
+    expect(source).toContain('if (hideLegend) setNativeLegendActionTargets([]);');
+  });
+
   it('answers chart(i).symbol() with the controlled prop in the same commit', () => {
     const source = readSource('mobile/useNativeTealchartCoreRuntime.ts');
 

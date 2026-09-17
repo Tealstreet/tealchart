@@ -220,6 +220,8 @@ export interface SkiaTealchartProps {
   priceLines?: PriceLine[];
   pricePrecision?: number;
   showTopBar?: boolean;
+  /** Hides the OHLC and indicator legend, like TradingView's `legend_widget` feature. */
+  hideLegend?: boolean;
   supportedResolutions?: ResolutionString[];
   uiPreferencesStorage?: TealchartKeyValueStorage | null;
   save_load_adapter?: ISaveLoadAdapter | null;
@@ -272,6 +274,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     priceLines,
     pricePrecision,
     showTopBar = true,
+    hideLegend = false,
     supportedResolutions,
     userDrawingState,
     onContextMenu,
@@ -473,6 +476,10 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
   const [nativeLegendActionTargets, setNativeLegendActionTargets] = useState<readonly NativeLegendActionHitTarget[]>(
     [],
   );
+  // A hidden legend reports no targets; stale ones would keep swallowing taps where it was.
+  useEffect(() => {
+    if (hideLegend) setNativeLegendActionTargets([]);
+  }, [hideLegend]);
   const [nativeChartSettingsButtonLayout, setNativeChartSettingsButtonLayout] = useState<LayoutRectangle | null>(null);
   const handleNativeChartSettingsButtonLayout = useCallback((layout: LayoutRectangle) => {
     setNativeChartSettingsButtonLayout((previous) =>
@@ -2268,7 +2275,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
           topBarLayout={topBarLayout}
         />
       )}
-      {frame && (
+      {frame && !hideLegend && (
         <NativeChartLegendOverlay
           bars={nativeRenderBars}
           downColor={options.downColor}
