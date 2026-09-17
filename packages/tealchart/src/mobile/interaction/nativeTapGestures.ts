@@ -22,6 +22,7 @@ import { resolveNativeCanvasTap } from './nativeCanvasTapResolver';
 import { hideNativeCrosshair, toggleNativeCrosshair } from './nativeCrosshair';
 import {
   isNativeCrosshairContextMenuButtonTap,
+  isNativeCrosshairOverMainPane,
   nativeCrosshairYToPrice,
   resolveNativeCrosshairContextMenuButtonLayout,
   resolveNativeCrosshairPriceLabelText,
@@ -55,6 +56,8 @@ export interface NativeCanvasTapGestureInput {
   frame: NativeChartFrame | null;
   hasContextMenu: boolean;
   intervalMs: number;
+  /** A plain chart click over the price pane - the native `mouse_down`/`mouse_up`. */
+  onCanvasClick: (time: number, price: number) => void;
   onContextMenuTap: (time: number, price: number, anchorX: number, anchorY: number) => void;
   onDrawingPlacementTap: (x: number, y: number) => void;
   /** Calls `claim` when it takes the tap; otherwise the crosshair gets it. */
@@ -90,6 +93,7 @@ export function createNativeCanvasTapGesture({
   frame,
   hasContextMenu,
   intervalMs,
+  onCanvasClick,
   onContextMenuTap,
   onDrawingPlacementTap,
   onDrawingSelectionTap,
@@ -106,6 +110,15 @@ export function createNativeCanvasTapGesture({
 
   const toggleCrosshairAt = (x: number, y: number) => {
     toggleNativeCrosshair(crosshair, frame, x, y);
+  };
+
+  // Fires whether the tap shows or hides the crosshair: web emits on every click.
+  const clickAt = (x: number, y: number) => {
+    'worklet';
+    if (!isNativeCrosshairOverMainPane(frame, y)) return;
+    const time = resolveNativeCrosshairSnappedTime(frame, sharedViewport, x, intervalMs);
+    const price = snapPriceToTick(nativeCrosshairYToPrice(y, sharedViewport, frame), pricePrecision);
+    runOnJS(onCanvasClick)(time, price);
   };
 
   // Drawing hit-testing happens on the JS thread inside the consumer's handler,
@@ -127,6 +140,7 @@ export function createNativeCanvasTapGesture({
       if (Date.now() <= drawingCrosshairFallbackSuppressedUntilMs.value) return;
       onClearTradeLineSelection();
       toggleCrosshairAt(x, y);
+      clickAt(x, y);
     }, 0);
   };
 
@@ -186,6 +200,7 @@ export function createNativeCanvasTapGesture({
       }
       runOnJS(onClearTradeLineSelection)();
       runOnJS(toggleCrosshairAt)(event.x, event.y);
+      clickAt(event.x, event.y);
     });
 }
 

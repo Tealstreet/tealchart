@@ -231,6 +231,7 @@ function canvasTapInput(overrides: Record<string, unknown> = {}) {
     drawingSelectionEnabled: false,
     frame: multiPaneFrame,
     hasContextMenu: false,
+    onCanvasClick: () => {},
     onContextMenuTap: () => {},
     onClearTradeLineSelection: () => {},
     onDrawingPlacementTap: () => {},
@@ -1863,6 +1864,27 @@ describe('canvas tap vs pane maximize double tap', () => {
     const canvasTapGesture = createNativeCanvasTapGesture(canvasTapInput()) as any;
 
     expect(canvasTapGesture.config.requireToFail).toBeUndefined();
+  });
+
+  it('reports a plain canvas tap over the price pane as a chart click', () => {
+    const onCanvasClick = vi.fn();
+    const canvasGesture = createNativeCanvasTapGesture(canvasTapInput({ intervalMs: 60_000, onCanvasClick })) as any;
+
+    canvasGesture.handlers.onEnd({ x: 150, y: 60 }, true);
+
+    expect(onCanvasClick).toHaveBeenCalledTimes(1);
+    const [, price] = onCanvasClick.mock.calls[0];
+    expect(price).toBeGreaterThanOrEqual(62_000);
+    expect(price).toBeLessThanOrEqual(64_000);
+  });
+
+  it('does not report a tap outside the price pane as a chart click', () => {
+    const onCanvasClick = vi.fn();
+    const canvasGesture = createNativeCanvasTapGesture(canvasTapInput({ intervalMs: 60_000, onCanvasClick })) as any;
+
+    canvasGesture.handlers.onEnd({ x: 150, y: 150 }, true);
+
+    expect(onCanvasClick).not.toHaveBeenCalled();
   });
 
   it('falls through from drawing selection to crosshair when no drawing claims the tap', async () => {

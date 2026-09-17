@@ -411,8 +411,8 @@ Tealchart must mirror that method name and chaining semantics instead of adding
 a React prop, adapter wrapper, or parallel helper API. Tealstreet-only features
 such as `setCancelAsSubmit`, compact labels, PnL, TP/SL controls, and bracket callbacks are additive extensions on the same imperative adapter
 objects, not a second line API. `src/imperative-contract.test.ts` compares the
-Tealchart interfaces and the v3 iframe `WidgetHost` method bridge against the
-vendored TradingView declarations; update that test when TradingView is
+Tealchart interfaces against the vendored TradingView declarations; update that
+test when TradingView is
 upgraded or when a deliberate backwards-compatible extension is added.
 
 Datafeed input follows TradingView's external shape. For example, datafeed bars

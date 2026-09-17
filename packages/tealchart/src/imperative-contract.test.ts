@@ -209,6 +209,7 @@ const TRADINGVIEW_WIDGET_METHODS = [
   'saveChartToServer',
   'setCSSCustomProperty',
   'subscribe',
+  'unsubscribe',
 ].sort();
 
 const TRADINGVIEW_WEB_WIDGET_METHODS = ['onShortcut'];
