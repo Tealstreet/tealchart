@@ -94,6 +94,7 @@ import {
 } from './mobile/interaction/nativeTradeLineHitTest';
 import { resolveNativeUserDrawingEditDragZones } from './mobile/interaction/nativeUserDrawingEditDragZones';
 import { useNativeChartGestureRuntime } from './mobile/interaction/useNativeChartGestureRuntime';
+import { useNativeCrossHairEvents } from './mobile/interaction/useNativeCrossHairEvents';
 import { useNativeOemsLineRuntime } from './mobile/interaction/useNativeOemsLineRuntime';
 import { useNativeSkiaInteractionRuntime } from './mobile/interaction/useNativeSkiaInteractionRuntime';
 import { useNativeSkiaSharedValueBridge } from './mobile/interaction/useNativeSkiaSharedValueBridge';
@@ -928,6 +929,9 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
       subscribe(event, callback): void {
         if (widgetDisposedRef.current) return;
         widgetEmitter.subscribe(event, callback as (...args: unknown[]) => void);
+      },
+      unsubscribe(event, callback): void {
+        widgetEmitter.unsubscribe(event, callback as (...args: unknown[]) => void);
       },
     }),
     [chartApi, setImperativeTheme, widgetEmitter],
@@ -2022,6 +2026,29 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     ],
   );
 
+  // The crosshair lands first so a click consumer reads the tapped price, as
+  // web's mouse_up does after its crosshair move.
+  const handleNativeCanvasClick = useCallback(
+    (time: number, price: number) => {
+      chartApi.emitCrossHairMoved({ time, price });
+      widgetEmitter.emit('mouse_down');
+      widgetEmitter.emit('mouse_up');
+    },
+    [chartApi, widgetEmitter],
+  );
+  const handleNativeCrossHairMoved = useCallback(
+    (time: number, price: number) => chartApi.emitCrossHairMoved({ time, price }),
+    [chartApi],
+  );
+  useNativeCrossHairEvents({
+    crosshair,
+    frame: hasDataViewport ? frame : null,
+    intervalMs: intervalToMs(nativeRenderInterval),
+    onCrossHairMoved: handleNativeCrossHairMoved,
+    pricePrecision: nativePricePrecision,
+    sharedViewport,
+  });
+
   const { nativeChartGesture } = useNativeChartGestureRuntime({
     beginNativeViewportInteraction,
     bracketDragActive,
@@ -2061,6 +2088,7 @@ export const SkiaTealchart = forwardRef<SkiaTealchartHandle, SkiaTealchartProps>
     onDrawingEditDragMove: handleNativeUserDrawingEditDragMove,
     onDrawingSelectionTap: handleNativeUserDrawingSelectionTap,
     onLeftToolRailToggleTap: toggleLeftToolRailCollapsed,
+    onCanvasClick: handleNativeCanvasClick,
     onContextMenuTap: handleNativeContextMenuTap,
     onSelectTradeLine: handleNativeSelectTradeLine,
     onClearTradeLineSelection: handleNativeClearTradeLineSelection,

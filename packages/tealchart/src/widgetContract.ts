@@ -44,6 +44,7 @@ export interface ITealchartWidget {
   /** @stub Accepted and dropped — there is no CSS surface to target. */
   setCSSCustomProperty(key: string, value: string): void;
   subscribe<TEvent extends WidgetEvent>(event: TEvent, callback: WidgetEventCallback<TEvent>): void;
+  unsubscribe<TEvent extends WidgetEvent>(event: TEvent, callback: WidgetEventCallback<TEvent>): void;
 }
 
 /**

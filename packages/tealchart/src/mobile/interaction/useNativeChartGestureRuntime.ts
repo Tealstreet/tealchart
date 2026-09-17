@@ -94,6 +94,7 @@ export interface NativeChartGestureRuntimeInput {
   onDrawingEditDragMove: (x: number, y: number) => void;
   onDrawingSelectionTap: (x: number, y: number, claimTap: () => void) => void;
   onLeftToolRailToggleTap: () => void;
+  onCanvasClick: Parameters<typeof createNativeCanvasTapGesture>[0]['onCanvasClick'];
   onContextMenuTap: Parameters<typeof createNativeCanvasTapGesture>[0]['onContextMenuTap'];
   onSelectTradeLine: Parameters<typeof createNativeCanvasTapGesture>[0]['onSelectTradeLine'];
   onClearTradeLineSelection: Parameters<typeof createNativeCanvasTapGesture>[0]['onClearTradeLineSelection'];
@@ -189,6 +190,7 @@ export function useNativeChartGestureRuntime({
   onDrawingEditDragMove,
   onDrawingSelectionTap,
   onLeftToolRailToggleTap,
+  onCanvasClick,
   onContextMenuTap,
   onSelectTradeLine,
   onClearTradeLineSelection,
@@ -232,6 +234,7 @@ export function useNativeChartGestureRuntime({
   const stableOnPaneDividerResizeStart = useLatestNativeCallback(onPaneDividerResizeStart ?? noopNativePaneDividerResize);
   const stableOnPaneDividerResizeEnd = useLatestNativeCallback(onPaneDividerResizeEnd ?? noopNativePaneDividerResize);
   const stableOnLeftToolRailToggleTap = useLatestNativeCallback(onLeftToolRailToggleTap);
+  const stableOnCanvasClick = useLatestNativeCallback(onCanvasClick);
   const stableOnContextMenuTap = useLatestNativeCallback(onContextMenuTap);
   const stableOnOverlayAction = useLatestNativeCallback(onOverlayAction);
   const stableOnSelectedDrawingAction = useLatestNativeCallback(onSelectedDrawingAction);
@@ -389,6 +392,7 @@ export function useNativeChartGestureRuntime({
       frame: dataFrame,
       hasContextMenu,
       intervalMs,
+      onCanvasClick: stableOnCanvasClick,
       onContextMenuTap: stableOnContextMenuTap,
       onDrawingPlacementTap: stableOnDrawingTap,
       onDrawingSelectionTap: stableOnDrawingSelectionTap,
@@ -416,6 +420,7 @@ export function useNativeChartGestureRuntime({
     pricePrecision,
     sharedViewport,
     stableCommitTradeLineAction,
+    stableOnCanvasClick,
     stableOnContextMenuTap,
     stableOnDrawingSelectionTap,
     stableOnDrawingTap,
