@@ -371,11 +371,26 @@ only on platforms that have committed baseline entries; on platforms without a
 recorded renderer baseline, under-threshold drift is tolerated because exact
 pixel counts would be platform noise rather than a reviewable semantic signal.
 The committed baseline includes `darwin` entries from local macOS rendering and
-`linux` entries generated on the CI runner, so the ratchet now enforces both on
-developer Macs and on the platform that gates merges. If Linux drift moves,
-regenerate the Linux entries on Linux (Docker or CI), not by widening the
+`linux` entries measured on CI, so the ratchet now enforces both on developer
+Macs and on the platform that gates merges. If Linux drift moves, raise the
+Linux entries from a Linux measurement (Docker or CI), not by widening the
 threshold, deleting the ratchet, or regenerating whichever platform happens to
 be local.
+**The `linux` entries are a CEILING across TWO CI hosts, and
+`assertVisualSnapshotDriftMatchesBaseline` compares `differingPixels` with `>`
+for exactly that reason.** This monorepo gates on `runs-on: [self-hosted,
+tealstreet]`; the `Tealstreet/tealchart` mirror gates the same source on
+`ubuntu-latest`. Their font stacks rasterise glyphs differently, so the same
+five text-bearing snapshots measure different pixel counts on each, while
+`process.platform` says `linux` on both and cannot tell them apart. An exact
+ratchet is therefore unsatisfiable: on 2026-09-17 the mirror's numbers were
+committed there, Copybara carried them here on 2026-09-20, and master went red
+for a day on five tests that had been green — the same trade in reverse had
+reddened the mirror three days earlier. Under a ceiling one entry satisfies
+both hosts, holding the higher of the two measurements. Never regenerate the
+`linux` entries wholesale from one host's run: that lowers the ceiling to that
+host and re-breaks the other. Raise a single entry by hand when a host measures
+above it, and say which host measured it.
 Regenerate platform drift deliberately with
 `yarn workspace @tealstreet/tealchart visual:snapshot:drift` only after running
 the snapshot tests that produce `.diff.png` diagnostics; if the numbers move,

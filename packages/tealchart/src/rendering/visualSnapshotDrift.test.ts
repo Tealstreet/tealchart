@@ -10,6 +10,9 @@ import {
 
 const baseline = VISUAL_SNAPSHOT_DRIFT_BASELINE[0]!;
 const linuxBaseline = VISUAL_SNAPSHOT_DRIFT_BASELINE.find((entry) => entry.platform === 'linux')!;
+const linuxBaselineWithDrift = VISUAL_SNAPSHOT_DRIFT_BASELINE.find(
+  (entry) => entry.platform === 'linux' && entry.differingPixels > 0,
+)!;
 const platformWithoutBaseline =
   (['aix', 'freebsd', 'openbsd', 'sunos', 'win32'] as const).find(
     (platform) => !VISUAL_SNAPSHOT_DRIFT_BASELINE.some((entry) => entry.platform === platform),
@@ -35,7 +38,7 @@ describe('visual snapshot drift baseline platform handling', () => {
     }).toThrow(/no committed drift baseline/);
   });
 
-  it('fails changed drift measurements on the Linux CI platform once baselined', () => {
+  it('fails drift above the committed ceiling on the Linux CI platform', () => {
     const differingPixels = linuxBaseline.differingPixels + 1;
     expect(() => {
       assertVisualSnapshotDriftMatchesBaseline(
@@ -46,7 +49,30 @@ describe('visual snapshot drift baseline platform handling', () => {
         },
         'linux',
       );
-    }).toThrow(/drift changed/);
+    }).toThrow(/drift rose above its committed ceiling/);
+  });
+
+  it('accepts drift below the committed ceiling, because two Linux CI hosts render differently', () => {
+    const differingPixels = linuxBaselineWithDrift.differingPixels - 1;
+    expect(() => {
+      assertVisualSnapshotDriftMatchesBaseline(
+        {
+          ...makeMeasurement(linuxBaselineWithDrift.name),
+          differingPixels,
+          differingPixelRatio: differingPixels / linuxBaselineWithDrift.totalPixels,
+        },
+        'linux',
+      );
+    }).not.toThrow();
+  });
+
+  it('fails a measurement taken at a different frame size', () => {
+    expect(() => {
+      assertVisualSnapshotDriftMatchesBaseline(
+        { ...makeMeasurement(linuxBaseline.name), width: 800, height: 600 },
+        'linux',
+      );
+    }).toThrow(/measured at 800x600/);
   });
 
   it('uses the global threshold only on platforms without committed renderer baselines', () => {
