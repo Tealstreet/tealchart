@@ -58,5 +58,8 @@ conflicts unless a maintainer asks you to resolve them.
 - Keep commits focused and easy to review.
 - Update nearby docs when changing non-obvious behavior.
 
-Merged mirror PRs sync upstream automatically. Do not attempt to access or
-modify the upstream monorepo from this mirror.
+Merged mirror PRs sync upstream automatically, in both directions, so land a
+given change in ONE repository. Authoring the same edit here and upstream makes
+the two conflict on the same lines and stops the sync until someone repairs it
+by hand. Do not attempt to access or modify the upstream monorepo from this
+mirror.
