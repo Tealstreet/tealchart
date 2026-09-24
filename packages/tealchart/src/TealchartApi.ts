@@ -21,6 +21,7 @@ import {
   EnhancedCrossHairState,
   ExecutionDirection,
   ExecutionLineRenderData,
+  ExecutionMarkerShape,
   FullOrderLineAdapter,
   FullPositionLineAdapter,
   IExecutionLineAdapter,
@@ -399,6 +400,32 @@ export function getTealchartApiLineRenderSnapshot(api: TealchartApi): TealchartA
  * genuine cancel still feels immediate.
  */
 const LINE_REMOVAL_COALESCE_MS = 250;
+
+/** FontAwesome caret-down / caret-up, as TradingView addresses its icons. */
+const CARET_DOWN_CODE_POINT = 0xf0d7;
+
+const isDownwardIcon = (icon: number | string | undefined): boolean => Number(icon) === CARET_DOWN_CODE_POINT;
+
+/** The `createMultipointShape` argument shapes we accept, mirroring TradingView. */
+export interface ShapePoint {
+  time: number;
+  price: number;
+}
+
+export interface CreateMultipointShapeOptions<TOverrides extends object> {
+  shape?: string;
+  text?: string;
+  lock?: boolean;
+  disableSelection?: boolean;
+  disableSave?: boolean;
+  disableUndo?: boolean;
+  showInObjectsTree?: boolean;
+  zOrder?: string;
+  icon?: number;
+  overrides?: TOverrides;
+}
+
+export type EntityId = string & { __entityId?: never };
 
 export class TealchartApi {
   private _symbol: string;
@@ -784,6 +811,68 @@ export class TealchartApi {
     this._executionLines.set(id, adapter);
     this._onLinesChanged?.();
     return createSyncPromise(adapter);
+  }
+
+  /**
+   * TradingView-compatible drawing creation, for the `shape: 'icon'` subset.
+   *
+   * Exists because the web app draws its fill markers with this call and not
+   * `createExecutionShape`, and a chart that silently lacks a method the caller
+   * assumes fails as an unhandled rejection with nothing on screen. Anything
+   * that runs against both chart engines has to find the same method here.
+   *
+   * Only `icon` is implemented. Anything else rejects by NAME rather than
+   * returning a handle to a drawing that was never made — a caller checking for
+   * a shape we do not draw should find out immediately.
+   */
+  createMultipointShape<TOverrides extends object>(
+    points: ShapePoint[],
+    options: CreateMultipointShapeOptions<TOverrides>,
+  ): Promise<EntityId> {
+    if (options?.shape !== 'icon') {
+      return Promise.reject(
+        new Error(`[tealchart] createMultipointShape supports shape 'icon', received '${String(options?.shape)}'`),
+      );
+    }
+
+    const point = points?.[0];
+    if (!point || typeof point.price !== 'number' || typeof point.time !== 'number') {
+      return Promise.reject(new Error('[tealchart] createMultipointShape requires one point with a time and a price'));
+    }
+
+    const overrides = (options.overrides ?? {}) as { size?: number; color?: string; icon?: number | string };
+    const icon = typeof overrides.icon === 'string' ? Number(overrides.icon) : (overrides.icon ?? options.icon);
+    const id = `shape_${++this._lineIdCounter}`;
+    // Passed at construction, not assigned afterwards: `_getRenderData()`
+    // returns a COPY, so mutating its result is silently discarded and the
+    // caret never reaches the renderer.
+    const adapter = this._createExecutionLineAdapter(id, 'caret');
+
+    adapter
+      .setPrice(point.price)
+      .setTime(point.time)
+      .setDirection(isDownwardIcon(icon) ? 'sell' : 'buy')
+      .setText('')
+      .setArrowColor(overrides.color ?? DEFAULT_BUY_CANDLE_COLOR)
+      .setArrowHeight(overrides.size ?? 22)
+      // Planted ON the price. The stem-and-head arrow is offset beside the bar;
+      // an icon is not.
+      .setArrowSpacing(0);
+
+    this._executionLines.set(id, adapter);
+    this._onLinesChanged?.();
+    return createSyncPromise(id as EntityId);
+  }
+
+  /**
+   * TradingView-compatible removal. `createMultipointShape` hands back an id
+   * rather than an adapter, so its caller needs this to clean up.
+   */
+  removeEntity(entityId: EntityId): void {
+    const id = String(entityId);
+    if (this._executionLines.delete(id)) {
+      this._onLinesChanged?.();
+    }
   }
 
   /**
@@ -1690,9 +1779,13 @@ export class TealchartApi {
   /**
    * @internal Create execution line adapter with TradingView-compatible chaining
    */
-  private _createExecutionLineAdapter(id: string): InternalExecutionLineAdapter {
+  private _createExecutionLineAdapter(
+    id: string,
+    markerShape: ExecutionMarkerShape = 'arrow',
+  ): InternalExecutionLineAdapter {
     const data: ExecutionLineRenderData = {
       id,
+      markerShape,
       price: 0,
       time: 0,
       direction: 'buy',

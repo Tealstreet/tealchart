@@ -4274,6 +4274,28 @@ export class TealchartRenderer {
       const arrowSpacing = Math.max(0, execution.arrowSpacing || 0);
       const markerCenterY = anchorY + (isBuy ? arrowSpacing : -arrowSpacing);
 
+      if (execution.markerShape === 'caret') {
+        // A caret sits ON the price rather than beside it: wide, short, and
+        // centred on `anchorY`. This is the glyph `createMultipointShape` with
+        // `shape: 'icon'` draws, so fill markers look the same here as they do
+        // on TradingView.
+        const halfWidth = arrowHeight * 0.5;
+        const height = arrowHeight * 0.62;
+        const baseY = isBuy ? anchorY + height / 2 : anchorY - height / 2;
+        const apexY = isBuy ? anchorY - height / 2 : anchorY + height / 2;
+
+        ctx.save();
+        ctx.fillStyle = execution.arrowColor;
+        ctx.beginPath();
+        ctx.moveTo(x, apexY);
+        ctx.lineTo(x + halfWidth, baseY);
+        ctx.lineTo(x - halfWidth, baseY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        continue;
+      }
+
       const tipY = isBuy ? markerCenterY - arrowHeight / 2 : markerCenterY + arrowHeight / 2;
       const tailY = isBuy ? markerCenterY + arrowHeight / 2 : markerCenterY - arrowHeight / 2;
       const headBaseY = isBuy ? markerCenterY - arrowHeight / 8 : markerCenterY + arrowHeight / 8;

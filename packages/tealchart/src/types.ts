@@ -1455,7 +1455,16 @@ export interface ExecutionLineRenderData {
   font: string;
   textColor: string;
   arrowColor: string;
+  /**
+   * `arrow` is TradingView's execution glyph: a tall stem-and-head marker drawn
+   * `arrowSpacing` px beside the bar. `caret` is the squat triangle planted ON
+   * the price that `createMultipointShape({ shape: 'icon' })` produces, which is
+   * what the web app's fill markers use. Defaults to `arrow`.
+   */
+  markerShape?: ExecutionMarkerShape;
 }
+
+export type ExecutionMarkerShape = 'arrow' | 'caret';
 
 // ============================================================================
 // TEALSTREET Extension Interfaces

@@ -873,3 +873,25 @@ other instance of the same shape.
 - `style.cursor` writes are guarded (`this.cursor !== cursor`) to avoid triggering style recalculation
 - **Per-chart interval persistence**: the interval lives in the chartKey-scoped `chartStore.settings`. A widget created with an explicit `interval` uses (and persists) it; created without one, it restores the interval a prior widget with the same `chartKey` persisted, else defaults to `'60'`. `setResolution` writes the new interval back to the store (via `_handleIntervalChange` → `_startDataLoad`, which persists `newInterval`). The store is held in a **process-lifetime** `chartStoreCache` (`getChartStore`), so tests must call `clearChartStoreCache()` (from `state/chartState`) in `afterEach` to avoid interval bleed across tests.
 - Resolution inputs are normalized at Tealchart API boundaries and in shared viewport math. Accept string resolutions (`'1h'`, `'60'`) and legacy numeric minute resolutions (`60`); keep missing interval semantics intact where `undefined`/`null` means "not provided" (for example, widget construction and `setSymbol`).
+
+## `createMultipointShape` exists for TradingView parity
+
+`TealchartApi` implements `createMultipointShape({ shape: 'icon' })` and
+`removeEntity` alongside `createExecutionShape`, because the web app's fill
+markers (`ExecutionMarksManager`) call the former on BOTH chart engines. When a
+shared caller reaches for a TradingView method tealchart lacks, the call throws
+inside an async handler and surfaces as an unhandled rejection: nothing renders
+and nothing is logged. Anything the web app calls against both engines has to
+exist here.
+
+Only `icon` is implemented; any other shape REJECTS by name rather than
+returning a handle to a drawing that was never made.
+
+**`_getRenderData()` returns a COPY (`{ ...data }`).** Assigning to its result is
+silently discarded, so per-drawing render state — `markerShape` is the first —
+must be passed into `_createExecutionLineAdapter`, not set afterwards.
+
+`markerShape` picks the glyph: `arrow` is TradingView's tall stem-and-head marker
+offset `arrowSpacing` px beside the bar, `caret` the squat triangle planted ON
+the price that icon shapes draw. Defaults to `arrow`, so existing execution
+shapes are unchanged.
