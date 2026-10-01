@@ -73,7 +73,7 @@
     "@tealstreet/tealscript": "*",
     "jotai": "^3.0.0",
     "jotai-optics": "^0.4.0",
-    "konva": "^10.5.0",
+    "konva": "^10.7.0",
     "nanostores": "^1.5.4",
     "optics-ts": "^2.4.1"
   },
