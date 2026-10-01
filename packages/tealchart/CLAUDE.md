@@ -411,6 +411,82 @@ execute.
 
 Built-in indicators defined in `builtinIndicators.ts`: SMA, EMA, RSI, MACD, Bollinger Bands, etc.
 
+## `_loadBars` must re-subscribe on FAILURE too
+
+The datafeed's `onResetCacheNeededCallback` is **one-shot per subscription**, and
+honouring it is what ends that subscription's lifecycle: a fresh `subscribeBars`
+registers a fresh, re-armable reset. Our reset callback is `_loadBars()`, so if a
+failed history load returns without reaching `_subscribeToBars()`, the old
+`listenerGuid` is stranded with its reset already spent — the host's
+`forceResetCacheCallbacks()` becomes a permanent no-op for that chart, and its
+kline listener stays bound to whatever exchange object the account reload
+disposed. The symptom is a chart that looks fine and never ticks again, only on
+the second reconnect, only after a venue hiccup.
+
+So the error callback re-subscribes — **only for the reset callers**, via
+`_loadBars(resubscribeOnError)`. There are TWO of them, and missing the second
+made the first useless: the host's reconnect calls `forceResetCacheCallbacks()`
+*and then* `resetData()`, so `resetData` -> `_handleResetData` ->
+`_startDataLoad({reason:'reset'})` begins a second transition behind the reset
+callback's own load. `_startDataLoad` therefore passes the flag for
+`reason === 'reset'` too — and it is that request which actually survives a
+reconnect.
+
+**The superseding is on the RESOLVE generation, not on `_loadBarsRequestId`
+alone**, and the distinction is load-bearing rather than pedantic.
+`_startDataLoad` bumps `_resolveSymbolRequestId`; the only bump of
+`_loadBarsRequestId` is inside `_loadBars` itself, reached after an async
+`resolveSymbol`. So for as long as that resolve is in flight the earlier
+request's `_loadBarsRequestId` still matches, and if getBars settles first — which
+`cachedFetchOhlcv` makes ordinary, since the cache can answer while resolveSymbol
+is still polling a cold exchange for markets — the superseded request writes its
+bars, calls `_setReady()` and re-subscribes behind the transition. `_loadBars`
+therefore captures `_resolveSymbolRequestId` as well and checks both. This
+paragraph previously credited `_loadBarsRequestId` with the whole job; it did not
+do it, and the outcome was benign only because the later `_subscribeToBars`
+happened to unsubscribe the resurrected subscription.
+
+**`_startDataLoad`'s own two failure exits re-subscribe too**, through
+`_restoreSubscriptionAfterFailedReset`. It unsubscribes and nulls
+`_barSubscriptionGuid` at the TOP, so `!symbolToResolve` and a `resolveSymbol`
+that errors each leave the chart with nothing — and on a reconnect the
+replacement exchange has an empty market list, which makes `resolveSymbol` the
+likeliest thing to fail of the two. Same narrow scope as above: `reason`
+must be `'reset'`, since a reset re-subscribes the symbol and interval it already
+had while a symbol change would bind the new market's ticks onto the old series.
+
+**`ChartWidgetCore` needs the same fix, and it is the one mobile uses.** The
+native Skia chart runs on `ChartWidgetCore` (via `useTealchartCore`), not on
+`TealchartWidget` — `index.native.ts` deliberately exports no web widget. Its
+`_loadBars` carries the same parameter and its reset callback passes `true`.
+`unsubscribeBars` lives inside `_subscribeToBars`, so re-subscribing is also what
+cleans up, and the reset callback bails unless its subscription is still the
+current one, which means the symbol and interval are unchanged and `_bars` belongs
+to the market being re-subscribed.
+
+The narrow scope is load-bearing, not caution. `_loadBars`'s other callers are the
+init path, `_handleRecoveryNeeded` and `_startDataLoad`; the latter two null the
+guid before loading, so they strand nothing. Re-subscribing for all of them would
+break two things: on `_startDataLoad`'s symbol/interval change `_symbolInfo` is
+already the new market while `_bars` deliberately still holds the old one (that is
+what `_barsAreForRequestedMarket` fades) and `_handleNewBar` has no market-key
+guard, so the new symbol's ticks would append to the old symbol's series; and
+`_handleNewBar` reaches `_handleRecoveryNeeded` directly, bypassing
+`_triggerRecovery`'s backoff and retry cap, so a venue serving ticks while failing
+history would retry once per tick without bound.
+
+**The web host has a backstop for live bars; mobile does not.** On web,
+`DefaultDatafeed`'s `startMonitoring` watchdog re-subscribes its kline listener
+after `KLINES_TIMEOUT_MS` of silence, and `useChartSession` drives `resetData()`
+on every reconnect regardless — so a stranded guid costs the bars that CLOSED
+during the gap, plus the chart's own reset. Neither exists on mobile:
+`ChartWidgetCore` has no `resetData` at all (`useTealchartCore` exposes
+`setSymbol`/`setInterval` only), and the native datafeed has no equivalent of
+that watchdog, which is a `DefaultDatafeed` member. On mobile the same shape is
+terminal until the chart remounts, so do not read the web backstop as cover for
+both halves — and remember `packages/tealchart` is excluded from `yarn sync`, so
+a fix here reaches mobile only through Copybara into its `vendor/tealchart`.
+
 ## TradingView Compatibility
 
 Implements TradingView-compatible interfaces:

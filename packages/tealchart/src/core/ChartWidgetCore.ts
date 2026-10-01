@@ -12,7 +12,6 @@
 import type { BuiltinIndicator } from '../indicators/builtinIndicators';
 import type {
   Bar,
-  DatafeedBar,
   IBasicDataFeed,
   LibrarySymbolInfo,
   ResolutionString,
@@ -31,7 +30,6 @@ import { normalizeResolution } from '../utils/normalizeResolution';
 import {
   DEFAULT_HISTORY_BACKFILL_BAR_COUNT,
   mergeLeftHistoryBackfillRequestHints,
-  resolveHistoryBackfillRequiredStartTime,
   resolveLeftHistoryBackfillContinuationHint,
   resolveLeftHistoryBackfillRequest,
 } from './historyBackfill';
@@ -355,9 +353,17 @@ export class ChartWidgetCore {
     this._onBarsChanged?.(this._bars, context);
   }
 
-  protected _loadBars(): void {
+  /**
+   * @param resubscribeOnError Re-subscribe to bars even if the history load
+   * fails. Only the datafeed's cache-reset callback passes this, and only it
+   * needs to: see the error handler below.
+   */
+  protected _loadBars(resubscribeOnError = false): void {
     if (this._disposed) return;
-    if (!this._symbolInfo) return;
+    if (!this._symbolInfo) {
+      console.warn('[ChartWidgetCore] _loadBars called with no resolved symbol; no bars will load');
+      return;
+    }
     // An interval change loads directly, without resolving. If a symbol change
     // is still resolving at that moment — a multi-second window on a cold
     // exchange, where resolveSymbol polls for markets — the info in hand is the
@@ -409,6 +415,24 @@ export class ChartWidgetCore {
 
         this._setLoading(false);
         console.error('[ChartWidgetCore] Failed to load bars:', error);
+
+        // Re-subscribe even though the history load failed, but ONLY for the
+        // cache-reset caller. `_subscribeToBars` is what calls
+        // `unsubscribeBars(oldGuid)` and registers a FRESH
+        // `onResetCacheNeededCallback`, and the datafeed's reset is one-shot per
+        // subscription: skip it and the old guid keeps `hasResetCache === true`
+        // forever, so every later `forceResetCacheCallbacks()` — the host's
+        // reconnect path — is a silent no-op for this chart and its kline
+        // listener stays bound to the exchange the account reload disposed. A
+        // failed load is exactly when that matters.
+        //
+        // Scoped to that one caller for the same reasons as the web widget: the
+        // reset callback already bailed unless its subscription is current, so
+        // the symbol and interval are unchanged, while the other callers would
+        // re-subscribe under a symbol `_bars` does not belong to.
+        if (resubscribeOnError) {
+          this._subscribeToBars();
+        }
       },
     );
   }
@@ -532,7 +556,10 @@ export class ChartWidgetCore {
 
   protected _subscribeToBars(): void {
     if (this._disposed) return;
-    if (!this._symbolInfo) return;
+    if (!this._symbolInfo) {
+      console.warn('[ChartWidgetCore] _subscribeToBars called with no resolved symbol; live candles will not start');
+      return;
+    }
 
     // Unsubscribe from previous
     if (this._barSubscriptionGuid) {
@@ -568,7 +595,10 @@ export class ChartWidgetCore {
         ) {
           return;
         }
-        this._loadBars();
+        // Re-subscribe even if the reload fails: honouring this callback spends
+        // the datafeed's one-shot reset, so only a fresh `subscribeBars` can
+        // re-arm it.
+        this._loadBars(true);
       },
     );
   }

@@ -187,6 +187,8 @@ interface MockDatafeed extends IBasicDataFeed {
   _getBarsErrCb: ((err: string) => void) | null;
   _subscribeCb: ((bar: DatafeedBar) => void) | null;
   _subscribeGuid: string | null;
+  _resetCb: (() => void) | null;
+  _subscribeCalls: string[];
   _resolveSymbolCalls: string[];
   _getBarsCalls: { symbolInfo: LibrarySymbolInfo; resolution: string; periodParams: PeriodParams }[];
   _unsubscribeCalls: string[];
@@ -201,6 +203,8 @@ function createMockDatafeed(): MockDatafeed {
     _getBarsErrCb: null,
     _subscribeCb: null,
     _subscribeGuid: null,
+    _resetCb: null,
+    _subscribeCalls: [],
     _resolveSymbolCalls: [],
     _getBarsCalls: [],
     _unsubscribeCalls: [],
@@ -238,6 +242,8 @@ function createMockDatafeed(): MockDatafeed {
     ) {
       datafeed._subscribeCb = onTick;
       datafeed._subscribeGuid = listenerGuid;
+      datafeed._resetCb = onResetCacheNeeded;
+      datafeed._subscribeCalls.push(listenerGuid);
     },
     unsubscribeBars(guid) {
       datafeed._unsubscribeCalls.push(guid);
@@ -4051,6 +4057,174 @@ describe('TealchartWidget', () => {
 
       widget.setSymbol('ETHUSDT');
       expect(datafeed._resolveSymbolCalls).toContain('ETHUSDT');
+    });
+
+    // The datafeed's `onResetCacheNeededCallback` is ONE-SHOT per subscription,
+    // and honouring it is what ends that subscription's lifecycle: a fresh
+    // `subscribeBars` registers a fresh, re-armable reset. If the history load
+    // that the reset triggers FAILS and we do not re-subscribe, that guid keeps
+    // `hasResetCache === true` forever — every later reconnect's
+    // `forceResetCacheCallbacks()` is a silent no-op for this chart, and its
+    // kline listener stays bound to the exchange the account reload disposed.
+    //
+    // Asserted on CALL COUNT, not guid identity: the guid ends in `Date.now()`
+    // and this runs synchronously on one symbol, so the replacement guid is the
+    // same string.
+    it('re-subscribes after a cache reset whose history load fails', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+      expect(widget).toBeDefined();
+
+      const oldGuid = datafeed._subscribeGuid;
+      expect(datafeed._subscribeCalls).toHaveLength(1);
+
+      datafeed._resetCb?.();
+      datafeed._getBarsErrCb?.('boom');
+
+      expect(datafeed._unsubscribeCalls).toContain(oldGuid!);
+      expect(datafeed._subscribeCalls).toHaveLength(2);
+    });
+
+    // The scope is the invariant: only the reset caller re-subscribes on failure.
+    // Doing it for every caller would re-subscribe under a CHANGED symbol on the
+    // symbol-change path, and would retry once per tick on the recovery path.
+    // The reconnect path the host actually drives: `forceResetCacheCallbacks()`
+    // fires the reset callback, and then `resetData()` supersedes it via
+    // `_startDataLoad({reason:'reset'})`. The SURVIVING request is the one that
+    // has to re-subscribe — covering only the reset callback leaves the chart with
+    // no subscription at all, and therefore no datafeed watchdog either.
+    it('re-subscribes when the reset-triggered reload fails after resetData', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      const oldGuid = datafeed._subscribeGuid;
+      expect(datafeed._subscribeCalls).toHaveLength(1);
+
+      // The host's order: reset the caches, then reset the data.
+      datafeed._resetCb?.();
+      widget.activeChart().resetData();
+      // The resolve that `_startDataLoad` kicked off, then a failed history load.
+      datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+      datafeed._getBarsErrCb?.('boom');
+
+      expect(datafeed._unsubscribeCalls).toContain(oldGuid!);
+      expect(datafeed._subscribeCalls).toHaveLength(2);
+    });
+
+    // `_startDataLoad` unsubscribes and nulls the guid BEFORE resolving, so a
+    // reset whose `resolveSymbol` fails leaves the chart with nothing at all —
+    // no kline listener, no re-armable reset, and no `DefaultDatafeed` watchdog,
+    // which lives inside `subscribeBars`. On a reconnect the replacement
+    // exchange has an empty market list and `resolveSymbol` is precisely what
+    // fails, so this exit is at least as likely as the getBars failure above.
+    it('re-subscribes when the reset-triggered resolveSymbol fails', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      const oldGuid = datafeed._subscribeGuid;
+      expect(datafeed._subscribeCalls).toHaveLength(1);
+
+      widget.activeChart().resetData();
+      datafeed._resolveSymbolErrCb?.('markets not loaded');
+
+      expect(datafeed._unsubscribeCalls).toContain(oldGuid!);
+      expect(datafeed._subscribeCalls).toHaveLength(2);
+    });
+
+    // Same invariant as the getBars case: a symbol change must NOT re-subscribe
+    // on failure. `_symbolInfo` would be the market being left while `_bars`
+    // still holds the old series, and `_handleNewBar` has no market-key guard.
+    it('does not re-subscribe when a symbol change resolveSymbol fails', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      const subscribesAfterInit = datafeed._subscribeCalls.length;
+      widget.setSymbol('ETHUSDT');
+      datafeed._resolveSymbolErrCb?.('markets not loaded');
+
+      expect(datafeed._subscribeCalls).toHaveLength(subscribesAfterInit);
+    });
+
+    // `_loadBarsRequestId` alone does not supersede a load that started before a
+    // `_startDataLoad`: that bumps `_resolveSymbolRequestId` and only reaches
+    // `_loadBars` after an async `resolveSymbol`, so the earlier request's id
+    // still matches. Here getBars settles FIRST, which is reachable whenever the
+    // candle cache answers while resolveSymbol is still polling for markets.
+    it('discards a load the reset transition superseded, even before it resolves', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      const subscribesAfterInit = datafeed._subscribeCalls.length;
+
+      // The reset callback starts a load...
+      datafeed._resetCb?.();
+      // ...then the host's `resetData()` begins a new transition, which nulls the
+      // subscription guid and bumps the resolve generation.
+      widget.activeChart().resetData();
+      // The FIRST load now answers. It belongs to the superseded generation.
+      datafeed._getBarsCb?.([{ time: 1, open: 1, high: 1, low: 1, close: 1, volume: 1 }], {});
+
+      expect(datafeed._subscribeCalls).toHaveLength(subscribesAfterInit);
+    });
+
+    /**
+     * A reset can land ON TOP of a symbol change that is still resolving, and then
+     * `reason === 'reset'` is true while `_symbolInfo` still holds the OLD market.
+     * Re-subscribing there binds the old symbol's ticks under the new symbol's guid,
+     * and `_handleNewBar` has no market-key guard.
+     */
+    it('does not re-subscribe a reset that failed while a symbol change was in flight', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      completeInit(datafeed);
+
+      const subscribesAfterInit = datafeed._subscribeCalls.length;
+
+      // A symbol change begins and is left resolving.
+      widget.setSymbol('ETHUSDT');
+      // The host's reconnect arrives on top of it, and its own resolve fails.
+      widget.activeChart().resetData();
+      datafeed._resolveSymbolErrCb?.('markets not loaded');
+
+      expect(datafeed._subscribeCalls).toHaveLength(subscribesAfterInit);
+    });
+
+    /**
+     * The guard keys on PROVENANCE, so a market whose `ticker` simply does not look
+     * like `_symbol` must still re-subscribe. Comparing the strings was tried and is
+     * unsound: `getCleanSymbol` returns `parts[1]`, so a three-part symbol yields the
+     * middle segment while the ticker's clean form yields the last — the guard then
+     * blocked reconnects on markets that had never changed.
+     */
+    it('re-subscribes when the ticker merely looks unlike the requested symbol', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      // Resolved for the symbol in hand, but with a ticker of a different shape — a
+      // HIP-3 style market whose venue symbol carries its own colon.
+      completeInit(datafeed, undefined, { ...defaultSymbolInfo, ticker: 'xyz:NQ', full_name: 'xyz:NQ' } as never);
+
+      const subscribesAfterInit = datafeed._subscribeCalls.length;
+      expect(subscribesAfterInit).toBeGreaterThan(0);
+
+      widget.activeChart().resetData();
+      datafeed._resolveSymbolErrCb?.('markets not loaded');
+
+      expect(datafeed._subscribeCalls.length).toBe(subscribesAfterInit + 1);
+    });
+
+    it('does not re-subscribe when a non-reset history load fails', () => {
+      const datafeed = createMockDatafeed();
+      const widget = createWidget(datafeed);
+      datafeed._resolveSymbolCb?.(defaultSymbolInfo);
+      datafeed._getBarsErrCb?.('boom');
+      expect(widget).toBeDefined();
+
+      expect(datafeed._subscribeCalls).toHaveLength(0);
     });
 
     it('setSymbol triggers unsubscribeBars for old symbol', () => {

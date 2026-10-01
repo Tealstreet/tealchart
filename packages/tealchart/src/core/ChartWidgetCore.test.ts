@@ -102,6 +102,42 @@ function createControlledDatafeed(): {
   };
 }
 
+describe('ChartWidgetCore bar subscription after a failed reset reload', () => {
+  // `ChartWidgetCore` is the engine behind the NATIVE Skia chart, so this is the
+  // mobile half of the same bug fixed in `TealchartWidget`: the datafeed's
+  // `onResetCacheNeededCallback` is one-shot per subscription, and honouring it
+  // only ends that subscription's lifecycle if a fresh `subscribeBars` follows.
+  // Without one, the host's `forceResetCacheCallbacks()` is a permanent no-op for
+  // this chart and its kline listener stays bound to the exchange the account
+  // reload disposed.
+  it('re-subscribes when the reset-triggered reload fails', () => {
+    const { datafeed, historyRequests, subscriptions, unsubscribedGuids } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '15' });
+
+    core.initialize();
+    historyRequests[0]!.onResult(makeBars(1_000_000, 15 * 60_000, 3));
+    expect(subscriptions).toHaveLength(1);
+    const oldGuid = subscriptions[0]!.guid;
+
+    subscriptions[0]!.onReset();
+    // The reload the reset kicked off fails.
+    historyRequests.at(-1)!.onError('boom');
+
+    expect(unsubscribedGuids).toContain(oldGuid);
+    expect(subscriptions).toHaveLength(2);
+  });
+
+  it('does not re-subscribe when a non-reset history load fails', () => {
+    const { datafeed, historyRequests, subscriptions } = createControlledDatafeed();
+    const core = new ChartWidgetCore({ datafeed, symbol: 'BTC', interval: '15' });
+
+    core.initialize();
+    historyRequests[0]!.onError('boom');
+
+    expect(subscriptions).toHaveLength(0);
+  });
+});
+
 describe('ChartWidgetCore data identity', () => {
   it('ignores stale history results after an interval change', () => {
     const { datafeed, historyRequests } = createControlledDatafeed();

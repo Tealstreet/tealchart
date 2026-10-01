@@ -263,6 +263,14 @@ export class TealchartWidget implements ITealchartWebWidget {
   // for the requested market is real data and must render at full strength.
   private _barsMarketKey: string | null = null;
   private _wasLoadingBars = false;
+  /** The value `_symbol` had when `_symbolInfo` was resolved. `ChartWidgetCore`
+   *  carries the same field for the same reason: it is the only exact way to ask
+   *  "does the resolved market still belong to the requested symbol?". Comparing the
+   *  two STRINGS cannot do it — `_symbol` comes from `getCleanSymbol`, which returns
+   *  `parts[1]`, so a three-part symbol (`hyperliquid:xyz:NQ`) yields the MIDDLE
+   *  segment while the ticker's own clean form is the last one. They differ for a
+   *  market that never changed, and no amount of normalising reconciles that. */
+  private _symbolInfoSymbol: string | null = null;
   private _loadBarsRequestId = 0;
   private _resolveSymbolRequestId = 0;
   private _disposed = false;
@@ -665,6 +673,7 @@ export class TealchartWidget implements ITealchartWebWidget {
           return;
         }
         this._symbolInfo = symbolInfo;
+        this._symbolInfoSymbol = this._symbol;
         this._chartApi.setSymbolInfo(symbolInfo);
         this._setResolvedRenderMetadata(symbolInfo);
         // Extract price precision from pricescale (e.g., 100 -> 0.01, 100000 -> 0.00001)
@@ -778,7 +787,12 @@ export class TealchartWidget implements ITealchartWebWidget {
     this._tealScriptManager?.setBars(normalizedBars);
   }
 
-  private _loadBars(): void {
+  /**
+   * @param resubscribeOnError Re-subscribe to bars even if the history load
+   * fails. Only the datafeed's cache-reset callback passes this, and only it
+   * needs to: see the error handler below.
+   */
+  private _loadBars(resubscribeOnError = false): void {
     if (!this._symbolInfo) {
       this._logger?.warn(LogCategory.Datafeed, '_loadBars called but no symbolInfo');
       return;
@@ -786,6 +800,14 @@ export class TealchartWidget implements ITealchartWebWidget {
 
     // Increment request ID to cancel any in-flight requests
     const requestId = ++this._loadBarsRequestId;
+    // ALSO captured, because `_loadBarsRequestId` alone does not supersede a
+    // load started before a `_startDataLoad`: that bumps
+    // `_resolveSymbolRequestId` and only reaches `_loadBars` after an async
+    // `resolveSymbol`, so until then this id still matches and the earlier
+    // request would write its bars and re-subscribe behind the transition.
+    const resolveGeneration = this._resolveSymbolRequestId;
+    const isSuperseded = () =>
+      this._disposed || requestId !== this._loadBarsRequestId || resolveGeneration !== this._resolveSymbolRequestId;
     // A fresh page is a fresh paging state. Leaving these behind stranded the
     // backfill below: a request in flight from the last page never clears its
     // own flag once its response is discarded as stale, and a market that had
@@ -816,7 +838,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       periodParams,
       (bars, _meta) => {
         // Check if this request is still valid (not superseded or disposed)
-        if (this._disposed || requestId !== this._loadBarsRequestId) {
+        if (isSuperseded()) {
           return;
         }
 
@@ -866,7 +888,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       },
       (error) => {
         // Check if this request is still valid
-        if (this._disposed || requestId !== this._loadBarsRequestId) {
+        if (isSuperseded()) {
           return; // Ignore stale error
         }
 
@@ -874,6 +896,30 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._logger?.error(LogCategory.Datafeed, 'Failed to load bars', error);
         this._scheduler.markDirty(DIRTY.FULL); // Re-render to hide loading state
         this._setReady();
+
+        // Re-subscribe even though the history load failed, but ONLY for the
+        // cache-reset caller. `_subscribeToBars` is what calls
+        // `unsubscribeBars(oldGuid)` and registers a FRESH
+        // `onResetCacheNeededCallback`, and the datafeed's reset is one-shot per
+        // subscription: skip it and the old guid keeps `hasResetCache === true`
+        // forever, so every later `forceResetCacheCallbacks()` — the host's
+        // reconnect path — is a silent no-op for this chart and its kline
+        // listener stays bound to the exchange the account reload disposed. A
+        // failed load is exactly when that matters.
+        //
+        // Scoped to that one caller deliberately. The reset callback bails unless
+        // its subscription is still the current one, so the symbol and interval
+        // are unchanged and `_bars` belongs to the market being re-subscribed.
+        // The other callers either null the guid first (so they strand nothing)
+        // or would re-subscribe under a CHANGED symbol — and `_handleNewBar` has
+        // no market-key guard, so the new symbol's ticks would land on the old
+        // symbol's series. `_handleRecoveryNeeded` additionally reaches
+        // `_handleNewBar` without `_triggerRecovery`'s backoff, so re-subscribing
+        // there would retry once per tick, forever, against a venue serving ticks
+        // but failing history.
+        if (resubscribeOnError) {
+          this._subscribeToBars();
+        }
       },
     );
   }
@@ -938,8 +984,18 @@ export class TealchartWidget implements ITealchartWebWidget {
         if (this._disposed || subscriptionGuid !== this._barSubscriptionGuid) {
           return;
         }
-        // Reset cache callback - reload bars
-        this._loadBars();
+        // Reset cache callback - reload bars, and re-subscribe even if that
+        // fails: honouring this callback spends the datafeed's one-shot reset,
+        // so only a fresh `subscribeBars` can re-arm it.
+        //
+        // On the host's reconnect this request IS superseded: the host calls
+        // `forceResetCacheCallbacks()` and then `resetData()`, whose
+        // `_startDataLoad({reason:'reset'})` bumps `_resolveSymbolRequestId` —
+        // which `_loadBars` captures alongside `_loadBarsRequestId` precisely so
+        // this request is discarded while the new resolve is still in flight.
+        // That is why `_startDataLoad` passes the same flag for
+        // `reason === 'reset'`: this call alone does not cover the reconnect.
+        this._loadBars(true);
       },
     );
   }
@@ -1034,7 +1090,16 @@ export class TealchartWidget implements ITealchartWebWidget {
     // Capture current request ID — if symbol/interval changes while this request
     // is in flight, _loadBarsRequestId will be incremented and this callback
     // will be discarded as stale.
+    //
+    // The resolve generation too, for the same reason `_loadBars` captures it: a
+    // `_startDataLoad` bumps `_resolveSymbolRequestId` and only reaches `_loadBars`
+    // after an async `resolveSymbol`, so between those two points this id still
+    // matches and a page response would prepend the PREVIOUS market's history into
+    // `_bars` and could set `_hasMoreHistoricalData = false` for the new one.
     const requestId = this._loadBarsRequestId;
+    const resolveGeneration = this._resolveSymbolRequestId;
+    const isSuperseded = () =>
+      this._disposed || requestId !== this._loadBarsRequestId || resolveGeneration !== this._resolveSymbolRequestId;
 
     const intervalMs = intervalToMs(this._interval);
     const request = resolveLeftHistoryBackfillRequest({
@@ -1058,7 +1123,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       },
       (bars, _meta) => {
         // Discard if widget was disposed or symbol/interval changed
-        if (this._disposed || requestId !== this._loadBarsRequestId) {
+        if (isSuperseded()) {
           this._logger?.debug(LogCategory.Widget, 'Discarded stale loadMoreBars response', { barCount: bars.length });
           return;
         }
@@ -1088,7 +1153,7 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._loadNextLeftHistoryBackfill(hint, previousEarliestBarTime);
       },
       (error) => {
-        if (this._disposed || requestId !== this._loadBarsRequestId) {
+        if (isSuperseded()) {
           return;
         }
         this._isLoadingMoreBars = false;
@@ -2575,6 +2640,7 @@ export class TealchartWidget implements ITealchartWebWidget {
       });
       this._isLoadingBars = false;
       this._scheduler.markDirty(DIRTY.FULL);
+      this._restoreSubscriptionAfterFailedReset(options.reason);
       return;
     }
 
@@ -2590,6 +2656,7 @@ export class TealchartWidget implements ITealchartWebWidget {
           return;
         }
         this._symbolInfo = symbolInfo;
+        this._symbolInfoSymbol = this._symbol;
         this._chartApi.setSymbolInfo(symbolInfo);
         this._setResolvedRenderMetadata(symbolInfo);
         // Update price precision from symbol's pricescale
@@ -2599,7 +2666,14 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._ui?.setRenderOptions(this._renderOptions);
         // Push supported resolutions to UI (may have changed on exchange switch)
         this._ui?.setSupportedResolutions(this._supportedResolutions);
-        this._loadBars();
+        // `reset` is the host's reconnect path, and it arrives here having already
+        // nulled `_barSubscriptionGuid` — so a failed load would leave the chart
+        // with NO subscription: no reset disposer, no kline listener, and no
+        // `DefaultDatafeed` watchdog, since that lives inside `subscribeBars`.
+        // A symbol or interval change must NOT do this: `_symbolInfo` is the new
+        // market while `_bars` is still the old one, and `_handleNewBar` has no
+        // market-key guard.
+        this._loadBars(options.reason === 'reset');
       },
       (error) => {
         if (this._disposed || resolveRequestId !== this._resolveSymbolRequestId) {
@@ -2608,8 +2682,55 @@ export class TealchartWidget implements ITealchartWebWidget {
         this._logger?.error(LogCategory.Datafeed, `Failed to resolve symbol (${options.reason})`, error);
         this._isLoadingBars = false;
         this._scheduler.markDirty(DIRTY.FULL);
+        this._restoreSubscriptionAfterFailedReset(options.reason);
       },
     );
+  }
+
+  /**
+   * A `reset` that fails BEFORE `_loadBars` must still leave the chart
+   * subscribed.
+   *
+   * `_startDataLoad` unsubscribes and nulls `_barSubscriptionGuid` at the top,
+   * so both of its own failure exits — no symbol to resolve, and a
+   * `resolveSymbol` that errors — leave the chart with nothing: no kline
+   * listener, no re-armable one-shot reset, and no `DefaultDatafeed` watchdog,
+   * since that lives inside `subscribeBars`. On a reconnect the replacement
+   * exchange has an empty market list and `resolveSymbol` is exactly what fails,
+   * so this is at least as likely as the getBars failure `_loadBars` covers.
+   *
+   * Only for `reason === 'reset'`. A symbol or interval change has already
+   * written the NEW market into `_symbolInfo` while `_bars` still holds the old
+   * one, and `_handleNewBar` has no market-key guard — re-subscribing there
+   * would append the new symbol's ticks to the old symbol's series. A reset
+   * re-subscribes the same symbol and interval it already had.
+   */
+  private _restoreSubscriptionAfterFailedReset(reason: 'symbol' | 'interval' | 'reset'): void {
+    if (reason !== 'reset' || this._disposed || this._barSubscriptionGuid || !this._symbolInfo) return;
+    // `reason === 'reset'` is not on its own enough, because a reset can land ON TOP
+    // of a symbol change that is still resolving: `setSymbol('ETH')` sets `_symbol`
+    // and starts a resolve, then the host's reconnect calls `resetData()` whose own
+    // resolve fails — and `_symbolInfo` is still BTC. Re-subscribing there binds BTC
+    // ticks under an ETH guid, and `_handleNewBar` has no market-key guard, so they
+    // append to a chart labelled ETH. The symbol must match before anything is bound.
+    // Compared by PROVENANCE, not by string. `_symbolInfoSymbol` is the `_symbol` that
+    // was in hand when this `_symbolInfo` resolved, so an inequality means `_symbol`
+    // has moved on since — which is exactly the case this guard exists for: a reset
+    // landing on top of a symbol change that is still resolving, where `_symbolInfo` is
+    // still the previous market and re-subscribing would bind its ticks under the new
+    // symbol's guid. Comparing the two strings was tried and is unsound in both
+    // directions: `getCleanSymbol` returns `parts[1]`, so a three-part symbol yields the
+    // middle segment while the ticker's clean form yields the last, and the guard then
+    // refused on markets that had not changed at all.
+    if (this._symbolInfoSymbol !== null && this._symbolInfoSymbol !== this._symbol) {
+      this._logger?.warn(LogCategory.Datafeed, 'Reset failed while a symbol change was in flight; not re-subscribing', {
+        resolvedFor: this._symbolInfoSymbol,
+        requested: this._symbol,
+      });
+      return;
+    }
+    this._logger?.warn(LogCategory.Datafeed, 'Reset failed before loading bars; re-subscribing to keep live candles');
+    this._subscribeToBars();
   }
 
   private _handleSymbolChange(symbol: string): void {
