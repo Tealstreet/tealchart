@@ -1,385 +1,49 @@
 {
   "artifact": "Capture UI notes v3",
   "instructions": "One record per attempt. Operator/agent records observed live cutoff and notes/evidence only; postprocessor derives file data. Do not fill unknown fields by guessing. chart_unchanged_attested is true only after following setup/reset procedure. Preserve all attempts; choose selected_attempts explicitly for duplicates.",
-  "selected_attempts": {},
+  "selected_attempts": {
+    "primitives-sma-stdev-v1.pine": 2,
+    "coverage-register-ta-1-v1.pine": 1,
+    "warmup-seed-ma-v2.pine": 1,
+    "mfi-flat-flows-v2.pine": 1,
+    "coverage-ta-2-v1.pine": 1,
+    "coverage-ta-3-v1.pine": 1,
+    "coverage-tad-1-v1.pine": 1,
+    "coverage-ta-1-v1.pine": 1,
+    "coverage-tab-1-v1.pine": 1,
+    "coverage-history-na-1-v1.pine": 1,
+    "coverage-math-1-v1.pine": 2,
+    "coverage-math-2-v1.pine": 1,
+    "coverage-request-1-v1.pine": 1,
+    "coverage-req-1-v1.pine": 1,
+    "coverage-collections-1-v1.pine": 1,
+    "coverage-collections-2-v1.pine": 1,
+    "coverage-plot-1-v1.pine": 1,
+    "conflicts-batch-1-v1.pine": 1,
+    "conflicts-batch-2-v1.pine": 1,
+    "coverage-ta-4-v1.pine": 1,
+    "coverage-matrix-1-v1.pine": 1,
+    "coverage-drawing-1-v1.pine": 1,
+    "coverage-drawing-3-v1.pine": 1,
+    "coverage-drawing-4-v1.pine": 1
+  },
   "attempts": [
     {
       "probe": "primitives-sma-stdev-v1.pine",
       "attempt": 1,
       "csv_file": "primitives-sma-stdev-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
+      "live_cutoff_unix_seconds": 1791029760,
+      "live_bar_open_utc": "2026-10-03T12:16:00Z",
       "captured_at_utc": null,
-      "reset_at_utc": null,
+      "reset_at_utc": "2026-10-03T12:17:30.495Z",
       "chart_unchanged_attested": false,
-      "notes": "",
+      "notes": "Live candle changed from 12:16 to 12:18 between tooltip observation and download; retained attempt is uncertain and will be recaptured. Screenshot filePath writes were rejected by MCP workspace configuration; screenshots absent for this attempt.",
       "evidence_paths": [],
       "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-register-ta-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-register-ta-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "warmup-seed-ma-v2.pine",
-      "attempt": 1,
-      "csv_file": "warmup-seed-ma-v2.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "mfi-flat-flows-v2.pine",
-      "attempt": 1,
-      "csv_file": "mfi-flat-flows-v2.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-ta-2-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-ta-2-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-ta-3-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-ta-3-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-tad-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-tad-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-ta-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-ta-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-tab-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-tab-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-history-na-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-history-na-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-math-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-math-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-math-2-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-math-2-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-request-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-request-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-req-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-req-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-collections-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-collections-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-collections-2-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-collections-2-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-strings-color-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-strings-color-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-plot-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-plot-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "conflicts-batch-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-2-v1.pine",
-      "attempt": 1,
-      "csv_file": "conflicts-batch-2-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-ta-4-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-ta-4-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-time-2-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-time-2-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-matrix-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-matrix-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-drawing-1-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-drawing-1-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-drawing-2-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-drawing-2-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-drawing-3-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-drawing-3-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "coverage-drawing-4-v1.pine",
-      "attempt": 1,
-      "csv_file": "coverage-drawing-4-v1.csv",
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
+      "input_changes": [],
+      "runtime": {
+        "status": "RUNS"
+      }
     },
     {
       "probe": "conflicts-batch-3-v1.pine",
@@ -730,6 +394,849 @@
       "evidence_paths": [],
       "column_map": {},
       "input_changes": []
+    },
+    {
+      "probe": "primitives-sma-stdev-v1.pine",
+      "attempt": 2,
+      "csv_file": "primitives-sma-stdev-v1-attempt2.csv",
+      "live_cutoff_unix_seconds": 1791030120,
+      "live_bar_open_utc": "2026-10-03T12:22:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:22",
+      "captured_at_utc": "2026-10-03T12:22:58.308Z",
+      "reset_at_utc": "2026-10-03T12:22:51.349Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/primitives-sma-stdev-v1-attempt2-setup.png",
+        "evidence/primitives-sma-stdev-v1-attempt2-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (14).csv",
+      "raw_sha256": "76cbb2ed98c18d43a0e41a5e8854b45250a158e3fb5452dffbe207d7168872a1",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-register-ta-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-register-ta-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030240,
+      "live_bar_open_utc": "2026-10-03T12:24:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:24",
+      "captured_at_utc": "2026-10-03T12:24:39.851Z",
+      "reset_at_utc": "2026-10-03T12:24:33.727Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-register-ta-1-v1-attempt1-setup.png",
+        "evidence/coverage-register-ta-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (15).csv",
+      "raw_sha256": "d950bf08e4ca9940da9f19ef6ad30499cf3f508ecb15c98c24c9c73fa0fc6bc3",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "warmup-seed-ma-v2.pine",
+      "attempt": 1,
+      "csv_file": "warmup-seed-ma-v2.csv",
+      "live_cutoff_unix_seconds": 1791030240,
+      "live_bar_open_utc": "2026-10-03T12:24:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:24",
+      "captured_at_utc": "2026-10-03T12:25:19.962Z",
+      "reset_at_utc": "2026-10-03T12:25:13.923Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/warmup-seed-ma-v2-attempt1-setup.png",
+        "evidence/warmup-seed-ma-v2-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (16).csv",
+      "raw_sha256": "64cdc6fc06cc64d0ee2a48210418d55a37a9fa247492d8451335239f6ebf92f0",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "mfi-flat-flows-v2.pine",
+      "attempt": 1,
+      "csv_file": "mfi-flat-flows-v2.csv",
+      "live_cutoff_unix_seconds": 1791030360,
+      "live_bar_open_utc": "2026-10-03T12:26:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:26",
+      "captured_at_utc": "2026-10-03T12:26:12.259Z",
+      "reset_at_utc": "2026-10-03T12:26:05.971Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/mfi-flat-flows-v2-attempt1-setup.png",
+        "evidence/mfi-flat-flows-v2-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (17).csv",
+      "raw_sha256": "1703b21bafbc92c67f2afbd3fa9c9803c97a1ed63ffe2d1ecdc82636150d42e8",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-ta-2-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-ta-2-v1.csv",
+      "live_cutoff_unix_seconds": 1791030360,
+      "live_bar_open_utc": "2026-10-03T12:26:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:26",
+      "captured_at_utc": "2026-10-03T12:26:41.125Z",
+      "reset_at_utc": "2026-10-03T12:26:33.838Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-ta-2-v1-attempt1-setup.png",
+        "evidence/coverage-ta-2-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (18).csv",
+      "raw_sha256": "63d6162eeca68ad27852c1de1ccf7c512f3fea7c3cad13b5c760e33ec36a9b8d",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-ta-3-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-ta-3-v1.csv",
+      "live_cutoff_unix_seconds": 1791030360,
+      "live_bar_open_utc": "2026-10-03T12:26:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:26",
+      "captured_at_utc": "2026-10-03T12:27:13.832Z",
+      "reset_at_utc": "2026-10-03T12:27:06.637Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-ta-3-v1-attempt1-setup.png",
+        "evidence/coverage-ta-3-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (19).csv",
+      "raw_sha256": "900b9f3fe5a8c8fcd4f73ce9062f4fced2d087dafaefb02754a7456c027d94fd",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-tad-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-tad-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030480,
+      "live_bar_open_utc": "2026-10-03T12:28:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:28",
+      "captured_at_utc": "2026-10-03T12:28:22.618Z",
+      "reset_at_utc": "2026-10-03T12:28:15.257Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-tad-1-v1-attempt1-setup.png",
+        "evidence/coverage-tad-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (20).csv",
+      "raw_sha256": "4a39f0c1c717a12c63c917d6b98da51303e12b9ca3019a6087fca8d70c2fdce5",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-ta-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-ta-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030480,
+      "live_bar_open_utc": "2026-10-03T12:28:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:28",
+      "captured_at_utc": "2026-10-03T12:28:56.143Z",
+      "reset_at_utc": "2026-10-03T12:28:45.969Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-ta-1-v1-attempt1-setup.png",
+        "evidence/coverage-ta-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (21).csv",
+      "raw_sha256": "9ac3693e2fe77eda33b90b5d334914800f80a8255209f0e3fb486ffae9dba538",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-tab-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-tab-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030600,
+      "live_bar_open_utc": "2026-10-03T12:30:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:30",
+      "captured_at_utc": "2026-10-03T12:30:10.781Z",
+      "reset_at_utc": "2026-10-03T12:30:00.689Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-tab-1-v1-attempt1-setup.png",
+        "evidence/coverage-tab-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (22).csv",
+      "raw_sha256": "a1c5830fe34d2749e75961702255d0d51dcf79655750536b940a637c0302e4bb",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-history-na-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-history-na-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030600,
+      "live_bar_open_utc": "2026-10-03T12:30:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:30",
+      "captured_at_utc": "2026-10-03T12:30:50.284Z",
+      "reset_at_utc": "2026-10-03T12:30:43.921Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-history-na-1-v1-attempt1-setup.png",
+        "evidence/coverage-history-na-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (23).csv",
+      "raw_sha256": "ec49cc97cc908971ac12a3a6fb9df0ed3f63a77e11cb79ded007c03819cb7689",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-math-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-math-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030600,
+      "live_bar_open_utc": "2026-10-03T12:30:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:30",
+      "captured_at_utc": "2026-10-03T12:31:49.291Z",
+      "reset_at_utc": "2026-10-03T12:31:42.850Z",
+      "chart_unchanged_attested": false,
+      "runtime": {
+        "status": "CAPTURE-MISMATCH",
+        "actual_indicator_title": "Extrema barsago oracle v1"
+      },
+      "notes": "MCP transport restart interrupted browser reload/restore. Capture contained the older saved Extrema barsago oracle v1, not the intended math probe. Rejected by supplied mapped-field check and retained as failed capture evidence. Recapture required.",
+      "evidence_paths": [
+        "evidence/coverage-math-1-v1-attempt1-setup.png",
+        "evidence/coverage-math-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (24).csv",
+      "raw_sha256": "48cce9d54602f654c56fa289cca46d7ce7fc90d95367ea2993681d9b0a4315c9",
+      "source_identity_verified": false
+    },
+    {
+      "probe": "coverage-math-1-v1.pine",
+      "attempt": 2,
+      "csv_file": "coverage-math-1-v1-attempt2.csv",
+      "live_cutoff_unix_seconds": 1791030720,
+      "live_bar_open_utc": "2026-10-03T12:32:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:32",
+      "captured_at_utc": "2026-10-03T12:33:05.416Z",
+      "reset_at_utc": "2026-10-03T12:32:56.938Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-math-1-v1-attempt2-setup.png",
+        "evidence/coverage-math-1-v1-attempt2-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (25).csv",
+      "raw_sha256": "0914d422c185c46f1a15cac447517c84e456c7fca70afab9728dd706f72b2a42",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-math-2-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-math-2-v1.csv",
+      "live_cutoff_unix_seconds": 1791030720,
+      "live_bar_open_utc": "2026-10-03T12:32:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:32",
+      "captured_at_utc": "2026-10-03T12:33:56.180Z",
+      "reset_at_utc": "2026-10-03T12:33:48.927Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-math-2-v1-attempt1-setup.png",
+        "evidence/coverage-math-2-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (26).csv",
+      "raw_sha256": "97c4200000613096a7a3d5a9ba6850cb8e42bc615cf559b77006be5adf8b37a3",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-request-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-request-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030840,
+      "live_bar_open_utc": "2026-10-03T12:34:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:34",
+      "captured_at_utc": "2026-10-03T12:35:22.081Z",
+      "reset_at_utc": "2026-10-03T12:35:14.664Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-request-1-v1-attempt1-setup.png",
+        "evidence/coverage-request-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "native_contexts_available": {
+        "1m": "TRUNCATED; original requested start/index unknown",
+        "6m": "NATIVE history clipped to requested index0/time control"
+      },
+      "native_context_evidence": "coverage-request-1-v1.contexts-v2.json",
+      "browser_download": "BINANCE_BTCUSDT, 2 (27).csv",
+      "raw_sha256": "64c774a34318316b84c39d53b91f9fd9055e077872f51f46ff4f2d8bb6dc3ce7",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-req-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791030960,
+      "live_bar_open_utc": "2026-10-03T12:36:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:36",
+      "captured_at_utc": "2026-10-03T12:36:06.577Z",
+      "reset_at_utc": "2026-10-03T12:36:00.071Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged. Native CSV has duplicate time/open/high/low/close headers (chart columns followed by plot columns). Supplied postprocessor rejects duplicate headers; raw export preserved unchanged. Native chart time is column0 UNIX seconds; plotted time is column10 milliseconds. No replay-readiness claim. Raw CSV repeats native time/OHLC header names in plotted fields. Supplied postprocessor rejects duplicate headers; positional parsing is required. No FILE-READY claim.",
+      "evidence_paths": [
+        "evidence/coverage-req-1-v1-attempt1-setup.png",
+        "evidence/coverage-req-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close",
+        "volume": "volume"
+      },
+      "native_contexts_available": {
+        "1m": "TRUNCATED; original requested start/index unknown",
+        "6m": "NATIVE history clipped to requested index0/time control"
+      },
+      "native_context_evidence": "coverage-req-1-v1.contexts-v2.json",
+      "browser_download": "BINANCE_BTCUSDT, 2 (28).csv",
+      "raw_sha256": "aaf19d357c546176d47de58eb940c1bee994251df843f8dad7e353bae4beb493",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-collections-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-collections-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791031080,
+      "live_bar_open_utc": "2026-10-03T12:38:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:38",
+      "captured_at_utc": "2026-10-03T12:39:41.124Z",
+      "reset_at_utc": "2026-10-03T12:39:34.438Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-collections-1-v1-attempt1-setup.png",
+        "evidence/coverage-collections-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (29).csv",
+      "raw_sha256": "c84e1824a9c0eb85d500736381211808685d6b3eab406630d28c52768c425e49",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-collections-2-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-collections-2-v1.csv",
+      "live_cutoff_unix_seconds": 1791031200,
+      "live_bar_open_utc": "2026-10-03T12:40:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:40",
+      "captured_at_utc": "2026-10-03T12:40:24.465Z",
+      "reset_at_utc": "2026-10-03T12:40:18.271Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-collections-2-v1-attempt1-setup.png",
+        "evidence/coverage-collections-2-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (30).csv",
+      "raw_sha256": "bc1b3d1395730dab05bccffed34f0e23cac482df9d5e7f3c240f971900cee21d",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-strings-color-1-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T12:41:52.543Z",
+      "reset_at_utc": "2026-10-03T12:41:00.363Z",
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "timestamp(s): unrecognized datetime format",
+          "editorError": {
+            "code": "CE10275",
+            "end": {
+              "column": 48,
+              "line": 78
+            },
+            "message": "timestamp(s): unrecognized datetime format",
+            "start": {
+              "column": 27,
+              "line": 78
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-strings-color-1-v1-attempt1-error.txt",
+        "evidence/coverage-strings-color-1-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-plot-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-plot-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791031320,
+      "live_bar_open_utc": "2026-10-03T12:42:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:42",
+      "captured_at_utc": "2026-10-03T12:43:48.563Z",
+      "reset_at_utc": "2026-10-03T12:42:28.522Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-plot-1-v1-attempt1-setup.png",
+        "evidence/coverage-plot-1-v1-attempt1-export.png",
+        "evidence/coverage-plot-1-v1-attempt1-data-window-controls.png",
+        "evidence/coverage-plot-1-v1-attempt1-data-window-ohlc.png",
+        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json"
+      ],
+      "input_changes": [],
+      "column_map": {
+        "plotbar_constant_actual (Open)": {
+          "title": "plotbar_constant_actual",
+          "channel": "open"
+        },
+        "plotbar_constant_actual (High": {
+          "title": "plotbar_constant_actual",
+          "channel": "high"
+        },
+        "plotbar_constant_actual (Low)": {
+          "title": "plotbar_constant_actual",
+          "channel": "low"
+        },
+        "plotbar_constant_actual (Close)": {
+          "title": "plotbar_constant_actual",
+          "channel": "close"
+        },
+        "plotbar_dynamic_actual (Open)": {
+          "title": "plotbar_dynamic_actual",
+          "channel": "open"
+        },
+        "plotbar_dynamic_actual (High": {
+          "title": "plotbar_dynamic_actual",
+          "channel": "high"
+        },
+        "plotbar_dynamic_actual (Low)": {
+          "title": "plotbar_dynamic_actual",
+          "channel": "low"
+        },
+        "plotbar_dynamic_actual (Close)": {
+          "title": "plotbar_dynamic_actual",
+          "channel": "close"
+        },
+        "plotcandle_constant_actual (Open)": {
+          "title": "plotcandle_constant_actual",
+          "channel": "open"
+        },
+        "plotcandle_constant_actual (High": {
+          "title": "plotcandle_constant_actual",
+          "channel": "high"
+        },
+        "plotcandle_constant_actual (Low)": {
+          "title": "plotcandle_constant_actual",
+          "channel": "low"
+        },
+        "plotcandle_constant_actual (Close)": {
+          "title": "plotcandle_constant_actual",
+          "channel": "close"
+        },
+        "plotcandle_dynamic_actual (Open)": {
+          "title": "plotcandle_dynamic_actual",
+          "channel": "open"
+        },
+        "plotcandle_dynamic_actual (High": {
+          "title": "plotcandle_dynamic_actual",
+          "channel": "high"
+        },
+        "plotcandle_dynamic_actual (Low)": {
+          "title": "plotcandle_dynamic_actual",
+          "channel": "low"
+        },
+        "plotcandle_dynamic_actual (Close)": {
+          "title": "plotcandle_dynamic_actual",
+          "channel": "close"
+        }
+      },
+      "ohlc_channel_mapping": "Explicit native CSV header channel names (Open/High/Low/Close), corroborated by native metainfo ohlc_open/high/low/close and finite witness. No positional or normalization inference. Data Window repeats titles without channel names; that UI labelling limitation remains.",
+      "witness": {
+        "pine_bar_index": 24134,
+        "input_case_mod11": 0,
+        "time_unix_seconds": 1791030480
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (31).csv",
+      "raw_sha256": "848660dc5530fa1b6df1a2156b687ed8ca9e0e028573b1da2debca5dfcfd8f19",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "conflicts-batch-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791031560,
+      "live_bar_open_utc": "2026-10-03T12:46:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:46",
+      "captured_at_utc": "2026-10-03T12:47:44.094Z",
+      "reset_at_utc": "2026-10-03T12:46:23.878Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-1-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-1-v1-attempt1-export.png",
+        "evidence/conflicts-batch-1-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-1-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-1-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-1-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-1-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-1-v1-attempt1-logs.png"
+        ],
+        "entries": 243,
+        "last_message_time_ms": 1791031658405.314,
+        "last_bar_time_ms": 1791031560000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (32).csv",
+      "raw_sha256": "233aa47cd64ae49423ba2aadb55d1762f3ebf4df96f9d52f5c96737a8d09026f",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "conflicts-batch-2-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-2-v1.csv",
+      "live_cutoff_unix_seconds": 1791031680,
+      "live_bar_open_utc": "2026-10-03T12:48:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:48",
+      "captured_at_utc": "2026-10-03T12:48:30.024Z",
+      "reset_at_utc": "2026-10-03T12:48:22.076Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-2-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-2-v1-attempt1-export.png",
+        "evidence/conflicts-batch-2-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-2-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-2-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-2-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-2-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-2-v1-attempt1-logs.png"
+        ],
+        "entries": 4,
+        "last_message_time_ms": 1791031704585.023,
+        "last_bar_time_ms": 1791031680000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (33).csv",
+      "raw_sha256": "35d87ca506de4cd153198a4be5abcb7dd8e1312dc1e2092facb5b311ff337a14",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-ta-4-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-ta-4-v1.csv",
+      "live_cutoff_unix_seconds": 1791031800,
+      "live_bar_open_utc": "2026-10-03T12:50:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:50",
+      "captured_at_utc": "2026-10-03T12:51:46.991Z",
+      "reset_at_utc": "2026-10-03T12:51:38.814Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-ta-4-v1-attempt1-setup.png",
+        "evidence/coverage-ta-4-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (34).csv",
+      "raw_sha256": "e2853d53e3dd67e95eb198995f077cc09c921709febfe199fb536ba9df3a6456",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-time-2-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T12:52:41.626Z",
+      "reset_at_utc": "2026-10-03T12:52:38.599Z",
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "{message}",
+          "editorError": {
+            "code": "CE10294",
+            "ctx": {
+              "message": "resolution.trim is not a function"
+            },
+            "end": {
+              "column": 53,
+              "line": 33
+            },
+            "message": "{message}",
+            "start": {
+              "column": 6,
+              "line": 33
+            },
+            "id": "USER;bf676dc519dd4750aca182f1b122e7cd"
+          },
+          "title": "Compilation error"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-time-2-v1-attempt1-error.txt",
+        "evidence/coverage-time-2-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-matrix-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-matrix-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791031920,
+      "live_bar_open_utc": "2026-10-03T12:52:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:52",
+      "captured_at_utc": "2026-10-03T12:53:13.242Z",
+      "reset_at_utc": "2026-10-03T12:53:05.841Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-matrix-1-v1-attempt1-setup.png",
+        "evidence/coverage-matrix-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (35).csv",
+      "raw_sha256": "d27e7f8fd85ae9027b4fa5efb04e2d6ae24d820d3f14c08af54a67803c68967f",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-drawing-1-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-drawing-1-v1.csv",
+      "live_cutoff_unix_seconds": 1791032040,
+      "live_bar_open_utc": "2026-10-03T12:54:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:54",
+      "captured_at_utc": "2026-10-03T12:54:13.357Z",
+      "reset_at_utc": "2026-10-03T12:54:06.122Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged. Raw CSV repeats native time/OHLC header names in plotted fields. Supplied postprocessor rejects duplicate headers; positional parsing is required. No FILE-READY claim.",
+      "evidence_paths": [
+        "evidence/coverage-drawing-1-v1-attempt1-setup.png",
+        "evidence/coverage-drawing-1-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (36).csv",
+      "raw_sha256": "4216da84ca12bced1df20b8541795a207c30054f50444c11dd2c04f2cc4be4b7",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-drawing-2-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T12:55:19.600Z",
+      "reset_at_utc": "2026-10-03T12:55:16.696Z",
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "expr0",
+              "argUserFriendlyRepresentation": "call \"array.get\" (series linefill)",
+              "argumentType": "series linefill",
+              "currentTypeDocStr": "simple string",
+              "funId": "operator ==",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 89,
+              "line": 78
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 37,
+              "line": 78
+            },
+            "id": "USER;74d844c6a9be4095a3c121930db75b40"
+          },
+          "title": "Compilation error"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-drawing-2-v1-attempt1-error.txt",
+        "evidence/coverage-drawing-2-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-drawing-3-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-drawing-3-v1.csv",
+      "live_cutoff_unix_seconds": 1791032040,
+      "live_bar_open_utc": "2026-10-03T12:54:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:54",
+      "captured_at_utc": "2026-10-03T12:55:59.125Z",
+      "reset_at_utc": "2026-10-03T12:55:52.208Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-drawing-3-v1-attempt1-setup.png",
+        "evidence/coverage-drawing-3-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (37).csv",
+      "raw_sha256": "03e32f3e79fcaacfb15bc4057fbbe194d4c8b18192bcf6ff467c7f6bb5b6feb9",
+      "source_identity_verified": true
+    },
+    {
+      "probe": "coverage-drawing-4-v1.pine",
+      "attempt": 1,
+      "csv_file": "coverage-drawing-4-v1.csv",
+      "live_cutoff_unix_seconds": 1791032160,
+      "live_bar_open_utc": "2026-10-03T12:56:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   12:56",
+      "captured_at_utc": "2026-10-03T12:57:10.571Z",
+      "reset_at_utc": "2026-10-03T12:57:03.304Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/coverage-drawing-4-v1-attempt1-setup.png",
+        "evidence/coverage-drawing-4-v1-attempt1-export.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "browser_download": "BINANCE_BTCUSDT, 2 (38).csv",
+      "raw_sha256": "18b5f1f7c46fb48c9bc1fe526f74842c75490ddb26d9420af9fe012ac7f6e33b",
+      "source_identity_verified": true
     }
-  ]
+  ],
+  "batch_start_utc": "2026-10-03T12:13:14.087265+00:00",
+  "numeric_batch_end_utc": "2026-10-03T12:59:16.520217+00:00"
 }

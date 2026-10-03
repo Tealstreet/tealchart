@@ -1,0 +1,26 @@
+Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "expr0",
+      "argUserFriendlyRepresentation": "call \"array.get\" (series linefill)",
+      "argumentType": "series linefill",
+      "currentTypeDocStr": "simple string",
+      "funId": "operator ==",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 89,
+      "line": 78
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 37,
+      "line": 78
+    },
+    "id": "USER;74d844c6a9be4095a3c121930db75b40"
+  },
+  "title": "Compilation error"
+}

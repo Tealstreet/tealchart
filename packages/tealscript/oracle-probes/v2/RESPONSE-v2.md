@@ -1,19 +1,53 @@
-# TradingView capture response v2
+# TradingView numeric capture response v2
 
-Bundle revision v3. Fill this response; leave HANDOFF-v2.md unchanged.
+Bundle revision v3, source master `8f95734802`. All 27 numeric sources attempted unchanged. The 25 isolated outcome scripts follow in `RESPONSE-v3.md`; they are not yet captured in this checkpoint.
 
-Batch start/end UTC: 
+Batch UTC: 2026-10-03T12:13:14.087265+00:00 to 2026-10-03T12:59:16.520217+00:00.
 
-|Probe/attempt|CSV or outcome path|Export UTC|Reset UTC|Observed live open/cutoff|Setup/defaults unchanged|Evidence/gaps|
-|---|---|---|---|---|---|---|
+22 numeric exports are FILE-READY under the supplied postprocessor. Two additional numeric exports run but have duplicate native/plot headers that the processor rejects. Three probes are COMPILE-ERROR. FILE-READY is file validation, not an A/B parity claim.
 
-Manifest: captures/v2/manifest-v2.json (postprocess-v2.py)
-UI notes: captures/v2/capture-notes-v3.json
-Outcomes: captures/v2/outcomes-v2.json
-Evidence: captures/v2/evidence/<probe>-attempt<N>-<kind>.<ext>
+| Probe / attempt | CSV or error evidence | Export UTC | Reset UTC | Observed live open UTC | Status / gaps |
+|---|---|---|---|---|---|
+| primitives-sma-stdev-v1.pine / 1 | [capture](captures/v2/primitives-sma-stdev-v1.csv) | unknown | 2026-10-03T12:17:30.495Z | 2026-10-03T12:16:00Z | NEEDS-EVIDENCE — Chart setup/reset unchanged attestation missing |
+| primitives-sma-stdev-v1.pine / 2 | [capture](captures/v2/primitives-sma-stdev-v1-attempt2.csv) | 2026-10-03T12:22:58.308Z | 2026-10-03T12:22:51.349Z | 2026-10-03T12:22:00.000Z | FILE-READY |
+| coverage-register-ta-1-v1.pine / 1 | [capture](captures/v2/coverage-register-ta-1-v1.csv) | 2026-10-03T12:24:39.851Z | 2026-10-03T12:24:33.727Z | 2026-10-03T12:24:00.000Z | FILE-READY |
+| warmup-seed-ma-v2.pine / 1 | [capture](captures/v2/warmup-seed-ma-v2.csv) | 2026-10-03T12:25:19.962Z | 2026-10-03T12:25:13.923Z | 2026-10-03T12:24:00.000Z | FILE-READY |
+| mfi-flat-flows-v2.pine / 1 | [capture](captures/v2/mfi-flat-flows-v2.csv) | 2026-10-03T12:26:12.259Z | 2026-10-03T12:26:05.971Z | 2026-10-03T12:26:00.000Z | FILE-READY |
+| coverage-ta-2-v1.pine / 1 | [capture](captures/v2/coverage-ta-2-v1.csv) | 2026-10-03T12:26:41.125Z | 2026-10-03T12:26:33.838Z | 2026-10-03T12:26:00.000Z | FILE-READY |
+| coverage-ta-3-v1.pine / 1 | [capture](captures/v2/coverage-ta-3-v1.csv) | 2026-10-03T12:27:13.832Z | 2026-10-03T12:27:06.637Z | 2026-10-03T12:26:00.000Z | FILE-READY |
+| coverage-tad-1-v1.pine / 1 | [capture](captures/v2/coverage-tad-1-v1.csv) | 2026-10-03T12:28:22.618Z | 2026-10-03T12:28:15.257Z | 2026-10-03T12:28:00.000Z | FILE-READY |
+| coverage-ta-1-v1.pine / 1 | [capture](captures/v2/coverage-ta-1-v1.csv) | 2026-10-03T12:28:56.143Z | 2026-10-03T12:28:45.969Z | 2026-10-03T12:28:00.000Z | FILE-READY |
+| coverage-tab-1-v1.pine / 1 | [capture](captures/v2/coverage-tab-1-v1.csv) | 2026-10-03T12:30:10.781Z | 2026-10-03T12:30:00.689Z | 2026-10-03T12:30:00.000Z | FILE-READY |
+| coverage-history-na-1-v1.pine / 1 | [capture](captures/v2/coverage-history-na-1-v1.csv) | 2026-10-03T12:30:50.284Z | 2026-10-03T12:30:43.921Z | 2026-10-03T12:30:00.000Z | FILE-READY |
+| coverage-math-1-v1.pine / 1 | [capture](captures/v2/coverage-math-1-v1.csv) | 2026-10-03T12:31:49.291Z | 2026-10-03T12:31:42.850Z | 2026-10-03T12:30:00.000Z | NEEDS-EVIDENCE — Missing mapped output columns: [{'title': 'input_time'}, {'title': 'abs_clean'}, {'title': 'abs_hole97'}, {'title': 'abs_warm0_7'}, {'title': 'sign_clean'}, {'title': 'sign_hole97'}, {'title': 'sign_warm0_7'}, {'title': 'ceil_clean'}, {'title': 'ceil_hole97'}, {'title': 'ceil_warm0_7'}, {'title': 'floor_clean'}, {'title': 'floor_hole97'}, {'title': 'floor_warm0_7'}, {'title': 'round_clean'}, {'title': 'round_hole97'}, {'title': 'round_warm0_7'}, {'title': 'round_to_mintick_clean'}, {'title': 'round_to_mintick_hole97'}, {'title': 'round_to_mintick_warm0_7'}, {'title': 'sqrt_clean'}, {'title': 'sqrt_hole97'}, {'title': 'sqrt_warm0_7'}, {'title': 'pow_clean'}, {'title': 'pow_hole97'}, {'title': 'pow_warm0_7'}, {'title': 'log_clean'}, {'title': 'log_hole97'}, {'title': 'log_warm0_7'}, {'title': 'log10_clean'}, {'title': 'log10_hole97'}, {'title': 'log10_warm0_7'}, {'title': 'exp_clean'}, {'title': 'exp_hole97'}, {'title': 'exp_warm0_7'}, {'title': 'sin_clean'}, {'title': 'sin_hole97'}, {'title': 'sin_warm0_7'}, {'title': 'cos_clean'}, {'title': 'cos_hole97'}, {'title': 'cos_warm0_7'}, {'title': 'tan_clean'}, {'title': 'tan_hole97'}, {'title': 'tan_warm0_7'}, {'title': 'asin_clean'}, {'title': 'asin_hole97'}, {'title': 'asin_warm0_7'}, {'title': 'acos_clean'}, {'title': 'acos_hole97'}, {'title': 'acos_warm0_7'}, {'title': 'atan_clean'}, {'title': 'atan_hole97'}, {'title': 'atan_warm0_7'}, {'title': 'sqrt_pow_control_delta'}, {'title': 'round_floor_control_delta'}]; Chart setup/reset unchanged attestation missing; Run status missing or not RUNS; failed/partial evidence is not FILE-READY |
+| coverage-math-1-v1.pine / 2 | [capture](captures/v2/coverage-math-1-v1-attempt2.csv) | 2026-10-03T12:33:05.416Z | 2026-10-03T12:32:56.938Z | 2026-10-03T12:32:00.000Z | FILE-READY |
+| coverage-math-2-v1.pine / 1 | [capture](captures/v2/coverage-math-2-v1.csv) | 2026-10-03T12:33:56.180Z | 2026-10-03T12:33:48.927Z | 2026-10-03T12:32:00.000Z | FILE-READY |
+| coverage-request-1-v1.pine / 1 | [capture](captures/v2/coverage-request-1-v1.csv) | 2026-10-03T12:35:22.081Z | 2026-10-03T12:35:14.664Z | 2026-10-03T12:34:00.000Z | FILE-READY — ; native 1m prefix unavailable |
+| coverage-req-1-v1.pine / 1 | [capture](captures/v2/coverage-req-1-v1.csv) | 2026-10-03T12:36:06.577Z | 2026-10-03T12:36:00.071Z | 2026-10-03T12:36:00.000Z | RUNS — Duplicate native/plot headers; native 1m prefix unavailable |
+| coverage-collections-1-v1.pine / 1 | [capture](captures/v2/coverage-collections-1-v1.csv) | 2026-10-03T12:39:41.124Z | 2026-10-03T12:39:34.438Z | 2026-10-03T12:38:00.000Z | FILE-READY |
+| coverage-collections-2-v1.pine / 1 | [capture](captures/v2/coverage-collections-2-v1.csv) | 2026-10-03T12:40:24.465Z | 2026-10-03T12:40:18.271Z | 2026-10-03T12:40:00.000Z | FILE-READY |
+| coverage-strings-color-1-v1.pine / 1 | [capture](captures/v2/evidence/coverage-strings-color-1-v1-attempt1-error.txt) | 2026-10-03T12:41:52.543Z | 2026-10-03T12:41:00.363Z | unknown | COMPILE-ERROR — timestamp(s): unrecognized datetime format |
+| coverage-plot-1-v1.pine / 1 | [capture](captures/v2/coverage-plot-1-v1.csv) | 2026-10-03T12:43:48.563Z | 2026-10-03T12:42:28.522Z | 2026-10-03T12:42:00.000Z | FILE-READY |
+| conflicts-batch-1-v1.pine / 1 | [capture](captures/v2/conflicts-batch-1-v1.csv) | 2026-10-03T12:47:44.094Z | 2026-10-03T12:46:23.878Z | 2026-10-03T12:46:00.000Z | FILE-READY |
+| conflicts-batch-2-v1.pine / 1 | [capture](captures/v2/conflicts-batch-2-v1.csv) | 2026-10-03T12:48:30.024Z | 2026-10-03T12:48:22.076Z | 2026-10-03T12:48:00.000Z | FILE-READY |
+| coverage-ta-4-v1.pine / 1 | [capture](captures/v2/coverage-ta-4-v1.csv) | 2026-10-03T12:51:46.991Z | 2026-10-03T12:51:38.814Z | 2026-10-03T12:50:00.000Z | FILE-READY |
+| coverage-time-2-v1.pine / 1 | [capture](captures/v2/evidence/coverage-time-2-v1-attempt1-error.txt) | 2026-10-03T12:52:41.626Z | 2026-10-03T12:52:38.599Z | unknown | COMPILE-ERROR — {message} |
+| coverage-matrix-1-v1.pine / 1 | [capture](captures/v2/coverage-matrix-1-v1.csv) | 2026-10-03T12:53:13.242Z | 2026-10-03T12:53:05.841Z | 2026-10-03T12:52:00.000Z | FILE-READY |
+| coverage-drawing-1-v1.pine / 1 | [capture](captures/v2/coverage-drawing-1-v1.csv) | 2026-10-03T12:54:13.357Z | 2026-10-03T12:54:06.122Z | 2026-10-03T12:54:00.000Z | RUNS — Duplicate native/plot headers |
+| coverage-drawing-2-v1.pine / 1 | [capture](captures/v2/evidence/coverage-drawing-2-v1-attempt1-error.txt) | 2026-10-03T12:55:19.600Z | 2026-10-03T12:55:16.696Z | unknown | COMPILE-ERROR — Cannot call "{funId}" with argument "{argDisplayName}"="{argUserFriendlyRepresentation}". An argument of "{argumentType}" type was used but a "{currentTypeDocStr}" {typePostfix} is expected. |
+| coverage-drawing-3-v1.pine / 1 | [capture](captures/v2/coverage-drawing-3-v1.csv) | 2026-10-03T12:55:59.125Z | 2026-10-03T12:55:52.208Z | 2026-10-03T12:54:00.000Z | FILE-READY |
+| coverage-drawing-4-v1.pine / 1 | [capture](captures/v2/coverage-drawing-4-v1.csv) | 2026-10-03T12:57:10.571Z | 2026-10-03T12:57:03.304Z | 2026-10-03T12:56:00.000Z | FILE-READY |
 
-Exact errors: include phase, full text, line/call/argument, failing bar and screenshot path.
+The first SMA attempt crossed a live candle boundary and has no saved screenshots because MCP filePath writes were rejected. The second attempt is selected. Math attempt 1 contains the older saved Extrema indicator after an interrupted reload; it is rejected and retained. Math attempt 2 is selected.
 
-Unknown times/indices/header mappings/context availability remain unknown. Partial exports are labelled failed; success values/logs/visual evidence are listed per script in PROBES-v2.md.
+Chrome MCP provided every browser operation and screenshot. Lossless image bytes returned inline by the screenshot tool are saved in evidence/. Full reload restoration uses the native chart configuration with initial bar spacing 0.02, which loads all available native history in the initial request. The source, inputs, symbol, interval, candles, UTC and replay settings are unchanged. No additional history requests occur after the selected reset. Source buffer equality and exactly one active expected indicator are checked before export. Live opening is read from the rendered rightmost-candle tooltip, with screenshots and before/after candle-boundary checks.
 
-When done, commit captures/v2/ and this response to master and push (authorized by Sam, as for v1).
+Request inputs: both `.contexts-v2.json` files contain native TradingView data. The 6m prefix is clipped to the unchanged requested index0/time control and matches its first close. The original uncut native datasets are preserved in `evidence/native-contexts-v1.json`. Available 1m history starts 2026-09-14, after the probe begins 2026-08-31; original requested 1m start/index is unknown. Dependent 1m replay remains blocked.
+
+Plot OHLC mappings use explicit Open/High/Low/Close names in the native CSV headers, supported by native metainfo and finite case0 witness screenshots. The Data Window repeats each title without channel names; this UI limitation is retained. No suffix-order or high/low-normalization inference was used. Drawing3/4 index checks use the conditional getter relations required by the handoff; these are not independent index controls. Numeric drawing/fill/appearance parity is not asserted.
+
+Conflict batches1/2 include all available native study log records at collection time in text and JSON, without modifying message strings. CF024 is `1.123456789`; CF029 is `1.00`. Raw log JSON preserves source positions, fractional millisecond message times and bar times.
+
+Exact compiler refusals: strings/color line78 CE10275 (`timestamp(s): unrecognized datetime format`); time2 line33 CE10294 (`resolution.trim is not a function`, context in JSON); drawing2 line78 CE10123 (operator == receives series linefill instead of expected simple string). Error screenshots and full native diagnostic/context are in evidence/. No success/chart-only CSV was fabricated for rejected sources.
+
+Manifest: [manifest-v2.json](captures/v2/manifest-v2.json). UI notes: [capture-notes-v3.json](captures/v2/capture-notes-v3.json). Errors: [outcomes-v2.json](captures/v2/outcomes-v2.json). Raw CSV byte hashes match the original browser downloads. The supplied postprocessor exits1 because the two duplicate-header files cannot be parsed; its diagnostics are preserved. All handoff/probe/source/map/runtime files remain unchanged.

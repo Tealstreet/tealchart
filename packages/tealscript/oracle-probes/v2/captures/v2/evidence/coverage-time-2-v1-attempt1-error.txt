@@ -1,0 +1,21 @@
+{message}
+{
+  "error": "{message}",
+  "editorError": {
+    "code": "CE10294",
+    "ctx": {
+      "message": "resolution.trim is not a function"
+    },
+    "end": {
+      "column": 53,
+      "line": 33
+    },
+    "message": "{message}",
+    "start": {
+      "column": 6,
+      "line": 33
+    },
+    "id": "USER;bf676dc519dd4750aca182f1b122e7cd"
+  },
+  "title": "Compilation error"
+}

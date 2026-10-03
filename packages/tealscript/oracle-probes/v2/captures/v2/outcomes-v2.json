@@ -1,4 +1,127 @@
 {
   "artifact": "TradingView outcome records v2",
-  "outcomes": []
+  "outcomes": [
+    {
+      "probe": "coverage-strings-color-1-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T12:41:52.543Z",
+      "reset_at_utc": "2026-10-03T12:41:00.363Z",
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "timestamp(s): unrecognized datetime format",
+          "editorError": {
+            "code": "CE10275",
+            "end": {
+              "column": 48,
+              "line": 78
+            },
+            "message": "timestamp(s): unrecognized datetime format",
+            "start": {
+              "column": 27,
+              "line": 78
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-strings-color-1-v1-attempt1-error.txt",
+        "evidence/coverage-strings-color-1-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-time-2-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T12:52:41.626Z",
+      "reset_at_utc": "2026-10-03T12:52:38.599Z",
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "{message}",
+          "editorError": {
+            "code": "CE10294",
+            "ctx": {
+              "message": "resolution.trim is not a function"
+            },
+            "end": {
+              "column": 53,
+              "line": 33
+            },
+            "message": "{message}",
+            "start": {
+              "column": 6,
+              "line": 33
+            },
+            "id": "USER;bf676dc519dd4750aca182f1b122e7cd"
+          },
+          "title": "Compilation error"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-time-2-v1-attempt1-error.txt",
+        "evidence/coverage-time-2-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-drawing-2-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T12:55:19.600Z",
+      "reset_at_utc": "2026-10-03T12:55:16.696Z",
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "expr0",
+              "argUserFriendlyRepresentation": "call \"array.get\" (series linefill)",
+              "argumentType": "series linefill",
+              "currentTypeDocStr": "simple string",
+              "funId": "operator ==",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 89,
+              "line": 78
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 37,
+              "line": 78
+            },
+            "id": "USER;74d844c6a9be4095a3c121930db75b40"
+          },
+          "title": "Compilation error"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-drawing-2-v1-attempt1-error.txt",
+        "evidence/coverage-drawing-2-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    }
+  ]
 }
