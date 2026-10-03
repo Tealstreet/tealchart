@@ -1,0 +1,47 @@
+Cannot call "hline" with argument "price"="call "matrix.new" (matrix<int>)". An argument of "matrix<int>" type was used but a "input float"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "price",
+      "argUserFriendlyRepresentation": "call \"matrix.new\" (matrix<int>)",
+      "argumentType": "matrix<int>",
+      "currentTypeDocStr": "input float",
+      "funId": "hline",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 30,
+      "line": 3
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 7,
+      "line": 3
+    },
+    "id": "USER;3b8fed81638147d28bbe3d71a2d6eca5"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///09291832-ffdc-4ddc-a4da-684508ffa09e.pine?placement%3Ddialog",
+        "path": "/09291832-ffdc-4ddc-a4da-684508ffa09e.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"hline\" with argument \"price\"=\"call \"matrix.new\" (matrix<int>)\". An argument of \"matrix<int>\" type was used but a \"input float\"  is expected.",
+      "startLineNumber": 3,
+      "startColumn": 7,
+      "endLineNumber": 3,
+      "endColumn": 31
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,843.23\nH\n84,843.23\nL\n84,843.22\nC\n84,843.23\n0.00 (0.00%)\n84,843.22\nSELL\n0.01\n84,843.23\nBUY\nUSDT\ncorpus-hline-matrix.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n16:11:36 UTC\n99+\nPine Editor\ncorpus-hline-matrix.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CORPUS-HLINE-MATRIX\")\nhline(matrix.new<int>(1, 1, 1))\nplot(1, \"OUTCOME\")\n1 of 1 problem\nCannot call \"hline\" with argument \"price\"=\"call \"matrix.new\" (matrix<int>)\". An argument of \"matrix<int>\" type was used but a \"input float\" is expected.(CE10123)\n1 ∙ Today, 00:11\nLine 3, Col 7\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"hline\" with argument \"price\"=\"call \"matrix.new\" (matrix<int>)\". An argument of \"matrix<int>\" type was used but a \"input float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"hline\" with argument \"price\"=\"call \"matrix.new\" (matrix<int>)\". An argument of \"matrix<int>\" type was used but a \"input float\"  is expected."
+}

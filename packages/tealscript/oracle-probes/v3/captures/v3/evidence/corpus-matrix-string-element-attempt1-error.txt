@@ -1,0 +1,47 @@
+Cannot call "matrix.fill" with argument "value"="bad". An argument of "literal string" type was used but a "series float"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "value",
+      "argUserFriendlyRepresentation": "bad",
+      "argumentType": "literal string",
+      "currentTypeDocStr": "series float",
+      "funId": "matrix.fill",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 17,
+      "line": 4
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 13,
+      "line": 4
+    },
+    "id": "USER;65f1f041dd8e4ecb8fc58fdd41421f56"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///40533db3-60e3-48f3-b3ce-f5d56ef3c487.pine?placement%3Ddialog",
+        "path": "/40533db3-60e3-48f3-b3ce-f5d56ef3c487.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"matrix.fill\" with argument \"value\"=\"bad\". An argument of \"literal string\" type was used but a \"series float\"  is expected.",
+      "startLineNumber": 4,
+      "startColumn": 13,
+      "endLineNumber": 4,
+      "endColumn": 18
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,843.22\n+6.74 (+0.01%)\n84,843.22\nSELL\n0.01\n84,843.23\nBUY\nUSDT\ncorpus-matrix-string-element.pine\nDate Range\n16:09:59 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\ncorpus-matrix-string-element.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CORPUS-MATRIX-STRING-ELEMENT\")\nvalues = matrix.new<float>(1, 1, 1.0)\nvalues.fill(\"bad\")\nplot(values.get(0, 0), \"OUTCOME\")\n1 of 1 problem\nCannot call \"matrix.fill\" with argument \"value\"=\"bad\". An argument of \"literal string\" type was used but a \"series float\" is expected.(CE10123)\n1 ∙ Today, 00:09\nLine 4, Col 13\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"matrix.fill\" with argument \"value\"=\"bad\". An argument of \"literal string\" type was used but a \"series float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"matrix.fill\" with argument \"value\"=\"bad\". An argument of \"literal string\" type was used but a \"series float\"  is expected."
+}

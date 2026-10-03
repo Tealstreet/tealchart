@@ -1,0 +1,44 @@
+Cannot assign a value of the "matrix<float>" type to the "bad" variable. The variable is declared with the "matrix<int>" type.
+{
+  "error": "Cannot assign a value of the \"{assignedValueType}\" type to the \"{variableName}\" variable. The variable is declared with the \"{ownValueType}\" type.",
+  "editorError": {
+    "code": "CE10173",
+    "ctx": {
+      "assignedValueType": "matrix<float>",
+      "ownValueType": "matrix<int>",
+      "variableName": "bad"
+    },
+    "end": {
+      "column": 46,
+      "line": 3
+    },
+    "message": "Cannot assign a value of the \"{assignedValueType}\" type to the \"{variableName}\" variable. The variable is declared with the \"{ownValueType}\" type.",
+    "start": {
+      "column": 1,
+      "line": 3
+    },
+    "id": "USER;453dd16be8424d1e8c7c2f64788fec46"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///d6d1194d-5c7a-49bd-a5d2-de2fa521bd6c.pine?placement%3Ddialog",
+        "path": "/d6d1194d-5c7a-49bd-a5d2-de2fa521bd6c.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10173",
+      "severity": 8,
+      "message": "Cannot assign a value of the \"matrix<float>\" type to the \"bad\" variable. The variable is declared with the \"matrix<int>\" type.",
+      "startLineNumber": 3,
+      "startColumn": 1,
+      "endLineNumber": 3,
+      "endColumn": 47
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,843.23\n+6.75 (+0.01%)\n84,843.22\nSELL\n0.01\n84,843.23\nBUY\nUSDT\ncorpus-matrix-float-to-int-id.pine\nDate Range\n16:09:48 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\ncorpus-matrix-float-to-int-id.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CORPUS-MATRIX-FLOAT-TO-INT-ID\")\nmatrix<int> bad = matrix.new<float>(1, 1, 1.0)\nplot(bad.get(0, 0), \"OUTCOME\")\n1 of 1 problem\nCannot assign a value of the \"matrix<float>\" type to the \"bad\" variable. The variable is declared with the \"matrix<int>\" type.(CE10173)\n1 ∙ Today, 00:09\nLine 3, Col 1\nPine Script® v6\nCompilation error: CE10173\n\nCannot assign a value of the \"matrix<float>\" type to the \"bad\" variable. The variable is declared with the \"matrix<int>\" type.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot assign a value of the \"matrix<float>\" type to the \"bad\" variable. The variable is declared with the \"matrix<int>\" type."
+}

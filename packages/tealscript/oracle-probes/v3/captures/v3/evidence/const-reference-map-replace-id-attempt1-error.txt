@@ -1,0 +1,39 @@
+A variable declared with the "const" type form cannot be modified.
+{
+  "error": "A variable declared with the \"const\" type form cannot be modified.",
+  "editorError": {
+    "code": "CE10085",
+    "end": {
+      "column": 5,
+      "line": 4
+    },
+    "message": "A variable declared with the \"const\" type form cannot be modified.",
+    "start": {
+      "column": 1,
+      "line": 4
+    },
+    "id": "USER;eb9de53f818947f9b57552229378a456"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///7e84edd6-30f3-48e0-8664-2fda9668677f.pine?placement%3Ddialog",
+        "path": "/7e84edd6-30f3-48e0-8664-2fda9668677f.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10085",
+      "severity": 8,
+      "message": "A variable declared with the \"const\" type form cannot be modified.",
+      "startLineNumber": 4,
+      "startColumn": 1,
+      "endLineNumber": 4,
+      "endColumn": 6
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,853.01\nH\n84,853.02\nL\n84,836.47\nC\n84,836.47\n−16.55 (−0.02%)\n84,836.47\nSELL\n0.01\n84,836.48\nBUY\nUSDT\nconst-reference-map-replace-id.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n16:07:03 UTC\n99+\nPine Editor\nconst-reference-map-replace-id.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-CONST-REF-MAP-REPLACE-ID\")\nconst map<string, float> value = map.new<string, float>()\nvalue := map.new<string, float>()\nplot(map.get(value, \"key\"), \"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" type form cannot be modified.(CE10085)\n1 ∙ Today, 00:07\nLine 4, Col 1\nPine Script® v6\nCompilation error: CE10085\n\nA variable declared with the \"const\" type form cannot be modified.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "A variable declared with the \"const\" type form cannot be modified."
+}

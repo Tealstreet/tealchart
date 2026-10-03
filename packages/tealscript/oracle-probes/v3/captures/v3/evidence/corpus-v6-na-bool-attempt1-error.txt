@@ -1,0 +1,47 @@
+Cannot call "na" with argument "x"="call "array.get" (series bool)". An argument of "series bool" type was used but a "simple float"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "x",
+      "argUserFriendlyRepresentation": "call \"array.get\" (series bool)",
+      "argumentType": "series bool",
+      "currentTypeDocStr": "simple float",
+      "funId": "na",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 21,
+      "line": 4
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 9,
+      "line": 4
+    },
+    "id": "USER;749a397115804a1e997c92d80de249fb"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///22d9a237-ad09-422a-a38f-a064b3861e67.pine?placement%3Ddialog",
+        "path": "/22d9a237-ad09-422a-a38f-a064b3861e67.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"na\" with argument \"x\"=\"call \"array.get\" (series bool)\". An argument of \"series bool\" type was used but a \"simple float\"  is expected.",
+      "startLineNumber": 4,
+      "startColumn": 9,
+      "endLineNumber": 4,
+      "endColumn": 22
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,843.22\n−0.01 (−0.00%)\n84,843.22\nSELL\n0.01\n84,843.23\nBUY\nUSDT\ncorpus-v6-na-bool.pine\nDate Range\n16:10:43 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\ncorpus-v6-na-bool.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"V3-CORPUS-V6-NA-BOOL\")\nvalues = array.from(true)\nplot(na(values.get(0)) ? 1 : 0, \"OUTCOME\")\n1 of 1 problem\nCannot call \"na\" with argument \"x\"=\"call \"array.get\" (series bool)\". An argument of \"series bool\" type was used but a \"simple float\" is expected.(CE10123)\n1 ∙ Today, 00:10\nLine 4, Col 9\nPine Script® v6\nCompilation error: CE10123\n\nCannot call \"na\" with argument \"x\"=\"call \"array.get\" (series bool)\". An argument of \"series bool\" type was used but a \"simple float\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"na\" with argument \"x\"=\"call \"array.get\" (series bool)\". An argument of \"series bool\" type was used but a \"simple float\"  is expected."
+}
