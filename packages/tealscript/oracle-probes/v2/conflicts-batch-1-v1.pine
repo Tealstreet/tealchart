@@ -1,0 +1,166 @@
+//@version=6
+indicator("Authority conflicts batch 1 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF002 array/C02
+// Type-directed array accessor discriminates return category.
+cf002_a = array.from(10, 20, 30)
+plot(array.size(cf002_a), "CF002_size", display = display.data_window)
+plot(array.get(cf002_a,1), "CF002_second", display = display.data_window)
+
+// CF004 array/C04
+// Odd-sized range forces both boundary promises to differ from the matching initial midpoint.
+cf004_a = array.from(4,5,5,5,6)
+plot(array.binary_search_leftmost(cf004_a,5), "CF004_left", display = display.data_window)
+plot(array.binary_search_rightmost(cf004_a,5), "CF004_right", display = display.data_window)
+plot(array.binary_search(cf004_a,5), "CF004_ordinary", display = display.data_window)
+
+// CF006 array/C06
+// Pine v6 rejects na(bool); no invalid na(bool) instrument is introduced.
+cf006_a = array.new_bool(1)
+cf006_b = array.new<bool>(1)
+plot(array.get(cf006_a,0)==false?1:0, "CF006_typed_false", display = display.data_window)
+plot(array.get(cf006_b,0)==false?1:0, "CF006_generic_false", display = display.data_window)
+plot(array.get(cf006_a,0)?1:0, "CF006_typed_truth", display = display.data_window)
+
+// CF007 array/C07
+// Missing marker and numeric output are both captured.
+cf007_a = array.from(7.0,2.0,9.0)
+cf007_tie = array.from(4.0,2.0,4.0,2.0)
+plot(array.mode(cf007_a), "CF007_mode_unique", display = display.data_window)
+plot(na(array.mode(cf007_a))?1:0, "CF007_unique_na", display = display.data_window)
+plot(array.mode(cf007_tie), "CF007_tie_control", display = display.data_window)
+
+// CF009 color-plot/C1
+// Component values distinguish exact blue constants without screenshot.
+
+plot(color.r(color.blue), "CF009_blue_r", display = display.data_window)
+plot(color.g(color.blue), "CF009_blue_g", display = display.data_window)
+plot(color.b(color.blue), "CF009_blue_b", display = display.data_window)
+
+// CF021 matrix-map/matrix-set-example-comment
+// Exact executable example plus both candidate coordinates.
+cf021_m=matrix.new<int>(2,3,4)
+matrix.set(cf021_m,0,1,3)
+plot(matrix.get(cf021_m,0,1), "CF021_code_coordinate", display = display.data_window)
+plot(matrix.get(cf021_m,1,2), "CF021_comment_coordinate", display = display.data_window)
+
+// CF024 str/tostring-default-precision
+// Exact strings logged at last bar; explicit formats are controls, not presumed canonical default.
+cf024_s=str.tostring(1.1234567890123)
+cf024_ten=str.tostring(1.1234567890123,"#.##########")
+cf024_eight=str.tostring(1.1234567890123,"#.########")
+plot(str.tonumber(cf024_s), "CF024_default_number", display = display.data_window)
+plot(cf024_s==cf024_ten?1:0, "CF024_equals_ten", display = display.data_window)
+plot(cf024_s==cf024_eight?1:0, "CF024_equals_eight", display = display.data_window)
+plot(str.length(cf024_s), "CF024_string_length", display = display.data_window)
+if barstate.islast
+    log.info("CF024 default="+cf024_s)
+
+// CF026 str/tostring-format-optionality
+// Does not identify which overlapping overload the compiler selects. That metadata distinction cannot be resolved from a valid one-argument call.
+cf026_s=str.tostring(1.25)
+plot(cf026_s=="1.25"?1:0, "CF026_omitted_format", display = display.data_window)
+plot(str.length(cf026_s), "CF026_length", display = display.data_window)
+
+// CF029 str/mintick-trailing-zero-example
+// BTCUSDT tick metadata is exported. If tick=1, this vector cannot discriminate decimals; record that limitation.
+cf029_v=100.0*syminfo.mintick
+cf029_s=str.tostring(cf029_v,format.mintick)
+cf029_plain=str.tostring(cf029_v)
+plot(cf029_v, "CF029_value", display = display.data_window)
+plot(str.length(cf029_s), "CF029_tick_text_length", display = display.data_window)
+plot(str.length(cf029_plain), "CF029_plain_text_length", display = display.data_window)
+plot(cf029_s==cf029_plain?1:0, "CF029_equals_plain", display = display.data_window)
+if barstate.islast
+    log.info("CF029 mintick="+cf029_s)
+
+// CF031 str/ascii-scope
+// Non-ASCII casing and emspace controlled literals.
+cf031_low=str.lower("ÉAZ")
+cf031_up=str.upper("éaz")
+cf031_trim=str.trim(" X ")
+plot(cf031_low=="éaz"?1:0, "CF031_lower_unicode", display = display.data_window)
+plot(cf031_up=="ÉAZ"?1:0, "CF031_upper_unicode", display = display.data_window)
+plot(str.length(cf031_trim), "CF031_trim_length", display = display.data_window)
+
+// CF034 ta-a/bbw-scale
+// Export chart close control; nonzero width bars distinguish factors.
+cf034_basis=ta.sma(close,5)
+cf034_dev=4.0*ta.stdev(close,5)
+cf034_ratio=2.0*cf034_dev/cf034_basis
+plot(ta.bbw(close,5,4), "CF034_builtin", display = display.data_window)
+plot(cf034_ratio, "CF034_ratio", display = display.data_window)
+plot(cf034_ratio*100.0, "CF034_percent", display = display.data_window)
+
+// CF035 ta-a/cog-missing-source
+// Original formula preserved; helper return is explicit expression.
+cf035_literal(src,length) =>
+    sum=math.sum(src,length)
+    num=0.0
+    for i=0 to length-1
+        num:=num+src[i]*(i+1)
+    -num/sum
+cf035_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+plot(cf035_src, "CF035_source", display = display.data_window)
+plot(ta.cog(cf035_src,5), "CF035_builtin", display = display.data_window)
+plot(cf035_literal(cf035_src,5), "CF035_literal", display = display.data_window)
+plot(na(cf035_literal(cf035_src,5))?1:0, "CF035_literal_is_na", display = display.data_window)
+
+// CF036 ta-a/atr-fallback-guard
+// DOMAIN LIMIT: establishes two claimed formulas differ. Native ATR cannot receive synthetic OHLC; ordinary BTCUSDT chart cannot settle native behavior when only previous close/high is missing.
+cf036_prevClose=int(time/120000)%11==7?float(na):close[1]
+cf036_prevHigh=high[1]
+cf036_guardClose=na(cf036_prevClose)?high-low:math.max(math.max(high-low,math.abs(high-cf036_prevClose)),math.abs(low-cf036_prevClose))
+cf036_guardHigh=na(cf036_prevHigh)?high-low:math.max(math.max(high-low,math.abs(high-cf036_prevClose)),math.abs(low-cf036_prevClose))
+plot(ta.atr(1), "CF036_native_atr", display = display.data_window)
+plot(na(cf036_prevClose)?1:0, "CF036_previous_close_is_na", display = display.data_window)
+plot(na(cf036_prevHigh)?1:0, "CF036_previous_high_is_na", display = display.data_window)
+plot(cf036_guardClose, "CF036_close_guard", display = display.data_window)
+plot(cf036_guardHigh, "CF036_high_guard", display = display.data_window)
+plot(ta.tr(true), "CF036_native_tr_true", display=display.data_window)
+
+// CF039 ta-b/ta.dev.hole-conflict
+// Raw-slot example versus non-na samples.
+cf039_literal(src,length) =>
+    mean=ta.sma(src,length)
+    sum=0.0
+    for i=0 to length-1
+        sum:=sum+math.abs(src[i]-mean)
+    sum/length
+cf039_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+plot(cf039_src, "CF039_source", display = display.data_window)
+plot(ta.dev(cf039_src,5), "CF039_builtin", display = display.data_window)
+plot(cf039_literal(cf039_src,5), "CF039_literal", display = display.data_window)
+
+// CF040 ta-b/ta.ema.hole-conflict
+// Explicit final sum preserves Pine assignment-return semantics; added identifier is instrumentation, not change to recurrence. Third hold-state/emit-na candidate included because new settlement reports show neither original whole policy wins.
+cf040_kept(src,length) =>
+    alpha=2.0/(length+1)
+    seed=src
+    state=0.0
+    state:=na(src)?state[1]:na(state[1])?seed:alpha*src+(1-alpha)*state[1]
+    [state,na(src)?float(na):state]
+cf040_literal(src,length) =>
+    alpha=2.0/(length+1)
+    sum=0.0
+    sum:=na(sum[1])?src:alpha*src+(1-alpha)*nz(sum[1])
+    sum
+cf040_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+plot(cf040_src, "CF040_source", display = display.data_window)
+plot(ta.ema(cf040_src,5), "CF040_builtin", display = display.data_window)
+plot(cf040_literal(cf040_src,5), "CF040_literal", display = display.data_window)
+[cf040_held,cf040_emit_na]=cf040_kept(cf040_src,5)
+plot(cf040_held, "CF040_held_control", display=display.data_window)
+plot(cf040_emit_na, "CF040_retained_state_emit_na", display=display.data_window)
+

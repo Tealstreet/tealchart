@@ -1,0 +1,572 @@
+[
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_open",
+    "expression": "open",
+    "builtins": [
+      "open"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_high",
+    "expression": "high",
+    "builtins": [
+      "high"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_low",
+    "expression": "low",
+    "builtins": [
+      "low"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_close",
+    "expression": "close",
+    "builtins": [
+      "close"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_volume",
+    "expression": "volume",
+    "builtins": [
+      "volume"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_time",
+    "expression": "time",
+    "builtins": [
+      "time"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "input_bar_index",
+    "expression": "bar_index",
+    "builtins": [
+      "bar_index"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_det_clean",
+    "expression": "false ? na : matrix.det(m)",
+    "builtins": [
+      "matrix.det"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_det_hole97",
+    "expression": "hole ? na : matrix.det(m)",
+    "builtins": [
+      "matrix.det"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_det_warm0_7",
+    "expression": "b < 8 ? na : matrix.det(m)",
+    "builtins": [
+      "matrix.det"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_trace_clean",
+    "expression": "false ? na : matrix.trace(m)",
+    "builtins": [
+      "matrix.trace"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_trace_hole97",
+    "expression": "hole ? na : matrix.trace(m)",
+    "builtins": [
+      "matrix.trace"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_trace_warm0_7",
+    "expression": "b < 8 ? na : matrix.trace(m)",
+    "builtins": [
+      "matrix.trace"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_rank_clean",
+    "expression": "false ? na : matrix.rank(m)",
+    "builtins": [
+      "matrix.rank"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_rank_hole97",
+    "expression": "hole ? na : matrix.rank(m)",
+    "builtins": [
+      "matrix.rank"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_rank_warm0_7",
+    "expression": "b < 8 ? na : matrix.rank(m)",
+    "builtins": [
+      "matrix.rank"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_inv00_clean",
+    "expression": "false ? na : matrix.get(matrix.inv(m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.inv"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_inv00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.inv(m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.inv"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_inv00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.inv(m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.inv"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_pinv00_clean",
+    "expression": "false ? na : matrix.get(matrix.pinv(m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.pinv"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_pinv00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.pinv(m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.pinv"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_pinv00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.pinv(m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.pinv"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_pow2_00_clean",
+    "expression": "false ? na : matrix.get(matrix.pow(m,2),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.pow"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_pow2_00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.pow(m,2),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.pow"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_pow2_00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.pow(m,2),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.pow"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_sum00_clean",
+    "expression": "false ? na : matrix.get(matrix.sum(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.sum"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_sum00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.sum(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.sum"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_sum00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.sum(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.sum"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_diff00_clean",
+    "expression": "false ? na : matrix.get(matrix.diff(m,m),0,0)",
+    "builtins": [
+      "matrix.diff",
+      "matrix.get"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_diff00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.diff(m,m),0,0)",
+    "builtins": [
+      "matrix.diff",
+      "matrix.get"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_diff00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.diff(m,m),0,0)",
+    "builtins": [
+      "matrix.diff",
+      "matrix.get"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_mult00_clean",
+    "expression": "false ? na : matrix.get(matrix.mult(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.mult"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_mult00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.mult(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.mult"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_mult00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.mult(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.mult"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_kron00_clean",
+    "expression": "false ? na : matrix.get(matrix.kron(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.kron"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_kron00_hole97",
+    "expression": "hole ? na : matrix.get(matrix.kron(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.kron"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_kron00_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.kron(m,m),0,0)",
+    "builtins": [
+      "matrix.get",
+      "matrix.kron"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_transpose01_clean",
+    "expression": "false ? na : matrix.get(matrix.transpose(m),0,1)",
+    "builtins": [
+      "matrix.get",
+      "matrix.transpose"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_transpose01_hole97",
+    "expression": "hole ? na : matrix.get(matrix.transpose(m),0,1)",
+    "builtins": [
+      "matrix.get",
+      "matrix.transpose"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_transpose01_warm0_7",
+    "expression": "b < 8 ? na : matrix.get(matrix.transpose(m),0,1)",
+    "builtins": [
+      "matrix.get",
+      "matrix.transpose"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_row1first_clean",
+    "expression": "false ? na : array.get(matrix.row(m,1),0)",
+    "builtins": [
+      "array.get",
+      "matrix.row"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_row1first_hole97",
+    "expression": "hole ? na : array.get(matrix.row(m,1),0)",
+    "builtins": [
+      "array.get",
+      "matrix.row"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_row1first_warm0_7",
+    "expression": "b < 8 ? na : array.get(matrix.row(m,1),0)",
+    "builtins": [
+      "array.get",
+      "matrix.row"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_col1first_clean",
+    "expression": "false ? na : array.get(matrix.col(m,1),0)",
+    "builtins": [
+      "array.get",
+      "matrix.col"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_col1first_hole97",
+    "expression": "hole ? na : array.get(matrix.col(m,1),0)",
+    "builtins": [
+      "array.get",
+      "matrix.col"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_col1first_warm0_7",
+    "expression": "b < 8 ? na : array.get(matrix.col(m,1),0)",
+    "builtins": [
+      "array.get",
+      "matrix.col"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_avg_clean",
+    "expression": "false ? na : matrix.avg(m)",
+    "builtins": [
+      "matrix.avg"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_avg_hole97",
+    "expression": "hole ? na : matrix.avg(m)",
+    "builtins": [
+      "matrix.avg"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_avg_warm0_7",
+    "expression": "b < 8 ? na : matrix.avg(m)",
+    "builtins": [
+      "matrix.avg"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_median_clean",
+    "expression": "false ? na : matrix.median(m)",
+    "builtins": [
+      "matrix.median"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_median_hole97",
+    "expression": "hole ? na : matrix.median(m)",
+    "builtins": [
+      "matrix.median"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_median_warm0_7",
+    "expression": "b < 8 ? na : matrix.median(m)",
+    "builtins": [
+      "matrix.median"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_min_clean",
+    "expression": "false ? na : matrix.min(m)",
+    "builtins": [
+      "matrix.min"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_min_hole97",
+    "expression": "hole ? na : matrix.min(m)",
+    "builtins": [
+      "matrix.min"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_min_warm0_7",
+    "expression": "b < 8 ? na : matrix.min(m)",
+    "builtins": [
+      "matrix.min"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_max_clean",
+    "expression": "false ? na : matrix.max(m)",
+    "builtins": [
+      "matrix.max"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_max_hole97",
+    "expression": "hole ? na : matrix.max(m)",
+    "builtins": [
+      "matrix.max"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_max_warm0_7",
+    "expression": "b < 8 ? na : matrix.max(m)",
+    "builtins": [
+      "matrix.max"
+    ],
+    "note": "Finite symmetric nonsingular matrix; hole/warm masks OUTPUT. Does not claim na-input linear-algebra coverage."
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_rows",
+    "expression": "matrix.rows(m)",
+    "builtins": [
+      "matrix.rows"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-matrix-1-v1",
+    "column": "matrix_columns",
+    "expression": "matrix.columns(m)",
+    "builtins": [
+      "matrix.columns"
+    ],
+    "note": ""
+  }
+]

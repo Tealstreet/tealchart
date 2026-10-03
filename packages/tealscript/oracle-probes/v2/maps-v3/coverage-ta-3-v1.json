@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-ta-3-v1.pine",
+  "source_sha256": "aa95c65e8500479835af8fcac813e117ad2dbfe2b9d2a881356ff6c2b8b73f8a",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_time"
+    },
+    {
+      "title": "input_bar_index"
+    },
+    {
+      "title": "input_hole_bar40_41"
+    },
+    {
+      "title": "dmi_plus_di5_adx5_chart_clean"
+    },
+    {
+      "title": "dmi_minus_di5_adx5_chart_clean"
+    },
+    {
+      "title": "dmi_adx_di5_adx5_chart_clean"
+    },
+    {
+      "title": "dmi_plus_di14_adx14_chart_clean"
+    },
+    {
+      "title": "dmi_minus_di14_adx14_chart_clean"
+    },
+    {
+      "title": "dmi_adx_di14_adx14_chart_clean"
+    },
+    {
+      "title": "dmi_plus_di28_adx28_chart_clean"
+    },
+    {
+      "title": "dmi_minus_di28_adx28_chart_clean"
+    },
+    {
+      "title": "dmi_adx_di28_adx28_chart_clean"
+    },
+    {
+      "title": "supertrend_line_factor3_atr5_chart_clean"
+    },
+    {
+      "title": "supertrend_direction_factor3_atr5_chart_clean"
+    },
+    {
+      "title": "supertrend_line_factor3_atr14_chart_clean"
+    },
+    {
+      "title": "supertrend_direction_factor3_atr14_chart_clean"
+    },
+    {
+      "title": "supertrend_line_factor3_atr28_chart_clean"
+    },
+    {
+      "title": "supertrend_direction_factor3_atr28_chart_clean"
+    },
+    {
+      "title": "sar_start_inc_max_002_002_02_chart_clean"
+    },
+    {
+      "title": "sar_start_inc_max_001_001_01_chart_clean"
+    },
+    {
+      "title": "sar_start_inc_max_005_005_05_chart_clean"
+    },
+    {
+      "title": "iii_variable_chart_clean"
+    },
+    {
+      "title": "wvad_variable_chart_clean"
+    },
+    {
+      "title": "wad_variable_chart_clean"
+    },
+    {
+      "title": "iii_formula_clean"
+    },
+    {
+      "title": "wvad_formula_clean"
+    },
+    {
+      "title": "wad_formula_clean"
+    },
+    {
+      "title": "iii_formula_hole40_41"
+    },
+    {
+      "title": "wvad_formula_hole40_41"
+    },
+    {
+      "title": "wad_formula_hole40_41"
+    },
+    {
+      "title": "iii_formula_lead0_4"
+    },
+    {
+      "title": "wvad_formula_lead0_4"
+    },
+    {
+      "title": "wad_formula_lead0_4"
+    },
+    {
+      "title": "tr_variable_chart_clean"
+    },
+    {
+      "title": "tr_function_handle_na_true"
+    },
+    {
+      "title": "tr_function_handle_na_false"
+    },
+    {
+      "title": "tr_formula_chart_clean"
+    },
+    {
+      "title": "tr_formula_outputhole40_41"
+    },
+    {
+      "title": "dmi_explicit_formula_plus_len14_clean"
+    },
+    {
+      "title": "dmi_explicit_formula_minus_len14_clean"
+    },
+    {
+      "title": "dmi_explicit_formula_adx_len14_clean"
+    },
+    {
+      "title": "dmi_explicit_formula_plus_len14_hole40_41"
+    },
+    {
+      "title": "dmi_explicit_formula_minus_len14_hole40_41"
+    },
+    {
+      "title": "dmi_explicit_formula_adx_len14_hole40_41"
+    },
+    {
+      "title": "dmi_explicit_formula_plus_len14_lead0_4"
+    },
+    {
+      "title": "dmi_explicit_formula_minus_len14_lead0_4"
+    },
+    {
+      "title": "dmi_explicit_formula_adx_len14_lead0_4"
+    },
+    {
+      "title": "supertrend_atr_dependency_rma14_clean"
+    },
+    {
+      "title": "supertrend_atr_dependency_rma14_hole40_41"
+    },
+    {
+      "title": "supertrend_atr_dependency_rma14_lead0_4"
+    },
+    {
+      "title": "sar_start_inc_03_max02_chart_clean"
+    },
+    {
+      "title": "sar_start_inc_04_max02_chart_clean"
+    },
+    {
+      "title": "control_dmi_di_sum_len5"
+    },
+    {
+      "title": "control_dmi_di_sum_len14"
+    },
+    {
+      "title": "control_dmi_di_sum_len28"
+    }
+  ]
+}

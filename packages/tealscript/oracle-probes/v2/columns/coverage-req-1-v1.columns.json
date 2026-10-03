@@ -1,0 +1,487 @@
+{
+  "script": "coverage-req-1-v1.pine",
+  "sourceSha256": "8f481a6dfe7ba2f524606361e8abf1c49fe296891d1712b0a46e5af481705a63",
+  "authority": "Column identity from unchanged parsed source; observations are not parity expectations",
+  "columns": [
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 1,
+      "title": "open",
+      "expression": "open",
+      "line": 73,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 2,
+      "title": "high",
+      "expression": "high",
+      "line": 74,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 3,
+      "title": "low",
+      "expression": "low",
+      "line": 75,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 4,
+      "title": "close",
+      "expression": "close",
+      "line": 76,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 5,
+      "title": "volume",
+      "expression": "volume",
+      "line": 77,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 6,
+      "title": "time",
+      "expression": "time",
+      "line": 78,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 7,
+      "title": "bar_index",
+      "expression": "bar_index",
+      "line": 79,
+      "evidence": "Native chart input/index control"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 8,
+      "title": "ltf1_clean_count",
+      "expression": "lcCount",
+      "line": 80,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 9,
+      "title": "ltf1_clean_non_na_count",
+      "expression": "lcValid",
+      "line": 81,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 10,
+      "title": "ltf1_clean_first",
+      "expression": "lcFirst",
+      "line": 82,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 11,
+      "title": "ltf1_clean_last",
+      "expression": "lcLast",
+      "line": 83,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 12,
+      "title": "ltf1_clean_non_na_sum",
+      "expression": "lcSum",
+      "line": 84,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 13,
+      "title": "ltf1_clean_non_na_mean",
+      "expression": "lcMean",
+      "line": 85,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 14,
+      "title": "ltf1_hole_count",
+      "expression": "lhCount",
+      "line": 86,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 15,
+      "title": "ltf1_hole_non_na_count",
+      "expression": "lhValid",
+      "line": 87,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 16,
+      "title": "ltf1_hole_first",
+      "expression": "lhFirst",
+      "line": 88,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 17,
+      "title": "ltf1_hole_last",
+      "expression": "lhLast",
+      "line": 89,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 18,
+      "title": "ltf1_hole_non_na_sum",
+      "expression": "lhSum",
+      "line": 90,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 19,
+      "title": "ltf1_hole_non_na_mean",
+      "expression": "lhMean",
+      "line": 91,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 20,
+      "title": "ltf1_warm_count",
+      "expression": "lwCount",
+      "line": 92,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 21,
+      "title": "ltf1_warm_non_na_count",
+      "expression": "lwValid",
+      "line": 93,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 22,
+      "title": "ltf1_warm_first",
+      "expression": "lwFirst",
+      "line": 94,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 23,
+      "title": "ltf1_warm_last",
+      "expression": "lwLast",
+      "line": 95,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 24,
+      "title": "ltf1_warm_non_na_sum",
+      "expression": "lwSum",
+      "line": 96,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 25,
+      "title": "ltf1_warm_non_na_mean",
+      "expression": "lwMean",
+      "line": 97,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 26,
+      "title": "htf6_clean_gapsoff_lookaheadoff",
+      "expression": "ooClose",
+      "line": 98,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 27,
+      "title": "htf6_hole_gapsoff_lookaheadoff",
+      "expression": "ooHole",
+      "line": 99,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 28,
+      "title": "htf6_sma4_warm_gapsoff_lookaheadoff",
+      "expression": "ooSma",
+      "line": 100,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 29,
+      "title": "htf6_rma4_warm_gapsoff_lookaheadoff",
+      "expression": "ooRma",
+      "line": 101,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 30,
+      "title": "htf6_time_gapsoff_lookaheadoff",
+      "expression": "ooTime",
+      "line": 102,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 31,
+      "title": "htf6_clean_gapsoff_lookaheadon",
+      "expression": "onClose",
+      "line": 103,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 32,
+      "title": "htf6_hole_gapsoff_lookaheadon",
+      "expression": "onHole",
+      "line": 104,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 33,
+      "title": "htf6_sma4_warm_gapsoff_lookaheadon",
+      "expression": "onSma",
+      "line": 105,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 34,
+      "title": "htf6_rma4_warm_gapsoff_lookaheadon",
+      "expression": "onRma",
+      "line": 106,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 35,
+      "title": "htf6_time_gapsoff_lookaheadon",
+      "expression": "onTime",
+      "line": 107,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 36,
+      "title": "htf6_clean_gapson_lookaheadoff",
+      "expression": "noClose",
+      "line": 108,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 37,
+      "title": "htf6_hole_gapson_lookaheadoff",
+      "expression": "noHole",
+      "line": 109,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 38,
+      "title": "htf6_sma4_warm_gapson_lookaheadoff",
+      "expression": "noSma",
+      "line": 110,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 39,
+      "title": "htf6_rma4_warm_gapson_lookaheadoff",
+      "expression": "noRma",
+      "line": 111,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 40,
+      "title": "htf6_time_gapson_lookaheadoff",
+      "expression": "noTime",
+      "line": 112,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 41,
+      "title": "htf6_clean_gapson_lookaheadon",
+      "expression": "nnClose",
+      "line": 113,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 42,
+      "title": "htf6_hole_gapson_lookaheadon",
+      "expression": "nnHole",
+      "line": 114,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 43,
+      "title": "htf6_sma4_warm_gapson_lookaheadon",
+      "expression": "nnSma",
+      "line": 115,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 44,
+      "title": "htf6_rma4_warm_gapson_lookaheadon",
+      "expression": "nnRma",
+      "line": 116,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 45,
+      "title": "htf6_time_gapson_lookaheadon",
+      "expression": "nnTime",
+      "line": 117,
+      "evidence": "Requested-context numeric observation"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 46,
+      "title": "table_count_before_scratch",
+      "expression": "beforeScratch",
+      "line": 118,
+      "evidence": "Table lifecycle readback only"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 47,
+      "title": "table_count_with_scratch",
+      "expression": "withScratch",
+      "line": 119,
+      "evidence": "Table lifecycle readback only"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 48,
+      "title": "table_count_after_clear",
+      "expression": "afterClear",
+      "line": 120,
+      "evidence": "Table lifecycle readback only"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 49,
+      "title": "table_count_after_delete",
+      "expression": "afterDelete",
+      "line": 121,
+      "evidence": "Table lifecycle readback only"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 50,
+      "title": "cell_clean_arg",
+      "expression": "cellClean",
+      "line": 122,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 51,
+      "title": "cell_hole_arg",
+      "expression": "cellHole",
+      "line": 123,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 52,
+      "title": "cell_warm_arg",
+      "expression": "cellWarm",
+      "line": 124,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 53,
+      "title": "cell_clean_text_length",
+      "expression": "str.length(cleanText)",
+      "line": 125,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 54,
+      "title": "cell_hole_text_length",
+      "expression": "str.length(holeText)",
+      "line": 126,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 55,
+      "title": "cell_warm_text_length",
+      "expression": "str.length(warmText)",
+      "line": 127,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 56,
+      "title": "cell_calls_reached",
+      "expression": "cellsReached",
+      "line": 128,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 57,
+      "title": "cell_text_setters_reached",
+      "expression": "textReached",
+      "line": 129,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 58,
+      "title": "cell_geometry_setters_reached",
+      "expression": "geometryReached",
+      "line": 130,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 59,
+      "title": "cell_appearance_setters_reached",
+      "expression": "appearanceReached",
+      "line": 131,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "index": 60,
+      "title": "merge_initialized",
+      "expression": "merged ? 1.0 : 0.0",
+      "line": 132,
+      "evidence": "Argument/string/call-completion control; not rendered table readback"
+    }
+  ]
+}

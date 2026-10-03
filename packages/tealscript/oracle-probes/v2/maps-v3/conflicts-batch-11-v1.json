@@ -1,0 +1,25 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "conflicts-batch-11-v1.pine",
+  "source_sha256": "465fd6e56987c0b591a315fd7fd982c2ae63265e000b20b0ee5ac0cfe1a55a75",
+  "columns": [
+    {
+      "title": "CTRL_BTCUSDT_2m"
+    },
+    {
+      "title": "CTRL_mintick"
+    },
+    {
+      "title": "CTRL_close"
+    },
+    {
+      "title": "CTRL_bar_index"
+    },
+    {
+      "title": "CTRL_time"
+    },
+    {
+      "title": "CF014_omission_accepted"
+    }
+  ]
+}

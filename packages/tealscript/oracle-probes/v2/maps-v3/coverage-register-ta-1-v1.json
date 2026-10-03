@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-register-ta-1-v1.pine",
+  "source_sha256": "d1800d60f28a0bc7a9a7c499841d20ca96615243a3b6df5a68c663801beea22d",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_bar_index"
+    },
+    {
+      "title": "stimulus_priceClean"
+    },
+    {
+      "title": "stimulus_priceZero"
+    },
+    {
+      "title": "stimulus_priceHole"
+    },
+    {
+      "title": "stimulus_priceLeading"
+    },
+    {
+      "title": "stimulus_volumeRiseZero"
+    },
+    {
+      "title": "stimulus_volumeRiseHole"
+    },
+    {
+      "title": "stimulus_volumeFallZero"
+    },
+    {
+      "title": "stimulus_volumeFallHole"
+    },
+    {
+      "title": "stimulus_flat"
+    },
+    {
+      "title": "stimulus_recoverHigh"
+    },
+    {
+      "title": "stimulus_recoverLow"
+    },
+    {
+      "title": "stimulus_phase"
+    },
+    {
+      "title": "nvi_native_builtin"
+    },
+    {
+      "title": "nvi_native_doc"
+    },
+    {
+      "title": "pvi_native_builtin"
+    },
+    {
+      "title": "pvi_native_doc"
+    },
+    {
+      "title": "nvi_zero_synthetic_doc"
+    },
+    {
+      "title": "nvi_zero_synthetic_legacy"
+    },
+    {
+      "title": "nvi_na_synthetic_doc"
+    },
+    {
+      "title": "nvi_na_synthetic_legacy"
+    },
+    {
+      "title": "pvi_zero_synthetic_doc"
+    },
+    {
+      "title": "pvi_zero_synthetic_legacy"
+    },
+    {
+      "title": "pvi_prior_volume_na_synthetic_doc"
+    },
+    {
+      "title": "pvi_prior_volume_na_synthetic_legacy"
+    },
+    {
+      "title": "kc_basis_hole_builtin"
+    },
+    {
+      "title": "kc_upper_hole_builtin"
+    },
+    {
+      "title": "kc_lower_hole_builtin"
+    },
+    {
+      "title": "kc_basis_hole_doc"
+    },
+    {
+      "title": "kc_upper_hole_doc"
+    },
+    {
+      "title": "kc_lower_hole_doc"
+    },
+    {
+      "title": "kcw_hole_builtin"
+    },
+    {
+      "title": "kcw_hole_doc"
+    },
+    {
+      "title": "kcw_clean_builtin"
+    },
+    {
+      "title": "kcw_clean_doc"
+    },
+    {
+      "title": "linear_clean_builtin"
+    },
+    {
+      "title": "linear_hole_builtin"
+    },
+    {
+      "title": "linear_hole_manual"
+    },
+    {
+      "title": "linear_leading_builtin"
+    },
+    {
+      "title": "rank_clean_builtin"
+    },
+    {
+      "title": "rank_hole_builtin"
+    },
+    {
+      "title": "rank_hole_manual"
+    },
+    {
+      "title": "rank_leading_builtin"
+    },
+    {
+      "title": "mom_length"
+    },
+    {
+      "title": "mom_source"
+    },
+    {
+      "title": "mom_dynamic_builtin"
+    },
+    {
+      "title": "mom_dynamic_manual"
+    },
+    {
+      "title": "mom_expression_builtin"
+    },
+    {
+      "title": "mom_expression_manual"
+    },
+    {
+      "title": "stoch_flat_len4_builtin"
+    },
+    {
+      "title": "stoch_flat_len4_manual"
+    },
+    {
+      "title": "stoch_recovery_len4_builtin"
+    },
+    {
+      "title": "stoch_recovery_len4_manual"
+    },
+    {
+      "title": "stoch_flat_len1_builtin"
+    },
+    {
+      "title": "stoch_flat_len1_manual"
+    }
+  ]
+}

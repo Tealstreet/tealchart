@@ -1,0 +1,622 @@
+{
+  "artifact": "Capture bundle v2",
+  "stagedAt": "2026-10-03T10:54:02.454857+00:00",
+  "chart": {
+    "tickerid": "BINANCE:BTCUSDT",
+    "interval": "2m",
+    "style": "standard candles",
+    "timezone": "Etc/UTC"
+  },
+  "numeric": [
+    {
+      "probe": "primitives-sma-stdev-v1.pine",
+      "sourceSha256": "1b89dc1fbe7fcef8ce71331791210b1026d1deb8ed71b8b85cba38adf62d80f1",
+      "path": "primitives-sma-stdev-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "60 constant-color plots; fixed positive lengths2/3/7/14/31, sample lengths >=2; bounded history<=31 within max_bars_back100; candidate negative variance guarded; no external requests or clock.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/primitives-sma-stdev-v1-columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-register-ta-1-v1.pine",
+      "sourceSha256": "d1800d60f28a0bc7a9a7c499841d20ca96615243a3b6df5a68c663801beea22d",
+      "path": "coverage-register-ta-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "60 constant-color plots; fixed positive lengths1/4; dynamic Mom lengths1/3/6 bounded within max_bars_back500. Four-element arrays populated before getters2/3; percentile75 valid. NVI/PVI synthetic controls do not feed native builtins.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-register-ta-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "warmup-seed-ma-v2.pine",
+      "sourceSha256": "68d62543d5cde05842056107ad677b12f3444432b770e4b0454bfad87c66a487",
+      "path": "warmup-seed-ma-v2.pine",
+      "plotBudgetUpperBound": 59,
+      "runtimeArgumentReview": "59 constant-color plots; HMA lengths2/5 only, positive TA lengths1/2/5; guarded bounded array access; bounded history <=4; fixed reload anchor. No HMA1. Numeric na/division by zero are observations, not invalid length arguments.",
+      "numericSlots": 59,
+      "columnMaps": [
+        "columns/warmup-seed-ma-v2-columns.json"
+      ]
+    },
+    {
+      "probe": "mfi-flat-flows-v2.pine",
+      "sourceSha256": "fde9b0d77776819f9a7a76668d9e5163bad1cad80d39d4afe692895762026daf",
+      "path": "mfi-flat-flows-v2.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "60 constant-color plots; MFI and math.sum length2; history1; bounded two-sample state; no external requests, clock, collections or HMA. Preserve signed roundoff and na ratios.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/mfi-flat-flows-v2-columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-ta-2-v1.pine",
+      "sourceSha256": "2017cf3e1d0f48d81856ba6d6a32b978f63a2a305f754b1912e94a8b60e26120",
+      "path": "coverage-ta-2-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Lengths fixed14, MACD12/26/9, TSI5/14; HMA14 avoids captured HMA1 failure. ALMA offset0.85/sigma6, linreg offset0; no nonpositive lengths.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-ta-new-columns-v1.json"
+      ]
+    },
+    {
+      "probe": "coverage-ta-3-v1.pine",
+      "sourceSha256": "aa95c65e8500479835af8fcac813e117ad2dbfe2b9d2a881356ff6c2b8b73f8a",
+      "path": "coverage-ta-3-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "DMI5/14/28 and matching ADX lengths; supertrend factor3 with ATR5/14/28; SAR positive start/inc/max; RMA14. Source-hole formula inputs do not introduce invalid lengths.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-ta-new-columns-v1.json"
+      ]
+    },
+    {
+      "probe": "coverage-tad-1-v1.pine",
+      "sourceSha256": "fae3d3b90babc42a537bce4bc767e0e6bdc66e983627d23253a62973585bc940",
+      "path": "coverage-tad-1-v1.pine",
+      "plotBudgetUpperBound": 61,
+      "runtimeArgumentReview": "Dynamic lengths2/3; helper lengths2/3; fixed statistics3/5. ATRperiod3 and supertrend factor2/3. valuewhen occurrence0/1 nonnegative. No HMA calls. Never/delayed VWAP anchors return na until activation rather than invalid runtime arguments.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-tad-1-v1-columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-ta-1-v1.pine",
+      "sourceSha256": "afb032e653ddc3cc9b58ba30e9ac2e2942ed5f49d9f6d5d130e3eba1bfbfb0b7",
+      "path": "coverage-ta-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Fixed length14 throughout; percentile percentages25/75 inside0..100; source NaNs are documented inputs, not invalid length arguments. No HMA calls.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-ta-new-columns-v1.json"
+      ]
+    },
+    {
+      "probe": "coverage-tab-1-v1.pine",
+      "sourceSha256": "27d49aa2145f7600141a11df45e19edc676ef79f739a81ebdbcde8527508e5fd",
+      "path": "coverage-tab-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Dynamic length is2 or explicit int(3). Fixed helper lengths5/10/14/15; legal casts produce3/5; HMAint(3) avoids HMA1. No zero/negative lengths; source history loops bounded. Linreg offset3 permitted and numeric.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-tab-1-v1-columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-history-na-1-v1.pine",
+      "sourceSha256": "ef1a6e467684aa8cfdf01cd5d8577d616ff6ed58fc4fc80646a258c8c3620322",
+      "path": "coverage-history-na-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "History offsets bounded constant nonnegative under max_bars_back200; initial unavailable history intentionally na. var/varip numeric state deterministic for historical-only replay; excludes live tail.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-history-na-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-math-1-v1.pine",
+      "sourceSha256": "9a62267fed136796a9682aa05d561970edbb232d71fa7f26fd7f30834c4c461f",
+      "path": "coverage-math-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Synthetic clean[-2,2], fixed positive/domain-safe operands for constrained operations. NaN/negative source math cases return numeric na where documented, no invalid TA lengths or object indices; correct 2m context supplied.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-math-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-math-2-v1.pine",
+      "sourceSha256": "d616c60e951472e0017a5da9d27115c7fc0e60357802af178112b82c8defcdaa",
+      "path": "coverage-math-2-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "math.random bounds0<1 and seed42 make sequence repeatable per reference. request.currency_rate(USD,USD) explicitly returns1 per reference, no external-rate dependency. math.sum fixed length3; round precision constants valid.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-math-2-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-request-1-v1.pine",
+      "sourceSha256": "25f7976ece7c1769362b53892b4863f54ad08ef679a71c788edb0996243a921b",
+      "path": "coverage-request-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Five same-symbol6m request contexts, under40-context and127-tuple-element budgets; positive rolling length3 and fixed history2; gaps/lookahead enums valid. Needs supplied deterministic requested-context datafeed before engine gate can pass.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-request-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-req-1-v1.pine",
+      "sourceSha256": "8f481a6dfe7ba2f524606361e8abf1c49fe296891d1712b0a46e5af481705a63",
+      "path": "coverage-req-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Lower timeframe1 is below chart2; higher timeframe6 above2. Collection reads guarded by count; loops only execute count>0; rolling lengths7/4 positive. Five request sites, tuples total23 below127. Missing request datafeed is harness blocker, not a discovered TV rejection.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-req-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-collections-1-v1.pine",
+      "sourceSha256": "348d69f239ab2d1648bc682086bf3a6aa1581137b080aab2dcf8c03df5957696",
+      "path": "coverage-collections-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Arrays length3 with valid statistic percentage50; 2x2 matrices only indices0/1. Map keys b%3 bounded; map missing key is documented na, not invalid index. NaN elements intentional supported inputs.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-collections-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-collections-2-v1.pine",
+      "sourceSha256": "0b7b9afb6c0b7073a86ebe747a686e783c83708ebb8936f4f1d0c2cb7bff5bb6",
+      "path": "coverage-collections-2-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Initial arrays length3; all mutation/slice/fill/get indices reviewed. Standardize output is now size-guarded before get1, so an empty all-NaN result cannot abort capture. Negative insert-1 within documented v6 range.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-collections-2-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-strings-color-1-v1.pine",
+      "sourceSha256": "57d845ba7244a0153eb2b8e8e555b31738b670f6447ea934316dcac5243bf913",
+      "path": "coverage-strings-color-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Substring positions0..3 on fixed source or na; regex [0-9]+ valid; replacement indices nonnegative. RGB10/20/30 transparency40 within range; fixed/default inputs including valid ISO timestamp. No clock or random dependency.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-strings-color-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-plot-1-v1.pine",
+      "sourceSha256": "ad144f7e00532bbc01cd761e92bc114eaba819dc52afd7e41fde09ea062e0e49",
+      "path": "coverage-plot-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "No TA lengths or indexable collections. Modulo11 cases are bounded, intentional NaN OHLC is explicitly documented to suppress drawing; full named fill arguments use constant colors and finite numeric anchors. No known TV-invalid runtime combination.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-plot-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-1-v1.pine",
+      "sourceSha256": "ce20f3503e2c1e0eecb9fca3dbb62b0a914a9ef7c3c71444edcdc5ae84c85c37",
+      "path": "conflicts-batch-1-v1.pine",
+      "plotBudgetUpperBound": 55,
+      "runtimeArgumentReview": "55 numeric plots. Arrays fixed lengths1/3/4/5 and getters valid0/1; binary-search array sorted. Matrix2x3 with valid coordinates0/1 and1/2. TA lengths5 and ATR1 positive; no HMA1; hole controls use numeric na. Color components and string equality/logging supply numeric or textual encodings without plot-color variation.",
+      "numericSlots": 55,
+      "columnMaps": [
+        "columns/conflicts-batches-v1.json"
+      ],
+      "unresolvedClaims": [
+        "CF002",
+        "CF004",
+        "CF006",
+        "CF007",
+        "CF009",
+        "CF021",
+        "CF024",
+        "CF026",
+        "CF029",
+        "CF031",
+        "CF035",
+        "CF036",
+        "CF039",
+        "CF040"
+      ],
+      "alreadySettledClaims": [
+        "CF034"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-2-v1.pine",
+      "sourceSha256": "9f88685f10a1822941d211e1d588a70c23fa1633a6e3bd5e4779706876d39db3",
+      "path": "conflicts-batch-2-v1.pine",
+      "plotBudgetUpperBound": 39,
+      "runtimeArgumentReview": "39 numeric plots. TA lengths5 positive and KC/KCW multiplier2, useTrueRange=false explicit controls. Numeric synthetic holes deterministic by epoch2m phase. Literal SUM helper retained with its branching return; no invalid compiler/runtime acceptance tests are packed into numeric batch. No HMA1.",
+      "numericSlots": 39,
+      "columnMaps": [
+        "columns/conflicts-batches-v1.json"
+      ],
+      "unresolvedClaims": [
+        "CF045",
+        "CF046",
+        "CF047",
+        "CF049",
+        "CF050"
+      ],
+      "alreadySettledClaims": [
+        "CF041",
+        "CF042",
+        "CF043",
+        "CF044",
+        "CF048"
+      ]
+    },
+    {
+      "probe": "coverage-ta-4-v1.pine",
+      "sourceSha256": "479088cf82c1b8806f6e6ddbe85122e22571277a9eec79bf21b70db68d257154",
+      "path": "coverage-ta-4-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Pivot types Traditional/Fibonacci/Woodie valid. developing=true only Fibonacci; Woodie developing=false. Every array.get(index0..10) guarded by array.size>index. Anchors are deterministic bar_index conditions.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-ta-new-columns-v1.json"
+      ]
+    },
+    {
+      "probe": "coverage-time-2-v1.pine",
+      "sourceSha256": "b1fed12979092b139cf07956609d9bdc2c0e38d93059421213709f3761cff703",
+      "path": "coverage-time-2-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Valid timeframe strings1S..12M and positive seconds1..31536036; from_seconds large values have documented clamping. Valid leap-day2024-02-29, DST transition dates and ISO strings in valid zones.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-time-2-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-matrix-1-v1.pine",
+      "sourceSha256": "c75a1be5b5e4e9ee23cce8490fce372361d540b56a50a085317e4ebdbe4a96e8",
+      "path": "coverage-matrix-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "2x2 square matrices, clean in[-2,2]. Matrix [[clean+5,1],[1,4]] determinant4(clean+5)-1 >=11; inverse nonsingular. Row/col/index parameters0/1 and exponent2 within domains, operations use compatible dimensions.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-matrix-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-drawing-1-v1.pine",
+      "sourceSha256": "b2d6de124031d5434424f2b7249d57a179f027708c6bb016b120fd3482c85998",
+      "path": "coverage-drawing-1-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "max object counts7 allowed. bar-index endpoints b,b+1 within bounds; time endpoints use xloc.bar_time. line.get_price only called on xloc.bar_index lines. Numeric-NaN y coordinates allowed; getters precede deletion. No collection index access.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-drawing-1-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-drawing-2-v1.pine",
+      "sourceSha256": "c201da90e7c04bd1c0cb70ccb3656a3c1ab5056c304255f7892d5869cc69d28f",
+      "path": "coverage-drawing-2-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Limits7; new linefill parents fit current live line count. All collection array.get reads guarded by size. linefill.all documented; implicit parent-delete removal followed by explicit delete allowed. Remaining live parent getters precede cleanup.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-drawing-2-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-drawing-3-v1.pine",
+      "sourceSha256": "981e33681209a14815a4b946f99915b94314e8db965c13c082ece9ff3bd85cac",
+      "path": "coverage-drawing-3-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Object limits50 allowed. bar-index mutation offsets b-1..b+3 are within bounds. get_price precedes set_xloc and operates on index lines; timestamp assignments use xloc.bar_time. Copies/getters precede deletion; NaN y-coordinate controls are allowed.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-drawing-3-v1.columns.json"
+      ]
+    },
+    {
+      "probe": "coverage-drawing-4-v1.pine",
+      "sourceSha256": "1e2207f9f7c0356200be41e712e4ddbb79fa4b87397b336ea4a342546b9ee546",
+      "path": "coverage-drawing-4-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "chart.point has both time/index coordinates, constructors select matching xloc. Point mutations and subsequent xloc changes use b+2/3 within future500 and timestamps with xloc.bar_time. Copy/getter reads precede deletion; NaN y inputs allowed.",
+      "numericSlots": 60,
+      "columnMaps": [
+        "columns/coverage-drawing-4-v1.columns.json"
+      ]
+    }
+  ],
+  "outcomeOnly": [
+    {
+      "probe": "conflicts-batch-3-v1.pine",
+      "sourceSha256": "5aa02bd382c54bceb9a36e7891eeacb561921bc50275234ec0b98d9f4fcd6bb0",
+      "path": "outcome-only/conflicts-batch-3-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF001"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-4-v1.pine",
+      "sourceSha256": "deb97f1b51ed444051045dfc240ea6621651d8d0e7056e57f939af7967b5adee",
+      "path": "outcome-only/conflicts-batch-4-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF003"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-5-v1.pine",
+      "sourceSha256": "4991c0300de25fe4c842df7959cc91c6641e7e22d71a2c7bde1c4be2b2aa1d32",
+      "path": "outcome-only/conflicts-batch-5-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF005"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-6-v1.pine",
+      "sourceSha256": "2bfadb40d2604a4ad50b49b949fab67e6421762fd92cceda6df01ea3048a741b",
+      "path": "outcome-only/conflicts-batch-6-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF008"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-7-v1.pine",
+      "sourceSha256": "5853d4590ae1cb6b19930956c7c15bf355f268a4a09770461d868659cd2f9101",
+      "path": "outcome-only/conflicts-batch-7-v1.pine",
+      "plotBudgetUpperBound": 6,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF010"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-8-v1.pine",
+      "sourceSha256": "c13a7d65b50656d9dbed1e90aa3d85b9b89ddf942dbcf73127b05b7b92014aa6",
+      "path": "outcome-only/conflicts-batch-8-v1.pine",
+      "plotBudgetUpperBound": 6,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF011"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-9-v1.pine",
+      "sourceSha256": "6e0661830f562bcfff957ed6e4d0128c9b4fe7c8697768d37412acc379b63c37",
+      "path": "outcome-only/conflicts-batch-9-v1.pine",
+      "plotBudgetUpperBound": 6,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF012"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-10-v1.pine",
+      "sourceSha256": "7bbc808b459a4aa41c58831f5258aa087e662c03479debc4659b5fcc1b8e0887",
+      "path": "outcome-only/conflicts-batch-10-v1.pine",
+      "plotBudgetUpperBound": 6,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF013"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-11-v1.pine",
+      "sourceSha256": "465fd6e56987c0b591a315fd7fd982c2ae63265e000b20b0ee5ac0cfe1a55a75",
+      "path": "outcome-only/conflicts-batch-11-v1.pine",
+      "plotBudgetUpperBound": 6,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF014"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-14-v1.pine",
+      "sourceSha256": "70ad981c8d298d4e71d724e5691e7a96bb2d19ae1410739155170963e97ff2cf",
+      "path": "outcome-only/conflicts-batch-14-v1.pine",
+      "plotBudgetUpperBound": 6,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF016"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-15-v1.pine",
+      "sourceSha256": "372cca92243c7ea2a80b02cbf2b8b8e6bf2f267709244b8d0a7a2c61024f74d6",
+      "path": "outcome-only/conflicts-batch-15-v1.pine",
+      "plotBudgetUpperBound": 7,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF016"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-16-v1.pine",
+      "sourceSha256": "51b33e6db702399af6e9e6e84cc25b226080b3e2844134a40c7cf1fbaa89ea51",
+      "path": "outcome-only/conflicts-batch-16-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF017"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-17-v1.pine",
+      "sourceSha256": "d1dd32d0b4d2342e143d5cf1892180c1df450725425005ad6cbc43cec81af6dd",
+      "path": "outcome-only/conflicts-batch-17-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF018"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-18-v1.pine",
+      "sourceSha256": "73cd90977019428ffbfbe56e253647ea2e60e4dceb35376e516a2c7a9d492ad7",
+      "path": "outcome-only/conflicts-batch-18-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF019"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-19-v1.pine",
+      "sourceSha256": "36bfc9e6915334779965134641cd1ac0ed9e526d35c8b131ea865b89756aa4bf",
+      "path": "outcome-only/conflicts-batch-19-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF020"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-20-v1.pine",
+      "sourceSha256": "b28cafe28fce9abcdca077279a302635853d4825c5cf4d35ab0fb618cd4ac41b",
+      "path": "outcome-only/conflicts-batch-20-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF022"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-21-v1.pine",
+      "sourceSha256": "58c9530223cc8a511c648e8361f76d62b05079f12752ee1247ff294999dc2b4b",
+      "path": "outcome-only/conflicts-batch-21-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF023"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-22-v1.pine",
+      "sourceSha256": "2e11ada9c288af320aaa84d14d3ca1100d29b7401ead957dd52829455fd8347a",
+      "path": "outcome-only/conflicts-batch-22-v1.pine",
+      "plotBudgetUpperBound": 7,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF025"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-23-v1.pine",
+      "sourceSha256": "0e4cf9d693b660fcdb131928882e186f990d6705e1b59bf1e71e817828ace262",
+      "path": "outcome-only/conflicts-batch-23-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF027"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-24-v1.pine",
+      "sourceSha256": "39a2b4a323b4a42c276b3bcb1ec44df0ea07bc5d01cba6ea9b9bfcb5d3ded178",
+      "path": "outcome-only/conflicts-batch-24-v1.pine",
+      "plotBudgetUpperBound": 7,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF028"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-25-v1.pine",
+      "sourceSha256": "befb0c2001c43a3cfdd9679c77db1d4e7bc4a954626f38cb10ca6edbd40af6d6",
+      "path": "outcome-only/conflicts-batch-25-v1.pine",
+      "plotBudgetUpperBound": 9,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF030"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-26-v1.pine",
+      "sourceSha256": "9d897bdcaf37f9817b2c154af2d4bac8f8b62dfa0028826d0a719db727958fa3",
+      "path": "outcome-only/conflicts-batch-26-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF032"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-27-v1.pine",
+      "sourceSha256": "0ed332cc4fd29c1a0cdfceda3f9fae899bfef5291e5870ecb64404e95613a4f4",
+      "path": "outcome-only/conflicts-batch-27-v1.pine",
+      "plotBudgetUpperBound": 8,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF033"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-28-v1.pine",
+      "sourceSha256": "3f5d20e89b0db93e7e1513fa7b8bc952f728ae25167796343086d654f3892bb8",
+      "path": "outcome-only/conflicts-batch-28-v1.pine",
+      "plotBudgetUpperBound": 7,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF037"
+      ]
+    },
+    {
+      "probe": "conflicts-batch-29-v1.pine",
+      "sourceSha256": "af6b9f8c8ffffe8dfd15109de329406adfba3e50b650a67a9fa1c0dbd29bd4de",
+      "path": "outcome-only/conflicts-batch-29-v1.pine",
+      "plotBudgetUpperBound": 7,
+      "runtimeArgumentReview": "Default/constant-color plot calls only; no conditional colors or plot-generating helper calls.",
+      "conflicts": [
+        "CF038"
+      ]
+    }
+  ],
+  "omittedOutcomeScripts": [
+    "conflicts-batch-12-v1.pine",
+    "conflicts-batch-13-v1.pine",
+    "conflicts-batch-30-v1.pine",
+    "conflicts-batch-31-v1.pine"
+  ],
+  "alreadySettledClaims": [
+    "CF034",
+    "CF041",
+    "CF042",
+    "CF043",
+    "CF044",
+    "CF048"
+  ],
+  "blockedNumeric": [
+    {
+      "probe": "coverage-time-1-v1.pine",
+      "reasons": [
+        "Clock/unseeded random/external request dependency needs deterministic-input evidence"
+      ]
+    }
+  ],
+  "authority": "Local preflight readiness is not TradingView compilation or parity evidence.",
+  "operatorRevision": "v3",
+  "capturePlan": "capture-plan-v3.json",
+  "normalizedMaps": "maps-v3/",
+  "operatorGuide": "PROBES-v2.md",
+  "postprocess": "postprocess-v2.py"
+}

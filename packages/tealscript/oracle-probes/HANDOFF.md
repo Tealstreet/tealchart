@@ -1,5 +1,9 @@
 # TradingView oracle capture — handoff
 
+> **Next capture round: v2.** Start at [`v2/HANDOFF-v2.md`](v2/HANDOFF-v2.md) — 27 numeric probes to export
+> as CSV plus 25 outcome-only scripts (paste, record what TradingView says). v1 replies stay in
+> [RESPONSE-v1.md](RESPONSE-v1.md); the v2 reply goes in `v2/RESPONSE-v2.md`.
+
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
 

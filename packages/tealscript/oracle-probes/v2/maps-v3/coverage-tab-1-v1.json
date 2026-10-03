@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-tab-1-v1.pine",
+  "source_sha256": "27d49aa2145f7600141a11df45e19edc676ef79f739a81ebdbcde8527508e5fd",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_bar_index"
+    },
+    {
+      "title": "input_dynamic_source"
+    },
+    {
+      "title": "input_falling_source"
+    },
+    {
+      "title": "input_dynamic_length"
+    },
+    {
+      "title": "input_ema_hole_source"
+    },
+    {
+      "title": "dev_dynamic_builtin"
+    },
+    {
+      "title": "dev_dynamic_manual"
+    },
+    {
+      "title": "highest_dynamic_builtin"
+    },
+    {
+      "title": "highest_dynamic_manual"
+    },
+    {
+      "title": "lowest_dynamic_builtin"
+    },
+    {
+      "title": "lowest_dynamic_manual"
+    },
+    {
+      "title": "linreg_dynamic_builtin"
+    },
+    {
+      "title": "linreg_dynamic_manual"
+    },
+    {
+      "title": "highestbars_dynamic_builtin"
+    },
+    {
+      "title": "highestbars_dynamic_manual"
+    },
+    {
+      "title": "lowestbars_dynamic_builtin"
+    },
+    {
+      "title": "lowestbars_dynamic_manual"
+    },
+    {
+      "title": "falling_dynamic_builtin"
+    },
+    {
+      "title": "falling_dynamic_manual"
+    },
+    {
+      "title": "dev_official_builtin_len10"
+    },
+    {
+      "title": "dev_official_terminal_declaration"
+    },
+    {
+      "title": "dev_manual_mad_len10"
+    },
+    {
+      "title": "ema_official_builtin_len15"
+    },
+    {
+      "title": "ema_official_terminal_assignment"
+    },
+    {
+      "title": "ema_inline_first_source_len15"
+    },
+    {
+      "title": "kc_len5_mult4_omit_mid"
+    },
+    {
+      "title": "kc_len5_mult4_omit_up"
+    },
+    {
+      "title": "kc_len5_mult4_omit_lo"
+    },
+    {
+      "title": "kc_len5_mult4_true_mid"
+    },
+    {
+      "title": "kc_len5_mult4_true_up"
+    },
+    {
+      "title": "kc_len5_mult4_true_lo"
+    },
+    {
+      "title": "kc_len5_mult4_false_mid"
+    },
+    {
+      "title": "kc_len5_mult4_false_up"
+    },
+    {
+      "title": "kc_len5_mult4_false_lo"
+    },
+    {
+      "title": "kc_len5_mult4_doc_mid"
+    },
+    {
+      "title": "kc_len5_mult4_doc_up"
+    },
+    {
+      "title": "kc_len5_mult4_doc_lo"
+    },
+    {
+      "title": "kc_doc_range_ema_tr_len5"
+    },
+    {
+      "title": "kc_doc_basis_ema_len5"
+    },
+    {
+      "title": "kcw_len5_mult4_omit"
+    },
+    {
+      "title": "kcw_len5_mult4_true"
+    },
+    {
+      "title": "kcw_len5_mult4_false"
+    },
+    {
+      "title": "kcw_len5_mult4_doc"
+    },
+    {
+      "title": "ema_hole_builtin_len14"
+    },
+    {
+      "title": "ema_hole_literal_official_function"
+    },
+    {
+      "title": "ema_hole_first_seed_hold_state_emit_na"
+    },
+    {
+      "title": "ema_hole_reseed_control"
+    },
+    {
+      "title": "ema_hole_sma_seed_hold_state_emit_na"
+    },
+    {
+      "title": "dmi_legal_explicit_int_cast_control"
+    },
+    {
+      "title": "ema_legal_explicit_int_cast_control"
+    },
+    {
+      "title": "hma_legal_explicit_int_cast_control"
+    },
+    {
+      "title": "kc_legal_explicit_int_cast_control"
+    },
+    {
+      "title": "kcw_legal_explicit_int_cast_control"
+    },
+    {
+      "title": "macd_legal_explicit_int_cast_control"
+    },
+    {
+      "title": "linreg_offset_legal_explicit_int_cast_control"
+    }
+  ]
+}

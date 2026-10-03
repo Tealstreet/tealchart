@@ -1,0 +1,146 @@
+//@version=6
+indicator("Authority conflicts batch 2 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF041 ta-b/ta.kc.hole-range-conflict
+// False true-range setting isolates hole policy from native firstbar TR differences.
+cf041_src=int(time/120000)%11==7?float(na):close
+cf041_basis=ta.ema(cf041_src,5)
+cf041_range=ta.ema(high-low,5)
+[cf041_m,cf041_u,cf041_l]=ta.kc(cf041_src,5,2,false)
+plot(cf041_src, "CF041_source", display = display.data_window)
+plot(cf041_u, "CF041_builtin_upper", display = display.data_window)
+plot(cf041_basis+2.0*cf041_range, "CF041_example_upper", display = display.data_window)
+
+// CF042 ta-b/ta.kc.mult-description-conflict
+// Definition candidates differ; disagreement is not automatically a defect.
+cf042_basis=ta.ema(close,5)
+cf042_span=ta.ema(high-low,5)
+cf042_sd=ta.stdev(close,5)
+[cf042_m,cf042_u,cf042_l]=ta.kc(close,5,2,false)
+plot(cf042_u, "CF042_builtin_upper", display = display.data_window)
+plot(cf042_basis+2.0*cf042_span, "CF042_range_upper", display = display.data_window)
+plot(cf042_basis+2.0*cf042_sd, "CF042_stdev_upper", display = display.data_window)
+
+// CF043 ta-b/ta.kcw.hole-range-conflict
+// False true-range setting isolates hole policy from native firstbar TR differences.
+cf043_src=int(time/120000)%11==7?float(na):close
+cf043_basis=ta.ema(cf043_src,5)
+cf043_range=ta.ema(high-low,5)
+plot(cf043_src, "CF043_source", display = display.data_window)
+plot(ta.kcw(cf043_src,5,2,false), "CF043_builtin", display = display.data_window)
+plot(4.0*cf043_range/cf043_basis, "CF043_example", display = display.data_window)
+
+// CF044 ta-b/ta.kcw.mult-description-conflict
+// Definition candidates differ; disagreement is not automatically a defect.
+cf044_basis=ta.ema(close,5)
+cf044_span=ta.ema(high-low,5)
+cf044_sd=ta.stdev(close,5)
+plot(ta.kcw(close,5,2,false), "CF044_builtin", display = display.data_window)
+plot(4.0*cf044_span/cf044_basis, "CF044_range_width", display = display.data_window)
+plot(4.0*cf044_sd/cf044_basis, "CF044_stdev_width", display = display.data_window)
+
+// CF045 ta-d/C1
+// Clean windows are a positive control; only hole-containing windows discriminate.
+cf045_literal(src,length) =>
+    sum=0.0
+    for i=0 to length-1
+        sum:=sum+src[i]/length
+    sum
+
+cf045_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+plot(cf045_src, "CF045_source", display = display.data_window)
+plot(ta.sma(cf045_src,5), "CF045_builtin", display = display.data_window)
+plot(cf045_literal(cf045_src,5), "CF045_literal", display = display.data_window)
+
+// CF046 ta-d/C2
+// Clean windows are a positive control; only hole-containing windows discriminate.
+cf046_literal(src,length) =>
+    norm=0.0
+    sum=0.0
+    for i=0 to length-1
+        weight=(length-i)*length
+        norm:=norm+weight
+        sum:=sum+src[i]*weight
+    sum/norm
+
+cf046_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+plot(cf046_src, "CF046_source", display = display.data_window)
+plot(ta.wma(cf046_src,5), "CF046_builtin", display = display.data_window)
+plot(cf046_literal(cf046_src,5), "CF046_literal", display = display.data_window)
+
+// CF047 ta-d/C3
+// Explicit final return instruments assignment-return example without changing recurrence. Third hold-state/emit-na candidate included because new settlement reports show neither original whole policy wins.
+cf047_kept(src,length) =>
+    alpha=1.0/length
+    seed=ta.sma(src,length)
+    state=0.0
+    state:=na(src)?state[1]:na(state[1])?seed:alpha*src+(1-alpha)*state[1]
+    [state,na(src)?float(na):state]
+cf047_literal(src,length) =>
+    alpha=1.0/length
+    sum=0.0
+    sum:=na(sum[1])?ta.sma(src,length):alpha*src+(1-alpha)*nz(sum[1])
+    sum
+cf047_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+plot(cf047_src, "CF047_source", display = display.data_window)
+plot(ta.rma(cf047_src,5), "CF047_builtin", display = display.data_window)
+plot(cf047_literal(cf047_src,5), "CF047_literal", display = display.data_window)
+[cf047_held,cf047_emit_na]=cf047_kept(cf047_src,5)
+plot(cf047_held, "CF047_held_control", display=display.data_window)
+plot(cf047_emit_na, "CF047_retained_state_emit_na", display=display.data_window)
+
+// CF048 ta-d/C4
+// Both change directions occur in repeating sawtooth source.
+cf048_src=int(time/120000)%11==7?float(na):10.0+float(int(time/120000)%7)
+cf048_up=math.max(cf048_src-cf048_src[1],0)
+cf048_dn=math.max(cf048_src[1]-cf048_src,0)
+cf048_rs=ta.rma(cf048_up,5)/ta.rma(cf048_dn,5)
+plot(cf048_src, "CF048_source", display = display.data_window)
+plot(ta.rsi(cf048_src,5), "CF048_builtin", display = display.data_window)
+plot(100.0-100.0/(1.0+cf048_rs), "CF048_example", display = display.data_window)
+
+// CF049 ta-d/C5
+// Exact SUM last-expression branching retained; no silent repair to return res.
+cf049_isZero(val,eps) => math.abs(val)<=eps
+cf049_SUM(fst,snd) =>
+    EPS=1e-10
+    res=fst+snd
+    if cf049_isZero(res,EPS)
+        res:=0
+    else
+        if not cf049_isZero(res,1e-4)
+            res:=res
+        else
+            15
+cf049_literal(src,length) =>
+    avg=ta.sma(src,length)
+    squares=0.0
+    for i=0 to length-1
+        val=cf049_SUM(src[i],-avg)
+        squares:=squares+val*val
+    math.sqrt(squares/length)
+cf049_src=1.0+float(int(time/120000)%5)*0.00001
+plot(cf049_src, "CF049_source", display = display.data_window)
+plot(ta.stdev(cf049_src,5,true), "CF049_builtin", display = display.data_window)
+plot(cf049_literal(cf049_src,5), "CF049_literal_SUM", display = display.data_window)
+plot(math.sqrt(2.0)*0.00001, "CF049_arithmetic", display = display.data_window)
+plot(math.sqrt(180.0), "CF049_fifteen_branch", display = display.data_window)
+
+// CF050 ta-d/C6
+// Source=low ensures distinct from close on nonflat bars.
+cf050_src=low
+plot(ta.stoch(cf050_src,high,low,5), "CF050_builtin_low_source", display = display.data_window)
+plot(100.0*(cf050_src-ta.lowest(low,5))/(ta.highest(high,5)-ta.lowest(low,5)), "CF050_source_formula", display = display.data_window)
+plot(100.0*(close-ta.lowest(low,5))/(ta.highest(high,5)-ta.lowest(low,5)), "CF050_close_formula", display = display.data_window)
+

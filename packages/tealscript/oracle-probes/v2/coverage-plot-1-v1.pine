@@ -1,0 +1,82 @@
+//@version=6
+// 60 numeric plot slots: 44 scalar plots + 4 OHLC plots x 4 channels.
+// All colors are constants; fills and hlines add no plot count.
+// Custom OHLC export must supply actual four fields; do not replace with helper extrema.
+indicator("Oracle coverage-plot-1 v1", overlay=false, precision=8, max_bars_back=20)
+int b = bar_index
+int k = b % 11
+float testOpen = k == 0 ? 10 : k == 1 ? 20 : k == 2 ? -2 : k == 3 ? 4 : k == 4 ? 0 : k == 5 ? na : k == 9 ? 7 : k == 10 ? -5 : 10
+float testHigh = k == 0 ? 4 : k == 1 ? 10 : k == 2 ? -10 : k == 3 ? 9 : k == 4 ? 0 : k == 6 ? na : k == 9 ? 7 : k == 10 ? -2 : 4
+float testLow = k == 0 ? 7 : k == 1 ? 30 : k == 2 ? -1 : k == 3 ? 1 : k == 4 ? 0 : k == 7 ? na : k == 9 ? 7 : k == 10 ? -10 : 7
+float testClose = k == 0 ? 20 : k == 1 ? 5 : k == 2 ? -5 : k == 3 ? 6 : k == 4 ? 0 : k == 8 ? na : k == 9 ? 7 : k == 10 ? -7 : 20
+bool anyMissing = na(testOpen) or na(testHigh) or na(testLow) or na(testClose)
+float expectedHigh = anyMissing ? na : math.max(testOpen, math.max(testHigh, math.max(testLow, testClose)))
+float expectedLow = anyMissing ? na : math.min(testOpen, math.min(testHigh, math.min(testLow, testClose)))
+float flatTop = 10 + (b % 5)
+float flatBottom = 0 - (b % 3)
+bool topHole = b % 17 == 5 or b % 17 == 6
+bool bottomHole = b % 17 == 11
+float holeTop = topHole ? na : flatTop
+float holeBottom = bottomHole ? na : flatBottom
+float gradientTop = 20 + b % 4
+float gradientBottom = -10 - b % 4
+float gradientAnchorTop = 10
+float gradientAnchorBottom = 0
+
+plot(open, "input_open", color=#123456, display=display.data_window)
+plot(high, "input_high", color=#123456, display=display.data_window)
+plot(low, "input_low", color=#123456, display=display.data_window)
+plot(close, "input_close", color=#123456, display=display.data_window)
+plot(volume, "input_volume", color=#123456, display=display.data_window)
+plot(time, "input_time_ms", color=#123456, display=display.data_window)
+plot(b, "input_bar_index", color=#123456, display=display.data_window)
+plot(k, "input_case_mod11", color=#123456, display=display.data_window)
+plot(10, "const_source_open", color=#123456, display=display.data_window)
+plot(4, "const_source_high", color=#123456, display=display.data_window)
+plot(7, "const_source_low", color=#123456, display=display.data_window)
+plot(20, "const_source_close", color=#123456, display=display.data_window)
+plot(20, "const_expected_high", color=#123456, display=display.data_window)
+plot(4, "const_expected_low", color=#123456, display=display.data_window)
+plot(testOpen, "dynamic_source_open", color=#123456, display=display.data_window)
+plot(testHigh, "dynamic_source_high", color=#123456, display=display.data_window)
+plot(testLow, "dynamic_source_low", color=#123456, display=display.data_window)
+plot(testClose, "dynamic_source_close", color=#123456, display=display.data_window)
+plot(expectedHigh, "dynamic_expected_high", color=#123456, display=display.data_window)
+plot(expectedLow, "dynamic_expected_low", color=#123456, display=display.data_window)
+plot(anyMissing ? 1 : 0, "dynamic_any_na_mask", color=#123456, display=display.data_window)
+flatTopPlot = plot(flatTop, "fill_flat_top_boundary", color=#123456, display=display.all)
+flatBottomPlot = plot(flatBottom, "fill_flat_bottom_boundary", color=#123456, display=display.all)
+holeTopPlot = plot(holeTop, "fill_hole_top_boundary", color=#123456, display=display.all)
+holeBottomPlot = plot(holeBottom, "fill_hole_bottom_boundary", color=#123456, display=display.all)
+gradientTopPlot = plot(gradientTop, "fill_gradient_top_boundary", color=#123456, display=display.all)
+gradientBottomPlot = plot(gradientBottom, "fill_gradient_bottom_boundary", color=#123456, display=display.all)
+plot(10, "fill_hline_top_price", color=#123456, display=display.data_window)
+plot(0, "fill_hline_bottom_price", color=#123456, display=display.data_window)
+plot(gradientAnchorTop, "fill_gradient_top_value_arg", color=#123456, display=display.data_window)
+plot(gradientAnchorBottom, "fill_gradient_bottom_value_arg", color=#123456, display=display.data_window)
+plot(na(holeTop) ? 1 : 0, "fill_hole_top_na_mask", color=#123456, display=display.data_window)
+plot(na(holeBottom) ? 1 : 0, "fill_hole_bottom_na_mask", color=#123456, display=display.data_window)
+plot(na(gradientTop) ? 1 : 0, "fill_gradient_top_na_mask", color=#123456, display=display.data_window)
+plot(na(gradientBottom) ? 1 : 0, "fill_gradient_bottom_na_mask", color=#123456, display=display.data_window)
+plot(math.max(flatTop,flatBottom), "fill_flat_upper_envelope", color=#123456, display=display.data_window)
+plot(math.min(flatTop,flatBottom), "fill_flat_lower_envelope", color=#123456, display=display.data_window)
+plot(math.max(gradientTop,gradientBottom), "fill_gradient_upper_envelope", color=#123456, display=display.data_window)
+plot(math.min(gradientTop,gradientBottom), "fill_gradient_lower_envelope", color=#123456, display=display.data_window)
+plot(flatTop-flatBottom, "fill_flat_numeric_height", color=#123456, display=display.data_window)
+plot(gradientTop-gradientBottom, "fill_gradient_numeric_height", color=#123456, display=display.data_window)
+plot(na(holeTop) or na(holeBottom) ? 1 : 0, "fill_hole_any_na_mask", color=#123456, display=display.data_window)
+plot(barstate.ishistory ? 1 : 0, "input_historical_mask", color=#123456, display=display.data_window)
+plot(b+1, "control_index_plus_one", color=#123456, display=display.data_window)
+plotbar(10, 4, 7, 20, title="plotbar_constant_actual", color=#123456, display=display.data_window)
+plotbar(testOpen, testHigh, testLow, testClose, title="plotbar_dynamic_actual", color=#123456, display=display.data_window)
+plotcandle(10, 4, 7, 20, title="plotcandle_constant_actual", color=#123456, wickcolor=#123456, bordercolor=#123456, display=display.data_window)
+plotcandle(testOpen, testHigh, testLow, testClose, title="plotcandle_dynamic_actual", color=#123456, wickcolor=#123456, bordercolor=#123456, display=display.data_window)
+
+// Fills return void. Boundary exports above are controls, not measured fill pixels.
+fill(flatTopPlot, flatBottomPlot, color=#123456, title="flat_fill_named", fillgaps=false)
+fill(holeTopPlot, holeBottomPlot, color=#123456, title="gap_fill_false_named", fillgaps=false)
+fill(holeTopPlot, holeBottomPlot, color=#654321, title="gap_fill_true_named", fillgaps=true)
+fill(gradientTopPlot, gradientBottomPlot, top_value=gradientAnchorTop, bottom_value=gradientAnchorBottom, top_color=#FF0000, bottom_color=#0000FF, title="gradient_fill_named", fillgaps=false)
+highLevel = hline(10, title="hline_top_control", color=#123456, display=display.none)
+lowLevel = hline(0, title="hline_bottom_control", color=#123456, display=display.none)
+fill(highLevel, lowLevel, color=#123456, title="hline_fill_named", fillgaps=false)

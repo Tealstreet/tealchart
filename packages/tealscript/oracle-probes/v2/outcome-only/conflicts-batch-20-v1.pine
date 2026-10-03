@@ -1,0 +1,26 @@
+//@version=6
+indicator("Authority conflicts batch 20 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF022 matrix-map/matrix-mult-vector-return-prose
+// Array destination/accessors discriminate vector return category.
+cf022_m=matrix.new<float>(2,2,0.0)
+matrix.set(cf022_m,0,0,1.0)
+matrix.set(cf022_m,0,1,2.0)
+matrix.set(cf022_m,1,0,3.0)
+matrix.set(cf022_m,1,1,4.0)
+array<float> cf022_r=matrix.mult(cf022_m,array.from(5.0,6.0))
+plot(array.size(cf022_r), "CF022_vector_size", display = display.data_window)
+plot(array.get(cf022_r,0), "CF022_first", display = display.data_window)
+plot(array.get(cf022_r,1), "CF022_second", display = display.data_window)
+

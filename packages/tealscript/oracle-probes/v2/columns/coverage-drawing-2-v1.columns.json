@@ -1,0 +1,362 @@
+[
+  {
+    "column": 1,
+    "title": "b",
+    "expr": "b",
+    "contract": "capture input"
+  },
+  {
+    "column": 2,
+    "title": "time",
+    "expr": "time",
+    "contract": "capture input"
+  },
+  {
+    "column": 3,
+    "title": "open",
+    "expr": "open",
+    "contract": "capture input"
+  },
+  {
+    "column": 4,
+    "title": "high",
+    "expr": "high",
+    "contract": "capture input"
+  },
+  {
+    "column": 5,
+    "title": "low",
+    "expr": "low",
+    "contract": "capture input"
+  },
+  {
+    "column": 6,
+    "title": "close",
+    "expr": "close",
+    "contract": "capture input"
+  },
+  {
+    "column": 7,
+    "title": "volume",
+    "expr": "volume",
+    "contract": "capture input"
+  },
+  {
+    "column": 8,
+    "title": "hole",
+    "expr": "hole ? 1 : 0",
+    "contract": "capture input"
+  },
+  {
+    "column": 9,
+    "title": "line_count",
+    "expr": "array.size(line.all)",
+    "contract": "line.all / max_lines_count"
+  },
+  {
+    "column": 10,
+    "title": "line_0_get_x1",
+    "expr": "array.size(line.all) > 0 ? line.get_x1(array.get(line.all, 0)) : na",
+    "contract": "line.all / line.get_x1"
+  },
+  {
+    "column": 11,
+    "title": "line_0_get_x2",
+    "expr": "array.size(line.all) > 0 ? line.get_x2(array.get(line.all, 0)) : na",
+    "contract": "line.all / line.get_x2"
+  },
+  {
+    "column": 12,
+    "title": "line_0_get_y1",
+    "expr": "array.size(line.all) > 0 ? line.get_y1(array.get(line.all, 0)) : na",
+    "contract": "line.all / line.get_y1"
+  },
+  {
+    "column": 13,
+    "title": "line_0_get_y2",
+    "expr": "array.size(line.all) > 0 ? line.get_y2(array.get(line.all, 0)) : na",
+    "contract": "line.all / line.get_y2"
+  },
+  {
+    "column": 14,
+    "title": "line_1_get_x1",
+    "expr": "array.size(line.all) > 1 ? line.get_x1(array.get(line.all, 1)) : na",
+    "contract": "line.all / line.get_x1"
+  },
+  {
+    "column": 15,
+    "title": "line_1_get_x2",
+    "expr": "array.size(line.all) > 1 ? line.get_x2(array.get(line.all, 1)) : na",
+    "contract": "line.all / line.get_x2"
+  },
+  {
+    "column": 16,
+    "title": "line_1_get_y1",
+    "expr": "array.size(line.all) > 1 ? line.get_y1(array.get(line.all, 1)) : na",
+    "contract": "line.all / line.get_y1"
+  },
+  {
+    "column": 17,
+    "title": "line_1_get_y2",
+    "expr": "array.size(line.all) > 1 ? line.get_y2(array.get(line.all, 1)) : na",
+    "contract": "line.all / line.get_y2"
+  },
+  {
+    "column": 18,
+    "title": "line_3_get_x1",
+    "expr": "array.size(line.all) > 3 ? line.get_x1(array.get(line.all, 3)) : na",
+    "contract": "line.all / line.get_x1"
+  },
+  {
+    "column": 19,
+    "title": "line_3_get_x2",
+    "expr": "array.size(line.all) > 3 ? line.get_x2(array.get(line.all, 3)) : na",
+    "contract": "line.all / line.get_x2"
+  },
+  {
+    "column": 20,
+    "title": "line_3_get_y1",
+    "expr": "array.size(line.all) > 3 ? line.get_y1(array.get(line.all, 3)) : na",
+    "contract": "line.all / line.get_y1"
+  },
+  {
+    "column": 21,
+    "title": "line_3_get_y2",
+    "expr": "array.size(line.all) > 3 ? line.get_y2(array.get(line.all, 3)) : na",
+    "contract": "line.all / line.get_y2"
+  },
+  {
+    "column": 22,
+    "title": "line_6_get_x1",
+    "expr": "array.size(line.all) > 6 ? line.get_x1(array.get(line.all, 6)) : na",
+    "contract": "line.all / line.get_x1"
+  },
+  {
+    "column": 23,
+    "title": "line_6_get_x2",
+    "expr": "array.size(line.all) > 6 ? line.get_x2(array.get(line.all, 6)) : na",
+    "contract": "line.all / line.get_x2"
+  },
+  {
+    "column": 24,
+    "title": "line_6_get_y1",
+    "expr": "array.size(line.all) > 6 ? line.get_y1(array.get(line.all, 6)) : na",
+    "contract": "line.all / line.get_y1"
+  },
+  {
+    "column": 25,
+    "title": "line_6_get_y2",
+    "expr": "array.size(line.all) > 6 ? line.get_y2(array.get(line.all, 6)) : na",
+    "contract": "line.all / line.get_y2"
+  },
+  {
+    "column": 26,
+    "title": "box_count",
+    "expr": "array.size(box.all)",
+    "contract": "box.all / max_boxs_count"
+  },
+  {
+    "column": 27,
+    "title": "box_0_get_left",
+    "expr": "array.size(box.all) > 0 ? box.get_left(array.get(box.all, 0)) : na",
+    "contract": "box.all / box.get_left"
+  },
+  {
+    "column": 28,
+    "title": "box_0_get_right",
+    "expr": "array.size(box.all) > 0 ? box.get_right(array.get(box.all, 0)) : na",
+    "contract": "box.all / box.get_right"
+  },
+  {
+    "column": 29,
+    "title": "box_0_get_top",
+    "expr": "array.size(box.all) > 0 ? box.get_top(array.get(box.all, 0)) : na",
+    "contract": "box.all / box.get_top"
+  },
+  {
+    "column": 30,
+    "title": "box_0_get_bottom",
+    "expr": "array.size(box.all) > 0 ? box.get_bottom(array.get(box.all, 0)) : na",
+    "contract": "box.all / box.get_bottom"
+  },
+  {
+    "column": 31,
+    "title": "box_1_get_left",
+    "expr": "array.size(box.all) > 1 ? box.get_left(array.get(box.all, 1)) : na",
+    "contract": "box.all / box.get_left"
+  },
+  {
+    "column": 32,
+    "title": "box_1_get_right",
+    "expr": "array.size(box.all) > 1 ? box.get_right(array.get(box.all, 1)) : na",
+    "contract": "box.all / box.get_right"
+  },
+  {
+    "column": 33,
+    "title": "box_1_get_top",
+    "expr": "array.size(box.all) > 1 ? box.get_top(array.get(box.all, 1)) : na",
+    "contract": "box.all / box.get_top"
+  },
+  {
+    "column": 34,
+    "title": "box_1_get_bottom",
+    "expr": "array.size(box.all) > 1 ? box.get_bottom(array.get(box.all, 1)) : na",
+    "contract": "box.all / box.get_bottom"
+  },
+  {
+    "column": 35,
+    "title": "box_3_get_left",
+    "expr": "array.size(box.all) > 3 ? box.get_left(array.get(box.all, 3)) : na",
+    "contract": "box.all / box.get_left"
+  },
+  {
+    "column": 36,
+    "title": "box_3_get_right",
+    "expr": "array.size(box.all) > 3 ? box.get_right(array.get(box.all, 3)) : na",
+    "contract": "box.all / box.get_right"
+  },
+  {
+    "column": 37,
+    "title": "box_3_get_top",
+    "expr": "array.size(box.all) > 3 ? box.get_top(array.get(box.all, 3)) : na",
+    "contract": "box.all / box.get_top"
+  },
+  {
+    "column": 38,
+    "title": "box_3_get_bottom",
+    "expr": "array.size(box.all) > 3 ? box.get_bottom(array.get(box.all, 3)) : na",
+    "contract": "box.all / box.get_bottom"
+  },
+  {
+    "column": 39,
+    "title": "box_6_get_left",
+    "expr": "array.size(box.all) > 6 ? box.get_left(array.get(box.all, 6)) : na",
+    "contract": "box.all / box.get_left"
+  },
+  {
+    "column": 40,
+    "title": "box_6_get_right",
+    "expr": "array.size(box.all) > 6 ? box.get_right(array.get(box.all, 6)) : na",
+    "contract": "box.all / box.get_right"
+  },
+  {
+    "column": 41,
+    "title": "box_6_get_top",
+    "expr": "array.size(box.all) > 6 ? box.get_top(array.get(box.all, 6)) : na",
+    "contract": "box.all / box.get_top"
+  },
+  {
+    "column": 42,
+    "title": "box_6_get_bottom",
+    "expr": "array.size(box.all) > 6 ? box.get_bottom(array.get(box.all, 6)) : na",
+    "contract": "box.all / box.get_bottom"
+  },
+  {
+    "column": 43,
+    "title": "label_count",
+    "expr": "array.size(label.all)",
+    "contract": "label.all / max_labels_count"
+  },
+  {
+    "column": 44,
+    "title": "label_0_get_x",
+    "expr": "array.size(label.all) > 0 ? label.get_x(array.get(label.all, 0)) : na",
+    "contract": "label.all / label.get_x"
+  },
+  {
+    "column": 45,
+    "title": "label_0_get_y",
+    "expr": "array.size(label.all) > 0 ? label.get_y(array.get(label.all, 0)) : na",
+    "contract": "label.all / label.get_y"
+  },
+  {
+    "column": 46,
+    "title": "label_1_get_x",
+    "expr": "array.size(label.all) > 1 ? label.get_x(array.get(label.all, 1)) : na",
+    "contract": "label.all / label.get_x"
+  },
+  {
+    "column": 47,
+    "title": "label_1_get_y",
+    "expr": "array.size(label.all) > 1 ? label.get_y(array.get(label.all, 1)) : na",
+    "contract": "label.all / label.get_y"
+  },
+  {
+    "column": 48,
+    "title": "label_3_get_x",
+    "expr": "array.size(label.all) > 3 ? label.get_x(array.get(label.all, 3)) : na",
+    "contract": "label.all / label.get_x"
+  },
+  {
+    "column": 49,
+    "title": "label_3_get_y",
+    "expr": "array.size(label.all) > 3 ? label.get_y(array.get(label.all, 3)) : na",
+    "contract": "label.all / label.get_y"
+  },
+  {
+    "column": 50,
+    "title": "label_6_get_x",
+    "expr": "array.size(label.all) > 6 ? label.get_x(array.get(label.all, 6)) : na",
+    "contract": "label.all / label.get_x"
+  },
+  {
+    "column": 51,
+    "title": "label_6_get_y",
+    "expr": "array.size(label.all) > 6 ? label.get_y(array.get(label.all, 6)) : na",
+    "contract": "label.all / label.get_y"
+  },
+  {
+    "column": 52,
+    "title": "fill_before_delete",
+    "expr": "array.size(linefill.all)",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 53,
+    "title": "fill_after_parent_delete",
+    "expr": "array.size(linefill.all)",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 54,
+    "title": "lines_after_parent_delete",
+    "expr": "array.size(line.all)",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 55,
+    "title": "survivor_is_other",
+    "expr": "array.size(linefill.all) > 0 ? array.get(linefill.all, array.size(linefill.all) - 1) == other ? 1 : 0 : na",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 56,
+    "title": "survivor_parent1_y",
+    "expr": "line.get_y1(linefill.get_line1(other))",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 57,
+    "title": "survivor_parent2_y",
+    "expr": "line.get_y1(linefill.get_line2(other))",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 58,
+    "title": "deleted_fill_surviving_parent_y",
+    "expr": "line.get_y1(z)",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 59,
+    "title": "fill_after_explicit_delete",
+    "expr": "array.size(linefill.all)",
+    "contract": "linefill selective parent deletion / getters"
+  },
+  {
+    "column": 60,
+    "title": "fill_after_cleanup",
+    "expr": "array.size(linefill.all)",
+    "contract": "linefill selective parent deletion / getters"
+  }
+]

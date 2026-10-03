@@ -1,0 +1,172 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "conflicts-batch-1-v1.pine",
+  "source_sha256": "ce20f3503e2c1e0eecb9fca3dbb62b0a914a9ef7c3c71444edcdc5ae84c85c37",
+  "columns": [
+    {
+      "title": "CTRL_time"
+    },
+    {
+      "title": "CTRL_bar_index"
+    },
+    {
+      "title": "CTRL_close"
+    },
+    {
+      "title": "CTRL_mintick"
+    },
+    {
+      "title": "CTRL_BTCUSDT_2m"
+    },
+    {
+      "title": "CF002_size"
+    },
+    {
+      "title": "CF002_second"
+    },
+    {
+      "title": "CF004_left"
+    },
+    {
+      "title": "CF004_right"
+    },
+    {
+      "title": "CF004_ordinary"
+    },
+    {
+      "title": "CF006_typed_false"
+    },
+    {
+      "title": "CF006_generic_false"
+    },
+    {
+      "title": "CF006_typed_truth"
+    },
+    {
+      "title": "CF007_mode_unique"
+    },
+    {
+      "title": "CF007_unique_na"
+    },
+    {
+      "title": "CF007_tie_control"
+    },
+    {
+      "title": "CF009_blue_r"
+    },
+    {
+      "title": "CF009_blue_g"
+    },
+    {
+      "title": "CF009_blue_b"
+    },
+    {
+      "title": "CF021_code_coordinate"
+    },
+    {
+      "title": "CF021_comment_coordinate"
+    },
+    {
+      "title": "CF024_default_number"
+    },
+    {
+      "title": "CF024_equals_ten"
+    },
+    {
+      "title": "CF024_equals_eight"
+    },
+    {
+      "title": "CF024_string_length"
+    },
+    {
+      "title": "CF026_omitted_format"
+    },
+    {
+      "title": "CF026_length"
+    },
+    {
+      "title": "CF029_value"
+    },
+    {
+      "title": "CF029_tick_text_length"
+    },
+    {
+      "title": "CF029_plain_text_length"
+    },
+    {
+      "title": "CF029_equals_plain"
+    },
+    {
+      "title": "CF031_lower_unicode"
+    },
+    {
+      "title": "CF031_upper_unicode"
+    },
+    {
+      "title": "CF031_trim_length"
+    },
+    {
+      "title": "CF034_builtin"
+    },
+    {
+      "title": "CF034_ratio"
+    },
+    {
+      "title": "CF034_percent"
+    },
+    {
+      "title": "CF035_source"
+    },
+    {
+      "title": "CF035_builtin"
+    },
+    {
+      "title": "CF035_literal"
+    },
+    {
+      "title": "CF035_literal_is_na"
+    },
+    {
+      "title": "CF036_native_atr"
+    },
+    {
+      "title": "CF036_previous_close_is_na"
+    },
+    {
+      "title": "CF036_previous_high_is_na"
+    },
+    {
+      "title": "CF036_close_guard"
+    },
+    {
+      "title": "CF036_high_guard"
+    },
+    {
+      "title": "CF036_native_tr_true"
+    },
+    {
+      "title": "CF039_source"
+    },
+    {
+      "title": "CF039_builtin"
+    },
+    {
+      "title": "CF039_literal"
+    },
+    {
+      "title": "CF040_source"
+    },
+    {
+      "title": "CF040_builtin"
+    },
+    {
+      "title": "CF040_literal"
+    },
+    {
+      "title": "CF040_held_control"
+    },
+    {
+      "title": "CF040_retained_state_emit_na"
+    }
+  ]
+}

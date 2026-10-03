@@ -1,0 +1,558 @@
+[
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_open",
+    "expression": "open",
+    "builtins": [
+      "open"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_high",
+    "expression": "high",
+    "builtins": [
+      "high"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_low",
+    "expression": "low",
+    "builtins": [
+      "low"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_close",
+    "expression": "close",
+    "builtins": [
+      "close"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_volume",
+    "expression": "volume",
+    "builtins": [
+      "volume"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_time",
+    "expression": "time",
+    "builtins": [
+      "time"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_bar_index",
+    "expression": "bar_index",
+    "builtins": [
+      "bar_index"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_length_clean",
+    "expression": "str.length(sClean)",
+    "builtins": [
+      "str.length"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_length_hole97",
+    "expression": "str.length(sHole)",
+    "builtins": [
+      "str.length"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_length_warm0_7",
+    "expression": "str.length(sWarm)",
+    "builtins": [
+      "str.length"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_tonumber_clean",
+    "expression": "str.tonumber(str.replace(sClean,\"AbC 12 \u00c9\",\"12.5\"))",
+    "builtins": [
+      "str.tonumber",
+      "str.replace"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_tonumber_hole97",
+    "expression": "str.tonumber(str.replace(sHole,\"AbC 12 \u00c9\",\"12.5\"))",
+    "builtins": [
+      "str.tonumber",
+      "str.replace"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_tonumber_warm0_7",
+    "expression": "str.tonumber(str.replace(sWarm,\"AbC 12 \u00c9\",\"12.5\"))",
+    "builtins": [
+      "str.tonumber",
+      "str.replace"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_pos_clean",
+    "expression": "str.pos(sClean,\"12\")",
+    "builtins": [
+      "str.pos"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_pos_hole97",
+    "expression": "str.pos(sHole,\"12\")",
+    "builtins": [
+      "str.pos"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_pos_warm0_7",
+    "expression": "str.pos(sWarm,\"12\")",
+    "builtins": [
+      "str.pos"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_contains_clean",
+    "expression": "str.contains(sClean,\"12\") ? 1 : 0",
+    "builtins": [
+      "str.contains"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_contains_hole97",
+    "expression": "str.contains(sHole,\"12\") ? 1 : 0",
+    "builtins": [
+      "str.contains"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_contains_warm0_7",
+    "expression": "str.contains(sWarm,\"12\") ? 1 : 0",
+    "builtins": [
+      "str.contains"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_startswith_clean",
+    "expression": "str.startswith(sClean,\"AbC\") ? 1 : 0",
+    "builtins": [
+      "str.startswith"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_startswith_hole97",
+    "expression": "str.startswith(sHole,\"AbC\") ? 1 : 0",
+    "builtins": [
+      "str.startswith"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_startswith_warm0_7",
+    "expression": "str.startswith(sWarm,\"AbC\") ? 1 : 0",
+    "builtins": [
+      "str.startswith"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_endswith_clean",
+    "expression": "str.endswith(sClean,\"\u00c9\") ? 1 : 0",
+    "builtins": [
+      "str.endswith"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_endswith_hole97",
+    "expression": "str.endswith(sHole,\"\u00c9\") ? 1 : 0",
+    "builtins": [
+      "str.endswith"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_endswith_warm0_7",
+    "expression": "str.endswith(sWarm,\"\u00c9\") ? 1 : 0",
+    "builtins": [
+      "str.endswith"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_lower_clean",
+    "expression": "str.lower(sClean) == \"abc 12 \u00e9\" ? 1 : 0",
+    "builtins": [
+      "str.lower"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_lower_hole97",
+    "expression": "str.lower(sHole) == \"abc 12 \u00e9\" ? 1 : 0",
+    "builtins": [
+      "str.lower"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_lower_warm0_7",
+    "expression": "str.lower(sWarm) == \"abc 12 \u00e9\" ? 1 : 0",
+    "builtins": [
+      "str.lower"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_upper_clean",
+    "expression": "str.upper(sClean) == \"ABC 12 \u00c9\" ? 1 : 0",
+    "builtins": [
+      "str.upper"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_upper_hole97",
+    "expression": "str.upper(sHole) == \"ABC 12 \u00c9\" ? 1 : 0",
+    "builtins": [
+      "str.upper"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_upper_warm0_7",
+    "expression": "str.upper(sWarm) == \"ABC 12 \u00c9\" ? 1 : 0",
+    "builtins": [
+      "str.upper"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_trim_clean",
+    "expression": "str.trim(\"  \" + sClean + \"  \") == \"AbC 12 \u00c9\" ? 1 : 0",
+    "builtins": [
+      "str.trim"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_trim_hole97",
+    "expression": "str.trim(\"  \" + sHole + \"  \") == \"AbC 12 \u00c9\" ? 1 : 0",
+    "builtins": [
+      "str.trim"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_trim_warm0_7",
+    "expression": "str.trim(\"  \" + sWarm + \"  \") == \"AbC 12 \u00c9\" ? 1 : 0",
+    "builtins": [
+      "str.trim"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_replace_all_clean",
+    "expression": "str.contains(str.replace_all(sClean,\" \",\"_\"),\"_\") ? 1 : 0",
+    "builtins": [
+      "str.replace_all"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_replace_all_hole97",
+    "expression": "str.contains(str.replace_all(sHole,\" \",\"_\"),\"_\") ? 1 : 0",
+    "builtins": [
+      "str.replace_all"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_replace_all_warm0_7",
+    "expression": "str.contains(str.replace_all(sWarm,\" \",\"_\"),\"_\") ? 1 : 0",
+    "builtins": [
+      "str.replace_all"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_match_clean",
+    "expression": "str.length(str.match(sClean,\"[0-9]+\"))",
+    "builtins": [
+      "str.match"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_match_hole97",
+    "expression": "str.length(str.match(sHole,\"[0-9]+\"))",
+    "builtins": [
+      "str.match"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_match_warm0_7",
+    "expression": "str.length(str.match(sWarm,\"[0-9]+\"))",
+    "builtins": [
+      "str.match"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_substring_clean",
+    "expression": "str.length(str.substring(sClean,0,3))",
+    "builtins": [
+      "str.substring"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_substring_hole97",
+    "expression": "str.length(str.substring(sHole,0,3))",
+    "builtins": [
+      "str.substring"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "str_substring_warm0_7",
+    "expression": "str.length(str.substring(sWarm,0,3))",
+    "builtins": [
+      "str.substring"
+    ],
+    "note": "String(na) input variant; booleans encoded 0/1. Unicode is deliberate."
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_r_clean",
+    "expression": "color.r(cClean)",
+    "builtins": [
+      "color.r",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_r_hole97",
+    "expression": "color.r(cHole)",
+    "builtins": [
+      "color.r",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_r_warm0_7",
+    "expression": "color.r(cWarm)",
+    "builtins": [
+      "color.r",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_g_clean",
+    "expression": "color.g(cClean)",
+    "builtins": [
+      "color.g",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_g_hole97",
+    "expression": "color.g(cHole)",
+    "builtins": [
+      "color.g",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_g_warm0_7",
+    "expression": "color.g(cWarm)",
+    "builtins": [
+      "color.g",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_b_clean",
+    "expression": "color.b(cClean)",
+    "builtins": [
+      "color.b",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_b_hole97",
+    "expression": "color.b(cHole)",
+    "builtins": [
+      "color.b",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_b_warm0_7",
+    "expression": "color.b(cWarm)",
+    "builtins": [
+      "color.b",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_t_clean",
+    "expression": "color.t(cClean)",
+    "builtins": [
+      "color.t",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_t_hole97",
+    "expression": "color.t(cHole)",
+    "builtins": [
+      "color.t",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "color_t_warm0_7",
+    "expression": "color.t(cWarm)",
+    "builtins": [
+      "color.t",
+      "color.rgb"
+    ],
+    "note": "Component getters make color values exportable numbers"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_int_default7",
+    "expression": "input.int(7,\"Integer default\")",
+    "builtins": [
+      "input.int"
+    ],
+    "note": "Keep defaults in the primary run"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_float_default125",
+    "expression": "input.float(1.25,\"Float default\")",
+    "builtins": [
+      "input.float"
+    ],
+    "note": "Keep defaults in the primary run"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_bool_default_true",
+    "expression": "input.bool(true,\"Bool default\") ? 1 : 0",
+    "builtins": [
+      "input.bool"
+    ],
+    "note": "Keep defaults in the primary run"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_source_default_close",
+    "expression": "input.source(close,\"Source default\")",
+    "builtins": [
+      "input.source"
+    ],
+    "note": "Keep defaults in the primary run"
+  },
+  {
+    "probe": "coverage-strings-color-1-v1",
+    "column": "input_time_default_utc",
+    "expression": "input.time(timestamp(\"2026-01-01T00:00:00Z\"),\"Time default\")",
+    "builtins": [
+      "input.time",
+      "timestamp"
+    ],
+    "note": "Keep defaults in the primary run"
+  }
+]

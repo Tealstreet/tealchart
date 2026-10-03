@@ -1,0 +1,22 @@
+//@version=6
+indicator("Authority conflicts batch 17 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF018 matrix-map/matrix.add_col-array-optionality
+// Omitted array_id acceptance isolated.
+cf018_m=matrix.new<float>(2,2,4.0)
+matrix.add_col(cf018_m,1)
+plot(matrix.rows(cf018_m), "CF018_rows", display = display.data_window)
+plot(matrix.columns(cf018_m), "CF018_columns", display = display.data_window)
+plot(na(matrix.get(cf018_m,1,1))?1:0, "CF018_new_is_na", display = display.data_window)
+

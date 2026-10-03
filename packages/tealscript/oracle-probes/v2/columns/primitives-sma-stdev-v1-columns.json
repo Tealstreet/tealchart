@@ -1,0 +1,246 @@
+{
+  "script": "primitives-sma-stdev-v1.pine",
+  "sourceSha256": "1b89dc1fbe7fcef8ce71331791210b1026d1deb8ed71b8b85cba38adf62d80f1",
+  "columns": [
+    {
+      "title": "input_time_ms",
+      "expression": "time"
+    },
+    {
+      "title": "input_bar_index",
+      "expression": "bar_index"
+    },
+    {
+      "title": "input_close",
+      "expression": "close"
+    },
+    {
+      "title": "input_wave",
+      "expression": "wave"
+    },
+    {
+      "title": "input_shifted_wave",
+      "expression": "shifted"
+    },
+    {
+      "title": "input_close_hole40_41",
+      "expression": "hole"
+    },
+    {
+      "title": "sma_len2_close_clean",
+      "expression": "ta.sma(close, 2)"
+    },
+    {
+      "title": "sum_len2_close_clean",
+      "expression": "math.sum(close, 2)"
+    },
+    {
+      "title": "stdev_population_len2_close_clean",
+      "expression": "ta.stdev(close, 2, true)"
+    },
+    {
+      "title": "stdev_sample_len2_close_clean",
+      "expression": "ta.stdev(close, 2, false)"
+    },
+    {
+      "title": "sma_len3_close_clean",
+      "expression": "ta.sma(close, 3)"
+    },
+    {
+      "title": "sum_len3_close_clean",
+      "expression": "math.sum(close, 3)"
+    },
+    {
+      "title": "stdev_population_len3_close_clean",
+      "expression": "ta.stdev(close, 3, true)"
+    },
+    {
+      "title": "stdev_sample_len3_close_clean",
+      "expression": "ta.stdev(close, 3, false)"
+    },
+    {
+      "title": "sma_len7_close_clean",
+      "expression": "ta.sma(close, 7)"
+    },
+    {
+      "title": "sum_len7_close_clean",
+      "expression": "math.sum(close, 7)"
+    },
+    {
+      "title": "stdev_population_len7_close_clean",
+      "expression": "ta.stdev(close, 7, true)"
+    },
+    {
+      "title": "stdev_sample_len7_close_clean",
+      "expression": "ta.stdev(close, 7, false)"
+    },
+    {
+      "title": "sma_len14_close_clean",
+      "expression": "ta.sma(close, 14)"
+    },
+    {
+      "title": "sum_len14_close_clean",
+      "expression": "math.sum(close, 14)"
+    },
+    {
+      "title": "stdev_population_len14_close_clean",
+      "expression": "ta.stdev(close, 14, true)"
+    },
+    {
+      "title": "stdev_sample_len14_close_clean",
+      "expression": "ta.stdev(close, 14, false)"
+    },
+    {
+      "title": "sma_len31_close_clean",
+      "expression": "ta.sma(close, 31)"
+    },
+    {
+      "title": "sum_len31_close_clean",
+      "expression": "math.sum(close, 31)"
+    },
+    {
+      "title": "stdev_population_len31_close_clean",
+      "expression": "ta.stdev(close, 31, true)"
+    },
+    {
+      "title": "stdev_sample_len31_close_clean",
+      "expression": "ta.stdev(close, 31, false)"
+    },
+    {
+      "title": "sma_len14_close_hole40_41",
+      "expression": "ta.sma(hole, 14)"
+    },
+    {
+      "title": "sum_len14_close_hole40_41",
+      "expression": "math.sum(hole, 14)"
+    },
+    {
+      "title": "stdev_population_len14_close_hole40_41",
+      "expression": "ta.stdev(hole, 14, true)"
+    },
+    {
+      "title": "stdev_sample_len14_close_hole40_41",
+      "expression": "ta.stdev(hole, 14, false)"
+    },
+    {
+      "title": "sma_len14_close_lead0_2",
+      "expression": "ta.sma(leading, 14)"
+    },
+    {
+      "title": "sum_len14_close_lead0_2",
+      "expression": "math.sum(leading, 14)"
+    },
+    {
+      "title": "stdev_population_len14_close_lead0_2",
+      "expression": "ta.stdev(leading, 14, true)"
+    },
+    {
+      "title": "stdev_sample_len14_close_lead0_2",
+      "expression": "ta.stdev(leading, 14, false)"
+    },
+    {
+      "title": "sma_len14_wave_clean",
+      "expression": "ta.sma(wave, 14)"
+    },
+    {
+      "title": "sum_len14_wave_clean",
+      "expression": "math.sum(wave, 14)"
+    },
+    {
+      "title": "stdev_population_len14_wave_clean",
+      "expression": "ta.stdev(wave, 14, true)"
+    },
+    {
+      "title": "stdev_sample_len14_wave_clean",
+      "expression": "ta.stdev(wave, 14, false)"
+    },
+    {
+      "title": "sma_len14_shifted_wave_clean",
+      "expression": "ta.sma(shifted, 14)"
+    },
+    {
+      "title": "sum_len14_shifted_wave_clean",
+      "expression": "math.sum(shifted, 14)"
+    },
+    {
+      "title": "stdev_population_len14_shifted_wave_clean",
+      "expression": "ta.stdev(shifted, 14, true)"
+    },
+    {
+      "title": "stdev_sample_len14_shifted_wave_clean",
+      "expression": "ta.stdev(shifted, 14, false)"
+    },
+    {
+      "title": "mean_sum_newest_first_len14_close_clean",
+      "expression": "f_sum(close, 14, false, false)"
+    },
+    {
+      "title": "mean_sum_oldest_first_len14_close_clean",
+      "expression": "f_sum(close, 14, true, false)"
+    },
+    {
+      "title": "mean_divide_each_newest_first_len14_close_clean",
+      "expression": "f_sum(close, 14, false, true)"
+    },
+    {
+      "title": "mean_divide_each_oldest_first_len14_close_clean",
+      "expression": "f_sum(close, 14, true, true)"
+    },
+    {
+      "title": "mean_running_subtract_add_len14_close_clean",
+      "expression": "f_running(close, 14, 0)"
+    },
+    {
+      "title": "mean_running_add_subtract_len14_close_clean",
+      "expression": "f_running(close, 14, 1)"
+    },
+    {
+      "title": "mean_running_difference_len14_close_clean",
+      "expression": "f_running(close, 14, 2)"
+    },
+    {
+      "title": "mean_running_kahan_subtract_add_len14_close_clean",
+      "expression": "f_kahan(close, 14)"
+    },
+    {
+      "title": "stdev_centered_ownmean_len14_close_clean",
+      "expression": "f_centered(close, 14, false)"
+    },
+    {
+      "title": "stdev_fresh_moment_ownmean_len14_close_clean",
+      "expression": "f_moment(close, 14, false)"
+    },
+    {
+      "title": "stdev_centered_ownmean_len14_wave_clean",
+      "expression": "f_centered(wave, 14, false)"
+    },
+    {
+      "title": "stdev_centered_nativemean_len14_wave_clean",
+      "expression": "f_centered(wave, 14, true)"
+    },
+    {
+      "title": "stdev_moment_ownmean_len14_shifted_wave_clean",
+      "expression": "f_moment(shifted, 14, false)"
+    },
+    {
+      "title": "stdev_moment_nativemean_len14_shifted_wave_clean",
+      "expression": "f_moment(shifted, 14, true)"
+    },
+    {
+      "title": "bb_basis_len14_mult2_close_clean",
+      "expression": "bbBasis"
+    },
+    {
+      "title": "bb_upper_len14_mult2_close_clean",
+      "expression": "bbUpper"
+    },
+    {
+      "title": "bb_lower_len14_mult2_close_clean",
+      "expression": "bbLower"
+    },
+    {
+      "title": "bbw_len14_mult2_close_clean",
+      "expression": "ta.bbw(close, 14, 2.0)"
+    }
+  ]
+}

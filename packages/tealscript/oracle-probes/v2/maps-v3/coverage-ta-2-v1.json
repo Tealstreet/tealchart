@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-ta-2-v1.pine",
+  "source_sha256": "2017cf3e1d0f48d81856ba6d6a32b978f63a2a305f754b1912e94a8b60e26120",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_time"
+    },
+    {
+      "title": "input_bar_index"
+    },
+    {
+      "title": "input_hole_bar40_41"
+    },
+    {
+      "title": "macd_line_12_26_9_clean"
+    },
+    {
+      "title": "macd_signal_12_26_9_clean"
+    },
+    {
+      "title": "macd_hist_12_26_9_clean"
+    },
+    {
+      "title": "macd_line_12_26_9_hole40_41"
+    },
+    {
+      "title": "macd_signal_12_26_9_hole40_41"
+    },
+    {
+      "title": "macd_hist_12_26_9_hole40_41"
+    },
+    {
+      "title": "macd_line_12_26_9_lead0_4"
+    },
+    {
+      "title": "macd_signal_12_26_9_lead0_4"
+    },
+    {
+      "title": "macd_hist_12_26_9_lead0_4"
+    },
+    {
+      "title": "tsi_short5_long14_clean"
+    },
+    {
+      "title": "tsi_short5_long14_hole40_41"
+    },
+    {
+      "title": "tsi_short5_long14_lead0_4"
+    },
+    {
+      "title": "correlation_close_open_len14_clean"
+    },
+    {
+      "title": "correlation_close_open_len14_hole40_41"
+    },
+    {
+      "title": "correlation_close_open_len14_lead0_4"
+    },
+    {
+      "title": "rci_len14_clean"
+    },
+    {
+      "title": "rci_len14_hole40_41"
+    },
+    {
+      "title": "rci_len14_lead0_4"
+    },
+    {
+      "title": "mom_len14_clean"
+    },
+    {
+      "title": "mom_len14_hole40_41"
+    },
+    {
+      "title": "mom_len14_lead0_4"
+    },
+    {
+      "title": "roc_len14_clean"
+    },
+    {
+      "title": "roc_len14_hole40_41"
+    },
+    {
+      "title": "roc_len14_lead0_4"
+    },
+    {
+      "title": "cog_len14_clean"
+    },
+    {
+      "title": "cog_len14_hole40_41"
+    },
+    {
+      "title": "cog_len14_lead0_4"
+    },
+    {
+      "title": "sma_len14_clean"
+    },
+    {
+      "title": "sma_len14_hole40_41"
+    },
+    {
+      "title": "sma_len14_lead0_4"
+    },
+    {
+      "title": "ema_len14_clean"
+    },
+    {
+      "title": "ema_len14_hole40_41"
+    },
+    {
+      "title": "ema_len14_lead0_4"
+    },
+    {
+      "title": "hma_len14_clean"
+    },
+    {
+      "title": "hma_len14_hole40_41"
+    },
+    {
+      "title": "hma_len14_lead0_4"
+    },
+    {
+      "title": "wma_len14_clean"
+    },
+    {
+      "title": "wma_len14_hole40_41"
+    },
+    {
+      "title": "wma_len14_lead0_4"
+    },
+    {
+      "title": "vwma_len14_clean"
+    },
+    {
+      "title": "vwma_len14_hole40_41"
+    },
+    {
+      "title": "vwma_len14_lead0_4"
+    },
+    {
+      "title": "swma_len4_clean"
+    },
+    {
+      "title": "swma_len4_hole40_41"
+    },
+    {
+      "title": "swma_len4_lead0_4"
+    },
+    {
+      "title": "alma_len14_clean"
+    },
+    {
+      "title": "alma_len14_hole40_41"
+    },
+    {
+      "title": "alma_len14_lead0_4"
+    },
+    {
+      "title": "linreg_len14_clean"
+    },
+    {
+      "title": "linreg_len14_hole40_41"
+    },
+    {
+      "title": "linreg_len14_lead0_4"
+    },
+    {
+      "title": "control_macd_hist_identity_hole40_41"
+    }
+  ]
+}

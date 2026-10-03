@@ -1,0 +1,545 @@
+[
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_open",
+    "expression": "open",
+    "builtins": [
+      "open"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_high",
+    "expression": "high",
+    "builtins": [
+      "high"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_low",
+    "expression": "low",
+    "builtins": [
+      "low"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_close",
+    "expression": "close",
+    "builtins": [
+      "close"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_volume",
+    "expression": "volume",
+    "builtins": [
+      "volume"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_time",
+    "expression": "time",
+    "builtins": [
+      "time"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "input_bar_index",
+    "expression": "bar_index",
+    "builtins": [
+      "bar_index"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_avg_clean",
+    "expression": "array.avg(arrClean)",
+    "builtins": [
+      "array.avg"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_avg_hole97",
+    "expression": "array.avg(arrHole)",
+    "builtins": [
+      "array.avg"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_avg_warm0_7",
+    "expression": "array.avg(arrWarm)",
+    "builtins": [
+      "array.avg"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_sum_clean",
+    "expression": "array.sum(arrClean)",
+    "builtins": [
+      "array.sum"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_sum_hole97",
+    "expression": "array.sum(arrHole)",
+    "builtins": [
+      "array.sum"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_sum_warm0_7",
+    "expression": "array.sum(arrWarm)",
+    "builtins": [
+      "array.sum"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_min_clean",
+    "expression": "array.min(arrClean)",
+    "builtins": [
+      "array.min"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_min_hole97",
+    "expression": "array.min(arrHole)",
+    "builtins": [
+      "array.min"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_min_warm0_7",
+    "expression": "array.min(arrWarm)",
+    "builtins": [
+      "array.min"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_max_clean",
+    "expression": "array.max(arrClean)",
+    "builtins": [
+      "array.max"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_max_hole97",
+    "expression": "array.max(arrHole)",
+    "builtins": [
+      "array.max"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_max_warm0_7",
+    "expression": "array.max(arrWarm)",
+    "builtins": [
+      "array.max"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_median_clean",
+    "expression": "array.median(arrClean)",
+    "builtins": [
+      "array.median"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_median_hole97",
+    "expression": "array.median(arrHole)",
+    "builtins": [
+      "array.median"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_median_warm0_7",
+    "expression": "array.median(arrWarm)",
+    "builtins": [
+      "array.median"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_mode_clean",
+    "expression": "array.mode(arrClean)",
+    "builtins": [
+      "array.mode"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_mode_hole97",
+    "expression": "array.mode(arrHole)",
+    "builtins": [
+      "array.mode"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_mode_warm0_7",
+    "expression": "array.mode(arrWarm)",
+    "builtins": [
+      "array.mode"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_variance_clean",
+    "expression": "array.variance(arrClean)",
+    "builtins": [
+      "array.variance"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_variance_hole97",
+    "expression": "array.variance(arrHole)",
+    "builtins": [
+      "array.variance"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_variance_warm0_7",
+    "expression": "array.variance(arrWarm)",
+    "builtins": [
+      "array.variance"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_stdev_clean",
+    "expression": "array.stdev(arrClean)",
+    "builtins": [
+      "array.stdev"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_stdev_hole97",
+    "expression": "array.stdev(arrHole)",
+    "builtins": [
+      "array.stdev"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_stdev_warm0_7",
+    "expression": "array.stdev(arrWarm)",
+    "builtins": [
+      "array.stdev"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_range_clean",
+    "expression": "array.range(arrClean)",
+    "builtins": [
+      "array.range"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_range_hole97",
+    "expression": "array.range(arrHole)",
+    "builtins": [
+      "array.range"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_range_warm0_7",
+    "expression": "array.range(arrWarm)",
+    "builtins": [
+      "array.range"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_percentile_linear_interpolation_clean",
+    "expression": "array.percentile_linear_interpolation(arrClean,50)",
+    "builtins": [
+      "array.percentile_linear_interpolation"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_percentile_linear_interpolation_hole97",
+    "expression": "array.percentile_linear_interpolation(arrHole,50)",
+    "builtins": [
+      "array.percentile_linear_interpolation"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_percentile_linear_interpolation_warm0_7",
+    "expression": "array.percentile_linear_interpolation(arrWarm,50)",
+    "builtins": [
+      "array.percentile_linear_interpolation"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_percentile_nearest_rank_clean",
+    "expression": "array.percentile_nearest_rank(arrClean,50)",
+    "builtins": [
+      "array.percentile_nearest_rank"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_percentile_nearest_rank_hole97",
+    "expression": "array.percentile_nearest_rank(arrHole,50)",
+    "builtins": [
+      "array.percentile_nearest_rank"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_percentile_nearest_rank_warm0_7",
+    "expression": "array.percentile_nearest_rank(arrWarm,50)",
+    "builtins": [
+      "array.percentile_nearest_rank"
+    ],
+    "note": "Array has exact three bar slots; holes are actual na elements, initial history unavailable"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_avg_clean",
+    "expression": "matrix.avg(mc)",
+    "builtins": [
+      "matrix.avg"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_avg_hole97",
+    "expression": "matrix.avg(mh)",
+    "builtins": [
+      "matrix.avg"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_avg_warm0_7",
+    "expression": "matrix.avg(mw)",
+    "builtins": [
+      "matrix.avg"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_median_clean",
+    "expression": "matrix.median(mc)",
+    "builtins": [
+      "matrix.median"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_median_hole97",
+    "expression": "matrix.median(mh)",
+    "builtins": [
+      "matrix.median"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_median_warm0_7",
+    "expression": "matrix.median(mw)",
+    "builtins": [
+      "matrix.median"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_mode_clean",
+    "expression": "matrix.mode(mc)",
+    "builtins": [
+      "matrix.mode"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_mode_hole97",
+    "expression": "matrix.mode(mh)",
+    "builtins": [
+      "matrix.mode"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_mode_warm0_7",
+    "expression": "matrix.mode(mw)",
+    "builtins": [
+      "matrix.mode"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_min_clean",
+    "expression": "matrix.min(mc)",
+    "builtins": [
+      "matrix.min"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_min_hole97",
+    "expression": "matrix.min(mh)",
+    "builtins": [
+      "matrix.min"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_min_warm0_7",
+    "expression": "matrix.min(mw)",
+    "builtins": [
+      "matrix.min"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_max_clean",
+    "expression": "matrix.max(mc)",
+    "builtins": [
+      "matrix.max"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_max_hole97",
+    "expression": "matrix.max(mh)",
+    "builtins": [
+      "matrix.max"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "matrix_max_warm0_7",
+    "expression": "matrix.max(mw)",
+    "builtins": [
+      "matrix.max"
+    ],
+    "note": "Actual matrix element holes"
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "map_size",
+    "expression": "map.size(m)",
+    "builtins": [
+      "map.size",
+      "map.put"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "map_contains_current",
+    "expression": "map.contains(m,b%3) ? 1 : 0",
+    "builtins": [
+      "map.contains",
+      "map.put"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "map_get_current",
+    "expression": "map.get(m,b%3)",
+    "builtins": [
+      "map.get",
+      "map.put"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_size_clean",
+    "expression": "array.size(arrClean)",
+    "builtins": [
+      "array.size"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-collections-1-v1",
+    "column": "array_get_current_hole",
+    "expression": "array.get(arrHole,2)",
+    "builtins": [
+      "array.get"
+    ],
+    "note": ""
+  }
+]

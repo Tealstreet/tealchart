@@ -1,0 +1,78 @@
+//@version=6
+indicator("coverage-strings-color-1-v1 — BTCUSDT 2m", overlay=false, precision=12, max_bars_back=200)
+// Standard BINANCE:BTCUSDT 2-minute chart. Export all 60 Data Window columns.
+// Leading na at b0..7; recurring interior na at b%97=40,41,42.
+if timeframe.period != "2"
+    runtime.error("Use BTCUSDT standard 2-minute candles")
+int b = bar_index
+bool hole = b % 97 == 40 or b % 97 == 41 or b % 97 == 42
+float clean = (b % 17 - 8) / 4.0
+float holes = hole ? na : clean
+float warm = b < 8 ? na : clean
+string sClean = "AbC 12 É"
+string sHole = hole ? string(na) : sClean
+string sWarm = b < 8 ? string(na) : sClean
+color cClean = color.rgb(10,20,30,40)
+color cHole = hole ? color(na) : cClean
+color cWarm = b < 8 ? color(na) : cClean
+
+plot(open, title="input_open", color=color.blue, display=display.data_window)
+plot(high, title="input_high", color=color.blue, display=display.data_window)
+plot(low, title="input_low", color=color.blue, display=display.data_window)
+plot(close, title="input_close", color=color.blue, display=display.data_window)
+plot(volume, title="input_volume", color=color.blue, display=display.data_window)
+plot(time, title="input_time", color=color.blue, display=display.data_window)
+plot(bar_index, title="input_bar_index", color=color.blue, display=display.data_window)
+plot(str.length(sClean), title="str_length_clean", color=color.blue, display=display.data_window)
+plot(str.length(sHole), title="str_length_hole97", color=color.blue, display=display.data_window)
+plot(str.length(sWarm), title="str_length_warm0_7", color=color.blue, display=display.data_window)
+plot(str.tonumber(str.replace(sClean,"AbC 12 É","12.5")), title="str_tonumber_clean", color=color.blue, display=display.data_window)
+plot(str.tonumber(str.replace(sHole,"AbC 12 É","12.5")), title="str_tonumber_hole97", color=color.blue, display=display.data_window)
+plot(str.tonumber(str.replace(sWarm,"AbC 12 É","12.5")), title="str_tonumber_warm0_7", color=color.blue, display=display.data_window)
+plot(str.pos(sClean,"12"), title="str_pos_clean", color=color.blue, display=display.data_window)
+plot(str.pos(sHole,"12"), title="str_pos_hole97", color=color.blue, display=display.data_window)
+plot(str.pos(sWarm,"12"), title="str_pos_warm0_7", color=color.blue, display=display.data_window)
+plot(str.contains(sClean,"12") ? 1 : 0, title="str_contains_clean", color=color.blue, display=display.data_window)
+plot(str.contains(sHole,"12") ? 1 : 0, title="str_contains_hole97", color=color.blue, display=display.data_window)
+plot(str.contains(sWarm,"12") ? 1 : 0, title="str_contains_warm0_7", color=color.blue, display=display.data_window)
+plot(str.startswith(sClean,"AbC") ? 1 : 0, title="str_startswith_clean", color=color.blue, display=display.data_window)
+plot(str.startswith(sHole,"AbC") ? 1 : 0, title="str_startswith_hole97", color=color.blue, display=display.data_window)
+plot(str.startswith(sWarm,"AbC") ? 1 : 0, title="str_startswith_warm0_7", color=color.blue, display=display.data_window)
+plot(str.endswith(sClean,"É") ? 1 : 0, title="str_endswith_clean", color=color.blue, display=display.data_window)
+plot(str.endswith(sHole,"É") ? 1 : 0, title="str_endswith_hole97", color=color.blue, display=display.data_window)
+plot(str.endswith(sWarm,"É") ? 1 : 0, title="str_endswith_warm0_7", color=color.blue, display=display.data_window)
+plot(str.lower(sClean) == "abc 12 é" ? 1 : 0, title="str_lower_clean", color=color.blue, display=display.data_window)
+plot(str.lower(sHole) == "abc 12 é" ? 1 : 0, title="str_lower_hole97", color=color.blue, display=display.data_window)
+plot(str.lower(sWarm) == "abc 12 é" ? 1 : 0, title="str_lower_warm0_7", color=color.blue, display=display.data_window)
+plot(str.upper(sClean) == "ABC 12 É" ? 1 : 0, title="str_upper_clean", color=color.blue, display=display.data_window)
+plot(str.upper(sHole) == "ABC 12 É" ? 1 : 0, title="str_upper_hole97", color=color.blue, display=display.data_window)
+plot(str.upper(sWarm) == "ABC 12 É" ? 1 : 0, title="str_upper_warm0_7", color=color.blue, display=display.data_window)
+plot(str.trim("  " + sClean + "  ") == "AbC 12 É" ? 1 : 0, title="str_trim_clean", color=color.blue, display=display.data_window)
+plot(str.trim("  " + sHole + "  ") == "AbC 12 É" ? 1 : 0, title="str_trim_hole97", color=color.blue, display=display.data_window)
+plot(str.trim("  " + sWarm + "  ") == "AbC 12 É" ? 1 : 0, title="str_trim_warm0_7", color=color.blue, display=display.data_window)
+plot(str.contains(str.replace_all(sClean," ","_"),"_") ? 1 : 0, title="str_replace_all_clean", color=color.blue, display=display.data_window)
+plot(str.contains(str.replace_all(sHole," ","_"),"_") ? 1 : 0, title="str_replace_all_hole97", color=color.blue, display=display.data_window)
+plot(str.contains(str.replace_all(sWarm," ","_"),"_") ? 1 : 0, title="str_replace_all_warm0_7", color=color.blue, display=display.data_window)
+plot(str.length(str.match(sClean,"[0-9]+")), title="str_match_clean", color=color.blue, display=display.data_window)
+plot(str.length(str.match(sHole,"[0-9]+")), title="str_match_hole97", color=color.blue, display=display.data_window)
+plot(str.length(str.match(sWarm,"[0-9]+")), title="str_match_warm0_7", color=color.blue, display=display.data_window)
+plot(str.length(str.substring(sClean,0,3)), title="str_substring_clean", color=color.blue, display=display.data_window)
+plot(str.length(str.substring(sHole,0,3)), title="str_substring_hole97", color=color.blue, display=display.data_window)
+plot(str.length(str.substring(sWarm,0,3)), title="str_substring_warm0_7", color=color.blue, display=display.data_window)
+plot(color.r(cClean), title="color_r_clean", color=color.blue, display=display.data_window)
+plot(color.r(cHole), title="color_r_hole97", color=color.blue, display=display.data_window)
+plot(color.r(cWarm), title="color_r_warm0_7", color=color.blue, display=display.data_window)
+plot(color.g(cClean), title="color_g_clean", color=color.blue, display=display.data_window)
+plot(color.g(cHole), title="color_g_hole97", color=color.blue, display=display.data_window)
+plot(color.g(cWarm), title="color_g_warm0_7", color=color.blue, display=display.data_window)
+plot(color.b(cClean), title="color_b_clean", color=color.blue, display=display.data_window)
+plot(color.b(cHole), title="color_b_hole97", color=color.blue, display=display.data_window)
+plot(color.b(cWarm), title="color_b_warm0_7", color=color.blue, display=display.data_window)
+plot(color.t(cClean), title="color_t_clean", color=color.blue, display=display.data_window)
+plot(color.t(cHole), title="color_t_hole97", color=color.blue, display=display.data_window)
+plot(color.t(cWarm), title="color_t_warm0_7", color=color.blue, display=display.data_window)
+plot(input.int(7,"Integer default"), title="input_int_default7", color=color.blue, display=display.data_window)
+plot(input.float(1.25,"Float default"), title="input_float_default125", color=color.blue, display=display.data_window)
+plot(input.bool(true,"Bool default") ? 1 : 0, title="input_bool_default_true", color=color.blue, display=display.data_window)
+plot(input.source(close,"Source default"), title="input_source_default_close", color=color.blue, display=display.data_window)
+plot(input.time(timestamp("2026-01-01T00:00:00Z"),"Time default"), title="input_time_default_utc", color=color.blue, display=display.data_window)

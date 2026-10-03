@@ -1,0 +1,28 @@
+//@version=6
+indicator("Authority conflicts batch 21 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF023 matrix-map/map-values-copy-reference-semantics
+// Distinguishes structural copying from object-state aliasing.
+type cf023_Item
+    int n
+cf023_m=map.new<string,cf023_Item>()
+map.put(cf023_m,"key",cf023_Item.new(10))
+cf023_vals=map.values(cf023_m)
+cf023_item=array.get(cf023_vals,0)
+cf023_item.n:=99
+array.push(cf023_vals,cf023_Item.new(20))
+plot(map.get(cf023_m,"key").n, "CF023_object_state", display = display.data_window)
+plot(map.size(cf023_m), "CF023_map_size", display = display.data_window)
+plot(array.size(cf023_vals), "CF023_values_size", display = display.data_window)
+

@@ -1,0 +1,22 @@
+//@version=6
+indicator("Authority conflicts batch 15 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF016 math/round-return-qualifier
+// Input-qualified consumer is plot linewidth; parser/run numeric success alone is insufficient.
+simple int cf016b_precision = int(syminfo.mintick)>0?1:2
+cf016b_input = input.float(2.125,"Round input")
+cf016b_result = math.round(cf016b_input,cf016b_precision)
+plot(cf016b_result, "CF016b_input_result", display = display.data_window)
+plot(close, "CF016b_input_consumer", display = display.data_window, linewidth = int(cf016b_result))
+

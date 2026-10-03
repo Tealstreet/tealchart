@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-matrix-1-v1.pine",
+  "source_sha256": "c75a1be5b5e4e9ee23cce8490fce372361d540b56a50a085317e4ebdbe4a96e8",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_time"
+    },
+    {
+      "title": "input_bar_index"
+    },
+    {
+      "title": "matrix_det_clean"
+    },
+    {
+      "title": "matrix_det_hole97"
+    },
+    {
+      "title": "matrix_det_warm0_7"
+    },
+    {
+      "title": "matrix_trace_clean"
+    },
+    {
+      "title": "matrix_trace_hole97"
+    },
+    {
+      "title": "matrix_trace_warm0_7"
+    },
+    {
+      "title": "matrix_rank_clean"
+    },
+    {
+      "title": "matrix_rank_hole97"
+    },
+    {
+      "title": "matrix_rank_warm0_7"
+    },
+    {
+      "title": "matrix_inv00_clean"
+    },
+    {
+      "title": "matrix_inv00_hole97"
+    },
+    {
+      "title": "matrix_inv00_warm0_7"
+    },
+    {
+      "title": "matrix_pinv00_clean"
+    },
+    {
+      "title": "matrix_pinv00_hole97"
+    },
+    {
+      "title": "matrix_pinv00_warm0_7"
+    },
+    {
+      "title": "matrix_pow2_00_clean"
+    },
+    {
+      "title": "matrix_pow2_00_hole97"
+    },
+    {
+      "title": "matrix_pow2_00_warm0_7"
+    },
+    {
+      "title": "matrix_sum00_clean"
+    },
+    {
+      "title": "matrix_sum00_hole97"
+    },
+    {
+      "title": "matrix_sum00_warm0_7"
+    },
+    {
+      "title": "matrix_diff00_clean"
+    },
+    {
+      "title": "matrix_diff00_hole97"
+    },
+    {
+      "title": "matrix_diff00_warm0_7"
+    },
+    {
+      "title": "matrix_mult00_clean"
+    },
+    {
+      "title": "matrix_mult00_hole97"
+    },
+    {
+      "title": "matrix_mult00_warm0_7"
+    },
+    {
+      "title": "matrix_kron00_clean"
+    },
+    {
+      "title": "matrix_kron00_hole97"
+    },
+    {
+      "title": "matrix_kron00_warm0_7"
+    },
+    {
+      "title": "matrix_transpose01_clean"
+    },
+    {
+      "title": "matrix_transpose01_hole97"
+    },
+    {
+      "title": "matrix_transpose01_warm0_7"
+    },
+    {
+      "title": "matrix_row1first_clean"
+    },
+    {
+      "title": "matrix_row1first_hole97"
+    },
+    {
+      "title": "matrix_row1first_warm0_7"
+    },
+    {
+      "title": "matrix_col1first_clean"
+    },
+    {
+      "title": "matrix_col1first_hole97"
+    },
+    {
+      "title": "matrix_col1first_warm0_7"
+    },
+    {
+      "title": "matrix_avg_clean"
+    },
+    {
+      "title": "matrix_avg_hole97"
+    },
+    {
+      "title": "matrix_avg_warm0_7"
+    },
+    {
+      "title": "matrix_median_clean"
+    },
+    {
+      "title": "matrix_median_hole97"
+    },
+    {
+      "title": "matrix_median_warm0_7"
+    },
+    {
+      "title": "matrix_min_clean"
+    },
+    {
+      "title": "matrix_min_hole97"
+    },
+    {
+      "title": "matrix_min_warm0_7"
+    },
+    {
+      "title": "matrix_max_clean"
+    },
+    {
+      "title": "matrix_max_hole97"
+    },
+    {
+      "title": "matrix_max_warm0_7"
+    },
+    {
+      "title": "matrix_rows"
+    },
+    {
+      "title": "matrix_columns"
+    }
+  ]
+}

@@ -1,0 +1,539 @@
+[
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_open",
+    "expression": "open",
+    "builtins": [
+      "open"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_high",
+    "expression": "high",
+    "builtins": [
+      "high"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_low",
+    "expression": "low",
+    "builtins": [
+      "low"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_close",
+    "expression": "close",
+    "builtins": [
+      "close"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_volume",
+    "expression": "volume",
+    "builtins": [
+      "volume"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_time",
+    "expression": "time",
+    "builtins": [
+      "time"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "input_bar_index",
+    "expression": "bar_index",
+    "builtins": [
+      "bar_index"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "avg_clean",
+    "expression": "math.avg(clean, 2.0, -1.0)",
+    "builtins": [
+      "math.avg"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "avg_hole97",
+    "expression": "math.avg(holes, 2.0, -1.0)",
+    "builtins": [
+      "math.avg"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "avg_warm0_7",
+    "expression": "math.avg(warm, 2.0, -1.0)",
+    "builtins": [
+      "math.avg"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "max_clean",
+    "expression": "math.max(clean, -1.0, 1.0)",
+    "builtins": [
+      "math.max"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "max_hole97",
+    "expression": "math.max(holes, -1.0, 1.0)",
+    "builtins": [
+      "math.max"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "max_warm0_7",
+    "expression": "math.max(warm, -1.0, 1.0)",
+    "builtins": [
+      "math.max"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "min_clean",
+    "expression": "math.min(clean, -1.0, 1.0)",
+    "builtins": [
+      "math.min"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "min_hole97",
+    "expression": "math.min(holes, -1.0, 1.0)",
+    "builtins": [
+      "math.min"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "min_warm0_7",
+    "expression": "math.min(warm, -1.0, 1.0)",
+    "builtins": [
+      "math.min"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "todegrees_clean",
+    "expression": "math.todegrees(clean)",
+    "builtins": [
+      "math.todegrees"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "todegrees_hole97",
+    "expression": "math.todegrees(holes)",
+    "builtins": [
+      "math.todegrees"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "todegrees_warm0_7",
+    "expression": "math.todegrees(warm)",
+    "builtins": [
+      "math.todegrees"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "toradians_clean",
+    "expression": "math.toradians(clean)",
+    "builtins": [
+      "math.toradians"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "toradians_hole97",
+    "expression": "math.toradians(holes)",
+    "builtins": [
+      "math.toradians"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "toradians_warm0_7",
+    "expression": "math.toradians(warm)",
+    "builtins": [
+      "math.toradians"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len5_clean",
+    "expression": "math.sum(clean, 5)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len5_hole97",
+    "expression": "math.sum(holes, 5)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len5_warm0_7",
+    "expression": "math.sum(warm, 5)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "random_seed42_clean",
+    "expression": "randomClean",
+    "builtins": [
+      "math.random"
+    ],
+    "note": "RNG observed values; holes mask output, not bounds. No assumption of shared PRNG algorithm."
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "random_seed42_hole97",
+    "expression": "randomHole",
+    "builtins": [
+      "math.random"
+    ],
+    "note": "RNG observed values; holes mask output, not bounds. No assumption of shared PRNG algorithm."
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "random_seed42_warm0_7",
+    "expression": "randomWarm",
+    "builtins": [
+      "math.random"
+    ],
+    "note": "RNG observed values; holes mask output, not bounds. No assumption of shared PRNG algorithm."
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "constant_pi",
+    "expression": "math.pi",
+    "builtins": [
+      "math.pi"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "constant_e",
+    "expression": "math.e",
+    "builtins": [
+      "math.e"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "constant_phi",
+    "expression": "math.phi",
+    "builtins": [
+      "math.phi"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "constant_rphi",
+    "expression": "math.rphi",
+    "builtins": [
+      "math.rphi"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len1_clean",
+    "expression": "math.sum(clean, 1)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len1_hole97",
+    "expression": "math.sum(holes, 1)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len1_warm0_7",
+    "expression": "math.sum(warm, 1)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len3_clean",
+    "expression": "math.sum(clean, 3)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len3_hole97",
+    "expression": "math.sum(holes, 3)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_len3_warm0_7",
+    "expression": "math.sum(warm, 3)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_dynamic_len1to5_clean",
+    "expression": "math.sum(clean, b % 5 + 1)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_dynamic_len1to5_hole97",
+    "expression": "math.sum(holes, b % 5 + 1)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_dynamic_len1to5_warm0_7",
+    "expression": "math.sum(warm, b % 5 + 1)",
+    "builtins": [
+      "math.sum"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_p050",
+    "expression": "math.round(0.5)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_m050",
+    "expression": "math.round(-0.5)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_p150",
+    "expression": "math.round(1.5)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_m150",
+    "expression": "math.round(-1.5)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_prec0",
+    "expression": "math.round(clean,0)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_prec2",
+    "expression": "math.round(clean/3,2)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "round_prec_dynamic",
+    "expression": "math.round(clean/3,b%3)",
+    "builtins": [
+      "math.round"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "sum_clean_len5_history_control",
+    "expression": "b < 4 ? na : clean+clean[1]+clean[2]+clean[3]+clean[4]",
+    "builtins": [],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "avg_primitive_control",
+    "expression": "(clean+2.0-1.0)/3.0",
+    "builtins": [],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "degree_radian_roundtrip",
+    "expression": "math.todegrees(math.toradians(clean))",
+    "builtins": [
+      "math.todegrees",
+      "math.toradians"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "currency_rate_usd_usd_clean",
+    "expression": "false ? na : request.currency_rate(\"USD\", \"USD\")",
+    "builtins": [
+      "request.currency_rate"
+    ],
+    "note": "Same-currency identity only; output-masked variants, not provider data coverage"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "currency_rate_usd_usd_hole97",
+    "expression": "hole ? na : request.currency_rate(\"USD\", \"USD\")",
+    "builtins": [
+      "request.currency_rate"
+    ],
+    "note": "Same-currency identity only; output-masked variants, not provider data coverage"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "currency_rate_usd_usd_warm0_7",
+    "expression": "b < 8 ? na : request.currency_rate(\"USD\", \"USD\")",
+    "builtins": [
+      "request.currency_rate"
+    ],
+    "note": "Same-currency identity only; output-masked variants, not provider data coverage"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "int_cast_clean",
+    "expression": "int(clean)",
+    "builtins": [
+      "int"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "int_cast_hole97",
+    "expression": "int(holes)",
+    "builtins": [
+      "int"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "int_cast_warm0_7",
+    "expression": "int(warm)",
+    "builtins": [
+      "int"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "float_cast_clean",
+    "expression": "float(clean)",
+    "builtins": [
+      "float"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "float_cast_hole97",
+    "expression": "float(holes)",
+    "builtins": [
+      "float"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  },
+  {
+    "probe": "coverage-math-2-v1",
+    "column": "float_cast_warm0_7",
+    "expression": "float(warm)",
+    "builtins": [
+      "float"
+    ],
+    "note": "Input variants: clean, recurring hole, leading na"
+  }
+]

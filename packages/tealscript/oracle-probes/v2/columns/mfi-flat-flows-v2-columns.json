@@ -1,0 +1,302 @@
+[
+  {
+    "title": "input_open",
+    "expression": "open",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_high",
+    "expression": "high",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_low",
+    "expression": "low",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_close",
+    "expression": "close",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_volume",
+    "expression": "volume",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_time",
+    "expression": "time",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_bar_index",
+    "expression": "bar_index",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "input_one_hole",
+    "expression": "oneHole",
+    "test": "Exact replay input; input_time is Unix milliseconds."
+  },
+  {
+    "title": "clean_mfi_inline_reference",
+    "expression": "100.0 - 100.0 / (1.0 + math.sum(volume * (ta.change(close) <= 0.0 ? 0.0 : close), 2) / math.sum(volume * (ta.change(close) >= 0.0 ? 0.0 : close), 2))",
+    "test": "Original inline MFI expression; compare call shape with named-sum reference."
+  },
+  {
+    "title": "clean_change",
+    "expression": "cleanChange",
+    "test": "Current source change used by directional-flow predicates."
+  },
+  {
+    "title": "clean_up_flow",
+    "expression": "cleanUp",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "clean_down_flow",
+    "expression": "cleanDown",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "clean_up_sum2",
+    "expression": "cleanUpSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "clean_down_sum2",
+    "expression": "cleanDownSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "clean_up_sum2_previous",
+    "expression": "cleanUpSum[1]",
+    "test": "Previous-bar math.sum result; exposes transition and cancellation state."
+  },
+  {
+    "title": "clean_down_sum2_previous",
+    "expression": "cleanDownSum[1]",
+    "test": "Previous-bar math.sum result; exposes transition and cancellation state."
+  },
+  {
+    "title": "clean_up_exact2",
+    "expression": "cleanExactUp",
+    "test": "Independent full-window sum over two non-missing flow values."
+  },
+  {
+    "title": "clean_down_exact2",
+    "expression": "cleanExactDown",
+    "test": "Independent full-window sum over two non-missing flow values."
+  },
+  {
+    "title": "clean_mfi_builtin",
+    "expression": "ta.mfi(close, 2)",
+    "test": "Direct ta.mfi source/length call, preserving builtin singular behavior."
+  },
+  {
+    "title": "clean_mfi_reference",
+    "expression": "100.0 - 100.0 / (1.0 + cleanUpSum / cleanDownSum)",
+    "test": "MFI reconstructed from separately exported directional sums."
+  },
+  {
+    "title": "clean_ratio",
+    "expression": "cleanUpSum / cleanDownSum",
+    "test": "Directional up/down ratio; unavailable at zero denominator is not a scale observation."
+  },
+  {
+    "title": "clean_flat_window",
+    "expression": "cleanChange == 0.0 and cleanChange[1] == 0.0 ? 1 : 0",
+    "test": "Two consecutive zero source changes; both exact flow sums should be zero."
+  },
+  {
+    "title": "hole40_mfi_inline_reference",
+    "expression": "100.0 - 100.0 / (1.0 + math.sum(volume * (ta.change(oneHole) <= 0.0 ? 0.0 : oneHole), 2) / math.sum(volume * (ta.change(oneHole) >= 0.0 ? 0.0 : oneHole), 2))",
+    "test": "Original inline MFI expression; compare call shape with named-sum reference."
+  },
+  {
+    "title": "hole40_change",
+    "expression": "hole40Change",
+    "test": "Current source change used by directional-flow predicates."
+  },
+  {
+    "title": "hole40_up_flow",
+    "expression": "hole40Up",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "hole40_down_flow",
+    "expression": "hole40Down",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "hole40_up_sum2",
+    "expression": "hole40UpSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "hole40_down_sum2",
+    "expression": "hole40DownSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "hole40_up_sum2_previous",
+    "expression": "hole40UpSum[1]",
+    "test": "Previous-bar math.sum result; exposes transition and cancellation state."
+  },
+  {
+    "title": "hole40_down_sum2_previous",
+    "expression": "hole40DownSum[1]",
+    "test": "Previous-bar math.sum result; exposes transition and cancellation state."
+  },
+  {
+    "title": "hole40_up_exact2",
+    "expression": "hole40ExactUp",
+    "test": "Independent full-window sum over two non-missing flow values."
+  },
+  {
+    "title": "hole40_down_exact2",
+    "expression": "hole40ExactDown",
+    "test": "Independent full-window sum over two non-missing flow values."
+  },
+  {
+    "title": "hole40_mfi_builtin",
+    "expression": "ta.mfi(oneHole, 2)",
+    "test": "Direct ta.mfi source/length call, preserving builtin singular behavior."
+  },
+  {
+    "title": "hole40_mfi_reference",
+    "expression": "100.0 - 100.0 / (1.0 + hole40UpSum / hole40DownSum)",
+    "test": "MFI reconstructed from separately exported directional sums."
+  },
+  {
+    "title": "hole40_ratio",
+    "expression": "hole40UpSum / hole40DownSum",
+    "test": "Directional up/down ratio; unavailable at zero denominator is not a scale observation."
+  },
+  {
+    "title": "hole40_flat_window",
+    "expression": "hole40Change == 0.0 and hole40Change[1] == 0.0 ? 1 : 0",
+    "test": "Two consecutive zero source changes; both exact flow sums should be zero."
+  },
+  {
+    "title": "hlc3_up_flow",
+    "expression": "hlc3Up",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "hlc3_down_flow",
+    "expression": "hlc3Down",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "hlc3_up_sum2",
+    "expression": "hlc3UpSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "hlc3_down_sum2",
+    "expression": "hlc3DownSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "hlc3_mfi_reference",
+    "expression": "100.0 - 100.0 / (1.0 + hlc3UpSum / hlc3DownSum)",
+    "test": "MFI reconstructed from separately exported directional sums."
+  },
+  {
+    "title": "hlc3_ratio",
+    "expression": "hlc3UpSum / hlc3DownSum",
+    "test": "Directional up/down ratio; unavailable at zero denominator is not a scale observation."
+  },
+  {
+    "title": "previous_volume_up_flow",
+    "expression": "previous_volumeUp",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "previous_volume_down_flow",
+    "expression": "previous_volumeDown",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "previous_volume_up_sum2",
+    "expression": "previous_volumeUpSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "previous_volume_down_sum2",
+    "expression": "previous_volumeDownSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "previous_volume_mfi_reference",
+    "expression": "100.0 - 100.0 / (1.0 + previous_volumeUpSum / previous_volumeDownSum)",
+    "test": "MFI reconstructed from separately exported directional sums."
+  },
+  {
+    "title": "previous_volume_ratio",
+    "expression": "previous_volumeUpSum / previous_volumeDownSum",
+    "test": "Directional up/down ratio; unavailable at zero denominator is not a scale observation."
+  },
+  {
+    "title": "previous_price_up_flow",
+    "expression": "previous_priceUp",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "previous_price_down_flow",
+    "expression": "previous_priceDown",
+    "test": "Signed current-bar directional money flow; determines source, price and volume sample."
+  },
+  {
+    "title": "previous_price_up_sum2",
+    "expression": "previous_priceUpSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "previous_price_down_sum2",
+    "expression": "previous_priceDownSum",
+    "test": "Absolute two-sample math.sum result; zero sign and residual magnitude are decisive."
+  },
+  {
+    "title": "previous_price_mfi_reference",
+    "expression": "100.0 - 100.0 / (1.0 + previous_priceUpSum / previous_priceDownSum)",
+    "test": "MFI reconstructed from separately exported directional sums."
+  },
+  {
+    "title": "previous_price_ratio",
+    "expression": "previous_priceUpSum / previous_priceDownSum",
+    "test": "Directional up/down ratio; unavailable at zero denominator is not a scale observation."
+  },
+  {
+    "title": "rolling_subtract_add_up",
+    "expression": "f_rolling2(cleanUp, 0)",
+    "test": "Floating rolling update with the stated operation order; compare both sums before ratios."
+  },
+  {
+    "title": "rolling_subtract_add_down",
+    "expression": "f_rolling2(cleanDown, 0)",
+    "test": "Floating rolling update with the stated operation order; compare both sums before ratios."
+  },
+  {
+    "title": "rolling_add_subtract_up",
+    "expression": "f_rolling2(cleanUp, 1)",
+    "test": "Floating rolling update with the stated operation order; compare both sums before ratios."
+  },
+  {
+    "title": "rolling_add_subtract_down",
+    "expression": "f_rolling2(cleanDown, 1)",
+    "test": "Floating rolling update with the stated operation order; compare both sums before ratios."
+  },
+  {
+    "title": "rolling_difference_up",
+    "expression": "f_rolling2(cleanUp, 2)",
+    "test": "Floating rolling update with the stated operation order; compare both sums before ratios."
+  },
+  {
+    "title": "rolling_difference_down",
+    "expression": "f_rolling2(cleanDown, 2)",
+    "test": "Floating rolling update with the stated operation order; compare both sums before ratios."
+  }
+]

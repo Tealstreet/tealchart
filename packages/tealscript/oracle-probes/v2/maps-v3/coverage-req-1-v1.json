@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-req-1-v1.pine",
+  "source_sha256": "8f481a6dfe7ba2f524606361e8abf1c49fe296891d1712b0a46e5af481705a63",
+  "columns": [
+    {
+      "title": "open"
+    },
+    {
+      "title": "high"
+    },
+    {
+      "title": "low"
+    },
+    {
+      "title": "close"
+    },
+    {
+      "title": "volume"
+    },
+    {
+      "title": "time"
+    },
+    {
+      "title": "bar_index"
+    },
+    {
+      "title": "ltf1_clean_count"
+    },
+    {
+      "title": "ltf1_clean_non_na_count"
+    },
+    {
+      "title": "ltf1_clean_first"
+    },
+    {
+      "title": "ltf1_clean_last"
+    },
+    {
+      "title": "ltf1_clean_non_na_sum"
+    },
+    {
+      "title": "ltf1_clean_non_na_mean"
+    },
+    {
+      "title": "ltf1_hole_count"
+    },
+    {
+      "title": "ltf1_hole_non_na_count"
+    },
+    {
+      "title": "ltf1_hole_first"
+    },
+    {
+      "title": "ltf1_hole_last"
+    },
+    {
+      "title": "ltf1_hole_non_na_sum"
+    },
+    {
+      "title": "ltf1_hole_non_na_mean"
+    },
+    {
+      "title": "ltf1_warm_count"
+    },
+    {
+      "title": "ltf1_warm_non_na_count"
+    },
+    {
+      "title": "ltf1_warm_first"
+    },
+    {
+      "title": "ltf1_warm_last"
+    },
+    {
+      "title": "ltf1_warm_non_na_sum"
+    },
+    {
+      "title": "ltf1_warm_non_na_mean"
+    },
+    {
+      "title": "htf6_clean_gapsoff_lookaheadoff"
+    },
+    {
+      "title": "htf6_hole_gapsoff_lookaheadoff"
+    },
+    {
+      "title": "htf6_sma4_warm_gapsoff_lookaheadoff"
+    },
+    {
+      "title": "htf6_rma4_warm_gapsoff_lookaheadoff"
+    },
+    {
+      "title": "htf6_time_gapsoff_lookaheadoff"
+    },
+    {
+      "title": "htf6_clean_gapsoff_lookaheadon"
+    },
+    {
+      "title": "htf6_hole_gapsoff_lookaheadon"
+    },
+    {
+      "title": "htf6_sma4_warm_gapsoff_lookaheadon"
+    },
+    {
+      "title": "htf6_rma4_warm_gapsoff_lookaheadon"
+    },
+    {
+      "title": "htf6_time_gapsoff_lookaheadon"
+    },
+    {
+      "title": "htf6_clean_gapson_lookaheadoff"
+    },
+    {
+      "title": "htf6_hole_gapson_lookaheadoff"
+    },
+    {
+      "title": "htf6_sma4_warm_gapson_lookaheadoff"
+    },
+    {
+      "title": "htf6_rma4_warm_gapson_lookaheadoff"
+    },
+    {
+      "title": "htf6_time_gapson_lookaheadoff"
+    },
+    {
+      "title": "htf6_clean_gapson_lookaheadon"
+    },
+    {
+      "title": "htf6_hole_gapson_lookaheadon"
+    },
+    {
+      "title": "htf6_sma4_warm_gapson_lookaheadon"
+    },
+    {
+      "title": "htf6_rma4_warm_gapson_lookaheadon"
+    },
+    {
+      "title": "htf6_time_gapson_lookaheadon"
+    },
+    {
+      "title": "table_count_before_scratch"
+    },
+    {
+      "title": "table_count_with_scratch"
+    },
+    {
+      "title": "table_count_after_clear"
+    },
+    {
+      "title": "table_count_after_delete"
+    },
+    {
+      "title": "cell_clean_arg"
+    },
+    {
+      "title": "cell_hole_arg"
+    },
+    {
+      "title": "cell_warm_arg"
+    },
+    {
+      "title": "cell_clean_text_length"
+    },
+    {
+      "title": "cell_hole_text_length"
+    },
+    {
+      "title": "cell_warm_text_length"
+    },
+    {
+      "title": "cell_calls_reached"
+    },
+    {
+      "title": "cell_text_setters_reached"
+    },
+    {
+      "title": "cell_geometry_setters_reached"
+    },
+    {
+      "title": "cell_appearance_setters_reached"
+    },
+    {
+      "title": "merge_initialized"
+    }
+  ]
+}

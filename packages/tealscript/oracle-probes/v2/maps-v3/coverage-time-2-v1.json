@@ -1,0 +1,187 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "coverage-time-2-v1.pine",
+  "source_sha256": "b1fed12979092b139cf07956609d9bdc2c0e38d93059421213709f3761cff703",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_time"
+    },
+    {
+      "title": "input_bar_index"
+    },
+    {
+      "title": "in_seconds_1s"
+    },
+    {
+      "title": "in_seconds_5s"
+    },
+    {
+      "title": "in_seconds_15s"
+    },
+    {
+      "title": "in_seconds_30s"
+    },
+    {
+      "title": "in_seconds_1"
+    },
+    {
+      "title": "in_seconds_2"
+    },
+    {
+      "title": "in_seconds_6"
+    },
+    {
+      "title": "in_seconds_30"
+    },
+    {
+      "title": "in_seconds_1d"
+    },
+    {
+      "title": "in_seconds_1w"
+    },
+    {
+      "title": "in_seconds_1m"
+    },
+    {
+      "title": "in_seconds_12m"
+    },
+    {
+      "title": "from_seconds_roundtrip_1"
+    },
+    {
+      "title": "from_seconds_roundtrip_59"
+    },
+    {
+      "title": "from_seconds_roundtrip_60"
+    },
+    {
+      "title": "from_seconds_roundtrip_61"
+    },
+    {
+      "title": "from_seconds_roundtrip_120"
+    },
+    {
+      "title": "from_seconds_roundtrip_3599"
+    },
+    {
+      "title": "from_seconds_roundtrip_3600"
+    },
+    {
+      "title": "from_seconds_roundtrip_86400"
+    },
+    {
+      "title": "from_seconds_roundtrip_604800"
+    },
+    {
+      "title": "from_seconds_roundtrip_2592000"
+    },
+    {
+      "title": "from_seconds_roundtrip_2628003"
+    },
+    {
+      "title": "from_seconds_roundtrip_31536036"
+    },
+    {
+      "title": "change_2"
+    },
+    {
+      "title": "change_6"
+    },
+    {
+      "title": "change_30"
+    },
+    {
+      "title": "change_1d"
+    },
+    {
+      "title": "change_1w"
+    },
+    {
+      "title": "change_1m"
+    },
+    {
+      "title": "timestamp_utc_leapday"
+    },
+    {
+      "title": "timestamp_ny_spring_before"
+    },
+    {
+      "title": "timestamp_ny_spring_after"
+    },
+    {
+      "title": "timestamp_ny_fall_fold"
+    },
+    {
+      "title": "timestamp_iso_string"
+    },
+    {
+      "title": "timestamp_current_calendar_midnight"
+    },
+    {
+      "title": "barstate_isfirst"
+    },
+    {
+      "title": "barstate_islast"
+    },
+    {
+      "title": "barstate_ishistory"
+    },
+    {
+      "title": "barstate_isrealtime"
+    },
+    {
+      "title": "barstate_isnew"
+    },
+    {
+      "title": "barstate_isconfirmed"
+    },
+    {
+      "title": "barstate_islastconfirmedhistory"
+    },
+    {
+      "title": "session_ismarket"
+    },
+    {
+      "title": "session_ispremarket"
+    },
+    {
+      "title": "session_ispostmarket"
+    },
+    {
+      "title": "syminfo_mintick"
+    },
+    {
+      "title": "syminfo_pricescale"
+    },
+    {
+      "title": "syminfo_mincontract"
+    },
+    {
+      "title": "syminfo_pointvalue"
+    },
+    {
+      "title": "timeframe_multiplier"
+    },
+    {
+      "title": "timeframe_isminutes"
+    },
+    {
+      "title": "timeframe_isintraday"
+    }
+  ]
+}

@@ -1,0 +1,623 @@
+{
+  "numericSlots": 60,
+  "scalarPlotCalls": 44,
+  "ohlcPlotCalls": 4,
+  "actualCsvOhlcLabels": "UNKNOWN UNTIL CAPTURE; expected four fields per OHLC plot. Map labels using exported Data Window fields, not assumed suffix order.",
+  "sourceSha256": "ad144f7e00532bbc01cd761e92bc114eaba819dc52afd7e41fde09ea062e0e49",
+  "columns": [
+    {
+      "ordinal": 1,
+      "title": "input_open",
+      "expression": "open",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 2,
+      "title": "input_high",
+      "expression": "high",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 3,
+      "title": "input_low",
+      "expression": "low",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 4,
+      "title": "input_close",
+      "expression": "close",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 5,
+      "title": "input_volume",
+      "expression": "volume",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 6,
+      "title": "input_time_ms",
+      "expression": "time",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 7,
+      "title": "input_bar_index",
+      "expression": "b",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 8,
+      "title": "input_case_mod11",
+      "expression": "k",
+      "kind": "plot",
+      "role": "input/control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 9,
+      "title": "const_source_open",
+      "expression": "10",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 10,
+      "title": "const_source_high",
+      "expression": "4",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 11,
+      "title": "const_source_low",
+      "expression": "7",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 12,
+      "title": "const_source_close",
+      "expression": "20",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 13,
+      "title": "const_expected_high",
+      "expression": "20",
+      "kind": "plot",
+      "role": "doc-only helper",
+      "reviewRows": [
+        "e21:r132",
+        "e22:r148"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 14,
+      "title": "const_expected_low",
+      "expression": "4",
+      "kind": "plot",
+      "role": "doc-only helper",
+      "reviewRows": [
+        "e21:r133",
+        "e22:r149"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 15,
+      "title": "dynamic_source_open",
+      "expression": "testOpen",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 16,
+      "title": "dynamic_source_high",
+      "expression": "testHigh",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 17,
+      "title": "dynamic_source_low",
+      "expression": "testLow",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 18,
+      "title": "dynamic_source_close",
+      "expression": "testClose",
+      "kind": "plot",
+      "role": "unnormalized input witness",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 19,
+      "title": "dynamic_expected_high",
+      "expression": "expectedHigh",
+      "kind": "plot",
+      "role": "doc-only helper",
+      "reviewRows": [
+        "e21:r132",
+        "e22:r148"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 20,
+      "title": "dynamic_expected_low",
+      "expression": "expectedLow",
+      "kind": "plot",
+      "role": "doc-only helper",
+      "reviewRows": [
+        "e21:r133",
+        "e22:r149"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 21,
+      "title": "dynamic_any_na_mask",
+      "expression": "anyMissing ? 1 : 0",
+      "kind": "plot",
+      "role": "NaN instrument control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 22,
+      "title": "fill_flat_top_boundary",
+      "expression": "flatTop",
+      "kind": "plot",
+      "role": "exported boundary, not measured fill",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 23,
+      "title": "fill_flat_bottom_boundary",
+      "expression": "flatBottom",
+      "kind": "plot",
+      "role": "exported boundary, not measured fill",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 24,
+      "title": "fill_hole_top_boundary",
+      "expression": "holeTop",
+      "kind": "plot",
+      "role": "exported boundary, not measured fill",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 25,
+      "title": "fill_hole_bottom_boundary",
+      "expression": "holeBottom",
+      "kind": "plot",
+      "role": "exported boundary, not measured fill",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 26,
+      "title": "fill_gradient_top_boundary",
+      "expression": "gradientTop",
+      "kind": "plot",
+      "role": "exported boundary, not measured gradient",
+      "reviewRows": [
+        "e51:r21",
+        "e51:r32"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 27,
+      "title": "fill_gradient_bottom_boundary",
+      "expression": "gradientBottom",
+      "kind": "plot",
+      "role": "exported boundary, not measured gradient",
+      "reviewRows": [
+        "e51:r21",
+        "e51:r32"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 28,
+      "title": "fill_hline_top_price",
+      "expression": "10",
+      "kind": "plot",
+      "role": "hline input mirror",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 29,
+      "title": "fill_hline_bottom_price",
+      "expression": "0",
+      "kind": "plot",
+      "role": "hline input mirror",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 30,
+      "title": "fill_gradient_top_value_arg",
+      "expression": "gradientAnchorTop",
+      "kind": "plot",
+      "role": "gradient argument mirror",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 31,
+      "title": "fill_gradient_bottom_value_arg",
+      "expression": "gradientAnchorBottom",
+      "kind": "plot",
+      "role": "gradient argument mirror",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 32,
+      "title": "fill_hole_top_na_mask",
+      "expression": "na(holeTop) ? 1 : 0",
+      "kind": "plot",
+      "role": "boundary hole control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 33,
+      "title": "fill_hole_bottom_na_mask",
+      "expression": "na(holeBottom) ? 1 : 0",
+      "kind": "plot",
+      "role": "boundary hole control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 34,
+      "title": "fill_gradient_top_na_mask",
+      "expression": "na(gradientTop) ? 1 : 0",
+      "kind": "plot",
+      "role": "boundary hole control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 35,
+      "title": "fill_gradient_bottom_na_mask",
+      "expression": "na(gradientBottom) ? 1 : 0",
+      "kind": "plot",
+      "role": "boundary hole control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 36,
+      "title": "fill_flat_upper_envelope",
+      "expression": "math.max(flatTop,flatBottom)",
+      "kind": "plot",
+      "role": "doc-only geometry helper",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 37,
+      "title": "fill_flat_lower_envelope",
+      "expression": "math.min(flatTop,flatBottom)",
+      "kind": "plot",
+      "role": "doc-only geometry helper",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 38,
+      "title": "fill_gradient_upper_envelope",
+      "expression": "math.max(gradientTop,gradientBottom)",
+      "kind": "plot",
+      "role": "doc-only geometry helper",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 39,
+      "title": "fill_gradient_lower_envelope",
+      "expression": "math.min(gradientTop,gradientBottom)",
+      "kind": "plot",
+      "role": "doc-only geometry helper",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 40,
+      "title": "fill_flat_numeric_height",
+      "expression": "flatTop-flatBottom",
+      "kind": "plot",
+      "role": "doc-only geometry helper",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 41,
+      "title": "fill_gradient_numeric_height",
+      "expression": "gradientTop-gradientBottom",
+      "kind": "plot",
+      "role": "doc-only geometry helper",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 42,
+      "title": "fill_hole_any_na_mask",
+      "expression": "na(holeTop) or na(holeBottom) ? 1 : 0",
+      "kind": "plot",
+      "role": "boundary hole control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 43,
+      "title": "input_historical_mask",
+      "expression": "barstate.ishistory ? 1 : 0",
+      "kind": "plot",
+      "role": "historical/live discriminator",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 44,
+      "title": "control_index_plus_one",
+      "expression": "b+1",
+      "kind": "plot",
+      "role": "instrument control",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 45,
+      "title": "plotbar_constant_actual [open]",
+      "plotTitle": "plotbar_constant_actual",
+      "ohlcChannel": "open",
+      "expression": "10",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 46,
+      "title": "plotbar_constant_actual [high]",
+      "plotTitle": "plotbar_constant_actual",
+      "ohlcChannel": "high",
+      "expression": "4",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e21:r132",
+        "e21:r133"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 47,
+      "title": "plotbar_constant_actual [low]",
+      "plotTitle": "plotbar_constant_actual",
+      "ohlcChannel": "low",
+      "expression": "7",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e21:r132",
+        "e21:r133"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 48,
+      "title": "plotbar_constant_actual [close]",
+      "plotTitle": "plotbar_constant_actual",
+      "ohlcChannel": "close",
+      "expression": "20",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 49,
+      "title": "plotbar_dynamic_actual [open]",
+      "plotTitle": "plotbar_dynamic_actual",
+      "ohlcChannel": "open",
+      "expression": "testOpen",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 50,
+      "title": "plotbar_dynamic_actual [high]",
+      "plotTitle": "plotbar_dynamic_actual",
+      "ohlcChannel": "high",
+      "expression": "testHigh",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e21:r132",
+        "e21:r133"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 51,
+      "title": "plotbar_dynamic_actual [low]",
+      "plotTitle": "plotbar_dynamic_actual",
+      "ohlcChannel": "low",
+      "expression": "testLow",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e21:r132",
+        "e21:r133"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 52,
+      "title": "plotbar_dynamic_actual [close]",
+      "plotTitle": "plotbar_dynamic_actual",
+      "ohlcChannel": "close",
+      "expression": "testClose",
+      "kind": "plotbar",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 53,
+      "title": "plotcandle_constant_actual [open]",
+      "plotTitle": "plotcandle_constant_actual",
+      "ohlcChannel": "open",
+      "expression": "10",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 54,
+      "title": "plotcandle_constant_actual [high]",
+      "plotTitle": "plotcandle_constant_actual",
+      "ohlcChannel": "high",
+      "expression": "4",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e22:r148",
+        "e22:r149"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 55,
+      "title": "plotcandle_constant_actual [low]",
+      "plotTitle": "plotcandle_constant_actual",
+      "ohlcChannel": "low",
+      "expression": "7",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e22:r148",
+        "e22:r149"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 56,
+      "title": "plotcandle_constant_actual [close]",
+      "plotTitle": "plotcandle_constant_actual",
+      "ohlcChannel": "close",
+      "expression": "20",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 57,
+      "title": "plotcandle_dynamic_actual [open]",
+      "plotTitle": "plotcandle_dynamic_actual",
+      "ohlcChannel": "open",
+      "expression": "testOpen",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 58,
+      "title": "plotcandle_dynamic_actual [high]",
+      "plotTitle": "plotcandle_dynamic_actual",
+      "ohlcChannel": "high",
+      "expression": "testHigh",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e22:r148",
+        "e22:r149"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 59,
+      "title": "plotcandle_dynamic_actual [low]",
+      "plotTitle": "plotcandle_dynamic_actual",
+      "ohlcChannel": "low",
+      "expression": "testLow",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [
+        "e22:r148",
+        "e22:r149"
+      ],
+      "expectedOffset": 0
+    },
+    {
+      "ordinal": 60,
+      "title": "plotcandle_dynamic_actual [close]",
+      "plotTitle": "plotcandle_dynamic_actual",
+      "ohlcChannel": "close",
+      "expression": "testClose",
+      "kind": "plotcandle",
+      "role": "actual custom-OHLC output; exported field labels must be recorded",
+      "reviewRows": [],
+      "expectedOffset": 0
+    }
+  ]
+}

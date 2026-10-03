@@ -1,0 +1,27 @@
+//@version=6
+indicator("Authority conflicts batch 6 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF008 array/C08
+// Enum/UDT acceptance isolated from other captures.
+enum cf008_Choice
+    first
+    second
+type cf008_Item
+    int n
+cf008_e = array.from(cf008_Choice.first, cf008_Choice.second)
+cf008_u = array.from(cf008_Item.new(10), cf008_Item.new(20))
+plot(array.size(cf008_e), "CF008_enum_size", display = display.data_window)
+plot(array.get(cf008_e,1)==cf008_Choice.second?1:0, "CF008_enum_value", display = display.data_window)
+plot(array.get(cf008_u,1).n, "CF008_udt_value", display = display.data_window)
+

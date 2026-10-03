@@ -1,0 +1,544 @@
+[
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_open",
+    "expression": "open",
+    "builtins": [
+      "open"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_high",
+    "expression": "high",
+    "builtins": [
+      "high"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_low",
+    "expression": "low",
+    "builtins": [
+      "low"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_close",
+    "expression": "close",
+    "builtins": [
+      "close"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_volume",
+    "expression": "volume",
+    "builtins": [
+      "volume"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_time",
+    "expression": "time",
+    "builtins": [
+      "time"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "input_bar_index",
+    "expression": "bar_index",
+    "builtins": [
+      "bar_index"
+    ],
+    "note": "Exact chart replay input / index"
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_copy_clean",
+    "expression": "arrayOp(clean,0)",
+    "builtins": [
+      "array.copy"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_copy_hole97",
+    "expression": "arrayOp(holes,0)",
+    "builtins": [
+      "array.copy"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_copy_warm0_7",
+    "expression": "arrayOp(warm,0)",
+    "builtins": [
+      "array.copy"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_concat_clean",
+    "expression": "arrayOp(clean,1)",
+    "builtins": [
+      "array.concat"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_concat_hole97",
+    "expression": "arrayOp(holes,1)",
+    "builtins": [
+      "array.concat"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_concat_warm0_7",
+    "expression": "arrayOp(warm,1)",
+    "builtins": [
+      "array.concat"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_abs_clean",
+    "expression": "arrayOp(clean,2)",
+    "builtins": [
+      "array.abs"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_abs_hole97",
+    "expression": "arrayOp(holes,2)",
+    "builtins": [
+      "array.abs"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_abs_warm0_7",
+    "expression": "arrayOp(warm,2)",
+    "builtins": [
+      "array.abs"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_slice_clean",
+    "expression": "arrayOp(clean,3)",
+    "builtins": [
+      "array.slice"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_slice_hole97",
+    "expression": "arrayOp(holes,3)",
+    "builtins": [
+      "array.slice"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_slice_warm0_7",
+    "expression": "arrayOp(warm,3)",
+    "builtins": [
+      "array.slice"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_reverse_clean",
+    "expression": "arrayOp(clean,4)",
+    "builtins": [
+      "array.reverse"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_reverse_hole97",
+    "expression": "arrayOp(holes,4)",
+    "builtins": [
+      "array.reverse"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_reverse_warm0_7",
+    "expression": "arrayOp(warm,4)",
+    "builtins": [
+      "array.reverse"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_sort_clean",
+    "expression": "arrayOp(clean,5)",
+    "builtins": [
+      "array.sort"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_sort_hole97",
+    "expression": "arrayOp(holes,5)",
+    "builtins": [
+      "array.sort"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_sort_warm0_7",
+    "expression": "arrayOp(warm,5)",
+    "builtins": [
+      "array.sort"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_sort_indices_clean",
+    "expression": "arrayOp(clean,6)",
+    "builtins": [
+      "array.sort_indices"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_sort_indices_hole97",
+    "expression": "arrayOp(holes,6)",
+    "builtins": [
+      "array.sort_indices"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_sort_indices_warm0_7",
+    "expression": "arrayOp(warm,6)",
+    "builtins": [
+      "array.sort_indices"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_standardize_clean",
+    "expression": "arrayOp(clean,7)",
+    "builtins": [
+      "array.standardize"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_standardize_hole97",
+    "expression": "arrayOp(holes,7)",
+    "builtins": [
+      "array.standardize"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_standardize_warm0_7",
+    "expression": "arrayOp(warm,7)",
+    "builtins": [
+      "array.standardize"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_fill_clean",
+    "expression": "arrayOp(clean,8)",
+    "builtins": [
+      "array.fill"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_fill_hole97",
+    "expression": "arrayOp(holes,8)",
+    "builtins": [
+      "array.fill"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_fill_warm0_7",
+    "expression": "arrayOp(warm,8)",
+    "builtins": [
+      "array.fill"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_set_clean",
+    "expression": "arrayOp(clean,9)",
+    "builtins": [
+      "array.set"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_set_hole97",
+    "expression": "arrayOp(holes,9)",
+    "builtins": [
+      "array.set"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_set_warm0_7",
+    "expression": "arrayOp(warm,9)",
+    "builtins": [
+      "array.set"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_push_clean",
+    "expression": "arrayOp(clean,10)",
+    "builtins": [
+      "array.push"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_push_hole97",
+    "expression": "arrayOp(holes,10)",
+    "builtins": [
+      "array.push"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_push_warm0_7",
+    "expression": "arrayOp(warm,10)",
+    "builtins": [
+      "array.push"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_pop_clean",
+    "expression": "arrayOp(clean,11)",
+    "builtins": [
+      "array.pop"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_pop_hole97",
+    "expression": "arrayOp(holes,11)",
+    "builtins": [
+      "array.pop"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_pop_warm0_7",
+    "expression": "arrayOp(warm,11)",
+    "builtins": [
+      "array.pop"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_shift_clean",
+    "expression": "arrayOp(clean,12)",
+    "builtins": [
+      "array.shift"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_shift_hole97",
+    "expression": "arrayOp(holes,12)",
+    "builtins": [
+      "array.shift"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_shift_warm0_7",
+    "expression": "arrayOp(warm,12)",
+    "builtins": [
+      "array.shift"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_unshift_clean",
+    "expression": "arrayOp(clean,13)",
+    "builtins": [
+      "array.unshift"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_unshift_hole97",
+    "expression": "arrayOp(holes,13)",
+    "builtins": [
+      "array.unshift"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_unshift_warm0_7",
+    "expression": "arrayOp(warm,13)",
+    "builtins": [
+      "array.unshift"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_insert_clean",
+    "expression": "arrayOp(clean,14)",
+    "builtins": [
+      "array.insert"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_insert_hole97",
+    "expression": "arrayOp(holes,14)",
+    "builtins": [
+      "array.insert"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_insert_warm0_7",
+    "expression": "arrayOp(warm,14)",
+    "builtins": [
+      "array.insert"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_remove_clean",
+    "expression": "arrayOp(clean,15)",
+    "builtins": [
+      "array.remove"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_remove_hole97",
+    "expression": "arrayOp(holes,15)",
+    "builtins": [
+      "array.remove"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_remove_warm0_7",
+    "expression": "arrayOp(warm,15)",
+    "builtins": [
+      "array.remove"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_clear_clean",
+    "expression": "arrayOp(clean,16)",
+    "builtins": [
+      "array.clear"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_clear_hole97",
+    "expression": "arrayOp(holes,16)",
+    "builtins": [
+      "array.clear"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_clear_warm0_7",
+    "expression": "arrayOp(warm,16)",
+    "builtins": [
+      "array.clear"
+    ],
+    "note": "Actual missing array elements; observe mutated slot/size or returned element. insert uses valid negative index -1."
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_includes_control",
+    "expression": "array.includes(array.from(clean,clean+1),clean) ? 1 : 0",
+    "builtins": [
+      "array.includes",
+      "array.from"
+    ],
+    "note": ""
+  },
+  {
+    "probe": "coverage-collections-2-v1",
+    "column": "array_indexof_control",
+    "expression": "array.indexof(array.from(clean,clean+1),clean+1)",
+    "builtins": [
+      "array.indexof",
+      "array.from"
+    ],
+    "note": ""
+  }
+]

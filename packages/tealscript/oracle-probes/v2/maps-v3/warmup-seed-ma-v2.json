@@ -1,0 +1,184 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "warmup-seed-ma-v2.pine",
+  "source_sha256": "68d62543d5cde05842056107ad677b12f3444432b770e4b0454bfad87c66a487",
+  "columns": [
+    {
+      "title": "input_open"
+    },
+    {
+      "title": "input_high"
+    },
+    {
+      "title": "input_low"
+    },
+    {
+      "title": "input_close"
+    },
+    {
+      "title": "input_volume"
+    },
+    {
+      "title": "input_seed_phase"
+    },
+    {
+      "title": "input_close_clean_seed0"
+    },
+    {
+      "title": "input_close_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "sma_len1_clean_seed0"
+    },
+    {
+      "title": "sma_len2_clean_seed0"
+    },
+    {
+      "title": "sma_len5_clean_seed0"
+    },
+    {
+      "title": "ema_len1_clean_seed0"
+    },
+    {
+      "title": "ema_len2_clean_seed0"
+    },
+    {
+      "title": "ema_len5_clean_seed0"
+    },
+    {
+      "title": "rma_len1_clean_seed0"
+    },
+    {
+      "title": "rma_len2_clean_seed0"
+    },
+    {
+      "title": "rma_len5_clean_seed0"
+    },
+    {
+      "title": "wma_len1_clean_seed0"
+    },
+    {
+      "title": "wma_len2_clean_seed0"
+    },
+    {
+      "title": "wma_len5_clean_seed0"
+    },
+    {
+      "title": "vwma_len1_clean_seed0"
+    },
+    {
+      "title": "vwma_len2_clean_seed0"
+    },
+    {
+      "title": "vwma_len5_clean_seed0"
+    },
+    {
+      "title": "alma_len1_clean_seed0_offset085_sigma6_floorfalse"
+    },
+    {
+      "title": "alma_len2_clean_seed0_offset085_sigma6_floorfalse"
+    },
+    {
+      "title": "alma_len5_clean_seed0_offset085_sigma6_floorfalse"
+    },
+    {
+      "title": "hma_len2_clean_seed0"
+    },
+    {
+      "title": "hma_len5_clean_seed0"
+    },
+    {
+      "title": "linreg_len1_clean_seed0_offset0"
+    },
+    {
+      "title": "linreg_len2_clean_seed0_offset0"
+    },
+    {
+      "title": "linreg_len5_clean_seed0_offset0"
+    },
+    {
+      "title": "swma_len4_clean_seed0"
+    },
+    {
+      "title": "sma_len2_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "sma_len5_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "ema_len2_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "ema_len5_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "rma_len2_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "rma_len5_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "wma_len2_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "wma_len5_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "vwma_len2_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "vwma_len5_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "alma_len2_holes_p1_p2_p40_p41_p80to85_offset085_sigma6_floorfalse"
+    },
+    {
+      "title": "alma_len5_holes_p1_p2_p40_p41_p80to85_offset085_sigma6_floorfalse"
+    },
+    {
+      "title": "hma_len2_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "hma_len5_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "linreg_len2_holes_p1_p2_p40_p41_p80to85_offset0"
+    },
+    {
+      "title": "linreg_len5_holes_p1_p2_p40_p41_p80to85_offset0"
+    },
+    {
+      "title": "swma_len4_holes_p1_p2_p40_p41_p80to85"
+    },
+    {
+      "title": "control_sma_len5_holes"
+    },
+    {
+      "title": "control_ema_len5_holes"
+    },
+    {
+      "title": "control_rma_len5_holes"
+    },
+    {
+      "title": "control_wma_len5_holes"
+    },
+    {
+      "title": "control_vwma_len5_holes"
+    },
+    {
+      "title": "control_swma_len4_holes"
+    },
+    {
+      "title": "control_alma_len5_holes_offset085_sigma6_floorfalse"
+    },
+    {
+      "title": "control_hma_len5_holes"
+    },
+    {
+      "title": "control_linreg_len5_holes_offset0"
+    },
+    {
+      "title": "alma_len5_clean_seed0_offset085_sigma6_floortrue"
+    }
+  ]
+}

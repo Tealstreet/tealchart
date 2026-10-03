@@ -1,0 +1,21 @@
+//@version=6
+indicator("Authority conflicts batch 28 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF037 ta-b/ta.kc.optional-conflict
+// Omission acceptance; existing builtin used as explicit default control.
+[cf037_m,cf037_u,cf037_l]=ta.kc(close,5,2)
+[cf037_mt,cf037_ut,cf037_lt]=ta.kc(close,5,2,true)
+plot(cf037_u, "CF037_omitted_upper", display = display.data_window)
+plot(cf037_ut, "CF037_explicit_upper", display = display.data_window)
+

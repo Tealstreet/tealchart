@@ -1,0 +1,21 @@
+//@version=6
+indicator("Authority conflicts batch 23 v1", overlay=false, max_bars_back=500, max_labels_count=50, max_boxes_count=50)
+// Chart: BTCUSDT, 2 minutes. Record exact exchange/tickerid; no request.security remapping.
+// Export chart data with indicator values. If compile/runtime error, capture full diagnostic.
+// A rejected isolated call is a result; do not modify the probe to make it compile.
+// Keep at least 100 bars; VWAP daily-default batch must span a day boundary.
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(syminfo.mintick, "CTRL_mintick", display=display.data_window)
+plot(str.contains(syminfo.ticker,"BTCUSDT") and timeframe.in_seconds()==120?1:0, "CTRL_BTCUSDT_2m", display=display.data_window)
+if barstate.islast
+    log.info("HOST tickerid="+syminfo.tickerid+" period="+timeframe.period+" mintick="+str.tostring(syminfo.mintick))
+
+// CF027 str/format-malformed-remark
+// Malformed exact text isolated; error is an intended discriminating outcome.
+cf027_s=str.format("{0,number,#.#)",1.34)
+plot(cf027_s=="1.3"?1:0, "CF027_one_decimal", display = display.data_window)
+plot(cf027_s=="{0,number,#.#)"?1:0, "CF027_literal", display = display.data_window)
+plot(str.length(cf027_s), "CF027_length", display = display.data_window)
+

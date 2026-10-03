@@ -1,0 +1,31 @@
+{
+  "artifact": "Normalized probe map v3",
+  "probe": "conflicts-batch-21-v1.pine",
+  "source_sha256": "58c9530223cc8a511c648e8361f76d62b05079f12752ee1247ff294999dc2b4b",
+  "columns": [
+    {
+      "title": "CTRL_BTCUSDT_2m"
+    },
+    {
+      "title": "CTRL_mintick"
+    },
+    {
+      "title": "CTRL_close"
+    },
+    {
+      "title": "CTRL_bar_index"
+    },
+    {
+      "title": "CTRL_time"
+    },
+    {
+      "title": "CF023_object_state"
+    },
+    {
+      "title": "CF023_map_size"
+    },
+    {
+      "title": "CF023_values_size"
+    }
+  ]
+}
