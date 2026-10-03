@@ -1,0 +1,7 @@
+//@version=6
+indicator("TRACE698 execution clock", overlay=false)
+varip int previous = na
+plot(timenow, "OUTCOME")
+if barstate.isrealtime
+    log.info("bar=" + str.tostring(bar_index) + " time=" + str.tostring(time, "#") + " time_close=" + str.tostring(time_close, "#") + " timenow=" + str.tostring(timenow, "#") + " previous=" + str.tostring(previous, "#") + " new=" + str.tostring(barstate.isnew))
+    previous := timenow

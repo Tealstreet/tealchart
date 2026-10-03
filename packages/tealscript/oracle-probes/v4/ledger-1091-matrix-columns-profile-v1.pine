@@ -1,0 +1,9 @@
+//@version=6
+indicator("Ledger1091 matrix columns profiling", overlay=false)
+var matrix<float> m = na
+if barstate.isfirst
+    m := matrix.new<float>()
+    array<float> values = array.new<float>(128, 1.0)
+    for i = 0 to 127
+        matrix.add_col(m, i, values)
+plot(matrix.rows(m) * 10000 + matrix.columns(m) * 100 + matrix.get(m, 127, 127), "OUTCOME")

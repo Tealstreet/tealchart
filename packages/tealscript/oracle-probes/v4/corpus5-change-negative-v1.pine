@@ -1,0 +1,4 @@
+//@version=5
+indicator("CORPUS5-CHANGE-NEGATIVE-V1")
+value = ta.change(close, -1)
+plot(value, "OUTCOME")

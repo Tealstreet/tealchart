@@ -1,0 +1,10 @@
+//@version=5
+indicator("V5-FLOAT-LENGTH-PERCENTILE-LINEAR-INTERPOLATION-V1")
+targetValue = ta.percentile_linear_interpolation(close, 2.5, 50)
+floorValue = ta.percentile_linear_interpolation(close, 2, 50)
+ceilValue = ta.percentile_linear_interpolation(close, 3, 50)
+plot(targetValue, title="OUTCOME", display=display.data_window)
+plot(floorValue, title="FLOOR_CONTROL", display=display.data_window)
+plot(ceilValue, title="CEIL_CONTROL", display=display.data_window)
+plot(close, title="INPUT_CLOSE", display=display.data_window)
+plot(bar_index, title="BAR_INDEX", display=display.data_window)

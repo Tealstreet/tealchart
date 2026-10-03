@@ -3,6 +3,9 @@
 > **Next capture round: v3.** Start at [`v3/HANDOFF-v3.md`](v3/HANDOFF-v3.md) — 104 outcome scripts plus 7
 > supplementary (6 conflict probes with CSV export, 1 bool-default outcome). The v3 reply goes in
 > `v3/captures/v3/RESPONSE-v3.md`, evidence beside it. v2 is done (`v2/RESPONSE-v2.md`, `v2/RESPONSE-v3.md`).
+> **Then round v4.** After v3, do [`v4/HANDOFF-v4.md`](v4/HANDOFF-v4.md) — 76 scripts: 13 numeric CSV first
+> (statistical moments and ranked-window settle ~60 precision/missing-slot columns), 8 screenshot probes, 55 outcome.
+> Reply at `v4/captures/v4/RESPONSE-v4.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.

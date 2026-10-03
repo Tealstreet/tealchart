@@ -1,0 +1,6 @@
+//@version=6
+indicator("Ledger1091 matrix constructor profiling", overlay=false)
+var matrix<float> m = na
+if barstate.isfirst
+    m := matrix.new<float>(128, 128, 1.0)
+plot(matrix.rows(m) * 10000 + matrix.columns(m) * 100 + matrix.get(m, 127, 127), "OUTCOME")

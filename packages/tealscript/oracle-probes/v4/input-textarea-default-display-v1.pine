@@ -1,0 +1,6 @@
+//@version=6
+indicator("INPUT-TEXTAREA-DISPLAY-AUTHORITY")
+omitted=input.text_area("DEFAULT","TextDefault")
+shown=input.text_area("ALL","TextAll",display=display.all)
+hidden=input.text_area("NONE","TextNone",display=display.none)
+plot(close,"OUTCOME")

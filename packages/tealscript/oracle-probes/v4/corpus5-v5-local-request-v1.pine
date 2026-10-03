@@ -1,0 +1,6 @@
+//@version=5
+indicator("corpus5-v5-local-request-v1")
+x = 0.0
+if bar_index >= 0
+    x := request.security(syminfo.tickerid, "2", close)
+plot(x, "OUTCOME")

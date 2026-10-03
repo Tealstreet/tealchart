@@ -1,0 +1,8 @@
+//@version=6
+indicator("trace-array-nearest-rank-int-dynamic-na-v6")
+a = array.from(10, 20, 30, 40, 50)
+percentage = bar_index < 40 ? 50.0 : float(na)
+result = array.percentile_nearest_rank(a, percentage)
+plot(bar_index, "BAR_INDEX", display=display.data_window)
+plot(percentage, "PERCENTAGE", display=display.data_window)
+plot(result, "OUTCOME", display=display.data_window)

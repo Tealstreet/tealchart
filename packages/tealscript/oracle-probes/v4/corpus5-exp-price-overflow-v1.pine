@@ -1,0 +1,3 @@
+//@version=5
+indicator("corpus5-exp-price-overflow-v1")
+plot(math.exp(close), "OUTCOME")

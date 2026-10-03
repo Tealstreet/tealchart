@@ -1,0 +1,10 @@
+//@version=5
+indicator("V5-FLOAT-LENGTH-HIGHEST-V1")
+targetValue = ta.highest(7.5)
+floorValue = ta.highest(7)
+ceilValue = ta.highest(8)
+plot(targetValue, title="OUTCOME", display=display.data_window)
+plot(floorValue, title="FLOOR_CONTROL", display=display.data_window)
+plot(ceilValue, title="CEIL_CONTROL", display=display.data_window)
+plot(close, title="INPUT_CLOSE", display=display.data_window)
+plot(bar_index, title="BAR_INDEX", display=display.data_window)

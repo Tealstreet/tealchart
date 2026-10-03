@@ -1,0 +1,11 @@
+//@version=4
+study("trace-bgcolor-offset-v4-series", overlay=false)
+phase = bar_index % 32
+source_code = phase == 8 ? 1 : phase == 9 ? 2 : phase == 11 ? 3 : phase == 12 ? 4 : 0
+series_offset = phase < 10 ? 2 : phase < 12 ? -1 : -3
+tint = source_code == 1 ? color.red : source_code == 2 ? color.blue : source_code == 3 ? color.lime : source_code == 4 ? color.orange : na
+bgcolor(tint, offset=series_offset, transp=0)
+plot(bar_index, "BAR_INDEX", transp=100)
+plot(phase, "PHASE", transp=100)
+plot(source_code, "SOURCE_CODE", transp=100)
+plot(series_offset, "SERIES_OFFSET", transp=100)

@@ -1,0 +1,5 @@
+//@version=5
+indicator("V4-ARRAY-STRING-EVERY-NAMESPACE-V5")
+values = array.from("", "alpha")
+result = array.every(values)
+plot(result == true ? 1 : result == false ? 0 : -1, "OUTCOME")

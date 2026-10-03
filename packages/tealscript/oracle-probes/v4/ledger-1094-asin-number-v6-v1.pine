@@ -1,0 +1,4 @@
+//@version=6
+indicator("Ledger1094 asin number v6", overlay=false)
+float value = math.asin(number=0.5)
+plot(value, "OUTCOME")

@@ -1,0 +1,5 @@
+//@version=5
+indicator("CORPUS5-TABLE-NA-ROW-V1")
+value = table.new(position.top_right, 1, 1)
+table.cell(value, 0, int(na), "X")
+plot(1, "OUTCOME")

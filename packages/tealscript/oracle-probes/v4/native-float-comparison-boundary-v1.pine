@@ -1,0 +1,21 @@
+//@version=6
+indicator("V4-NATIVE-FLOAT-COMPARISON-BOUNDARY")
+phase = bar_index % 12
+x = switch phase
+    0 => 9e-11
+    1 => 1e-10
+    2 => 1.1e-10
+    3 => 4.9e-10
+    4 => -9e-11
+    5 => -1.1e-10
+    6 => 1.00000000009
+    7 => 1.00000000011
+    8 => 1.00000000049
+    9 => 100000000.00000001
+    10 => 0.0
+    => -0.0
+base = phase >= 6 and phase <= 8 ? 1.0 : phase == 9 ? 100000000.0 : 0.0
+outcome = (x == base ? 1 : 0) + (x != base ? 2 : 0) + (x < base ? 4 : 0) + (x > base ? 8 : 0) + (x <= base ? 16 : 0) + (x >= base ? 32 : 0)
+plot(outcome, "OUTCOME")
+if bar_index < 12
+    log.info("phase={0}; x={1}; base={2}; comparison-mask={3}", phase, x, base, outcome)

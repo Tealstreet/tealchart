@@ -1,0 +1,828 @@
+{
+  "artifact": "Capture round v4 numeric and outcome scripts",
+  "chart": {
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "type": "standard candles",
+    "timezone": "UTC"
+  },
+  "numeric": [
+    {
+      "probe": "statistical-native-moments-order-v1.pine",
+      "sourceSha256": "eebafda38556e415a407420cab238e8520266bcfcd64c14af1a6aae448a9e899",
+      "path": "statistical-native-moments-order-v1.pine",
+      "plotBudgetUpperBound": 60,
+      "runtimeArgumentReview": "Constant positive lengths2/3/7/14/31; literal biased booleans;60 ordinary plots with constant default colors; no requests or runtime-invalid lookbacks.",
+      "conflicts": [
+        "STATISTICAL-NATIVE-MOMENTS-ORDER-V1"
+      ],
+      "columnMap": "statistical-native-moments-order-v1.columns.json",
+      "minimumHistoryBars": 512,
+      "requiredFirstBarIndex": 0,
+      "captureKind": "NUMERIC-CSV",
+      "localGate": "statistical-native-moments-order-v1.gate-v1.json"
+    },
+    {
+      "probe": "ranked-window-missing-slots-v2.pine",
+      "path": "ranked-window-missing-slots-v2.pine",
+      "sourceSha256": "82d45781f7b60f6615e3f3366a809a092f913fd2539550e83f7d00fed6ee3578",
+      "plotBudgetUpperBound": 58,
+      "runtimeArgumentReview": "Author-supplied synthetic numeric discriminator; preserve native refusal without changing source.",
+      "conflicts": [
+        "RANKED-WINDOW-MISSING-SLOTS-V2"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 256,
+      "columnMap": "ranked-window-missing-slots-v2.columns.json",
+      "requiredFirstBarIndex": 0
+    },
+    {
+      "probe": "ranked-window-missing-slots-v1.pine",
+      "path": "ranked-window-missing-slots-v1.pine",
+      "sourceSha256": "fdea580363fe392ca07820cc58fb03d4d2ae074d9e0e9fae3786b89d4ad9b2f4",
+      "plotBudgetUpperBound": 46,
+      "runtimeArgumentReview": "Author-supplied synthetic numeric discriminator; preserve native refusal without changing source.",
+      "conflicts": [
+        "RANKED-WINDOW-MISSING-SLOTS-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 256,
+      "columnMap": "ranked-window-missing-slots-v1.columns.json",
+      "requiredFirstBarIndex": 0,
+      "supersededBy": "ranked-window-missing-slots-v2.pine"
+    },
+    {
+      "probe": "v5-float-length-ema-v1.pine",
+      "sourceSha256": "38e8fe9eab820a5f49edda4b69748d9a97eb03d0dbd6330cd3c992176b6e59e3",
+      "path": "v5-float-length-ema-v1.pine",
+      "plotBudgetUpperBound": 5,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-EMA-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-highest-v1.pine",
+      "sourceSha256": "0334f8d75fe02c908b52529c6cc47c039bf5393f122aacc5ac46c69245141f56",
+      "path": "v5-float-length-highest-v1.pine",
+      "plotBudgetUpperBound": 5,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-HIGHEST-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-macd-fastlen-v1.pine",
+      "sourceSha256": "2841fdc125295ac8f4bce5a45dbfc698c0c67092a8878b864651543cdeae5034",
+      "path": "v5-float-length-macd-fastlen-v1.pine",
+      "plotBudgetUpperBound": 11,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-MACD-FASTLEN-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-macd-siglen-v1.pine",
+      "sourceSha256": "6240d8ed6b7bdb744b5b319acfdc313df9fdd4560cce6429b233465cd27846f1",
+      "path": "v5-float-length-macd-siglen-v1.pine",
+      "plotBudgetUpperBound": 11,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-MACD-SIGLEN-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-macd-slowlen-v1.pine",
+      "sourceSha256": "949808fb14996aec6c0fb52c3f84905d831bbe442e669e0b952746c80523937f",
+      "path": "v5-float-length-macd-slowlen-v1.pine",
+      "plotBudgetUpperBound": 11,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-MACD-SLOWLEN-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-percentile-linear-interpolation-v1.pine",
+      "sourceSha256": "190cc35c041f595de1381eafd272d88f2f0ee92116d637241fcbbb0934ebf311",
+      "path": "v5-float-length-percentile-linear-interpolation-v1.pine",
+      "plotBudgetUpperBound": 5,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-PERCENTILE-LINEAR-INTERPOLATION-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-sma-v1.pine",
+      "sourceSha256": "41f9bac020524cc448086b36650b140449132ba093ce84bf329105ab419a8fc4",
+      "path": "v5-float-length-sma-v1.pine",
+      "plotBudgetUpperBound": 5,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-SMA-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "v5-float-length-wma-v1.pine",
+      "sourceSha256": "ec12f1cbadc061f3793f8d7053376caadda714e44cb244421112f292ab73966f",
+      "path": "v5-float-length-wma-v1.pine",
+      "plotBudgetUpperBound": 5,
+      "runtimeArgumentReview": "One fractional target; separate integer floor/ceiling controls; no input/other invalid call masks target.",
+      "conflicts": [
+        "V5-FLOAT-LENGTH-WMA-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 500
+    },
+    {
+      "probe": "native-float-comparison-boundary-v1.pine",
+      "sourceSha256": "c16b04f7d8075253df69ef8dd27d9c4d8b7dfbe098246c3cf4510ffa58c85eb7",
+      "path": "native-float-comparison-boundary-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Capture source-pinned output and first-cycle logs; no inferred outcomes.",
+      "conflicts": [
+        "NATIVE-FLOAT-COMPARISON-BOUNDARY-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 12
+    },
+    {
+      "probe": "native-float-magnitude-output-v1.pine",
+      "sourceSha256": "3fabe6f76e9461c1ad1ec7d7cba3029c07be9f3e34b10cb8e840c8a87be5d5df",
+      "path": "native-float-magnitude-output-v1.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Capture source-pinned output and first-cycle logs; no inferred outcomes.",
+      "conflicts": [
+        "NATIVE-FLOAT-MAGNITUDE-OUTPUT-V1"
+      ],
+      "captureKind": "NUMERIC-CSV",
+      "minimumHistoryBars": 8
+    }
+  ],
+  "outcomeOnly": [
+    {
+      "probe": "trace-plotbar-inconsistent-ohlc-visual-v6.pine",
+      "sourceSha256": "983e478662a5336ae6cfd7de04c34ced3b3a8b67135683e5a41395711590a253",
+      "path": "trace-plotbar-inconsistent-ohlc-visual-v6.pine",
+      "plotBudgetUpperBound": 12,
+      "runtimeArgumentReview": "One OHLC target plus eight constant-color numeric controls; fixed6phase cases,show_last18,max32labels; no requests, inputs, or invalid indices. Labels at90 identify cases; finite OHLC except deliberate missing high case5.",
+      "conflicts": [
+        "V4-PLOTBAR-RAW-OHLC-GEOMETRY"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-plotcandle-inconsistent-ohlc-visual-v6.pine",
+      "sourceSha256": "da452055cf03244da93a37c113e5032970fdb9cc8bfbf3ba6563c444117f4f84",
+      "path": "trace-plotcandle-inconsistent-ohlc-visual-v6.pine",
+      "plotBudgetUpperBound": 12,
+      "runtimeArgumentReview": "One OHLC target plus eight constant-color numeric controls; fixed6phase cases,show_last18,max32labels; no requests, inputs, or invalid indices. Labels at90 identify cases; finite OHLC except deliberate missing high case5.",
+      "conflicts": [
+        "V4-PLOTCANDLE-RAW-OHLC-GEOMETRY"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-bgcolor-offset-v3-series.pine",
+      "sourceSha256": "605ab6938f7b6f0940c5300c11f9efe5c6ac710dd5c9d862e1bff02b60f557fe",
+      "path": "trace-bgcolor-offset-v3-series.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-BGCOLOR-OFFSET-V3-SERIES"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-bgcolor-offset-v3-zero-control.pine",
+      "sourceSha256": "1be260a87df772d3d4e2bb92b0f7cfe4b24043a378b423bf7dfee999ac38ceec",
+      "path": "trace-bgcolor-offset-v3-zero-control.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-BGCOLOR-OFFSET-V3-ZERO-CONTROL"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-bgcolor-offset-v4-series.pine",
+      "sourceSha256": "b3e3d6dd5800c42532c165795ab826df4910049806a27a83578ccb026d0c3244",
+      "path": "trace-bgcolor-offset-v4-series.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-BGCOLOR-OFFSET-V4-SERIES"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-bgcolor-offset-v4-zero-control.pine",
+      "sourceSha256": "63ae14acdaf97440468c1d7afcfc483e391d0790e3696c80c765bd2d34ddae13",
+      "path": "trace-bgcolor-offset-v4-zero-control.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-BGCOLOR-OFFSET-V4-ZERO-CONTROL"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-bgcolor-offset-v5-series.pine",
+      "sourceSha256": "8f7f59dfe6674c2d8ac0d5150b8541a6bd5744621392e9d069a33933d3756061",
+      "path": "trace-bgcolor-offset-v5-series.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-BGCOLOR-OFFSET-V5-SERIES"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "trace-bgcolor-offset-v5-zero-control.pine",
+      "sourceSha256": "73f1a64da230734afd8380b95b5008091ce12fe0c992c14e99c277d7da7a40a6",
+      "path": "trace-bgcolor-offset-v5-zero-control.pine",
+      "plotBudgetUpperBound": 4,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-BGCOLOR-OFFSET-V5-ZERO-CONTROL"
+      ],
+      "captureKind": "SCREENSHOTS-AND-CSV"
+    },
+    {
+      "probe": "corpus1-matrix-sum-omitted-id2-namespace-float-v1.pine",
+      "path": "corpus1-matrix-sum-omitted-id2-namespace-float-v1.pine",
+      "sourceSha256": "648a40f61bd4fa0dd8ad8fb77c9cf158334291e7258f658e79b790fccd836a79",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-MATRIX-SUM-OMITTED-ID2-NAMESPACE-FLOAT"
+      ],
+      "runtimeArgumentReview": "One isolated omitted-id2 call. str.tostring records scalar or matrix result in first-bar log/table; one OUTCOME sentinel does not infer a result."
+    },
+    {
+      "probe": "corpus1-matrix-sum-omitted-id2-receiver-int-v1.pine",
+      "path": "corpus1-matrix-sum-omitted-id2-receiver-int-v1.pine",
+      "sourceSha256": "7a9b43ead84e059ec1f2e1a9b5b1b124a02c6419ce2971ab2c0d2059207340e1",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-MATRIX-SUM-OMITTED-ID2-RECEIVER-INT"
+      ],
+      "runtimeArgumentReview": "One isolated omitted-id2 call. str.tostring records scalar or matrix result in first-bar log/table; one OUTCOME sentinel does not infer a result."
+    },
+    {
+      "probe": "corpus1-matrix-sum-omitted-id2-returned-receiver-float-v1.pine",
+      "path": "corpus1-matrix-sum-omitted-id2-returned-receiver-float-v1.pine",
+      "sourceSha256": "0574e171678061e4cb07a809c988a101d326d55d4f7998e3016f2964f6bf3c1f",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-MATRIX-SUM-OMITTED-ID2-RETURNED-RECEIVER-FLOAT"
+      ],
+      "runtimeArgumentReview": "One isolated omitted-id2 call. str.tostring records scalar or matrix result in first-bar log/table; one OUTCOME sentinel does not infer a result."
+    },
+    {
+      "probe": "corpus5-change-negative-v1.pine",
+      "sourceSha256": "a78c744ea3a4a1a52ef03f15e4a499f2d5f48eb98cf9fc724481b2ec9162d1eb",
+      "path": "corpus5-change-negative-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated target; preserve exact phase/result.",
+      "conflicts": [
+        "CORPUS5-CHANGE-NEGATIVE-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-change-zero-v1.pine",
+      "sourceSha256": "0b125c6cf46664f2d8225a1995c2bbeffa3fa495d2ab0216615e39dca99068f3",
+      "path": "corpus5-change-zero-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated target; preserve exact phase/result.",
+      "conflicts": [
+        "CORPUS5-CHANGE-ZERO-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-exp-price-overflow-v1.pine",
+      "path": "corpus5-exp-price-overflow-v1.pine",
+      "sourceSha256": "cc9441af5efc1be09308a9eb2db5c6b46c3a9485891fb86d08485cbacb7db436",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "BTC exponent overflows local finite representation. Exact native overflow/missingness not specified; capture all OUTCOME values.",
+      "conflicts": [
+        "CORPUS5-EXP-PRICE-OVERFLOW-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-matrix-negative-identity-power-v1.pine",
+      "sourceSha256": "1b770d87ce52689dc5bf49b6dd23656f7de2310724af9fae996d5abe192063ec",
+      "path": "corpus5-matrix-negative-identity-power-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated target; preserve exact phase/result.",
+      "conflicts": [
+        "CORPUS5-MATRIX-NEGATIVE-IDENTITY-POWER-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-pivot-request-counter-v1.pine",
+      "sourceSha256": "d91765c9517a779ff170b0b6632d4941fac93206a3c48be8015b4758e5d6cf20",
+      "path": "corpus5-pivot-request-counter-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One request tuple containing pivot array and explicit-tail counter, single OUTCOME plot.",
+      "conflicts": [
+        "CORPUS5-PIVOT-REQUEST-COUNTER-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-table-na-row-v1.pine",
+      "sourceSha256": "e97d9e68935579c2ee635de221b9a45c8abd7430bbd059463256515da94b088a",
+      "path": "corpus5-table-na-row-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated target; preserve exact phase/result.",
+      "conflicts": [
+        "CORPUS5-TABLE-NA-ROW-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-v5-float-highest-length-v1.pine",
+      "path": "corpus5-v5-float-highest-length-v1.pine",
+      "sourceSha256": "401208f49ef80df3471e0aa89814009651d0136fa21b6049c15b1c286b410d37",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "On chart2 ratio7.5 is float; documented integer signature forbids implicit float-to-int cast. Preserve source/version.",
+      "conflicts": [
+        "CORPUS5-V5-FLOAT-HIGHEST-LENGTH-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-v5-history-price-offset-v1.pine",
+      "path": "corpus5-v5-history-price-offset-v1.pine",
+      "sourceSha256": "8ae4fc7a5addb3e81f781db818dd7b078499ffc73cb5910fe42e92782433fd13",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Price-derived float offset source is compatibility negative test; separate index-kind/offset-limit diagnostic from autosizing.",
+      "conflicts": [
+        "CORPUS5-V5-HISTORY-PRICE-OFFSET-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-v5-local-request-v1.pine",
+      "path": "corpus5-v5-local-request-v1.pine",
+      "sourceSha256": "ec2610424aed269f904f9f513f97529f9e179bd508d1f42d9da8f6d2cbfcd159",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "v5 direct local requests without dynamic_requests are documented compiler-invalid. Capture exact native phase.",
+      "conflicts": [
+        "CORPUS5-V5-LOCAL-REQUEST-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-v6-dynamic-history600-v1.pine",
+      "path": "corpus5-v6-dynamic-history600-v1.pine",
+      "sourceSha256": "956903d86530d739ae2ba5384f84b27b215bf13d3647d8b0355dd42f7497982a",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Current engine refuses offset501 although OHLC history ceiling10000. Record native sizing/outputs; minimum1200bars.",
+      "conflicts": [
+        "CORPUS5-V6-DYNAMIC-HISTORY600-V1"
+      ]
+    },
+    {
+      "probe": "corpus5-v6-equal-lower-timeframe-v1.pine",
+      "path": "corpus5-v6-equal-lower-timeframe-v1.pine",
+      "sourceSha256": "03534f71d4f1e41996b5f9beaf34845eb944a3e2b065a13708aeac2b1ace3eba",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Current docs accept lower OR EQUAL chart timeframe; engine equal refuses. No invented native intrabar count.",
+      "conflicts": [
+        "CORPUS5-V6-EQUAL-LOWER-TIMEFRAME-V1"
+      ]
+    },
+    {
+      "probe": "drawing-box-eq-v2.pine",
+      "sourceSha256": "54da4ed5444cc206b2d76d4e7a9b7f5b8c4e5db275840cb43d4ee0172d683252",
+      "path": "drawing-box-eq-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-BOX-EQ"
+      ]
+    },
+    {
+      "probe": "drawing-box-ne-v2.pine",
+      "sourceSha256": "e55abe016c37ba07d6a80e65800f5e02244cc7992f269ab0636e7ff313e68297",
+      "path": "drawing-box-ne-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-BOX-NE"
+      ]
+    },
+    {
+      "probe": "drawing-chart-point-eq-v2.pine",
+      "sourceSha256": "122b8fa7d9a976210dbce9a45ca18c6312b1abbb222e0aebae61c1d554883eb3",
+      "path": "drawing-chart-point-eq-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-CHART-POINT-EQ"
+      ]
+    },
+    {
+      "probe": "drawing-chart-point-ne-v2.pine",
+      "sourceSha256": "4e3f806d4b9c6da217966e1467ed6912a94e4b3325b5daf57577ab0617793cfa",
+      "path": "drawing-chart-point-ne-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-CHART-POINT-NE"
+      ]
+    },
+    {
+      "probe": "drawing-default-blue-v5-v1.pine",
+      "path": "drawing-default-blue-v5-v1.pine",
+      "sourceSha256": "9efce44b981125a099e8a27101a3711820006ee3f2bc40fc3989dbe85e9a2bae",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "20 drawing references allocated once at last bar, 20 explicit text-only labels, finite last-bar close coordinates; one plot execution control. No requests, ID comparisons or per-bar allocation.",
+      "conflicts": [
+        "V4-DRAWING-DEFAULT-BLUE-V5"
+      ]
+    },
+    {
+      "probe": "drawing-default-blue-v6-v1.pine",
+      "path": "drawing-default-blue-v6-v1.pine",
+      "sourceSha256": "bf87c46a400bd2e62a0904f0d21bb99482fa01cf667c7e4d1b844f046e6726b4",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "20 drawing references allocated once at last bar, 20 explicit text-only labels, finite last-bar close coordinates; one plot execution control. No requests, ID comparisons or per-bar allocation.",
+      "conflicts": [
+        "V4-DRAWING-DEFAULT-BLUE-V6"
+      ]
+    },
+    {
+      "probe": "drawing-polyline-eq-v2.pine",
+      "sourceSha256": "060f2380d57b54ea8d2ae43bd05d5f1205049e79f03dc73ed0b6fa9b8de35aa7",
+      "path": "drawing-polyline-eq-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-POLYLINE-EQ"
+      ]
+    },
+    {
+      "probe": "drawing-polyline-ne-v2.pine",
+      "sourceSha256": "e2a244f605c99e77deea62770e15cff9e71a105b3af83b70733666325a367b0c",
+      "path": "drawing-polyline-ne-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-POLYLINE-NE"
+      ]
+    },
+    {
+      "probe": "drawing-table-eq-v2.pine",
+      "sourceSha256": "3139d9e4ed7f874fb8f920a0fc983044702b66fe00fe794ef5d0fcae24d96351",
+      "path": "drawing-table-eq-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-TABLE-EQ"
+      ]
+    },
+    {
+      "probe": "drawing-table-ne-v2.pine",
+      "sourceSha256": "0e7d85757c0939956e1dc76edbccdda68dda9eb16510bd7a41c9f50051052dd7",
+      "path": "drawing-table-ne-v2.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One drawing family/operator; two persistent var references and alias/distinct comparison; no per-bar object allocation.",
+      "conflicts": [
+        "V4-DRAWING-TABLE-NE"
+      ]
+    },
+    {
+      "probe": "input-generic-computed-source-v1.pine",
+      "sourceSha256": "3840cb602b73d6c19a612009e4a7087194038d484cd00812ed902726050ff369",
+      "path": "input-generic-computed-source-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Constant input metadata and one price control; preserve host interaction outcomes separately.",
+      "conflicts": [
+        "INPUT-GENERIC-SOURCE-DEFAULT-AUTHORITY"
+      ]
+    },
+    {
+      "probe": "input-source-positional-order-v1.pine",
+      "sourceSha256": "5645a58133d042bba67adce5963cd10bedce99162798abcdd98ab07be3205162",
+      "path": "input-source-positional-order-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Constant input metadata and one price control; preserve host interaction outcomes separately.",
+      "conflicts": [
+        "INPUT-GENERIC-SOURCE-POSITIONAL-AUTHORITY"
+      ]
+    },
+    {
+      "probe": "input-textarea-default-display-v1.pine",
+      "sourceSha256": "d2a029cd95e27fd996a9853c074d2bcf74dc8ea162b5a2c192682a6ee5d5066a",
+      "path": "input-textarea-default-display-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Constant input metadata and one price control; preserve host interaction outcomes separately.",
+      "conflicts": [
+        "INPUT-TEXTAREA-DISPLAY-AUTHORITY"
+      ]
+    },
+    {
+      "probe": "input-time-default-display-v1.pine",
+      "sourceSha256": "8698446da2ae22b02a01ae2d68419fdaf13507d189d4dcc65043ad83e584c19c",
+      "path": "input-time-default-display-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Constant input metadata and one price control; preserve host interaction outcomes separately.",
+      "conflicts": [
+        "INPUT-TIME-DISPLAY-AUTHORITY"
+      ]
+    },
+    {
+      "probe": "input-time-marker-kind-v1.pine",
+      "sourceSha256": "5203d8ca2e71427bebe7b71e77fbe3536888529a8863b2b57d177e3a40bccf10",
+      "path": "input-time-marker-kind-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Constant input metadata and one price control; preserve host interaction outcomes separately.",
+      "conflicts": [
+        "INPUT-TIME-MARKER-AUTHORITY"
+      ]
+    },
+    {
+      "probe": "ledger-1091-matrix-columns-profile-v1.pine",
+      "sourceSha256": "ff34f8cf9e8f363883bb08c85af8007b9e2752f5b945f69863312c7a3f8131e9",
+      "path": "ledger-1091-matrix-columns-profile-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One isolated outcome; profiling scripts require profiler UI evidence.",
+      "conflicts": [
+        "LEDGER-1091-MATRIX-COLUMNS-PROFILE-V1"
+      ]
+    },
+    {
+      "probe": "ledger-1091-matrix-constructor-profile-v1.pine",
+      "sourceSha256": "90e1b84f52c501be209ac9a9eb1dbda84a88ddd69b8547762bcd561f0a56afca",
+      "path": "ledger-1091-matrix-constructor-profile-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One isolated outcome; profiling scripts require profiler UI evidence.",
+      "conflicts": [
+        "LEDGER-1091-MATRIX-CONSTRUCTOR-PROFILE-V1"
+      ]
+    },
+    {
+      "probe": "ledger-1091-matrix-rows-profile-v1.pine",
+      "sourceSha256": "4a52e00a2c43a36a98ed02053edd7e645541516f3630a115274112bc49c07f64",
+      "path": "ledger-1091-matrix-rows-profile-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One isolated outcome; profiling scripts require profiler UI evidence.",
+      "conflicts": [
+        "LEDGER-1091-MATRIX-ROWS-PROFILE-V1"
+      ]
+    },
+    {
+      "probe": "ledger-1094-asin-number-v5-v1.pine",
+      "sourceSha256": "aaa71170f0a917987c7344904aab5c8c484b240cb1a7f2f9e320f0ae72161e32",
+      "path": "ledger-1094-asin-number-v5-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One isolated outcome; profiling scripts require profiler UI evidence.",
+      "conflicts": [
+        "LEDGER-1094-ASIN-NUMBER-V5-V1"
+      ]
+    },
+    {
+      "probe": "ledger-1094-asin-number-v6-v1.pine",
+      "sourceSha256": "c4b5c58c2d65815da9f0b84c206fcc6ba680c9f69a0577269b0cd25732b781ce",
+      "path": "ledger-1094-asin-number-v6-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "One isolated outcome; profiling scripts require profiler UI evidence.",
+      "conflicts": [
+        "LEDGER-1094-ASIN-NUMBER-V6-V1"
+      ]
+    },
+    {
+      "probe": "trace-698-timenow-observations-v1.pine",
+      "sourceSha256": "d5051bbe11371d5578e164d6d5a0eebfe0acca7cf81856ae8ab2f13a2af7de62",
+      "path": "trace-698-timenow-observations-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated outcome; observe exact native values and settings.",
+      "conflicts": [
+        "LEDGER-698-TRACE-V1"
+      ]
+    },
+    {
+      "probe": "trace-705-chart-fg-solid-background-v1.pine",
+      "sourceSha256": "c84e011a62b9c0e4b52cb0d2b66f32fd860d550ef02d58000491884fa50d32a6",
+      "path": "trace-705-chart-fg-solid-background-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated outcome; observe exact native values and settings.",
+      "conflicts": [
+        "LEDGER-705-TRACE-V1"
+      ]
+    },
+    {
+      "probe": "trace-720-hma-mature-hole-length16-v1.pine",
+      "sourceSha256": "cfb1c20fc53e802dcc3f190c1c58635e6498fddca3c96b575bfe875bc37171ec",
+      "path": "trace-720-hma-mature-hole-length16-v1.pine",
+      "plotBudgetUpperBound": 1,
+      "runtimeArgumentReview": "Single isolated outcome; observe exact native values and settings.",
+      "conflicts": [
+        "LEDGER-720-TRACE-V1"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-float-boundaries-control-v6.pine",
+      "sourceSha256": "0e78eb309302ed805cf6a16099963c366d199511bde0d9a656d539262e5b46ef",
+      "path": "trace-array-nearest-rank-float-boundaries-control-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-FLOAT-BOUNDARIES-CONTROL-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-float-dynamic-high-v6.pine",
+      "sourceSha256": "8aae401a2b9ef829e44ec19f96e1d9da96b9437f90d950fe185fc6d5e5072b2f",
+      "path": "trace-array-nearest-rank-float-dynamic-high-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-FLOAT-DYNAMIC-HIGH-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-float-dynamic-low-v6.pine",
+      "sourceSha256": "c6648656934e683f328a26b834750f337309a0ad5dae02596a502281ceb56755",
+      "path": "trace-array-nearest-rank-float-dynamic-low-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-FLOAT-DYNAMIC-LOW-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-float-dynamic-na-v6.pine",
+      "sourceSha256": "55058730f5e525cfecc41034ca2e9e810aa27c758a53685e94e0fc2494505c6b",
+      "path": "trace-array-nearest-rank-float-dynamic-na-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-FLOAT-DYNAMIC-NA-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-int-boundaries-control-v6.pine",
+      "sourceSha256": "b6d75c63d1a2fd11bfe207544a5d819a6ccfc1e3e274beaf72f45443fb37f166",
+      "path": "trace-array-nearest-rank-int-boundaries-control-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-INT-BOUNDARIES-CONTROL-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-int-dynamic-high-v6.pine",
+      "sourceSha256": "b02a1adeadef967cad0eafed932fdf776b694e93567ffe54fef8aa5558e50dab",
+      "path": "trace-array-nearest-rank-int-dynamic-high-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-INT-DYNAMIC-HIGH-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-int-dynamic-low-v6.pine",
+      "sourceSha256": "dc78ca43f335849619b067500f76cce67c73512705bffc461252792dbc7eb6fe",
+      "path": "trace-array-nearest-rank-int-dynamic-low-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-INT-DYNAMIC-LOW-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-nearest-rank-int-dynamic-na-v6.pine",
+      "sourceSha256": "35184058f0a22ba850fdd290fcb1af0d7f30959b5748f6dbd25be2b07b3ae84b",
+      "path": "trace-array-nearest-rank-int-dynamic-na-v6.pine",
+      "plotBudgetUpperBound": 3,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-ARRAY-NEAREST-RANK-INT-DYNAMIC-NA-V6"
+      ]
+    },
+    {
+      "probe": "trace-array-string-every-namespace-v5.pine",
+      "path": "trace-array-string-every-namespace-v5.pine",
+      "sourceSha256": "c0f15c335cbb00065cad68413236892171affb5d5186471612a07b3161fe2a91",
+      "pineVersion": 5,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-EVERY-NAMESPACE-V5"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-every-namespace-v6.pine",
+      "path": "trace-array-string-every-namespace-v6.pine",
+      "sourceSha256": "0554a7d9d5f457a978e780cb8dc7cbb2f2aad99e1882651819014bc29fc9ad2f",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-EVERY-NAMESPACE-V6"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-every-receiver-v5.pine",
+      "path": "trace-array-string-every-receiver-v5.pine",
+      "sourceSha256": "0315a57585011d2d4dea5f84dbf8f1714b24b72f87cf51fa97c286338821eebb",
+      "pineVersion": 5,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-EVERY-RECEIVER-V5"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-every-receiver-v6.pine",
+      "path": "trace-array-string-every-receiver-v6.pine",
+      "sourceSha256": "52b733435c34698d0bffc8ba6be3203e754f1398cbf48e8c332dd4eb388baa20",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-EVERY-RECEIVER-V6"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-some-namespace-v5.pine",
+      "path": "trace-array-string-some-namespace-v5.pine",
+      "sourceSha256": "f05311d1ae976076d790dd71b4bc74e8065217322cd0b2edfab5e9b826a71651",
+      "pineVersion": 5,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-SOME-NAMESPACE-V5"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-some-namespace-v6.pine",
+      "path": "trace-array-string-some-namespace-v6.pine",
+      "sourceSha256": "8f68f60685b971765d762b8f90a7852d5bab24423a767e67c74a1bb9ad6b49ef",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-SOME-NAMESPACE-V6"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-some-receiver-v5.pine",
+      "path": "trace-array-string-some-receiver-v5.pine",
+      "sourceSha256": "0af919315b1604529f917d7662f9ae873b40068657aaf4fcd1af10f612502af2",
+      "pineVersion": 5,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-SOME-RECEIVER-V5"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-array-string-some-receiver-v6.pine",
+      "path": "trace-array-string-some-receiver-v6.pine",
+      "sourceSha256": "d9a28d74b2e0ac4961bc280d26165cb7d1f4a8d62e0b0e640bb11038d5240028",
+      "pineVersion": 6,
+      "plotBudgetUpperBound": 1,
+      "conflicts": [
+        "V4-ARRAY-STRING-SOME-RECEIVER-V6"
+      ],
+      "runtimeArgumentReview": "One isolated string-array every/some call and one equality-encoded result plot; no na(bool), log, table or drawings helper."
+    },
+    {
+      "probe": "trace-equal-key-sort-indices-v6.pine",
+      "sourceSha256": "dba23eb8acb6f13ed1a0bbd7ad127d67c12df34017a1da9e35ec15fe01b8e37d",
+      "path": "trace-equal-key-sort-indices-v6.pine",
+      "plotBudgetUpperBound": 19,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-EQUAL-KEY-SORT-INDICES-V6"
+      ]
+    },
+    {
+      "probe": "trace-equal-key-udt-sort-v6.pine",
+      "sourceSha256": "fc6fb85870f35d059597ff46872eab01584093290cc8ef18d4fa4ab5f8a95254",
+      "path": "trace-equal-key-udt-sort-v6.pine",
+      "plotBudgetUpperBound": 43,
+      "runtimeArgumentReview": "Deterministic finite arrays/positive lengths; invalid percentage isolated intentionally from bar40; series bgcolor offset is intentional target, not presumed valid. Preserve native phase.",
+      "conflicts": [
+        "TRACE-EQUAL-KEY-UDT-SORT-V6"
+      ]
+    }
+  ],
+  "authority": "expected-outcome-v4.json",
+  "operatorGuide": "HANDOFF-v4.md"
+}

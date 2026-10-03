@@ -1,0 +1,19 @@
+//@version=6
+indicator("V4-NATIVE-FLOAT-MAGNITUDE-OUTPUT")
+phase = bar_index % 8
+magnitude = switch phase
+    0 => 9e99
+    1 => 1e100
+    2 => 1.1e100
+    3 => -1.1e100
+    4 => 1e101
+    5 => 1e200
+    6 => 1e300
+    => 0.0
+calculated = magnitude * 1.0
+plot(calculated, "OUTCOME")
+plot(na(calculated) ? 1 : 0, "SOURCE_NA")
+plot(calculated / 1e100, "SCALED_SOURCE")
+plot(na(calculated[1]) ? 1 : 0, "PREVIOUS_NA")
+if bar_index < 8
+    log.info("phase={0}; source-na={1}; scaled={2}; previous-na={3}", phase, na(calculated), calculated / 1e100, na(calculated[1]))
