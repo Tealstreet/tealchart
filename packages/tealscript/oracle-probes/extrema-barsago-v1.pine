@@ -1,0 +1,114 @@
+//@version=6
+indicator("Extrema barsago oracle v1", overlay=false, precision=10, max_bars_back=256)
+// 60 numerical plot slots. Data Window display preserves raw export values without mixed-unit pane scales.
+// Export all available bars, including the earliest ones for initialization evidence.
+f_fixed(float src, int n, bool isHigh) =>
+    float best = na
+    float off = na
+    for i = 0 to n - 1
+        float v = src[i]
+        if not na(v)
+            if na(best)
+                best := v
+                off := -i
+            else if (isHigh and v > best) or (not isHigh and v < best)
+                best := v
+                off := -i
+    [best, off]
+
+// Deliberate hypothesis: full chart-bar window, strict on both sides, poison any hole.
+f_strict_pivot(float src, int leftN, int rightN, bool isHigh) =>
+    float candidate = src[rightN]
+    bool valid = bar_index >= leftN + rightN and not na(candidate)
+    for i = 0 to leftN + rightN
+        float v = src[i]
+        if na(v)
+            valid := false
+        else if i != rightN
+            if (isHigh and v >= candidate) or (not isHigh and v <= candidate)
+                valid := false
+    valid ? candidate : na
+
+int p64 = bar_index % 64
+int p16 = bar_index % 16
+float triangle = p16 <= 8 ? p16 : 16 - p16
+float plateau = p16 <= 7 ? p16 : 15 - p16
+bool hole = p64 == 40 or p64 == 41 or (p64 >= 48 and p64 <= 55)
+bool pivotHole = p64 == 5 or p64 == 8 or p64 == 10 or p64 == 16 or p64 == 31 or p64 == 33 or hole
+float closeHole = hole ? na : close
+float highHole = hole ? na : high
+float lowHole = hole ? na : low
+float triangleHole = pivotHole ? na : triangle
+float leadingTriangle = bar_index < 8 ? na : triangle
+
+[fixedHiClean, fixedHbClean] = f_fixed(close, 5, true)
+[fixedLoClean, fixedLbClean] = f_fixed(close, 5, false)
+[fixedHiHole, fixedHbHole] = f_fixed(closeHole, 5, true)
+[fixedLoHole, fixedLbHole] = f_fixed(closeHole, 5, false)
+[fixedHiPlateau, fixedHbPlateau] = f_fixed(plateau, 5, true)
+[fixedLoPlateau, fixedLbPlateau] = f_fixed(plateau, 5, false)
+[aroonHiClean, aroonHbClean] = f_fixed(high, 6, true)
+[aroonLoClean, aroonLbClean] = f_fixed(low, 6, false)
+[aroonHiHole, aroonHbHole] = f_fixed(highHole, 6, true)
+[aroonLoHole, aroonLbHole] = f_fixed(lowHole, 6, false)
+
+plot(open, title="input_open", display=display.data_window)
+plot(high, title="input_high", display=display.data_window)
+plot(low, title="input_low", display=display.data_window)
+plot(close, title="input_close", display=display.data_window)
+plot(volume, title="input_volume", display=display.data_window)
+plot(bar_index, title="input_bar_index", display=display.data_window)
+plot(ta.highest(close, 5), title="highest_len5_close_clean", display=display.data_window)
+plot(ta.lowest(close, 5), title="lowest_len5_close_clean", display=display.data_window)
+plot(ta.highestbars(close, 5), title="highestbars_len5_close_clean", display=display.data_window)
+plot(ta.lowestbars(close, 5), title="lowestbars_len5_close_clean", display=display.data_window)
+plot(ta.highest(closeHole, 5), title="highest_len5_close_holes64", display=display.data_window)
+plot(ta.lowest(closeHole, 5), title="lowest_len5_close_holes64", display=display.data_window)
+plot(ta.highestbars(closeHole, 5), title="highestbars_len5_close_holes64", display=display.data_window)
+plot(ta.lowestbars(closeHole, 5), title="lowestbars_len5_close_holes64", display=display.data_window)
+plot(ta.highest(plateau, 5), title="highest_len5_plateau_p16", display=display.data_window)
+plot(ta.lowest(plateau, 5), title="lowest_len5_plateau_p16", display=display.data_window)
+plot(ta.highestbars(plateau, 5), title="highestbars_len5_plateau_p16", display=display.data_window)
+plot(ta.lowestbars(plateau, 5), title="lowestbars_len5_plateau_p16", display=display.data_window)
+plot(fixedHiClean, title="manual_fixedbars_highest_len5_close_clean", display=display.data_window)
+plot(fixedLoClean, title="manual_fixedbars_lowest_len5_close_clean", display=display.data_window)
+plot(fixedHbClean, title="manual_fixedbars_highestbars_len5_close_clean", display=display.data_window)
+plot(fixedLbClean, title="manual_fixedbars_lowestbars_len5_close_clean", display=display.data_window)
+plot(fixedHiHole, title="manual_fixedbars_highest_len5_close_hole", display=display.data_window)
+plot(fixedLoHole, title="manual_fixedbars_lowest_len5_close_hole", display=display.data_window)
+plot(fixedHbHole, title="manual_fixedbars_highestbars_len5_close_hole", display=display.data_window)
+plot(fixedLbHole, title="manual_fixedbars_lowestbars_len5_close_hole", display=display.data_window)
+plot(fixedHiPlateau, title="manual_fixedbars_highest_len5_plateau_p16", display=display.data_window)
+plot(fixedLoPlateau, title="manual_fixedbars_lowest_len5_plateau_p16", display=display.data_window)
+plot(fixedHbPlateau, title="manual_fixedbars_highestbars_len5_plateau_p16", display=display.data_window)
+plot(fixedLbPlateau, title="manual_fixedbars_lowestbars_len5_plateau_p16", display=display.data_window)
+plot(ta.pivothigh(triangle, 2, 2), title="pivothigh_left2_right2_triangle_clean", display=display.data_window)
+plot(ta.pivotlow(triangle, 2, 2), title="pivotlow_left2_right2_triangle_clean", display=display.data_window)
+plot(ta.pivothigh(triangleHole, 2, 2), title="pivothigh_left2_right2_triangle_holes64", display=display.data_window)
+plot(ta.pivotlow(triangleHole, 2, 2), title="pivotlow_left2_right2_triangle_holes64", display=display.data_window)
+plot(ta.pivothigh(plateau, 2, 2), title="pivothigh_left2_right2_plateau_p16", display=display.data_window)
+plot(ta.pivotlow(plateau, 2, 2), title="pivotlow_left2_right2_plateau_p16", display=display.data_window)
+plot(ta.pivothigh(triangle, 1, 3), title="pivothigh_left1_right3_triangle_clean", display=display.data_window)
+plot(ta.pivotlow(triangle, 1, 3), title="pivotlow_left1_right3_triangle_clean", display=display.data_window)
+plot(f_strict_pivot(triangle, 2, 2, true), title="manual_strict_pivothigh_left2_right2_triangle_clean", display=display.data_window)
+plot(f_strict_pivot(triangle, 2, 2, false), title="manual_strict_pivotlow_left2_right2_triangle_clean", display=display.data_window)
+plot(f_strict_pivot(triangleHole, 2, 2, true), title="manual_strict_pivothigh_left2_right2_triangle_holes64", display=display.data_window)
+plot(f_strict_pivot(triangleHole, 2, 2, false), title="manual_strict_pivotlow_left2_right2_triangle_holes64", display=display.data_window)
+plot(f_strict_pivot(plateau, 2, 2, true), title="manual_strict_pivothigh_left2_right2_plateau_p16", display=display.data_window)
+plot(f_strict_pivot(plateau, 2, 2, false), title="manual_strict_pivotlow_left2_right2_plateau_p16", display=display.data_window)
+plot(100.0 * (5.0 + ta.highestbars(high, 6)) / 5.0, title="aroon_up_len5_window6_clean", display=display.data_window)
+plot(100.0 * (5.0 + ta.lowestbars(low, 6)) / 5.0, title="aroon_down_len5_window6_clean", display=display.data_window)
+plot(100.0 * (5.0 + aroonHbClean) / 5.0, title="manual_fixedbars_aroon_up_len5_window6_clean", display=display.data_window)
+plot(100.0 * (5.0 + aroonLbClean) / 5.0, title="manual_fixedbars_aroon_down_len5_window6_clean", display=display.data_window)
+plot(100.0 * (5.0 + ta.highestbars(highHole, 6)) / 5.0, title="aroon_up_len5_window6_holes64", display=display.data_window)
+plot(100.0 * (5.0 + ta.lowestbars(lowHole, 6)) / 5.0, title="aroon_down_len5_window6_holes64", display=display.data_window)
+plot(100.0 * (5.0 + aroonHbHole) / 5.0, title="manual_fixedbars_aroon_up_len5_window6_holes64", display=display.data_window)
+plot(100.0 * (5.0 + aroonLbHole) / 5.0, title="manual_fixedbars_aroon_down_len5_window6_holes64", display=display.data_window)
+plot(ta.highest(triangle, 5), title="highest_len5_triangle_clean", display=display.data_window)
+plot(ta.lowest(triangle, 5), title="lowest_len5_triangle_clean", display=display.data_window)
+plot(ta.highestbars(triangle, 5), title="highestbars_len5_triangle_clean", display=display.data_window)
+plot(ta.lowestbars(triangle, 5), title="lowestbars_len5_triangle_clean", display=display.data_window)
+plot(ta.highest(leadingTriangle, 5), title="highest_len5_triangle_leadingna_b0to7", display=display.data_window)
+plot(ta.lowest(leadingTriangle, 5), title="lowest_len5_triangle_leadingna_b0to7", display=display.data_window)
+plot(ta.highestbars(leadingTriangle, 5), title="highestbars_len5_triangle_leadingna_b0to7", display=display.data_window)
+plot(ta.lowestbars(leadingTriangle, 5), title="lowestbars_len5_triangle_leadingna_b0to7", display=display.data_window)

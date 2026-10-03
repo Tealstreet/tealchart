@@ -1,0 +1,97 @@
+//@version=6
+indicator("History maxbarsback oracle v1", overlay=false, max_bars_back=512, precision=10)
+// Export all indicator columns. Data-window-only plots preserve raw numbers without scale distortion.
+// Holes repeat so a chart export need not include the first 600 bars.
+hole = bar_index % 600 == 40 or bar_index % 600 == 41
+clean = close
+holes = hole ? na : close
+targetClean = close
+targetHole = holes
+max_bars_back(targetClean, 768)
+max_bars_back(targetHole, 768)
+cycleDepth = bar_index % 513
+lateDepth = bar_index < 900 ? 1 : 768
+var int persistentCount = 0
+persistentCount += 1
+varip int intrabarCount = 0
+intrabarCount += 1
+int regularCount = 0
+regularCount += 1
+var float heldClean = na
+heldClean := clean
+var float heldHole = na
+if not hole
+    heldHole := clean
+varip float heldIpHole = na
+if not hole
+    heldIpHole := clean
+heldPrimitive = hole ? (bar_index % 600 == 40 ? close[1] : close[2]) : close
+var float sumClean = 0.0
+sumClean += clean
+var float sumHole = 0.0
+sumHole += nz(holes)
+varip float sumIpHole = 0.0
+sumIpHole += nz(holes)
+float sumHistoryHole = 0.0
+sumHistoryHole := nz(sumHistoryHole[1]) + nz(holes)
+
+plot(open, title="input_open", display=display.data_window)
+plot(high, title="input_high", display=display.data_window)
+plot(low, title="input_low", display=display.data_window)
+plot(close, title="input_close", display=display.data_window)
+plot(volume, title="input_volume", display=display.data_window)
+plot(bar_index, title="input_bar_index", display=display.data_window)
+plot(hole ? 1 : 0, title="input_hole_mod600_40_41", display=display.data_window)
+plot(cycleDepth, title="input_cycledepth_mod513", display=display.data_window)
+plot(clean[0], title="close_clean_history_d0", display=display.data_window)
+plot(holes[0], title="close_holes_history_d0", display=display.data_window)
+plot(clean[1], title="close_clean_history_d1", display=display.data_window)
+plot(holes[1], title="close_holes_history_d1", display=display.data_window)
+plot(clean[2], title="close_clean_history_d2", display=display.data_window)
+plot(holes[2], title="close_holes_history_d2", display=display.data_window)
+plot(clean[3], title="close_clean_history_d3", display=display.data_window)
+plot(holes[3], title="close_holes_history_d3", display=display.data_window)
+plot(clean[16], title="close_clean_history_d16", display=display.data_window)
+plot(holes[16], title="close_holes_history_d16", display=display.data_window)
+plot(clean[64], title="close_clean_history_d64", display=display.data_window)
+plot(holes[64], title="close_holes_history_d64", display=display.data_window)
+plot(clean[255], title="close_clean_history_d255", display=display.data_window)
+plot(holes[255], title="close_holes_history_d255", display=display.data_window)
+plot(clean[499], title="close_clean_history_d499", display=display.data_window)
+plot(holes[499], title="close_holes_history_d499", display=display.data_window)
+plot(clean[512], title="close_clean_history_d512", display=display.data_window)
+plot(holes[512], title="close_holes_history_d512", display=display.data_window)
+plot((clean - open)[1], title="spread_clean_exprhistory_d1", display=display.data_window)
+plot(clean[1] - open[1], title="spread_clean_primitive_d1", display=display.data_window)
+plot((holes - open)[1], title="spread_holes_exprhistory_d1", display=display.data_window)
+plot(holes[1] - open[1], title="spread_holes_primitive_d1", display=display.data_window)
+plot((clean - open)[16], title="spread_clean_exprhistory_d16", display=display.data_window)
+plot(clean[16] - open[16], title="spread_clean_primitive_d16", display=display.data_window)
+plot((holes - open)[16], title="spread_holes_exprhistory_d16", display=display.data_window)
+plot(holes[16] - open[16], title="spread_holes_primitive_d16", display=display.data_window)
+plot(nz(holes)[1], title="nz_hole_before_history_d1", display=display.data_window)
+plot(bar_index == 0 ? na : nz(holes[1]), title="nz_hole_before_primitive_d1", display=display.data_window)
+plot(nz(holes[1]), title="nz_hole_after_history_d1", display=display.data_window)
+plot(nz(clean[1]), title="nz_clean_after_history_d1", display=display.data_window)
+plot(clean[cycleDepth], title="dynamic_clean_decl512_cycle0_512", display=display.data_window)
+plot(holes[cycleDepth], title="dynamic_holes_decl512_cycle0_512", display=display.data_window)
+plot(targetClean[768], title="dynamic_targetclean_mbb768_d768", display=display.data_window)
+plot(targetHole[768], title="dynamic_targethole_mbb768_d768", display=display.data_window)
+plot(targetClean[lateDepth], title="dynamic_targetclean_mbb768_late900", display=display.data_window)
+plot(targetHole[lateDepth], title="dynamic_targethole_mbb768_late900", display=display.data_window)
+plot(bar_index - cycleDepth, title="dynamic_barindex_decl512_cycle_primitive", display=display.data_window)
+plot((bar_index - cycleDepth) % 600 == 40 or (bar_index - cycleDepth) % 600 == 41 ? na : close[cycleDepth], title="dynamic_hole_cycle_primitive", display=display.data_window)
+plot(regularCount, title="regular_count_reset_eachbar", display=display.data_window)
+plot(persistentCount, title="var_count_historical", display=display.data_window)
+plot(intrabarCount, title="varip_count_historical", display=display.data_window)
+plot(bar_index + 1, title="count_barindex_primitive", display=display.data_window)
+plot(heldClean, title="var_hold_clean", display=display.data_window)
+plot(heldHole, title="var_hold_holes", display=display.data_window)
+plot(heldIpHole, title="varip_hold_holes", display=display.data_window)
+plot(heldPrimitive, title="hold_holes_primitive", display=display.data_window)
+plot(heldHole[1], title="var_hold_holes_history_d1", display=display.data_window)
+plot(heldIpHole[1], title="varip_hold_holes_history_d1", display=display.data_window)
+plot(sumClean, title="var_sum_clean", display=display.data_window)
+plot(sumHole, title="var_sum_holes_nz0", display=display.data_window)
+plot(sumIpHole, title="varip_sum_holes_nz0", display=display.data_window)
+plot(sumHistoryHole, title="sum_holes_history_recurrence", display=display.data_window)

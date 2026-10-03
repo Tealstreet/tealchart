@@ -1,0 +1,123 @@
+//@version=6
+indicator("RMA chain oracle v1 (60 columns)", overlay=false, precision=12)
+// Export ALL chart data, including the first dataset bar (input_bar_index = 0).
+// No requests, libraries, alerts, drawings, or changing input parameters.
+f_rma(src, length) =>
+    var float total = 0.0
+    var int count = 0
+    var float value = na
+    if not na(src)
+        if count < length
+            total := total + src
+            count := count + 1
+            if count == length
+                value := total / length
+        else
+            value := src / length + (1.0 - 1.0 / length) * value
+    value
+
+f_adj_rsi(src, length) =>
+    delta = src - src[1]
+    up = math.max(delta, 0.0)
+    down = math.max(-delta, 0.0)
+    gain = ta.rma(up, length)
+    loss = ta.rma(down, length)
+    100.0 - 100.0 / (1.0 + gain / loss)
+
+// Competing hole model: last VALID source, primitive RMA, na on hole bar.
+f_bridge_rsi(src, length) =>
+    var float previous = na
+    delta = na(src) or na(previous) ? na : src - previous
+    up = math.max(delta, 0.0)
+    down = math.max(-delta, 0.0)
+    gain = f_rma(up, length)
+    loss = f_rma(down, length)
+    if not na(src)
+        previous := src
+    na(src) or na(gain) or na(loss) ? na : loss == 0.0 ? 100.0 : 100.0 - 100.0 / (1.0 + gain / loss)
+
+// Bounded, exact arithmetic waveform: alternating moves, abrupt resets, both signs.
+syn = 50.0 + (bar_index % 11) * 2.0 + (bar_index % 3 == 0 ? 7.0 : -3.0)
+s_clean = syn
+s_lead0_4 = bar_index < 5 ? na : syn
+s_seed3_4 = bar_index == 3 or bar_index == 4 ? na : syn
+s_hole40_41 = bar_index == 40 or bar_index == 41 ? na : syn
+s_long80_95 = bar_index >= 80 and bar_index <= 95 ? na : syn
+s_period17_8 = bar_index % 17 == 8 ? na : syn
+tr_raw = ta.tr(true)
+tr_primitive = na(close[1]) ? high - low : math.max(high - low, math.max(math.abs(high - close[1]), math.abs(low - close[1])))
+tr_hole40_41 = bar_index == 40 or bar_index == 41 ? na : tr_raw
+plot(bar_index, "input_bar_index", display=display.data_window)
+plot(open, "input_open", display=display.data_window)
+plot(high, "input_high", display=display.data_window)
+plot(low, "input_low", display=display.data_window)
+plot(close, "input_close", display=display.data_window)
+plot(volume, "input_volume", display=display.data_window)
+plot(syn, "input_syn_wave", display=display.all)
+plot(tr_raw, "tr_handle_na_true", display=display.all)
+r_clean_3 = ta.rma(s_clean, 3)
+plot(r_clean_3, "rma_syn_len3_clean", display=display.all)
+plot(f_rma(s_clean, 3), "rma_primitive_syn_len3_clean", display=display.all)
+r_clean_14 = ta.rma(s_clean, 14)
+plot(r_clean_14, "rma_syn_len14_clean", display=display.all)
+plot(f_rma(s_clean, 14), "rma_primitive_syn_len14_clean", display=display.all)
+r_lead0_4_3 = ta.rma(s_lead0_4, 3)
+plot(r_lead0_4_3, "rma_syn_len3_lead0_4", display=display.all)
+plot(f_rma(s_lead0_4, 3), "rma_primitive_syn_len3_lead0_4", display=display.all)
+r_lead0_4_14 = ta.rma(s_lead0_4, 14)
+plot(r_lead0_4_14, "rma_syn_len14_lead0_4", display=display.all)
+plot(f_rma(s_lead0_4, 14), "rma_primitive_syn_len14_lead0_4", display=display.all)
+r_seed3_4_3 = ta.rma(s_seed3_4, 3)
+plot(r_seed3_4_3, "rma_syn_len3_seed3_4", display=display.all)
+plot(f_rma(s_seed3_4, 3), "rma_primitive_syn_len3_seed3_4", display=display.all)
+r_seed3_4_14 = ta.rma(s_seed3_4, 14)
+plot(r_seed3_4_14, "rma_syn_len14_seed3_4", display=display.all)
+plot(f_rma(s_seed3_4, 14), "rma_primitive_syn_len14_seed3_4", display=display.all)
+r_hole40_41_3 = ta.rma(s_hole40_41, 3)
+plot(r_hole40_41_3, "rma_syn_len3_hole40_41", display=display.all)
+plot(f_rma(s_hole40_41, 3), "rma_primitive_syn_len3_hole40_41", display=display.all)
+r_hole40_41_14 = ta.rma(s_hole40_41, 14)
+plot(r_hole40_41_14, "rma_syn_len14_hole40_41", display=display.all)
+plot(f_rma(s_hole40_41, 14), "rma_primitive_syn_len14_hole40_41", display=display.all)
+r_long80_95_3 = ta.rma(s_long80_95, 3)
+plot(r_long80_95_3, "rma_syn_len3_long80_95", display=display.all)
+plot(f_rma(s_long80_95, 3), "rma_primitive_syn_len3_long80_95", display=display.all)
+r_long80_95_14 = ta.rma(s_long80_95, 14)
+plot(r_long80_95_14, "rma_syn_len14_long80_95", display=display.all)
+plot(f_rma(s_long80_95, 14), "rma_primitive_syn_len14_long80_95", display=display.all)
+r_period17_8_3 = ta.rma(s_period17_8, 3)
+plot(r_period17_8_3, "rma_syn_len3_period17_8", display=display.all)
+plot(f_rma(s_period17_8, 3), "rma_primitive_syn_len3_period17_8", display=display.all)
+r_period17_8_14 = ta.rma(s_period17_8, 14)
+plot(r_period17_8_14, "rma_syn_len14_period17_8", display=display.all)
+plot(f_rma(s_period17_8, 14), "rma_primitive_syn_len14_period17_8", display=display.all)
+a_3 = ta.atr(3)
+plot(a_3, "atr_chart_len3_clean", display=display.all)
+plot(ta.rma(tr_raw, 3), "atr_rma_tr_len3_clean", display=display.all)
+plot(f_rma(tr_primitive, 3), "atr_primitive_tr_len3_clean", display=display.all)
+a_14 = ta.atr(14)
+plot(a_14, "atr_chart_len14_clean", display=display.all)
+plot(ta.rma(tr_raw, 14), "atr_rma_tr_len14_clean", display=display.all)
+plot(f_rma(tr_primitive, 14), "atr_primitive_tr_len14_clean", display=display.all)
+plot(tr_hole40_41, "input_tr_hole40_41", display=display.all)
+plot(ta.rma(tr_hole40_41, 3), "atr_equiv_rma_tr_len3_hole40_41", display=display.all)
+plot(f_rma(tr_hole40_41, 3), "atr_equiv_primitive_tr_len3_hole40_41", display=display.all)
+plot(ta.rma(tr_hole40_41, 14), "atr_equiv_rma_tr_len14_hole40_41", display=display.all)
+plot(f_rma(tr_hole40_41, 14), "atr_equiv_primitive_tr_len14_hole40_41", display=display.all)
+plot(ta.rsi(s_clean, 14), "rsi_syn_len14_clean", display=display.all)
+plot(f_adj_rsi(s_clean, 14), "rsi_adj_rma_syn_len14_clean", display=display.all)
+plot(ta.rsi(s_lead0_4, 14), "rsi_syn_len14_lead0_4", display=display.all)
+plot(f_adj_rsi(s_lead0_4, 14), "rsi_adj_rma_syn_len14_lead0_4", display=display.all)
+plot(ta.rsi(s_seed3_4, 14), "rsi_syn_len14_seed3_4", display=display.all)
+plot(f_adj_rsi(s_seed3_4, 14), "rsi_adj_rma_syn_len14_seed3_4", display=display.all)
+plot(ta.rsi(s_hole40_41, 14), "rsi_syn_len14_hole40_41", display=display.all)
+plot(f_adj_rsi(s_hole40_41, 14), "rsi_adj_rma_syn_len14_hole40_41", display=display.all)
+plot(ta.rsi(s_long80_95, 14), "rsi_syn_len14_long80_95", display=display.all)
+plot(f_adj_rsi(s_long80_95, 14), "rsi_adj_rma_syn_len14_long80_95", display=display.all)
+plot(ta.rsi(s_period17_8, 14), "rsi_syn_len14_period17_8", display=display.all)
+plot(f_adj_rsi(s_period17_8, 14), "rsi_adj_rma_syn_len14_period17_8", display=display.all)
+plot(ta.rma(math.max(s_hole40_41 - s_hole40_41[1], 0.0), 14), "rsi_adj_gain_rma_syn_len14_hole40_41", display=display.all)
+plot(ta.rma(math.max(s_hole40_41[1] - s_hole40_41, 0.0), 14), "rsi_adj_loss_rma_syn_len14_hole40_41", display=display.all)
+plot(f_bridge_rsi(s_hole40_41, 14), "rsi_bridge_primitive_syn_len14_hole40_41", display=display.all)
+plot(ta.rsi(r_clean_14, 14), "rsi_of_rma_syn_len14_clean", display=display.all)
+plot(ta.rsi(a_14, 14), "rsi_of_atr_chart_len14_clean", display=display.all)

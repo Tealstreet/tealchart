@@ -1,0 +1,140 @@
+//@version=6
+indicator("Oracle na holes crosses v1", overlay=false, precision=8, max_bars_back=100)
+// 60 constant-color plots. Export ALL chart data; retain bar indices 0..127.
+// Data-window plots remain exportable while OHLCV/index do not distort pane scale.
+float clean = float(bar_index % 8 <= 4 ? bar_index % 8 - 2 : 6 - bar_index % 8)
+float start = bar_index < 5 ? na : clean
+float hole = bar_index == 40 or bar_index == 41 or bar_index == 44 or bar_index == 47 ? na : clean
+float zero = 0.0
+float startB = bar_index < 2 ? na : zero
+float holeB = bar_index == 50 or bar_index == 51 or bar_index == 55 ? na : zero
+bool sampleEvent = bar_index % 4 == 0
+plot(bar_index, title="input_bar_index", color=color.blue, display=display.data_window)
+plot(open, title="input_open", color=color.blue, display=display.data_window)
+plot(high, title="input_high", color=color.blue, display=display.data_window)
+plot(low, title="input_low", color=color.blue, display=display.data_window)
+plot(close, title="input_close", color=color.blue, display=display.data_window)
+plot(volume, title="input_volume", color=color.blue, display=display.data_window)
+plot(clean, title="source_clean_wave8", color=color.blue)
+plot(start, title="source_start_wave8", color=color.blue)
+plot(hole, title="source_hole_wave8", color=color.blue)
+plot(ta.crossover(clean, zero) ? 1 : 0, title="crossover_clean_a_b0_builtin", color=color.blue)
+plot((clean > zero and clean[1] <= zero[1]) ? 1 : 0, title="crossover_clean_a_b0_manual", color=color.blue)
+plot(ta.crossover(start, startB) ? 1 : 0, title="crossover_start_a0to4_b0to1_builtin", color=color.blue)
+plot((start > startB and start[1] <= startB[1]) ? 1 : 0, title="crossover_start_a0to4_b0to1_manual", color=color.blue)
+plot(ta.crossover(hole, holeB) ? 1 : 0, title="crossover_hole_a40_41_44_47_b50_51_55_builtin", color=color.blue)
+plot((hole > holeB and hole[1] <= holeB[1]) ? 1 : 0, title="crossover_hole_a40_41_44_47_b50_51_55_manual", color=color.blue)
+plot(ta.crossunder(clean, zero) ? 1 : 0, title="crossunder_clean_a_b0_builtin", color=color.blue)
+plot((clean < zero and clean[1] >= zero[1]) ? 1 : 0, title="crossunder_clean_a_b0_manual", color=color.blue)
+plot(ta.crossunder(start, startB) ? 1 : 0, title="crossunder_start_a0to4_b0to1_builtin", color=color.blue)
+plot((start < startB and start[1] >= startB[1]) ? 1 : 0, title="crossunder_start_a0to4_b0to1_manual", color=color.blue)
+plot(ta.crossunder(hole, holeB) ? 1 : 0, title="crossunder_hole_a40_41_44_47_b50_51_55_builtin", color=color.blue)
+plot((hole < holeB and hole[1] >= holeB[1]) ? 1 : 0, title="crossunder_hole_a40_41_44_47_b50_51_55_manual", color=color.blue)
+plot(ta.cross(clean, zero) ? 1 : 0, title="cross_clean_a_b0_builtin", color=color.blue)
+plot(((clean > zero and clean[1] <= zero[1]) or (clean < zero and clean[1] >= zero[1])) ? 1 : 0, title="cross_clean_a_b0_manual", color=color.blue)
+plot(ta.cross(start, startB) ? 1 : 0, title="cross_start_a0to4_b0to1_builtin", color=color.blue)
+plot(((start > startB and start[1] <= startB[1]) or (start < startB and start[1] >= startB[1])) ? 1 : 0, title="cross_start_a0to4_b0to1_manual", color=color.blue)
+plot(ta.cross(hole, holeB) ? 1 : 0, title="cross_hole_a40_41_44_47_b50_51_55_builtin", color=color.blue)
+plot(((hole > holeB and hole[1] <= holeB[1]) or (hole < holeB and hole[1] >= holeB[1])) ? 1 : 0, title="cross_hole_a40_41_44_47_b50_51_55_manual", color=color.blue)
+var float rising_len3_clean_p1 = na
+var float rising_len3_clean_p2 = na
+var float rising_len3_clean_p3 = na
+bool rising_len3_clean_manual = not na(clean) and not na(rising_len3_clean_p3) and clean > rising_len3_clean_p1 and clean > rising_len3_clean_p2 and clean > rising_len3_clean_p3
+plot(ta.rising(clean, 3) ? 1 : 0, title="rising_len3_clean_builtin", color=color.blue)
+plot(rising_len3_clean_manual ? 1 : 0, title="rising_len3_clean_manual_non_na3", color=color.blue)
+if not na(clean)
+    rising_len3_clean_p3 := rising_len3_clean_p2
+    rising_len3_clean_p2 := rising_len3_clean_p1
+    rising_len3_clean_p1 := clean
+var float rising_len3_start_p1 = na
+var float rising_len3_start_p2 = na
+var float rising_len3_start_p3 = na
+bool rising_len3_start_manual = not na(start) and not na(rising_len3_start_p3) and start > rising_len3_start_p1 and start > rising_len3_start_p2 and start > rising_len3_start_p3
+plot(ta.rising(start, 3) ? 1 : 0, title="rising_len3_start_builtin", color=color.blue)
+plot(rising_len3_start_manual ? 1 : 0, title="rising_len3_start_manual_non_na3", color=color.blue)
+if not na(start)
+    rising_len3_start_p3 := rising_len3_start_p2
+    rising_len3_start_p2 := rising_len3_start_p1
+    rising_len3_start_p1 := start
+var float rising_len3_hole_p1 = na
+var float rising_len3_hole_p2 = na
+var float rising_len3_hole_p3 = na
+bool rising_len3_hole_manual = not na(hole) and not na(rising_len3_hole_p3) and hole > rising_len3_hole_p1 and hole > rising_len3_hole_p2 and hole > rising_len3_hole_p3
+plot(ta.rising(hole, 3) ? 1 : 0, title="rising_len3_hole_builtin", color=color.blue)
+plot(rising_len3_hole_manual ? 1 : 0, title="rising_len3_hole_manual_non_na3", color=color.blue)
+if not na(hole)
+    rising_len3_hole_p3 := rising_len3_hole_p2
+    rising_len3_hole_p2 := rising_len3_hole_p1
+    rising_len3_hole_p1 := hole
+var float falling_len3_clean_p1 = na
+var float falling_len3_clean_p2 = na
+var float falling_len3_clean_p3 = na
+bool falling_len3_clean_manual = not na(clean) and not na(falling_len3_clean_p3) and clean < falling_len3_clean_p1 and clean < falling_len3_clean_p2 and clean < falling_len3_clean_p3
+plot(ta.falling(clean, 3) ? 1 : 0, title="falling_len3_clean_builtin", color=color.blue)
+plot(falling_len3_clean_manual ? 1 : 0, title="falling_len3_clean_manual_non_na3", color=color.blue)
+if not na(clean)
+    falling_len3_clean_p3 := falling_len3_clean_p2
+    falling_len3_clean_p2 := falling_len3_clean_p1
+    falling_len3_clean_p1 := clean
+var float falling_len3_start_p1 = na
+var float falling_len3_start_p2 = na
+var float falling_len3_start_p3 = na
+bool falling_len3_start_manual = not na(start) and not na(falling_len3_start_p3) and start < falling_len3_start_p1 and start < falling_len3_start_p2 and start < falling_len3_start_p3
+plot(ta.falling(start, 3) ? 1 : 0, title="falling_len3_start_builtin", color=color.blue)
+plot(falling_len3_start_manual ? 1 : 0, title="falling_len3_start_manual_non_na3", color=color.blue)
+if not na(start)
+    falling_len3_start_p3 := falling_len3_start_p2
+    falling_len3_start_p2 := falling_len3_start_p1
+    falling_len3_start_p1 := start
+var float falling_len3_hole_p1 = na
+var float falling_len3_hole_p2 = na
+var float falling_len3_hole_p3 = na
+bool falling_len3_hole_manual = not na(hole) and not na(falling_len3_hole_p3) and hole < falling_len3_hole_p1 and hole < falling_len3_hole_p2 and hole < falling_len3_hole_p3
+plot(ta.falling(hole, 3) ? 1 : 0, title="falling_len3_hole_builtin", color=color.blue)
+plot(falling_len3_hole_manual ? 1 : 0, title="falling_len3_hole_manual_non_na3", color=color.blue)
+if not na(hole)
+    falling_len3_hole_p3 := falling_len3_hole_p2
+    falling_len3_hole_p2 := falling_len3_hole_p1
+    falling_len3_hole_p1 := hole
+plot(ta.change(clean, 1), title="change_len1_clean_builtin", color=color.blue)
+plot(clean - clean[1], title="change_len1_clean_manual", color=color.blue)
+plot(ta.change(start, 1), title="change_len1_start_builtin", color=color.blue)
+plot(start - start[1], title="change_len1_start_manual", color=color.blue)
+plot(ta.change(hole, 1), title="change_len1_hole_builtin", color=color.blue)
+plot(hole - hole[1], title="change_len1_hole_manual", color=color.blue)
+bool event_clean = clean > 0
+var int lastEvent_clean = na
+if event_clean
+    lastEvent_clean := bar_index
+plot(ta.barssince(event_clean), title="barssince_src_positive_clean_builtin", color=color.blue)
+plot(bar_index - lastEvent_clean, title="barssince_src_positive_clean_manual", color=color.blue)
+bool event_start = start > 0
+var int lastEvent_start = na
+if event_start
+    lastEvent_start := bar_index
+plot(ta.barssince(event_start), title="barssince_src_positive_start_builtin", color=color.blue)
+plot(bar_index - lastEvent_start, title="barssince_src_positive_start_manual", color=color.blue)
+bool event_hole = hole > 0
+var int lastEvent_hole = na
+if event_hole
+    lastEvent_hole := bar_index
+plot(ta.barssince(event_hole), title="barssince_src_positive_hole_builtin", color=color.blue)
+plot(bar_index - lastEvent_hole, title="barssince_src_positive_hole_manual", color=color.blue)
+var float remembered_clean = na
+if sampleEvent
+    remembered_clean := clean
+plot(ta.valuewhen(sampleEvent, clean, 0), title="valuewhen_event_mod4_src_clean_occ0_builtin", color=color.blue)
+plot(ta.valuewhen(sampleEvent, clean, 1), title="valuewhen_event_mod4_src_clean_occ1_builtin", color=color.blue)
+plot(remembered_clean, title="valuewhen_event_mod4_src_clean_occ0_manual", color=color.blue)
+var float remembered_start = na
+if sampleEvent
+    remembered_start := start
+plot(ta.valuewhen(sampleEvent, start, 0), title="valuewhen_event_mod4_src_start_occ0_builtin", color=color.blue)
+plot(ta.valuewhen(sampleEvent, start, 1), title="valuewhen_event_mod4_src_start_occ1_builtin", color=color.blue)
+plot(remembered_start, title="valuewhen_event_mod4_src_start_occ0_manual", color=color.blue)
+var float remembered_hole = na
+if sampleEvent
+    remembered_hole := hole
+plot(ta.valuewhen(sampleEvent, hole, 0), title="valuewhen_event_mod4_src_hole_occ0_builtin", color=color.blue)
+plot(ta.valuewhen(sampleEvent, hole, 1), title="valuewhen_event_mod4_src_hole_occ1_builtin", color=color.blue)
+plot(remembered_hole, title="valuewhen_event_mod4_src_hole_occ0_manual", color=color.blue)
