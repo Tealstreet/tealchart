@@ -12,7 +12,7 @@
       "export_bytes": 24370002,
       "captured_at_utc": "2026-10-03T12:22:58.308Z",
       "file_modified_at_utc": "2026-10-03T12:23:26.688140+00:00",
-      "processed_at_utc": "2026-10-03T12:57:13.209823+00:00",
+      "processed_at_utc": "2026-10-03T13:33:32.051941+00:00",
       "reset_at_utc": "2026-10-03T12:22:51.349Z",
       "observed_live_bar_open_utc": "2026-10-03T12:22:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -378,7 +378,7 @@
       "export_bytes": 13625761,
       "captured_at_utc": "2026-10-03T12:24:39.851Z",
       "file_modified_at_utc": "2026-10-03T12:24:40.343238+00:00",
-      "processed_at_utc": "2026-10-03T12:57:13.933771+00:00",
+      "processed_at_utc": "2026-10-03T13:33:32.726827+00:00",
       "reset_at_utc": "2026-10-03T12:24:33.727Z",
       "observed_live_bar_open_utc": "2026-10-03T12:24:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -745,7 +745,7 @@
       "export_bytes": 3625226,
       "captured_at_utc": "2026-10-03T12:25:19.962Z",
       "file_modified_at_utc": "2026-10-03T12:25:20.513594+00:00",
-      "processed_at_utc": "2026-10-03T12:57:14.399833+00:00",
+      "processed_at_utc": "2026-10-03T13:33:33.153787+00:00",
       "reset_at_utc": "2026-10-03T12:25:13.923Z",
       "observed_live_bar_open_utc": "2026-10-03T12:24:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -1107,7 +1107,7 @@
       "export_bytes": 20491418,
       "captured_at_utc": "2026-10-03T12:26:12.259Z",
       "file_modified_at_utc": "2026-10-03T12:26:12.716823+00:00",
-      "processed_at_utc": "2026-10-03T12:57:15.242456+00:00",
+      "processed_at_utc": "2026-10-03T13:33:33.911270+00:00",
       "reset_at_utc": "2026-10-03T12:26:05.971Z",
       "observed_live_bar_open_utc": "2026-10-03T12:26:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -1474,7 +1474,7 @@
       "export_bytes": 25615885,
       "captured_at_utc": "2026-10-03T12:26:41.125Z",
       "file_modified_at_utc": "2026-10-03T12:26:41.664040+00:00",
-      "processed_at_utc": "2026-10-03T12:57:16.150379+00:00",
+      "processed_at_utc": "2026-10-03T13:33:34.788089+00:00",
       "reset_at_utc": "2026-10-03T12:26:33.838Z",
       "observed_live_bar_open_utc": "2026-10-03T12:26:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -1841,7 +1841,7 @@
       "export_bytes": 23635387,
       "captured_at_utc": "2026-10-03T12:27:13.832Z",
       "file_modified_at_utc": "2026-10-03T12:27:14.273808+00:00",
-      "processed_at_utc": "2026-10-03T12:57:17.030379+00:00",
+      "processed_at_utc": "2026-10-03T13:33:35.657941+00:00",
       "reset_at_utc": "2026-10-03T12:27:06.637Z",
       "observed_live_bar_open_utc": "2026-10-03T12:26:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -2208,7 +2208,7 @@
       "export_bytes": 17329722,
       "captured_at_utc": "2026-10-03T12:28:22.618Z",
       "file_modified_at_utc": "2026-10-03T12:28:23.064282+00:00",
-      "processed_at_utc": "2026-10-03T12:57:17.808065+00:00",
+      "processed_at_utc": "2026-10-03T13:33:36.404424+00:00",
       "reset_at_utc": "2026-10-03T12:28:15.257Z",
       "observed_live_bar_open_utc": "2026-10-03T12:28:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -2575,7 +2575,7 @@
       "export_bytes": 16412885,
       "captured_at_utc": "2026-10-03T12:28:56.143Z",
       "file_modified_at_utc": "2026-10-03T12:28:56.609279+00:00",
-      "processed_at_utc": "2026-10-03T12:57:18.579573+00:00",
+      "processed_at_utc": "2026-10-03T13:33:37.134504+00:00",
       "reset_at_utc": "2026-10-03T12:28:45.969Z",
       "observed_live_bar_open_utc": "2026-10-03T12:28:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -2942,7 +2942,7 @@
       "export_bytes": 20139293,
       "captured_at_utc": "2026-10-03T12:30:10.781Z",
       "file_modified_at_utc": "2026-10-03T12:30:11.211392+00:00",
-      "processed_at_utc": "2026-10-03T12:57:19.391780+00:00",
+      "processed_at_utc": "2026-10-03T13:33:37.917817+00:00",
       "reset_at_utc": "2026-10-03T12:30:00.689Z",
       "observed_live_bar_open_utc": "2026-10-03T12:30:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -3309,7 +3309,7 @@
       "export_bytes": 6445444,
       "captured_at_utc": "2026-10-03T12:30:50.284Z",
       "file_modified_at_utc": "2026-10-03T12:30:50.802699+00:00",
-      "processed_at_utc": "2026-10-03T12:57:20.052244+00:00",
+      "processed_at_utc": "2026-10-03T13:33:38.472554+00:00",
       "reset_at_utc": "2026-10-03T12:30:43.921Z",
       "observed_live_bar_open_utc": "2026-10-03T12:30:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -3676,7 +3676,7 @@
       "export_bytes": 18154942,
       "captured_at_utc": "2026-10-03T12:33:05.416Z",
       "file_modified_at_utc": "2026-10-03T12:33:05.834116+00:00",
-      "processed_at_utc": "2026-10-03T12:57:21.407821+00:00",
+      "processed_at_utc": "2026-10-03T13:33:39.703219+00:00",
       "reset_at_utc": "2026-10-03T12:32:56.938Z",
       "observed_live_bar_open_utc": "2026-10-03T12:32:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -4043,7 +4043,7 @@
       "export_bytes": 12833186,
       "captured_at_utc": "2026-10-03T12:33:56.180Z",
       "file_modified_at_utc": "2026-10-03T12:33:56.635614+00:00",
-      "processed_at_utc": "2026-10-03T12:57:22.090334+00:00",
+      "processed_at_utc": "2026-10-03T13:33:40.389955+00:00",
       "reset_at_utc": "2026-10-03T12:33:48.927Z",
       "observed_live_bar_open_utc": "2026-10-03T12:32:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -4410,7 +4410,7 @@
       "export_bytes": 13506518,
       "captured_at_utc": "2026-10-03T12:35:22.081Z",
       "file_modified_at_utc": "2026-10-03T12:35:22.544273+00:00",
-      "processed_at_utc": "2026-10-03T12:57:22.754122+00:00",
+      "processed_at_utc": "2026-10-03T13:33:41.039111+00:00",
       "reset_at_utc": "2026-10-03T12:35:14.664Z",
       "observed_live_bar_open_utc": "2026-10-03T12:34:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -4777,7 +4777,7 @@
       "export_bytes": 10286506,
       "captured_at_utc": "2026-10-03T12:39:41.124Z",
       "file_modified_at_utc": "2026-10-03T12:39:41.775395+00:00",
-      "processed_at_utc": "2026-10-03T12:57:23.633384+00:00",
+      "processed_at_utc": "2026-10-03T13:33:41.873712+00:00",
       "reset_at_utc": "2026-10-03T12:39:34.438Z",
       "observed_live_bar_open_utc": "2026-10-03T12:38:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -5144,7 +5144,7 @@
       "export_bytes": 8053882,
       "captured_at_utc": "2026-10-03T12:40:24.465Z",
       "file_modified_at_utc": "2026-10-03T12:40:24.910212+00:00",
-      "processed_at_utc": "2026-10-03T12:57:24.261210+00:00",
+      "processed_at_utc": "2026-10-03T13:33:42.470213+00:00",
       "reset_at_utc": "2026-10-03T12:40:18.271Z",
       "observed_live_bar_open_utc": "2026-10-03T12:40:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -5511,7 +5511,7 @@
       "export_bytes": 5831106,
       "captured_at_utc": "2026-10-03T12:43:48.563Z",
       "file_modified_at_utc": "2026-10-03T12:43:49.097304+00:00",
-      "processed_at_utc": "2026-10-03T12:57:24.771828+00:00",
+      "processed_at_utc": "2026-10-03T13:33:42.953034+00:00",
       "reset_at_utc": "2026-10-03T12:42:28.522Z",
       "observed_live_bar_open_utc": "2026-10-03T12:42:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -5591,70 +5591,6 @@
         "plotcandle_dynamic_actual (Close)"
       ],
       "column_map": {
-        "plotbar_constant_actual (Open)": {
-          "title": "plotbar_constant_actual",
-          "channel": "open"
-        },
-        "plotbar_constant_actual (High": {
-          "title": "plotbar_constant_actual",
-          "channel": "high"
-        },
-        "plotbar_constant_actual (Low)": {
-          "title": "plotbar_constant_actual",
-          "channel": "low"
-        },
-        "plotbar_constant_actual (Close)": {
-          "title": "plotbar_constant_actual",
-          "channel": "close"
-        },
-        "plotbar_dynamic_actual (Open)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "open"
-        },
-        "plotbar_dynamic_actual (High": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "high"
-        },
-        "plotbar_dynamic_actual (Low)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "low"
-        },
-        "plotbar_dynamic_actual (Close)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "close"
-        },
-        "plotcandle_constant_actual (Open)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "open"
-        },
-        "plotcandle_constant_actual (High": {
-          "title": "plotcandle_constant_actual",
-          "channel": "high"
-        },
-        "plotcandle_constant_actual (Low)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "low"
-        },
-        "plotcandle_constant_actual (Close)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "close"
-        },
-        "plotcandle_dynamic_actual (Open)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "open"
-        },
-        "plotcandle_dynamic_actual (High": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "high"
-        },
-        "plotcandle_dynamic_actual (Low)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "low"
-        },
-        "plotcandle_dynamic_actual (Close)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "close"
-        },
         "input_open": {
           "title": "input_open"
         },
@@ -5878,10 +5814,13 @@
         "evidence/coverage-plot-1-v1-attempt1-export.png",
         "evidence/coverage-plot-1-v1-attempt1-data-window-controls.png",
         "evidence/coverage-plot-1-v1-attempt1-data-window-ohlc.png",
-        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json"
+        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json",
+        "evidence/coverage-plot-1-v1-attempt1-mapping-v2.json"
       ],
-      "validation_errors": [],
-      "status": "FILE-READY",
+      "validation_errors": [
+        "Missing mapped output columns: [{'title': 'plotbar_constant_actual', 'channel': 'open'}, {'title': 'plotbar_constant_actual', 'channel': 'high'}, {'title': 'plotbar_constant_actual', 'channel': 'low'}, {'title': 'plotbar_constant_actual', 'channel': 'close'}, {'title': 'plotbar_dynamic_actual', 'channel': 'open'}, {'title': 'plotbar_dynamic_actual', 'channel': 'high'}, {'title': 'plotbar_dynamic_actual', 'channel': 'low'}, {'title': 'plotbar_dynamic_actual', 'channel': 'close'}, {'title': 'plotcandle_constant_actual', 'channel': 'open'}, {'title': 'plotcandle_constant_actual', 'channel': 'high'}, {'title': 'plotcandle_constant_actual', 'channel': 'low'}, {'title': 'plotcandle_constant_actual', 'channel': 'close'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'open'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'high'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'low'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'close'}]"
+      ],
+      "status": "NEEDS-EVIDENCE",
       "runtime": {
         "status": "RUNS"
       }
@@ -5897,7 +5836,7 @@
       "export_bytes": 9518242,
       "captured_at_utc": "2026-10-03T12:47:44.094Z",
       "file_modified_at_utc": "2026-10-03T12:47:44.770574+00:00",
-      "processed_at_utc": "2026-10-03T12:57:25.319321+00:00",
+      "processed_at_utc": "2026-10-03T13:33:43.476118+00:00",
       "reset_at_utc": "2026-10-03T12:46:23.878Z",
       "observed_live_bar_open_utc": "2026-10-03T12:46:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -6241,7 +6180,7 @@
       "export_bytes": 13664723,
       "captured_at_utc": "2026-10-03T12:48:30.024Z",
       "file_modified_at_utc": "2026-10-03T12:48:30.486092+00:00",
-      "processed_at_utc": "2026-10-03T12:57:25.925961+00:00",
+      "processed_at_utc": "2026-10-03T13:33:44.025075+00:00",
       "reset_at_utc": "2026-10-03T12:48:22.076Z",
       "observed_live_bar_open_utc": "2026-10-03T12:48:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -6505,7 +6444,7 @@
       "export_bytes": 18708998,
       "captured_at_utc": "2026-10-03T12:51:46.991Z",
       "file_modified_at_utc": "2026-10-03T12:51:47.813225+00:00",
-      "processed_at_utc": "2026-10-03T12:57:26.765211+00:00",
+      "processed_at_utc": "2026-10-03T13:33:44.800047+00:00",
       "reset_at_utc": "2026-10-03T12:51:38.814Z",
       "observed_live_bar_open_utc": "2026-10-03T12:50:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -6872,7 +6811,7 @@
       "export_bytes": 8996890,
       "captured_at_utc": "2026-10-03T12:53:13.242Z",
       "file_modified_at_utc": "2026-10-03T12:53:13.788674+00:00",
-      "processed_at_utc": "2026-10-03T12:57:27.414099+00:00",
+      "processed_at_utc": "2026-10-03T13:33:45.407565+00:00",
       "reset_at_utc": "2026-10-03T12:53:05.841Z",
       "observed_live_bar_open_utc": "2026-10-03T12:52:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -7239,7 +7178,7 @@
       "export_bytes": 13979318,
       "captured_at_utc": "2026-10-03T12:55:59.125Z",
       "file_modified_at_utc": "2026-10-03T12:55:59.550246+00:00",
-      "processed_at_utc": "2026-10-03T12:57:28.250855+00:00",
+      "processed_at_utc": "2026-10-03T13:33:46.218630+00:00",
       "reset_at_utc": "2026-10-03T12:55:52.208Z",
       "observed_live_bar_open_utc": "2026-10-03T12:54:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -7605,7 +7544,7 @@
       "export_bytes": 15414809,
       "captured_at_utc": "2026-10-03T12:57:10.571Z",
       "file_modified_at_utc": "2026-10-03T12:57:11.129560+00:00",
-      "processed_at_utc": "2026-10-03T12:57:28.963095+00:00",
+      "processed_at_utc": "2026-10-03T13:33:46.877657+00:00",
       "reset_at_utc": "2026-10-03T12:57:03.304Z",
       "observed_live_bar_open_utc": "2026-10-03T12:56:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -7959,6 +7898,2035 @@
       "runtime": {
         "status": "RUNS"
       }
+    },
+    {
+      "probe": "conflicts-batch-3-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-3-v1.pine",
+      "csv_file": "conflicts-batch-3-v1.csv",
+      "attempt": 1,
+      "source_sha256": "5aa02bd382c54bceb9a36e7891eeacb561921bc50275234ec0b98d9f4fcd6bb0",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "e9d92009b41bf05d0093b376d8018776f2fd895091da005f6d118063216a209a",
+      "export_bytes": 2057255,
+      "captured_at_utc": "2026-10-03T13:01:29.713Z",
+      "file_modified_at_utc": "2026-10-03T13:01:30.176971+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.062750+00:00",
+      "reset_at_utc": "2026-10-03T13:01:23.055Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:00:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF001_min_omitted",
+        "CF001_max_omitted",
+        "CF001_min_explicit"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF001_min_omitted": {
+          "title": "CF001_min_omitted"
+        },
+        "CF001_max_omitted": {
+          "title": "CF001_max_omitted"
+        },
+        "CF001_min_explicit": {
+          "title": "CF001_min_explicit"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF001_min_omitted": "numeric; source expression defines value",
+        "CF001_max_omitted": "numeric; source expression defines value",
+        "CF001_min_explicit": "numeric; source expression defines value"
+      },
+      "row_count": 24151,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24150.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032400.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032400,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24150,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-3-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-3-v1-attempt1-export.png",
+        "evidence/conflicts-batch-3-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-3-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-3-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-5-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-5-v1.pine",
+      "csv_file": "conflicts-batch-5-v1.csv",
+      "attempt": 1,
+      "source_sha256": "4991c0300de25fe4c842df7959cc91c6641e7e22d71a2c7bde1c4be2b2aa1d32",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "2913ae59ef102685dcb839753c18a694ae0fe0576d7a6171a3b4baa65bbc2f95",
+      "export_bytes": 2057343,
+      "captured_at_utc": "2026-10-03T13:02:58.278Z",
+      "file_modified_at_utc": "2026-10-03T13:02:58.852551+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.203700+00:00",
+      "reset_at_utc": "2026-10-03T13:02:51.947Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:02:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF005_search_string",
+        "CF005_left_string",
+        "CF005_right_string"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF005_search_string": {
+          "title": "CF005_search_string"
+        },
+        "CF005_left_string": {
+          "title": "CF005_left_string"
+        },
+        "CF005_right_string": {
+          "title": "CF005_right_string"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF005_search_string": "numeric; source expression defines value",
+        "CF005_left_string": "numeric; source expression defines value",
+        "CF005_right_string": "numeric; source expression defines value"
+      },
+      "row_count": 24152,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24151.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032520.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032520,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24151,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-5-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-5-v1-attempt1-export.png",
+        "evidence/conflicts-batch-5-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-5-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-5-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-6-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-6-v1.pine",
+      "csv_file": "conflicts-batch-6-v1.csv",
+      "attempt": 1,
+      "source_sha256": "2bfadb40d2604a4ad50b49b949fab67e6421762fd92cceda6df01ea3048a741b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "393f523f155d30d53e222e57c62c97dc8362cf5a74cd1e1b026306ecb36b950e",
+      "export_bytes": 2081481,
+      "captured_at_utc": "2026-10-03T13:03:34.728Z",
+      "file_modified_at_utc": "2026-10-03T13:03:35.212637+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.344676+00:00",
+      "reset_at_utc": "2026-10-03T13:03:28.552Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:02:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF008_enum_size",
+        "CF008_enum_value",
+        "CF008_udt_value"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF008_enum_size": {
+          "title": "CF008_enum_size"
+        },
+        "CF008_enum_value": {
+          "title": "CF008_enum_value"
+        },
+        "CF008_udt_value": {
+          "title": "CF008_udt_value"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF008_enum_size": "numeric; source expression defines value",
+        "CF008_enum_value": "numeric; source expression defines value",
+        "CF008_udt_value": "numeric; source expression defines value"
+      },
+      "row_count": 24152,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24151.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032520.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032520,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24151,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-6-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-6-v1-attempt1-export.png",
+        "evidence/conflicts-batch-6-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-6-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-6-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-7-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-7-v1.pine",
+      "csv_file": "conflicts-batch-7-v1.csv",
+      "attempt": 1,
+      "source_sha256": "5853d4590ae1cb6b19930956c7c15bf355f268a4a09770461d868659cd2f9101",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "5db7455e69c6d90e1272e670341bbf15c92f716d81fa80d7e1df5942eb5f077e",
+      "export_bytes": 1960954,
+      "captured_at_utc": "2026-10-03T13:08:37.302Z",
+      "file_modified_at_utc": "2026-10-03T13:08:37.811008+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.475249+00:00",
+      "reset_at_utc": "2026-10-03T13:08:30.431Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:08:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF010_input_color_accepted"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF010_input_color_accepted": {
+          "title": "CF010_input_color_accepted"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF010_input_color_accepted": "numeric; source expression defines value"
+      },
+      "row_count": 24155,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24154.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032880.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032880,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24154,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-7-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-7-v1-attempt1-export.png",
+        "evidence/conflicts-batch-7-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-7-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-7-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-7-v1-attempt1-inputs-supplement-v1.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-8-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-8-v1.pine",
+      "csv_file": "conflicts-batch-8-v1.csv",
+      "attempt": 1,
+      "source_sha256": "c13a7d65b50656d9dbed1e90aa3d85b9b89ddf942dbcf73127b05b7b92014aa6",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "3b5474fb758900ac4db30316cbf1d4290636395b5eca04a254764abe6476f797",
+      "export_bytes": 1960957,
+      "captured_at_utc": "2026-10-03T13:09:18.222Z",
+      "file_modified_at_utc": "2026-10-03T13:09:18.698706+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.607829+00:00",
+      "reset_at_utc": "2026-10-03T13:09:09.423Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:08:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF011_hline_gradient_accepted"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF011_hline_gradient_accepted": {
+          "title": "CF011_hline_gradient_accepted"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF011_hline_gradient_accepted": "numeric; source expression defines value"
+      },
+      "row_count": 24155,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24154.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032880.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032880,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24154,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-8-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-8-v1-attempt1-export.png",
+        "evidence/conflicts-batch-8-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-8-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-8-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-8-v1-attempt1-visual.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-14-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-14-v1.pine",
+      "csv_file": "conflicts-batch-14-v1.csv",
+      "attempt": 1,
+      "source_sha256": "70ad981c8d298d4e71d724e5691e7a96bb2d19ae1410739155170963e97ff2cf",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "a4dec3e0543022b59855b2dfa38ff1f44c36fb9921732d0d47219bb6a3ce1e89",
+      "export_bytes": 2033497,
+      "captured_at_utc": "2026-10-03T13:11:24.877Z",
+      "file_modified_at_utc": "2026-10-03T13:11:25.444227+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.744112+00:00",
+      "reset_at_utc": "2026-10-03T13:11:17.779Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:10:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF016a_const_result"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF016a_const_result": {
+          "title": "CF016a_const_result"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF016a_const_result": "numeric; source expression defines value"
+      },
+      "row_count": 24156,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24155.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033000.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033000,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24155,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-14-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-14-v1-attempt1-export.png",
+        "evidence/conflicts-batch-14-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-14-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-14-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-15-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-15-v1.pine",
+      "csv_file": "conflicts-batch-15-v1.csv",
+      "attempt": 1,
+      "source_sha256": "372cca92243c7ea2a80b02cbf2b8b8e6bf2f267709244b8d0a7a2c61024f74d6",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "c9377e59d082d10c2339760c2938b042f6e187cd025186a12ec189a8c0084510",
+      "export_bytes": 2236671,
+      "captured_at_utc": "2026-10-03T13:12:09.454Z",
+      "file_modified_at_utc": "2026-10-03T13:12:10.539639+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.898794+00:00",
+      "reset_at_utc": "2026-10-03T13:11:59.884Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:12:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF016b_input_result",
+        "CF016b_input_consumer"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF016b_input_result": {
+          "title": "CF016b_input_result"
+        },
+        "CF016b_input_consumer": {
+          "title": "CF016b_input_consumer"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF016b_input_result": "numeric; source expression defines value",
+        "CF016b_input_consumer": "numeric; source expression defines value"
+      },
+      "row_count": 24157,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24156.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033120.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033120,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24156,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-15-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-15-v1-attempt1-export.png",
+        "evidence/conflicts-batch-15-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-15-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-15-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-15-v1-attempt1-inputs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-16-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-16-v1.pine",
+      "csv_file": "conflicts-batch-16-v1.csv",
+      "attempt": 1,
+      "source_sha256": "51b33e6db702399af6e9e6e84cc25b226080b3e2844134a40c7cf1fbaa89ea51",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "2cb2e83c9fd1c8b66fbcc788a35ca4927b289f68a81372aeeca95efd33cc2d2a",
+      "export_bytes": 2057840,
+      "captured_at_utc": "2026-10-03T13:14:11.605Z",
+      "file_modified_at_utc": "2026-10-03T13:14:12.512075+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.039656+00:00",
+      "reset_at_utc": "2026-10-03T13:13:59.807Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF017_rows",
+        "CF017_columns",
+        "CF017_new_is_na"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF017_rows": {
+          "title": "CF017_rows"
+        },
+        "CF017_columns": {
+          "title": "CF017_columns"
+        },
+        "CF017_new_is_na": {
+          "title": "CF017_new_is_na"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF017_rows": "numeric; source expression defines value",
+        "CF017_columns": "numeric; source expression defines value",
+        "CF017_new_is_na": "numeric; source expression defines value"
+      },
+      "row_count": 24158,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24157.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033240.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033240,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24157,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-16-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-16-v1-attempt1-export.png",
+        "evidence/conflicts-batch-16-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-16-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-16-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-17-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-17-v1.pine",
+      "csv_file": "conflicts-batch-17-v1.csv",
+      "attempt": 1,
+      "source_sha256": "d1dd32d0b4d2342e143d5cf1892180c1df450725425005ad6cbc43cec81af6dd",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "c5d98e40fdd9bdf385156e0c95167d4bbc371122337317082c0d7834c4e8af5c",
+      "export_bytes": 2057840,
+      "captured_at_utc": "2026-10-03T13:15:01.272Z",
+      "file_modified_at_utc": "2026-10-03T13:15:01.739074+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.181132+00:00",
+      "reset_at_utc": "2026-10-03T13:14:51.763Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF018_rows",
+        "CF018_columns",
+        "CF018_new_is_na"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF018_rows": {
+          "title": "CF018_rows"
+        },
+        "CF018_columns": {
+          "title": "CF018_columns"
+        },
+        "CF018_new_is_na": {
+          "title": "CF018_new_is_na"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF018_rows": "numeric; source expression defines value",
+        "CF018_columns": "numeric; source expression defines value",
+        "CF018_new_is_na": "numeric; source expression defines value"
+      },
+      "row_count": 24158,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24157.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033240.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033240,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24157,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-17-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-17-v1-attempt1-export.png",
+        "evidence/conflicts-batch-17-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-17-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-17-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-18-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-18-v1.pine",
+      "csv_file": "conflicts-batch-18-v1.csv",
+      "attempt": 1,
+      "source_sha256": "73cd90977019428ffbfbe56e253647ea2e60e4dceb35376e516a2c7a9d492ad7",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "b5226872ac5b3f089697e293bc5936d4a4866ff90826832721a17bfe960d8f98",
+      "export_bytes": 2057863,
+      "captured_at_utc": "2026-10-03T13:15:51.256Z",
+      "file_modified_at_utc": "2026-10-03T13:15:51.911590+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.319351+00:00",
+      "reset_at_utc": "2026-10-03T13:15:42.687Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF019_remaining_rows",
+        "CF019_remaining_columns",
+        "CF019_removed_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF019_remaining_rows": {
+          "title": "CF019_remaining_rows"
+        },
+        "CF019_remaining_columns": {
+          "title": "CF019_remaining_columns"
+        },
+        "CF019_removed_size": {
+          "title": "CF019_removed_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF019_remaining_rows": "numeric; source expression defines value",
+        "CF019_remaining_columns": "numeric; source expression defines value",
+        "CF019_removed_size": "numeric; source expression defines value"
+      },
+      "row_count": 24158,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24157.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033240.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033240,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24157,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-18-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-18-v1-attempt1-export.png",
+        "evidence/conflicts-batch-18-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-18-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-18-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-19-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-19-v1.pine",
+      "csv_file": "conflicts-batch-19-v1.csv",
+      "attempt": 1,
+      "source_sha256": "36bfc9e6915334779965134641cd1ac0ed9e526d35c8b131ea865b89756aa4bf",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "5412d8582b53ffd7939dc643ed588bf272c353b023cbcf6fe60647f2cdd1a084",
+      "export_bytes": 2057952,
+      "captured_at_utc": "2026-10-03T13:16:33.472Z",
+      "file_modified_at_utc": "2026-10-03T13:16:34.028831+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.459376+00:00",
+      "reset_at_utc": "2026-10-03T13:16:25.279Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF020_remaining_rows",
+        "CF020_remaining_columns",
+        "CF020_removed_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF020_remaining_rows": {
+          "title": "CF020_remaining_rows"
+        },
+        "CF020_remaining_columns": {
+          "title": "CF020_remaining_columns"
+        },
+        "CF020_removed_size": {
+          "title": "CF020_removed_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF020_remaining_rows": "numeric; source expression defines value",
+        "CF020_remaining_columns": "numeric; source expression defines value",
+        "CF020_removed_size": "numeric; source expression defines value"
+      },
+      "row_count": 24159,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24158.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033360.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033360,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24158,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-19-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-19-v1-attempt1-export.png",
+        "evidence/conflicts-batch-19-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-19-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-19-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-20-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-20-v1.pine",
+      "csv_file": "conflicts-batch-20-v1.csv",
+      "attempt": 1,
+      "source_sha256": "b28cafe28fce9abcdca077279a302635853d4825c5cf4d35ab0fb618cd4ac41b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "25f477b9d429fff3f7f7e28d1da6a5166de84cbffd09670917e774384f62df76",
+      "export_bytes": 2106249,
+      "captured_at_utc": "2026-10-03T13:17:25.835Z",
+      "file_modified_at_utc": "2026-10-03T13:17:26.265612+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.602389+00:00",
+      "reset_at_utc": "2026-10-03T13:17:19.669Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF022_vector_size",
+        "CF022_first",
+        "CF022_second"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF022_vector_size": {
+          "title": "CF022_vector_size"
+        },
+        "CF022_first": {
+          "title": "CF022_first"
+        },
+        "CF022_second": {
+          "title": "CF022_second"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF022_vector_size": "numeric; source expression defines value",
+        "CF022_first": "numeric; source expression defines value",
+        "CF022_second": "numeric; source expression defines value"
+      },
+      "row_count": 24159,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24158.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033360.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033360,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24158,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-20-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-20-v1-attempt1-export.png",
+        "evidence/conflicts-batch-20-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-20-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-20-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-21-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-21-v1.pine",
+      "csv_file": "conflicts-batch-21-v1-attempt2.csv",
+      "attempt": 2,
+      "source_sha256": "58c9530223cc8a511c648e8361f76d62b05079f12752ee1247ff294999dc2b4b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "6b60f98275bd5e245d0d59d7643ce12a56a5a24f60bd8cab67453f50b9d95a8c",
+      "export_bytes": 2082180,
+      "captured_at_utc": "2026-10-03T13:19:00.255Z",
+      "file_modified_at_utc": "2026-10-03T13:19:01.031105+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.884138+00:00",
+      "reset_at_utc": "2026-10-03T13:18:48.352Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:18:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF023_object_state",
+        "CF023_map_size",
+        "CF023_values_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF023_object_state": {
+          "title": "CF023_object_state"
+        },
+        "CF023_map_size": {
+          "title": "CF023_map_size"
+        },
+        "CF023_values_size": {
+          "title": "CF023_values_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF023_object_state": "numeric; source expression defines value",
+        "CF023_map_size": "numeric; source expression defines value",
+        "CF023_values_size": "numeric; source expression defines value"
+      },
+      "row_count": 24160,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24159.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033480.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033480,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24159,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-21-v1-attempt2-setup.png",
+        "evidence/conflicts-batch-21-v1-attempt2-export.png",
+        "evidence/conflicts-batch-21-v1-attempt2-logs.txt",
+        "evidence/conflicts-batch-21-v1-attempt2-logs-v1.json",
+        "evidence/conflicts-batch-21-v1-attempt2-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-22-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-22-v1.pine",
+      "csv_file": "conflicts-batch-22-v1.csv",
+      "attempt": 1,
+      "source_sha256": "2e11ada9c288af320aaa84d14d3ca1100d29b7401ead957dd52829455fd8347a",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "6dc22293bc6966317b4382cb391cd2abe57cd2fb93d4e8f8f55180bd4ea1f511",
+      "export_bytes": 2009682,
+      "captured_at_utc": "2026-10-03T13:19:45.543Z",
+      "file_modified_at_utc": "2026-10-03T13:19:46.383607+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.016719+00:00",
+      "reset_at_utc": "2026-10-03T13:19:35.301Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:18:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF025_omitted_end",
+        "CF025_length"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF025_omitted_end": {
+          "title": "CF025_omitted_end"
+        },
+        "CF025_length": {
+          "title": "CF025_length"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF025_omitted_end": "numeric; source expression defines value",
+        "CF025_length": "numeric; source expression defines value"
+      },
+      "row_count": 24160,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24159.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033480.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033480,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24159,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-22-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-22-v1-attempt1-export.png",
+        "evidence/conflicts-batch-22-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-22-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-22-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-25-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-25-v1.pine",
+      "csv_file": "conflicts-batch-25-v1.csv",
+      "attempt": 1,
+      "source_sha256": "befb0c2001c43a3cfdd9679c77db1d4e7bc4a954626f38cb10ca6edbd40af6d6",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "f7f72081259174fd1dbef033fcdb912a124d16bdceca019fd9b555273f28dbe4",
+      "export_bytes": 2106440,
+      "captured_at_utc": "2026-10-03T13:21:17.959Z",
+      "file_modified_at_utc": "2026-10-03T13:21:18.391610+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.162842+00:00",
+      "reset_at_utc": "2026-10-03T13:21:11.682Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:20:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF030_m_length",
+        "CF030_s_length",
+        "CF030_m_whole",
+        "CF030_s_whole"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF030_m_length": {
+          "title": "CF030_m_length"
+        },
+        "CF030_s_length": {
+          "title": "CF030_s_length"
+        },
+        "CF030_m_whole": {
+          "title": "CF030_m_whole"
+        },
+        "CF030_s_whole": {
+          "title": "CF030_s_whole"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF030_m_length": "numeric; source expression defines value",
+        "CF030_s_length": "numeric; source expression defines value",
+        "CF030_m_whole": "numeric; source expression defines value",
+        "CF030_s_whole": "numeric; source expression defines value"
+      },
+      "row_count": 24161,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24160.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033600.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033600,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24160,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-25-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-25-v1-attempt1-export.png",
+        "evidence/conflicts-batch-25-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-25-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-25-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-26-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-26-v1.pine",
+      "csv_file": "conflicts-batch-26-v1.csv",
+      "attempt": 1,
+      "source_sha256": "9d897bdcaf37f9817b2c154af2d4bac8f8b62dfa0028826d0a719db727958fa3",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "134d0726ccbca832676da1ba7d8936530c4beb0d1bfbde30422191790ee50491",
+      "export_bytes": 3279760,
+      "captured_at_utc": "2026-10-03T13:21:57.273Z",
+      "file_modified_at_utc": "2026-10-03T13:21:57.730427+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.336108+00:00",
+      "reset_at_utc": "2026-10-03T13:21:51.476Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:20:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 15,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF032_omit_floor",
+        "CF032_explicit_false",
+        "CF032_explicit_true"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF032_omit_floor": {
+          "title": "CF032_omit_floor"
+        },
+        "CF032_explicit_false": {
+          "title": "CF032_explicit_false"
+        },
+        "CF032_explicit_true": {
+          "title": "CF032_explicit_true"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF032_omit_floor": "numeric; source expression defines value",
+        "CF032_explicit_false": "numeric; source expression defines value",
+        "CF032_explicit_true": "numeric; source expression defines value"
+      },
+      "row_count": 24161,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24160.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033600.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033600,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24160,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-26-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-26-v1-attempt1-export.png",
+        "evidence/conflicts-batch-26-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-26-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-26-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-27-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-27-v1.pine",
+      "csv_file": "conflicts-batch-27-v1.csv",
+      "attempt": 1,
+      "source_sha256": "0ed332cc4fd29c1a0cdfceda3f9fae899bfef5291e5870ecb64404e95613a4f4",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "e26fdd6c3a2b0ca981f61c9f8b174508037396b77c71fd5ccea6e0db87cd7196",
+      "export_bytes": 2072005,
+      "captured_at_utc": "2026-10-03T13:22:42.417Z",
+      "file_modified_at_utc": "2026-10-03T13:22:42.872202+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.494494+00:00",
+      "reset_at_utc": "2026-10-03T13:22:35.476Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF033_omit_length",
+        "CF033_explicit_one",
+        "CF033_explicit_two"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF033_omit_length": {
+          "title": "CF033_omit_length"
+        },
+        "CF033_explicit_one": {
+          "title": "CF033_explicit_one"
+        },
+        "CF033_explicit_two": {
+          "title": "CF033_explicit_two"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF033_omit_length": "numeric; source expression defines value",
+        "CF033_explicit_one": "numeric; source expression defines value",
+        "CF033_explicit_two": "numeric; source expression defines value"
+      },
+      "row_count": 24162,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24161.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033720.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033720,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24161,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-27-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-27-v1-attempt1-export.png",
+        "evidence/conflicts-batch-27-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-27-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-27-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-28-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-28-v1.pine",
+      "csv_file": "conflicts-batch-28-v1.csv",
+      "attempt": 1,
+      "source_sha256": "3f5d20e89b0db93e7e1513fa7b8bc952f728ae25167796343086d654f3892bb8",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "84b37c0aa24915a0f4497c76121f057b770124ab9f9495d0f3eec162571981ac",
+      "export_bytes": 2775138,
+      "captured_at_utc": "2026-10-03T13:23:20.228Z",
+      "file_modified_at_utc": "2026-10-03T13:23:20.726830+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.648214+00:00",
+      "reset_at_utc": "2026-10-03T13:23:14.154Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 11,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF037_omitted_upper",
+        "CF037_explicit_upper"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF037_omitted_upper": {
+          "title": "CF037_omitted_upper"
+        },
+        "CF037_explicit_upper": {
+          "title": "CF037_explicit_upper"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF037_omitted_upper": "numeric; source expression defines value",
+        "CF037_explicit_upper": "numeric; source expression defines value"
+      },
+      "row_count": 24162,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24161.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033720.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033720,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24161,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-28-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-28-v1-attempt1-export.png",
+        "evidence/conflicts-batch-28-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-28-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-28-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-29-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-29-v1.pine",
+      "csv_file": "conflicts-batch-29-v1-attempt2.csv",
+      "attempt": 2,
+      "source_sha256": "af6b9f8c8ffffe8dfd15109de329406adfba3e50b650a67a9fa1c0dbd29bd4de",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "03ba0238e56fc6d574636c1d3370557004787e364a6c912177c26c98eee67c74",
+      "export_bytes": 2953387,
+      "captured_at_utc": "2026-10-03T13:25:14.004Z",
+      "file_modified_at_utc": "2026-10-03T13:25:14.458168+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.957518+00:00",
+      "reset_at_utc": "2026-10-03T13:25:07.820Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:24:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 21,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF038_omitted",
+        "CF038_explicit"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF038_omitted": {
+          "title": "CF038_omitted"
+        },
+        "CF038_explicit": {
+          "title": "CF038_explicit"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF038_omitted": "numeric; source expression defines value",
+        "CF038_explicit": "numeric; source expression defines value"
+      },
+      "row_count": 24163,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24162.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033840.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033840,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24162,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-29-v1-attempt2-setup.png",
+        "evidence/conflicts-batch-29-v1-attempt2-export.png",
+        "evidence/conflicts-batch-29-v1-attempt2-logs.txt",
+        "evidence/conflicts-batch-29-v1-attempt2-logs-v1.json",
+        "evidence/conflicts-batch-29-v1-attempt2-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
     }
   ],
   "attempts": [
@@ -7973,7 +9941,7 @@
       "export_bytes": 24367980,
       "captured_at_utc": null,
       "file_modified_at_utc": "2026-10-03T12:18:45.165517+00:00",
-      "processed_at_utc": "2026-10-03T12:57:12.269698+00:00",
+      "processed_at_utc": "2026-10-03T13:33:31.187822+00:00",
       "reset_at_utc": "2026-10-03T12:17:30.495Z",
       "observed_live_bar_open_utc": "2026-10-03T12:16:00Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -8317,7 +10285,7 @@
       "history_complete": true,
       "volume_unused_by_source": true,
       "input_changes": [],
-      "notes": "Live candle changed from 12:16 to 12:18 between tooltip observation and download; retained attempt is uncertain and will be recaptured. Screenshot filePath writes were rejected by MCP workspace configuration; screenshots absent for this attempt.",
+      "notes": "Live candle changed from 12:16 to 12:18 between tooltip observation and download; retained attempt is uncertain and will be recaptured. Screenshot filePath writes were rejected by MCP workspace configuration; screenshots absent for this attempt. Live candle changed during export; this uncertain attempt is retained and excluded from selection. Use the attested selected repeat.",
       "evidence_paths": [],
       "validation_errors": [
         "Chart setup/reset unchanged attestation missing"
@@ -8338,7 +10306,7 @@
       "export_bytes": 24370002,
       "captured_at_utc": "2026-10-03T12:22:58.308Z",
       "file_modified_at_utc": "2026-10-03T12:23:26.688140+00:00",
-      "processed_at_utc": "2026-10-03T12:57:13.209823+00:00",
+      "processed_at_utc": "2026-10-03T13:33:32.051941+00:00",
       "reset_at_utc": "2026-10-03T12:22:51.349Z",
       "observed_live_bar_open_utc": "2026-10-03T12:22:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -8704,7 +10672,7 @@
       "export_bytes": 13625761,
       "captured_at_utc": "2026-10-03T12:24:39.851Z",
       "file_modified_at_utc": "2026-10-03T12:24:40.343238+00:00",
-      "processed_at_utc": "2026-10-03T12:57:13.933771+00:00",
+      "processed_at_utc": "2026-10-03T13:33:32.726827+00:00",
       "reset_at_utc": "2026-10-03T12:24:33.727Z",
       "observed_live_bar_open_utc": "2026-10-03T12:24:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -9071,7 +11039,7 @@
       "export_bytes": 3625226,
       "captured_at_utc": "2026-10-03T12:25:19.962Z",
       "file_modified_at_utc": "2026-10-03T12:25:20.513594+00:00",
-      "processed_at_utc": "2026-10-03T12:57:14.399833+00:00",
+      "processed_at_utc": "2026-10-03T13:33:33.153787+00:00",
       "reset_at_utc": "2026-10-03T12:25:13.923Z",
       "observed_live_bar_open_utc": "2026-10-03T12:24:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -9433,7 +11401,7 @@
       "export_bytes": 20491418,
       "captured_at_utc": "2026-10-03T12:26:12.259Z",
       "file_modified_at_utc": "2026-10-03T12:26:12.716823+00:00",
-      "processed_at_utc": "2026-10-03T12:57:15.242456+00:00",
+      "processed_at_utc": "2026-10-03T13:33:33.911270+00:00",
       "reset_at_utc": "2026-10-03T12:26:05.971Z",
       "observed_live_bar_open_utc": "2026-10-03T12:26:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -9800,7 +11768,7 @@
       "export_bytes": 25615885,
       "captured_at_utc": "2026-10-03T12:26:41.125Z",
       "file_modified_at_utc": "2026-10-03T12:26:41.664040+00:00",
-      "processed_at_utc": "2026-10-03T12:57:16.150379+00:00",
+      "processed_at_utc": "2026-10-03T13:33:34.788089+00:00",
       "reset_at_utc": "2026-10-03T12:26:33.838Z",
       "observed_live_bar_open_utc": "2026-10-03T12:26:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -10167,7 +12135,7 @@
       "export_bytes": 23635387,
       "captured_at_utc": "2026-10-03T12:27:13.832Z",
       "file_modified_at_utc": "2026-10-03T12:27:14.273808+00:00",
-      "processed_at_utc": "2026-10-03T12:57:17.030379+00:00",
+      "processed_at_utc": "2026-10-03T13:33:35.657941+00:00",
       "reset_at_utc": "2026-10-03T12:27:06.637Z",
       "observed_live_bar_open_utc": "2026-10-03T12:26:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -10534,7 +12502,7 @@
       "export_bytes": 17329722,
       "captured_at_utc": "2026-10-03T12:28:22.618Z",
       "file_modified_at_utc": "2026-10-03T12:28:23.064282+00:00",
-      "processed_at_utc": "2026-10-03T12:57:17.808065+00:00",
+      "processed_at_utc": "2026-10-03T13:33:36.404424+00:00",
       "reset_at_utc": "2026-10-03T12:28:15.257Z",
       "observed_live_bar_open_utc": "2026-10-03T12:28:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -10901,7 +12869,7 @@
       "export_bytes": 16412885,
       "captured_at_utc": "2026-10-03T12:28:56.143Z",
       "file_modified_at_utc": "2026-10-03T12:28:56.609279+00:00",
-      "processed_at_utc": "2026-10-03T12:57:18.579573+00:00",
+      "processed_at_utc": "2026-10-03T13:33:37.134504+00:00",
       "reset_at_utc": "2026-10-03T12:28:45.969Z",
       "observed_live_bar_open_utc": "2026-10-03T12:28:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -11268,7 +13236,7 @@
       "export_bytes": 20139293,
       "captured_at_utc": "2026-10-03T12:30:10.781Z",
       "file_modified_at_utc": "2026-10-03T12:30:11.211392+00:00",
-      "processed_at_utc": "2026-10-03T12:57:19.391780+00:00",
+      "processed_at_utc": "2026-10-03T13:33:37.917817+00:00",
       "reset_at_utc": "2026-10-03T12:30:00.689Z",
       "observed_live_bar_open_utc": "2026-10-03T12:30:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -11635,7 +13603,7 @@
       "export_bytes": 6445444,
       "captured_at_utc": "2026-10-03T12:30:50.284Z",
       "file_modified_at_utc": "2026-10-03T12:30:50.802699+00:00",
-      "processed_at_utc": "2026-10-03T12:57:20.052244+00:00",
+      "processed_at_utc": "2026-10-03T13:33:38.472554+00:00",
       "reset_at_utc": "2026-10-03T12:30:43.921Z",
       "observed_live_bar_open_utc": "2026-10-03T12:30:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -12002,7 +13970,7 @@
       "export_bytes": 6099330,
       "captured_at_utc": "2026-10-03T12:31:49.291Z",
       "file_modified_at_utc": "2026-10-03T12:31:49.794550+00:00",
-      "processed_at_utc": "2026-10-03T12:57:20.619865+00:00",
+      "processed_at_utc": "2026-10-03T13:33:38.970057+00:00",
       "reset_at_utc": "2026-10-03T12:31:42.850Z",
       "observed_live_bar_open_utc": "2026-10-03T12:30:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -12212,7 +14180,7 @@
       "export_bytes": 18154942,
       "captured_at_utc": "2026-10-03T12:33:05.416Z",
       "file_modified_at_utc": "2026-10-03T12:33:05.834116+00:00",
-      "processed_at_utc": "2026-10-03T12:57:21.407821+00:00",
+      "processed_at_utc": "2026-10-03T13:33:39.703219+00:00",
       "reset_at_utc": "2026-10-03T12:32:56.938Z",
       "observed_live_bar_open_utc": "2026-10-03T12:32:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -12579,7 +14547,7 @@
       "export_bytes": 12833186,
       "captured_at_utc": "2026-10-03T12:33:56.180Z",
       "file_modified_at_utc": "2026-10-03T12:33:56.635614+00:00",
-      "processed_at_utc": "2026-10-03T12:57:22.090334+00:00",
+      "processed_at_utc": "2026-10-03T13:33:40.389955+00:00",
       "reset_at_utc": "2026-10-03T12:33:48.927Z",
       "observed_live_bar_open_utc": "2026-10-03T12:32:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -12946,7 +14914,7 @@
       "export_bytes": 13506518,
       "captured_at_utc": "2026-10-03T12:35:22.081Z",
       "file_modified_at_utc": "2026-10-03T12:35:22.544273+00:00",
-      "processed_at_utc": "2026-10-03T12:57:22.754122+00:00",
+      "processed_at_utc": "2026-10-03T13:33:41.039111+00:00",
       "reset_at_utc": "2026-10-03T12:35:14.664Z",
       "observed_live_bar_open_utc": "2026-10-03T12:34:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -13313,7 +15281,7 @@
       "export_bytes": 10286506,
       "captured_at_utc": "2026-10-03T12:39:41.124Z",
       "file_modified_at_utc": "2026-10-03T12:39:41.775395+00:00",
-      "processed_at_utc": "2026-10-03T12:57:23.633384+00:00",
+      "processed_at_utc": "2026-10-03T13:33:41.873712+00:00",
       "reset_at_utc": "2026-10-03T12:39:34.438Z",
       "observed_live_bar_open_utc": "2026-10-03T12:38:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -13680,7 +15648,7 @@
       "export_bytes": 8053882,
       "captured_at_utc": "2026-10-03T12:40:24.465Z",
       "file_modified_at_utc": "2026-10-03T12:40:24.910212+00:00",
-      "processed_at_utc": "2026-10-03T12:57:24.261210+00:00",
+      "processed_at_utc": "2026-10-03T13:33:42.470213+00:00",
       "reset_at_utc": "2026-10-03T12:40:18.271Z",
       "observed_live_bar_open_utc": "2026-10-03T12:40:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -14047,7 +16015,7 @@
       "export_bytes": 5831106,
       "captured_at_utc": "2026-10-03T12:43:48.563Z",
       "file_modified_at_utc": "2026-10-03T12:43:49.097304+00:00",
-      "processed_at_utc": "2026-10-03T12:57:24.771828+00:00",
+      "processed_at_utc": "2026-10-03T13:33:42.953034+00:00",
       "reset_at_utc": "2026-10-03T12:42:28.522Z",
       "observed_live_bar_open_utc": "2026-10-03T12:42:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -14127,70 +16095,6 @@
         "plotcandle_dynamic_actual (Close)"
       ],
       "column_map": {
-        "plotbar_constant_actual (Open)": {
-          "title": "plotbar_constant_actual",
-          "channel": "open"
-        },
-        "plotbar_constant_actual (High": {
-          "title": "plotbar_constant_actual",
-          "channel": "high"
-        },
-        "plotbar_constant_actual (Low)": {
-          "title": "plotbar_constant_actual",
-          "channel": "low"
-        },
-        "plotbar_constant_actual (Close)": {
-          "title": "plotbar_constant_actual",
-          "channel": "close"
-        },
-        "plotbar_dynamic_actual (Open)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "open"
-        },
-        "plotbar_dynamic_actual (High": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "high"
-        },
-        "plotbar_dynamic_actual (Low)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "low"
-        },
-        "plotbar_dynamic_actual (Close)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "close"
-        },
-        "plotcandle_constant_actual (Open)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "open"
-        },
-        "plotcandle_constant_actual (High": {
-          "title": "plotcandle_constant_actual",
-          "channel": "high"
-        },
-        "plotcandle_constant_actual (Low)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "low"
-        },
-        "plotcandle_constant_actual (Close)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "close"
-        },
-        "plotcandle_dynamic_actual (Open)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "open"
-        },
-        "plotcandle_dynamic_actual (High": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "high"
-        },
-        "plotcandle_dynamic_actual (Low)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "low"
-        },
-        "plotcandle_dynamic_actual (Close)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "close"
-        },
         "input_open": {
           "title": "input_open"
         },
@@ -14414,10 +16318,13 @@
         "evidence/coverage-plot-1-v1-attempt1-export.png",
         "evidence/coverage-plot-1-v1-attempt1-data-window-controls.png",
         "evidence/coverage-plot-1-v1-attempt1-data-window-ohlc.png",
-        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json"
+        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json",
+        "evidence/coverage-plot-1-v1-attempt1-mapping-v2.json"
       ],
-      "validation_errors": [],
-      "status": "FILE-READY",
+      "validation_errors": [
+        "Missing mapped output columns: [{'title': 'plotbar_constant_actual', 'channel': 'open'}, {'title': 'plotbar_constant_actual', 'channel': 'high'}, {'title': 'plotbar_constant_actual', 'channel': 'low'}, {'title': 'plotbar_constant_actual', 'channel': 'close'}, {'title': 'plotbar_dynamic_actual', 'channel': 'open'}, {'title': 'plotbar_dynamic_actual', 'channel': 'high'}, {'title': 'plotbar_dynamic_actual', 'channel': 'low'}, {'title': 'plotbar_dynamic_actual', 'channel': 'close'}, {'title': 'plotcandle_constant_actual', 'channel': 'open'}, {'title': 'plotcandle_constant_actual', 'channel': 'high'}, {'title': 'plotcandle_constant_actual', 'channel': 'low'}, {'title': 'plotcandle_constant_actual', 'channel': 'close'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'open'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'high'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'low'}, {'title': 'plotcandle_dynamic_actual', 'channel': 'close'}]"
+      ],
+      "status": "NEEDS-EVIDENCE",
       "runtime": {
         "status": "RUNS"
       }
@@ -14433,7 +16340,7 @@
       "export_bytes": 9518242,
       "captured_at_utc": "2026-10-03T12:47:44.094Z",
       "file_modified_at_utc": "2026-10-03T12:47:44.770574+00:00",
-      "processed_at_utc": "2026-10-03T12:57:25.319321+00:00",
+      "processed_at_utc": "2026-10-03T13:33:43.476118+00:00",
       "reset_at_utc": "2026-10-03T12:46:23.878Z",
       "observed_live_bar_open_utc": "2026-10-03T12:46:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -14777,7 +16684,7 @@
       "export_bytes": 13664723,
       "captured_at_utc": "2026-10-03T12:48:30.024Z",
       "file_modified_at_utc": "2026-10-03T12:48:30.486092+00:00",
-      "processed_at_utc": "2026-10-03T12:57:25.925961+00:00",
+      "processed_at_utc": "2026-10-03T13:33:44.025075+00:00",
       "reset_at_utc": "2026-10-03T12:48:22.076Z",
       "observed_live_bar_open_utc": "2026-10-03T12:48:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -15041,7 +16948,7 @@
       "export_bytes": 18708998,
       "captured_at_utc": "2026-10-03T12:51:46.991Z",
       "file_modified_at_utc": "2026-10-03T12:51:47.813225+00:00",
-      "processed_at_utc": "2026-10-03T12:57:26.765211+00:00",
+      "processed_at_utc": "2026-10-03T13:33:44.800047+00:00",
       "reset_at_utc": "2026-10-03T12:51:38.814Z",
       "observed_live_bar_open_utc": "2026-10-03T12:50:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -15408,7 +17315,7 @@
       "export_bytes": 8996890,
       "captured_at_utc": "2026-10-03T12:53:13.242Z",
       "file_modified_at_utc": "2026-10-03T12:53:13.788674+00:00",
-      "processed_at_utc": "2026-10-03T12:57:27.414099+00:00",
+      "processed_at_utc": "2026-10-03T13:33:45.407565+00:00",
       "reset_at_utc": "2026-10-03T12:53:05.841Z",
       "observed_live_bar_open_utc": "2026-10-03T12:52:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -15775,7 +17682,7 @@
       "export_bytes": 13979318,
       "captured_at_utc": "2026-10-03T12:55:59.125Z",
       "file_modified_at_utc": "2026-10-03T12:55:59.550246+00:00",
-      "processed_at_utc": "2026-10-03T12:57:28.250855+00:00",
+      "processed_at_utc": "2026-10-03T13:33:46.218630+00:00",
       "reset_at_utc": "2026-10-03T12:55:52.208Z",
       "observed_live_bar_open_utc": "2026-10-03T12:54:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -16141,7 +18048,7 @@
       "export_bytes": 15414809,
       "captured_at_utc": "2026-10-03T12:57:10.571Z",
       "file_modified_at_utc": "2026-10-03T12:57:11.129560+00:00",
-      "processed_at_utc": "2026-10-03T12:57:28.963095+00:00",
+      "processed_at_utc": "2026-10-03T13:33:46.877657+00:00",
       "reset_at_utc": "2026-10-03T12:57:03.304Z",
       "observed_live_bar_open_utc": "2026-10-03T12:56:00.000Z",
       "tickerid": "BINANCE:BTCUSDT",
@@ -16489,6 +18396,2252 @@
       "evidence_paths": [
         "evidence/coverage-drawing-4-v1-attempt1-setup.png",
         "evidence/coverage-drawing-4-v1-attempt1-export.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-3-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-3-v1.pine",
+      "csv_file": "conflicts-batch-3-v1.csv",
+      "attempt": 1,
+      "source_sha256": "5aa02bd382c54bceb9a36e7891eeacb561921bc50275234ec0b98d9f4fcd6bb0",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "e9d92009b41bf05d0093b376d8018776f2fd895091da005f6d118063216a209a",
+      "export_bytes": 2057255,
+      "captured_at_utc": "2026-10-03T13:01:29.713Z",
+      "file_modified_at_utc": "2026-10-03T13:01:30.176971+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.062750+00:00",
+      "reset_at_utc": "2026-10-03T13:01:23.055Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:00:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF001_min_omitted",
+        "CF001_max_omitted",
+        "CF001_min_explicit"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF001_min_omitted": {
+          "title": "CF001_min_omitted"
+        },
+        "CF001_max_omitted": {
+          "title": "CF001_max_omitted"
+        },
+        "CF001_min_explicit": {
+          "title": "CF001_min_explicit"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF001_min_omitted": "numeric; source expression defines value",
+        "CF001_max_omitted": "numeric; source expression defines value",
+        "CF001_min_explicit": "numeric; source expression defines value"
+      },
+      "row_count": 24151,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24150.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032400.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032400,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24150,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-3-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-3-v1-attempt1-export.png",
+        "evidence/conflicts-batch-3-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-3-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-3-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-5-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-5-v1.pine",
+      "csv_file": "conflicts-batch-5-v1.csv",
+      "attempt": 1,
+      "source_sha256": "4991c0300de25fe4c842df7959cc91c6641e7e22d71a2c7bde1c4be2b2aa1d32",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "2913ae59ef102685dcb839753c18a694ae0fe0576d7a6171a3b4baa65bbc2f95",
+      "export_bytes": 2057343,
+      "captured_at_utc": "2026-10-03T13:02:58.278Z",
+      "file_modified_at_utc": "2026-10-03T13:02:58.852551+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.203700+00:00",
+      "reset_at_utc": "2026-10-03T13:02:51.947Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:02:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF005_search_string",
+        "CF005_left_string",
+        "CF005_right_string"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF005_search_string": {
+          "title": "CF005_search_string"
+        },
+        "CF005_left_string": {
+          "title": "CF005_left_string"
+        },
+        "CF005_right_string": {
+          "title": "CF005_right_string"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF005_search_string": "numeric; source expression defines value",
+        "CF005_left_string": "numeric; source expression defines value",
+        "CF005_right_string": "numeric; source expression defines value"
+      },
+      "row_count": 24152,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24151.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032520.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032520,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24151,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-5-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-5-v1-attempt1-export.png",
+        "evidence/conflicts-batch-5-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-5-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-5-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-6-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-6-v1.pine",
+      "csv_file": "conflicts-batch-6-v1.csv",
+      "attempt": 1,
+      "source_sha256": "2bfadb40d2604a4ad50b49b949fab67e6421762fd92cceda6df01ea3048a741b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "393f523f155d30d53e222e57c62c97dc8362cf5a74cd1e1b026306ecb36b950e",
+      "export_bytes": 2081481,
+      "captured_at_utc": "2026-10-03T13:03:34.728Z",
+      "file_modified_at_utc": "2026-10-03T13:03:35.212637+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.344676+00:00",
+      "reset_at_utc": "2026-10-03T13:03:28.552Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:02:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF008_enum_size",
+        "CF008_enum_value",
+        "CF008_udt_value"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF008_enum_size": {
+          "title": "CF008_enum_size"
+        },
+        "CF008_enum_value": {
+          "title": "CF008_enum_value"
+        },
+        "CF008_udt_value": {
+          "title": "CF008_udt_value"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF008_enum_size": "numeric; source expression defines value",
+        "CF008_enum_value": "numeric; source expression defines value",
+        "CF008_udt_value": "numeric; source expression defines value"
+      },
+      "row_count": 24152,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24151.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032520.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032520,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24151,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-6-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-6-v1-attempt1-export.png",
+        "evidence/conflicts-batch-6-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-6-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-6-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-7-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-7-v1.pine",
+      "csv_file": "conflicts-batch-7-v1.csv",
+      "attempt": 1,
+      "source_sha256": "5853d4590ae1cb6b19930956c7c15bf355f268a4a09770461d868659cd2f9101",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "5db7455e69c6d90e1272e670341bbf15c92f716d81fa80d7e1df5942eb5f077e",
+      "export_bytes": 1960954,
+      "captured_at_utc": "2026-10-03T13:08:37.302Z",
+      "file_modified_at_utc": "2026-10-03T13:08:37.811008+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.475249+00:00",
+      "reset_at_utc": "2026-10-03T13:08:30.431Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:08:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF010_input_color_accepted"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF010_input_color_accepted": {
+          "title": "CF010_input_color_accepted"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF010_input_color_accepted": "numeric; source expression defines value"
+      },
+      "row_count": 24155,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24154.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032880.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032880,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24154,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-7-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-7-v1-attempt1-export.png",
+        "evidence/conflicts-batch-7-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-7-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-7-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-7-v1-attempt1-inputs-supplement-v1.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-8-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-8-v1.pine",
+      "csv_file": "conflicts-batch-8-v1.csv",
+      "attempt": 1,
+      "source_sha256": "c13a7d65b50656d9dbed1e90aa3d85b9b89ddf942dbcf73127b05b7b92014aa6",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "3b5474fb758900ac4db30316cbf1d4290636395b5eca04a254764abe6476f797",
+      "export_bytes": 1960957,
+      "captured_at_utc": "2026-10-03T13:09:18.222Z",
+      "file_modified_at_utc": "2026-10-03T13:09:18.698706+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.607829+00:00",
+      "reset_at_utc": "2026-10-03T13:09:09.423Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:08:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF011_hline_gradient_accepted"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF011_hline_gradient_accepted": {
+          "title": "CF011_hline_gradient_accepted"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF011_hline_gradient_accepted": "numeric; source expression defines value"
+      },
+      "row_count": 24155,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24154.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791032880.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791032880,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24154,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-8-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-8-v1-attempt1-export.png",
+        "evidence/conflicts-batch-8-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-8-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-8-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-8-v1-attempt1-visual.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-14-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-14-v1.pine",
+      "csv_file": "conflicts-batch-14-v1.csv",
+      "attempt": 1,
+      "source_sha256": "70ad981c8d298d4e71d724e5691e7a96bb2d19ae1410739155170963e97ff2cf",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "a4dec3e0543022b59855b2dfa38ff1f44c36fb9921732d0d47219bb6a3ce1e89",
+      "export_bytes": 2033497,
+      "captured_at_utc": "2026-10-03T13:11:24.877Z",
+      "file_modified_at_utc": "2026-10-03T13:11:25.444227+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.744112+00:00",
+      "reset_at_utc": "2026-10-03T13:11:17.779Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:10:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF016a_const_result"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF016a_const_result": {
+          "title": "CF016a_const_result"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF016a_const_result": "numeric; source expression defines value"
+      },
+      "row_count": 24156,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24155.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033000.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033000,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24155,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-14-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-14-v1-attempt1-export.png",
+        "evidence/conflicts-batch-14-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-14-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-14-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-15-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-15-v1.pine",
+      "csv_file": "conflicts-batch-15-v1.csv",
+      "attempt": 1,
+      "source_sha256": "372cca92243c7ea2a80b02cbf2b8b8e6bf2f267709244b8d0a7a2c61024f74d6",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "c9377e59d082d10c2339760c2938b042f6e187cd025186a12ec189a8c0084510",
+      "export_bytes": 2236671,
+      "captured_at_utc": "2026-10-03T13:12:09.454Z",
+      "file_modified_at_utc": "2026-10-03T13:12:10.539639+00:00",
+      "processed_at_utc": "2026-10-03T13:33:47.898794+00:00",
+      "reset_at_utc": "2026-10-03T13:11:59.884Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:12:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF016b_input_result",
+        "CF016b_input_consumer"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF016b_input_result": {
+          "title": "CF016b_input_result"
+        },
+        "CF016b_input_consumer": {
+          "title": "CF016b_input_consumer"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF016b_input_result": "numeric; source expression defines value",
+        "CF016b_input_consumer": "numeric; source expression defines value"
+      },
+      "row_count": 24157,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24156.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033120.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033120,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24156,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-15-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-15-v1-attempt1-export.png",
+        "evidence/conflicts-batch-15-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-15-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-15-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-15-v1-attempt1-inputs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-16-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-16-v1.pine",
+      "csv_file": "conflicts-batch-16-v1.csv",
+      "attempt": 1,
+      "source_sha256": "51b33e6db702399af6e9e6e84cc25b226080b3e2844134a40c7cf1fbaa89ea51",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "2cb2e83c9fd1c8b66fbcc788a35ca4927b289f68a81372aeeca95efd33cc2d2a",
+      "export_bytes": 2057840,
+      "captured_at_utc": "2026-10-03T13:14:11.605Z",
+      "file_modified_at_utc": "2026-10-03T13:14:12.512075+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.039656+00:00",
+      "reset_at_utc": "2026-10-03T13:13:59.807Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF017_rows",
+        "CF017_columns",
+        "CF017_new_is_na"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF017_rows": {
+          "title": "CF017_rows"
+        },
+        "CF017_columns": {
+          "title": "CF017_columns"
+        },
+        "CF017_new_is_na": {
+          "title": "CF017_new_is_na"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF017_rows": "numeric; source expression defines value",
+        "CF017_columns": "numeric; source expression defines value",
+        "CF017_new_is_na": "numeric; source expression defines value"
+      },
+      "row_count": 24158,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24157.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033240.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033240,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24157,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-16-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-16-v1-attempt1-export.png",
+        "evidence/conflicts-batch-16-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-16-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-16-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-17-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-17-v1.pine",
+      "csv_file": "conflicts-batch-17-v1.csv",
+      "attempt": 1,
+      "source_sha256": "d1dd32d0b4d2342e143d5cf1892180c1df450725425005ad6cbc43cec81af6dd",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "c5d98e40fdd9bdf385156e0c95167d4bbc371122337317082c0d7834c4e8af5c",
+      "export_bytes": 2057840,
+      "captured_at_utc": "2026-10-03T13:15:01.272Z",
+      "file_modified_at_utc": "2026-10-03T13:15:01.739074+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.181132+00:00",
+      "reset_at_utc": "2026-10-03T13:14:51.763Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF018_rows",
+        "CF018_columns",
+        "CF018_new_is_na"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF018_rows": {
+          "title": "CF018_rows"
+        },
+        "CF018_columns": {
+          "title": "CF018_columns"
+        },
+        "CF018_new_is_na": {
+          "title": "CF018_new_is_na"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF018_rows": "numeric; source expression defines value",
+        "CF018_columns": "numeric; source expression defines value",
+        "CF018_new_is_na": "numeric; source expression defines value"
+      },
+      "row_count": 24158,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24157.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033240.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033240,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24157,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-17-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-17-v1-attempt1-export.png",
+        "evidence/conflicts-batch-17-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-17-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-17-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-18-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-18-v1.pine",
+      "csv_file": "conflicts-batch-18-v1.csv",
+      "attempt": 1,
+      "source_sha256": "73cd90977019428ffbfbe56e253647ea2e60e4dceb35376e516a2c7a9d492ad7",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "b5226872ac5b3f089697e293bc5936d4a4866ff90826832721a17bfe960d8f98",
+      "export_bytes": 2057863,
+      "captured_at_utc": "2026-10-03T13:15:51.256Z",
+      "file_modified_at_utc": "2026-10-03T13:15:51.911590+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.319351+00:00",
+      "reset_at_utc": "2026-10-03T13:15:42.687Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF019_remaining_rows",
+        "CF019_remaining_columns",
+        "CF019_removed_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF019_remaining_rows": {
+          "title": "CF019_remaining_rows"
+        },
+        "CF019_remaining_columns": {
+          "title": "CF019_remaining_columns"
+        },
+        "CF019_removed_size": {
+          "title": "CF019_removed_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF019_remaining_rows": "numeric; source expression defines value",
+        "CF019_remaining_columns": "numeric; source expression defines value",
+        "CF019_removed_size": "numeric; source expression defines value"
+      },
+      "row_count": 24158,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24157.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033240.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033240,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24157,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-18-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-18-v1-attempt1-export.png",
+        "evidence/conflicts-batch-18-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-18-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-18-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-19-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-19-v1.pine",
+      "csv_file": "conflicts-batch-19-v1.csv",
+      "attempt": 1,
+      "source_sha256": "36bfc9e6915334779965134641cd1ac0ed9e526d35c8b131ea865b89756aa4bf",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "5412d8582b53ffd7939dc643ed588bf272c353b023cbcf6fe60647f2cdd1a084",
+      "export_bytes": 2057952,
+      "captured_at_utc": "2026-10-03T13:16:33.472Z",
+      "file_modified_at_utc": "2026-10-03T13:16:34.028831+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.459376+00:00",
+      "reset_at_utc": "2026-10-03T13:16:25.279Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF020_remaining_rows",
+        "CF020_remaining_columns",
+        "CF020_removed_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF020_remaining_rows": {
+          "title": "CF020_remaining_rows"
+        },
+        "CF020_remaining_columns": {
+          "title": "CF020_remaining_columns"
+        },
+        "CF020_removed_size": {
+          "title": "CF020_removed_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF020_remaining_rows": "numeric; source expression defines value",
+        "CF020_remaining_columns": "numeric; source expression defines value",
+        "CF020_removed_size": "numeric; source expression defines value"
+      },
+      "row_count": 24159,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24158.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033360.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033360,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24158,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-19-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-19-v1-attempt1-export.png",
+        "evidence/conflicts-batch-19-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-19-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-19-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-20-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-20-v1.pine",
+      "csv_file": "conflicts-batch-20-v1.csv",
+      "attempt": 1,
+      "source_sha256": "b28cafe28fce9abcdca077279a302635853d4825c5cf4d35ab0fb618cd4ac41b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "25f477b9d429fff3f7f7e28d1da6a5166de84cbffd09670917e774384f62df76",
+      "export_bytes": 2106249,
+      "captured_at_utc": "2026-10-03T13:17:25.835Z",
+      "file_modified_at_utc": "2026-10-03T13:17:26.265612+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.602389+00:00",
+      "reset_at_utc": "2026-10-03T13:17:19.669Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF022_vector_size",
+        "CF022_first",
+        "CF022_second"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF022_vector_size": {
+          "title": "CF022_vector_size"
+        },
+        "CF022_first": {
+          "title": "CF022_first"
+        },
+        "CF022_second": {
+          "title": "CF022_second"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF022_vector_size": "numeric; source expression defines value",
+        "CF022_first": "numeric; source expression defines value",
+        "CF022_second": "numeric; source expression defines value"
+      },
+      "row_count": 24159,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24158.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033360.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033360,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24158,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-20-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-20-v1-attempt1-export.png",
+        "evidence/conflicts-batch-20-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-20-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-20-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-21-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-21-v1.pine",
+      "csv_file": "conflicts-batch-21-v1.csv",
+      "attempt": 1,
+      "source_sha256": "58c9530223cc8a511c648e8361f76d62b05079f12752ee1247ff294999dc2b4b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "a6f1122aaa9ad5a026de031807ad024dc70d3c5df000516df478627a6d8f3db4",
+      "export_bytes": 2082180,
+      "captured_at_utc": "2026-10-03T13:18:05.311Z",
+      "file_modified_at_utc": "2026-10-03T13:18:05.956318+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.742484+00:00",
+      "reset_at_utc": "2026-10-03T13:17:57.217Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Planned setup; not attested",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF023_object_state",
+        "CF023_map_size",
+        "CF023_values_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF023_object_state": {
+          "title": "CF023_object_state"
+        },
+        "CF023_map_size": {
+          "title": "CF023_map_size"
+        },
+        "CF023_values_size": {
+          "title": "CF023_values_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF023_object_state": "numeric; source expression defines value",
+        "CF023_map_size": "numeric; source expression defines value",
+        "CF023_values_size": "numeric; source expression defines value"
+      },
+      "row_count": 24160,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24159.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033480.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033360,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24158,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged. Live candle changed during export; this uncertain attempt is retained and excluded from selection. Use the attested selected repeat.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-21-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-21-v1-attempt1-export.png",
+        "evidence/conflicts-batch-21-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-21-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-21-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [
+        "Chart setup/reset unchanged attestation missing"
+      ],
+      "status": "NEEDS-EVIDENCE",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-21-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-21-v1.pine",
+      "csv_file": "conflicts-batch-21-v1-attempt2.csv",
+      "attempt": 2,
+      "source_sha256": "58c9530223cc8a511c648e8361f76d62b05079f12752ee1247ff294999dc2b4b",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "6b60f98275bd5e245d0d59d7643ce12a56a5a24f60bd8cab67453f50b9d95a8c",
+      "export_bytes": 2082180,
+      "captured_at_utc": "2026-10-03T13:19:00.255Z",
+      "file_modified_at_utc": "2026-10-03T13:19:01.031105+00:00",
+      "processed_at_utc": "2026-10-03T13:33:48.884138+00:00",
+      "reset_at_utc": "2026-10-03T13:18:48.352Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:18:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF023_object_state",
+        "CF023_map_size",
+        "CF023_values_size"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF023_object_state": {
+          "title": "CF023_object_state"
+        },
+        "CF023_map_size": {
+          "title": "CF023_map_size"
+        },
+        "CF023_values_size": {
+          "title": "CF023_values_size"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF023_object_state": "numeric; source expression defines value",
+        "CF023_map_size": "numeric; source expression defines value",
+        "CF023_values_size": "numeric; source expression defines value"
+      },
+      "row_count": 24160,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24159.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033480.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033480,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24159,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-21-v1-attempt2-setup.png",
+        "evidence/conflicts-batch-21-v1-attempt2-export.png",
+        "evidence/conflicts-batch-21-v1-attempt2-logs.txt",
+        "evidence/conflicts-batch-21-v1-attempt2-logs-v1.json",
+        "evidence/conflicts-batch-21-v1-attempt2-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-22-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-22-v1.pine",
+      "csv_file": "conflicts-batch-22-v1.csv",
+      "attempt": 1,
+      "source_sha256": "2e11ada9c288af320aaa84d14d3ca1100d29b7401ead957dd52829455fd8347a",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "6dc22293bc6966317b4382cb391cd2abe57cd2fb93d4e8f8f55180bd4ea1f511",
+      "export_bytes": 2009682,
+      "captured_at_utc": "2026-10-03T13:19:45.543Z",
+      "file_modified_at_utc": "2026-10-03T13:19:46.383607+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.016719+00:00",
+      "reset_at_utc": "2026-10-03T13:19:35.301Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:18:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF025_omitted_end",
+        "CF025_length"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF025_omitted_end": {
+          "title": "CF025_omitted_end"
+        },
+        "CF025_length": {
+          "title": "CF025_length"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF025_omitted_end": "numeric; source expression defines value",
+        "CF025_length": "numeric; source expression defines value"
+      },
+      "row_count": 24160,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24159.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033480.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033480,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24159,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-22-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-22-v1-attempt1-export.png",
+        "evidence/conflicts-batch-22-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-22-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-22-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-25-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-25-v1.pine",
+      "csv_file": "conflicts-batch-25-v1.csv",
+      "attempt": 1,
+      "source_sha256": "befb0c2001c43a3cfdd9679c77db1d4e7bc4a954626f38cb10ca6edbd40af6d6",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "f7f72081259174fd1dbef033fcdb912a124d16bdceca019fd9b555273f28dbe4",
+      "export_bytes": 2106440,
+      "captured_at_utc": "2026-10-03T13:21:17.959Z",
+      "file_modified_at_utc": "2026-10-03T13:21:18.391610+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.162842+00:00",
+      "reset_at_utc": "2026-10-03T13:21:11.682Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:20:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF030_m_length",
+        "CF030_s_length",
+        "CF030_m_whole",
+        "CF030_s_whole"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF030_m_length": {
+          "title": "CF030_m_length"
+        },
+        "CF030_s_length": {
+          "title": "CF030_s_length"
+        },
+        "CF030_m_whole": {
+          "title": "CF030_m_whole"
+        },
+        "CF030_s_whole": {
+          "title": "CF030_s_whole"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF030_m_length": "numeric; source expression defines value",
+        "CF030_s_length": "numeric; source expression defines value",
+        "CF030_m_whole": "numeric; source expression defines value",
+        "CF030_s_whole": "numeric; source expression defines value"
+      },
+      "row_count": 24161,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24160.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033600.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033600,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24160,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-25-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-25-v1-attempt1-export.png",
+        "evidence/conflicts-batch-25-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-25-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-25-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-26-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-26-v1.pine",
+      "csv_file": "conflicts-batch-26-v1.csv",
+      "attempt": 1,
+      "source_sha256": "9d897bdcaf37f9817b2c154af2d4bac8f8b62dfa0028826d0a719db727958fa3",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "134d0726ccbca832676da1ba7d8936530c4beb0d1bfbde30422191790ee50491",
+      "export_bytes": 3279760,
+      "captured_at_utc": "2026-10-03T13:21:57.273Z",
+      "file_modified_at_utc": "2026-10-03T13:21:57.730427+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.336108+00:00",
+      "reset_at_utc": "2026-10-03T13:21:51.476Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:20:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 15,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF032_omit_floor",
+        "CF032_explicit_false",
+        "CF032_explicit_true"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF032_omit_floor": {
+          "title": "CF032_omit_floor"
+        },
+        "CF032_explicit_false": {
+          "title": "CF032_explicit_false"
+        },
+        "CF032_explicit_true": {
+          "title": "CF032_explicit_true"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF032_omit_floor": "numeric; source expression defines value",
+        "CF032_explicit_false": "numeric; source expression defines value",
+        "CF032_explicit_true": "numeric; source expression defines value"
+      },
+      "row_count": 24161,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24160.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033600.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033600,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24160,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-26-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-26-v1-attempt1-export.png",
+        "evidence/conflicts-batch-26-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-26-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-26-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-27-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-27-v1.pine",
+      "csv_file": "conflicts-batch-27-v1.csv",
+      "attempt": 1,
+      "source_sha256": "0ed332cc4fd29c1a0cdfceda3f9fae899bfef5291e5870ecb64404e95613a4f4",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "e26fdd6c3a2b0ca981f61c9f8b174508037396b77c71fd5ccea6e0db87cd7196",
+      "export_bytes": 2072005,
+      "captured_at_utc": "2026-10-03T13:22:42.417Z",
+      "file_modified_at_utc": "2026-10-03T13:22:42.872202+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.494494+00:00",
+      "reset_at_utc": "2026-10-03T13:22:35.476Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 2,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF033_omit_length",
+        "CF033_explicit_one",
+        "CF033_explicit_two"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF033_omit_length": {
+          "title": "CF033_omit_length"
+        },
+        "CF033_explicit_one": {
+          "title": "CF033_explicit_one"
+        },
+        "CF033_explicit_two": {
+          "title": "CF033_explicit_two"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF033_omit_length": "numeric; source expression defines value",
+        "CF033_explicit_one": "numeric; source expression defines value",
+        "CF033_explicit_two": "numeric; source expression defines value"
+      },
+      "row_count": 24162,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24161.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033720.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033720,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24161,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-27-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-27-v1-attempt1-export.png",
+        "evidence/conflicts-batch-27-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-27-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-27-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-28-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-28-v1.pine",
+      "csv_file": "conflicts-batch-28-v1.csv",
+      "attempt": 1,
+      "source_sha256": "3f5d20e89b0db93e7e1513fa7b8bc952f728ae25167796343086d654f3892bb8",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "84b37c0aa24915a0f4497c76121f057b770124ab9f9495d0f3eec162571981ac",
+      "export_bytes": 2775138,
+      "captured_at_utc": "2026-10-03T13:23:20.228Z",
+      "file_modified_at_utc": "2026-10-03T13:23:20.726830+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.648214+00:00",
+      "reset_at_utc": "2026-10-03T13:23:14.154Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 11,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF037_omitted_upper",
+        "CF037_explicit_upper"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF037_omitted_upper": {
+          "title": "CF037_omitted_upper"
+        },
+        "CF037_explicit_upper": {
+          "title": "CF037_explicit_upper"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF037_omitted_upper": "numeric; source expression defines value",
+        "CF037_explicit_upper": "numeric; source expression defines value"
+      },
+      "row_count": 24162,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24161.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033720.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033720,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24161,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-28-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-28-v1-attempt1-export.png",
+        "evidence/conflicts-batch-28-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-28-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-28-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [],
+      "status": "FILE-READY",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-29-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-29-v1.pine",
+      "csv_file": "conflicts-batch-29-v1.csv",
+      "attempt": 1,
+      "source_sha256": "af6b9f8c8ffffe8dfd15109de329406adfba3e50b650a67a9fa1c0dbd29bd4de",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "b70d94bbe2aa9f6c5bdfc0cbe8bac263b0f9017eb9a095d04a3d12197773e0eb",
+      "export_bytes": 2953389,
+      "captured_at_utc": "2026-10-03T13:24:03.687Z",
+      "file_modified_at_utc": "2026-10-03T13:24:04.176170+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.801572+00:00",
+      "reset_at_utc": "2026-10-03T13:23:57.566Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Planned setup; not attested",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 21,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF038_omitted",
+        "CF038_explicit"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF038_omitted": {
+          "title": "CF038_omitted"
+        },
+        "CF038_explicit": {
+          "title": "CF038_explicit"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF038_omitted": "numeric; source expression defines value",
+        "CF038_explicit": "numeric; source expression defines value"
+      },
+      "row_count": 24163,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24162.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033840.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033720,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24161,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged. Live candle changed during export; this uncertain attempt is retained and excluded from selection. Use the attested selected repeat.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-29-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-29-v1-attempt1-export.png",
+        "evidence/conflicts-batch-29-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-29-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-29-v1-attempt1-logs.png"
+      ],
+      "validation_errors": [
+        "Chart setup/reset unchanged attestation missing"
+      ],
+      "status": "NEEDS-EVIDENCE",
+      "runtime": {
+        "status": "RUNS"
+      }
+    },
+    {
+      "probe": "conflicts-batch-29-v1.pine",
+      "source_path": "outcome-only/conflicts-batch-29-v1.pine",
+      "csv_file": "conflicts-batch-29-v1-attempt2.csv",
+      "attempt": 2,
+      "source_sha256": "af6b9f8c8ffffe8dfd15109de329406adfba3e50b650a67a9fa1c0dbd29bd4de",
+      "source_identity_basis": "Staged source hash; operator pasted unchanged source per procedure",
+      "export_sha256": "03ba0238e56fc6d574636c1d3370557004787e364a6c912177c26c98eee67c74",
+      "export_bytes": 2953387,
+      "captured_at_utc": "2026-10-03T13:25:14.004Z",
+      "file_modified_at_utc": "2026-10-03T13:25:14.458168+00:00",
+      "processed_at_utc": "2026-10-03T13:33:49.957518+00:00",
+      "reset_at_utc": "2026-10-03T13:25:07.820Z",
+      "observed_live_bar_open_utc": "2026-10-03T13:24:00.000Z",
+      "tickerid": "BINANCE:BTCUSDT",
+      "interval": "2m",
+      "chart_style": "standard candles",
+      "timezone": "Etc/UTC",
+      "chart_setup_basis": "Bundle setup; attested unchanged",
+      "pine_precision": null,
+      "export_max_fraction_digits_observed": 21,
+      "precision_note": "Observed CSV lexemes, not a guarantee or comparison tolerance",
+      "csv_time_unit": "seconds",
+      "columns": [
+        "time",
+        "open",
+        "high",
+        "low",
+        "close",
+        "CTRL_time",
+        "CTRL_bar_index",
+        "CTRL_close",
+        "CTRL_mintick",
+        "CTRL_BTCUSDT_2m",
+        "CF038_omitted",
+        "CF038_explicit"
+      ],
+      "column_map": {
+        "CTRL_BTCUSDT_2m": {
+          "title": "CTRL_BTCUSDT_2m"
+        },
+        "CTRL_mintick": {
+          "title": "CTRL_mintick"
+        },
+        "CTRL_close": {
+          "title": "CTRL_close"
+        },
+        "CTRL_bar_index": {
+          "title": "CTRL_bar_index"
+        },
+        "CTRL_time": {
+          "title": "CTRL_time"
+        },
+        "CF038_omitted": {
+          "title": "CF038_omitted"
+        },
+        "CF038_explicit": {
+          "title": "CF038_explicit"
+        }
+      },
+      "input_columns": {
+        "time": "time",
+        "open": "open",
+        "high": "high",
+        "low": "low",
+        "close": "close"
+      },
+      "plotted_units": {
+        "CTRL_BTCUSDT_2m": "numeric; source expression defines value",
+        "CTRL_mintick": "numeric; source expression defines value",
+        "CTRL_close": "numeric; source expression defines value",
+        "CTRL_bar_index": "bar_index",
+        "CTRL_time": "milliseconds",
+        "CF038_omitted": "numeric; source expression defines value",
+        "CF038_explicit": "numeric; source expression defines value"
+      },
+      "row_count": 24163,
+      "first_bar_index": 0.0,
+      "last_bar_index": 24162.0,
+      "index_basis": "Direct plotted CTRL_bar_index",
+      "first_timestamp": 1788134400.0,
+      "last_timestamp": 1791033840.0,
+      "timestamp_unit": "unix_seconds",
+      "historical_compare_before_unix_seconds": 1791033840,
+      "cutoff_basis": "Operator/agent observed live-bar opening timestamp",
+      "historical_rows": 24162,
+      "minimum_history_rows": 100,
+      "history_complete": true,
+      "volume_unused_by_source": true,
+      "input_changes": [],
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-29-v1-attempt2-setup.png",
+        "evidence/conflicts-batch-29-v1-attempt2-export.png",
+        "evidence/conflicts-batch-29-v1-attempt2-logs.txt",
+        "evidence/conflicts-batch-29-v1-attempt2-logs-v1.json",
+        "evidence/conflicts-batch-29-v1-attempt2-logs.png"
       ],
       "validation_errors": [],
       "status": "FILE-READY",

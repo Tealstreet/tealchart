@@ -1,0 +1,64 @@
+Cannot call "operator ==" with argument "expr0"="call "array.get" (series linefill)". An argument of "series linefill" type was used but a "simple string"  is expected.
+{
+  "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+  "editorError": {
+    "code": "CE10123",
+    "ctx": {
+      "argDisplayName": "expr0",
+      "argUserFriendlyRepresentation": "call \"array.get\" (series linefill)",
+      "argumentType": "series linefill",
+      "currentTypeDocStr": "simple string",
+      "funId": "operator ==",
+      "typePostfix": ""
+    },
+    "end": {
+      "column": 89,
+      "line": 78
+    },
+    "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+    "start": {
+      "column": 37,
+      "line": 78
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///af8cd600-b66a-4b5b-a154-820ba252ee8a.pine?placement%3Ddialog",
+        "path": "/af8cd600-b66a-4b5b-a154-820ba252ee8a.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\"  is expected.",
+      "startLineNumber": 78,
+      "startColumn": 37,
+      "endLineNumber": 78,
+      "endColumn": 90
+    },
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///af8cd600-b66a-4b5b-a154-820ba252ee8a.pine?placement%3Ddialog",
+        "path": "/af8cd600-b66a-4b5b-a154-820ba252ee8a.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10123",
+      "severity": 8,
+      "message": "Cannot call \"operator ==\" with argument \"expr1\"=\"other\". An argument of \"series linefill\" type was used but a \"simple string\"  is expected.",
+      "startLineNumber": 78,
+      "startColumn": 94,
+      "endLineNumber": 78,
+      "endColumn": 99
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,820.01\n+0.01 (+0.00%)\n84,820.00\nSELL\n0.01\n84,820.01\nBUY\nOracle na holes crosses v1\nUSDT\nDate Range\n13:27:09 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nUntitled script\nPublish script\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\n80\n81\n82\n83\n84\n85\n86\n87\n88\n89\nz = line.new(b, close + 2, b + 1, close + 3)\nf = linefill.new(a, z,  color.blue)\nu = line.new(b, close + 10, b + 1, close + 11)\nv = line.new(b, close + 20, b + 1, close + 21)\nother = linefill.new(u, v,  color.red)\nplot(array.size(linefill.all), \"fill_before_delete\", display=display.data_window)\nline.delete(a)\nplot(array.size(linefill.all), \"fill_after_parent_delete\", display=display.data_window)\nplot(array.size(line.all), \"lines_after_parent_delete\", display=display.data_window)\nplot(array.size(linefill.all) > 0 ? array.get(linefill.all, array.size(linefill.all) - 1) == other ? 1 : 0 : na, \"survivor_is_other\", display=display.data_window)\nplot(line.get_y1(linefill.get_line1(other)), \"survivor_parent1_y\", display=display.data_window)\nplot(line.get_y1(linefill.get_line2(other)), \"survivor_parent2_y\", display=display.data_window)\nplot(line.get_y1(z), \"deleted_fill_surviving_parent_y\", display=display.data_window)\nlinefill.delete(f)\nplot(array.size(linefill.all), \"fill_after_explicit_delete\", display=display.data_window)\nline.delete(z)\nlinefill.delete(other)\nline.delete(u)\nline.delete(v)\nplot(array.size(linefill.all), \"fill_after_cleanup\", display=display.data_window)\n1 of 2 problems\nCannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\" is expected.(CE10123)\nLine 78, Col 37\nPine Script® v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10123\n\nCannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Cannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\"  is expected."
+}

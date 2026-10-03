@@ -25,7 +25,26 @@
     "coverage-matrix-1-v1.pine": 1,
     "coverage-drawing-1-v1.pine": 1,
     "coverage-drawing-3-v1.pine": 1,
-    "coverage-drawing-4-v1.pine": 1
+    "coverage-drawing-4-v1.pine": 1,
+    "conflicts-batch-3-v1.pine": 1,
+    "conflicts-batch-5-v1.pine": 1,
+    "conflicts-batch-6-v1.pine": 1,
+    "conflicts-batch-7-v1.pine": 1,
+    "conflicts-batch-8-v1.pine": 1,
+    "conflicts-batch-14-v1.pine": 1,
+    "conflicts-batch-15-v1.pine": 1,
+    "conflicts-batch-16-v1.pine": 1,
+    "conflicts-batch-17-v1.pine": 1,
+    "conflicts-batch-18-v1.pine": 1,
+    "conflicts-batch-19-v1.pine": 1,
+    "conflicts-batch-20-v1.pine": 1,
+    "conflicts-batch-21-v1.pine": 2,
+    "conflicts-batch-22-v1.pine": 1,
+    "conflicts-batch-25-v1.pine": 1,
+    "conflicts-batch-26-v1.pine": 1,
+    "conflicts-batch-27-v1.pine": 1,
+    "conflicts-batch-28-v1.pine": 1,
+    "conflicts-batch-29-v1.pine": 2
   },
   "attempts": [
     {
@@ -37,363 +56,13 @@
       "captured_at_utc": null,
       "reset_at_utc": "2026-10-03T12:17:30.495Z",
       "chart_unchanged_attested": false,
-      "notes": "Live candle changed from 12:16 to 12:18 between tooltip observation and download; retained attempt is uncertain and will be recaptured. Screenshot filePath writes were rejected by MCP workspace configuration; screenshots absent for this attempt.",
+      "notes": "Live candle changed from 12:16 to 12:18 between tooltip observation and download; retained attempt is uncertain and will be recaptured. Screenshot filePath writes were rejected by MCP workspace configuration; screenshots absent for this attempt. Live candle changed during export; this uncertain attempt is retained and excluded from selection. Use the attested selected repeat.",
       "evidence_paths": [],
       "column_map": {},
       "input_changes": [],
       "runtime": {
         "status": "RUNS"
       }
-    },
-    {
-      "probe": "conflicts-batch-3-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-4-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-5-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-6-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-7-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-8-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-9-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-10-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-11-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-14-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-15-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-16-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-17-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-18-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-19-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-20-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-21-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-22-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-23-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-24-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-25-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-26-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-27-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-28-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
-    },
-    {
-      "probe": "conflicts-batch-29-v1.pine",
-      "attempt": 1,
-      "csv_file": null,
-      "live_cutoff_unix_seconds": null,
-      "live_bar_open_utc": null,
-      "captured_at_utc": null,
-      "reset_at_utc": null,
-      "chart_unchanged_attested": false,
-      "notes": "",
-      "evidence_paths": [],
-      "column_map": {},
-      "input_changes": []
     },
     {
       "probe": "primitives-sma-stdev-v1.pine",
@@ -878,76 +547,12 @@
         "evidence/coverage-plot-1-v1-attempt1-export.png",
         "evidence/coverage-plot-1-v1-attempt1-data-window-controls.png",
         "evidence/coverage-plot-1-v1-attempt1-data-window-ohlc.png",
-        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json"
+        "evidence/coverage-plot-1-v1-attempt1-witness-v1.json",
+        "evidence/coverage-plot-1-v1-attempt1-mapping-v2.json"
       ],
       "input_changes": [],
-      "column_map": {
-        "plotbar_constant_actual (Open)": {
-          "title": "plotbar_constant_actual",
-          "channel": "open"
-        },
-        "plotbar_constant_actual (High": {
-          "title": "plotbar_constant_actual",
-          "channel": "high"
-        },
-        "plotbar_constant_actual (Low)": {
-          "title": "plotbar_constant_actual",
-          "channel": "low"
-        },
-        "plotbar_constant_actual (Close)": {
-          "title": "plotbar_constant_actual",
-          "channel": "close"
-        },
-        "plotbar_dynamic_actual (Open)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "open"
-        },
-        "plotbar_dynamic_actual (High": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "high"
-        },
-        "plotbar_dynamic_actual (Low)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "low"
-        },
-        "plotbar_dynamic_actual (Close)": {
-          "title": "plotbar_dynamic_actual",
-          "channel": "close"
-        },
-        "plotcandle_constant_actual (Open)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "open"
-        },
-        "plotcandle_constant_actual (High": {
-          "title": "plotcandle_constant_actual",
-          "channel": "high"
-        },
-        "plotcandle_constant_actual (Low)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "low"
-        },
-        "plotcandle_constant_actual (Close)": {
-          "title": "plotcandle_constant_actual",
-          "channel": "close"
-        },
-        "plotcandle_dynamic_actual (Open)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "open"
-        },
-        "plotcandle_dynamic_actual (High": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "high"
-        },
-        "plotcandle_dynamic_actual (Low)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "low"
-        },
-        "plotcandle_dynamic_actual (Close)": {
-          "title": "plotcandle_dynamic_actual",
-          "channel": "close"
-        }
-      },
-      "ohlc_channel_mapping": "Explicit native CSV header channel names (Open/High/Low/Close), corroborated by native metainfo ohlc_open/high/low/close and finite witness. No positional or normalization inference. Data Window repeats titles without channel names; that UI labelling limitation remains.",
+      "column_map": {},
+      "ohlc_channel_mapping": "UNKNOWN: Data Window repeats titles without channel names; the handoff forbids assuming suffix/order. Raw CSV, finite case0 witness, native metainfo and candidate export labels are preserved for follow-up.",
       "witness": {
         "pine_bar_index": 24134,
         "input_case_mod11": 0,
@@ -1235,8 +840,1407 @@
       "browser_download": "BINANCE_BTCUSDT, 2 (38).csv",
       "raw_sha256": "18b5f1f7c46fb48c9bc1fe526f74842c75490ddb26d9420af9fe012ac7f6e33b",
       "source_identity_verified": true
+    },
+    {
+      "probe": "conflicts-batch-3-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-3-v1.csv",
+      "live_cutoff_unix_seconds": 1791032400,
+      "live_bar_open_utc": "2026-10-03T13:00:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:00",
+      "captured_at_utc": "2026-10-03T13:01:29.713Z",
+      "reset_at_utc": "2026-10-03T13:01:23.055Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-3-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-3-v1-attempt1-export.png",
+        "evidence/conflicts-batch-3-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-3-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-3-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-3-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-3-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-3-v1-attempt1-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791032484327.877,
+        "last_bar_time_ms": 1791032400000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (39).csv",
+      "raw_sha256": "e9d92009b41bf05d0093b376d8018776f2fd895091da005f6d118063216a209a"
+    },
+    {
+      "probe": "conflicts-batch-4-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:02:40.362Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "id",
+              "argUserFriendlyRepresentation": "cf003_a",
+              "argumentType": "array<int>",
+              "currentTypeDocStr": "array<bool>",
+              "funId": "array.every",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 19
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 18,
+              "line": 19
+            },
+            "id": "USER;83015359e8b540bc9b4937e249d301b7"
+          },
+          "title": "Compilation error",
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,843.29\n\u221220.80 (\u22120.02%)\n84,843.29\nSELL\n0.01\n84,843.30\nBUY\nUSDT\nconflicts-batch-4-v1.pine\nDate Range\n13:02:39 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nconflicts-batch-4-v1.pine\nPublish script\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF003\u00a0array/C03\n//\u00a0Numeric\u00a0argument\u00a0eligibility\u00a0must\u00a0be\u00a0captured\u00a0as\u00a0compiler\u00a0outcome\u00a0if\u00a0refused.\ncf003_a\u00a0=\u00a0array.from(0,2,-1)\ncf003_b\u00a0=\u00a0array.from(2.0,-1.0)\nplot(array.every(cf003_a)?1:0,\u00a0\"CF003_every_zero\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(array.some(cf003_a)?1:0,\u00a0\"CF003_some_nonzero\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(array.every(cf003_b)?1:0,\u00a0\"CF003_every_float\",\u00a0display\u00a0=\u00a0display.data_window)\n2 of 3 problems\nCannot call \"array.some\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.(CE10123)\n1 \u2219 Today, 21:02\nLine 20, Col 17\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected."
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-4-v1-attempt1-error.txt",
+        "evidence/conflicts-batch-4-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-5-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-5-v1.csv",
+      "live_cutoff_unix_seconds": 1791032520,
+      "live_bar_open_utc": "2026-10-03T13:02:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:02",
+      "captured_at_utc": "2026-10-03T13:02:58.278Z",
+      "reset_at_utc": "2026-10-03T13:02:51.947Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-5-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-5-v1-attempt1-export.png",
+        "evidence/conflicts-batch-5-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-5-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-5-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-5-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-5-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-5-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791032572643.615,
+        "last_bar_time_ms": 1791032520000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (40).csv",
+      "raw_sha256": "2913ae59ef102685dcb839753c18a694ae0fe0576d7a6171a3b4baa65bbc2f95"
+    },
+    {
+      "probe": "conflicts-batch-6-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-6-v1.csv",
+      "live_cutoff_unix_seconds": 1791032520,
+      "live_bar_open_utc": "2026-10-03T13:02:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:02",
+      "captured_at_utc": "2026-10-03T13:03:34.728Z",
+      "reset_at_utc": "2026-10-03T13:03:28.552Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-6-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-6-v1-attempt1-export.png",
+        "evidence/conflicts-batch-6-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-6-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-6-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-6-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-6-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-6-v1-attempt1-logs.png"
+        ],
+        "entries": 4,
+        "last_message_time_ms": 1791032609605.235,
+        "last_bar_time_ms": 1791032520000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (41).csv",
+      "raw_sha256": "393f523f155d30d53e222e57c62c97dc8362cf5a74cd1e1b026306ecb36b950e"
+    },
+    {
+      "probe": "conflicts-batch-7-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-7-v1.csv",
+      "live_cutoff_unix_seconds": 1791032880,
+      "live_bar_open_utc": "2026-10-03T13:08:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:08",
+      "captured_at_utc": "2026-10-03T13:08:37.302Z",
+      "reset_at_utc": "2026-10-03T13:08:30.431Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-7-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-7-v1-attempt1-export.png",
+        "evidence/conflicts-batch-7-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-7-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-7-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-7-v1-attempt1-inputs-supplement-v1.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-7-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-7-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-7-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791032911307.483,
+        "last_bar_time_ms": 1791032880000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (42).csv",
+      "raw_sha256": "5db7455e69c6d90e1272e670341bbf15c92f716d81fa80d7e1df5942eb5f077e",
+      "input_observation": "Supplemental Inputs screenshot on a fresh unchanged-source installation after batch completion shows Hline input color red. No input/style changes; screenshot does not claim to be simultaneous with attempt1 export."
+    },
+    {
+      "probe": "conflicts-batch-8-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-8-v1.csv",
+      "live_cutoff_unix_seconds": 1791032880,
+      "live_bar_open_utc": "2026-10-03T13:08:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:08",
+      "captured_at_utc": "2026-10-03T13:09:18.222Z",
+      "reset_at_utc": "2026-10-03T13:09:09.423Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-8-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-8-v1-attempt1-export.png",
+        "evidence/conflicts-batch-8-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-8-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-8-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-8-v1-attempt1-visual.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-8-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-8-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-8-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791032950413.47,
+        "last_bar_time_ms": 1791032880000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (43).csv",
+      "raw_sha256": "3b5474fb758900ac4db30316cbf1d4290636395b5eca04a254764abe6476f797",
+      "visual_observation": "Separate post-export screenshot shows the actual pane fill grading from red at hline100 to blue at hline0. No inputs or styles changed."
+    },
+    {
+      "probe": "conflicts-batch-9-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:10:26.047Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "No value assigned to the \"{name}\" parameter in {functionName}()",
+          "editorError": {
+            "code": "CE10165",
+            "ctx": {
+              "functionName": "box.set_text_formatting",
+              "name": "text_formatting"
+            },
+            "end": {
+              "column": 34,
+              "line": 18
+            },
+            "message": "No value assigned to the \"{name}\" parameter in {functionName}()",
+            "start": {
+              "column": 1,
+              "line": 18
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///b529af6b-56ef-4021-868b-bba9f0114d64.pine?placement%3Ddialog",
+                "path": "/b529af6b-56ef-4021-868b-bba9f0114d64.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10165",
+              "severity": 8,
+              "message": "No value assigned to the \"text_formatting\" parameter in box.set_text_formatting()",
+              "startLineNumber": 18,
+              "startColumn": 1,
+              "endLineNumber": 18,
+              "endColumn": 35
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,860.03\n0.00 (0.00%)\n84,860.02\nSELL\n0.01\n84,860.03\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n13:10:25 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nconflicts-batch-9-v1.pine\nPublish script\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\nplot(close,\u00a0\"CTRL_close\",\u00a0display=display.data_window)\nplot(syminfo.mintick,\u00a0\"CTRL_mintick\",\u00a0display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF012\u00a0drawing/C1\n//\u00a0Save\u00a0last-bar\u00a0drawing\u00a0screenshot\u00a0to\u00a0check\u00a0omitted\u00a0argument\u00a0clears\u00a0bold;\u00a0no\u00a0formatting\u00a0getter\u00a0exists.\ncf012_obj\u00a0=\u00a0box.new(bar_index,high,bar_index+1,low,text=\"bold\u00a0control\",text_formatting=text.format_bold)\nbox.set_text_formatting(cf012_obj)\nplot(1,\u00a0\"CF012_omission_accepted\",\u00a0display\u00a0=\u00a0display.data_window)\n1 of 1 problem\nNo value assigned to the \"text_formatting\" parameter in box.set_text_formatting()(CE10165)\n1 \u2219 Today, 21:10\nLine 18, Col 1\nPine Script\u00ae v6\nCompilation error: CE10165\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10165\n\nNo value assigned to the \"text_formatting\" parameter in box.set_text_formatting()\n\nOpen in editor",
+          "context_substituted_message": "No value assigned to the \"text_formatting\" parameter in box.set_text_formatting()"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-9-v1-attempt1-error.txt",
+        "evidence/conflicts-batch-9-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-10-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:10:36.157Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "No value assigned to the \"{name}\" parameter in {functionName}()",
+          "editorError": {
+            "code": "CE10165",
+            "ctx": {
+              "functionName": "label.set_text_formatting",
+              "name": "text_formatting"
+            },
+            "end": {
+              "column": 36,
+              "line": 18
+            },
+            "message": "No value assigned to the \"{name}\" parameter in {functionName}()",
+            "start": {
+              "column": 1,
+              "line": 18
+            },
+            "id": "USER;899fd6a525e74eed9049156347026181"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///ee4ab9da-a20c-4a41-93ac-662219671156.pine?placement%3Ddialog",
+                "path": "/ee4ab9da-a20c-4a41-93ac-662219671156.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10165",
+              "severity": 8,
+              "message": "No value assigned to the \"text_formatting\" parameter in label.set_text_formatting()",
+              "startLineNumber": 18,
+              "startColumn": 1,
+              "endLineNumber": 18,
+              "endColumn": 37
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,860.03\n0.00 (0.00%)\n84,860.02\nSELL\n0.01\n84,860.03\nBUY\nUSDT\nconflicts-batch-10-v1.pine\nDate Range\n13:10:35 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nconflicts-batch-10-v1.pine\nPublish script\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\nplot(close,\u00a0\"CTRL_close\",\u00a0display=display.data_window)\nplot(syminfo.mintick,\u00a0\"CTRL_mintick\",\u00a0display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF013\u00a0drawing/C2\n//\u00a0Save\u00a0last-bar\u00a0drawing\u00a0screenshot\u00a0to\u00a0check\u00a0omitted\u00a0argument\u00a0clears\u00a0bold;\u00a0no\u00a0formatting\u00a0getter\u00a0exists.\ncf013_obj\u00a0=\u00a0label.new(bar_index,close,\"bold\u00a0control\",text_formatting=text.format_bold)\nlabel.set_text_formatting(cf013_obj)\nplot(1,\u00a0\"CF013_omission_accepted\",\u00a0display\u00a0=\u00a0display.data_window)\n1 of 1 problem\nNo value assigned to the \"text_formatting\" parameter in label.set_text_formatting()(CE10165)\n1 \u2219 Today, 21:10\nLine 18, Col 1\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10165\n\nNo value assigned to the \"text_formatting\" parameter in label.set_text_formatting()\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "No value assigned to the \"text_formatting\" parameter in label.set_text_formatting()"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-10-v1-attempt1-error.txt",
+        "evidence/conflicts-batch-10-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-11-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:10:46.726Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "No value assigned to the \"{name}\" parameter in {functionName}()",
+          "editorError": {
+            "code": "CE10165",
+            "ctx": {
+              "functionName": "table.cell_set_text_formatting",
+              "name": "text_formatting"
+            },
+            "end": {
+              "column": 45,
+              "line": 19
+            },
+            "message": "No value assigned to the \"{name}\" parameter in {functionName}()",
+            "start": {
+              "column": 1,
+              "line": 19
+            },
+            "id": "USER;a7bb65d8cc414c02b5fafd4a2e005b22"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///3953e13d-49ab-4a83-8712-3307c7074ed2.pine?placement%3Ddialog",
+                "path": "/3953e13d-49ab-4a83-8712-3307c7074ed2.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10165",
+              "severity": 8,
+              "message": "No value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()",
+              "startLineNumber": 19,
+              "startColumn": 1,
+              "endLineNumber": 19,
+              "endColumn": 46
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,860.02\n\u22120.01 (\u22120.00%)\n84,860.02\nSELL\n0.01\n84,860.03\nBUY\nUSDT\nconflicts-batch-11-v1.pine\nDate Range\n13:10:46 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nconflicts-batch-11-v1.pine\nPublish script\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\nplot(syminfo.mintick,\u00a0\"CTRL_mintick\",\u00a0display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF014\u00a0drawing/C3\n//\u00a0Save\u00a0last-bar\u00a0drawing\u00a0screenshot\u00a0to\u00a0check\u00a0omitted\u00a0argument\u00a0clears\u00a0bold;\u00a0no\u00a0formatting\u00a0getter\u00a0exists.\nvar\u00a0cf014_obj\u00a0=\u00a0table.new(position.top_right,1,1)\ntable.cell(cf014_obj,0,0,\"bold\u00a0control\",text_formatting=text.format_bold)\ntable.cell_set_text_formatting(cf014_obj,0,0)\nplot(1,\u00a0\"CF014_omission_accepted\",\u00a0display\u00a0=\u00a0display.data_window)\n1 of 1 problem\nNo value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()(CE10165)\n1 \u2219 Today, 21:10\nLine 19, Col 1\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10165\n\nNo value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "No value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-11-v1-attempt1-error.txt",
+        "evidence/conflicts-batch-11-v1-attempt1-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-14-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-14-v1.csv",
+      "live_cutoff_unix_seconds": 1791033000,
+      "live_bar_open_utc": "2026-10-03T13:10:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:10",
+      "captured_at_utc": "2026-10-03T13:11:24.877Z",
+      "reset_at_utc": "2026-10-03T13:11:17.779Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-14-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-14-v1-attempt1-export.png",
+        "evidence/conflicts-batch-14-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-14-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-14-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-14-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-14-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-14-v1-attempt1-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791033079460.056,
+        "last_bar_time_ms": 1791033000000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (44).csv",
+      "raw_sha256": "a4dec3e0543022b59855b2dfa38ff1f44c36fb9921732d0d47219bb6a3ce1e89"
+    },
+    {
+      "probe": "conflicts-batch-15-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-15-v1.csv",
+      "live_cutoff_unix_seconds": 1791033120,
+      "live_bar_open_utc": "2026-10-03T13:12:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:12",
+      "captured_at_utc": "2026-10-03T13:12:09.454Z",
+      "reset_at_utc": "2026-10-03T13:11:59.884Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-15-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-15-v1-attempt1-export.png",
+        "evidence/conflicts-batch-15-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-15-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-15-v1-attempt1-logs.png",
+        "evidence/conflicts-batch-15-v1-attempt1-inputs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-15-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-15-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-15-v1-attempt1-logs.png"
+        ],
+        "entries": 5,
+        "last_message_time_ms": 1791033121337.334,
+        "last_bar_time_ms": 1791033120000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (45).csv",
+      "raw_sha256": "c9377e59d082d10c2339760c2938b042f6e187cd025186a12ec189a8c0084510",
+      "input_observation": "Inputs screenshot after export confirms Round=2.125. HOST log records mintick=0.01. Settings viewed then Cancel; no changes."
+    },
+    {
+      "probe": "conflicts-batch-16-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-16-v1.csv",
+      "live_cutoff_unix_seconds": 1791033240,
+      "live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:14",
+      "captured_at_utc": "2026-10-03T13:14:11.605Z",
+      "reset_at_utc": "2026-10-03T13:13:59.807Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-16-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-16-v1-attempt1-export.png",
+        "evidence/conflicts-batch-16-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-16-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-16-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-16-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-16-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-16-v1-attempt1-logs.png"
+        ],
+        "entries": 5,
+        "last_message_time_ms": 1791033242366.382,
+        "last_bar_time_ms": 1791033240000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (46).csv",
+      "raw_sha256": "2cb2e83c9fd1c8b66fbcc788a35ca4927b289f68a81372aeeca95efd33cc2d2a"
+    },
+    {
+      "probe": "conflicts-batch-17-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-17-v1.csv",
+      "live_cutoff_unix_seconds": 1791033240,
+      "live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:14",
+      "captured_at_utc": "2026-10-03T13:15:01.272Z",
+      "reset_at_utc": "2026-10-03T13:14:51.763Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-17-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-17-v1-attempt1-export.png",
+        "evidence/conflicts-batch-17-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-17-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-17-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-17-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-17-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-17-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791033292545.597,
+        "last_bar_time_ms": 1791033240000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (47).csv",
+      "raw_sha256": "c5d98e40fdd9bdf385156e0c95167d4bbc371122337317082c0d7834c4e8af5c"
+    },
+    {
+      "probe": "conflicts-batch-18-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-18-v1.csv",
+      "live_cutoff_unix_seconds": 1791033240,
+      "live_bar_open_utc": "2026-10-03T13:14:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:14",
+      "captured_at_utc": "2026-10-03T13:15:51.256Z",
+      "reset_at_utc": "2026-10-03T13:15:42.687Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-18-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-18-v1-attempt1-export.png",
+        "evidence/conflicts-batch-18-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-18-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-18-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-18-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-18-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-18-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791033343382.037,
+        "last_bar_time_ms": 1791033240000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (48).csv",
+      "raw_sha256": "b5226872ac5b3f089697e293bc5936d4a4866ff90826832721a17bfe960d8f98"
+    },
+    {
+      "probe": "conflicts-batch-19-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-19-v1.csv",
+      "live_cutoff_unix_seconds": 1791033360,
+      "live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:16",
+      "captured_at_utc": "2026-10-03T13:16:33.472Z",
+      "reset_at_utc": "2026-10-03T13:16:25.279Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-19-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-19-v1-attempt1-export.png",
+        "evidence/conflicts-batch-19-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-19-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-19-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-19-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-19-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-19-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791033387032.37,
+        "last_bar_time_ms": 1791033360000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (49).csv",
+      "raw_sha256": "5412d8582b53ffd7939dc643ed588bf272c353b023cbcf6fe60647f2cdd1a084"
+    },
+    {
+      "probe": "conflicts-batch-20-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-20-v1.csv",
+      "live_cutoff_unix_seconds": 1791033360,
+      "live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:16",
+      "captured_at_utc": "2026-10-03T13:17:25.835Z",
+      "reset_at_utc": "2026-10-03T13:17:19.669Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-20-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-20-v1-attempt1-export.png",
+        "evidence/conflicts-batch-20-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-20-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-20-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-20-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-20-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-20-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791033440606.033,
+        "last_bar_time_ms": 1791033360000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (50).csv",
+      "raw_sha256": "25f477b9d429fff3f7f7e28d1da6a5166de84cbffd09670917e774384f62df76"
+    },
+    {
+      "probe": "conflicts-batch-21-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-21-v1.csv",
+      "live_cutoff_unix_seconds": 1791033360,
+      "live_bar_open_utc": "2026-10-03T13:16:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:16",
+      "captured_at_utc": "2026-10-03T13:18:05.311Z",
+      "reset_at_utc": "2026-10-03T13:17:57.217Z",
+      "chart_unchanged_attested": false,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged. Live candle changed during export; this uncertain attempt is retained and excluded from selection. Use the attested selected repeat.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-21-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-21-v1-attempt1-export.png",
+        "evidence/conflicts-batch-21-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-21-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-21-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-21-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-21-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-21-v1-attempt1-logs.png"
+        ],
+        "entries": 9,
+        "last_message_time_ms": 1791033478105.31,
+        "last_bar_time_ms": 1791033360000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (51).csv",
+      "raw_sha256": "a6f1122aaa9ad5a026de031807ad024dc70d3c5df000516df478627a6d8f3db4"
+    },
+    {
+      "probe": "conflicts-batch-21-v1.pine",
+      "attempt": 2,
+      "csv_file": "conflicts-batch-21-v1-attempt2.csv",
+      "live_cutoff_unix_seconds": 1791033480,
+      "live_bar_open_utc": "2026-10-03T13:18:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:18",
+      "captured_at_utc": "2026-10-03T13:19:00.255Z",
+      "reset_at_utc": "2026-10-03T13:18:48.352Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-21-v1-attempt2-setup.png",
+        "evidence/conflicts-batch-21-v1-attempt2-export.png",
+        "evidence/conflicts-batch-21-v1-attempt2-logs.txt",
+        "evidence/conflicts-batch-21-v1-attempt2-logs-v1.json",
+        "evidence/conflicts-batch-21-v1-attempt2-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-21-v1-attempt2-logs.txt",
+          "evidence/conflicts-batch-21-v1-attempt2-logs-v1.json",
+          "evidence/conflicts-batch-21-v1-attempt2-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791033529575.857,
+        "last_bar_time_ms": 1791033480000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (52).csv",
+      "raw_sha256": "6b60f98275bd5e245d0d59d7643ce12a56a5a24f60bd8cab67453f50b9d95a8c"
+    },
+    {
+      "probe": "conflicts-batch-22-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-22-v1.csv",
+      "live_cutoff_unix_seconds": 1791033480,
+      "live_bar_open_utc": "2026-10-03T13:18:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:18",
+      "captured_at_utc": "2026-10-03T13:19:45.543Z",
+      "reset_at_utc": "2026-10-03T13:19:35.301Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-22-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-22-v1-attempt1-export.png",
+        "evidence/conflicts-batch-22-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-22-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-22-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-22-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-22-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-22-v1-attempt1-logs.png"
+        ],
+        "entries": 5,
+        "last_message_time_ms": 1791033578576.869,
+        "last_bar_time_ms": 1791033480000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (53).csv",
+      "raw_sha256": "6dc22293bc6966317b4382cb391cd2abe57cd2fb93d4e8f8f55180bd4ea1f511"
+    },
+    {
+      "probe": "conflicts-batch-23-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:20:32.892Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "RUNTIME-ERROR",
+        "error": {
+          "ctx": {
+            "bar_index": 0
+          },
+          "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 17
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///d41cba3d-cc57-48c0-920a-a71d1682fc00.pine?placement%3Ddialog",
+                "path": "/d41cba3d-cc57-48c0-920a-a71d1682fc00.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CW10023",
+              "severity": 4,
+              "message": "The argument for the `formatString` parameter for `str.format` expects 0 value(s), but received 1 value(s).",
+              "startLineNumber": 17,
+              "startColumn": 9,
+              "endLineNumber": 17,
+              "endColumn": 42
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,802.95\n\u22129.17 (\u22120.01%)\n84,802.95\nSELL\n0.01\n84,802.96\nBUY\nUSDT\nAuthority conflicts batch 23 v1\nDate Range\n13:20:31 UTC\n99+\nAuthority conflicts batch 23 v1\nNo data\nPine Editor\nconflicts-batch-23-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n//@version=6\nindicator(\"Authority\u00a0conflicts\u00a0batch\u00a023\u00a0v1\",\u00a0overlay=false,\u00a0max_bars_back=500,\u00a0max_labels_count=50,\u00a0max_boxes_count=50)\n//\u00a0Chart:\u00a0BTCUSDT,\u00a02\u00a0minutes.\u00a0Record\u00a0exact\u00a0exchange/tickerid;\u00a0no\u00a0request.security\u00a0remapping.\n//\u00a0Export\u00a0chart\u00a0data\u00a0with\u00a0indicator\u00a0values.\u00a0If\u00a0compile/runtime\u00a0error,\u00a0capture\u00a0full\u00a0diagnostic.\n//\u00a0A\u00a0rejected\u00a0isolated\u00a0call\u00a0is\u00a0a\u00a0result;\u00a0do\u00a0not\u00a0modify\u00a0the\u00a0probe\u00a0to\u00a0make\u00a0it\u00a0compile.\n//\u00a0Keep\u00a0at\u00a0least\u00a0100\u00a0bars;\u00a0VWAP\u00a0daily-default\u00a0batch\u00a0must\u00a0span\u00a0a\u00a0day\u00a0boundary.\nplot(time,\u00a0\"CTRL_time\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0\"CTRL_bar_index\",\u00a0display=display.data_window)\nplot(close,\u00a0\"CTRL_close\",\u00a0display=display.data_window)\nplot(syminfo.mintick,\u00a0\"CTRL_mintick\",\u00a0display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF027\u00a0str/format-malformed-remark\n//\u00a0Malformed\u00a0exact\u00a0text\u00a0isolated;\u00a0error\u00a0is\u00a0an\u00a0intended\u00a0discriminating\u00a0outcome.\ncf027_s=str.format(\"{0,number,#.#)\",1.34)\nplot(cf027_s==\"1.3\"?1:0,\u00a0\"CF027_one_decimal\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(cf027_s==\"{0,number,#.#)\"?1:0,\u00a0\"CF027_literal\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(str.length(cf027_s),\u00a0\"CF027_length\",\u00a0display\u00a0=\u00a0display.data_window)\n1 \u2219 Today, 21:20\nLine 1, Col 1\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nRuntime error\nError on bar 0: Unmatched braces in the pattern.\nat #main():17\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Error on bar 0: Unmatched braces in the pattern."
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-23-v1-attempt1-error.txt",
+        "evidence/conflicts-batch-23-v1-attempt1-error.png",
+        "evidence/conflicts-batch-23-v1-attempt1-error-v2.txt"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-24-v1.pine",
+      "attempt": 1,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:20:44.731Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "RUNTIME-ERROR",
+        "error": {
+          "ctx": {
+            "bar_index": 0
+          },
+          "error": "Error on bar {bar_index}: Cannot format given Object as a Number",
+          "stack_trace": [
+            {
+              "n": "#main",
+              "p": 17
+            }
+          ],
+          "title": "Runtime error",
+          "showReportItButton": false,
+          "studyAccessBlocked": false,
+          "compiler_markers": [],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,800.01\n\u221212.11 (\u22120.01%)\n84,800.00\nSELL\n0.01\n84,800.01\nBUY\nUSDT\nAuthority conflicts batch 24 v1\nDate Range\n13:20:43 UTC\n99+\nAuthority conflicts batch 24 v1\nNo data\nPine Editor\nconflicts-batch-24-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n//@version=6\nindicator(\"Authority\u00a0conflicts\u00a0batch\u00a024\u00a0v1\",\u00a0overlay=false,\u00a0max_bars_back=500,\u00a0max_labels_count=50,\u00a0max_boxes_count=50)\n//\u00a0Chart:\u00a0BTCUSDT,\u00a02\u00a0minutes.\u00a0Record\u00a0exact\u00a0exchange/tickerid;\u00a0no\u00a0request.security\u00a0remapping.\n//\u00a0Export\u00a0chart\u00a0data\u00a0with\u00a0indicator\u00a0values.\u00a0If\u00a0compile/runtime\u00a0error,\u00a0capture\u00a0full\u00a0diagnostic.\n//\u00a0A\u00a0rejected\u00a0isolated\u00a0call\u00a0is\u00a0a\u00a0result;\u00a0do\u00a0not\u00a0modify\u00a0the\u00a0probe\u00a0to\u00a0make\u00a0it\u00a0compile.\n//\u00a0Keep\u00a0at\u00a0least\u00a0100\u00a0bars;\u00a0VWAP\u00a0daily-default\u00a0batch\u00a0must\u00a0span\u00a0a\u00a0day\u00a0boundary.\nplot(time,\u00a0\"CTRL_time\",\u00a0display=display.data_window)\nplot(bar_index,\u00a0\"CTRL_bar_index\",\u00a0display=display.data_window)\nplot(close,\u00a0\"CTRL_close\",\u00a0display=display.data_window)\nplot(syminfo.mintick,\u00a0\"CTRL_mintick\",\u00a0display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF028\u00a0str/format-array-allowed-types\n//\u00a0Capture\u00a0compile/runtime\u00a0rejection\u00a0if\u00a0arrays\u00a0excluded;\u00a0exact\u00a0formatted\u00a0text\u00a0logged.\ncf028_s=str.format(\"{0,number,#.#}\",array.from(1.34,2.56))\nplot(str.length(cf028_s),\u00a0\"CF028_length\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(str.length(cf028_s)>0?1:0,\u00a0\"CF028_nonempty\",\u00a0display\u00a0=\u00a0display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"CF028\u00a0array=\"+cf028_s)\n1 \u2219 Today, 21:20\nLine 1, Col 1\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nRuntime error\nError on bar 0: Cannot format given Object as a Number\nat #main():17\nOpen in editor",
+          "context_substituted_message": "Error on bar 0: Cannot format given Object as a Number"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-24-v1-attempt1-error.txt",
+        "evidence/conflicts-batch-24-v1-attempt1-error.png",
+        "evidence/conflicts-batch-24-v1-attempt1-error-v2.txt"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-25-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-25-v1.csv",
+      "live_cutoff_unix_seconds": 1791033600,
+      "live_bar_open_utc": "2026-10-03T13:20:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:20",
+      "captured_at_utc": "2026-10-03T13:21:17.959Z",
+      "reset_at_utc": "2026-10-03T13:21:11.682Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-25-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-25-v1-attempt1-export.png",
+        "evidence/conflicts-batch-25-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-25-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-25-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-25-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-25-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-25-v1-attempt1-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791033672603.073,
+        "last_bar_time_ms": 1791033600000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (54).csv",
+      "raw_sha256": "f7f72081259174fd1dbef033fcdb912a124d16bdceca019fd9b555273f28dbe4"
+    },
+    {
+      "probe": "conflicts-batch-26-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-26-v1.csv",
+      "live_cutoff_unix_seconds": 1791033600,
+      "live_bar_open_utc": "2026-10-03T13:20:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:20",
+      "captured_at_utc": "2026-10-03T13:21:57.273Z",
+      "reset_at_utc": "2026-10-03T13:21:51.476Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-26-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-26-v1-attempt1-export.png",
+        "evidence/conflicts-batch-26-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-26-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-26-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-26-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-26-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-26-v1-attempt1-logs.png"
+        ],
+        "entries": 2,
+        "last_message_time_ms": 1791033712376.887,
+        "last_bar_time_ms": 1791033600000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (55).csv",
+      "raw_sha256": "134d0726ccbca832676da1ba7d8936530c4beb0d1bfbde30422191790ee50491"
+    },
+    {
+      "probe": "conflicts-batch-27-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-27-v1.csv",
+      "live_cutoff_unix_seconds": 1791033720,
+      "live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:22",
+      "captured_at_utc": "2026-10-03T13:22:42.417Z",
+      "reset_at_utc": "2026-10-03T13:22:35.476Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-27-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-27-v1-attempt1-export.png",
+        "evidence/conflicts-batch-27-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-27-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-27-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-27-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-27-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-27-v1-attempt1-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791033757320.699,
+        "last_bar_time_ms": 1791033720000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (56).csv",
+      "raw_sha256": "e26fdd6c3a2b0ca981f61c9f8b174508037396b77c71fd5ccea6e0db87cd7196"
+    },
+    {
+      "probe": "conflicts-batch-28-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-28-v1.csv",
+      "live_cutoff_unix_seconds": 1791033720,
+      "live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:22",
+      "captured_at_utc": "2026-10-03T13:23:20.228Z",
+      "reset_at_utc": "2026-10-03T13:23:14.154Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-28-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-28-v1-attempt1-export.png",
+        "evidence/conflicts-batch-28-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-28-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-28-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-28-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-28-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-28-v1-attempt1-logs.png"
+        ],
+        "entries": 4,
+        "last_message_time_ms": 1791033795294.514,
+        "last_bar_time_ms": 1791033720000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (57).csv",
+      "raw_sha256": "84b37c0aa24915a0f4497c76121f057b770124ab9f9495d0f3eec162571981ac"
+    },
+    {
+      "probe": "conflicts-batch-29-v1.pine",
+      "attempt": 1,
+      "csv_file": "conflicts-batch-29-v1.csv",
+      "live_cutoff_unix_seconds": 1791033720,
+      "live_bar_open_utc": "2026-10-03T13:22:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:22",
+      "captured_at_utc": "2026-10-03T13:24:03.687Z",
+      "reset_at_utc": "2026-10-03T13:23:57.566Z",
+      "chart_unchanged_attested": false,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged. Live candle changed during export; this uncertain attempt is retained and excluded from selection. Use the attested selected repeat.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-29-v1-attempt1-setup.png",
+        "evidence/conflicts-batch-29-v1-attempt1-export.png",
+        "evidence/conflicts-batch-29-v1-attempt1-logs.txt",
+        "evidence/conflicts-batch-29-v1-attempt1-logs-v1.json",
+        "evidence/conflicts-batch-29-v1-attempt1-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-29-v1-attempt1-logs.txt",
+          "evidence/conflicts-batch-29-v1-attempt1-logs-v1.json",
+          "evidence/conflicts-batch-29-v1-attempt1-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791033838577.185,
+        "last_bar_time_ms": 1791033720000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (58).csv",
+      "raw_sha256": "b70d94bbe2aa9f6c5bdfc0cbe8bac263b0f9017eb9a095d04a3d12197773e0eb"
+    },
+    {
+      "probe": "conflicts-batch-4-v1.pine",
+      "attempt": 2,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:24:34.800Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "id",
+              "argUserFriendlyRepresentation": "cf003_a",
+              "argumentType": "array<int>",
+              "currentTypeDocStr": "array<bool>",
+              "funId": "array.every",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 24,
+              "line": 19
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 18,
+              "line": 19
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///801e692c-289d-48a6-a124-46cec61e80ee.pine?placement%3Ddialog",
+                "path": "/801e692c-289d-48a6-a124-46cec61e80ee.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"array.every\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+              "startLineNumber": 19,
+              "startColumn": 18,
+              "endLineNumber": 19,
+              "endColumn": 25
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///801e692c-289d-48a6-a124-46cec61e80ee.pine?placement%3Ddialog",
+                "path": "/801e692c-289d-48a6-a124-46cec61e80ee.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"array.some\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected.",
+              "startLineNumber": 20,
+              "startColumn": 17,
+              "endLineNumber": 20,
+              "endColumn": 24
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///801e692c-289d-48a6-a124-46cec61e80ee.pine?placement%3Ddialog",
+                "path": "/801e692c-289d-48a6-a124-46cec61e80ee.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"array.every\" with argument \"id\"=\"cf003_b\". An argument of \"array<float>\" type was used but a \"array<bool>\"  is expected.",
+              "startLineNumber": 21,
+              "startColumn": 18,
+              "endLineNumber": 21,
+              "endColumn": 25
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,797.36\n\u22120.01 (\u22120.00%)\n84,797.36\nSELL\n0.01\n84,797.37\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n13:24:34 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nUntitled script\nPublish script\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\nplot(syminfo.mintick,\u00a0\"CTRL_mintick\",\u00a0display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\")\u00a0and\u00a0timeframe.in_seconds()==120?1:0,\u00a0\"CTRL_BTCUSDT_2m\",\u00a0display=display.data_window)\nif\u00a0barstate.islast\n\u00a0\u00a0\u00a0\u00a0log.info(\"HOST\u00a0tickerid=\"+syminfo.tickerid+\"\u00a0period=\"+timeframe.period+\"\u00a0mintick=\"+str.tostring(syminfo.mintick))\n//\u00a0CF003\u00a0array/C03\n//\u00a0Numeric\u00a0argument\u00a0eligibility\u00a0must\u00a0be\u00a0captured\u00a0as\u00a0compiler\u00a0outcome\u00a0if\u00a0refused.\ncf003_a\u00a0=\u00a0array.from(0,2,-1)\ncf003_b\u00a0=\u00a0array.from(2.0,-1.0)\nplot(array.every(cf003_a)?1:0,\u00a0\"CF003_every_zero\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(array.some(cf003_a)?1:0,\u00a0\"CF003_some_nonzero\",\u00a0display\u00a0=\u00a0display.data_window)\nplot(array.every(cf003_b)?1:0,\u00a0\"CF003_every_float\",\u00a0display\u00a0=\u00a0display.data_window)\n1 of 3 problems\nCannot call \"array.every\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.(CE10123)\nLine 19, Col 18\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10123\n\nCannot call \"array.every\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"array.every\" with argument \"id\"=\"cf003_a\". An argument of \"array<int>\" type was used but a \"array<bool>\"  is expected."
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-4-v1-attempt2-error.txt",
+        "evidence/conflicts-batch-4-v1-attempt2-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "conflicts-batch-29-v1.pine",
+      "attempt": 2,
+      "csv_file": "conflicts-batch-29-v1-attempt2.csv",
+      "live_cutoff_unix_seconds": 1791033840,
+      "live_bar_open_utc": "2026-10-03T13:24:00.000Z",
+      "live_tooltip": "Sat 03 Oct '26   13:24",
+      "captured_at_utc": "2026-10-03T13:25:14.004Z",
+      "reset_at_utc": "2026-10-03T13:25:07.820Z",
+      "chart_unchanged_attested": true,
+      "runtime": {
+        "status": "RUNS"
+      },
+      "notes": "Unchanged source verified in Monaco; saved using filename; one indicator instance. Full page reload restores chart configuration with initial spacing 0.02 so the initial native request reloads all available history before capture; no subsequent requestMoreData or setup change. Screenshot tooltip rendered at rightmost candle. Defaults unchanged.",
+      "evidence_paths": [
+        "evidence/conflicts-batch-29-v1-attempt2-setup.png",
+        "evidence/conflicts-batch-29-v1-attempt2-export.png",
+        "evidence/conflicts-batch-29-v1-attempt2-logs.txt",
+        "evidence/conflicts-batch-29-v1-attempt2-logs-v1.json",
+        "evidence/conflicts-batch-29-v1-attempt2-logs.png"
+      ],
+      "input_changes": [],
+      "column_map": {},
+      "pine_logs": {
+        "paths": [
+          "evidence/conflicts-batch-29-v1-attempt2-logs.txt",
+          "evidence/conflicts-batch-29-v1-attempt2-logs-v1.json",
+          "evidence/conflicts-batch-29-v1-attempt2-logs.png"
+        ],
+        "entries": 3,
+        "last_message_time_ms": 1791033908634.488,
+        "last_bar_time_ms": 1791033840000
+      },
+      "browser_download": "BINANCE_BTCUSDT, 2 (59).csv",
+      "raw_sha256": "03ba0238e56fc6d574636c1d3370557004787e364a6c912177c26c98eee67c74"
+    },
+    {
+      "probe": "coverage-strings-color-1-v1.pine",
+      "attempt": 2,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:26:49.649Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "timestamp(s): unrecognized datetime format",
+          "editorError": {
+            "code": "CE10275",
+            "end": {
+              "column": 48,
+              "line": 78
+            },
+            "message": "timestamp(s): unrecognized datetime format",
+            "start": {
+              "column": 27,
+              "line": 78
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "fsPath": "/996d0eff-9386-4bde-b9f9-860526dfa2da.pine",
+                "external": "file:///996d0eff-9386-4bde-b9f9-860526dfa2da.pine?placement%3Ddialog",
+                "path": "/996d0eff-9386-4bde-b9f9-860526dfa2da.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "owner",
+              "code": "CE10275",
+              "severity": 8,
+              "message": "timestamp(s): unrecognized datetime format",
+              "startLineNumber": 78,
+              "startColumn": 27,
+              "endLineNumber": 78,
+              "endColumn": 48
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,820.01\n+0.01 (+0.00%)\n84,820.00\nSELL\n0.01\n84,820.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n13:26:48 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nUntitled script\nPublish script\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\nplot(color.b(cHole),\u00a0title=\"color_b_hole97\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(color.b(cWarm),\u00a0title=\"color_b_warm0_7\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(color.t(cClean),\u00a0title=\"color_t_clean\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(color.t(cHole),\u00a0title=\"color_t_hole97\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(color.t(cWarm),\u00a0title=\"color_t_warm0_7\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(input.int(7,\"Integer\u00a0default\"),\u00a0title=\"input_int_default7\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(input.float(1.25,\"Float\u00a0default\"),\u00a0title=\"input_float_default125\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(input.bool(true,\"Bool\u00a0default\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"input_bool_default_true\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(input.source(close,\"Source\u00a0default\"),\u00a0title=\"input_source_default_close\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(input.time(timestamp(\"2026-01-01T00:00:00Z\"),\"Time\u00a0default\"),\u00a0title=\"input_time_default_utc\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\n1 of 1 problem\ntimestamp(s): unrecognized datetime format(CE10275)\nLine 78, Col 27\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10275\n\ntimestamp(s): unrecognized datetime format\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "timestamp(s): unrecognized datetime format"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-strings-color-1-v1-attempt2-error.txt",
+        "evidence/coverage-strings-color-1-v1-attempt2-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-time-2-v1.pine",
+      "attempt": 2,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:27:00.277Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "{message}",
+          "editorError": {
+            "code": "CE10294",
+            "ctx": {
+              "message": "resolution.trim is not a function"
+            },
+            "end": {
+              "column": 53,
+              "line": 33
+            },
+            "message": "{message}",
+            "start": {
+              "column": 6,
+              "line": 33
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "fsPath": "/a4a813d7-c7d6-4802-9c0d-110a3c3c6d3c.pine",
+                "external": "file:///a4a813d7-c7d6-4802-9c0d-110a3c3c6d3c.pine?placement%3Ddialog",
+                "path": "/a4a813d7-c7d6-4802-9c0d-110a3c3c6d3c.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "owner",
+              "code": "CE10294",
+              "severity": 8,
+              "message": "resolution.trim is not a function",
+              "startLineNumber": 33,
+              "startColumn": 6,
+              "endLineNumber": 33,
+              "endColumn": 53
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,820.01\n+0.01 (+0.00%)\n84,820.00\nSELL\n0.01\n84,820.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n13:26:59 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nUntitled script\nPublish script\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n61\n62\n63\nplot(timeframe.in_seconds(\"1\"),\u00a0title=\"in_seconds_1\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"2\"),\u00a0title=\"in_seconds_2\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"6\"),\u00a0title=\"in_seconds_6\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"30\"),\u00a0title=\"in_seconds_30\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"1D\"),\u00a0title=\"in_seconds_1d\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"1W\"),\u00a0title=\"in_seconds_1w\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"1M\"),\u00a0title=\"in_seconds_1m\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(\"12M\"),\u00a0title=\"in_seconds_12m\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(1)),\u00a0title=\"from_seconds_roundtrip_1\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(59)),\u00a0title=\"from_seconds_roundtrip_59\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(60)),\u00a0title=\"from_seconds_roundtrip_60\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(61)),\u00a0title=\"from_seconds_roundtrip_61\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(120)),\u00a0title=\"from_seconds_roundtrip_120\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(3599)),\u00a0title=\"from_seconds_roundtrip_3599\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(3600)),\u00a0title=\"from_seconds_roundtrip_3600\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(86400)),\u00a0title=\"from_seconds_roundtrip_86400\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(604800)),\u00a0title=\"from_seconds_roundtrip_604800\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(2592000)),\u00a0title=\"from_seconds_roundtrip_2592000\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(2628003)),\u00a0title=\"from_seconds_roundtrip_2628003\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.in_seconds(timeframe.from_seconds(31536036)),\u00a0title=\"from_seconds_roundtrip_31536036\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.change(\"2\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"change_2\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.change(\"6\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"change_6\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.change(\"30\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"change_30\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.change(\"1D\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"change_1d\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.change(\"1W\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"change_1w\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timeframe.change(\"1M\")\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"change_1m\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timestamp(\"UTC\",2024,2,29,12,30,15),\u00a0title=\"timestamp_utc_leapday\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timestamp(\"America/New_York\",2026,3,8,1,30,0),\u00a0title=\"timestamp_ny_spring_before\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timestamp(\"America/New_York\",2026,3,8,3,30,0),\u00a0title=\"timestamp_ny_spring_after\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timestamp(\"America/New_York\",2026,11,1,1,30,0),\u00a0title=\"timestamp_ny_fall_fold\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timestamp(\"2026-01-01T00:00:00Z\"),\u00a0title=\"timestamp_iso_string\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(timestamp(\"UTC\",year,month,dayofmonth,0,0,0),\u00a0title=\"timestamp_current_calendar_midnight\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.isfirst\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_isfirst\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.islast\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_islast\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.ishistory\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_ishistory\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.isrealtime\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_isrealtime\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.isnew\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_isnew\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.isconfirmed\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_isconfirmed\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(barstate.islastconfirmedhistory\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"barstate_islastconfirmedhistory\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\nplot(session.ismarket\u00a0?\u00a01\u00a0:\u00a00,\u00a0title=\"session_ismarket\",\u00a0color=\u00a0color.blue,\u00a0display=display.data_window)\n1 of 1 problem\nresolution.trim is not a function(CE10294)\nLine 33, Col 6\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10294\n\nresolution.trim is not a function\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "resolution.trim is not a function"
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-time-2-v1-attempt2-error.txt",
+        "evidence/coverage-time-2-v1-attempt2-error.png"
+      ],
+      "column_map": {}
+    },
+    {
+      "probe": "coverage-drawing-2-v1.pine",
+      "attempt": 2,
+      "csv_file": null,
+      "live_cutoff_unix_seconds": null,
+      "live_bar_open_utc": null,
+      "captured_at_utc": "2026-10-03T13:27:10.333Z",
+      "reset_at_utc": null,
+      "chart_unchanged_attested": false,
+      "input_changes": [],
+      "runtime": {
+        "status": "COMPILE-ERROR",
+        "error": {
+          "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "editorError": {
+            "code": "CE10123",
+            "ctx": {
+              "argDisplayName": "expr0",
+              "argUserFriendlyRepresentation": "call \"array.get\" (series linefill)",
+              "argumentType": "series linefill",
+              "currentTypeDocStr": "simple string",
+              "funId": "operator ==",
+              "typePostfix": ""
+            },
+            "end": {
+              "column": 89,
+              "line": 78
+            },
+            "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+            "start": {
+              "column": 37,
+              "line": 78
+            },
+            "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+          },
+          "title": "Compilation error",
+          "compiler_markers": [
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///af8cd600-b66a-4b5b-a154-820ba252ee8a.pine?placement%3Ddialog",
+                "path": "/af8cd600-b66a-4b5b-a154-820ba252ee8a.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\"  is expected.",
+              "startLineNumber": 78,
+              "startColumn": 37,
+              "endLineNumber": 78,
+              "endColumn": 90
+            },
+            {
+              "resource": {
+                "$mid": 1,
+                "external": "file:///af8cd600-b66a-4b5b-a154-820ba252ee8a.pine?placement%3Ddialog",
+                "path": "/af8cd600-b66a-4b5b-a154-820ba252ee8a.pine",
+                "scheme": "file",
+                "query": "placement=dialog"
+              },
+              "owner": "_generated_diagnostic_collection_name_#0",
+              "code": "CE10123",
+              "severity": 8,
+              "message": "Cannot call \"operator ==\" with argument \"expr1\"=\"other\". An argument of \"series linefill\" type was used but a \"simple string\"  is expected.",
+              "startLineNumber": 78,
+              "startColumn": 94,
+              "endLineNumber": 78,
+              "endColumn": 99
+            }
+          ],
+          "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,820.01\n+0.01 (+0.00%)\n84,820.00\nSELL\n0.01\n84,820.01\nBUY\nOracle na holes crosses v1\nUSDT\nDate Range\n13:27:09 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nUntitled script\nPublish script\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\n80\n81\n82\n83\n84\n85\n86\n87\n88\n89\nz\u00a0=\u00a0line.new(b,\u00a0close\u00a0+\u00a02,\u00a0b\u00a0+\u00a01,\u00a0close\u00a0+\u00a03)\nf\u00a0=\u00a0linefill.new(a,\u00a0z,\u00a0\u00a0color.blue)\nu\u00a0=\u00a0line.new(b,\u00a0close\u00a0+\u00a010,\u00a0b\u00a0+\u00a01,\u00a0close\u00a0+\u00a011)\nv\u00a0=\u00a0line.new(b,\u00a0close\u00a0+\u00a020,\u00a0b\u00a0+\u00a01,\u00a0close\u00a0+\u00a021)\nother\u00a0=\u00a0linefill.new(u,\u00a0v,\u00a0\u00a0color.red)\nplot(array.size(linefill.all),\u00a0\"fill_before_delete\",\u00a0display=display.data_window)\nline.delete(a)\nplot(array.size(linefill.all),\u00a0\"fill_after_parent_delete\",\u00a0display=display.data_window)\nplot(array.size(line.all),\u00a0\"lines_after_parent_delete\",\u00a0display=display.data_window)\nplot(array.size(linefill.all)\u00a0>\u00a00\u00a0?\u00a0array.get(linefill.all,\u00a0array.size(linefill.all)\u00a0-\u00a01)\u00a0==\u00a0other\u00a0?\u00a01\u00a0:\u00a00\u00a0:\u00a0na,\u00a0\"survivor_is_other\",\u00a0display=display.data_window)\nplot(line.get_y1(linefill.get_line1(other)),\u00a0\"survivor_parent1_y\",\u00a0display=display.data_window)\nplot(line.get_y1(linefill.get_line2(other)),\u00a0\"survivor_parent2_y\",\u00a0display=display.data_window)\nplot(line.get_y1(z),\u00a0\"deleted_fill_surviving_parent_y\",\u00a0display=display.data_window)\nlinefill.delete(f)\nplot(array.size(linefill.all),\u00a0\"fill_after_explicit_delete\",\u00a0display=display.data_window)\nline.delete(z)\nlinefill.delete(other)\nline.delete(u)\nline.delete(v)\nplot(array.size(linefill.all),\u00a0\"fill_after_cleanup\",\u00a0display=display.data_window)\n1 of 2 problems\nCannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\" is expected.(CE10123)\nLine 78, Col 37\nPine Script\u00ae v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10123\n\nCannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+          "context_substituted_message": "Cannot call \"operator ==\" with argument \"expr0\"=\"call \"array.get\" (series linefill)\". An argument of \"series linefill\" type was used but a \"simple string\"  is expected."
+        }
+      },
+      "notes": "Unchanged source verified in editor; no success CSV exported. TradingView compiler/runtime rejected the unchanged source. Chart stub title can retain a previous metadata title after compiler rejection.",
+      "evidence_paths": [
+        "evidence/coverage-drawing-2-v1-attempt2-error.txt",
+        "evidence/coverage-drawing-2-v1-attempt2-error.png",
+        "evidence/coverage-drawing-2-v1-user-screenshot-v1.png"
+      ],
+      "column_map": {},
+      "user_observation": "Sam supplied the screenshot during this capture session, corroborating line78 CE10123 and the two compiler problems. Its original capture time is unknown."
     }
   ],
   "batch_start_utc": "2026-10-03T12:13:14.087265+00:00",
-  "numeric_batch_end_utc": "2026-10-03T12:59:16.520217+00:00"
+  "numeric_batch_end_utc": "2026-10-03T12:59:16.520217+00:00",
+  "batch_end_utc": "2026-10-03T13:30:21.303397+00:00",
+  "outcome_first_recorded_reset_utc": "2026-10-03T13:01:23.055Z"
 }

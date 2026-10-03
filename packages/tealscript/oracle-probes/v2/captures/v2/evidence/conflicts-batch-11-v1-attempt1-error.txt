@@ -1,0 +1,43 @@
+No value assigned to the "text_formatting" parameter in table.cell_set_text_formatting()
+{
+  "error": "No value assigned to the \"{name}\" parameter in {functionName}()",
+  "editorError": {
+    "code": "CE10165",
+    "ctx": {
+      "functionName": "table.cell_set_text_formatting",
+      "name": "text_formatting"
+    },
+    "end": {
+      "column": 45,
+      "line": 19
+    },
+    "message": "No value assigned to the \"{name}\" parameter in {functionName}()",
+    "start": {
+      "column": 1,
+      "line": 19
+    },
+    "id": "USER;a7bb65d8cc414c02b5fafd4a2e005b22"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///3953e13d-49ab-4a83-8712-3307c7074ed2.pine?placement%3Ddialog",
+        "path": "/3953e13d-49ab-4a83-8712-3307c7074ed2.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10165",
+      "severity": 8,
+      "message": "No value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()",
+      "startLineNumber": 19,
+      "startColumn": 1,
+      "endLineNumber": 19,
+      "endColumn": 46
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,860.02\n−0.01 (−0.00%)\n84,860.02\nSELL\n0.01\n84,860.03\nBUY\nUSDT\nconflicts-batch-11-v1.pine\nDate Range\n13:10:46 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nconflicts-batch-11-v1.pine\nPublish script\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\nplot(syminfo.mintick, \"CTRL_mintick\", display=display.data_window)\nplot(str.contains(syminfo.ticker,\"BTCUSDT\") and timeframe.in_seconds()==120?1:0, \"CTRL_BTCUSDT_2m\", display=display.data_window)\nif barstate.islast\n    log.info(\"HOST tickerid=\"+syminfo.tickerid+\" period=\"+timeframe.period+\" mintick=\"+str.tostring(syminfo.mintick))\n// CF014 drawing/C3\n// Save last-bar drawing screenshot to check omitted argument clears bold; no formatting getter exists.\nvar cf014_obj = table.new(position.top_right,1,1)\ntable.cell(cf014_obj,0,0,\"bold control\",text_formatting=text.format_bold)\ntable.cell_set_text_formatting(cf014_obj,0,0)\nplot(1, \"CF014_omission_accepted\", display = display.data_window)\n1 of 1 problem\nNo value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()(CE10165)\n1 ∙ Today, 21:10\nLine 19, Col 1\nPine Script® v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10165\n\nNo value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "No value assigned to the \"text_formatting\" parameter in table.cell_set_text_formatting()"
+}

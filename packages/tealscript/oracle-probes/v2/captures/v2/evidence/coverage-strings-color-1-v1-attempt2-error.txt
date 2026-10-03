@@ -1,0 +1,40 @@
+timestamp(s): unrecognized datetime format
+{
+  "error": "timestamp(s): unrecognized datetime format",
+  "editorError": {
+    "code": "CE10275",
+    "end": {
+      "column": 48,
+      "line": 78
+    },
+    "message": "timestamp(s): unrecognized datetime format",
+    "start": {
+      "column": 27,
+      "line": 78
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "fsPath": "/996d0eff-9386-4bde-b9f9-860526dfa2da.pine",
+        "external": "file:///996d0eff-9386-4bde-b9f9-860526dfa2da.pine?placement%3Ddialog",
+        "path": "/996d0eff-9386-4bde-b9f9-860526dfa2da.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "owner",
+      "code": "CE10275",
+      "severity": 8,
+      "message": "timestamp(s): unrecognized datetime format",
+      "startLineNumber": 78,
+      "startColumn": 27,
+      "endLineNumber": 78,
+      "endColumn": 48
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\nC\n84,820.01\n+0.01 (+0.00%)\n84,820.00\nSELL\n0.01\n84,820.01\nBUY\nUSDT\nOracle na holes crosses v1\nDate Range\n13:26:48 UTC\n99+\nPine logs\nHow to work with logs\nAdd the indicator to the chart\nUse the log functions\nEnable logging\nPine Editor\nUntitled script\nPublish script\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\nplot(color.b(cHole), title=\"color_b_hole97\", color= color.blue, display=display.data_window)\nplot(color.b(cWarm), title=\"color_b_warm0_7\", color= color.blue, display=display.data_window)\nplot(color.t(cClean), title=\"color_t_clean\", color= color.blue, display=display.data_window)\nplot(color.t(cHole), title=\"color_t_hole97\", color= color.blue, display=display.data_window)\nplot(color.t(cWarm), title=\"color_t_warm0_7\", color= color.blue, display=display.data_window)\nplot(input.int(7,\"Integer default\"), title=\"input_int_default7\", color= color.blue, display=display.data_window)\nplot(input.float(1.25,\"Float default\"), title=\"input_float_default125\", color= color.blue, display=display.data_window)\nplot(input.bool(true,\"Bool default\") ? 1 : 0, title=\"input_bool_default_true\", color= color.blue, display=display.data_window)\nplot(input.source(close,\"Source default\"), title=\"input_source_default_close\", color= color.blue, display=display.data_window)\nplot(input.time(timestamp(\"2026-01-01T00:00:00Z\"),\"Time default\"), title=\"input_time_default_utc\", color= color.blue, display=display.data_window)\n1 of 1 problem\ntimestamp(s): unrecognized datetime format(CE10275)\nLine 78, Col 27\nPine Script® v6\nTry AI Copilot to analyze charts\nCopilot empowers market analysis, chart routines, alerts, watchlists, Pine Script, and much more.\nTry now\nCompilation error: CE10275\n\ntimestamp(s): unrecognized datetime format\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "timestamp(s): unrecognized datetime format"
+}

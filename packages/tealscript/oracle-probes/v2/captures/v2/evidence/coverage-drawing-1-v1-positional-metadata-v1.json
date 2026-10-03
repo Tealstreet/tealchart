@@ -1,0 +1,288 @@
+{
+  "artifact": "Duplicate-header capture positional metadata v1",
+  "csv_file": "coverage-drawing-1-v1.csv",
+  "sha256": "4216da84ca12bced1df20b8541795a207c30054f50444c11dd2c04f2cc4be4b7",
+  "ordered_headers": [
+    {
+      "offset_zero_based": 0,
+      "header": "time"
+    },
+    {
+      "offset_zero_based": 1,
+      "header": "open"
+    },
+    {
+      "offset_zero_based": 2,
+      "header": "high"
+    },
+    {
+      "offset_zero_based": 3,
+      "header": "low"
+    },
+    {
+      "offset_zero_based": 4,
+      "header": "close"
+    },
+    {
+      "offset_zero_based": 5,
+      "header": "b"
+    },
+    {
+      "offset_zero_based": 6,
+      "header": "time"
+    },
+    {
+      "offset_zero_based": 7,
+      "header": "open"
+    },
+    {
+      "offset_zero_based": 8,
+      "header": "high"
+    },
+    {
+      "offset_zero_based": 9,
+      "header": "low"
+    },
+    {
+      "offset_zero_based": 10,
+      "header": "close"
+    },
+    {
+      "offset_zero_based": 11,
+      "header": "volume"
+    },
+    {
+      "offset_zero_based": 12,
+      "header": "hole"
+    },
+    {
+      "offset_zero_based": 13,
+      "header": "clean_index_get_x1"
+    },
+    {
+      "offset_zero_based": 14,
+      "header": "clean_index_get_x2"
+    },
+    {
+      "offset_zero_based": 15,
+      "header": "clean_index_get_y1"
+    },
+    {
+      "offset_zero_based": 16,
+      "header": "clean_index_get_y2"
+    },
+    {
+      "offset_zero_based": 17,
+      "header": "clean_index_get_left"
+    },
+    {
+      "offset_zero_based": 18,
+      "header": "clean_index_get_right"
+    },
+    {
+      "offset_zero_based": 19,
+      "header": "clean_index_get_top"
+    },
+    {
+      "offset_zero_based": 20,
+      "header": "clean_index_get_bottom"
+    },
+    {
+      "offset_zero_based": 21,
+      "header": "clean_index_get_x"
+    },
+    {
+      "offset_zero_based": 22,
+      "header": "clean_index_get_y"
+    },
+    {
+      "offset_zero_based": 23,
+      "header": "clean_index_price_forward"
+    },
+    {
+      "offset_zero_based": 24,
+      "header": "clean_time_get_x1"
+    },
+    {
+      "offset_zero_based": 25,
+      "header": "clean_time_get_x2"
+    },
+    {
+      "offset_zero_based": 26,
+      "header": "clean_time_get_y1"
+    },
+    {
+      "offset_zero_based": 27,
+      "header": "clean_time_get_y2"
+    },
+    {
+      "offset_zero_based": 28,
+      "header": "clean_time_get_left"
+    },
+    {
+      "offset_zero_based": 29,
+      "header": "clean_time_get_right"
+    },
+    {
+      "offset_zero_based": 30,
+      "header": "clean_time_get_top"
+    },
+    {
+      "offset_zero_based": 31,
+      "header": "clean_time_get_bottom"
+    },
+    {
+      "offset_zero_based": 32,
+      "header": "clean_time_get_x"
+    },
+    {
+      "offset_zero_based": 33,
+      "header": "clean_time_get_y"
+    },
+    {
+      "offset_zero_based": 34,
+      "header": "holes_index_get_x1"
+    },
+    {
+      "offset_zero_based": 35,
+      "header": "holes_index_get_x2"
+    },
+    {
+      "offset_zero_based": 36,
+      "header": "holes_index_get_y1"
+    },
+    {
+      "offset_zero_based": 37,
+      "header": "holes_index_get_y2"
+    },
+    {
+      "offset_zero_based": 38,
+      "header": "holes_index_get_left"
+    },
+    {
+      "offset_zero_based": 39,
+      "header": "holes_index_get_right"
+    },
+    {
+      "offset_zero_based": 40,
+      "header": "holes_index_get_top"
+    },
+    {
+      "offset_zero_based": 41,
+      "header": "holes_index_get_bottom"
+    },
+    {
+      "offset_zero_based": 42,
+      "header": "holes_index_get_x"
+    },
+    {
+      "offset_zero_based": 43,
+      "header": "holes_index_get_y"
+    },
+    {
+      "offset_zero_based": 44,
+      "header": "holes_index_price_forward"
+    },
+    {
+      "offset_zero_based": 45,
+      "header": "holes_time_get_x1"
+    },
+    {
+      "offset_zero_based": 46,
+      "header": "holes_time_get_x2"
+    },
+    {
+      "offset_zero_based": 47,
+      "header": "holes_time_get_y1"
+    },
+    {
+      "offset_zero_based": 48,
+      "header": "holes_time_get_y2"
+    },
+    {
+      "offset_zero_based": 49,
+      "header": "holes_time_get_left"
+    },
+    {
+      "offset_zero_based": 50,
+      "header": "holes_time_get_right"
+    },
+    {
+      "offset_zero_based": 51,
+      "header": "holes_time_get_top"
+    },
+    {
+      "offset_zero_based": 52,
+      "header": "holes_time_get_bottom"
+    },
+    {
+      "offset_zero_based": 53,
+      "header": "holes_time_get_x"
+    },
+    {
+      "offset_zero_based": 54,
+      "header": "holes_time_get_y"
+    },
+    {
+      "offset_zero_based": 55,
+      "header": "warmup_index_get_x1"
+    },
+    {
+      "offset_zero_based": 56,
+      "header": "warmup_index_get_x2"
+    },
+    {
+      "offset_zero_based": 57,
+      "header": "warmup_index_get_y1"
+    },
+    {
+      "offset_zero_based": 58,
+      "header": "warmup_index_get_y2"
+    },
+    {
+      "offset_zero_based": 59,
+      "header": "warmup_index_get_left"
+    },
+    {
+      "offset_zero_based": 60,
+      "header": "warmup_index_get_right"
+    },
+    {
+      "offset_zero_based": 61,
+      "header": "warmup_index_get_top"
+    },
+    {
+      "offset_zero_based": 62,
+      "header": "warmup_index_get_bottom"
+    },
+    {
+      "offset_zero_based": 63,
+      "header": "warmup_index_get_x"
+    },
+    {
+      "offset_zero_based": 64,
+      "header": "warmup_index_get_y"
+    }
+  ],
+  "duplicate_headers": [
+    "time",
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "row_count": 24148,
+  "all_row_widths_match": true,
+  "index_header": "b",
+  "index_offset_zero_based": 5,
+  "first_bar_index": 0,
+  "last_bar_index": 24147,
+  "indices_contiguous": true,
+  "native_time_offset_zero_based": 0,
+  "first_native_timestamp_seconds": 1788134400,
+  "last_native_timestamp_seconds": 1791032040,
+  "observed_live_cutoff_seconds": 1791032040,
+  "historical_rows": 24147,
+  "status": "POSTPROCESS-BLOCKED",
+  "limitation": "Metadata only, using the unique explicit plotted index control. Duplicate native/plot OHLC/time headers remain unchanged and unmapped. This does not make the supplied postprocessor accept the file."
+}
