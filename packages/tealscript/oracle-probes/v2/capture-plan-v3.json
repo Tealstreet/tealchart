@@ -3497,7 +3497,7 @@
       "volume_unused_by_source": false,
       "inputs": {
         "chart": "native UNIX time + OHLC; native Volume or plotted input_volume/volume if used",
-        "index": "not independently instrumented"
+        "index": "bar_index"
       },
       "defaults": "Keep all input/style defaults; record input screenshot and changes; CF016b Round=2.125",
       "columns": [
