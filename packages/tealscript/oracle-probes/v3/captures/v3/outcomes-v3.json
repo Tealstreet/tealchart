@@ -3145,5 +3145,3025 @@
       ],
       "entries": 0
     }
+  },
+  {
+    "script": "varip-01-chart-point.pine",
+    "attempt": 1,
+    "source_sha256": "6b06837dfe53bfadfaa5c79e4f2d22fc0e5495f5027ddc080cb469a7b3326ae2",
+    "indicator_title": "V3-VARIP-01",
+    "status": "RUNS",
+    "csv_file": "captures/v3/varip-01-chart-point-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (62).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-VARIP-01",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23927,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24227,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:33:29.499Z",
+    "live_candle_open_utc": "2026-10-03T15:32:00.000Z",
+    "export_utc": "2026-10-03T15:33:36.516Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/varip-01-chart-point-attempt1-setup.png",
+      "captures/v3/evidence/varip-01-chart-point-attempt1-export.png",
+      "captures/v3/evidence/varip-01-chart-point-attempt1-logs.txt",
+      "captures/v3/evidence/varip-01-chart-point-attempt1-logs-v1.json",
+      "captures/v3/evidence/varip-01-chart-point-attempt1-logs.png",
+      "captures/v3/evidence/varip-01-chart-point-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:32",
+    "historical_compare_before_unix_seconds": 1791041520,
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-01-chart-point-attempt1-logs.txt",
+        "evidence/varip-01-chart-point-attempt1-logs-v1.json",
+        "evidence/varip-01-chart-point-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8fea33be2814548c5b6ce6e2125ede70374aafafb23620dade94ff8ff424d056",
+    "csv_bytes": 1289700,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24227,
+    "historical_rows": 24226,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041520,
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "77674.04"
+    }
+  },
+  {
+    "script": "varip-02-footprint.pine",
+    "attempt": 1,
+    "source_sha256": "284a1845edc76157df8402e151bedfc0590f0236c12619e2f69b77f5d857e865",
+    "indicator_title": "V3-VARIP-02",
+    "status": "RUNS",
+    "csv_file": "captures/v3/varip-02-footprint-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (63).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-VARIP-02",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23927,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24227,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:33:51.719Z",
+    "live_candle_open_utc": "2026-10-03T15:32:00.000Z",
+    "export_utc": "2026-10-03T15:33:58.235Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/varip-02-footprint-attempt1-setup.png",
+      "captures/v3/evidence/varip-02-footprint-attempt1-export.png",
+      "captures/v3/evidence/varip-02-footprint-attempt1-logs.txt",
+      "captures/v3/evidence/varip-02-footprint-attempt1-logs-v1.json",
+      "captures/v3/evidence/varip-02-footprint-attempt1-logs.png",
+      "captures/v3/evidence/varip-02-footprint-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:32",
+    "historical_compare_before_unix_seconds": 1791041520,
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-02-footprint-attempt1-logs.txt",
+        "evidence/varip-02-footprint-attempt1-logs-v1.json",
+        "evidence/varip-02-footprint-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d64a60bef4bccb5bd4125d188d292258f245fe7651cb66a8cead25ef1e020a6d",
+    "csv_bytes": 1120112,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24227,
+    "historical_rows": 24226,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041520,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "varip-03-volume-row.pine",
+    "attempt": 1,
+    "source_sha256": "4689f5c5d31ae342624b416f29f014cd77ac06efc2eedb040a8bfde91bcb57fd",
+    "indicator_title": "V3-VARIP-03",
+    "status": "RUNS",
+    "csv_file": "captures/v3/varip-03-volume-row-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (64).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-VARIP-03",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23928,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24228,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:34:13.975Z",
+    "live_candle_open_utc": "2026-10-03T15:34:00.000Z",
+    "export_utc": "2026-10-03T15:34:21.226Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/varip-03-volume-row-attempt1-setup.png",
+      "captures/v3/evidence/varip-03-volume-row-attempt1-export.png",
+      "captures/v3/evidence/varip-03-volume-row-attempt1-logs.txt",
+      "captures/v3/evidence/varip-03-volume-row-attempt1-logs-v1.json",
+      "captures/v3/evidence/varip-03-volume-row-attempt1-logs.png",
+      "captures/v3/evidence/varip-03-volume-row-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:34",
+    "historical_compare_before_unix_seconds": 1791041640,
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-03-volume-row-attempt1-logs.txt",
+        "evidence/varip-03-volume-row-attempt1-logs-v1.json",
+        "evidence/varip-03-volume-row-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "25ef7fcd43da8d9a862261d9289213cc46fd84690460c4092a33575a1fda93ba",
+    "csv_bytes": 1120158,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24228,
+    "historical_rows": 24227,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041640,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "varip-04-enum.pine",
+    "attempt": 1,
+    "source_sha256": "4fb4786a1602cae3648752c9fe66b5c42eadc87f6d5365991b7a761bd340b91f",
+    "indicator_title": "V3-VARIP-04",
+    "status": "RUNS",
+    "csv_file": "captures/v3/varip-04-enum-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (65).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-VARIP-04",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23928,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24228,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:34:36.718Z",
+    "live_candle_open_utc": "2026-10-03T15:34:00.000Z",
+    "export_utc": "2026-10-03T15:34:43.513Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/varip-04-enum-attempt1-setup.png",
+      "captures/v3/evidence/varip-04-enum-attempt1-export.png",
+      "captures/v3/evidence/varip-04-enum-attempt1-logs.txt",
+      "captures/v3/evidence/varip-04-enum-attempt1-logs-v1.json",
+      "captures/v3/evidence/varip-04-enum-attempt1-logs.png",
+      "captures/v3/evidence/varip-04-enum-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:34",
+    "historical_compare_before_unix_seconds": 1791041640,
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-04-enum-attempt1-logs.txt",
+        "evidence/varip-04-enum-attempt1-logs-v1.json",
+        "evidence/varip-04-enum-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "646363c8c1457a775de989141bdf3664b106c22131892b92d2ea89069603e850",
+    "csv_bytes": 1120161,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24228,
+    "historical_rows": 24227,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041640,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "varip-05-array-chart-point.pine",
+    "attempt": 1,
+    "source_sha256": "6f491465966b678d51d0782b7310b950f1000611bf73d74431a8a0c4c1aacd02",
+    "indicator_title": "V3-VARIP-05",
+    "status": "RUNS",
+    "csv_file": "captures/v3/varip-05-array-chart-point-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (66).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-VARIP-05",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23928,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24228,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:35:37.276Z",
+    "live_candle_open_utc": "2026-10-03T15:34:00.000Z",
+    "export_utc": "2026-10-03T15:35:44.155Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/varip-05-array-chart-point-attempt1-setup.png",
+      "captures/v3/evidence/varip-05-array-chart-point-attempt1-export.png",
+      "captures/v3/evidence/varip-05-array-chart-point-attempt1-logs.txt",
+      "captures/v3/evidence/varip-05-array-chart-point-attempt1-logs-v1.json",
+      "captures/v3/evidence/varip-05-array-chart-point-attempt1-logs.png",
+      "captures/v3/evidence/varip-05-array-chart-point-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:34",
+    "historical_compare_before_unix_seconds": 1791041640,
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-05-array-chart-point-attempt1-logs.txt",
+        "evidence/varip-05-array-chart-point-attempt1-logs-v1.json",
+        "evidence/varip-05-array-chart-point-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "7f226c7778dc3554255f76ba4efb01075661af8c43d022ba836f47928df2918f",
+    "csv_bytes": 1120158,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24228,
+    "historical_rows": 24227,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041640,
+    "first_historical_values": {
+      "OUTCOME": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "0"
+    }
+  },
+  {
+    "script": "varip-06-map-int-float.pine",
+    "attempt": 1,
+    "source_sha256": "36743214425a8e4be4e9e4e8b31be7b115fb49765250e964f64cf069c40f72d1",
+    "indicator_title": "V3-VARIP-06",
+    "status": "RUNS",
+    "csv_file": "captures/v3/varip-06-map-int-float-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (67).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-VARIP-06",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23928,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24229,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:35:59.858Z",
+    "live_candle_open_utc": "2026-10-03T15:36:00.000Z",
+    "export_utc": "2026-10-03T15:36:06.281Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/varip-06-map-int-float-attempt1-setup.png",
+      "captures/v3/evidence/varip-06-map-int-float-attempt1-export.png",
+      "captures/v3/evidence/varip-06-map-int-float-attempt1-logs.txt",
+      "captures/v3/evidence/varip-06-map-int-float-attempt1-logs-v1.json",
+      "captures/v3/evidence/varip-06-map-int-float-attempt1-logs.png",
+      "captures/v3/evidence/varip-06-map-int-float-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791041760,
+    "pine_logs": {
+      "paths": [
+        "evidence/varip-06-map-int-float-attempt1-logs.txt",
+        "evidence/varip-06-map-int-float-attempt1-logs-v1.json",
+        "evidence/varip-06-map-int-float-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8339ea4b5790596e18654470e491eb1cbad9df9aea5193e356163fb742e34d46",
+    "csv_bytes": 1120207,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24229,
+    "historical_rows": 24228,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041760,
+    "first_historical_values": {
+      "OUTCOME": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "0"
+    }
+  },
+  {
+    "script": "scalar-08-table-anchor-reset-identical-remerge.pine",
+    "attempt": 1,
+    "source_sha256": "8cdb8a462866fc66294edd35aefbe6146c2c8657847456e3fb579c8ea35de7b6",
+    "indicator_title": "V3-TABLE-ANCHOR-RESET",
+    "status": "RUNS",
+    "csv_file": "captures/v3/scalar-08-table-anchor-reset-identical-remerge-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (68).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-TABLE-ANCHOR-RESET",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23929,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24229,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:36:22.377Z",
+    "live_candle_open_utc": "2026-10-03T15:36:00.000Z",
+    "export_utc": "2026-10-03T15:36:29.073Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-setup.png",
+      "captures/v3/evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-export.png",
+      "captures/v3/evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-logs.png",
+      "captures/v3/evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791041760,
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-logs.txt",
+        "evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-logs-v1.json",
+        "evidence/scalar-08-table-anchor-reset-identical-remerge-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "f8a05219a4f6fb56b0c5f262d7fb959c4c4d74a75ceb48030356700258ccf13b",
+    "csv_bytes": 1120207,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24229,
+    "historical_rows": 24228,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041760,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "array-01-generic-bool-default.pine",
+    "attempt": 1,
+    "source_sha256": "0a772bd1ef3dbb22caa8335a8da894f8f8a6db5568c83dce4919a8b1942253a5",
+    "indicator_title": "V3-GENERIC-BOOL-DEFAULT",
+    "status": "RUNS",
+    "csv_file": "captures/v3/array-01-generic-bool-default-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (69).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-GENERIC-BOOL-DEFAULT",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23929,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24229,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:36:44.402Z",
+    "live_candle_open_utc": "2026-10-03T15:36:00.000Z",
+    "export_utc": "2026-10-03T15:36:51.490Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/array-01-generic-bool-default-attempt1-setup.png",
+      "captures/v3/evidence/array-01-generic-bool-default-attempt1-export.png",
+      "captures/v3/evidence/array-01-generic-bool-default-attempt1-logs.txt",
+      "captures/v3/evidence/array-01-generic-bool-default-attempt1-logs-v1.json",
+      "captures/v3/evidence/array-01-generic-bool-default-attempt1-logs.png",
+      "captures/v3/evidence/array-01-generic-bool-default-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791041760,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-01-generic-bool-default-attempt1-logs.txt",
+        "evidence/array-01-generic-bool-default-attempt1-logs-v1.json",
+        "evidence/array-01-generic-bool-default-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "fbbe50ba3559abdb5b3515dd699c5ec7db24642ab3d59165dac286c090c15e84",
+    "csv_bytes": 1120207,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24229,
+    "historical_rows": 24228,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041760,
+    "first_historical_values": {
+      "OUTCOME": "0"
+    },
+    "last_historical_values": {
+      "OUTCOME": "0"
+    }
+  },
+  {
+    "script": "strings-01-tostring-default-precision.pine",
+    "attempt": 1,
+    "source_sha256": "92028223d991ce604ae5a5bffda7ef359ac6feb02847960c68332c2f2ea6320f",
+    "indicator_title": "V3-TOSTRING-DEFAULT-PRECISION",
+    "status": "RUNS",
+    "csv_file": "captures/v3/strings-01-tostring-default-precision-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (70).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-TOSTRING-DEFAULT-PRECISION",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23929,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24229,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:37:36.913Z",
+    "live_candle_open_utc": "2026-10-03T15:36:00.000Z",
+    "export_utc": "2026-10-03T15:37:42.896Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-setup.png",
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-export.png",
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-logs.txt",
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-logs-v1.json",
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-logs.png",
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-visual.png",
+      "captures/v3/evidence/strings-01-tostring-default-precision-attempt1-table-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Separate table screenshot taken after export with legend-hover buttons dismissed; table and native first-bar logs agree. Default table text contrast retained.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:36",
+    "historical_compare_before_unix_seconds": 1791041760,
+    "pine_logs": {
+      "paths": [
+        "evidence/strings-01-tostring-default-precision-attempt1-logs.txt",
+        "evidence/strings-01-tostring-default-precision-attempt1-logs-v1.json",
+        "evidence/strings-01-tostring-default-precision-attempt1-logs.png"
+      ],
+      "entries": 2,
+      "last_message_time_ms": 1788134400000,
+      "last_bar_time_ms": 1788134400000
+    },
+    "csv_sha256": "efb968f02e027e9497b02d516ad25f94d25ed3ab38989c345df9999b80d0c305",
+    "csv_bytes": 1120207,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24229,
+    "historical_rows": 24228,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041760,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    },
+    "exact_strings": {
+      "PRICE": "78477.5908",
+      "THIRD": "0.3333333333"
+    }
+  },
+  {
+    "script": "array-02-get-index-literal-na.pine",
+    "attempt": 1,
+    "source_sha256": "250f383cef4e3c4309efb7b6bc8033c20b5383ba75ed63664d2cb133533d1b48",
+    "indicator_title": "V3-ARRAY-NA-INDEX-01",
+    "status": "RUNS",
+    "csv_file": "captures/v3/array-02-get-index-literal-na-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (71).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-ARRAY-NA-INDEX-01",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23930,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24230,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:39:52.464Z",
+    "live_candle_open_utc": "2026-10-03T15:38:00.000Z",
+    "export_utc": "2026-10-03T15:39:58.523Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/array-02-get-index-literal-na-attempt1-setup.png",
+      "captures/v3/evidence/array-02-get-index-literal-na-attempt1-export.png",
+      "captures/v3/evidence/array-02-get-index-literal-na-attempt1-logs.txt",
+      "captures/v3/evidence/array-02-get-index-literal-na-attempt1-logs-v1.json",
+      "captures/v3/evidence/array-02-get-index-literal-na-attempt1-logs.png",
+      "captures/v3/evidence/array-02-get-index-literal-na-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:38",
+    "historical_compare_before_unix_seconds": 1791041880,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-02-get-index-literal-na-attempt1-logs.txt",
+        "evidence/array-02-get-index-literal-na-attempt1-logs-v1.json",
+        "evidence/array-02-get-index-literal-na-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "2dcf7031dbeacc38f2dcacedb6062e62078f611247610d25662f10d7aba1d7fb",
+    "csv_bytes": 1096026,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24230,
+    "historical_rows": 24229,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041880,
+    "first_historical_values": {
+      "OUTCOME": ""
+    },
+    "last_historical_values": {
+      "OUTCOME": ""
+    }
+  },
+  {
+    "script": "array-03-get-index-math-round-na.pine",
+    "attempt": 1,
+    "source_sha256": "d59a1fa127804938ecd673e1be6da04b81f66a99e56f680b52990468f338c8bc",
+    "indicator_title": "V3-ARRAY-NA-INDEX-02",
+    "status": "RUNS",
+    "csv_file": "captures/v3/array-03-get-index-math-round-na-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (72).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-ARRAY-NA-INDEX-02",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23931,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24231,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:40:14.812Z",
+    "live_candle_open_utc": "2026-10-03T15:40:00.000Z",
+    "export_utc": "2026-10-03T15:40:20.933Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/array-03-get-index-math-round-na-attempt1-setup.png",
+      "captures/v3/evidence/array-03-get-index-math-round-na-attempt1-export.png",
+      "captures/v3/evidence/array-03-get-index-math-round-na-attempt1-logs.txt",
+      "captures/v3/evidence/array-03-get-index-math-round-na-attempt1-logs-v1.json",
+      "captures/v3/evidence/array-03-get-index-math-round-na-attempt1-logs.png",
+      "captures/v3/evidence/array-03-get-index-math-round-na-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:40",
+    "historical_compare_before_unix_seconds": 1791042000,
+    "pine_logs": {
+      "paths": [
+        "evidence/array-03-get-index-math-round-na-attempt1-logs.txt",
+        "evidence/array-03-get-index-math-round-na-attempt1-logs-v1.json",
+        "evidence/array-03-get-index-math-round-na-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c25d4a03d6d0c766f4ad0bd0eeffc819d9d37693aab208a4f39bd8bf73fecf99",
+    "csv_bytes": 1096074,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24231,
+    "historical_rows": 24230,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042000,
+    "first_historical_values": {
+      "OUTCOME": ""
+    },
+    "last_historical_values": {
+      "OUTCOME": ""
+    }
+  },
+  {
+    "script": "strings-02-split-empty-separator-sizes.pine",
+    "attempt": 1,
+    "source_sha256": "c5d67ee4c05e0b1c7a96cd677bebab828e2a3f312c67c6beb703f26ca67b81e2",
+    "indicator_title": "V3-SPLIT-EMPTY-SEPARATOR-SIZES",
+    "status": "RUNS",
+    "csv_file": "captures/v3/strings-02-split-empty-separator-sizes-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (73).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SPLIT-EMPTY-SEPARATOR-SIZES",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23931,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24231,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:40:36.616Z",
+    "live_candle_open_utc": "2026-10-03T15:40:00.000Z",
+    "export_utc": "2026-10-03T15:40:42.386Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/strings-02-split-empty-separator-sizes-attempt1-setup.png",
+      "captures/v3/evidence/strings-02-split-empty-separator-sizes-attempt1-export.png",
+      "captures/v3/evidence/strings-02-split-empty-separator-sizes-attempt1-logs.txt",
+      "captures/v3/evidence/strings-02-split-empty-separator-sizes-attempt1-logs-v1.json",
+      "captures/v3/evidence/strings-02-split-empty-separator-sizes-attempt1-logs.png",
+      "captures/v3/evidence/strings-02-split-empty-separator-sizes-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:40",
+    "historical_compare_before_unix_seconds": 1791042000,
+    "pine_logs": {
+      "paths": [
+        "evidence/strings-02-split-empty-separator-sizes-attempt1-logs.txt",
+        "evidence/strings-02-split-empty-separator-sizes-attempt1-logs-v1.json",
+        "evidence/strings-02-split-empty-separator-sizes-attempt1-logs.png"
+      ],
+      "entries": 2,
+      "last_message_time_ms": 1788134400000,
+      "last_bar_time_ms": 1788134400000
+    },
+    "csv_sha256": "59f046fa3530f3320108ed047245805cbfa2f10f1df9fb38ba00fb0a1346a35f",
+    "csv_bytes": 1120305,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24231,
+    "historical_rows": 24230,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042000,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "history-01-negative-offset.pine",
+    "attempt": 1,
+    "source_sha256": "ac82a6c6c4c7aa9cd81277aa3bf14660141a09bcd5860036654573d933a8965a",
+    "indicator_title": "V3-HISTORY-NEGATIVE-OFFSET",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: The script attempts to reference historical data that is too far from the current bar (-1 bars back). The history-referencing length for the expression must be a value between 0 and 10000.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "invalidBarsBack": -1,
+          "code": "RE10008",
+          "bar_index": 0,
+          "maxBarsBack": 10000
+        },
+        "error": "Error on bar {bar_index}: The script attempts to reference historical data that is too far from the current bar ({invalidBarsBack} bars back). The history-referencing length for the expression must be a value between 0 and {maxBarsBack}.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,820.26\nH\n84,820.30\nL\n84,820.26\nC\n84,820.29\n+0.02 (+0.00%)\n84,820.29\nSELL\n0.01\n84,820.30\nBUY\nUSDT\nV3-HISTORY-NEGATIVE-OFFSET\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:41:21 UTC\n99+\nRuntime error: RE10008\nRuntime error: RE10008\nError on bar 0: The script attempts to reference historical data that is too far from the current bar (-1 bars back). The history-referencing length for the expression must be a value between 0 and 10000.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: The script attempts to reference historical data that is too far from the current bar (-1 bars back). The history-referencing length for the expression must be a value between 0 and 10000."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-HISTORY-NEGATIVE-OFFSET",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23931,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24231,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:41:18.477Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/history-01-negative-offset-attempt1-error.png",
+      "captures/v3/evidence/history-01-negative-offset-attempt1-error.txt",
+      "captures/v3/evidence/history-01-negative-offset-attempt1-logs.txt",
+      "captures/v3/evidence/history-01-negative-offset-attempt1-logs-v1.json",
+      "captures/v3/evidence/history-01-negative-offset-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:41:22.955Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/history-01-negative-offset-attempt1-logs.txt",
+        "evidence/history-01-negative-offset-attempt1-logs-v1.json",
+        "evidence/history-01-negative-offset-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "history-02-unavailable-offset.pine",
+    "attempt": 1,
+    "source_sha256": "e4990ac56b05ec36146a3d1d49498d9d36846c990a1261c8e92179a421e9ba75",
+    "indicator_title": "V3-HISTORY-UNAVAILABLE-OFFSET",
+    "status": "RUNS",
+    "csv_file": "captures/v3/history-02-unavailable-offset-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (74).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-HISTORY-UNAVAILABLE-OFFSET",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23931,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24231,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:41:36.288Z",
+    "live_candle_open_utc": "2026-10-03T15:40:00.000Z",
+    "export_utc": "2026-10-03T15:41:42.707Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/history-02-unavailable-offset-attempt1-setup.png",
+      "captures/v3/evidence/history-02-unavailable-offset-attempt1-export.png",
+      "captures/v3/evidence/history-02-unavailable-offset-attempt1-logs.txt",
+      "captures/v3/evidence/history-02-unavailable-offset-attempt1-logs-v1.json",
+      "captures/v3/evidence/history-02-unavailable-offset-attempt1-logs.png",
+      "captures/v3/evidence/history-02-unavailable-offset-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:40",
+    "historical_compare_before_unix_seconds": 1791042000,
+    "pine_logs": {
+      "paths": [
+        "evidence/history-02-unavailable-offset-attempt1-logs.txt",
+        "evidence/history-02-unavailable-offset-attempt1-logs-v1.json",
+        "evidence/history-02-unavailable-offset-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e9595f41ee13079a357d1fd1ec42865bcd6cacb297f667c2de2901fc894679ab",
+    "csv_bytes": 1275550,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24231,
+    "historical_rows": 24230,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042000,
+    "first_historical_values": {
+      "OUTCOME": "77674.04"
+    },
+    "last_historical_values": {
+      "OUTCOME": "84820.27"
+    }
+  },
+  {
+    "script": "plot-01-series-offset-v3.pine",
+    "attempt": 1,
+    "source_sha256": "d46334e18abac484583a7f2948031665504e66aec4d09977859f02845e955178",
+    "indicator_title": "V3-PLOT-SERIES-OFFSET-PINE3",
+    "status": "RUNS",
+    "csv_file": "captures/v3/plot-01-series-offset-v3-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (75).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-PLOT-SERIES-OFFSET-PINE3",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23931,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24232,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:41:58.809Z",
+    "live_candle_open_utc": "2026-10-03T15:42:00.000Z",
+    "export_utc": "2026-10-03T15:42:05.283Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-setup.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-export.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-logs.txt",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-logs-v1.json",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-logs.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-visual.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-placement-v1.json",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-placement-positive-v1.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-placement-negative-v1.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-placement-update1-v1.png",
+      "captures/v3/evidence/plot-01-series-offset-v3-attempt1-placement-update2-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Additional placement screenshots taken after export with unchanged source/inputs; native offset and separate live observations recorded.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:42",
+    "historical_compare_before_unix_seconds": 1791042120,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-01-series-offset-v3-attempt1-logs.txt",
+        "evidence/plot-01-series-offset-v3-attempt1-logs-v1.json",
+        "evidence/plot-01-series-offset-v3-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "4848b41391b1ede2a7f6a11c07468cc9d91fa246cfb3a4b166914e3fa689131d",
+    "csv_bytes": 1275592,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24232,
+    "historical_rows": 24231,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042120,
+    "first_historical_values": {
+      "OUTCOME": ""
+    },
+    "last_historical_values": {
+      "OUTCOME": "84820.27"
+    },
+    "placement_witness": "captures/v3/evidence/plot-01-series-offset-v3-attempt1-placement-v1.json"
+  },
+  {
+    "script": "plot-02-series-offset-v4.pine",
+    "attempt": 1,
+    "source_sha256": "b185797f2f3d4fa725752c8ebfd76e8429c619de35f1095c77e1fe422aa94788",
+    "indicator_title": "V3-PLOT-SERIES-OFFSET-PINE4",
+    "status": "RUNS",
+    "csv_file": "captures/v3/plot-02-series-offset-v4-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (76).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-PLOT-SERIES-OFFSET-PINE4",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23934,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24234,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:47:54.069Z",
+    "live_candle_open_utc": "2026-10-03T15:46:00.000Z",
+    "export_utc": "2026-10-03T15:48:00.757Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-setup.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-export.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-logs.txt",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-logs-v1.json",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-logs.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-visual.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-placement-v1.json",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-placement-positive-v1.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-placement-negative-v1.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-placement-update1-v1.png",
+      "captures/v3/evidence/plot-02-series-offset-v4-attempt1-placement-update2-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Additional placement screenshots taken after export with unchanged source/inputs; native offset and separate live observations recorded.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:46",
+    "historical_compare_before_unix_seconds": 1791042360,
+    "pine_logs": {
+      "paths": [
+        "evidence/plot-02-series-offset-v4-attempt1-logs.txt",
+        "evidence/plot-02-series-offset-v4-attempt1-logs-v1.json",
+        "evidence/plot-02-series-offset-v4-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d4ac7e1d62bb4a36189465bd209d96f79f5791a8b7788e5ba33216a5518723e7",
+    "csv_bytes": 1275700,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24234,
+    "historical_rows": 24233,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042360,
+    "first_historical_values": {
+      "OUTCOME": ""
+    },
+    "last_historical_values": {
+      "OUTCOME": "84838.27"
+    },
+    "placement_witness": "captures/v3/evidence/plot-02-series-offset-v4-attempt1-placement-v1.json"
+  },
+  {
+    "script": "ledger-division-v5-positive-const.pine",
+    "attempt": 1,
+    "source_sha256": "8fe652ac51e00e354315b993a4a49d836355a57571fa1b816e432fe3a50cfa41",
+    "indicator_title": "V3-LEDGER-DIV-V5-POSITIVE-CONST",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-positive-const-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (77).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-POSITIVE-CONST",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23935,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24235,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:49:51.380Z",
+    "live_candle_open_utc": "2026-10-03T15:48:00.000Z",
+    "export_utc": "2026-10-03T15:49:57.814Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-positive-const-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-positive-const-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-positive-const-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-positive-const-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-positive-const-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-positive-const-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:48",
+    "historical_compare_before_unix_seconds": 1791042480,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-positive-const-attempt1-logs.txt",
+        "evidence/ledger-division-v5-positive-const-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-positive-const-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8f2fc0ed3143ac067e7135efea5732da6947f8163baf1bd487baae07794a902a",
+    "csv_bytes": 1120486,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24235,
+    "historical_rows": 24234,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042480,
+    "first_historical_values": {
+      "OUTCOME": "2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "2"
+    }
+  },
+  {
+    "script": "ledger-division-v5-negative-numerator.pine",
+    "attempt": 1,
+    "source_sha256": "4c88e9019bad21bd55bb812273141386f176d5ac6e8dd1a7370b06a48fdaf9a7",
+    "indicator_title": "V3-LEDGER-DIV-V5-NEGATIVE-NUMERATOR",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-negative-numerator-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (78).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-NEGATIVE-NUMERATOR",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23936,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24236,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:50:13.501Z",
+    "live_candle_open_utc": "2026-10-03T15:50:00.000Z",
+    "export_utc": "2026-10-03T15:50:20.600Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-negative-numerator-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-negative-numerator-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-negative-numerator-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-negative-numerator-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-negative-numerator-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-negative-numerator-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:50",
+    "historical_compare_before_unix_seconds": 1791042600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-negative-numerator-attempt1-logs.txt",
+        "evidence/ledger-division-v5-negative-numerator-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-negative-numerator-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d5743ce371aebf96e5ec431b609ea75b55fad936d244622b580f549f8a384d92",
+    "csv_bytes": 1144765,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24236,
+    "historical_rows": 24235,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042600,
+    "first_historical_values": {
+      "OUTCOME": "-2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2"
+    }
+  },
+  {
+    "script": "ledger-division-v5-negative-denominator.pine",
+    "attempt": 1,
+    "source_sha256": "93b752d575b0367a20faed3a5184cb28071749959999e803649aa2f817b62d06",
+    "indicator_title": "V3-LEDGER-DIV-V5-NEGATIVE-DENOMINATOR",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-negative-denominator-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (79).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-NEGATIVE-DENOMINATOR",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23936,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24236,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:50:36.486Z",
+    "live_candle_open_utc": "2026-10-03T15:50:00.000Z",
+    "export_utc": "2026-10-03T15:50:43.511Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-negative-denominator-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-negative-denominator-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-negative-denominator-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-negative-denominator-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-negative-denominator-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-negative-denominator-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:50",
+    "historical_compare_before_unix_seconds": 1791042600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-negative-denominator-attempt1-logs.txt",
+        "evidence/ledger-division-v5-negative-denominator-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-negative-denominator-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "c6db7757a997ad1ab4e990efafb18e4492cd39d18acb567adb6b190149596f6b",
+    "csv_bytes": 1144768,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24236,
+    "historical_rows": 24235,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042600,
+    "first_historical_values": {
+      "OUTCOME": "-2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2"
+    }
+  },
+  {
+    "script": "ledger-division-v5-both-negative.pine",
+    "attempt": 1,
+    "source_sha256": "64010fe078ac397640337fc452a0e386744608b48bb1b386e5527fb490428d94",
+    "indicator_title": "V3-LEDGER-DIV-V5-BOTH-NEGATIVE",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-both-negative-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (80).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-BOTH-NEGATIVE",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23936,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24236,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:50:59.718Z",
+    "live_candle_open_utc": "2026-10-03T15:50:00.000Z",
+    "export_utc": "2026-10-03T15:51:05.710Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-both-negative-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-both-negative-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-both-negative-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-both-negative-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-both-negative-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-both-negative-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:50",
+    "historical_compare_before_unix_seconds": 1791042600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-both-negative-attempt1-logs.txt",
+        "evidence/ledger-division-v5-both-negative-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-both-negative-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b1fb65cbd0d3c938bbd53fa09a074a0fd4df6b266778acae0515fa9d341edae7",
+    "csv_bytes": 1120529,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24236,
+    "historical_rows": 24235,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042600,
+    "first_historical_values": {
+      "OUTCOME": "2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "2"
+    }
+  },
+  {
+    "script": "ledger-division-v5-negative-exact.pine",
+    "attempt": 1,
+    "source_sha256": "998a834a546bdc18743aff123fb6ba214ea29e87f008b45888b2223229f94147",
+    "indicator_title": "V3-LEDGER-DIV-V5-NEGATIVE-EXACT",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-negative-exact-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (81).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-NEGATIVE-EXACT",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23936,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24237,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:51:55.544Z",
+    "live_candle_open_utc": "2026-10-03T15:50:00.000Z",
+    "export_utc": "2026-10-03T15:52:02.120Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-negative-exact-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-negative-exact-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-negative-exact-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-negative-exact-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-negative-exact-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-negative-exact-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:50",
+    "historical_compare_before_unix_seconds": 1791042600,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-negative-exact-attempt1-logs.txt",
+        "evidence/ledger-division-v5-negative-exact-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-negative-exact-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "e952931582421b6187d23872538ac45a1577434f567e0bd16fbdbde5dbc0c9f3",
+    "csv_bytes": 1144765,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24236,
+    "historical_rows": 24235,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042600,
+    "first_historical_values": {
+      "OUTCOME": "-3"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-3"
+    }
+  },
+  {
+    "script": "ledger-division-v5-float-control.pine",
+    "attempt": 1,
+    "source_sha256": "cf9677622d80b7d693703dedea812095c6d7b28e0d12832e92c8bb4484cc28dc",
+    "indicator_title": "V3-LEDGER-DIV-V5-FLOAT-CONTROL",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-float-control-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (82).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-FLOAT-CONTROL",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23937,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24237,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:52:17.918Z",
+    "live_candle_open_utc": "2026-10-03T15:52:00.000Z",
+    "export_utc": "2026-10-03T15:52:24.642Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-float-control-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-float-control-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-float-control-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-float-control-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-float-control-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-float-control-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:52",
+    "historical_compare_before_unix_seconds": 1791042720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-float-control-attempt1-logs.txt",
+        "evidence/ledger-division-v5-float-control-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-float-control-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "15c98f57412941b449b3ee5f0e19f3e20a65943ffc0b14e26ff54ef18b3d730b",
+    "csv_bytes": 1193283,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24237,
+    "historical_rows": 24236,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042720,
+    "first_historical_values": {
+      "OUTCOME": "-2.5"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2.5"
+    }
+  },
+  {
+    "script": "ledger-division-v5-input-control.pine",
+    "attempt": 1,
+    "source_sha256": "1bb141826a00b02997e69bc88fc0f1282e3ae44bbbe1e13d0b0e8987d0cd1eda",
+    "indicator_title": "V3-LEDGER-DIV-V5-INPUT-CONTROL",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v5-input-control-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (83).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Denominator",
+          "value": 2,
+          "default": 2
+        }
+      ],
+      "observed_indicator_title": "V3-LEDGER-DIV-V5-INPUT-CONTROL",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23937,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24237,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:52:42.632Z",
+    "live_candle_open_utc": "2026-10-03T15:52:00.000Z",
+    "export_utc": "2026-10-03T15:52:49.079Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-inputs.png",
+      "captures/v3/evidence/ledger-division-v5-input-control-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:52",
+    "historical_compare_before_unix_seconds": 1791042720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v5-input-control-attempt1-logs.txt",
+        "evidence/ledger-division-v5-input-control-attempt1-logs-v1.json",
+        "evidence/ledger-division-v5-input-control-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "ed785d4e880bfde0d0823670a86476fcfac223c79f1ce082126e38145eca7cdb",
+    "csv_bytes": 1193280,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24237,
+    "historical_rows": 24236,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042720,
+    "first_historical_values": {
+      "OUTCOME": "-2.5"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2.5"
+    }
+  },
+  {
+    "script": "ledger-division-v4-positive-const.pine",
+    "attempt": 1,
+    "source_sha256": "a08ed746e6ed9914c2bb572da793258f76f129e104c66d5f4bbda0137f7f5f0b",
+    "indicator_title": "V3-LEDGER-DIV-V4-POSITIVE-CONST",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-positive-const-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (84).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-POSITIVE-CONST",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23937,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24237,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:53:08.753Z",
+    "live_candle_open_utc": "2026-10-03T15:52:00.000Z",
+    "export_utc": "2026-10-03T15:53:15.751Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-positive-const-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-positive-const-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-positive-const-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-positive-const-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-positive-const-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-positive-const-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:52",
+    "historical_compare_before_unix_seconds": 1791042720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-positive-const-attempt1-logs.txt",
+        "evidence/ledger-division-v4-positive-const-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-positive-const-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "d68e0a9d6a574b40415dbb08b1f9284e6ff7942fa88deca2f23c3f38fc3d38fa",
+    "csv_bytes": 1120569,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24237,
+    "historical_rows": 24236,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042720,
+    "first_historical_values": {
+      "OUTCOME": "2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "2"
+    }
+  },
+  {
+    "script": "ledger-division-v4-negative-numerator.pine",
+    "attempt": 1,
+    "source_sha256": "1628a9890c2594ef5a44744f14a89544075d38f8c14c2befc478bc3c3e8ef6f8",
+    "indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-NUMERATOR",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-negative-numerator-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (85).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-NUMERATOR",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23937,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24238,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:53:56.683Z",
+    "live_candle_open_utc": "2026-10-03T15:52:00.000Z",
+    "export_utc": "2026-10-03T15:54:03.199Z",
+    "live_boundary_confirmed_unchanged": false,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:52",
+    "historical_compare_before_unix_seconds": 1791042720,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-negative-numerator-attempt1-logs.txt",
+        "evidence/ledger-division-v4-negative-numerator-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-negative-numerator-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b71c6bb6dc3d13984fb184ab688ee81352dd31d52989b47562bba540e6e7b5f4",
+    "csv_bytes": 1144853,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24238,
+    "historical_rows": 24236,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042840,
+    "first_historical_values": {
+      "OUTCOME": "-2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2"
+    }
+  },
+  {
+    "script": "ledger-division-v4-negative-numerator.pine",
+    "attempt": 2,
+    "source_sha256": "1628a9890c2594ef5a44744f14a89544075d38f8c14c2befc478bc3c3e8ef6f8",
+    "indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-NUMERATOR",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-negative-numerator-attempt2.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (86).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-NUMERATOR",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23938,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24238,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:54:19.443Z",
+    "live_candle_open_utc": "2026-10-03T15:54:00.000Z",
+    "export_utc": "2026-10-03T15:54:25.767Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt2-setup.png",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt2-export.png",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt2-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt2-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt2-logs.png",
+      "captures/v3/evidence/ledger-division-v4-negative-numerator-attempt2-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:54",
+    "historical_compare_before_unix_seconds": 1791042840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-negative-numerator-attempt2-logs.txt",
+        "evidence/ledger-division-v4-negative-numerator-attempt2-logs-v1.json",
+        "evidence/ledger-division-v4-negative-numerator-attempt2-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "6d2a74873c1364e837dcda920b918f44689d0946197704f6f379e2a69b14fda1",
+    "csv_bytes": 1144856,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24238,
+    "historical_rows": 24237,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042840,
+    "first_historical_values": {
+      "OUTCOME": "-2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2"
+    }
+  },
+  {
+    "script": "ledger-division-v4-negative-denominator.pine",
+    "attempt": 1,
+    "source_sha256": "1d4368347584a4bd996016a7c839e8bdd5a8e91407c1fa15f7cadcbf68842fe9",
+    "indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-DENOMINATOR",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-negative-denominator-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (87).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-DENOMINATOR",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23938,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24238,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:54:42.387Z",
+    "live_candle_open_utc": "2026-10-03T15:54:00.000Z",
+    "export_utc": "2026-10-03T15:54:49.628Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-negative-denominator-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-negative-denominator-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-negative-denominator-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-negative-denominator-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-negative-denominator-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-negative-denominator-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:54",
+    "historical_compare_before_unix_seconds": 1791042840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-negative-denominator-attempt1-logs.txt",
+        "evidence/ledger-division-v4-negative-denominator-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-negative-denominator-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "6d2a74873c1364e837dcda920b918f44689d0946197704f6f379e2a69b14fda1",
+    "csv_bytes": 1144856,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24238,
+    "historical_rows": 24237,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042840,
+    "first_historical_values": {
+      "OUTCOME": "-2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2"
+    }
+  },
+  {
+    "script": "ledger-division-v4-both-negative.pine",
+    "attempt": 1,
+    "source_sha256": "b1b311884924bdf98fffd16cbf5076c67e8be66c045e45747dae4075ae3b9c89",
+    "indicator_title": "V3-LEDGER-DIV-V4-BOTH-NEGATIVE",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-both-negative-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (88).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-BOTH-NEGATIVE",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23938,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24238,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:55:05.322Z",
+    "live_candle_open_utc": "2026-10-03T15:54:00.000Z",
+    "export_utc": "2026-10-03T15:55:11.662Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-both-negative-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-both-negative-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-both-negative-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-both-negative-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-both-negative-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-both-negative-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:54",
+    "historical_compare_before_unix_seconds": 1791042840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-both-negative-attempt1-logs.txt",
+        "evidence/ledger-division-v4-both-negative-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-both-negative-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "71ae0ae97dfd1c7e8391b8810ac560560409f97265bd87713c1787437337da92",
+    "csv_bytes": 1120615,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24238,
+    "historical_rows": 24237,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042840,
+    "first_historical_values": {
+      "OUTCOME": "2"
+    },
+    "last_historical_values": {
+      "OUTCOME": "2"
+    }
+  },
+  {
+    "script": "ledger-division-v4-negative-exact.pine",
+    "attempt": 1,
+    "source_sha256": "21aa8809f7399fca0829f9183583f0c80e2d9e948e2c2a44784b97ba8dc441d9",
+    "indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-EXACT",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-negative-exact-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (89).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-NEGATIVE-EXACT",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23938,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24238,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:55:28.206Z",
+    "live_candle_open_utc": "2026-10-03T15:54:00.000Z",
+    "export_utc": "2026-10-03T15:55:35.172Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-negative-exact-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-negative-exact-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-negative-exact-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-negative-exact-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-negative-exact-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-negative-exact-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:54",
+    "historical_compare_before_unix_seconds": 1791042840,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-negative-exact-attempt1-logs.txt",
+        "evidence/ledger-division-v4-negative-exact-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-negative-exact-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0dcb15756b121c6cb43a21599d8e05bb0556fc9f4359c47e65e962072ec61e05",
+    "csv_bytes": 1144856,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24238,
+    "historical_rows": 24237,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042840,
+    "first_historical_values": {
+      "OUTCOME": "-3"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-3"
+    }
+  },
+  {
+    "script": "ledger-division-v4-float-control.pine",
+    "attempt": 1,
+    "source_sha256": "737e22be83b7a967a13b14aeea67c4392ba66371acedfaea7fa61ca2146e6954",
+    "indicator_title": "V3-LEDGER-DIV-V4-FLOAT-CONTROL",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-float-control-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (90).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-FLOAT-CONTROL",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23939,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24239,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:56:29.633Z",
+    "live_candle_open_utc": "2026-10-03T15:56:00.000Z",
+    "export_utc": "2026-10-03T15:56:36.076Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-float-control-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-float-control-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-float-control-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-float-control-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-float-control-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-float-control-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:56",
+    "historical_compare_before_unix_seconds": 1791042960,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-float-control-attempt1-logs.txt",
+        "evidence/ledger-division-v4-float-control-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-float-control-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0f06bd68de9e557cfcbeb9462bf59e662e4352913082ced859b06671faa409ea",
+    "csv_bytes": 1193378,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24239,
+    "historical_rows": 24238,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042960,
+    "first_historical_values": {
+      "OUTCOME": "-2.5"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2.5"
+    }
+  },
+  {
+    "script": "ledger-division-v4-input-control.pine",
+    "attempt": 1,
+    "source_sha256": "081aa5a175c9c84f1a4ad9d904366da3569da0902b8e2813260ca81fa982937d",
+    "indicator_title": "V3-LEDGER-DIV-V4-INPUT-CONTROL",
+    "status": "RUNS",
+    "csv_file": "captures/v3/ledger-division-v4-input-control-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (91).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Denominator",
+          "value": 2,
+          "default": 2
+        }
+      ],
+      "observed_indicator_title": "V3-LEDGER-DIV-V4-INPUT-CONTROL",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23939,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24239,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:56:52.663Z",
+    "live_candle_open_utc": "2026-10-03T15:56:00.000Z",
+    "export_utc": "2026-10-03T15:56:59.288Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-setup.png",
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-export.png",
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-logs.txt",
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-logs-v1.json",
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-logs.png",
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-inputs.png",
+      "captures/v3/evidence/ledger-division-v4-input-control-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:56",
+    "historical_compare_before_unix_seconds": 1791042960,
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-division-v4-input-control-attempt1-logs.txt",
+        "evidence/ledger-division-v4-input-control-attempt1-logs-v1.json",
+        "evidence/ledger-division-v4-input-control-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "0f06bd68de9e557cfcbeb9462bf59e662e4352913082ced859b06671faa409ea",
+    "csv_bytes": 1193378,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24239,
+    "historical_rows": 24238,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791042960,
+    "first_historical_values": {
+      "OUTCOME": "-2.5"
+    },
+    "last_historical_values": {
+      "OUTCOME": "-2.5"
+    }
+  },
+  {
+    "script": "strings-04-na-initializer.pine",
+    "attempt": 1,
+    "source_sha256": "b8e7b0f48e9a599d75670d43697f42e7ed42c2009e3d600e4196419d130290eb",
+    "indicator_title": "V3-STRING-NA-INITIALIZER",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10127",
+      "text": "A variable declared with the \"const\" keyword cannot accept values of the \"simple na\" form. Assign a \"const\" value to this variable or remove the \"const\" keyword from its declaration.",
+      "line": 3,
+      "column": 23,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "A variable declared with the \"{explicitTypeKind}\" keyword cannot accept values of the \"{strType}\" form. Assign a \"{explicitTypeKind1}\" value to this variable or remove the \"{explicitTypeKind2}\" keyword from its declaration.",
+        "editorError": {
+          "code": "CE10127",
+          "ctx": {
+            "explicitTypeKind": "const",
+            "explicitTypeKind1": "const",
+            "explicitTypeKind2": "const",
+            "strType": "simple na"
+          },
+          "end": {
+            "column": 24,
+            "line": 3
+          },
+          "message": "A variable declared with the \"{explicitTypeKind}\" keyword cannot accept values of the \"{strType}\" form. Assign a \"{explicitTypeKind1}\" value to this variable or remove the \"{explicitTypeKind2}\" keyword from its declaration.",
+          "start": {
+            "column": 23,
+            "line": 3
+          },
+          "id": "USER;321081caec1542d197754a4252c86dbe"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///940c17bf-e95b-4b2d-a7e3-4b404ba2925c.pine?placement%3Ddialog",
+              "path": "/940c17bf-e95b-4b2d-a7e3-4b404ba2925c.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10127",
+            "severity": 8,
+            "message": "A variable declared with the \"const\" keyword cannot accept values of the \"simple na\" form. Assign a \"const\" value to this variable or remove the \"const\" keyword from its declaration.",
+            "startLineNumber": 3,
+            "startColumn": 23,
+            "endLineNumber": 3,
+            "endColumn": 25
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,854.01\nH\n84,854.02\nL\n84,854.01\nC\n84,854.01\n0.00 (0.00%)\n84,854.01\nSELL\n0.01\n84,854.02\nBUY\nUSDT\nstrings-04-na-initializer.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n16:02:09 UTC\n99+\nPine Editor\nstrings-04-na-initializer.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n//@version=6\nindicator(\"V3-STRING-NA-INITIALIZER\")\nconst\u00a0string\u00a0absent\u00a0=\u00a0na\noutcome\u00a0=\u00a0na(absent)\u00a0?\u00a01\u00a0:\u00a0absent\u00a0==\u00a0\"\"\u00a0?\u00a02\u00a0:\u00a03\nobservedText\u00a0=\u00a0na(absent)\u00a0?\u00a0\"INITIALIZER=NA\"\u00a0:\u00a0\"INITIALIZER=<\"\u00a0+\u00a0absent\u00a0+\u00a0\">\"\nvar\u00a0table\u00a0results\u00a0=\u00a0table.new(position.top_right,\u00a01,\u00a01)\nif\u00a0barstate.isfirst\n\u00a0\u00a0\u00a0\u00a0table.cell(results,\u00a00,\u00a00,\u00a0observedText)\n\u00a0\u00a0\u00a0\u00a0log.info(observedText)\nplot(outcome,\u00a0\"OUTCOME\")\n1 of 1 problem\nA variable declared with the \"const\" keyword cannot accept values of the \"simple na\" form. Assign a \"const\" value to this variable or remove the \"const\" keyword from its declaration.(CE10127)\n1 \u2219 Today, 23:57\nLine 3, Col 23\nPine Script\u00ae v6\nCompilation error: CE10127\n\nA variable declared with the \"const\" keyword cannot accept values of the \"simple na\" form. Assign a \"const\" value to this variable or remove the \"const\" keyword from its declaration.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "A variable declared with the \"const\" keyword cannot accept values of the \"simple na\" form. Assign a \"const\" value to this variable or remove the \"const\" keyword from its declaration."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "strings-04-na-initializer.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23939,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24242,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/strings-04-na-initializer-attempt1-error.png",
+      "captures/v3/evidence/strings-04-na-initializer-attempt1-error.txt",
+      "captures/v3/evidence/strings-04-na-initializer-attempt1-logs.txt",
+      "captures/v3/evidence/strings-04-na-initializer-attempt1-logs-v1.json",
+      "captures/v3/evidence/strings-04-na-initializer-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T16:02:11.478Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/strings-04-na-initializer-attempt1-logs.txt",
+        "evidence/strings-04-na-initializer-attempt1-logs-v1.json",
+        "evidence/strings-04-na-initializer-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "strings-03-tostring-eleven-decimal-rounding.pine",
+    "attempt": 1,
+    "source_sha256": "bb799178b83eedefc16ba204c927ddb3f6abd3e464f2fd9c1946e8bff4c117e5",
+    "indicator_title": "V3-TOSTRING-ELEVEN-DECIMAL-ROUNDING",
+    "status": "RUNS",
+    "csv_file": "captures/v3/strings-03-tostring-eleven-decimal-rounding-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (92).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-TOSTRING-ELEVEN-DECIMAL-ROUNDING",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23942,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24242,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T16:02:37.004Z",
+    "live_candle_open_utc": "2026-10-03T16:02:00.000Z",
+    "export_utc": "2026-10-03T16:02:43.482Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-setup.png",
+      "captures/v3/evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-export.png",
+      "captures/v3/evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-logs.txt",
+      "captures/v3/evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-logs-v1.json",
+      "captures/v3/evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-logs.png",
+      "captures/v3/evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   16:02",
+    "historical_compare_before_unix_seconds": 1791043320,
+    "pine_logs": {
+      "paths": [
+        "evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-logs.txt",
+        "evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-logs-v1.json",
+        "evidence/strings-03-tostring-eleven-decimal-rounding-attempt1-logs.png"
+      ],
+      "entries": 2,
+      "last_message_time_ms": 1788134400000,
+      "last_bar_time_ms": 1788134400000
+    },
+    "csv_sha256": "6edc4fcd1b906922bbb8ad4a862b0be0ce67c31d317ebcfbf681d9c00b5412a7",
+    "csv_bytes": 1120808,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24242,
+    "historical_rows": 24241,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791043320,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "conditional-01-unmatched-string-if.pine",
+    "attempt": 1,
+    "source_sha256": "77521367f4681fd50e1345a7ffbe8ed07bc7235d62685335de8ad26e6165fe5c",
+    "indicator_title": "V3-UNMATCHED-STRING-IF",
+    "status": "RUNS",
+    "csv_file": "captures/v3/conditional-01-unmatched-string-if-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (93).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-UNMATCHED-STRING-IF",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23942,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24242,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T16:02:57.105Z",
+    "live_candle_open_utc": "2026-10-03T16:02:00.000Z",
+    "export_utc": "2026-10-03T16:03:03.716Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/conditional-01-unmatched-string-if-attempt1-setup.png",
+      "captures/v3/evidence/conditional-01-unmatched-string-if-attempt1-export.png",
+      "captures/v3/evidence/conditional-01-unmatched-string-if-attempt1-logs.txt",
+      "captures/v3/evidence/conditional-01-unmatched-string-if-attempt1-logs-v1.json",
+      "captures/v3/evidence/conditional-01-unmatched-string-if-attempt1-logs.png",
+      "captures/v3/evidence/conditional-01-unmatched-string-if-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   16:02",
+    "historical_compare_before_unix_seconds": 1791043320,
+    "pine_logs": {
+      "paths": [
+        "evidence/conditional-01-unmatched-string-if-attempt1-logs.txt",
+        "evidence/conditional-01-unmatched-string-if-attempt1-logs-v1.json",
+        "evidence/conditional-01-unmatched-string-if-attempt1-logs.png"
+      ],
+      "entries": 1,
+      "last_message_time_ms": 1788134400000,
+      "last_bar_time_ms": 1788134400000
+    },
+    "csv_sha256": "d9e0f6954716a736e82253364d99668ea7da940265325fdd40dee742e01ca75f",
+    "csv_bytes": 1120802,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24242,
+    "historical_rows": 24241,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791043320,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
   }
 ]
