@@ -56,6 +56,13 @@ plus `plot-offset-visual` on a 2-minute chart.
 
 ## Where the expected values live
 
+The committed [capture set v1](captures/v1/README-v1.md) contains eight raw
+TradingView CSVs plus the exact runtime error from the unchanged
+`warmup-seed-ma-v1` probe. Its manifest records source/export hashes, chart
+context, column order and historical comparison cutoffs. Sam explicitly requested
+this capture set be committed for replay on another machine; the companion
+predictions and harnesses remain in the archive below.
+
 Each script has a companion `<name>-v1.md` in
 `~/cs/docs/tealscript-parity-archive/oracle-probes/` carrying, per column: what it
 tests, TealScript's **current** value, and a **prediction** of agree/disagree that was

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "script": "warmup-seed-ma-v1.pine",
+  "symbol": "BINANCE:BTCUSDT",
+  "interval": "2",
+  "status": "runtime-error",
+  "csv_produced": false,
+  "message": "Error on bar 0: Invalid value of the 'length' argument (0) in the 'wma' function. It must be > 0.",
+  "tradingview_status": {
+    "type": 3,
+    "errorDescription": {
+      "ctx": { "op": ">", "code": "RE10001", "argName": "length", "bar_index": 0, "value": 0, "funName": "wma" },
+      "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+      "stack_trace": [{ "n": "#main", "p": 95 }],
+      "title": "Runtime error",
+      "showReportItButton": false,
+      "studyAccessBlocked": false
+    }
+  },
+  "source_line_95": "plot(ta.hma(clean, 1), \"hma_len1_clean_seed0\", display=display.data_window)"
+}
