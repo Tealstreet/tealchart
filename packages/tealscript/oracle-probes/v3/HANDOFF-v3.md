@@ -4,7 +4,7 @@ Capture 104 outcome-only source-pinned Pine v3-v6 scripts, one unchanged source 
 
 Start here:
 
-- Bundle root: `packages/tealscript/oracle-probes/v3/` on master. Save returned evidence under `packages/tealscript/oracle-probes/v3/captures/v3/` and commit it, plus a `RESPONSE-v4.md` reply beside this handoff. Keep this revision separate from v2.
+- Bundle root: `packages/tealscript/oracle-probes/v3/` on master. Save returned evidence under `packages/tealscript/oracle-probes/v3/captures/v3/` and commit it, plus the `captures/v3/RESPONSE-v3.md` reply described below. Keep this revision separate from v2.
 - Copy-ready sources, indicator titles, hashes, predictions and evidence requirements are in [PROBES-v3.md](PROBES-v3.md). Each code block matches its `.pine` file byte for byte.
 - Capture on BINANCE:BTCUSDT, 2-minute standard candles, UTC, normal live mode (Bar Replay off). Keep default inputs/styles. Save a setup/Inputs screenshot and record actual tickerid, timeframe, minimum tick and chart type.
 - Load at least 100 historical bars before the reset; retain all loaded history. This is a capture floor, not proof every edge predicate was exercised. These minimal scripts have no bar-index control plot. Record the chart's dataset start separately; do not infer Pine bar_index from CSV row number.
