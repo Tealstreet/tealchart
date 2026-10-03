@@ -1,5 +1,8 @@
 # TradingView oracle capture — handoff
 
+Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
+`RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
+
 ## What these are
 
 Nine Pine v6 indicator scripts, **60 plots each**, written to extract **TradingView's
