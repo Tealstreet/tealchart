@@ -1,0 +1,26 @@
+//@version=6
+indicator("Corpus continuous session boundaries v6", overlay=false)
+var float currentHigh = na
+var float currentLow = na
+var float previousHigh = na
+var float previousLow = na
+if session.isfirstbar_regular
+    currentHigh := high
+    currentLow := low
+if high > currentHigh and session.ismarket
+    currentHigh := high
+if low < currentLow and session.ismarket
+    currentLow := low
+if session.isfirstbar
+    previousHigh := currentHigh[1]
+    previousLow := currentLow[1]
+plot(bar_index, "INDEX")
+plot(close, "CLOSE")
+plot(time, "TIME")
+plot(time("D"), "DAY_OPEN")
+plot(session.isfirstbar ? 1 : 0, "FIRST")
+plot(session.isfirstbar_regular ? 1 : 0, "FIRST_REGULAR")
+plot(session.islastbar ? 1 : 0, "LAST")
+plot(session.islastbar_regular ? 1 : 0, "LAST_REGULAR")
+plot(previousHigh, "PREVIOUS_HIGH")
+plot(previousLow, "PREVIOUS_LOW")

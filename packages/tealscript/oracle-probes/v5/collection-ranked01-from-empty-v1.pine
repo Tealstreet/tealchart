@@ -1,0 +1,5 @@
+//@version=6
+indicator("Empty from outcome")
+values = array.from()
+plot(array.size(values), "EMPTY_SIZE")
+plot(bar_index, "INDEX")

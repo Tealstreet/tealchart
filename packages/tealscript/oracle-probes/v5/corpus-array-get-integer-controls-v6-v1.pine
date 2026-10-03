@@ -1,0 +1,7 @@
+//@version=6
+indicator("corpus-array-get-integer-controls-v6-v1")
+a = array.from(10, 20, 30)
+plot(array.get(a, 1), "floor_control")
+plot(array.get(a, 2), "ceil_control")
+plot(array.get(a, -1), "negative_floor_control")
+plot(array.get(a, 0), "negative_trunc_control")

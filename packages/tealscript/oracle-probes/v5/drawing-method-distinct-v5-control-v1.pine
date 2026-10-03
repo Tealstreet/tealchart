@@ -1,0 +1,10 @@
+//@version=5
+indicator("Distinct user method overload control")
+type Point
+    float x
+method shift(Point p) => p.x
+method shift(Point p, float amount) => p.x + amount
+p = Point.new(10)
+plot(p.shift(), title="ZERO_ARGUMENT")
+plot(p.shift(2), title="ONE_ARGUMENT")
+plot(time, title="INPUT_TIME")

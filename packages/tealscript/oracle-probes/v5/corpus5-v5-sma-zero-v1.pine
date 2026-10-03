@@ -1,0 +1,5 @@
+//@version=5
+indicator("corpus5-v5-sma-zero-v1")
+target = ta.sma(close, 0)
+plot(target, "TARGET")
+plot(ta.sma(close, 1), "LENGTH1_CONTROL")

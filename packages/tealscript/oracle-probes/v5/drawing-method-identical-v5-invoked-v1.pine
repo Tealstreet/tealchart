@@ -1,0 +1,9 @@
+//@version=5
+indicator("Identical user method invocation probe")
+type Point
+    float x
+method shift(Point p) => p.x
+method shift(Point p) => p.x + 1
+p = Point.new(10)
+plot(p.shift(), title="SELECTED_BODY")
+plot(time, title="INPUT_TIME")

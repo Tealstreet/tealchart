@@ -6,6 +6,8 @@
 > **Then round v4.** After v3, do [`v4/HANDOFF-v4.md`](v4/HANDOFF-v4.md) — 76 scripts: 13 numeric CSV first
 > (statistical moments and ranked-window settle ~60 precision/missing-slot columns), 8 screenshot probes, 55 outcome.
 > Reply at `v4/captures/v4/RESPONSE-v4.md`.
+> **Then round v5.** After v4, do [`v5/HANDOFF-v5.md`](v5/HANDOFF-v5.md) — 130 scripts: 20 numeric CSV,
+> 14 screenshot, 96 outcome (`SHA256SUMS-v2.txt` pins every source). Reply at `v5/captures/v5/RESPONSE-v5.md`.
 
 Agent exchange: [capture response v1](RESPONSE-v1.md). The next reply belongs in
 `RESPONSE-v2.md` beside this handoff; commit responses so both machines can read them.
@@ -48,17 +50,17 @@ we have never had.
 
 ## The nine scripts and their chart requirements
 
-| Script | Probes | Chart requirement |
-| --- | --- | --- |
-| `na-holes-crosses-v1` | crossover, crossunder, cross, rising, falling, change, barssince, valuewhen — clean / na-at-start / na interior hole, with holes injected into A and B separately | bar_index **0–127** |
-| `na-holes-oscillators-v1` | rsi, stoch, bb, bbw, kc, kcw, cci, cmo, wpr with injected holes | index **0 → 80+** (holes at 40–41, needs recovery) |
-| `warmup-seed-ma-v1` | sma, ema, rma, wma, vwma, swma, alma, hma, linreg across lengths including 1 and 2 | phases **−5 → ≥91**, prefer **159**; holes at 1, 2, 40, 41, 80–85 |
-| `rma-chain-v1` | rma → atr → rsi bar by bar, six gap regimes | index **0 → ≥109** so seeded ATR/RSI replay exactly |
-| `extrema-barsago-v1` | highest, lowest, highestbars, lowestbars, pivothigh, pivotlow, hand-built Aroon — sign and offset convention | **192 bars** |
-| `volume-vwap-v1` | vwap, obv, pvt, nvi, pvi, accdist, mfi, cum — 20 MFI and 14 anchored-VWAP probes | index **0**, **≥100 bars**; replay rejects truncated history |
-| `plot-offset-visual-v1` | plot offset — const and input, positive and negative | leave the **Shift input at 3** |
-| `htf-request-security-v1` | request.security at HTF 6/10/30, lookahead on/off, gaps on/off, security_lower_tf | **2-minute chart** |
-| `history-maxbarsback-v1` | history operator depth, max_bars_back, var/varip as series | **1800+ bars**; reload before comparing historical varip |
+| Script                    | Probes                                                                                                                                                            | Chart requirement                                                 |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `na-holes-crosses-v1`     | crossover, crossunder, cross, rising, falling, change, barssince, valuewhen — clean / na-at-start / na interior hole, with holes injected into A and B separately | bar_index **0–127**                                               |
+| `na-holes-oscillators-v1` | rsi, stoch, bb, bbw, kc, kcw, cci, cmo, wpr with injected holes                                                                                                   | index **0 → 80+** (holes at 40–41, needs recovery)                |
+| `warmup-seed-ma-v1`       | sma, ema, rma, wma, vwma, swma, alma, hma, linreg across lengths including 1 and 2                                                                                | phases **−5 → ≥91**, prefer **159**; holes at 1, 2, 40, 41, 80–85 |
+| `rma-chain-v1`            | rma → atr → rsi bar by bar, six gap regimes                                                                                                                       | index **0 → ≥109** so seeded ATR/RSI replay exactly               |
+| `extrema-barsago-v1`      | highest, lowest, highestbars, lowestbars, pivothigh, pivotlow, hand-built Aroon — sign and offset convention                                                      | **192 bars**                                                      |
+| `volume-vwap-v1`          | vwap, obv, pvt, nvi, pvi, accdist, mfi, cum — 20 MFI and 14 anchored-VWAP probes                                                                                  | index **0**, **≥100 bars**; replay rejects truncated history      |
+| `plot-offset-visual-v1`   | plot offset — const and input, positive and negative                                                                                                              | leave the **Shift input at 3**                                    |
+| `htf-request-security-v1` | request.security at HTF 6/10/30, lookahead on/off, gaps on/off, security_lower_tf                                                                                 | **2-minute chart**                                                |
+| `history-maxbarsback-v1`  | history operator depth, max_bars_back, var/varip as series                                                                                                        | **1800+ bars**; reload before comparing historical varip          |
 
 Premium allows 25 indicators per chart, so all nine fit in **two charts**: the seven
 "any symbol" scripts on one chart with 1800+ bars loaded, and `htf-request-security`

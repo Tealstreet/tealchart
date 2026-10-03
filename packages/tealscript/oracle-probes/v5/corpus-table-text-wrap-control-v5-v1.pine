@@ -1,0 +1,7 @@
+//@version=5
+indicator("corpus-table-text-wrap-control-v5-v1")
+var t = table.new(position.top_left, 1, 1)
+if barstate.islast
+    table.cell(t, 0, 0, "text")
+    table.cell_set_text_halign(t, 0, 0, text.align_left)
+plot(close)

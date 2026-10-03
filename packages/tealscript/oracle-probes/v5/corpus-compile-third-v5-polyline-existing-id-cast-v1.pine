@@ -1,0 +1,9 @@
+//@version=5
+indicator("corpus-compile-third-v5-polyline-existing-id-cast-v1")
+var points = array.new<chart.point>()
+if barstate.isfirst
+    array.push(points, chart.point.from_index(bar_index, close))
+    array.push(points, chart.point.from_index(bar_index + 1, close + 1))
+var id = polyline.new(points, line_color=color.red)
+cast_id = polyline(id)
+plot(na(cast_id) ? 1 : 0, "TARGET_MISSING")

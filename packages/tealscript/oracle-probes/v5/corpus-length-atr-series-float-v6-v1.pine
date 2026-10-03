@@ -1,0 +1,6 @@
+//@version=6
+indicator("V5-CORPUS-ATR-SERIES-FLOAT-V1")
+length = 14.0
+if close > open
+    length := 10.0
+plot(ta.atr(length), "OUTCOME")

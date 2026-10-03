@@ -1,0 +1,9 @@
+//@version=5
+indicator("corpus-array-get-loop-int-controls-v5-v1")
+sorted = array.from(10.0, 20.0, 30.0, 40.0, 50.0)
+var divisor = 2
+float result = na
+for i = 1 to 3
+    result := array.get(sorted, int(i / divisor))
+plot(result, "loop_explicit_int")
+plot(array.get(sorted, 3 / 2), "const_int_division")

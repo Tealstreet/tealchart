@@ -1,0 +1,304 @@
+{
+  "artifact": "Currency constant literal values columns v1",
+  "source": "currency-constant-literal-values-v1.pine",
+  "sourceSha256": "028304f62c24c56df10cbc732d001e3b083fbab67c25af5905b15b1c9e0b4fab",
+  "plotCount": 43,
+  "columns": [
+    "CONTROL_ABC",
+    "CONTROL_AZZ",
+    "CONTROL_ZZZ",
+    "ARS_CODE",
+    "AUD_CODE",
+    "BDT_CODE",
+    "BHD_CODE",
+    "BRL_CODE",
+    "CAD_CODE",
+    "CLP_CODE",
+    "CNY_CODE",
+    "COP_CODE",
+    "CZK_CODE",
+    "DKK_CODE",
+    "EGP_CODE",
+    "ETH_CODE",
+    "GBP_CODE",
+    "HKD_CODE",
+    "HUF_CODE",
+    "IDR_CODE",
+    "ILS_CODE",
+    "INR_CODE",
+    "ISK_CODE",
+    "KES_CODE",
+    "KRW_CODE",
+    "KWD_CODE",
+    "LKR_CODE",
+    "MAD_CODE",
+    "MXN_CODE",
+    "MYR_CODE",
+    "NGN_CODE",
+    "NOK_CODE",
+    "NZD_CODE",
+    "PEN_CODE",
+    "PHP_CODE",
+    "PKR_CODE",
+    "PLN_CODE",
+    "QAR_CODE",
+    "RON_CODE",
+    "RSD_CODE",
+    "RUB_CODE",
+    "SAR_CODE",
+    "SEK_CODE"
+  ],
+  "encoding": {
+    "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    "formula": "(index(char0)*26 + index(char1))*26 + index(char2)",
+    "decode": "Three base-26 digits mapped to uppercase letters; preserve leading A digits. Invalid length/alphabet yields na; first-bar log records the unencoded string.",
+    "controlValues": {
+      "CONTROL_ABC": 28,
+      "CONTROL_AZZ": 675,
+      "CONTROL_ZZZ": 17575
+    }
+  },
+  "members": [
+    {
+      "rank": 1561,
+      "member": "currency.ARS",
+      "column": "ARS_CODE",
+      "logPrefix": "currency.ARS="
+    },
+    {
+      "rank": 1562,
+      "member": "currency.AUD",
+      "column": "AUD_CODE",
+      "logPrefix": "currency.AUD="
+    },
+    {
+      "rank": 1563,
+      "member": "currency.BDT",
+      "column": "BDT_CODE",
+      "logPrefix": "currency.BDT="
+    },
+    {
+      "rank": 1564,
+      "member": "currency.BHD",
+      "column": "BHD_CODE",
+      "logPrefix": "currency.BHD="
+    },
+    {
+      "rank": 1565,
+      "member": "currency.BRL",
+      "column": "BRL_CODE",
+      "logPrefix": "currency.BRL="
+    },
+    {
+      "rank": 1566,
+      "member": "currency.CAD",
+      "column": "CAD_CODE",
+      "logPrefix": "currency.CAD="
+    },
+    {
+      "rank": 1567,
+      "member": "currency.CLP",
+      "column": "CLP_CODE",
+      "logPrefix": "currency.CLP="
+    },
+    {
+      "rank": 1568,
+      "member": "currency.CNY",
+      "column": "CNY_CODE",
+      "logPrefix": "currency.CNY="
+    },
+    {
+      "rank": 1569,
+      "member": "currency.COP",
+      "column": "COP_CODE",
+      "logPrefix": "currency.COP="
+    },
+    {
+      "rank": 1570,
+      "member": "currency.CZK",
+      "column": "CZK_CODE",
+      "logPrefix": "currency.CZK="
+    },
+    {
+      "rank": 1571,
+      "member": "currency.DKK",
+      "column": "DKK_CODE",
+      "logPrefix": "currency.DKK="
+    },
+    {
+      "rank": 1572,
+      "member": "currency.EGP",
+      "column": "EGP_CODE",
+      "logPrefix": "currency.EGP="
+    },
+    {
+      "rank": 1573,
+      "member": "currency.ETH",
+      "column": "ETH_CODE",
+      "logPrefix": "currency.ETH="
+    },
+    {
+      "rank": 1574,
+      "member": "currency.GBP",
+      "column": "GBP_CODE",
+      "logPrefix": "currency.GBP="
+    },
+    {
+      "rank": 1575,
+      "member": "currency.HKD",
+      "column": "HKD_CODE",
+      "logPrefix": "currency.HKD="
+    },
+    {
+      "rank": 1576,
+      "member": "currency.HUF",
+      "column": "HUF_CODE",
+      "logPrefix": "currency.HUF="
+    },
+    {
+      "rank": 1577,
+      "member": "currency.IDR",
+      "column": "IDR_CODE",
+      "logPrefix": "currency.IDR="
+    },
+    {
+      "rank": 1578,
+      "member": "currency.ILS",
+      "column": "ILS_CODE",
+      "logPrefix": "currency.ILS="
+    },
+    {
+      "rank": 1579,
+      "member": "currency.INR",
+      "column": "INR_CODE",
+      "logPrefix": "currency.INR="
+    },
+    {
+      "rank": 1580,
+      "member": "currency.ISK",
+      "column": "ISK_CODE",
+      "logPrefix": "currency.ISK="
+    },
+    {
+      "rank": 1581,
+      "member": "currency.KES",
+      "column": "KES_CODE",
+      "logPrefix": "currency.KES="
+    },
+    {
+      "rank": 1582,
+      "member": "currency.KRW",
+      "column": "KRW_CODE",
+      "logPrefix": "currency.KRW="
+    },
+    {
+      "rank": 1583,
+      "member": "currency.KWD",
+      "column": "KWD_CODE",
+      "logPrefix": "currency.KWD="
+    },
+    {
+      "rank": 1584,
+      "member": "currency.LKR",
+      "column": "LKR_CODE",
+      "logPrefix": "currency.LKR="
+    },
+    {
+      "rank": 1585,
+      "member": "currency.MAD",
+      "column": "MAD_CODE",
+      "logPrefix": "currency.MAD="
+    },
+    {
+      "rank": 1586,
+      "member": "currency.MXN",
+      "column": "MXN_CODE",
+      "logPrefix": "currency.MXN="
+    },
+    {
+      "rank": 1587,
+      "member": "currency.MYR",
+      "column": "MYR_CODE",
+      "logPrefix": "currency.MYR="
+    },
+    {
+      "rank": 1588,
+      "member": "currency.NGN",
+      "column": "NGN_CODE",
+      "logPrefix": "currency.NGN="
+    },
+    {
+      "rank": 1589,
+      "member": "currency.NOK",
+      "column": "NOK_CODE",
+      "logPrefix": "currency.NOK="
+    },
+    {
+      "rank": 1590,
+      "member": "currency.NZD",
+      "column": "NZD_CODE",
+      "logPrefix": "currency.NZD="
+    },
+    {
+      "rank": 1591,
+      "member": "currency.PEN",
+      "column": "PEN_CODE",
+      "logPrefix": "currency.PEN="
+    },
+    {
+      "rank": 1592,
+      "member": "currency.PHP",
+      "column": "PHP_CODE",
+      "logPrefix": "currency.PHP="
+    },
+    {
+      "rank": 1593,
+      "member": "currency.PKR",
+      "column": "PKR_CODE",
+      "logPrefix": "currency.PKR="
+    },
+    {
+      "rank": 1594,
+      "member": "currency.PLN",
+      "column": "PLN_CODE",
+      "logPrefix": "currency.PLN="
+    },
+    {
+      "rank": 1595,
+      "member": "currency.QAR",
+      "column": "QAR_CODE",
+      "logPrefix": "currency.QAR="
+    },
+    {
+      "rank": 1596,
+      "member": "currency.RON",
+      "column": "RON_CODE",
+      "logPrefix": "currency.RON="
+    },
+    {
+      "rank": 1597,
+      "member": "currency.RSD",
+      "column": "RSD_CODE",
+      "logPrefix": "currency.RSD="
+    },
+    {
+      "rank": 1598,
+      "member": "currency.RUB",
+      "column": "RUB_CODE",
+      "logPrefix": "currency.RUB="
+    },
+    {
+      "rank": 1599,
+      "member": "currency.SAR",
+      "column": "SAR_CODE",
+      "logPrefix": "currency.SAR="
+    },
+    {
+      "rank": 1600,
+      "member": "currency.SEK",
+      "column": "SEK_CODE",
+      "logPrefix": "currency.SEK="
+    }
+  ],
+  "nativeStatus": "NOT-CAPTURED"
+}

@@ -1,0 +1,10 @@
+//@version=6
+indicator("corpus-array-get-size-series-controls-v6-v1")
+sorted = array.from(10.0, 20.0, 30.0, 40.0, 50.0)
+sz = array.size(sorted)
+i = bar_index % 5
+k_nwe = input.float(2.0)
+plot(array.get(sorted, math.floor(sz / 2)), "size_floor")
+plot(array.get(sorted, math.ceil(sz / 2)), "size_ceil")
+plot(array.get(sorted, math.floor(i / k_nwe)), "series_floor")
+plot(array.get(sorted, math.ceil(i / k_nwe)), "series_ceil")

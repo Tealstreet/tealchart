@@ -1,0 +1,58 @@
+//@version=6
+indicator("V5-FLOAT-EQUALITY-NONZERO-DISCRIMINATOR-V3", precision=16)
+phase = bar_index % 16
+a = switch phase
+    0 => 0.00000000009
+    1 => 0.00000000011
+    2 => 0.00000000049
+    3 => 1.00000000009
+    4 => 1.00000000011
+    5 => 1.00000000049
+    6 => 1.00000000049
+    7 => -1.00000000049
+    8 => 2.00000000049
+    9 => 1.0
+    10 => -1.0
+    11 => 100000000.00000001
+    12 => 1e-10
+    13 => 2e-10
+    14 => -1e-10
+    => -2e-10
+b = switch phase
+    0 => 0.0
+    1 => 0.0
+    2 => 0.0
+    3 => 1.0
+    4 => 1.0
+    5 => 1.0
+    6 => 1.00000000051
+    7 => -1.00000000051
+    8 => 2.00000000051
+    9 => 1.0
+    10 => 1.0
+    11 => 100000000.0
+    => 0.0
+plot(phase, "PHASE")
+plot(a == b ? 1 : 0, "EQ")
+plot(a != b ? 1 : 0, "NE")
+plot(a < b ? 1 : 0, "LT")
+plot(a <= b ? 1 : 0, "LE")
+plot(a > b ? 1 : 0, "GT")
+plot(a >= b ? 1 : 0, "GE")
+plot(math.abs(a-b)*1e12, "ABS_DIFF_SCALED")
+x = close * 2e-10
+normalized = (close / close) * 2e-10
+plot(time, "input_time", display=display.data_window)
+plot(bar_index, "input_bar_index", display=display.data_window)
+plot(close, "input_close", display=display.data_window)
+plot(x * 1e10, "x_scaled_1e10", display=display.data_window)
+plot(x == 0.0 ? 1 : 0, "x_eq_zero", display=display.data_window)
+plot(x != 0.0 ? 1 : 0, "x_neq_zero", display=display.data_window)
+plot(0.0 == x ? 1 : 0, "zero_eq_x", display=display.data_window)
+plot(0.0 != x ? 1 : 0, "zero_neq_x", display=display.data_window)
+plot(normalized * 1e10, "normalized_scaled_1e10", display=display.data_window)
+plot(normalized == 0.0 ? 1 : 0, "normalized_eq_zero", display=display.data_window)
+plot(normalized != 0.0 ? 1 : 0, "normalized_neq_zero", display=display.data_window)
+plot(2e-10 == 0.0 ? 1 : 0, "literal_eq_zero", display=display.data_window)
+plot(2e-10 != 0.0 ? 1 : 0, "literal_neq_zero", display=display.data_window)
+plot(na(x) ? 1 : 0, "x_na", display=display.data_window)

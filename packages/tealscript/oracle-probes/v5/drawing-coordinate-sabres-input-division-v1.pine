@@ -1,0 +1,5 @@
+//@version=5
+indicator("Sabres point v1")
+length = input.int(50)
+p = chart.point.from_index(bar_index + (length / 2 - 1), low)
+plot(close)

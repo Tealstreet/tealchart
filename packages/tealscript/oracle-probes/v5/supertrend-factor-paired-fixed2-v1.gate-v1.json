@@ -1,0 +1,14 @@
+{
+  "artifact": "Supertrend factor local instrumentation gate v1",
+  "sourceSha256": "d21cdc8ae28b7e646846c421c848b6d6795314827bf8641b901fe36eb302d879",
+  "bars": 300,
+  "diagnostics": [],
+  "compiled": true,
+  "errors": [],
+  "repeatErrors": [],
+  "plots": 12,
+  "mapMatches": true,
+  "complete": true,
+  "deterministic": true,
+  "authority": "Instrumentation validation only; not TradingView parity"
+}

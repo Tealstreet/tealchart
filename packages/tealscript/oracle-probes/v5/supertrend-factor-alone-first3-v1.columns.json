@@ -1,0 +1,58 @@
+{
+  "artifact": "Supertrend factor alone-first3 ordered columns v1",
+  "source": "supertrend-factor-alone-first3-v1.pine",
+  "sourceSha256": "cd4c4ee7b2d6f865fba61f52b360d0bfc68f23ab71bc8700827511f4e73dcb97",
+  "plotCount": 10,
+  "columns": [
+    {
+      "index": 0,
+      "title": "input_time_ms",
+      "expression": "time"
+    },
+    {
+      "index": 1,
+      "title": "input_bar_index",
+      "expression": "bar_index"
+    },
+    {
+      "index": 2,
+      "title": "input_open",
+      "expression": "open"
+    },
+    {
+      "index": 3,
+      "title": "input_high",
+      "expression": "high"
+    },
+    {
+      "index": 4,
+      "title": "input_low",
+      "expression": "low"
+    },
+    {
+      "index": 5,
+      "title": "input_close",
+      "expression": "close"
+    },
+    {
+      "index": 6,
+      "title": "input_volume",
+      "expression": "volume"
+    },
+    {
+      "index": 7,
+      "title": "input_factor",
+      "expression": "factor"
+    },
+    {
+      "index": 8,
+      "title": "dynamic_line",
+      "expression": "line"
+    },
+    {
+      "index": 9,
+      "title": "dynamic_direction",
+      "expression": "direction"
+    }
+  ]
+}

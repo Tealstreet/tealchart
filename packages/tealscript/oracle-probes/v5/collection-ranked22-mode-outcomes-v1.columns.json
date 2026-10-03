@@ -1,0 +1,20 @@
+{
+  "artifact": "collection-ranked22 mode columns v1",
+  "source": "collection-ranked22-mode-outcomes-v1.pine",
+  "sourceSha256": "2ab22b09a0224db80cc8bea242b1d58238b5a2e5210fe912bbd0e0cbf5e54d24",
+  "plotCount": 12,
+  "columns": [
+    "int_unique",
+    "int_tie",
+    "int_single",
+    "int_distinct_namespace",
+    "int_distinct_method",
+    "int_empty",
+    "float_unique",
+    "float_tie",
+    "float_single",
+    "float_distinct_namespace",
+    "float_distinct_method",
+    "float_empty"
+  ]
+}

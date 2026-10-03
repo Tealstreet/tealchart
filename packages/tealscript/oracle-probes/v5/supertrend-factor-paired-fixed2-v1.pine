@@ -1,0 +1,17 @@
+//@version=6
+indicator("Supertrend factor paired-fixed2 v1", overlay=false)
+factor = bar_index % 2 == 0 ? 2.0 : 3.0
+[line, direction] = ta.supertrend(factor, 3)
+[fixedLine, fixedDirection] = ta.supertrend(2.0, 3)
+plot(time, "input_time_ms", display=display.data_window)
+plot(bar_index, "input_bar_index", display=display.data_window)
+plot(open, "input_open", display=display.data_window)
+plot(high, "input_high", display=display.data_window)
+plot(low, "input_low", display=display.data_window)
+plot(close, "input_close", display=display.data_window)
+plot(volume, "input_volume", display=display.data_window)
+plot(factor, "input_factor", display=display.data_window)
+plot(line, "dynamic_line", display=display.data_window)
+plot(direction, "dynamic_direction", display=display.data_window)
+plot(fixedLine, "fixed2_line", display=display.data_window)
+plot(fixedDirection, "fixed2_direction", display=display.data_window)

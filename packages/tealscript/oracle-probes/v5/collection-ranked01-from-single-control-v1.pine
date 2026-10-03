@@ -1,0 +1,5 @@
+//@version=6
+indicator("Singleton from control")
+values = array.from(17)
+plot(array.size(values), "SIZE")
+plot(array.get(values, 0), "VALUE")

@@ -1,0 +1,8 @@
+//@version=5
+indicator("ledger47-zero-div-v5-literal-negative-zero-v1", overlay=false)
+value = close / -0.0
+plot(time, title="INPUT_TIME")
+plot(close, title="NUMERATOR_CLOSE")
+plot(value, title="RAW")
+plot(na(value) ? 1 : 0, title="IS_NA")
+plot(nz(value, 42.0), title="NZ_42")

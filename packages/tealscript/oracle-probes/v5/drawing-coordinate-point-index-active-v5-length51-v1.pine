@@ -1,0 +1,7 @@
+//@version=5
+indicator("Point index active input division 51")
+length = input.int(51)
+p = chart.point.from_index(bar_index + (length / 2 - 1), low)
+plot(p.index, title="POINT_INDEX")
+plot(bar_index, title="CHART_INDEX")
+plot(time, title="INPUT_TIME")

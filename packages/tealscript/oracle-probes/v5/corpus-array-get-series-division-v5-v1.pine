@@ -1,0 +1,6 @@
+//@version=5
+indicator("corpus-array-get-series-division-v5-v1")
+sorted = array.from(10.0, 20.0, 30.0, 40.0, 50.0)
+i = bar_index % 5
+k_nwe = input.float(2.0)
+plot(array.get(sorted, i / k_nwe), "series_division")

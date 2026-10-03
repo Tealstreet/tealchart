@@ -1,0 +1,8 @@
+//@version=5
+indicator("Unsupported duplicate user method")
+type Point
+    float x
+
+method shift(Point p) => p.x
+method shift(Point p) => p.x + 1
+plot(close)

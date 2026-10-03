@@ -1,0 +1,32 @@
+{
+  "artifact": "Float equality discriminator columns v3",
+  "source": "float-equality-nonzero-discriminator-v3.pine",
+  "sourceSha256": "9780d704a83e9ecf4b80724b5cc63ae49054fcec68b05949e971f86145bb09f3",
+  "plotCount": 22,
+  "columns": [
+    "PHASE",
+    "EQ",
+    "NE",
+    "LT",
+    "LE",
+    "GT",
+    "GE",
+    "ABS_DIFF_SCALED",
+    "input_time",
+    "input_bar_index",
+    "input_close",
+    "x_scaled_1e10",
+    "x_eq_zero",
+    "x_neq_zero",
+    "zero_eq_x",
+    "zero_neq_x",
+    "normalized_scaled_1e10",
+    "normalized_eq_zero",
+    "normalized_neq_zero",
+    "literal_eq_zero",
+    "literal_neq_zero",
+    "x_na"
+  ],
+  "preservedDirectControlSource": "zero-equality-direct-boundary-v1.pine",
+  "preservedDirectBodySha256": "a82c590f7605a88172e994f47cc5a58c1ac4e74c0e7a387592cf4fdffd80b2a8"
+}

@@ -1,0 +1,12 @@
+//@version=6
+indicator("trace-plotarrow-height-negative-min-v6",overlay=true)
+source=bar_index%4==0?1:bar_index%4==1?-1:bar_index%4==2?4:-4
+series_offset=0
+minimum=-5
+maximum=50
+plotarrow(source,minheight=minimum,maxheight=maximum,colorup=color.lime,colordown=color.red)
+plot(bar_index,"BAR_INDEX",display=display.data_window)
+plot(source,"SOURCE",display=display.data_window)
+plot(series_offset,"OFFSET",display=display.data_window)
+plot(minimum,"MINHEIGHT",display=display.data_window)
+plot(maximum,"MAXHEIGHT",display=display.data_window)

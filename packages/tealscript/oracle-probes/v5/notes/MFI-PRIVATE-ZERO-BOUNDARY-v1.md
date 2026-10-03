@@ -1,0 +1,9 @@
+# MFI private zero boundary v1
+
+Capture unchanged `mfi-private-zero-boundary-v1.pine` on BINANCE:BTCUSDT, standard2-minute candles, UTC, longest available history from script bar_index0. Export all60 numeric data-window columns, UNIX timestamps, blanks and raw signed values; retain complete diagnostics if refused. At least600 historical bars are required; the four original carry witnesses need the longest available history and matching initial chart history when possible. Native result is NOT-CAPTURED.
+
+Seven source scales are1,2^-20,2^-30,2^-40,2^-45,2^-50,2^-60. Each group emits builtin MFI length2; the current official Pine formula using scaled-source changes; a formula using unscaled-close signs; a labelled candidate absolute1e-10 zero guard; upper/lower sums divided back by the source scale; and scaled-source Pine up/down flows divided back by scale. Restoring sums before plotting retains tiny signed carries in the CSV. Four input columns preserve time, bar index, close and volume. The ordered column map carries the unchanged source SHA256.
+
+Interpretation must inspect the Pine-sign flow controls before attributing a scaled builtin result to a zero guard. Source comparisons can themselves change at tiny scales; the unscaled-sign controls isolate that effect. Formula controls are definitions to discriminate, not promoted builtin authority. The1e-10 candidate is not a claimed native rule; multiple thresholds or other private arithmetic may fit old finite witnesses.
+
+Local gate, when its adjacent gate receipt exists:600 captured OHLCV bars run twice on pinned integration32bfca533f,60 unique complete vectors, no semantic/runtime errors and identical outputs. This proves readiness only. No shared bundle manifest was changed; overseer can register the probe after reviewing its gate. Owner ymk07v.

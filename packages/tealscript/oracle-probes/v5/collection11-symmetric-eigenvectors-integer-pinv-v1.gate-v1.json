@@ -1,0 +1,19 @@
+{
+  "bars": 160,
+  "runs": [
+    {
+      "errors": [],
+      "plotCount": 11,
+      "allFinite": true
+    },
+    {
+      "errors": [],
+      "plotCount": 11,
+      "allFinite": true
+    }
+  ],
+  "identical": true,
+  "nativeObserved": false,
+  "sourceSha256": "e8a6fe4efd7b7adf7528ab218e63375b60fae5d094a5c47e9dcc836240bbb20f",
+  "localEngineHead": "88df865ccddfb22ed3544138918f17137af09f1e"
+}

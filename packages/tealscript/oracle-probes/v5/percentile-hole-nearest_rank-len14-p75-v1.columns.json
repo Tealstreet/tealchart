@@ -1,0 +1,15 @@
+{
+  "artifact": "percentile_nearest_rank_len14_pct75_hole40_41 columns v1",
+  "source": "percentile-hole-nearest_rank-len14-p75-v1.pine",
+  "sourceSha256": "3feff77726fad1b5c5a6189b99b985659a173369099c0cec9e66a16a9d681280",
+  "plotCount": 7,
+  "columns": [
+    "input_bar_index",
+    "input_time",
+    "input_close",
+    "input_source",
+    "input_missing",
+    "percentile_nearest_rank_len14_pct75_hole40_41",
+    "clean_control"
+  ]
+}

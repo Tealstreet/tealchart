@@ -1,0 +1,100 @@
+{
+  "artifact": "Compound operator association Pine v6 columns v1",
+  "source": "compound-operator-association-pine-v6-v1.pine",
+  "sourceSha256": "53fe243fb89dba8831789ea290ba9977b25532749053ddccf492cc8c4107e737",
+  "plotCount": 23,
+  "columns": [
+    {
+      "index": 0,
+      "title": "input_time"
+    },
+    {
+      "index": 1,
+      "title": "input_bar_index"
+    },
+    {
+      "index": 2,
+      "title": "add_plain"
+    },
+    {
+      "index": 3,
+      "title": "add_grouped"
+    },
+    {
+      "index": 4,
+      "title": "add_two_subtractions"
+    },
+    {
+      "index": 5,
+      "title": "subtract_plain"
+    },
+    {
+      "index": 6,
+      "title": "subtract_grouped"
+    },
+    {
+      "index": 7,
+      "title": "multiply_plain_subtraction"
+    },
+    {
+      "index": 8,
+      "title": "multiply_grouped_subtraction"
+    },
+    {
+      "index": 9,
+      "title": "divide_plain_subtraction"
+    },
+    {
+      "index": 10,
+      "title": "divide_grouped_subtraction"
+    },
+    {
+      "index": 11,
+      "title": "multiply_then_divide"
+    },
+    {
+      "index": 12,
+      "title": "divide_then_multiply"
+    },
+    {
+      "index": 13,
+      "title": "add_left_control"
+    },
+    {
+      "index": 14,
+      "title": "add_grouped_control"
+    },
+    {
+      "index": 15,
+      "title": "subtract_left_control"
+    },
+    {
+      "index": 16,
+      "title": "subtract_grouped_control"
+    },
+    {
+      "index": 17,
+      "title": "multiply_left_control"
+    },
+    {
+      "index": 18,
+      "title": "divide_left_control"
+    },
+    {
+      "index": 19,
+      "title": "multiply_divide_left_control"
+    },
+    {
+      "index": 20,
+      "title": "multiply_divide_grouped_control"
+    },
+    {
+      "index": 21,
+      "title": "divide_multiply_left_control"
+    },
+    {
+      "index": 22,
+      "title": "divide_multiply_grouped_control"
+    }
+  ]
+}

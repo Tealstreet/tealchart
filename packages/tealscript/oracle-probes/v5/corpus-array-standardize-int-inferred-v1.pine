@@ -1,0 +1,9 @@
+//@version=6
+indicator("corpus-array-standardize-int-inferred-v1")
+sorted = array.from(10.0, 20.0, 30.0, 40.0, 50.0)
+a = array.from(1, 2, 3)
+b = array.standardize(a)
+plot(array.size(b), "size")
+plot(array.get(b, 0), "first")
+plot(array.get(b, 1), "middle")
+plot(array.get(b, 2), "last")

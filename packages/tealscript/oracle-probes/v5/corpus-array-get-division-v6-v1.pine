@@ -1,0 +1,5 @@
+//@version=6
+indicator("corpus-array-get-division-v6-v1")
+a = array.from(10, 20, 30)
+n = input.int(3)
+plot(array.get(a, n / 2), "division")

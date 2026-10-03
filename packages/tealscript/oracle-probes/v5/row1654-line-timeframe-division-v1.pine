@@ -1,0 +1,7 @@
+//@version=5
+indicator("row1654-line-timeframe-division-v1", overlay=true)
+tfMultiplier = timeframe.multiplier
+if barstate.islast
+    for barIndex = 0 to 1
+        line.new(bar_index + barIndex * 60 / tfMultiplier, low, bar_index + (barIndex + 1) * 60 / tfMultiplier, high, xloc=xloc.bar_index)
+plot(close, "compile_control")

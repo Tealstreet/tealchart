@@ -1,0 +1,9 @@
+//@version=5
+indicator("row1654-explicit-int-control-v1", overlay=true)
+tfMultiplier = timeframe.multiplier
+lookbackLength = 1440 / tfMultiplier
+plot(ta.lowest(low, int(lookbackLength)), "explicit_int_control")
+if barstate.islast
+    for barIndex = 0 to 1
+        line.new(int(bar_index + barIndex * 60 / tfMultiplier), low, int(bar_index + (barIndex + 1) * 60 / tfMultiplier), high, xloc=xloc.bar_index)
+        label.new(int(bar_index + barIndex * 60 / tfMultiplier), low, "control", xloc=xloc.bar_index)

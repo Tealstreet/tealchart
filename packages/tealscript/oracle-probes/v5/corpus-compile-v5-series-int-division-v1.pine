@@ -1,0 +1,7 @@
+//@version=5
+indicator("corpus-compile-v5-series-int-division-v1")
+int target = bar_index / 2
+plot(target,"target")
+plot(int(bar_index / 2),"explicit_int_control")
+plot(math.floor(bar_index / 2),"floor_control")
+plot(bar_index / 2,"unannotated_control")

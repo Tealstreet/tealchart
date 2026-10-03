@@ -1,0 +1,9 @@
+//@version=6
+indicator("trace-max-all-na-seed-v1")
+allValue=ta.max(float(na))
+leadingSource=bar_index < 5 ? float(na) : float(bar_index)
+leadingValue=ta.max(leadingSource)
+plot(allValue,"ALL_VALUE")
+plot(na(allValue)?1:0,"ALL_MISSING")
+plot(leadingValue,"LEADING_VALUE")
+plot(na(leadingValue)?1:0,"LEADING_MISSING")

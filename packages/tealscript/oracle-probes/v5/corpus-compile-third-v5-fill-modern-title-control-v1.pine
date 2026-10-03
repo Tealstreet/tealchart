@@ -1,0 +1,5 @@
+//@version=5
+indicator("corpus-compile-third-v5-fill-modern-title-control-v1")
+p1 = plot(close, "UPPER")
+p2 = plot(close - 1, "LOWER")
+fill(p1, p2, color.green, "Fill")

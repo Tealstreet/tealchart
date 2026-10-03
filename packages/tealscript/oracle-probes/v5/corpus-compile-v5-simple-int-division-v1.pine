@@ -1,0 +1,7 @@
+//@version=5
+indicator("corpus-compile-v5-simple-int-division-v1")
+var int target = timeframe.in_seconds(timeframe.period) / 60
+plot(target,"target")
+plot(int(timeframe.in_seconds(timeframe.period) / 60),"explicit_int_control")
+plot(math.floor(timeframe.in_seconds(timeframe.period) / 60),"floor_control")
+plot(timeframe.in_seconds(timeframe.period) / 60,"unannotated_control")

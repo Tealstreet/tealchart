@@ -1,0 +1,51 @@
+//@version=6
+indicator("V5 compound operator generalization", overlay=false)
+phase = bar_index % 2
+x = phase == 0 ? 1e16 : -1e16
+a = -x
+b = phase == 0 ? -1.0 : 1.0
+float plainAdd = x
+plainAdd += a - b
+float groupedAdd = x
+groupedAdd += (a - b)
+float multipleSubtract = x
+multipleSubtract += a - b - b
+float plainSubtract = x
+plainSubtract -= -a - b
+float groupedSubtract = x
+groupedSubtract -= (-a - b)
+float plainMultiply = 3.0
+plainMultiply *= 4.0 - 2.0
+float groupedMultiply = 3.0
+groupedMultiply *= (4.0 - 2.0)
+float plainDivide = 12.0
+plainDivide /= 4.0 - 2.0
+float groupedDivide = 12.0
+groupedDivide /= (4.0 - 2.0)
+float multiplyThenDivide = x
+multiplyThenDivide *= a / 3.0
+float divideThenMultiply = x
+divideThenMultiply /= 3.0 * a
+plot(time, "input_time", display=display.data_window)
+plot(bar_index, "input_bar_index", display=display.data_window)
+plot(plainAdd, "add_plain")
+plot(groupedAdd, "add_grouped")
+plot(multipleSubtract, "add_two_subtractions")
+plot(plainSubtract, "subtract_plain")
+plot(groupedSubtract, "subtract_grouped")
+plot(plainMultiply, "multiply_plain_subtraction")
+plot(groupedMultiply, "multiply_grouped_subtraction")
+plot(plainDivide, "divide_plain_subtraction")
+plot(groupedDivide, "divide_grouped_subtraction")
+plot(multiplyThenDivide, "multiply_then_divide")
+plot(divideThenMultiply, "divide_then_multiply")
+plot((x + a) - b, "add_left_control")
+plot(x + (a - b), "add_grouped_control")
+plot((x - (-a)) - b, "subtract_left_control")
+plot(x - (-a - b), "subtract_grouped_control")
+plot((3.0 * 4.0) - 2.0, "multiply_left_control")
+plot((12.0 / 4.0) - 2.0, "divide_left_control")
+plot((x * a) / 3.0, "multiply_divide_left_control")
+plot(x * (a / 3.0), "multiply_divide_grouped_control")
+plot((x / 3.0) * a, "divide_multiply_left_control")
+plot(x / (3.0 * a), "divide_multiply_grouped_control")

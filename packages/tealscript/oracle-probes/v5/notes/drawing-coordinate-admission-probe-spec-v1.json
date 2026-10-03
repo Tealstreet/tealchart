@@ -1,0 +1,75 @@
+{
+  "artifact": "Drawing coordinate float admission probes v1",
+  "owner": "codex-p4250m",
+  "cases": [
+    {
+      "source": "drawing-coordinate-backquant-float-x-v1.pine",
+      "sourceSha256": "6a7537b70ad28ad819cc93aa17a6367f6b8f11d79d039f270a70b76ceca6cff0",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Does the unchanged version-specific floating expression compile in the documented integer coordinate slot? Record exact compiler diagnostic or runtime output; no admission predicted."
+    },
+    {
+      "source": "drawing-coordinate-profile-float-right-v1.pine",
+      "sourceSha256": "26fcaadce0aebc1e20634f983e394bbd48dab6c2857d309dde8eb14a85167518",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Does the unchanged version-specific floating expression compile in the documented integer coordinate slot? Record exact compiler diagnostic or runtime output; no admission predicted."
+    },
+    {
+      "source": "drawing-coordinate-sabres-input-division-v1.pine",
+      "sourceSha256": "4cfcf8d804c92e16ca4b385f5dd684dafa761a2aeecaa217115da4181d831808",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Does the unchanged version-specific floating expression compile in the documented integer coordinate slot? Record exact compiler diagnostic or runtime output; no admission predicted."
+    },
+    {
+      "source": "drawing-coordinate-point-index-active-v5-length50-v1.pine",
+      "sourceSha256": "ffa5628632bebdaba2a8e5c6eb53cfbdb220fd503e136226cd8757284d744531",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Active point index output avoids an unused constructor; retain int input qualifier. Observe compile refusal or actual POINT_INDEX/CHART_INDEX vector, including nonintegral51 control. No implicit conversion policy assumed.",
+      "columns": [
+        "POINT_INDEX",
+        "CHART_INDEX",
+        "INPUT_TIME"
+      ]
+    },
+    {
+      "source": "drawing-coordinate-point-index-active-v5-length51-v1.pine",
+      "sourceSha256": "e34138eb126b476e220cdfabe3f1551781d09ac35a99afdc6f7d1a0487d5e0ff",
+      "nativeStatus": "UNOBSERVED",
+      "question": "Active point index output avoids an unused constructor; retain int input qualifier. Observe compile refusal or actual POINT_INDEX/CHART_INDEX vector, including nonintegral51 control. No implicit conversion policy assumed.",
+      "columns": [
+        "POINT_INDEX",
+        "CHART_INDEX",
+        "INPUT_TIME"
+      ]
+    }
+  ],
+  "corpusSources": [
+    {
+      "comparisonId": "v7:188",
+      "sourcePath": "/home/sam/cs/docs/tealscript-parity-archive/corpus-cache/pine-corpus-v7-20260911/sources/0189__regalouisei-collect-tradingview__harmonic-frequency-visualizer-backquant.pine",
+      "sourceSha256": "ca016a397d4d73314b7724aaaaea6d789bc3725d5d3da653ea645b0bec54d6dc"
+    },
+    {
+      "comparisonId": "v56:542",
+      "sourcePath": "/home/sam/cs/docs/tealscript-parity-archive/corpus-cache/pine-corpus-v5-20260910/sources/0543__casoon-pine-scripts__momentum_profile.pine",
+      "sourceSha256": "3b6e476d82db3add225831a8cd5dc6adca1e6359aaddae939380454f715fc20c"
+    },
+    {
+      "comparisonId": "v56:563",
+      "sourcePath": "/home/sam/cs/docs/tealscript-parity-archive/corpus-cache/pine-corpus-v5-20260910/sources/0564__casoon-pine-scripts__money_flow_delta_profile.pine",
+      "sourceSha256": "86b6744ff3820d7e245a78945ea214b3513d598ca38032e7ce883ce64add2856"
+    },
+    {
+      "comparisonId": "v56:1319",
+      "sourcePath": "/home/sam/cs/docs/tealscript-parity-archive/corpus-cache/pine-corpus-v6-20260911/sources/0320__deepentropy-lightweight-charts-indicators__MA-Sabres-LuxAlgo-.pine",
+      "sourceSha256": "c9d44f9eb543fa5424d201a64412bf33f03692b666baa615e781a1a3380f45e5"
+    },
+    {
+      "comparisonId": "v56:1384",
+      "sourcePath": "/home/sam/cs/docs/tealscript-parity-archive/corpus-cache/pine-corpus-v6-20260911/sources/0385__deepentropy-oakscriptJS__MA-Sabres-LuxAlgo-.pine",
+      "sourceSha256": "c9d44f9eb543fa5424d201a64412bf33f03692b666baa615e781a1a3380f45e5"
+    }
+  ],
+  "authority": "Integer x/right/index reference slots; no implicit float-to-int conversion. Current engine refusals are retained pending native evidence.",
+  "captureInstructions": "Retain original Pine versions and default inputs. Record native compile diagnostic, source location and phase or exported drawing/plot result. Compare a separate explicit int() cast control if needed. These minimal sources isolate slot admission; full original-source acceptance must be recorded independently."
+}

@@ -1,0 +1,6 @@
+//@version=6
+indicator("corpus5-v6-exp-price-overflow-v1")
+value = math.exp(close)
+plot(value, "PRICE_EXP_TARGET")
+plot(math.exp(1.0), "FINITE_CONTROL")
+plot(na(value) ? 1 : 0, "TARGET_IS_NA")

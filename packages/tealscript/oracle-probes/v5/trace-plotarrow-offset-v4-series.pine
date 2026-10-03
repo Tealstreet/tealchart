@@ -1,0 +1,11 @@
+//@version=4
+study("trace-plotarrow-offset-v4-series",overlay=true)
+phase=bar_index%32
+source=phase==8?1:phase==9?-1:phase==11?4:phase==12?-4:0
+series_offset=phase<10?2:phase<12?-1:-3
+plotarrow(source,colorup=color.lime,colordown=color.red,offset=series_offset,minheight=10,maxheight=50)
+plot(bar_index,"BAR_INDEX",transp=100)
+plot(source,"SOURCE",transp=100)
+plot(series_offset,"OFFSET",transp=100)
+plot(10,"MINHEIGHT",transp=100)
+plot(50,"MAXHEIGHT",transp=100)

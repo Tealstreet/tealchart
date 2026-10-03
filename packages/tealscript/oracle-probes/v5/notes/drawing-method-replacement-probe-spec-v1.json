@@ -1,0 +1,37 @@
+{
+  "artifact": "User-method replacement native probe spec v1",
+  "owner": "codex-p4250m",
+  "corpusRow": "v56:1376",
+  "exactSourceSha256": "7ba22e4d2286acb6d0c7a51ca15c0b0c94d0549f4c9977634bcfc31e48c04937",
+  "authorityReport": "/home/sam/.cache/fleet-tmp/o/verify-gaps43-v2.md",
+  "currentPolicy": "Keep source admitted as instructed. Do not derive identical-signature invocation selection or refusal from UDF overload uniqueness.",
+  "chart": {
+    "ticker": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "minimumConfirmedBars": 32
+  },
+  "captureInstructions": "Paste unchanged sources separately into TV. Record exact compile/runtime diagnostic with location and phase, or export every plot. Compare invoked SELECTED_BODY=10 vs11 without preselecting either. Exact fixture acceptance alone does not settle invoked replacement.",
+  "cases": [
+    {
+      "source": "drawing-method-identical-v56-1376-exact-v1.pine",
+      "sourceSha256": "7ba22e4d2286acb6d0c7a51ca15c0b0c94d0549f4c9977634bcfc31e48c04937",
+      "pineVersion": 5,
+      "purpose": "Exact unchanged non-TV fixture; record native compile outcome, no call selection is observable.",
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "source": "drawing-method-identical-v5-invoked-v1.pine",
+      "sourceSha256": "d4ecb67b99abd0fcc859f3b5133f2ef6f33e7755f827bd08fcbda8f9f55a21cd",
+      "pineVersion": 5,
+      "purpose": "Same signatures with distinct bodies and an invocation; determine refusal versus selection without assuming first or last wins.",
+      "nativeStatus": "UNOBSERVED"
+    },
+    {
+      "source": "drawing-method-distinct-v5-control-v1.pine",
+      "sourceSha256": "db1fc63dee03de48f6b3e6a17a6053fa89182fa02a2a6dfcc8f99f3972b98c34",
+      "pineVersion": 5,
+      "purpose": "Distinct arity control; manual permits this overload, columns distinguish both bodies.",
+      "nativeStatus": "UNOBSERVED"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+//@version=5
+indicator("corpus-array-get-fraction-v5-v1")
+a = array.from(10, 20, 30)
+plot(array.get(a, 1.5), "fraction")

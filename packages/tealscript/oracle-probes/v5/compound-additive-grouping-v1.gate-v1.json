@@ -1,0 +1,21 @@
+{
+  "probe": "compound-additive-grouping-v1.pine",
+  "status": "LOCAL-GREEN-CONTROLS-ONLY",
+  "semanticErrors": 0,
+  "runtimeErrors": 0,
+  "plots": 8,
+  "bars": 100,
+  "outputs": {
+    "input_time": 0,
+    "input_bar_index": 0,
+    "root_plain": 1,
+    "root_grouped": 0,
+    "control_left": 1,
+    "control_right": 0,
+    "udf_plain": 1,
+    "udf_grouped": 0
+  },
+  "authority": "Grouped/plain targets require native observation; local outputs are not predictions.",
+  "engine_commit_before_pending_compound_fix": "8a12970c6d",
+  "engine_includes_pending_compound_fix": true
+}

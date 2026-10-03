@@ -1,0 +1,4 @@
+//@version=6
+indicator("corpus-compile-third-v6-leading-comma-declaration-v1")
+  , INV=color(na)
+plot(close, "TARGET")

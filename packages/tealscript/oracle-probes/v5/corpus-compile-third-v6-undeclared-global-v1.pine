@@ -1,0 +1,3 @@
+//@version=6
+indicator("corpus-compile-third-v6-undeclared-global-v1")
+plot(relVol, "TARGET")

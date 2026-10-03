@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "script": "corpus-continuous-session-boundaries-v6-v1.pine",
+  "sourceSha256": "29ecf55c61423cbf6cba97f1f986c8d91e2aa926bec26774435f040ace6228b9",
+  "columns": [
+    "INDEX",
+    "CLOSE",
+    "TIME",
+    "DAY_OPEN",
+    "FIRST",
+    "FIRST_REGULAR",
+    "LAST",
+    "LAST_REGULAR",
+    "PREVIOUS_HIGH",
+    "PREVIOUS_LOW"
+  ]
+}

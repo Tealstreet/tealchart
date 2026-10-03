@@ -1,0 +1,7 @@
+//@version=5
+indicator("corpus5-v5-extrema-warmup1000-v1")
+plot(bar_index, "BAR_INDEX")
+plot(ta.highest(high,1000), "HIGH1000")
+plot(ta.lowest(low,1000), "LOW1000")
+plot(ta.highest(high,10), "HIGH10_CONTROL")
+plot(ta.lowest(low,10), "LOW10_CONTROL")
