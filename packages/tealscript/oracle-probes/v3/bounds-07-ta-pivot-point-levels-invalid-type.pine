@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-BOUNDS-07", max_bars_back=256)
+plot(array.size(ta.pivot_point_levels("INVALID", true, false)), "OUTCOME")

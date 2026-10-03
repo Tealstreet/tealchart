@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CORPUS-FOOTPRINT-MISSING-TICKS")
+value = request.footprint()
+plot(close, "OUTCOME")

@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CORPUS-V6-NA-BOOL")
+values = array.from(true)
+plot(na(values.get(0)) ? 1 : 0, "OUTCOME")

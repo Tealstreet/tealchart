@@ -1,0 +1,7 @@
+# Color outcome probes v2
+
+The requested row 98 probes are [dynamic low](colors-new-dynamic-low-v1.pine) and [dynamic high](colors-new-dynamic-high-v1.pine). Each has one OUTCOME plot, a valid transparency 25 on bar 0, and an isolated invalid series transparency (-1 or 101) from bar 1. Retain BEFORE/AFTER logs and the native diagnostic or full successful output. Literal out-of-range compiler behavior cannot settle this runtime case; a missing AFTER log alone cannot prove an error. Their native outcomes remain UNKNOWN.
+
+The [blue probe](colors-blue-constant-v1.pine) compares both documented literals and emits packed RGB. Since staging, native CF009 has settled the v6 constant as RGB41/98/255, hence #2962FF. Evidence: [native CSV](/home/sam/cs/tealstreet-next/packages/tealscript/oracle-probes/v2/captures/v2/conflicts-batch-1-v1.csv), 24,143 historical rows strictly before1791031560, [adjudication](/home/sam/cs/docs/tealscript-parity-archive/conflicts-adjudicated-v1.md). The additional blue source itself remains unrun; its expected packed value2712319 follows from the settled channels.
+
+The [manual](https://www.tradingview.com/pine-script-docs/visuals/colors/) claim #2196F3 and [reference](https://www.tradingview.com/pine-script-reference/v6/#const_color.blue) claim #2962FF are both retained in expected-outcome-v3.json. Follow HANDOFF-v3.md for per-attempt source hashes, capture records, screenshots, CSVs and exact logs. Parser/hash/one-plot validation checks the instrument only. This adjudication says nothing about earlier Pine versions.

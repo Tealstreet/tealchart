@@ -1,0 +1,3 @@
+//@version=5
+indicator("V3-LEDGER-DIV-V5-BOTH-NEGATIVE")
+plot((-5) / (-2), "OUTCOME")

@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CONST-REF-MAP-QUALIFIER-DIAGNOSTIC")
+const map<string, float> value = map.new<string, float>()
+plot(value, "OUTCOME")

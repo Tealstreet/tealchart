@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CORPUS-MATRIX-FLOAT-TO-INT-ID")
+matrix<int> bad = matrix.new<float>(1, 1, 1.0)
+plot(bad.get(0, 0), "OUTCOME")

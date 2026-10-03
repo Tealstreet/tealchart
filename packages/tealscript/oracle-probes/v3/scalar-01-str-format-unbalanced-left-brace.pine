@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-SCALAR-01", max_bars_back=256)
+plot(str.length(str.format("ab {0", close)), "OUTCOME")

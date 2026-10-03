@@ -1,0 +1,93 @@
+//@version=6
+indicator("CF046 WMA leading consecutive holes v3", precision=16)
+length = 5
+rawWma(x, n) =>
+    total = 0.0
+    norm = 0.0
+    for i = 0 to n - 1
+        weight = (n - i) * n
+        norm += weight
+        total += x[i] * weight
+    total / norm
+compactWma(x, n) =>
+    var values = array.new<float>()
+    if not na(x)
+        array.unshift(values, x)
+        if array.size(values) > n
+            array.pop(values)
+    result = float(na)
+    if array.size(values) == n
+        weighted = 0.0
+        for i = 0 to n - 1
+            weighted += array.get(values, i) * (n - i)
+        result := weighted / (n * (n + 1) / 2.0)
+    result
+lastValid(x) =>
+    var value = float(na)
+    if not na(x)
+        value := x
+    value
+phase = bar_index % 31
+value = 10.0 + float(bar_index % 13) * 3.0
+src0 = (bar_index < 8) ? float(na) : value
+once0 = nz(src0, src0[1])
+held0 = lastValid(src0)
+filledOnce0 = rawWma(once0, length)
+filledHeld0 = rawWma(held0, length)
+plot(src0, "CF046_leading_source", display=display.data_window)
+plot(ta.wma(src0, length), "CF046_leading_builtin", display=display.data_window)
+plot(rawWma(src0, length), "CF046_leading_literal", display=display.data_window)
+plot(compactWma(src0, length), "CF046_leading_compact", display=display.data_window)
+plot(na(src0) ? float(na) : filledOnce0, "CF046_leading_once_current_na", display=display.data_window)
+plot(na(src0) ? float(na) : filledHeld0, "CF046_leading_held_current_na", display=display.data_window)
+src1 = (phase >= 9 and phase <= 11) ? float(na) : value
+once1 = nz(src1, src1[1])
+held1 = lastValid(src1)
+filledOnce1 = rawWma(once1, length)
+filledHeld1 = rawWma(held1, length)
+plot(src1, "CF046_three_source", display=display.data_window)
+plot(ta.wma(src1, length), "CF046_three_builtin", display=display.data_window)
+plot(rawWma(src1, length), "CF046_three_literal", display=display.data_window)
+plot(compactWma(src1, length), "CF046_three_compact", display=display.data_window)
+plot(na(src1) ? float(na) : filledOnce1, "CF046_three_once_current_na", display=display.data_window)
+plot(na(src1) ? float(na) : filledHeld1, "CF046_three_held_current_na", display=display.data_window)
+src2 = (phase >= 9 and phase <= 16) ? float(na) : value
+once2 = nz(src2, src2[1])
+held2 = lastValid(src2)
+filledOnce2 = rawWma(once2, length)
+filledHeld2 = rawWma(held2, length)
+plot(src2, "CF046_long_source", display=display.data_window)
+plot(ta.wma(src2, length), "CF046_long_builtin", display=display.data_window)
+plot(rawWma(src2, length), "CF046_long_literal", display=display.data_window)
+plot(compactWma(src2, length), "CF046_long_compact", display=display.data_window)
+plot(na(src2) ? float(na) : filledOnce2, "CF046_long_once_current_na", display=display.data_window)
+plot(na(src2) ? float(na) : filledHeld2, "CF046_long_held_current_na", display=display.data_window)
+src3 = (phase >= 8 and phase <= 20 and phase % 2 == 0) ? float(na) : value
+once3 = nz(src3, src3[1])
+held3 = lastValid(src3)
+filledOnce3 = rawWma(once3, length)
+filledHeld3 = rawWma(held3, length)
+plot(src3, "CF046_alternating_source", display=display.data_window)
+plot(ta.wma(src3, length), "CF046_alternating_builtin", display=display.data_window)
+plot(rawWma(src3, length), "CF046_alternating_literal", display=display.data_window)
+plot(compactWma(src3, length), "CF046_alternating_compact", display=display.data_window)
+plot(na(src3) ? float(na) : filledOnce3, "CF046_alternating_once_current_na", display=display.data_window)
+plot(na(src3) ? float(na) : filledHeld3, "CF046_alternating_held_current_na", display=display.data_window)
+src4 = (bar_index < 8 or (phase >= 9 and phase <= 11)) ? float(na) : value
+once4 = nz(src4, src4[1])
+held4 = lastValid(src4)
+filledOnce4 = rawWma(once4, length)
+filledHeld4 = rawWma(held4, length)
+plot(src4, "CF046_leading_then_runs_source", display=display.data_window)
+plot(ta.wma(src4, length), "CF046_leading_then_runs_builtin", display=display.data_window)
+plot(rawWma(src4, length), "CF046_leading_then_runs_literal", display=display.data_window)
+plot(compactWma(src4, length), "CF046_leading_then_runs_compact", display=display.data_window)
+plot(na(src4) ? float(na) : filledOnce4, "CF046_leading_then_runs_once_current_na", display=display.data_window)
+plot(na(src4) ? float(na) : filledHeld4, "CF046_leading_then_runs_held_current_na", display=display.data_window)
+plot(phase, "CF046_phase", display=display.data_window)
+plot(value, "CF046_clean_value", display=display.data_window)
+
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(1, "CTRL_sentinel", display=display.data_window)

@@ -1,0 +1,37 @@
+{
+  "script": "scalar-09-nz-legacy-bool-default-v1.pine",
+  "sha256": "b6a2043b7dd961587a0df872b09f9dea9418e232f9b0d65e4a1d4cdeb9be1332",
+  "conflict_id": "V3-NZ-LEGACY-BOOL-DEFAULT",
+  "case_id": "nz:legacy-bool-default",
+  "builtin": "nz",
+  "category": "legacy-default-trace-required",
+  "authority": [
+    "https://www.tradingview.com/pine-script-docs/migration-guides/to-pine-version-6/#boolean-values-cannot-be-na"
+  ],
+  "expected_outcome": {
+    "phase": "UNSPECIFIED",
+    "columns": {},
+    "rule": "Preserve uncertainty about the exact v5 omitted bool replacement. OUTCOME 0 identifies false, -1 identifies na, 1 identifies true. Capture any refusal exactly."
+  },
+  "claim_under_test": "Omitted bool replacement in legacy nz is false. Conditional prediction: successful OUTCOME=0 on every historical row.",
+  "expected_error_code": null,
+  "expected_error_text": null,
+  "settlement": "TRACE-REQUIRED",
+  "columns": [
+    "OUTCOME"
+  ],
+  "target_lines": [
+    4,
+    5
+  ],
+  "record": [
+    "At least 100 historical OUTCOME rows, unchanged defaults and original source; or exact compile/runtime diagnostic with phase, code if visible, and text."
+  ],
+  "chart": {
+    "symbol": "BINANCE:BTCUSDT",
+    "timeframe": "2",
+    "type": "standard candles",
+    "timezone": "UTC"
+  },
+  "adjudication": "NA is tested before the ternary, so 0 cannot silently conflate false and na. This v5 probe does not independently settle v4."
+}

@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-BOUNDS-09", max_bars_back=256)
+plot(color.t(color.new(color.red, 101)), "OUTCOME")

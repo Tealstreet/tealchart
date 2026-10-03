@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-HISTORY-NEGATIVE-OFFSET")
+plot(close[-1], "OUTCOME")

@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-DRAWING-11", max_bars_back=256)
+box.new(bar_index,high,bar_index+501,low)
+plot(1, "OUTCOME")

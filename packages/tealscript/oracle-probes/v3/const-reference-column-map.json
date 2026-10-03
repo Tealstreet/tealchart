@@ -1,0 +1,186 @@
+{
+  "conflict": "CONST-REFERENCE-AUTHORITY-CONFLICT",
+  "ledgerRanks": [
+    611,
+    612
+  ],
+  "authority": [
+    "https://www.tradingview.com/pine-script-docs/language/type-system/#using-const-with-reference-types",
+    "https://www.tradingview.com/pine-script-reference/v6/#type_const"
+  ],
+  "status": "UNSPECIFIED; pending TV",
+  "columns": [
+    {
+      "script": "const-reference-array-accept-mutate.pine",
+      "sourceSha256": "8b173165707dcb134dc1d4f9a6b9090ccfa8bdfc901b3640042674dae67e4682",
+      "column": "OUTCOME",
+      "family": "array",
+      "stage": "accept-mutate",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4,
+        5
+      ],
+      "successValue": "close + 1",
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-array-qualifier-diagnostic.pine",
+      "sourceSha256": "987103f5303ab2e3469abe3db1b276e1f5eb681edfedbd69d5388efbb4e9a1aa",
+      "column": "OUTCOME",
+      "family": "array",
+      "stage": "qualifier-diagnostic",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": "native diagnostic must name the reference qualified type"
+    },
+    {
+      "script": "const-reference-array-replace-id.pine",
+      "sourceSha256": "49f46289af72b01c5e743fd53d6f523a428272d9f9b004a605a55e90e2b47e0f",
+      "column": "OUTCOME",
+      "family": "array",
+      "stage": "replace-id",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-matrix-accept-mutate.pine",
+      "sourceSha256": "9ddf368e2090bb6c50371db7390235c1bbeacc4e21ae6edb52bbc6dd031dd418",
+      "column": "OUTCOME",
+      "family": "matrix",
+      "stage": "accept-mutate",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4,
+        5
+      ],
+      "successValue": "close + 1",
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-matrix-qualifier-diagnostic.pine",
+      "sourceSha256": "884d9905b3e56dd7ff12f84a9722305c68d8f79eb0cb6799b09bd602da47458e",
+      "column": "OUTCOME",
+      "family": "matrix",
+      "stage": "qualifier-diagnostic",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": "native diagnostic must name the reference qualified type"
+    },
+    {
+      "script": "const-reference-matrix-replace-id.pine",
+      "sourceSha256": "28a8e7b33a5f2e7c5398811fda88dfbf82e185820ab14dba6e8822340805d2f9",
+      "column": "OUTCOME",
+      "family": "matrix",
+      "stage": "replace-id",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-map-accept-mutate.pine",
+      "sourceSha256": "0b74ea41e5e80f726bfc6eff5aada8794e4609390e4a85d8c4462bfef5b5dbad",
+      "column": "OUTCOME",
+      "family": "map",
+      "stage": "accept-mutate",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4,
+        5
+      ],
+      "successValue": "close + 1",
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-map-qualifier-diagnostic.pine",
+      "sourceSha256": "d84eb9a51b98a8ee49da468d861e86902fe4fb5151efe2db8463c481142cbe62",
+      "column": "OUTCOME",
+      "family": "map",
+      "stage": "qualifier-diagnostic",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": "native diagnostic must name the reference qualified type"
+    },
+    {
+      "script": "const-reference-map-replace-id.pine",
+      "sourceSha256": "35419551a5e118fc67e79aa9cff28caf628d9f0d511d8f9ae101a7076bbfb0e2",
+      "column": "OUTCOME",
+      "family": "map",
+      "stage": "replace-id",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-line-accept-mutate.pine",
+      "sourceSha256": "c3fbbc9f0aefe13b91ef2e9b39fc523a58339f25f6177bcce94e4f5b76023e4b",
+      "column": "OUTCOME",
+      "family": "line",
+      "stage": "accept-mutate",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4,
+        5
+      ],
+      "successValue": "close + 1",
+      "qualifierObservation": null
+    },
+    {
+      "script": "const-reference-line-qualifier-diagnostic.pine",
+      "sourceSha256": "9069782e5682211c0bd079b102d727680788b70ec6d0dc998a7db5d418d9d04a",
+      "column": "OUTCOME",
+      "family": "line",
+      "stage": "qualifier-diagnostic",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": "native diagnostic must name the reference qualified type"
+    },
+    {
+      "script": "const-reference-line-replace-id.pine",
+      "sourceSha256": "e614e6ad1e155377f846de85d779ebac84704edb6e985ad4b2c3e93c93a71010",
+      "column": "OUTCOME",
+      "family": "line",
+      "stage": "replace-id",
+      "declarationLine": 3,
+      "targetLines": [
+        3,
+        4
+      ],
+      "successValue": null,
+      "qualifierObservation": null
+    }
+  ]
+}

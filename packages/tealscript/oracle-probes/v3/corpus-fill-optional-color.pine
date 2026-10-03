@@ -1,0 +1,6 @@
+//@version=6
+indicator("V3-CORPUS-FILL-OPTIONAL-COLOR")
+first = plot(close, "FILL_FIRST")
+second = plot(open, "FILL_SECOND")
+fill(first, second)
+plot(1, "OUTCOME")

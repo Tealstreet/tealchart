@@ -1,0 +1,11 @@
+//@version=6
+indicator("V3-UNMATCHED-STRING-IF")
+string result = if false
+    "selected"
+outcome = na(result) ? 1 : result == "" ? 2 : 3
+observedText = na(result) ? "RESULT=NA" : "RESULT=<" + result + ">"
+var table results = table.new(position.top_right, 1, 1)
+if barstate.isfirst
+    table.cell(results, 0, 0, observedText)
+    log.info(observedText)
+plot(outcome, "OUTCOME")

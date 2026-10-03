@@ -1,0 +1,5 @@
+//@version=6
+indicator("V3-CORPUS-ARRAY-STRING-ELEMENT")
+values = array.new<string>()
+values.push(1)
+plot(values.size(), "OUTCOME")

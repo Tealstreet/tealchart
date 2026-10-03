@@ -1,0 +1,25 @@
+//@version=6
+indicator("CF036 native ATR guards v3", precision=16)
+length = 5
+trClose = na(close[1]) ? high - low : math.max(math.max(high - low, math.abs(high - close[1])), math.abs(low - close[1]))
+trHigh = na(high[1]) ? high - low : math.max(math.max(high - low, math.abs(high - close[1])), math.abs(low - close[1]))
+discriminator = na(high[1]) != na(close[1])
+var int covered = 0
+if discriminator and not na(high) and not na(low)
+    covered += 1
+plot(high, "CF036_high", display=display.data_window)
+plot(low, "CF036_low", display=display.data_window)
+plot(close[1], "CF036_prev_close", display=display.data_window)
+plot(high[1], "CF036_prev_high", display=display.data_window)
+plot(discriminator ? 1 : 0, "CF036_guard_diverges", display=display.data_window)
+plot(covered, "CF036_covered_count", display=display.data_window)
+plot(ta.atr(length), "CF036_builtin", display=display.data_window)
+plot(ta.rma(trClose, length), "CF036_close_guard", display=display.data_window)
+plot(ta.rma(trHigh, length), "CF036_high_guard", display=display.data_window)
+plot(trClose, "CF036_tr_close_guard", display=display.data_window)
+plot(trHigh, "CF036_tr_high_guard", display=display.data_window)
+
+plot(time, "CTRL_time", display=display.data_window)
+plot(bar_index, "CTRL_bar_index", display=display.data_window)
+plot(close, "CTRL_close", display=display.data_window)
+plot(1, "CTRL_sentinel", display=display.data_window)

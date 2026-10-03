@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-BOUNDS-05", max_bars_back=256)
+plot(ta.valuewhen(true, close, -1), "OUTCOME")

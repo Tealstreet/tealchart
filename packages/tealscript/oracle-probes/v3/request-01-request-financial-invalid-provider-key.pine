@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-REQUEST-01", max_bars_back=256)
+plot(request.financial("INVALID:__ARG_AUDIT__","TOTAL_REVENUE","FQ",ignore_invalid_symbol=false), "OUTCOME")

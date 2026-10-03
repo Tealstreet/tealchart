@@ -1,0 +1,5 @@
+//@version=5
+indicator("V3-CORPUS-V5-UNARY-PLUS-STRING")
+text() => "value"
+label.new(bar_index, close, "Prefix" + +text())
+plot(1, "OUTCOME")

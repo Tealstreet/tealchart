@@ -1,0 +1,5 @@
+//@version=5
+indicator("V3-NZ-LEGACY-BOOL-DEFAULT")
+bool missing = na
+bool result = nz(missing)
+plot(na(result) ? -1 : result ? 1 : 0, "OUTCOME")

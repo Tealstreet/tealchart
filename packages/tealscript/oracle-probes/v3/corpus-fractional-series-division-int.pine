@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CORPUS-FRACTIONAL-SERIES-DIVISION-INT")
+int elapsed = (time - time[1]) / 1000
+plot(elapsed, "OUTCOME")

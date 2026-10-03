@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-CONST-REF-ARRAY-QUALIFIER-DIAGNOSTIC")
+const array<float> value = array.new<float>(1, close)
+plot(value, "OUTCOME")

@@ -1,0 +1,6 @@
+//@version=6
+indicator("V3-BOUNDS-12", max_bars_back=256)
+t=table.new(position.top_right,1,1)
+table.cell(t,0,0,"x")
+table.cell_set_text_size(t,0,0,-1)
+plot(close, "OUTCOME")

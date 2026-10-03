@@ -1,0 +1,5 @@
+//@version=6
+indicator("V3-CORPUS-MATRIX-SUM-METHOD")
+values = matrix.new<float>(1, 1, 1.0)
+result = values.sum()
+plot(result.get(0, 0), "OUTCOME")

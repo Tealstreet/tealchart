@@ -1,0 +1,4 @@
+//@version=5
+indicator("V3-LEDGER-DIV-V5-INPUT-CONTROL")
+denominator = input.int(2, "Denominator", minval=1)
+plot((-5) / denominator, "OUTCOME")

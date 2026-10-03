@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-VARIP-06")
+varip map<int, float> value = map.new<int, float>()
+plot(map.size(value), "OUTCOME")

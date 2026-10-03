@@ -1,0 +1,4 @@
+//@version=6
+indicator("V3-VARIP-03")
+varip volume_row value = na
+plot(1, "OUTCOME")

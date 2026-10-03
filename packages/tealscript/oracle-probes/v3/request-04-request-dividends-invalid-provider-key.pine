@@ -1,0 +1,3 @@
+//@version=6
+indicator("V3-REQUEST-04", max_bars_back=256)
+plot(request.dividends("INVALID:__ARG_AUDIT__",ignore_invalid_symbol=false), "OUTCOME")

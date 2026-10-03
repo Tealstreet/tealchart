@@ -1,0 +1,5 @@
+//@version=6
+indicator("V3-DRAWING-09", max_bars_back=256)
+l=label.new(bar_index,close)
+label.set_xy(l,bar_index+501,close)
+plot(1, "OUTCOME")

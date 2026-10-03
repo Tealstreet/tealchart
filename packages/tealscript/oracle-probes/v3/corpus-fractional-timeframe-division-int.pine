@@ -1,0 +1,6 @@
+//@version=6
+indicator("V3-CORPUS-FRACTIONAL-TIMEFRAME-DIVISION-INT")
+length() =>
+    int tf_mins = timeframe.in_seconds() / 60
+    tf_mins
+plot(length(), "OUTCOME")

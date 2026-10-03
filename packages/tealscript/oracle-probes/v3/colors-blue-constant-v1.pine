@@ -1,0 +1,10 @@
+//@version=6
+indicator("V3-COLOR-BLUE-CONSTANT")
+red = color.r(color.blue)
+green = color.g(color.blue)
+blue = color.b(color.blue)
+packed = red * 65536 + green * 256 + blue
+if barstate.isfirst
+    log.info("BLUE R=" + str.tostring(red) + " G=" + str.tostring(green) + " B=" + str.tostring(blue) + " T=" + str.tostring(color.t(color.blue)))
+    log.info("MANUAL=" + str.tostring(color.blue == #2196F3) + " REFERENCE=" + str.tostring(color.blue == #2962FF))
+plot(packed, "OUTCOME")

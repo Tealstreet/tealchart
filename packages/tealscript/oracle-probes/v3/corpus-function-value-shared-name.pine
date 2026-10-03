@@ -1,0 +1,5 @@
+//@version=6
+indicator("V3-CORPUS-FUNCTION-VALUE-SHARED-NAME")
+ma(value) => value * 2
+ma = close
+plot(ma(ma), "OUTCOME")
