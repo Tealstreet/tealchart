@@ -3490,7 +3490,7 @@
       "pine_precision": 10,
       "minimum_history_rows": 600,
       "required_index_range": "0..599",
-      "index_title": null,
+      "index_title": "bar_index",
       "index_relation": null,
       "seed_phase": false,
       "required_seed_phases": null,
