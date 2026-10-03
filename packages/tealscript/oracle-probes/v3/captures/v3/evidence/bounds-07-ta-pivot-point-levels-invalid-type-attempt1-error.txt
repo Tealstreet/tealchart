@@ -1,0 +1,24 @@
+Error on bar 0: Invalid argument 'INVALID' for 'type' in the 'ta.pivot_point_levels' function. Possible values: ['Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie']
+{
+  "ctx": {
+    "possibleValues": "'Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie'",
+    "code": "RE10005",
+    "argName": "type",
+    "bar_index": 0,
+    "value": "INVALID",
+    "funName": "ta.pivot_point_levels"
+  },
+  "error": "Error on bar {bar_index}: Invalid argument '{value}' for '{argName}' in the '{funName}' function. Possible values: [{possibleValues}]",
+  "stack_trace": [
+    {
+      "n": "#main",
+      "p": 3
+    }
+  ],
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,842.01\nH\n84,864.00\nL\n84,842.00\nC\n84,864.00\n+21.99 (+0.03%)\n84,863.99\nSELL\n0.01\n84,864.00\nBUY\nUSDT\nV3-BOUNDS-07\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:20:36 UTC\n99+\nRuntime error: RE10005\nRuntime error: RE10005\nError on bar 0: Invalid argument 'INVALID' for 'type' in the 'ta.pivot_point_levels' function. Possible values: ['Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie']\nat #main():3\nOpen in editor",
+  "context_substituted_message": "Error on bar 0: Invalid argument 'INVALID' for 'type' in the 'ta.pivot_point_levels' function. Possible values: ['Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie']"
+}

@@ -1,0 +1,3149 @@
+[
+  {
+    "script": "bounds-01-ta-percentile-nearest-rank-percentage--1-0.pine",
+    "attempt": 1,
+    "source_sha256": "9a5aa1d04020621f39ec6d4d1864d2101a1901e831b1ffc5a9e7efb971c6f9c7",
+    "indicator_title": "V3-BOUNDS-01",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'percentage' argument (-1) in the 'percentile_nearest_rank' function. It must be in the range [0..100].",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "min": 0,
+          "code": "RE10002",
+          "argName": "percentage",
+          "bar_index": 0,
+          "max": 100,
+          "value": -1,
+          "funName": "percentile_nearest_rank"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.01\nH\n84,846.01\nL\n84,838.00\nC\n84,846.00\n+7.99 (+0.01%)\n84,846.00\nSELL\n0.01\n84,846.01\nBUY\nUSDT\nV3-BOUNDS-01\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:17:21 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 0: Invalid value of the 'percentage' argument (-1) in the 'percentile_nearest_rank' function. It must be in the range [0..100].\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'percentage' argument (-1) in the 'percentile_nearest_rank' function. It must be in the range [0..100]."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23919,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24219,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:16:29.089Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-error.png",
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-error.txt",
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-logs.png",
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-capture-instrument-v1.json",
+      "captures/v3/evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-error-preliminary-v1.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index. Runtime diagnostic collection initially failed because Monaco was not loaded after native full reload. The helper now treats absent compiler markers separately from native runtime diagnostics; collection resumed without changing the source.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:17:22.459Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-logs.txt",
+        "evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-logs-v1.json",
+        "evidence/bounds-01-ta-percentile-nearest-rank-percentage--1-0-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-02-ta-percentile-nearest-rank-percentage-101-0.pine",
+    "attempt": 1,
+    "source_sha256": "a33168716db36e4f3d96de335e6fc8e87edaf6c4a7d5924634e0a5c7e771fc2a",
+    "indicator_title": "V3-BOUNDS-02",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'percentage' argument (101) in the 'percentile_nearest_rank' function. It must be in the range [0..100].",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "min": 0,
+          "code": "RE10002",
+          "argName": "percentage",
+          "bar_index": 0,
+          "max": 100,
+          "value": 101,
+          "funName": "percentile_nearest_rank"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.01\nH\n84,848.48\nL\n84,838.00\nC\n84,848.48\n+10.47 (+0.01%)\n84,848.47\nSELL\n0.01\n84,848.48\nBUY\nUSDT\nV3-BOUNDS-02\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:17:37 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 0: Invalid value of the 'percentage' argument (101) in the 'percentile_nearest_rank' function. It must be in the range [0..100].\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'percentage' argument (101) in the 'percentile_nearest_rank' function. It must be in the range [0..100]."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23919,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24219,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:17:35.558Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-error.png",
+      "captures/v3/evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-error.txt",
+      "captures/v3/evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:17:39.753Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-logs.txt",
+        "evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-logs-v1.json",
+        "evidence/bounds-02-ta-percentile-nearest-rank-percentage-101-0-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-03-ta-percentile-linear-interpolation-percentage--1-0.pine",
+    "attempt": 1,
+    "source_sha256": "90f850193885b8d9589bcc7e4c19b344f1f1410914e40982f6ef9265b9236e85",
+    "indicator_title": "V3-BOUNDS-03",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'percentage' argument (-1) in the 'percentile_linear_interpolation' function. It must be in the range [0..100].",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "min": 0,
+          "code": "RE10002",
+          "argName": "percentage",
+          "bar_index": 0,
+          "max": 100,
+          "value": -1,
+          "funName": "percentile_linear_interpolation"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.01\nH\n84,848.48\nL\n84,838.00\nC\n84,848.47\n+10.46 (+0.01%)\n84,848.47\nSELL\n0.01\n84,848.48\nBUY\nUSDT\nV3-BOUNDS-03\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:17:55 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 0: Invalid value of the 'percentage' argument (-1) in the 'percentile_linear_interpolation' function. It must be in the range [0..100].\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'percentage' argument (-1) in the 'percentile_linear_interpolation' function. It must be in the range [0..100]."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23919,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24219,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:17:53.601Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-error.png",
+      "captures/v3/evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-error.txt",
+      "captures/v3/evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:17:57.853Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-logs.txt",
+        "evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-logs-v1.json",
+        "evidence/bounds-03-ta-percentile-linear-interpolation-percentage--1-0-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-04-ta-percentile-linear-interpolation-percentage-101-0.pine",
+    "attempt": 1,
+    "source_sha256": "d794dce8bb0b3e3fc4837fd816ee867ae9e601eb9cb799cacbc3e930f9e70678",
+    "indicator_title": "V3-BOUNDS-04",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'percentage' argument (101) in the 'percentile_linear_interpolation' function. It must be in the range [0..100].",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "min": 0,
+          "code": "RE10002",
+          "argName": "percentage",
+          "bar_index": 0,
+          "max": 100,
+          "value": 101,
+          "funName": "percentile_linear_interpolation"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,848.47\nH\n84,848.48\nL\n84,848.47\nC\n84,848.48\n0.00 (0.00%)\n84,848.47\nSELL\n0.01\n84,848.48\nBUY\nUSDT\nV3-BOUNDS-04\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:18:13 UTC\n99+\nRuntime error: RE10002\nRuntime error: RE10002\nError on bar 0: Invalid value of the 'percentage' argument (101) in the 'percentile_linear_interpolation' function. It must be in the range [0..100].\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'percentage' argument (101) in the 'percentile_linear_interpolation' function. It must be in the range [0..100]."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23920,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24220,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:18:12.011Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-error.png",
+      "captures/v3/evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-error.txt",
+      "captures/v3/evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:18:16.250Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-logs.txt",
+        "evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-logs-v1.json",
+        "evidence/bounds-04-ta-percentile-linear-interpolation-percentage-101-0-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-05-ta-valuewhen-occurrence--1.pine",
+    "attempt": 1,
+    "source_sha256": "b539ec6523dfbfb220fa78ec8599935e74a3b1ae2c68676c5b9d022ebe7c20aa",
+    "indicator_title": "V3-BOUNDS-05",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'occurrence' argument (-1) in the 'valuewhen' function. It must be >= 0.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "op": ">=",
+          "code": "RE10001",
+          "argName": "occurrence",
+          "bar_index": 0,
+          "value": -1,
+          "funName": "valuewhen"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,848.47\nH\n84,858.26\nL\n84,838.65\nC\n84,842.01\n\u22126.47 (\u22120.01%)\n84,842.00\nSELL\n0.01\n84,842.01\nBUY\nUSDT\nV3-BOUNDS-05\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:19:57 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'occurrence' argument (-1) in the 'valuewhen' function. It must be >= 0.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'occurrence' argument (-1) in the 'valuewhen' function. It must be >= 0."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-BOUNDS-05",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23920,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24220,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:19:54.636Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-error.png",
+      "captures/v3/evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-error.txt",
+      "captures/v3/evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:19:59.846Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-logs.txt",
+        "evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-logs-v1.json",
+        "evidence/bounds-05-ta-valuewhen-occurrence--1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-06-str-repeat-repeat--1.pine",
+    "attempt": 1,
+    "source_sha256": "4435c2fe8ba992c33432c67231dcfba0a2945d388876e86fb4ab660dca64a3f0",
+    "indicator_title": "V3-BOUNDS-06",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'repeat' parameter '-1' in the 'str.repeat' function. It must be >= 0.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "count": -1,
+          "bar_index": 0,
+          "code": "RE10126"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the 'repeat' parameter '{count}' in the 'str.repeat' function. It must be >= 0.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,842.01\nH\n84,856.00\nL\n84,842.00\nC\n84,855.99\n+13.98 (+0.02%)\n84,855.99\nSELL\n0.01\n84,856.00\nBUY\nUSDT\nV3-BOUNDS-06\n-1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:20:17 UTC\n99+\nRuntime error: RE10126\nRuntime error: RE10126\nError on bar 0: Invalid value of the 'repeat' parameter '-1' in the 'str.repeat' function. It must be >= 0.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'repeat' parameter '-1' in the 'str.repeat' function. It must be >= 0."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "untitled",
+          "value": -1,
+          "default": -1
+        }
+      ],
+      "observed_indicator_title": "V3-BOUNDS-06",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24221,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:20:13.699Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-06-str-repeat-repeat--1-attempt1-error.png",
+      "captures/v3/evidence/bounds-06-str-repeat-repeat--1-attempt1-error.txt",
+      "captures/v3/evidence/bounds-06-str-repeat-repeat--1-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-06-str-repeat-repeat--1-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-06-str-repeat-repeat--1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:20:19.281Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-06-str-repeat-repeat--1-attempt1-logs.txt",
+        "evidence/bounds-06-str-repeat-repeat--1-attempt1-logs-v1.json",
+        "evidence/bounds-06-str-repeat-repeat--1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-07-ta-pivot-point-levels-invalid-type.pine",
+    "attempt": 1,
+    "source_sha256": "d9878a478cabd6eb22b95cc8555052405d6a9af6306511ea3bed8c3f7b1a159e",
+    "indicator_title": "V3-BOUNDS-07",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid argument 'INVALID' for 'type' in the 'ta.pivot_point_levels' function. Possible values: ['Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie']",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "possibleValues": "'Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie'",
+          "code": "RE10005",
+          "argName": "type",
+          "bar_index": 0,
+          "value": "INVALID",
+          "funName": "ta.pivot_point_levels"
+        },
+        "error": "Error on bar {bar_index}: Invalid argument '{value}' for '{argName}' in the '{funName}' function. Possible values: [{possibleValues}]",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,842.01\nH\n84,864.00\nL\n84,842.00\nC\n84,864.00\n+21.99 (+0.03%)\n84,863.99\nSELL\n0.01\n84,864.00\nBUY\nUSDT\nV3-BOUNDS-07\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:20:36 UTC\n99+\nRuntime error: RE10005\nRuntime error: RE10005\nError on bar 0: Invalid argument 'INVALID' for 'type' in the 'ta.pivot_point_levels' function. Possible values: ['Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie']\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid argument 'INVALID' for 'type' in the 'ta.pivot_point_levels' function. Possible values: ['Camarilla', 'Traditional', 'DM', 'Classic', 'Fibonacci', 'Woodie']"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-BOUNDS-07",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24221,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:20:33.775Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-error.png",
+      "captures/v3/evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-error.txt",
+      "captures/v3/evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:20:38.607Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-logs.txt",
+        "evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-logs-v1.json",
+        "evidence/bounds-07-ta-pivot-point-levels-invalid-type-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-08-color-rgb-component-or-transparency.pine",
+    "attempt": 1,
+    "source_sha256": "16ac8ece6bb757aad83be103e773dfd229c4555edd699059859f68668c66dc74",
+    "indicator_title": "V3-BOUNDS-08",
+    "status": "RUNS",
+    "csv_file": "captures/v3/bounds-08-color-rgb-component-or-transparency-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (60).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-BOUNDS-08",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24221,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:20:52.861Z",
+    "live_candle_open_utc": "2026-10-03T15:20:00.000Z",
+    "export_utc": "2026-10-03T15:20:59.171Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-08-color-rgb-component-or-transparency-attempt1-setup.png",
+      "captures/v3/evidence/bounds-08-color-rgb-component-or-transparency-attempt1-export.png",
+      "captures/v3/evidence/bounds-08-color-rgb-component-or-transparency-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-08-color-rgb-component-or-transparency-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-08-color-rgb-component-or-transparency-attempt1-logs.png",
+      "captures/v3/evidence/bounds-08-color-rgb-component-or-transparency-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:20",
+    "historical_compare_before_unix_seconds": 1791040800,
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-08-color-rgb-component-or-transparency-attempt1-logs.txt",
+        "evidence/bounds-08-color-rgb-component-or-transparency-attempt1-logs-v1.json",
+        "evidence/bounds-08-color-rgb-component-or-transparency-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "67c50e1815eb7f837e9c6038b15b4f98c4db93148d02f706327237426c94cdd8",
+    "csv_bytes": 1168268,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24221,
+    "historical_rows": 24220,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791040800,
+    "first_historical_values": {
+      "OUTCOME": "255"
+    },
+    "last_historical_values": {
+      "OUTCOME": "255"
+    }
+  },
+  {
+    "script": "bounds-09-color-new-component-or-transparency.pine",
+    "attempt": 1,
+    "source_sha256": "060b1b418836e278861563de00fc7313990f140b65ea74c4535c0636fa549b35",
+    "indicator_title": "V3-BOUNDS-09",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10274",
+      "text": "color.new: transp argument value should be between 0 and 100",
+      "line": 3,
+      "column": 35,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "color.new: transp argument value should be between 0 and 100",
+        "editorError": {
+          "code": "CE10274",
+          "end": {
+            "column": 37,
+            "line": 3
+          },
+          "message": "color.new: transp argument value should be between 0 and 100",
+          "start": {
+            "column": 35,
+            "line": 3
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,842.01\nH\n84,864.00\nL\n84,842.00\nC\n84,846.01\n+4.00 (+0.00%)\n84,846.01\nSELL\n0.01\n84,846.02\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:21:30 UTC\n99+\nPine Editor\nbounds-09-color-new-component-or-transparency.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V3-BOUNDS-09\",\u00a0max_bars_back=256)\nplot(color.t(\u00a0color.new(color.red,\u00a0101)),\u00a0\"OUTCOME\")\n1 \u2219 Today, 23:21\nLine 3, Col 35\nPine Script\u00ae v6\nCompilation error: CE10274\nCompilation error: CE10274\n\ncolor.new: transp argument value should be between 0 and 100\n\nOpen in editor",
+        "context_substituted_message": "color.new: transp argument value should be between 0 and 100"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24221,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-09-color-new-component-or-transparency-attempt1-error.png",
+      "captures/v3/evidence/bounds-09-color-new-component-or-transparency-attempt1-error.txt",
+      "captures/v3/evidence/bounds-09-color-new-component-or-transparency-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-09-color-new-component-or-transparency-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-09-color-new-component-or-transparency-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:21:32.312Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-09-color-new-component-or-transparency-attempt1-logs.txt",
+        "evidence/bounds-09-color-new-component-or-transparency-attempt1-logs-v1.json",
+        "evidence/bounds-09-color-new-component-or-transparency-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-10-label-set-size-text-size--1.pine",
+    "attempt": 1,
+    "source_sha256": "19dd856ab1d3a0446cac585487621ef1f2cab030ba1fef035ce9676edb170b16",
+    "indicator_title": "V3-BOUNDS-10",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Invalid value of the 'size' argument (-1) in the 'label.set_size' function. It must be >= 0.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "op": ">=",
+          "code": "RE10001",
+          "argName": "size",
+          "bar_index": 0,
+          "value": -1,
+          "funName": "label.set_size"
+        },
+        "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be {op} 0.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,842.01\nH\n84,864.00\nL\n84,842.00\nC\n84,858.00\n+15.99 (+0.02%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nV3-BOUNDS-10\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:21:49 UTC\n99+\nRuntime error: RE10001\nRuntime error: RE10001\nError on bar 0: Invalid value of the 'size' argument (-1) in the 'label.set_size' function. It must be >= 0.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Invalid value of the 'size' argument (-1) in the 'label.set_size' function. It must be >= 0."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-BOUNDS-10",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24221,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:21:46.229Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-10-label-set-size-text-size--1-attempt1-error.png",
+      "captures/v3/evidence/bounds-10-label-set-size-text-size--1-attempt1-error.txt",
+      "captures/v3/evidence/bounds-10-label-set-size-text-size--1-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-10-label-set-size-text-size--1-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-10-label-set-size-text-size--1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:21:51.025Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-10-label-set-size-text-size--1-attempt1-logs.txt",
+        "evidence/bounds-10-label-set-size-text-size--1-attempt1-logs-v1.json",
+        "evidence/bounds-10-label-set-size-text-size--1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-11-table-cell-text-size--1.pine",
+    "attempt": 1,
+    "source_sha256": "390379f363368c2b8eeb039f644c78736dfd13abc6d48e7583421de2cf5fe247",
+    "indicator_title": "V3-BOUNDS-11",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10039",
+      "text": "The \"table.cell()\" function cannot have a negative \"text_size\" value. Use a positive value in the function call.",
+      "line": 4,
+      "column": 32,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The \"{funId}()\" function cannot have a negative \"{argument_name}\" value. Use a positive value in the function call.",
+        "editorError": {
+          "code": "CE10039",
+          "ctx": {
+            "argument_name": "text_size",
+            "funId": "table.cell"
+          },
+          "end": {
+            "column": 33,
+            "line": 4
+          },
+          "message": "The \"{funId}()\" function cannot have a negative \"{argument_name}\" value. Use a positive value in the function call.",
+          "start": {
+            "column": 32,
+            "line": 4
+          },
+          "id": "USER;02824478757041c69ba29ab7d7226f9a"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.00\nH\n84,858.00\nL\n84,858.00\nC\n84,858.00\n\u22120.01 (\u22120.00%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nbounds-11-table-cell-text-size--1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:22:01 UTC\n99+\nPine Editor\nbounds-11-table-cell-text-size--1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=6\nindicator(\"V3-BOUNDS-11\",\u00a0max_bars_back=256)\nt=table.new(position.top_right,1,1)\ntable.cell(t,0,0,\"x\",text_size=-1)\nplot(close,\u00a0\"OUTCOME\")\n1 \u2219 Today, 23:21\nLine 4, Col 32\nPine Script\u00ae v6\nCompilation error: CE10039\n\nThe \"table.cell()\" function cannot have a negative \"text_size\" value. Use a positive value in the function call.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "The \"table.cell()\" function cannot have a negative \"text_size\" value. Use a positive value in the function call."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "bounds-11-table-cell-text-size--1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24221,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-11-table-cell-text-size--1-attempt1-error.png",
+      "captures/v3/evidence/bounds-11-table-cell-text-size--1-attempt1-error.txt",
+      "captures/v3/evidence/bounds-11-table-cell-text-size--1-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-11-table-cell-text-size--1-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-11-table-cell-text-size--1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:22:03.067Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-11-table-cell-text-size--1-attempt1-logs.txt",
+        "evidence/bounds-11-table-cell-text-size--1-attempt1-logs-v1.json",
+        "evidence/bounds-11-table-cell-text-size--1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "bounds-12-table-cell-set-text-size-text-size--1.pine",
+    "attempt": 1,
+    "source_sha256": "e8bce681a9f90178a790d53f43f456ddb1635289b1be168be7c8faddf9976110",
+    "indicator_title": "V3-BOUNDS-12",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10039",
+      "text": "The \"table.cell_set_text_size()\" function cannot have a negative \"text_size\" value. Use a positive value in the function call.",
+      "line": 5,
+      "column": 32,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "The \"{funId}()\" function cannot have a negative \"{argument_name}\" value. Use a positive value in the function call.",
+        "editorError": {
+          "code": "CE10039",
+          "ctx": {
+            "argument_name": "text_size",
+            "funId": "table.cell_set_text_size"
+          },
+          "end": {
+            "column": 33,
+            "line": 5
+          },
+          "message": "The \"{funId}()\" function cannot have a negative \"{argument_name}\" value. Use a positive value in the function call.",
+          "start": {
+            "column": 32,
+            "line": 5
+          },
+          "id": "USER;15a552c98d7b424995dab7fee89fdbcb"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.00\nH\n84,858.01\nL\n84,858.00\nC\n84,858.01\n0.00 (0.00%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nbounds-12-table-cell-set-text-size-text-size--1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:22:12 UTC\n99+\nPine Editor\nbounds-12-table-cell-set-text-size-text-size--1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=6\nindicator(\"V3-BOUNDS-12\",\u00a0max_bars_back=256)\nt=table.new(position.top_right,1,1)\ntable.cell(t,0,0,\"x\")\ntable.cell_set_text_size(t,0,0,-1)\nplot(close,\u00a0\"OUTCOME\")\n1 \u2219 Today, 23:22\nLine 5, Col 32\nPine Script\u00ae v6\nCompilation error: CE10039\n\nThe \"table.cell_set_text_size()\" function cannot have a negative \"text_size\" value. Use a positive value in the function call.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "The \"table.cell_set_text_size()\" function cannot have a negative \"text_size\" value. Use a positive value in the function call."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "bounds-12-table-cell-set-text-size-text-size--1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23921,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24222,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-error.png",
+      "captures/v3/evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-error.txt",
+      "captures/v3/evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-logs.txt",
+      "captures/v3/evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-logs-v1.json",
+      "captures/v3/evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:22:14.684Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-logs.txt",
+        "evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-logs-v1.json",
+        "evidence/bounds-12-table-cell-set-text-size-text-size--1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-01-str-format-unbalanced-left-brace.pine",
+    "attempt": 1,
+    "source_sha256": "887584e8eb04c7c8c61bcf18f9eaebfedec224f5ac189c712867bd30aa0db353",
+    "indicator_title": "V3-SCALAR-01",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Unmatched braces in the pattern.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.00\nH\n84,858.01\nL\n84,858.00\nC\n84,858.00\n\u22120.01 (\u22120.00%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nV3-SCALAR-01\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:23:02 UTC\n99+\nRuntime error\nRuntime error\nError on bar 0: Unmatched braces in the pattern.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Unmatched braces in the pattern."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-01",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23922,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24222,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:22:59.169Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-error.png",
+      "captures/v3/evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-error.txt",
+      "captures/v3/evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:23:04.250Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-logs.txt",
+        "evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-logs-v1.json",
+        "evidence/scalar-01-str-format-unbalanced-left-brace-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-02-log-info-unbalanced-left-brace.pine",
+    "attempt": 1,
+    "source_sha256": "31589a8942af56cc83605d1dd94e11ae25e2a7741470d65e16b69c258281983d",
+    "indicator_title": "V3-SCALAR-02",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Unmatched braces in the pattern.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.00\nH\n84,858.01\nL\n84,858.00\nC\n84,858.01\n0.00 (0.00%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nV3-SCALAR-02\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:23:21 UTC\n99+\nV3-SCALAR-02\nNo data\nRuntime error\nRuntime error\nError on bar 0: Unmatched braces in the pattern.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Unmatched braces in the pattern."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-02",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23922,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24222,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:23:17.933Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-error.png",
+      "captures/v3/evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-error.txt",
+      "captures/v3/evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:23:22.838Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-logs.txt",
+        "evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-logs-v1.json",
+        "evidence/scalar-02-log-info-unbalanced-left-brace-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-03-log-warning-unbalanced-left-brace.pine",
+    "attempt": 1,
+    "source_sha256": "eed710b13f3f76a69e41e903ae944052af9e80a10d9748d3132512b374dcc09f",
+    "indicator_title": "V3-SCALAR-03",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Unmatched braces in the pattern.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.00\nH\n84,858.01\nL\n84,858.00\nC\n84,858.00\n\u22120.01 (\u22120.00%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nV3-SCALAR-03\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:23:37 UTC\n99+\nV3-SCALAR-03\nNo data\nRuntime error\nRuntime error\nError on bar 0: Unmatched braces in the pattern.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Unmatched braces in the pattern."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-03",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23922,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24222,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:23:35.109Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-error.png",
+      "captures/v3/evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-error.txt",
+      "captures/v3/evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:23:39.505Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-logs.txt",
+        "evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-logs-v1.json",
+        "evidence/scalar-03-log-warning-unbalanced-left-brace-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-04-log-error-unbalanced-left-brace.pine",
+    "attempt": 1,
+    "source_sha256": "c0cb728e5bc93e26bd4f87c26d109c8762cff3813681e90cd7261ca704972c20",
+    "indicator_title": "V3-SCALAR-04",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: Unmatched braces in the pattern.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0
+        },
+        "error": "Error on bar {bar_index}: Unmatched braces in the pattern.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.00\nH\n84,858.01\nL\n84,858.00\nC\n84,858.00\n\u22120.01 (\u22120.00%)\n84,858.00\nSELL\n0.01\n84,858.01\nBUY\nUSDT\nV3-SCALAR-04\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:23:54 UTC\n99+\nV3-SCALAR-04\nNo data\nRuntime error\nRuntime error\nError on bar 0: Unmatched braces in the pattern.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: Unmatched braces in the pattern."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-04",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23922,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24222,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:23:51.502Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-error.png",
+      "captures/v3/evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-error.txt",
+      "captures/v3/evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:23:55.936Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-logs.txt",
+        "evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-logs-v1.json",
+        "evidence/scalar-04-log-error-unbalanced-left-brace-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-05-ta-pivot-point-levels-Woodie-developing.pine",
+    "attempt": 1,
+    "source_sha256": "383adc0fd72e501b8d466246bb510ab75df32248da93ac8ea009ac73b29ff39e",
+    "indicator_title": "V3-SCALAR-05",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0,
+          "code": "RE10128"
+        },
+        "error": "Error on bar {bar_index}: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.01\nH\n84,858.01\nL\n84,855.14\nC\n84,855.15\n\u22122.86 (\u22120.00%)\n84,855.14\nSELL\n0.01\n84,855.15\nBUY\nUSDT\nV3-SCALAR-05\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:24:31 UTC\n99+\nRuntime error: RE10128\nRuntime error: RE10128\nError on bar 0: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\".\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: The `developing` parameter of the `ta.pivot_point_levels()` cannot be `true` when `type` is \"Woodie\"."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-05",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23923,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24223,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:24:28.839Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-error.png",
+      "captures/v3/evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-error.txt",
+      "captures/v3/evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:24:33.055Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-logs.txt",
+        "evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-logs-v1.json",
+        "evidence/scalar-05-ta-pivot-point-levels-Woodie-developing-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-06-line-get-price-time-xloc.pine",
+    "attempt": 1,
+    "source_sha256": "9b7c16634b396d246d95656dfb321090dfcd5bce45f57e791e95bfd5c7bf688b",
+    "indicator_title": "V3-SCALAR-06",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 0: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 0,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 0,
+          "code": "RE10119"
+        },
+        "error": "Error on bar {bar_index}: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.01\nH\n84,858.01\nL\n84,855.14\nC\n84,855.14\n\u22122.87 (\u22120.00%)\n84,855.14\nSELL\n0.01\n84,855.15\nBUY\nUSDT\nV3-SCALAR-06\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:24:49 UTC\n99+\nRuntime error: RE10119\nRuntime error: RE10119\nError on bar 0: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 0: 'line.get_price' must be used with lines created using 'xloc=xloc.bar_index'."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-06",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23923,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24223,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:24:47.483Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-06-line-get-price-time-xloc-attempt1-error.png",
+      "captures/v3/evidence/scalar-06-line-get-price-time-xloc-attempt1-error.txt",
+      "captures/v3/evidence/scalar-06-line-get-price-time-xloc-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-06-line-get-price-time-xloc-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-06-line-get-price-time-xloc-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:24:51.709Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-06-line-get-price-time-xloc-attempt1-logs.txt",
+        "evidence/scalar-06-line-get-price-time-xloc-attempt1-logs-v1.json",
+        "evidence/scalar-06-line-get-price-time-xloc-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "scalar-07-table-merge-cells-merge-already-merged.pine",
+    "attempt": 1,
+    "source_sha256": "61b0bb3bf9b3c0f96b1c980b16b66ac6d00b10a7e19af1e499c9c66a6baad458",
+    "indicator_title": "V3-SCALAR-07",
+    "status": "RUNS",
+    "csv_file": "captures/v3/scalar-07-table-merge-cells-merge-already-merged-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 (61).csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-SCALAR-07",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23923,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24223,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:25:05.168Z",
+    "live_candle_open_utc": "2026-10-03T15:24:00.000Z",
+    "export_utc": "2026-10-03T15:25:11.053Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v3/evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-setup.png",
+      "captures/v3/evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-export.png",
+      "captures/v3/evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-logs.txt",
+      "captures/v3/evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-logs-v1.json",
+      "captures/v3/evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-logs.png",
+      "captures/v3/evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-visual.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "live_tooltip": "Sat 03 Oct '26   15:24",
+    "historical_compare_before_unix_seconds": 1791041040,
+    "pine_logs": {
+      "paths": [
+        "evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-logs.txt",
+        "evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-logs-v1.json",
+        "evidence/scalar-07-table-merge-cells-merge-already-merged-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "b6efc91ef26cba8ad16c36b11ab371cd7ae5998d6c466bf92e36956280818ead",
+    "csv_bytes": 1119918,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "OUTCOME"
+    ],
+    "csv_rows": 24223,
+    "historical_rows": 24222,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791041040,
+    "first_historical_values": {
+      "OUTCOME": "1"
+    },
+    "last_historical_values": {
+      "OUTCOME": "1"
+    }
+  },
+  {
+    "script": "request-01-request-financial-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "09cb064806e1b2bda568ab2928e0ad3426aa866e1a74de4a830f5a360c16cac7",
+    "indicator_title": "V3-REQUEST-01",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Invalid symbol: FUND:INVALID;__ARG_AUDIT__;TOTAL_REVENUE_FQ",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "FUND:INVALID;__ARG_AUDIT__;TOTAL_REVENUE_FQ"
+        },
+        "error": "Invalid symbol: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,858.01\nH\n84,858.01\nL\n84,841.55\nC\n84,841.55\n\u221216.46 (\u22120.02%)\n84,841.55\nSELL\n0.01\n84,841.56\nBUY\nUSDT\nV3-REQUEST-01\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:25:28 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: FUND:INVALID;__ARG_AUDIT__;TOTAL_REVENUE_FQ",
+        "context_substituted_message": "Invalid symbol: FUND:INVALID;__ARG_AUDIT__;TOTAL_REVENUE_FQ"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-REQUEST-01",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23923,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24223,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:25:26.660Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-01-request-financial-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-01-request-financial-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-01-request-financial-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-01-request-financial-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-01-request-financial-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:25:30.578Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-01-request-financial-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-01-request-financial-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-01-request-financial-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "request-02-request-quandl-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "890fad073295c649da9768f46687f28273be67890ba6c225083a99119e37036c",
+    "indicator_title": "V3-REQUEST-02",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Invalid symbol: QUANDL:INVALID/__ARG_AUDIT__|0.0",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "QUANDL:INVALID/__ARG_AUDIT__|0.0"
+        },
+        "error": "Invalid symbol: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,844.28\nL\n84,844.27\nC\n84,844.28\n0.00 (0.00%)\n84,844.27\nSELL\n0.01\n84,844.28\nBUY\nUSDT\nV3-REQUEST-02\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:07 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: QUANDL:INVALID/__ARG_AUDIT__|0.0",
+        "context_substituted_message": "Invalid symbol: QUANDL:INVALID/__ARG_AUDIT__|0.0"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-REQUEST-02",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:26:05.175Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-02-request-quandl-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-02-request-quandl-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-02-request-quandl-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-02-request-quandl-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-02-request-quandl-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:26:09.306Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-02-request-quandl-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-02-request-quandl-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-02-request-quandl-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "request-03-request-earnings-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "c233a8c9c0b08e5f43795e874f22d91d6c67132cef018a6c96d4421368115ad6",
+    "indicator_title": "V3-REQUEST-03",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Invalid symbol: ESD_FACTSET:INVALID;__ARG_AUDIT__;EARNINGS",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "ESD_FACTSET:INVALID;__ARG_AUDIT__;EARNINGS"
+        },
+        "error": "Invalid symbol: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,844.28\nL\n84,844.27\nC\n84,844.27\n\u22120.01 (\u22120.00%)\n84,844.27\nSELL\n0.01\n84,844.28\nBUY\nUSDT\nV3-REQUEST-03\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:25 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: ESD_FACTSET:INVALID;__ARG_AUDIT__;EARNINGS",
+        "context_substituted_message": "Invalid symbol: ESD_FACTSET:INVALID;__ARG_AUDIT__;EARNINGS"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-REQUEST-03",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:26:23.294Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-03-request-earnings-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-03-request-earnings-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-03-request-earnings-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-03-request-earnings-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-03-request-earnings-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:26:27.454Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-03-request-earnings-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-03-request-earnings-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-03-request-earnings-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "request-04-request-dividends-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "46f2cf4065463ba7017fcfa248dfe943263a40f5eefa088c3275b55f920d3489",
+    "indicator_title": "V3-REQUEST-04",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Invalid symbol: ESD_FACTSET:INVALID;__ARG_AUDIT__;DIVIDENDS",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "ESD_FACTSET:INVALID;__ARG_AUDIT__;DIVIDENDS"
+        },
+        "error": "Invalid symbol: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,847.54\nL\n84,844.27\nC\n84,847.53\n+3.25 (+0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-REQUEST-04\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:44 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: ESD_FACTSET:INVALID;__ARG_AUDIT__;DIVIDENDS",
+        "context_substituted_message": "Invalid symbol: ESD_FACTSET:INVALID;__ARG_AUDIT__;DIVIDENDS"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-REQUEST-04",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:26:42.053Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-04-request-dividends-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-04-request-dividends-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-04-request-dividends-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-04-request-dividends-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-04-request-dividends-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:26:46.660Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-04-request-dividends-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-04-request-dividends-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-04-request-dividends-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "request-05-request-splits-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "6c2c12b810e2c9e58ba003f38c18eeee55def020c2a11e21c805f96e3c1cac9e",
+    "indicator_title": "V3-REQUEST-05",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10165",
+      "text": "No value assigned to the \"field\" parameter in request.splits()",
+      "line": 3,
+      "column": 6,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "No value assigned to the \"{name}\" parameter in {functionName}()",
+        "editorError": {
+          "code": "CE10165",
+          "ctx": {
+            "functionName": "request.splits",
+            "name": "field"
+          },
+          "end": {
+            "column": 72,
+            "line": 3
+          },
+          "message": "No value assigned to the \"{name}\" parameter in {functionName}()",
+          "start": {
+            "column": 6,
+            "line": 3
+          },
+          "id": "USER;78f1f7b69e004731ae850a3a40565f91"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///f3416f4b-5063-49ce-8824-f985d3f71944.pine?placement%3Ddialog",
+              "path": "/f3416f4b-5063-49ce-8824-f985d3f71944.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10165",
+            "severity": 8,
+            "message": "No value assigned to the \"field\" parameter in request.splits()",
+            "startLineNumber": 3,
+            "startColumn": 6,
+            "endLineNumber": 3,
+            "endColumn": 73
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,847.54\nL\n84,844.27\nC\n84,847.54\n+3.26 (+0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nrequest-05-request-splits-invalid-provider-key.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:56 UTC\n99+\nPine Editor\nrequest-05-request-splits-invalid-provider-key.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V3-REQUEST-05\",\u00a0max_bars_back=256)\nplot(request.splits(\"INVALID:__ARG_AUDIT__\",ignore_invalid_symbol=false),\u00a0\"OUTCOME\")\n1 of 1 problem\nNo value assigned to the \"field\" parameter in request.splits()(CE10165)\n1 \u2219 Today, 23:26\nLine 3, Col 6\nPine Script\u00ae v6\nCompilation error: CE10165\n\nNo value assigned to the \"field\" parameter in request.splits()\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "No value assigned to the \"field\" parameter in request.splits()"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "request-05-request-splits-invalid-provider-key.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-05-request-splits-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-05-request-splits-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-05-request-splits-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-05-request-splits-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-05-request-splits-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:26:58.614Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-05-request-splits-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-05-request-splits-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-05-request-splits-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "request-06-request-economic-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "e4bbce32f6d4943b84e1140becac092f09921e07013d7edbf5be083b6957f28d",
+    "indicator_title": "V3-REQUEST-06",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Invalid symbol: ECONOMICS:INVALIDINVALID",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "ECONOMICS:INVALIDINVALID"
+        },
+        "error": "Invalid symbol: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,847.54\nL\n84,844.27\nC\n84,847.54\n+3.26 (+0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-REQUEST-06\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:27:22 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: ECONOMICS:INVALIDINVALID",
+        "context_substituted_message": "Invalid symbol: ECONOMICS:INVALIDINVALID"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-REQUEST-06",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:27:20.941Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-06-request-economic-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-06-request-economic-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-06-request-economic-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-06-request-economic-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-06-request-economic-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:27:25.032Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-06-request-economic-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-06-request-economic-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-06-request-economic-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "request-07-request-currency-rate-invalid-provider-key.pine",
+    "attempt": 1,
+    "source_sha256": "c0bbc9ac09f77f027e3e3ad9f212f93bfc0f36204ca1c4eca1f584b66f49a47f",
+    "indicator_title": "V3-REQUEST-07",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Symbol resolve error: ={\"base-currency-id\":\"XTVCINVALID\",\"currency-id\":\"USD\"}",
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "symbol": "={\"base-currency-id\":\"XTVCINVALID\",\"currency-id\":\"USD\"}"
+        },
+        "error": "Symbol resolve error: {symbol}",
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,847.54\nL\n84,844.27\nC\n84,847.53\n+3.25 (+0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-REQUEST-07\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:27:43 UTC\n99+\nRuntime error\nRuntime error\n\nSymbol resolve error: ={\"base-currency-id\":\"XTVCINVALID\",\"currency-id\":\"USD\"}",
+        "context_substituted_message": "Symbol resolve error: ={\"base-currency-id\":\"XTVCINVALID\",\"currency-id\":\"USD\"}"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-REQUEST-07",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:27:41.058Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-error.png",
+      "captures/v3/evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-error.txt",
+      "captures/v3/evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-logs.txt",
+      "captures/v3/evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-logs-v1.json",
+      "captures/v3/evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:27:45.318Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-logs.txt",
+        "evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-logs-v1.json",
+        "evidence/request-07-request-currency-rate-invalid-provider-key-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-01-line-new-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "32915548a3b1301ba32ddd18bbe21ca6ced313f89ed31cb26d8c84fe23ce4a9a",
+    "indicator_title": "V3-DRAWING-01",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24223: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 24223,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24223,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,847.53\nH\n84,847.53\nL\n84,847.53\nC\n84,847.53\n\u22120.01 (\u22120.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-DRAWING-01\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:28:02 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24223: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 24223: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-01",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23924,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24224,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:27:59.844Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-01-line-new-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-01-line-new-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-01-line-new-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-01-line-new-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-01-line-new-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:28:04.350Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-01-line-new-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-01-line-new-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-01-line-new-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-02-line-set-x1-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "65ff3bd4ec992178c14101bc8412466c26acdc42a8dfe1520b63e8e1688c988e",
+    "indicator_title": "V3-DRAWING-02",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24224,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24224,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,847.53\nH\n84,847.54\nL\n84,847.53\nC\n84,847.54\n0.00 (0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-DRAWING-02\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:28:20 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-02",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23925,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24225,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:28:18.375Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-02-line-set-x1-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-02-line-set-x1-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-02-line-set-x1-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-02-line-set-x1-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-02-line-set-x1-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:28:22.352Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-02-line-set-x1-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-02-line-set-x1-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-02-line-set-x1-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-03-line-set-xy1-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "77853668c937ce24a8e8fff12350e624e3ac6ce6d25e8fb28422e0d8368cdccc",
+    "indicator_title": "V3-DRAWING-03",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24224,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24224,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,847.53\nH\n84,847.54\nL\n84,847.53\nC\n84,847.54\n0.00 (0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-DRAWING-03\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:28:54 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-03",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23925,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24225,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:28:52.377Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-03-line-set-xy1-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-03-line-set-xy1-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-03-line-set-xy1-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-03-line-set-xy1-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-03-line-set-xy1-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:28:56.680Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-03-line-set-xy1-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-03-line-set-xy1-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-03-line-set-xy1-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-04-line-set-x2-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "36c679d62a106e600e714d4bd7fc9c6ea32bd74095a18fd4f378ebc340c178bb",
+    "indicator_title": "V3-DRAWING-04",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24224,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24224,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,847.53\nH\n84,847.54\nL\n84,847.53\nC\n84,847.54\n0.00 (0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-DRAWING-04\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:29:13 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-04",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23925,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24225,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:29:11.034Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-04-line-set-x2-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-04-line-set-x2-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-04-line-set-x2-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-04-line-set-x2-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-04-line-set-x2-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:29:15.149Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-04-line-set-x2-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-04-line-set-x2-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-04-line-set-x2-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-05-box-set-left-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "f0f817a6d1a6ade7d504996d793d5cc3d2206cf711a4fc106fa9413e64ab07f2",
+    "indicator_title": "V3-DRAWING-05",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24224,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24224,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,847.53\nH\n84,847.54\nL\n84,847.53\nC\n84,847.53\n\u22120.01 (\u22120.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-DRAWING-05\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:29:31 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-05",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23925,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24225,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:29:29.103Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-05-box-set-left-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-05-box-set-left-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-05-box-set-left-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-05-box-set-left-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-05-box-set-left-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:29:33.152Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-05-box-set-left-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-05-box-set-left-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-05-box-set-left-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-06-box-set-right-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "1d4397e486d097706c3faaf3e7c6d492e7513695f815e19b39a8e7345d1b842a",
+    "indicator_title": "V3-DRAWING-06",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24224,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24224,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,847.53\nH\n84,847.54\nL\n84,847.53\nC\n84,847.54\n0.00 (0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-DRAWING-06\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:29:49 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24224: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-06",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23925,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24225,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:29:46.981Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-06-box-set-right-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-06-box-set-right-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-06-box-set-right-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-06-box-set-right-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-06-box-set-right-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:29:51.019Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-06-box-set-right-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-06-box-set-right-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-06-box-set-right-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-07-label-new-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "cc2d4b84ffb9bea9a298f26e455bf8bd6572f8ae336fb7196b122fc0d3ab6b94",
+    "indicator_title": "V3-DRAWING-07",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 24225,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24225,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.66\nH\n84,838.67\nL\n84,834.00\nC\n84,834.00\n\u22124.66 (\u22120.01%)\n84,834.00\nSELL\n0.01\n84,834.01\nBUY\nUSDT\nV3-DRAWING-07\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:30:21 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-07",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23926,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24226,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:30:19.018Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-07-label-new-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-07-label-new-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-07-label-new-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-07-label-new-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-07-label-new-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:30:23.092Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-07-label-new-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-07-label-new-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-07-label-new-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-08-label-set-x-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "4161bdd8a01681120a667c8d6991d4984996400bc06bd9d18a7a255d44a3b7d5",
+    "indicator_title": "V3-DRAWING-08",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24225,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24225,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.66\nH\n84,838.67\nL\n84,818.00\nC\n84,818.01\n\u221220.65 (\u22120.02%)\n84,818.00\nSELL\n0.01\n84,818.01\nBUY\nUSDT\nV3-DRAWING-08\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:30:41 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-08",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23926,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24226,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:30:37.879Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-08-label-set-x-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-08-label-set-x-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-08-label-set-x-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-08-label-set-x-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-08-label-set-x-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:30:42.966Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-08-label-set-x-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-08-label-set-x-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-08-label-set-x-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-09-label-set-xy-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "3ba9abfc76bbd01435c3e8a2308a0aea1ba36884c595734fe04e34e46275064a",
+    "indicator_title": "V3-DRAWING-09",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24225,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24225,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.66\nH\n84,838.67\nL\n84,818.00\nC\n84,818.00\n\u221220.66 (\u22120.02%)\n84,818.00\nSELL\n0.01\n84,818.01\nBUY\nUSDT\nV3-DRAWING-09\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:31:03 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-09",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23926,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24226,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:31:01.507Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-09-label-set-xy-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-09-label-set-xy-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-09-label-set-xy-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-09-label-set-xy-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-09-label-set-xy-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:31:05.891Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-09-label-set-xy-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-09-label-set-xy-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-09-label-set-xy-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-10-line-set-xy2-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "b43728d831b7ebe26dbcf9f7657c094a6606a1e5ab8d15eb9154f6732d3c39c9",
+    "indicator_title": "V3-DRAWING-10",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 4,
+      "column": null,
+      "first_bar_index": 24225,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24225,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 4
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,838.66\nH\n84,838.67\nL\n84,818.00\nC\n84,818.00\n\u221220.66 (\u22120.02%)\n84,818.00\nSELL\n0.01\n84,818.01\nBUY\nUSDT\nV3-DRAWING-10\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:31:22 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():4\nOpen in editor",
+        "context_substituted_message": "Error on bar 24225: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-10",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23926,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24226,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:31:20.348Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-10-line-set-xy2-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-10-line-set-xy2-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-10-line-set-xy2-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-10-line-set-xy2-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-10-line-set-xy2-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:31:24.732Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-10-line-set-xy2-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-10-line-set-xy2-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-10-line-set-xy2-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "script": "drawing-11-box-new-future-index-501.pine",
+    "attempt": 1,
+    "source_sha256": "5a2e466670b351a9165015de65d98fbe6d3ffee02d23f3d6390fc9e163e80286",
+    "indicator_title": "V3-DRAWING-11",
+    "status": "RUNTIME-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Error on bar 24226: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.",
+      "line": 3,
+      "column": null,
+      "first_bar_index": 24226,
+      "first_bar_time_utc": null,
+      "native": {
+        "ctx": {
+          "bar_index": 24226,
+          "maxOffsetInFutureForDrawings": 500,
+          "code": "RE10020"
+        },
+        "error": "Error on bar {bar_index}: Objects positioned using xloc.bar_index cannot be drawn further than {maxOffsetInFutureForDrawings} bars into the future.",
+        "stack_trace": [
+          {
+            "n": "#main",
+            "p": 3
+          }
+        ],
+        "title": "Runtime error",
+        "showReportItButton": false,
+        "studyAccessBlocked": false,
+        "compiler_markers": [],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,766.60\nH\n84,786.01\nL\n84,766.59\nC\n84,786.00\n+19.40 (+0.02%)\n84,786.00\nSELL\n0.01\n84,786.01\nBUY\nUSDT\nV3-DRAWING-11\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:32:26 UTC\n99+\nRuntime error: RE10020\nRuntime error: RE10020\nError on bar 24226: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future.\nat #main():3\nOpen in editor",
+        "context_substituted_message": "Error on bar 24226: Objects positioned using xloc.bar_index cannot be drawn further than 500 bars into the future."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "V3-DRAWING-11",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -23927,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24227,
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-03T15:32:22.586Z",
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v3/evidence/drawing-11-box-new-future-index-501-attempt1-error.png",
+      "captures/v3/evidence/drawing-11-box-new-future-index-501-attempt1-error.txt",
+      "captures/v3/evidence/drawing-11-box-new-future-index-501-attempt1-logs.txt",
+      "captures/v3/evidence/drawing-11-box-new-future-index-501-attempt1-logs-v1.json",
+      "captures/v3/evidence/drawing-11-box-new-future-index-501-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "source_identity_verified": true,
+    "error_observed_utc": "2026-10-03T15:32:27.494Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/drawing-11-box-new-future-index-501-attempt1-logs.txt",
+        "evidence/drawing-11-box-new-future-index-501-attempt1-logs-v1.json",
+        "evidence/drawing-11-box-new-future-index-501-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  }
+]

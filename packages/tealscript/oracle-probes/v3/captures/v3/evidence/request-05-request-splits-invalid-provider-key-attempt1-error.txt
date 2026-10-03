@@ -1,0 +1,43 @@
+No value assigned to the "field" parameter in request.splits()
+{
+  "error": "No value assigned to the \"{name}\" parameter in {functionName}()",
+  "editorError": {
+    "code": "CE10165",
+    "ctx": {
+      "functionName": "request.splits",
+      "name": "field"
+    },
+    "end": {
+      "column": 72,
+      "line": 3
+    },
+    "message": "No value assigned to the \"{name}\" parameter in {functionName}()",
+    "start": {
+      "column": 6,
+      "line": 3
+    },
+    "id": "USER;78f1f7b69e004731ae850a3a40565f91"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///f3416f4b-5063-49ce-8824-f985d3f71944.pine?placement%3Ddialog",
+        "path": "/f3416f4b-5063-49ce-8824-f985d3f71944.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10165",
+      "severity": 8,
+      "message": "No value assigned to the \"field\" parameter in request.splits()",
+      "startLineNumber": 3,
+      "startColumn": 6,
+      "endLineNumber": 3,
+      "endColumn": 73
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,847.54\nL\n84,844.27\nC\n84,847.54\n+3.26 (+0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nrequest-05-request-splits-invalid-provider-key.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:26:56 UTC\n99+\nPine Editor\nrequest-05-request-splits-invalid-provider-key.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V3-REQUEST-05\", max_bars_back=256)\nplot(request.splits(\"INVALID:__ARG_AUDIT__\",ignore_invalid_symbol=false), \"OUTCOME\")\n1 of 1 problem\nNo value assigned to the \"field\" parameter in request.splits()(CE10165)\n1 ∙ Today, 23:26\nLine 3, Col 6\nPine Script® v6\nCompilation error: CE10165\n\nNo value assigned to the \"field\" parameter in request.splits()\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "No value assigned to the \"field\" parameter in request.splits()"
+}

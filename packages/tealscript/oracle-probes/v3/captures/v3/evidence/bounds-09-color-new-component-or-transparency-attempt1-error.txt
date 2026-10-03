@@ -1,0 +1,21 @@
+color.new: transp argument value should be between 0 and 100
+{
+  "error": "color.new: transp argument value should be between 0 and 100",
+  "editorError": {
+    "code": "CE10274",
+    "end": {
+      "column": 37,
+      "line": 3
+    },
+    "message": "color.new: transp argument value should be between 0 and 100",
+    "start": {
+      "column": 35,
+      "line": 3
+    },
+    "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,842.01\nH\n84,864.00\nL\n84,842.00\nC\n84,846.01\n+4.00 (+0.00%)\n84,846.01\nSELL\n0.01\n84,846.02\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:21:30 UTC\n99+\nPine Editor\nbounds-09-color-new-component-or-transparency.pine\nPublish script\n1\n2\n3\n4\n//@version=6\nindicator(\"V3-BOUNDS-09\", max_bars_back=256)\nplot(color.t( color.new(color.red, 101)), \"OUTCOME\")\n1 ∙ Today, 23:21\nLine 3, Col 35\nPine Script® v6\nCompilation error: CE10274\nCompilation error: CE10274\n\ncolor.new: transp argument value should be between 0 and 100\n\nOpen in editor",
+  "context_substituted_message": "color.new: transp argument value should be between 0 and 100"
+}

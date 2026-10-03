@@ -1,0 +1,13 @@
+Invalid symbol: ECONOMICS:INVALIDINVALID
+{
+  "ctx": {
+    "symbol": "ECONOMICS:INVALIDINVALID"
+  },
+  "error": "Invalid symbol: {symbol}",
+  "title": "Runtime error",
+  "showReportItButton": false,
+  "studyAccessBlocked": false,
+  "compiler_markers": [],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,844.28\nH\n84,847.54\nL\n84,844.27\nC\n84,847.54\n+3.26 (+0.00%)\n84,847.53\nSELL\n0.01\n84,847.54\nBUY\nUSDT\nV3-REQUEST-06\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:27:22 UTC\n99+\nRuntime error\nRuntime error\n\nInvalid symbol: ECONOMICS:INVALIDINVALID",
+  "context_substituted_message": "Invalid symbol: ECONOMICS:INVALIDINVALID"
+}
