@@ -1,0 +1,35 @@
+{
+  "index": 299,
+  "bar": [
+    1791140760,
+    85388.01,
+    85408.01,
+    85374.34,
+    85376.07,
+    13.59962
+  ],
+  "source_row": [
+    1791140760,
+    20013,
+    0,
+    0,
+    0,
+    0,
+    66.66666666666667,
+    66.66666666666667
+  ],
+  "browser_utc": "2026-10-04T19:08:02.904Z",
+  "title": "array-percentrank-fraction-and-ties v14 v1",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   19:06",
+  "visible_range": {
+    "_firstBar": 264,
+    "_lastBar": 302
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

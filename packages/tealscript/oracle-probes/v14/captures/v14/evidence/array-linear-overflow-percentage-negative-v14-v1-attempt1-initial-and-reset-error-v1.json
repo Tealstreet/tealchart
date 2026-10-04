@@ -1,0 +1,2572 @@
+{
+  "initial_status": {
+    "browser_utc": "2026-10-04T19:10:36.099Z",
+    "bars": 301,
+    "end": false,
+    "first": {
+      "index": 0,
+      "value": [
+        1791105000,
+        85126.01,
+        85141.96,
+        85126,
+        85141.15,
+        9.46008
+      ]
+    },
+    "last": {
+      "index": 300,
+      "value": [
+        1791141000,
+        85382.71,
+        85382.71,
+        85382.7,
+        85382.7,
+        0.17182
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "array-linear-overflow-percentage-negative v14 v1",
+        "status": {
+          "type": 3,
+          "errorDescription": {
+            "ctx": {
+              "min": 0,
+              "code": "RE10002",
+              "argName": "percentage",
+              "bar_index": 0,
+              "max": 100,
+              "value": null,
+              "funName": "array.percentile_linear_interpolation"
+            },
+            "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 5
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false
+          }
+        },
+        "size": 0,
+        "first": null,
+        "last": null
+      }
+    ]
+  },
+  "reset_timeline": [
+    {
+      "browser_utc": "2026-10-04T19:10:41.667Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.19313
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:42.688Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.19313
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:43.379Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.21085
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:44.056Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.21223
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:44.727Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.21761
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:45.484Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.21761
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:46.235Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.21908
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:47.019Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.2246
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:47.698Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.2246
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:48.697Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.22998
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:49.491Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.23101
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:50.164Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.23101
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:50.854Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.23655
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:51.533Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.23655
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:52.216Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.23655
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:52.903Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.27667
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:53.604Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.27684
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:54.581Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.28018
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:55.272Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.28018
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:56.026Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.28047
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:56.711Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.28826
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:57.398Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.28826
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:58.183Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.29384
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:58.868Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.29384
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:10:59.555Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.29384
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:00.656Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.29466
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:01.331Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.29909
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:02.013Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.29991
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:02.695Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.3079
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:03.400Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.3079
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:04.126Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.31155
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:04.800Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.32672
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:05.521Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.32672
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:06.550Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.3268
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:07.227Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.33123
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:07.919Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.33151
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:08.619Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.36685
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:09.291Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.7,
+          0.36685
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:10.095Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.47635
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    },
+    {
+      "browser_utc": "2026-10-04T19:11:10.771Z",
+      "bars": 2544,
+      "end": false,
+      "first": {
+        "index": -2244,
+        "value": [
+          1790835840,
+          84323.91,
+          84340.01,
+          84312.01,
+          84332,
+          8.96771
+        ]
+      },
+      "last": {
+        "index": 299,
+        "value": [
+          1791141000,
+          85382.71,
+          85382.71,
+          85382.7,
+          85382.71,
+          0.47904
+        ]
+      },
+      "timezone": "Etc/UTC",
+      "studies": [
+        {
+          "name": "array-linear-overflow-percentage-negative v14 v1",
+          "status": {
+            "type": 3,
+            "errorDescription": {
+              "ctx": {
+                "min": 0,
+                "code": "RE10002",
+                "argName": "percentage",
+                "bar_index": 0,
+                "max": 100,
+                "value": null,
+                "funName": "array.percentile_linear_interpolation"
+              },
+              "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+              "stack_trace": [
+                {
+                  "n": "#main",
+                  "p": 5
+                }
+              ],
+              "title": "Runtime error",
+              "showReportItButton": false,
+              "studyAccessBlocked": false
+            }
+          },
+          "size": 0,
+          "first": null,
+          "last": null
+        }
+      ]
+    }
+  ],
+  "native_error": {
+    "browser_utc": "2026-10-04T19:12:35.891Z",
+    "bars": 2545,
+    "end": false,
+    "first": {
+      "index": -2244,
+      "value": [
+        1790835840,
+        84323.91,
+        84340.01,
+        84312.01,
+        84332,
+        8.96771
+      ]
+    },
+    "last": {
+      "index": 300,
+      "value": [
+        1791141120,
+        85382.71,
+        85382.71,
+        85382.7,
+        85382.71,
+        0.17298
+      ]
+    },
+    "timezone": "Etc/UTC",
+    "studies": [
+      {
+        "name": "array-linear-overflow-percentage-negative v14 v1",
+        "status": {
+          "type": 3,
+          "errorDescription": {
+            "ctx": {
+              "min": 0,
+              "code": "RE10002",
+              "argName": "percentage",
+              "bar_index": 0,
+              "max": 100,
+              "value": null,
+              "funName": "array.percentile_linear_interpolation"
+            },
+            "error": "Error on bar {bar_index}: Invalid value of the '{argName}' argument ({value}) in the '{funName}' function. It must be in the range [{min}..{max}].",
+            "stack_trace": [
+              {
+                "n": "#main",
+                "p": 5
+              }
+            ],
+            "title": "Runtime error",
+            "showReportItButton": false,
+            "studyAccessBlocked": false,
+            "native_context_scalar_types": [
+              {
+                "key": "min",
+                "type": "number",
+                "nonfinite": false,
+                "native_string": "0"
+              },
+              {
+                "key": "code",
+                "type": "string",
+                "nonfinite": false,
+                "native_string": "RE10002"
+              },
+              {
+                "key": "argName",
+                "type": "string",
+                "nonfinite": false,
+                "native_string": "percentage"
+              },
+              {
+                "key": "bar_index",
+                "type": "number",
+                "nonfinite": false,
+                "native_string": "0"
+              },
+              {
+                "key": "max",
+                "type": "number",
+                "nonfinite": false,
+                "native_string": "100"
+              },
+              {
+                "key": "value",
+                "type": "object",
+                "nonfinite": false,
+                "native_string": "null"
+              },
+              {
+                "key": "funName",
+                "type": "string",
+                "nonfinite": false,
+                "native_string": "array.percentile_linear_interpolation"
+              }
+            ],
+            "compiler_markers": [],
+            "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,382.71\nH\n85,382.71\nL\n85,382.70\nC\n85,382.71\n0.00 (0.00%)\n85,382.70\nSELL\n0.01\n85,382.71\nBUY\nUSDT\narray-linear-overflow-percentage-negative v14 v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n19:12:37 UTC\n99+",
+            "context_substituted_message": "Error on bar 0: Invalid value of the 'percentage' argument ({value}) in the 'array.percentile_linear_interpolation' function. It must be in the range [0..100]."
+          }
+        },
+        "size": 0,
+        "first": null,
+        "last": null
+      }
+    ]
+  },
+  "unobserved": "Full end-of-data reset not reached; no output, qualifying scalar input or post-error state inferred."
+}
