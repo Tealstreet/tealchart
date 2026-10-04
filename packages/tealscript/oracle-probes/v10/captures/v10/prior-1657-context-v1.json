@@ -1,0 +1,79 @@
+{
+  "artifact": "Prior1657 source context v1",
+  "handoff_reference": "HANDOFF-v10.md says v56:1657 is not repasted because of the original v5 capture",
+  "original_registration": "v5/corpus-gaps43-local-udf-exact-v6.pine",
+  "actual_declared_version": 5,
+  "filename_note": "The v6 filename suffix does not change actual source Pine5 declaration; bytes were not changed.",
+  "verified_source_sha256": "e8015eb9373e922265ecc5079f1d7c247c6ef799f4f89b94198b828269c74396",
+  "original_attempt": 1,
+  "original_status": "COMPILE-ERROR",
+  "original_diagnostic": {
+    "code": null,
+    "text": "Mismatched input 'end of line without line continuation' expecting ')'",
+    "line": 141,
+    "column": 38,
+    "first_bar_index": null,
+    "first_bar_time_utc": null,
+    "native": {
+      "error": "Mismatched input 'end of line without line continuation' expecting ')'",
+      "editorError": {
+        "end": {
+          "column": 41,
+          "line": 141
+        },
+        "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+        "start": {
+          "column": 38,
+          "line": 141
+        },
+        "id": "USER;577f2783756e41b6aee5e92135fc4976"
+      },
+      "title": "Compilation error",
+      "compiler_markers": [
+        {
+          "resource": {
+            "$mid": 1,
+            "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+            "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+            "scheme": "file",
+            "query": "placement=dialog"
+          },
+          "owner": "_generated_diagnostic_collection_name_#0",
+          "code": "PINE_VERSION_OUTDATED",
+          "severity": 4,
+          "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+          "startLineNumber": 1,
+          "startColumn": 3,
+          "endLineNumber": 1,
+          "endColumn": 12
+        },
+        {
+          "resource": {
+            "$mid": 1,
+            "external": "file:///5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine?placement%3Ddialog",
+            "path": "/5e4bcf71-4bf3-41b7-bb0a-48da0d296054.pine",
+            "scheme": "file",
+            "query": "placement=dialog"
+          },
+          "owner": "_generated_diagnostic_collection_name_#0",
+          "severity": 8,
+          "message": "Mismatched input 'end of line without line continuation' expecting ')'",
+          "startLineNumber": 141,
+          "startColumn": 38,
+          "endLineNumber": 141,
+          "endColumn": 42
+        }
+      ],
+      "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n84,821.59\nH\n84,821.59\nL\n84,821.58\nC\n84,821.59\n0.00 (0.00%)\n84,821.58\nSELL\n0.01\n84,821.59\nBUY\ncorpus-gaps43-local-udf-exact-v6.pine\nUSDT\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n03:24:43 UTC\n99+\nPine Editor\ncorpus-gaps43-local-udf-exact-v6.pine\nPublish script\n132\n133\n134\n135\n136\n137\n138\n139\n140\n141\n142\n143\n144\n145\n146\n147\n148\n149\n150\n151\n152\n153\n154\n155\n156\n157\n158\n159\n160\n161\n162\n163\n164\n165\n166\n167\n168\n169\n170\n171\nfloat\u00a0zMacd\u00a0\u00a0=\u00a0_zscore(macdHist,\u00a0\u00a0lookback)\nfloat\u00a0zBb\u00a0\u00a0\u00a0\u00a0=\u00a0_zscore(bbPos,\u00a0\u00a0\u00a0\u00a0\u00a0lookback)\nfloat\u00a0zAtr\u00a0\u00a0\u00a0=\u00a0_zscore(atrVal,\u00a0\u00a0\u00a0\u00a0lookback)\nfloat\u00a0zStoch\u00a0=\u00a0_zscore(stochKVal,\u00a0lookback)\nfloat\u00a0zObv\u00a0\u00a0\u00a0=\u00a0_zscore(obvDelta,\u00a0\u00a0lookback)\nfloat\u00a0zAdx\u00a0\u00a0\u00a0=\u00a0_zscore(adxVal,\u00a0\u00a0\u00a0\u00a0lookback)\nfloat\u00a0zVwap\u00a0\u00a0=\u00a0_zscore(vwapDev,\u00a0\u00a0\u00a0lookback)\n//\u00a0Instantiate\u00a0FeatureVector\u00a0UDT\nFeatureVector\u00a0fv\u00a0=\u00a0FeatureVector.new(\n\u00a0\u00a0\u00a0\u00a0rsi_z\u00a0\u00a0=\u00a0zRsi,\n\u00a0\u00a0\u00a0\u00a0macd_z\u00a0=\u00a0zMacd,\n\u00a0\u00a0\u00a0\u00a0bb_z\u00a0\u00a0\u00a0=\u00a0zBb,\n\u00a0\u00a0\u00a0\u00a0atr_z\u00a0\u00a0=\u00a0zAtr,\n\u00a0\u00a0\u00a0\u00a0stoch_z=\u00a0zStoch,\n\u00a0\u00a0\u00a0\u00a0obv_z\u00a0\u00a0=\u00a0zObv,\n\u00a0\u00a0\u00a0\u00a0adx_z\u00a0\u00a0=\u00a0zAdx,\n\u00a0\u00a0\u00a0\u00a0vwap_z\u00a0=\u00a0zVwap\n)\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//\u00a0LAYER\u00a03\u00a0\u2014\u00a0WEIGHTED\u00a0COMPOSITE\u00a0SCORE\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfloat\u00a0wSum\u00a0=\u00a0wRsi\u00a0+\u00a0wMacd\u00a0+\u00a0wBb\u00a0+\u00a0wAtr\u00a0+\u00a0wStoch\u00a0+\u00a0wObv\u00a0+\u00a0wAdx\u00a0+\u00a0wVwap\u00a0+\u00a01e-9\nfloat\u00a0rawScore\u00a0=\n\u00a0\u00a0\u00a0\u00a0(wRsi\u00a0\u00a0\u00a0*\u00a0fv.rsi_z\n\u00a0\u00a0\u00a0+\u00a0wMacd\u00a0\u00a0*\u00a0fv.macd_z\n\u00a0\u00a0\u00a0+\u00a0wBb\u00a0\u00a0\u00a0\u00a0*\u00a0fv.bb_z\n\u00a0\u00a0\u00a0+\u00a0wAtr\u00a0\u00a0\u00a0*\u00a0fv.atr_z\n\u00a0\u00a0\u00a0+\u00a0wStoch\u00a0*\u00a0fv.stoch_z\n\u00a0\u00a0\u00a0+\u00a0wObv\u00a0\u00a0\u00a0*\u00a0fv.obv_z\n\u00a0\u00a0\u00a0+\u00a0wAdx\u00a0\u00a0\u00a0*\u00a0fv.adx_z\n\u00a0\u00a0\u00a0+\u00a0wVwap\u00a0\u00a0*\u00a0fv.vwap_z)\u00a0/\u00a0wSum\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n//\u00a0LAYER\u00a04\u00a0\u2014\u00a0KALMAN\u00a0SMOOTHER\u00a0\u00a0(scalar\u00a01-D\u00a0state-space)\n//\u00a0\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nvar\u00a0float\u00a0kState\u00a0=\u00a0rawScore\n1 of 2 problems\nMismatched input 'end of line without line continuation' expecting ')'\n1 \u2219 Today, 11:24\nLine 141, Col 38\nPine Script\u00ae v5\nCompilation error\n\nMismatched input 'end of line without line continuation' expecting ')'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+      "context_substituted_message": "Mismatched input 'end of line without line continuation' expecting ')'"
+    }
+  },
+  "original_evidence_sha256": {
+    "v5/captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-error.png": "ca619ccf07f4862dd17b02063f49befe7b23eed62e79a037b81bc4cf0c7abf72",
+    "v5/captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-error.txt": "e7f8dbba923fb14445dad314c4ad9719c81f9d9539e542c0dd248d963cb34446",
+    "v5/captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "v5/captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs-v1.json": "74353bccb9298597cac55a193bc10cc33df2291131f5efbe82319dab8455e1d6",
+    "v5/captures/v5/evidence/corpus-gaps43-local-udf-exact-v6-attempt1-logs.png": "82ca12d8a64e9a66a9980b7f9a97a821218ce511fac41e81da6304ac2cb3ca46"
+  },
+  "limits": "Original line141 refusal masks the disputed engine line308 condition. No fresh capture, context relabelling or continuation-boundary inference; not a new v10 primary source."
+}

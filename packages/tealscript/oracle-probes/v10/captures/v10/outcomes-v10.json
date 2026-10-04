@@ -1969,5 +1969,1770 @@
       "Input bar index": "24924"
     },
     "data_window_witness": "captures/v10/evidence/nvi-formula-holes-magnitude-v6-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T14:55:09.309Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "corpus-framework-exact-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "02b9dcd04cd5ea2990297dd7d216f00f294ed2fa7c745489a58a0bd8492c82ce",
+    "indicator_title": "Unit Testing Framework",
+    "status": "RUNS",
+    "csv_file": "captures/v10/corpus-framework-exact-v5-v1-attempt1.csv",
+    "original_download_filename": "BINANCE_BTCUSDT, 2 - 2026-10-04T225508.522.csv",
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": null,
+      "line": null,
+      "column": null,
+      "first_bar_index": null,
+      "first_bar_time_utc": null
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [
+        {
+          "id": "in_0",
+          "name": "Show test suites statuses",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_1",
+          "name": "Show passed tests",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_2",
+          "name": "Show failed tests",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_3",
+          "name": "Show skipped tests",
+          "value": true,
+          "default": true
+        },
+        {
+          "id": "in_4",
+          "name": "Reporter Position",
+          "value": "Upper Left",
+          "default": "Upper Left"
+        },
+        {
+          "id": "in_5",
+          "name": "Reporter Background Color",
+          "value": "#363A45",
+          "default": "#363A45"
+        },
+        {
+          "id": "in_6",
+          "name": "Reporter Text Color",
+          "value": "#FFFFFF",
+          "default": "#FFFFFF"
+        }
+      ],
+      "observed_indicator_title": "Unit Testing Framework",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24628,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24928,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": "2026-10-04T14:54:51.319Z",
+    "live_candle_open_utc": "2026-10-04T14:54:00.000Z",
+    "export_utc": "2026-10-04T14:55:08.806Z",
+    "live_boundary_confirmed_unchanged": true,
+    "evidence_files": [
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-setup.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-export.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-logs.txt",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-logs.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-inputs.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-visual.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-data-window-v1.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-data-window-v1.json",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-data-window-v1.txt",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-authority-object-geometry-v1.json",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-authority-object-geometry-v1.png",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-framework-test-report-v1.json",
+      "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-framework-test-report-v1.png",
+      "captures/v10/framework-test-report-v1.txt",
+      "captures/v10/framework-context-v1.json"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": [
+      {
+        "browser_utc": "2026-10-04T14:54:52.037Z",
+        "bars": 300,
+        "end": false,
+        "first": {
+          "index": 0,
+          "value": [
+            1791089760,
+            84812.01,
+            84812.01,
+            84812,
+            84812.01,
+            1.1836
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224.01,
+            1.53053
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 0
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:52.813Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224.01,
+            1.54438
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 1,
+              "startTime": 1791125692355
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:53.503Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224.01,
+            1.55817
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 1,
+              "startTime": 1791125692355
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:54.299Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224.01,
+            1.55817
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:54.999Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224,
+            1.56629
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:55.904Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224,
+            1.57409
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:56.640Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224,
+            1.59569
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:57.752Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224,
+            1.60343
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:54:58.612Z",
+        "bars": 2544,
+        "end": false,
+        "first": {
+          "index": -2244,
+          "value": [
+            1790820480,
+            83558.01,
+            83634.4,
+            83558.01,
+            83628,
+            6.58101
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85224.01,
+            85222.53,
+            85224.01,
+            1.6108
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      },
+      {
+        "browser_utc": "2026-10-04T14:55:00.439Z",
+        "bars": 24928,
+        "end": true,
+        "first": {
+          "index": -24628,
+          "value": [
+            1788134400,
+            77682,
+            77682.01,
+            77572,
+            77674.04,
+            51.86295
+          ]
+        },
+        "last": {
+          "index": 299,
+          "value": [
+            1791125640,
+            85222.54,
+            85228.01,
+            85222.53,
+            85228,
+            1.70629
+          ]
+        },
+        "timezone": "Etc/UTC",
+        "studies": [
+          {
+            "name": "Unit Testing Framework",
+            "status": {
+              "type": 2
+            },
+            "size": 0,
+            "first": null,
+            "last": null
+          }
+        ]
+      }
+    ],
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///03f1a185-4509-49c4-9193-083cb9027278.pine?placement%3Ddialog",
+          "path": "/03f1a185-4509-49c4-9193-083cb9027278.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    ],
+    "live_tooltip": "Sun 04 Oct '26   14:54",
+    "historical_compare_before_unix_seconds": 1791125640,
+    "pine_logs": {
+      "paths": [
+        "evidence/corpus-framework-exact-v5-v1-attempt1-logs.txt",
+        "evidence/corpus-framework-exact-v5-v1-attempt1-logs-v1.json",
+        "evidence/corpus-framework-exact-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    },
+    "csv_sha256": "8add7b65799bded9c824400842b7497b17f98b18b5043d7ccf265a9d46515d26",
+    "csv_bytes": 1103090,
+    "csv_headers": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "duplicate_headers_preserved": false,
+    "declared_to_native_column_positions": {},
+    "first_historical_cells": [
+      "1788134400",
+      "77682",
+      "77682.01",
+      "77572",
+      "77674.04"
+    ],
+    "last_historical_cells": [
+      "1791125520",
+      "85163.46",
+      "85222.54",
+      "85163.45",
+      "85222.53"
+    ],
+    "declared_to_native_header_mapping": {},
+    "csv_rows": 24928,
+    "historical_rows": 24927,
+    "first_csv_timestamp_seconds": 1788134400,
+    "last_csv_timestamp_seconds": 1791125640,
+    "first_csv_time_raw": "1788134400",
+    "last_csv_time_raw": "1791125640",
+    "first_historical_values": {},
+    "last_historical_values": {},
+    "data_window_witness": "captures/v10/evidence/corpus-framework-exact-v5-v1-attempt1-data-window-v1.json"
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:16:08.957Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "sort-v56-815-exact-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "a8193da177a20a6d127b90a9cae826152ca53f601c69bbdcbbe2608b6b553263",
+    "indicator_title": "Unsupported array sort_indices bool namespace",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected.",
+      "line": 5,
+      "column": 30,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected.",
+        "editorError": {
+          "end": {
+            "column": 35,
+            "line": 5
+          },
+          "message": "Cannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected.",
+          "start": {
+            "column": 30,
+            "line": 5
+          },
+          "id": "USER;64eb9fe01ecd4728859be8cb120fa590"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///de024f96-9b39-4373-b954-ac51e80b4fa4.pine?placement%3Ddialog",
+              "path": "/de024f96-9b39-4373-b954-ac51e80b4fa4.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///de024f96-9b39-4373-b954-ac51e80b4fa4.pine?placement%3Ddialog",
+              "path": "/de024f96-9b39-4373-b954-ac51e80b4fa4.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected.",
+            "startLineNumber": 5,
+            "startColumn": 30,
+            "endLineNumber": 5,
+            "endColumn": 36
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,356.00\nH\n85,356.00\nL\n85,355.99\nC\n85,356.00\n0.00 (0.00%)\n85,355.99\nSELL\n0.01\n85,356.00\nBUY\nUSDT\nOracle na holes crosses v1\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:16:10 UTC\n99+\nPine Editor\nsort-v56-815-exact-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=5\nindicator(\"Unsupported\u00a0array\u00a0sort_indices\u00a0bool\u00a0namespace\")\nvalues\u00a0=\u00a0array.new_bool()\nvalues.push(true)\nindices\u00a0=\u00a0array.sort_indices(values)\nplot(close)\n2 of 2 problems\nVersion 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.(PINE_VERSION_OUTDATED)\n1 \u2219 Today, 23:16\nLine 1, Col 3\nPine Script\u00ae v5\nCompilation error\nCompilation error\n\nCannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected.\n\nOpen in editor",
+        "context_substituted_message": "Cannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "Oracle na holes crosses v1",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24628,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24939,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/sort-v56-815-exact-v5-v1-attempt1-error.png",
+      "captures/v10/evidence/sort-v56-815-exact-v5-v1-attempt1-error.txt",
+      "captures/v10/evidence/sort-v56-815-exact-v5-v1-attempt1-logs.txt",
+      "captures/v10/evidence/sort-v56-815-exact-v5-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/sort-v56-815-exact-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///de024f96-9b39-4373-b954-ac51e80b4fa4.pine?placement%3Ddialog",
+          "path": "/de024f96-9b39-4373-b954-ac51e80b4fa4.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///de024f96-9b39-4373-b954-ac51e80b4fa4.pine?placement%3Ddialog",
+          "path": "/de024f96-9b39-4373-b954-ac51e80b4fa4.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Cannot call 'array.sort_indices' with argument 'id'='values'. An argument of 'array<bool>' type was used but a 'array<float>' is expected.",
+        "startLineNumber": 5,
+        "startColumn": 30,
+        "endLineNumber": 5,
+        "endColumn": 36
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:16:12.442Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/sort-v56-815-exact-v5-v1-attempt1-logs.txt",
+        "evidence/sort-v56-815-exact-v5-v1-attempt1-logs-v1.json",
+        "evidence/sort-v56-815-exact-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:16:21.215Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "sort-v56-977-exact-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "08ba449094ca10e33c5a6060132cc4c0e670c99c65786353a2ff17b64fbf97cf",
+    "indicator_title": "Unsupported array sort box",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Cannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.",
+      "line": 5,
+      "column": 12,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.",
+        "editorError": {
+          "end": {
+            "column": 17,
+            "line": 5
+          },
+          "message": "Cannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.",
+          "start": {
+            "column": 12,
+            "line": 5
+          },
+          "id": "USER;ffa169009c2743b7ae79671dbcc74cd4"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine?placement%3Ddialog",
+              "path": "/40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine?placement%3Ddialog",
+              "path": "/40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Cannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.",
+            "startLineNumber": 5,
+            "startColumn": 12,
+            "endLineNumber": 5,
+            "endColumn": 18
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,356.00\nH\n85,356.00\nL\n85,355.99\nC\n85,355.99\n\u22120.01 (\u22120.00%)\n85,355.99\nSELL\n0.01\n85,356.00\nBUY\nUSDT\nsort-v56-977-exact-v5-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:16:23 UTC\n99+\nPine Editor\nsort-v56-977-exact-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n//@version=5\nindicator(\"Unsupported\u00a0array\u00a0sort\u00a0box\")\nvalues\u00a0=\u00a0array.new_box()\nvalues.push(box.new(bar_index,\u00a0high,\u00a0bar_index\u00a0+\u00a01,\u00a0low))\narray.sort(values)\nplot(close)\n1 of 2 problems\nCannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.\n1 \u2219 Today, 23:16\nLine 5, Col 12\nPine Script\u00ae v5\nCompilation error\n\nCannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "sort-v56-977-exact-v5-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24628,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24939,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/sort-v56-977-exact-v5-v1-attempt1-error.png",
+      "captures/v10/evidence/sort-v56-977-exact-v5-v1-attempt1-error.txt",
+      "captures/v10/evidence/sort-v56-977-exact-v5-v1-attempt1-logs.txt",
+      "captures/v10/evidence/sort-v56-977-exact-v5-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/sort-v56-977-exact-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine?placement%3Ddialog",
+          "path": "/40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine?placement%3Ddialog",
+          "path": "/40756a17-0dda-4bf3-ae31-fd4c8f3900fb.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Cannot call 'array.sort' with argument 'id'='values'. An argument of 'array<box>' type was used but a 'array<float>' is expected.",
+        "startLineNumber": 5,
+        "startColumn": 12,
+        "endLineNumber": 5,
+        "endColumn": 18
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:16:24.998Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/sort-v56-977-exact-v5-v1-attempt1-logs.txt",
+        "evidence/sort-v56-977-exact-v5-v1-attempt1-logs-v1.json",
+        "evidence/sort-v56-977-exact-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:16:34.220Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "sort-v56-1676-exact-v5-v1.pine",
+    "attempt": 1,
+    "source_sha256": "691a3257f554680771afa786fb1d95c870ff49c1a2ffc6deba9a53acc7e85922",
+    "indicator_title": "Unsupported array sort polyline namespace",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": null,
+      "text": "Could not find function or function reference 'array.new_polyline'",
+      "line": 3,
+      "column": 10,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Could not find function or function reference 'array.new_polyline'",
+        "editorError": {
+          "end": {
+            "column": 27,
+            "line": 3
+          },
+          "message": "Could not find function or function reference 'array.new_polyline'",
+          "start": {
+            "column": 10,
+            "line": 3
+          },
+          "id": "USER;1111e243d7aa45288c202d0fb98462ff"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///f28b2f4e-d1ea-428a-90d6-47368e48d172.pine?placement%3Ddialog",
+              "path": "/f28b2f4e-d1ea-428a-90d6-47368e48d172.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "PINE_VERSION_OUTDATED",
+            "severity": 4,
+            "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+            "startLineNumber": 1,
+            "startColumn": 3,
+            "endLineNumber": 1,
+            "endColumn": 12
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///f28b2f4e-d1ea-428a-90d6-47368e48d172.pine?placement%3Ddialog",
+              "path": "/f28b2f4e-d1ea-428a-90d6-47368e48d172.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "severity": 8,
+            "message": "Could not find function or function reference 'array.new_polyline'",
+            "startLineNumber": 3,
+            "startColumn": 10,
+            "endLineNumber": 3,
+            "endColumn": 28
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,356.00\nH\n85,356.00\nL\n85,355.99\nC\n85,355.99\n\u22120.01 (\u22120.00%)\n85,355.99\nSELL\n0.01\n85,356.00\nBUY\nUSDT\nsort-v56-1676-exact-v5-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:16:36 UTC\n99+\nPine Editor\nsort-v56-1676-exact-v5-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n//@version=5\nindicator(\"Unsupported\u00a0array\u00a0sort\u00a0polyline\u00a0namespace\")\nvalues\u00a0=\u00a0array.new_polyline(0)\narray.sort(values)\nplot(close)\n1 of 2 problems\nCould not find function or function reference 'array.new_polyline'\n1 \u2219 Today, 23:16\nLine 3, Col 10\nPine Script\u00ae v5\nCompilation error\n\nCould not find function or function reference 'array.new_polyline'\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Could not find function or function reference 'array.new_polyline'"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "sort-v56-1676-exact-v5-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24628,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24939,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/sort-v56-1676-exact-v5-v1-attempt1-error.png",
+      "captures/v10/evidence/sort-v56-1676-exact-v5-v1-attempt1-error.txt",
+      "captures/v10/evidence/sort-v56-1676-exact-v5-v1-attempt1-logs.txt",
+      "captures/v10/evidence/sort-v56-1676-exact-v5-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/sort-v56-1676-exact-v5-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f28b2f4e-d1ea-428a-90d6-47368e48d172.pine?placement%3Ddialog",
+          "path": "/f28b2f4e-d1ea-428a-90d6-47368e48d172.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "PINE_VERSION_OUTDATED",
+        "severity": 4,
+        "message": "Version 5 of Pine Script\u00ae is outdated. We recommend using the current version, which is 6.",
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 12
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///f28b2f4e-d1ea-428a-90d6-47368e48d172.pine?placement%3Ddialog",
+          "path": "/f28b2f4e-d1ea-428a-90d6-47368e48d172.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "severity": 8,
+        "message": "Could not find function or function reference 'array.new_polyline'",
+        "startLineNumber": 3,
+        "startColumn": 10,
+        "endLineNumber": 3,
+        "endColumn": 28
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:16:37.857Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/sort-v56-1676-exact-v5-v1-attempt1-logs.txt",
+        "evidence/sort-v56-1676-exact-v5-v1-attempt1-logs-v1.json",
+        "evidence/sort-v56-1676-exact-v5-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:16:46.766Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "documented49-corpus-v7-258-exact-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "d36a0afcb55f15a1e94a3eeeedfcd917409506d3862be0d9cc7e42cd68fc43f1",
+    "indicator_title": "basics/const_namespaces",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10123",
+      "text": "Cannot call \"operator +\" with argument \"expr0\"=\"scale.left\". An argument of \"const scale_type\" type was used but a \"const string\"  is expected.",
+      "line": 5,
+      "column": 10,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+        "editorError": {
+          "code": "CE10123",
+          "ctx": {
+            "argDisplayName": "expr0",
+            "argUserFriendlyRepresentation": "scale.left",
+            "argumentType": "const scale_type",
+            "currentTypeDocStr": "const string",
+            "funId": "operator +",
+            "typePostfix": ""
+          },
+          "end": {
+            "column": 19,
+            "line": 5
+          },
+          "message": "Cannot call \"{funId}\" with argument \"{argDisplayName}\"=\"{argUserFriendlyRepresentation}\". An argument of \"{argumentType}\" type was used but a \"{currentTypeDocStr}\" {typePostfix} is expected.",
+          "start": {
+            "column": 10,
+            "line": 5
+          },
+          "id": "USER;884fee7b1f0942d58f9a7cef3b4880d4"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator +\" with argument \"expr0\"=\"scale.left\". An argument of \"const scale_type\" type was used but a \"const string\"  is expected.",
+            "startLineNumber": 5,
+            "startColumn": 10,
+            "endLineNumber": 5,
+            "endColumn": 20
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator +\" with argument \"expr1\"=\"scale.none\". An argument of \"const scale_type\" type was used but a \"const int\"  is expected.",
+            "startLineNumber": 5,
+            "startColumn": 29,
+            "endLineNumber": 5,
+            "endColumn": 39
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator +\" with argument \"expr0\"=\"backadjustment.inherit\". An argument of \"const backadjustment\" type was used but a \"const string\"  is expected.",
+            "startLineNumber": 9,
+            "startColumn": 10,
+            "endLineNumber": 9,
+            "endColumn": 32
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator +\" with argument \"expr1\"=\"backadjustment.on\". An argument of \"const backadjustment\" type was used but a \"const int\"  is expected.",
+            "startLineNumber": 9,
+            "startColumn": 41,
+            "endLineNumber": 9,
+            "endColumn": 58
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator +\" with argument \"expr0\"=\"settlement_as_close.off\". An argument of \"const settlement\" type was used but a \"const string\"  is expected.",
+            "startLineNumber": 10,
+            "startColumn": 10,
+            "endLineNumber": 10,
+            "endColumn": 33
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10123",
+            "severity": 8,
+            "message": "Cannot call \"operator +\" with argument \"expr1\"=\"settlement_as_close.on\". An argument of \"const settlement\" type was used but a \"const int\"  is expected.",
+            "startLineNumber": 10,
+            "startColumn": 42,
+            "endLineNumber": 10,
+            "endColumn": 64
+          },
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+              "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10068",
+            "severity": 8,
+            "message": "Invalid argument \"expr1\" in \"operator +\" call. Possible values: [text.format_none, text.format_bold, text.format_italic]",
+            "startLineNumber": 11,
+            "startColumn": 29,
+            "endLineNumber": 11,
+            "endColumn": 32
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,356.00\nH\n85,356.00\nL\n85,349.12\nC\n85,349.12\n\u22126.88 (\u22120.01%)\n85,349.12\nSELL\n0.01\n85,349.13\nBUY\nUSDT\ndocumented49-corpus-v7-258-exact-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:16:48 UTC\n99+\nPine Editor\ndocumented49-corpus-v7-258-exact-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n//@version=6\nindicator(\"basics/const_namespaces\")\n//\u00a0Skip\u00a0PineTS:\u00a0PineTS\u00a0does\u00a0not\u00a0model\u00a0these\u00a0constant\u00a0namespaces.\nlog.info(yloc.abovebar\u00a0+\u00a0\",\"\u00a0+\u00a0yloc.price)\nlog.info(scale.left\u00a0+\u00a0\",\"\u00a0+\u00a0scale.none)\nlog.info(font.family_default\u00a0+\u00a0\",\"\u00a0+\u00a0font.family_monospace)\nlog.info(splits.numerator\u00a0+\u00a0\",\"\u00a0+\u00a0splits.denominator)\nlog.info(adjustment.dividends\u00a0+\u00a0\",\"\u00a0+\u00a0adjustment.none)\nlog.info(backadjustment.inherit\u00a0+\u00a0\",\"\u00a0+\u00a0backadjustment.on)\nlog.info(settlement_as_close.off\u00a0+\u00a0\",\"\u00a0+\u00a0settlement_as_close.on)\nlog.info(text.format_bold\u00a0+\u00a0\",\"\u00a0+\u00a0text.format_none)\n//\u00a0Expected\u00a0output:\n//\u00a0abovebar,price\n//\u00a0left,none\n//\u00a0family_default,family_monospace\n//\u00a0numerator,denominator\n//\u00a0dividends,none\n//\u00a0inherit,on\n//\u00a0off,on\n//\u00a0format_bold,format_none\n1 of 7 problems\nCannot call \"operator +\" with argument \"expr0\"=\"scale.left\". An argument of \"const scale_type\" type was used but a \"const string\" is expected.(CE10123)\n1 \u2219 Today, 23:16\nLine 5, Col 10\nPine Script\u00ae v6\nCompilation error: CE10123\n\nCannot call \"operator +\" with argument \"expr0\"=\"scale.left\". An argument of \"const scale_type\" type was used but a \"const string\" is expected.\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Cannot call \"operator +\" with argument \"expr0\"=\"scale.left\". An argument of \"const scale_type\" type was used but a \"const string\"  is expected."
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "documented49-corpus-v7-258-exact-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24628,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24939,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-error.png",
+      "captures/v10/evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-error.txt",
+      "captures/v10/evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator +\" with argument \"expr0\"=\"scale.left\". An argument of \"const scale_type\" type was used but a \"const string\"  is expected.",
+        "startLineNumber": 5,
+        "startColumn": 10,
+        "endLineNumber": 5,
+        "endColumn": 20
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator +\" with argument \"expr1\"=\"scale.none\". An argument of \"const scale_type\" type was used but a \"const int\"  is expected.",
+        "startLineNumber": 5,
+        "startColumn": 29,
+        "endLineNumber": 5,
+        "endColumn": 39
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator +\" with argument \"expr0\"=\"backadjustment.inherit\". An argument of \"const backadjustment\" type was used but a \"const string\"  is expected.",
+        "startLineNumber": 9,
+        "startColumn": 10,
+        "endLineNumber": 9,
+        "endColumn": 32
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator +\" with argument \"expr1\"=\"backadjustment.on\". An argument of \"const backadjustment\" type was used but a \"const int\"  is expected.",
+        "startLineNumber": 9,
+        "startColumn": 41,
+        "endLineNumber": 9,
+        "endColumn": 58
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator +\" with argument \"expr0\"=\"settlement_as_close.off\". An argument of \"const settlement\" type was used but a \"const string\"  is expected.",
+        "startLineNumber": 10,
+        "startColumn": 10,
+        "endLineNumber": 10,
+        "endColumn": 33
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10123",
+        "severity": 8,
+        "message": "Cannot call \"operator +\" with argument \"expr1\"=\"settlement_as_close.on\". An argument of \"const settlement\" type was used but a \"const int\"  is expected.",
+        "startLineNumber": 10,
+        "startColumn": 42,
+        "endLineNumber": 10,
+        "endColumn": 64
+      },
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///2b55441a-270f-4fd6-96e5-20e609a4687f.pine?placement%3Ddialog",
+          "path": "/2b55441a-270f-4fd6-96e5-20e609a4687f.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10068",
+        "severity": 8,
+        "message": "Invalid argument \"expr1\" in \"operator +\" call. Possible values: [text.format_none, text.format_bold, text.format_italic]",
+        "startLineNumber": 11,
+        "startColumn": 29,
+        "endLineNumber": 11,
+        "endColumn": 32
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:16:50.447Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-logs.txt",
+        "evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-logs-v1.json",
+        "evidence/documented49-corpus-v7-258-exact-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
+  },
+  {
+    "native_environment": {
+      "browser_utc": "2026-10-04T15:16:59.216Z",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "platform": "MacIntel",
+      "user_agent_data": {
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "platform": "",
+        "platformVersion": ""
+      },
+      "device_pixel_ratio": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "visual_viewport_scale": 1
+      },
+      "browser_zoom": "100% requested using actual Chrome Meta+0 shortcut before this v10 batch; visualViewport scale recorded independently.",
+      "tradingview_build": null,
+      "tradingview_script_urls": [
+        "https://static.tradingview.com/static/bundles/6458.61692daa70239732c9cc.js",
+        "https://static.tradingview.com/static/bundles/62571.cb3dfad0e5162d9efda8.js",
+        "https://static.tradingview.com/static/bundles/13712.d5cbae462cafe46ca0bf.js",
+        "https://static.tradingview.com/static/bundles/36915.8bcc8af0789944e383e9.js",
+        "https://static.tradingview.com/static/bundles/51771.fd1142d2d4b80eb80edc.js",
+        "https://static.tradingview.com/static/bundles/18969.ca128f407a2b91762687.js",
+        "https://static.tradingview.com/static/bundles/79303.43eff168e2693f34f99f.js",
+        "https://static.tradingview.com/static/bundles/10087.403ab9598cdf44e89542.js",
+        "https://static.tradingview.com/static/bundles/54252.7e3b770e8a7a79c91557.js",
+        "https://static.tradingview.com/static/bundles/83057.69a3112917a17404ec20.js",
+        "https://static.tradingview.com/static/bundles/4351.624c2ed5019db8eae1fe.js",
+        "https://static.tradingview.com/static/bundles/main_chart.fb4a7f6de787e13a7ab1.js"
+      ],
+      "build_limit": "If a build number is not exposed above, it remains UNKNOWN; native asset URLs are preserved, not re-labelled as a semantic release."
+    },
+    "script": "ledger-909-max-bars-back-10001-v6-v1.pine",
+    "attempt": 1,
+    "source_sha256": "fa1228c3f06d67b1eb5e0eb29f50d896467bff3d5c0b884ab2a53d958d03c1de",
+    "indicator_title": "Ledger 909 max_bars_back 10001",
+    "status": "COMPILE-ERROR",
+    "csv_file": null,
+    "original_download_filename": null,
+    "partial_csv_file": null,
+    "diagnostic": {
+      "code": "CE10041",
+      "text": "Invalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000",
+      "line": 3,
+      "column": 22,
+      "first_bar_index": null,
+      "first_bar_time_utc": null,
+      "native": {
+        "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+        "editorError": {
+          "code": "CE10041",
+          "ctx": {
+            "argument_name": "num",
+            "funId": "max_bars_back",
+            "max_value": 5000,
+            "min_value": 0,
+            "value": 10001
+          },
+          "end": {
+            "column": 26,
+            "line": 3
+          },
+          "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+          "start": {
+            "column": 22,
+            "line": 3
+          },
+          "id": "USER;5e7d2bbf6f2b4c1b90d66f92c0a83d1d"
+        },
+        "title": "Compilation error",
+        "compiler_markers": [
+          {
+            "resource": {
+              "$mid": 1,
+              "external": "file:///0eb577c6-7798-4398-b94e-bc39a78fd7b4.pine?placement%3Ddialog",
+              "path": "/0eb577c6-7798-4398-b94e-bc39a78fd7b4.pine",
+              "scheme": "file",
+              "query": "placement=dialog"
+            },
+            "owner": "_generated_diagnostic_collection_name_#0",
+            "code": "CE10041",
+            "severity": 8,
+            "message": "Invalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000",
+            "startLineNumber": 3,
+            "startColumn": 22,
+            "endLineNumber": 3,
+            "endColumn": 27
+          }
+        ],
+        "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,356.00\nH\n85,356.00\nL\n85,349.12\nC\n85,349.13\n\u22126.87 (\u22120.01%)\n85,349.12\nSELL\n0.01\n85,349.13\nBUY\nUSDT\nledger-909-max-bars-back-10001-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:17:01 UTC\n99+\nPine Editor\nledger-909-max-bars-back-10001-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"Ledger\u00a0909\u00a0max_bars_back\u00a010001\")\nmax_bars_back(close,\u00a010001)\nplot(close,\u00a0\"Close\u00a0control\")\n1 of 1 problem\nInvalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000(CE10041)\n1 \u2219 Today, 23:16\nLine 3, Col 22\nPine Script\u00ae v6\nCompilation error: CE10041\n\nInvalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+        "context_substituted_message": "Invalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000"
+      }
+    },
+    "setup": {
+      "tickerid": "BINANCE:BTCUSDT",
+      "timeframe": "2",
+      "chart_type": "standard candles",
+      "native_style": 1,
+      "timezone": "Etc/UTC",
+      "bar_replay": false,
+      "mintick": 0.01,
+      "defaults_confirmed": true,
+      "native_user_inputs": [],
+      "observed_indicator_title": "ledger-909-max-bars-back-10001-v6-v1.pine",
+      "dataset_start_utc": "2026-08-31T00:00:00.000Z",
+      "first_chart_bar": {
+        "index": -24628,
+        "value": [
+          1788134400,
+          77682,
+          77682.01,
+          77572,
+          77674.04,
+          51.86295
+        ]
+      },
+      "chart_bars": 24939,
+      "subscription": "pro_premium",
+      "native_end_of_data": true,
+      "exchange_timezone": "Etc/UTC",
+      "exchange_session": "24x7",
+      "currency": "USDT",
+      "chart_session": "regular",
+      "pine_index_basis": "UNKNOWN: native chart dataset order is recorded separately; no Pine index is inferred from CSV row number."
+    },
+    "reset_utc": null,
+    "live_candle_open_utc": null,
+    "export_utc": null,
+    "live_boundary_confirmed_unchanged": null,
+    "evidence_files": [
+      "captures/v10/evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-error.png",
+      "captures/v10/evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-error.txt",
+      "captures/v10/evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-logs.txt",
+      "captures/v10/evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-logs-v1.json",
+      "captures/v10/evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-logs.png"
+    ],
+    "notes": "Unchanged whole editor buffer verified; exact title checked on successful study; one active probe. No input/style changes. Native chart OHLC/start is separate from unobserved Pine execution index.",
+    "independent_page_reload_utc": null,
+    "source_identity_verified": true,
+    "reset_native_observations": null,
+    "native_editor_markers": [
+      {
+        "resource": {
+          "$mid": 1,
+          "external": "file:///0eb577c6-7798-4398-b94e-bc39a78fd7b4.pine?placement%3Ddialog",
+          "path": "/0eb577c6-7798-4398-b94e-bc39a78fd7b4.pine",
+          "scheme": "file",
+          "query": "placement=dialog"
+        },
+        "owner": "_generated_diagnostic_collection_name_#0",
+        "code": "CE10041",
+        "severity": 8,
+        "message": "Invalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000",
+        "startLineNumber": 3,
+        "startColumn": 22,
+        "endLineNumber": 3,
+        "endColumn": 27
+      }
+    ],
+    "error_observed_utc": "2026-10-04T15:17:02.871Z",
+    "pine_logs": {
+      "paths": [
+        "evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-logs.txt",
+        "evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-logs-v1.json",
+        "evidence/ledger-909-max-bars-back-10001-v6-v1-attempt1-logs.png"
+      ],
+      "entries": 0
+    }
   }
 ]

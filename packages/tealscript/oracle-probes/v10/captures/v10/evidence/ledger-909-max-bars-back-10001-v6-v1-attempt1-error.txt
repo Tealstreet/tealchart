@@ -1,0 +1,46 @@
+Invalid value "10001" for "num" parameter of the "max_bars_back()" function. It must be between 0 and 5000
+{
+  "error": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+  "editorError": {
+    "code": "CE10041",
+    "ctx": {
+      "argument_name": "num",
+      "funId": "max_bars_back",
+      "max_value": 5000,
+      "min_value": 0,
+      "value": 10001
+    },
+    "end": {
+      "column": 26,
+      "line": 3
+    },
+    "message": "Invalid value \"{value}\" for \"{argument_name}\" parameter of the \"{funId}()\" function. It must be between {min_value} and {max_value}",
+    "start": {
+      "column": 22,
+      "line": 3
+    },
+    "id": "USER;5e7d2bbf6f2b4c1b90d66f92c0a83d1d"
+  },
+  "title": "Compilation error",
+  "compiler_markers": [
+    {
+      "resource": {
+        "$mid": 1,
+        "external": "file:///0eb577c6-7798-4398-b94e-bc39a78fd7b4.pine?placement%3Ddialog",
+        "path": "/0eb577c6-7798-4398-b94e-bc39a78fd7b4.pine",
+        "scheme": "file",
+        "query": "placement=dialog"
+      },
+      "owner": "_generated_diagnostic_collection_name_#0",
+      "code": "CE10041",
+      "severity": 8,
+      "message": "Invalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000",
+      "startLineNumber": 3,
+      "startColumn": 22,
+      "endLineNumber": 3,
+      "endColumn": 27
+    }
+  ],
+  "rendered_ui_text": "11\nBTCUSDT\n3m\n5m\n15m\n30m\n45m\n1h\n2h\n3h\n4h\n8h\n10h\n12h\nD\n3D\n10D\nW\nM\n2m\nbasic\nSave\nTrade\nB\nBitcoin / TetherUS\n2\nBinance\nO\n85,356.00\nH\n85,356.00\nL\n85,349.12\nC\n85,349.13\n−6.87 (−0.01%)\n85,349.12\nSELL\n0.01\n85,349.13\nBUY\nUSDT\nledger-909-max-bars-back-10001-v6-v1.pine\n1D\n5D\n1M\n3M\n6M\nYTD\n1Y\n5Y\nAll\n15:17:01 UTC\n99+\nPine Editor\nledger-909-max-bars-back-10001-v6-v1.pine\nPublish script\n1\n2\n3\n4\n5\n//@version=6\nindicator(\"Ledger 909 max_bars_back 10001\")\nmax_bars_back(close, 10001)\nplot(close, \"Close control\")\n1 of 1 problem\nInvalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000(CE10041)\n1 ∙ Today, 23:16\nLine 3, Col 22\nPine Script® v6\nCompilation error: CE10041\n\nInvalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000\n\nOpen in editor\nOpened in Pine Editor\n\nThe source code is currently open in Pine Editor.\n\nGo there now",
+  "context_substituted_message": "Invalid value \"10001\" for \"num\" parameter of the \"max_bars_back()\" function. It must be between 0 and 5000"
+}

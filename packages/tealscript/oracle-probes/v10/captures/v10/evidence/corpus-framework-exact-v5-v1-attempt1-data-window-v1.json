@@ -1,0 +1,26 @@
+{
+  "index": 298,
+  "bar": [
+    1791125520,
+    85163.46,
+    85222.54,
+    85163.45,
+    85222.53,
+    4.23697
+  ],
+  "source_row": null,
+  "browser_utc": "2026-10-04T14:55:19.431Z",
+  "title": "Unit Testing Framework",
+  "timezone": "Etc/UTC",
+  "subscription": "pro_premium",
+  "crosshair_label": "Sun 04 Oct '26   14:52",
+  "visible_range": {
+    "_firstBar": 263,
+    "_lastBar": 301
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 2
+  }
+}

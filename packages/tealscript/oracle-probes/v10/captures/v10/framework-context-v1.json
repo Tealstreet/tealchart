@@ -1,0 +1,31 @@
+{
+  "artifact": "Framework context v1",
+  "source": "corpus-framework-exact-v5-v1.pine",
+  "source_sha256": "02b9dcd04cd5ea2990297dd7d216f00f294ed2fa7c745489a58a0bd8492c82ce",
+  "attempt": 1,
+  "native_report": "framework-test-report-v1.txt",
+  "native_suites": {
+    "passed": 5,
+    "failed": 2,
+    "skipped": 1,
+    "total": 8
+  },
+  "native_tests": {
+    "passed": 57,
+    "failed": 2,
+    "skipped": 2,
+    "total": 61
+  },
+  "source_demonstration_failures": [
+    {
+      "line": 309,
+      "source": "_it(\"this test is failed\", true, false)"
+    },
+    {
+      "line": 315,
+      "source": "_it(\"this test is failed\", true, false)"
+    }
+  ],
+  "native_report_completed": "Whole report label contains every61test status, preserved as native text and unmodified PNG using a separate2000x3000,DPR2 viewport; default1440x900 restored. No numeric plot exists or was added; CSV contains native host OHLC only.",
+  "limitations": "Native framework demonstration result, not local engine result or all-pass claim; datatype array test statuses retained independently from intentional example failures."
+}
